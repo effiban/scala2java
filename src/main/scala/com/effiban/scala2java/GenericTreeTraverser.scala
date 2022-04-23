@@ -1,27 +1,16 @@
 package com.effiban.scala2java
 
+import com.effiban.scala2java.JavaEmitter._
+import com.effiban.scala2java.TraversalContext.javaOwnerContext
+
 import scala.meta.Defn.Trait
-import scala.meta.Mod.{Abstract, Annot, Final, Private, Protected, Sealed, ValParam}
+import scala.meta.Mod.{Abstract, Annot, Final, Private, Protected, Sealed}
 import scala.meta.Name.Indeterminate
 import scala.meta.Pat.{Alternative, Bind}
 import scala.meta.Term.{AnonymousFunction, Apply, ApplyType, ApplyUnary, Ascribe, Assign, Block, Do, Eta, For, ForYield, If, New, NewAnonymous, Param, Return, Select, Super, This, Throw, Try, TryWithHandler, While}
 import scala.meta.{Case, Ctor, Decl, Defn, Enumerator, Import, Importee, Importer, Init, Lit, Mod, Name, Pat, Pkg, Source, Stat, Template, Term, Tree, Type}
 
-object Scala2JavaTraverser {
-
-  import JavaEmitter._
-
-  private sealed trait JavaOwnerContext
-
-  private case object Class extends JavaOwnerContext
-
-  private case object Interface extends JavaOwnerContext
-
-  private case object Method extends JavaOwnerContext
-
-  private case object Lambda extends JavaOwnerContext
-
-  private case object NoOwner extends JavaOwnerContext
+object GenericTreeTraverser extends ScalaTreeTraverser[Tree] {
 
   private final val ScalaModTypeToJavaModifierName: Map[Class[_ <: Mod], String] = Map(
     classOf[Private] -> "private",
@@ -61,25 +50,23 @@ object Scala2JavaTraverser {
 
   private val JavaPlaceholder = "__"
 
-  private var javaOwnerContext: JavaOwnerContext = NoOwner
+  override def traverse(tree: Tree): Unit = tree match {
+    case source: Source => SourceTraverser.traverse(source)
 
-  def traverse(tree: Tree): Unit = tree match {
-    case source: Source => traverse(source)
+    case pkg: Pkg => PkgTraverser.traverse(pkg)
 
-    case `package`: Pkg => traverse(`package`)
+    case valDecl: Decl.Val => DeclValTraverser.traverse(valDecl)
+    case varDecl: Decl.Var => DeclVarTraverser.traverse(varDecl)
+    case defDecl: Decl.Def => DeclDefTraverser.traverse(defDecl)
+    case typeDecl: Decl.Type => DeclTypeTraverser.traverse(typeDecl)
 
-    case valDecl: Decl.Val => traverse(valDecl)
-    case varDecl: Decl.Var => traverse(varDecl)
-    case defDecl: Decl.Def => traverse(defDecl)
-    case typeDecl: Decl.Type => traverse(typeDecl)
-
-    case valDef: Defn.Val => traverse(valDef)
-    case varDef: Defn.Var => traverse(varDef)
-    case defDef: Defn.Def => traverse(defDef)
-    case typeDef: Defn.Type => traverse(typeDef)
-    case classDef: Defn.Class => traverse(classDef)
-    case traitDef: Trait => traverse(traitDef)
-    case objectDef: Defn.Object => traverse(objectDef)
+    case valDef: Defn.Val => DefnValTraverser.traverse(valDef)
+    case varDef: Defn.Var => DefnVarTraverser.traverse(varDef)
+    case defDef: Defn.Def => DefnDefTraverser.traverse(defDef)
+    case typeDef: Defn.Type => DefnTypeTraverser.traverse(typeDef)
+    case classDef: Defn.Class => ClassTraverser.traverse(classDef)
+    case traitDef: Trait => TraitTraverser.traverse(traitDef)
+    case objectDef: Defn.Object => ObjectTraverser.traverse(objectDef)
 
     case `this`: This => traverse(`this`)
     case `super`: Super => traverse(`super`)
@@ -165,236 +152,19 @@ object Scala2JavaTraverser {
 
     case init: Init => traverse(init)
 
-    case _ => emitComment(s"UNPARSEABLE: $tree")
+    case _ => emitComment(s"UNRECOGNIZED: $tree")
   }
 
   ////////////// TREE TRAVERSERS /////////////////
 
-  private def traverse(source: Source): Unit = {
-    source.stats.foreach(traverse)
-  }
-
-  private def traverse(pkg: Pkg): Unit = {
-    emit("package ")
-    traverse(pkg.ref)
-    emitStatementEnd()
-    emitLine()
-    pkg.stats.foreach(traverse)
-  }
-
-
-  private def traverse(valDecl: Decl.Val): Unit = {
-    val annotationsOnSameLine = valDecl.mods.exists(_.isInstanceOf[ValParam])
-    traverseAnnotations(valDecl.mods.collect { case ann: Annot => ann }, annotationsOnSameLine)
-    val mods = valDecl.mods :+ Final()
-    val modifierNames = javaOwnerContext match {
-      case Class => resolveJavaClassDataMemberExplicitModifiers(mods)
-      case _ if javaOwnerContext == Interface => Nil
-      // The only possible modifier for a local var is 'final'
-      case Method => resolveJavaExplicitModifiers(mods, List(classOf[Final]))
-      case _ => Nil
-    }
-    emitModifiers(modifierNames)
-    traverse(valDecl.decltpe)
-    emit(" ")
-    valDecl.pats.foreach(traverse)
-  }
-
-  private def traverse(varDecl: Decl.Var): Unit = {
-    val annotationsOnSameLine = varDecl.mods.exists(_.isInstanceOf[ValParam])
-    traverseAnnotations(varDecl.mods.collect { case ann: Annot => ann }, annotationsOnSameLine)
-    val modifierNames = javaOwnerContext match {
-      case Class => resolveJavaClassDataMemberExplicitModifiers(varDecl.mods)
-      case _ => Nil
-    }
-    emitModifiers(modifierNames)
-    traverse(varDecl.decltpe)
-    emit(" ")
-    varDecl.pats.foreach(traverse)
-  }
-
-  private def traverse(defDecl: Decl.Def): Unit = {
-    emitLine()
-    traverseAnnotations(defDecl.mods.collect { case ann: Annot => ann })
-    val resolvedModifierNames = javaOwnerContext match {
-      case Interface => resolveJavaInterfaceMethodExplicitModifiers(defDecl.mods, hasBody = false)
-      case Class => resolveJavaClassMethodExplicitModifiers(defDecl.mods)
-      case _ => Nil
-    }
-    emitModifiers(resolvedModifierNames)
-    traverse(defDecl.decltpe)
-    emit(s" ${toJavaName(defDecl.name)}")
-    // TODO handle method type params
-
-    val outerJavaOwnerContext = javaOwnerContext
-    javaOwnerContext = Method
-    traverseMethodParams(defDecl)
-    javaOwnerContext = outerJavaOwnerContext
-  }
-
-  // Scala type declaration : Closest thing in Java is an empty interface with same params
-  private def traverse(typeDecl: Decl.Type): Unit = {
-    emitTypeDeclaration(modifiers = resolveJavaInterfaceExplicitModifiers(typeDecl.mods),
-      typeKeyword = "interface",
-      name = typeDecl.name.toString)
-    traverseGenericTypeList(typeDecl.tparams)
-    // TODO handle bounds properly
-  }
-
-
-  private def traverse(valDef: Defn.Val): Unit = {
-    val annotationsOnSameLine = valDef.mods.exists(_.isInstanceOf[ValParam])
-    traverseAnnotations(valDef.mods.collect { case ann: Annot => ann }, annotationsOnSameLine)
-    val mods = valDef.mods :+ Final()
-    val modifierNames = mods match {
-      case modifiers if javaOwnerContext == Class => resolveJavaClassDataMemberExplicitModifiers(modifiers)
-      case _ if javaOwnerContext == Interface => Nil
-      // The only possible modifier for a method param or local var is 'final' (if it's immutable as determined above)
-      case modifiers if javaOwnerContext == Method => resolveJavaExplicitModifiers(modifiers, List(classOf[Final]))
-      case _ => Nil
-    }
-    emitModifiers(modifierNames)
-    valDef.decltpe match {
-      case Some(declType) =>
-        traverse(declType)
-        emit(" ")
-      case None if javaOwnerContext == Method => emit("var ")
-      case _ =>
-    }
-    valDef.pats.foreach(traverse)
-    emit(" = ")
-    traverse(valDef.rhs)
-  }
-
-  private def traverse(varDef: Defn.Var): Unit = {
-    val annotationsOnSameLine = varDef.mods.exists(_.isInstanceOf[ValParam])
-    traverseAnnotations(varDef.mods.collect { case ann: Annot => ann }, annotationsOnSameLine)
-    val modifierNames = varDef.mods match {
-      case modifiers if javaOwnerContext == Class => resolveJavaClassDataMemberExplicitModifiers(modifiers)
-      case _ => Nil
-    }
-    emitModifiers(modifierNames)
-    varDef.decltpe match {
-      case Some(declType) =>
-        traverse(declType)
-        emit(" ")
-      case None if javaOwnerContext == Method => emit("var ")
-      case _ =>
-    }
-    varDef.pats.foreach(traverse)
-    varDef.rhs.foreach { rhs =>
-      emit(" = ")
-      traverse(rhs)
-    }
-  }
-
-  private def traverse(defDef: Defn.Def): Unit = {
-    emitLine()
-    traverseAnnotations(defDef.mods.collect { case ann: Annot => ann })
-    val resolvedModifierNames = javaOwnerContext match {
-      case Interface => resolveJavaInterfaceMethodExplicitModifiers(defDef.mods, hasBody = true)
-      case Class => resolveJavaClassMethodExplicitModifiers(defDef.mods)
-      case _ => Nil
-    }
-    emitModifiers(resolvedModifierNames)
-    defDef.decltpe.foreach(traverse)
-    emit(s" ${toJavaName(defDef.name)}")
-    // TODO handle method type params
-
-    val outerJavaOwnerContext = javaOwnerContext
-    javaOwnerContext = Method
-    traverseMethodParamsAndBody(defDef)
-    javaOwnerContext = outerJavaOwnerContext
-  }
-
-  // Scala type definition : Closest thing in Java is an empty interface extending the same RHS
-  private def traverse(typeDef: Defn.Type): Unit = {
-    emitTypeDeclaration(modifiers = resolveJavaInterfaceExplicitModifiers(typeDef.mods),
-      typeKeyword = "interface",
-      name = typeDef.name.toString)
-    traverseGenericTypeList(typeDef.tparams)
-    emit(" extends ") // TODO handle bounds properly
-    val outerJavaOwnerContext = javaOwnerContext
-    javaOwnerContext = Interface
-    traverse(typeDef.body)
-    javaOwnerContext = outerJavaOwnerContext
-  }
-
-  private def traverse(classDef: Defn.Class): Unit = {
-    emitLine()
-    val annotations = classDef.mods
-      .filter(_.isInstanceOf[Annot])
-      .map(_.asInstanceOf[Annot])
-    traverseAnnotations(annotations)
-
-    if (classDef.mods.exists(_.isInstanceOf[Mod.Case])) {
-      traverseCaseClassDef(classDef)
-    } else {
-      traverseRegularClassDef(classDef)
-    }
-  }
-
-  private def traverseCaseClassDef(classDef: Defn.Class): Unit = {
-    emitTypeDeclaration(modifiers = resolveJavaClassExplicitModifiers(classDef.mods),
-      typeKeyword = "record",
-      name = classDef.name.toString)
-    // TODO - traverse type params
-    emitParametersStart()
-    traverse(classDef.ctor.paramss.flatten)
-    emitParametersEnd()
-    val outerJavaOwnerContext = javaOwnerContext
-    javaOwnerContext = Class
-    traverse(classDef.templ)
-    javaOwnerContext = outerJavaOwnerContext
-  }
-
-  private def traverseRegularClassDef(classDef: Defn.Class): Unit = {
-    emitTypeDeclaration(modifiers = resolveJavaClassExplicitModifiers(classDef.mods),
-      typeKeyword = "class",
-      name = classDef.name.toString)
-    // TODO - traverse type params
-
-    val outerJavaOwnerContext = javaOwnerContext
-    javaOwnerContext = Class
-    traverseTemplate(template = classDef.templ,
-      maybeExplicitPrimaryCtor = Some(classDef.ctor),
-      maybeClassName = Some(classDef.name))
-    javaOwnerContext = outerJavaOwnerContext
-  }
-
-  private def traverse(traitDef: Trait): Unit = {
-    emitTypeDeclaration(modifiers = resolveJavaInterfaceExplicitModifiers(traitDef.mods),
-      typeKeyword = "interface",
-      name = traitDef.name.toString)
-    // TODO - traverse type params
-    val outerJavaOwnerContext = javaOwnerContext
-    javaOwnerContext = Interface
-    traverse(traitDef.templ)
-    javaOwnerContext = outerJavaOwnerContext
-  }
-
-  private def traverse(objectDef: Defn.Object): Unit = {
-    emitLine()
-    emitComment("originally a Scala object")
-    emitLine()
-    emitTypeDeclaration(modifiers = resolveJavaClassExplicitModifiers(objectDef.mods),
-      typeKeyword = "class",
-      name = s"${objectDef.name.toString}")
-    val outerJavaOwnerContext = javaOwnerContext
-    javaOwnerContext = Class
-    traverse(objectDef.templ)
-    javaOwnerContext = outerJavaOwnerContext
-  }
-
-
-  private def traverse(`this`: This): Unit = {
+  def traverse(`this`: This): Unit = {
     `this`.qual match {
       case Name.Anonymous() => emit("this")
       case name => traverse(name)
     }
   }
 
-  private def traverse(`super`: Super): Unit = {
+  def traverse(`super`: Super): Unit = {
     `super`.thisp match {
       case Name.Anonymous() =>
       case name =>
@@ -407,12 +177,12 @@ object Scala2JavaTraverser {
     }
   }
 
-  private def traverse(name: Term.Name): Unit = {
+  def traverse(name: Term.Name): Unit = {
     emit(toJavaName(name))
   }
 
   // qualified name
-  private def traverse(termSelect: Term.Select): Unit = {
+  def traverse(termSelect: Term.Select): Unit = {
     val adjustedTermRef = termSelect match {
       case Select(Select(Term.Name("scala"), Term.Name("util")), name) => name
       case Select(Select(Term.Name("scala"), Term.Name("package")), name) => name
@@ -431,14 +201,14 @@ object Scala2JavaTraverser {
     }
   }
 
-  private def traverse(applyUnary: ApplyUnary): Unit = {
+  def traverse(applyUnary: ApplyUnary): Unit = {
     traverse(applyUnary.op)
     traverse(applyUnary.arg)
   }
 
 
   // method invocation
-  private def traverse(termApply: Term.Apply): Unit = {
+  def traverse(termApply: Term.Apply): Unit = {
     traverse(termApply.fun)
     emitParametersStart()
     traverse(termApply.args)
@@ -446,7 +216,7 @@ object Scala2JavaTraverser {
   }
 
   // parametrized type application, e.g.: classOf[X], identity[X], List[X]
-  private def traverse(termApplyType: ApplyType): Unit = {
+  def traverse(termApplyType: ApplyType): Unit = {
     termApplyType.fun match {
       case Term.Name("classOf") =>
         termApplyType.targs match {
@@ -465,7 +235,7 @@ object Scala2JavaTraverser {
   }
 
   // Infix method invocation, e.g.: a + b
-  private def traverse(termApplyInfix: Term.ApplyInfix): Unit = {
+  def traverse(termApplyInfix: Term.ApplyInfix): Unit = {
     traverse(termApplyInfix.lhs)
     emit(" ")
     traverse(termApplyInfix.op)
@@ -474,18 +244,18 @@ object Scala2JavaTraverser {
   }
 
   // Variable assignment
-  private def traverse(assign: Assign): Unit = {
+  def traverse(assign: Assign): Unit = {
     traverse(assign.lhs)
     emit(" = ")
     traverse(assign.rhs)
   }
 
-  private def traverse(`return`: Return): Unit = {
+  def traverse(`return`: Return): Unit = {
     emit("return ")
     traverse(`return`.expr)
   }
 
-  private def traverse(`throw`: Throw): Unit = {
+  def traverse(`throw`: Throw): Unit = {
     emit("throw ")
     traverse(`throw`.expr)
     emitStatementEnd()
@@ -493,7 +263,7 @@ object Scala2JavaTraverser {
 
   // Explicitly specified type, e.g.: x = 2:Short
   // Java equivalent is casting
-  private def traverse(ascribe: Ascribe): Unit = {
+  def traverse(ascribe: Ascribe): Unit = {
     emit("(")
     traverse(ascribe.tpe)
     emit(")")
@@ -502,7 +272,7 @@ object Scala2JavaTraverser {
 
   // Expression annotation, e.g.:  (x: @annot) match ....
   // Partially supported in Java, so it will be rendered if it is a Java annotation
-  private def traverse(termAnnotation: Term.Annotate): Unit = {
+  def traverse(termAnnotation: Term.Annotate): Unit = {
     emit("(")
     traverseAnnotations(termAnnotation.annots, onSameLine = true)
     traverse(termAnnotation.expr)
@@ -510,20 +280,20 @@ object Scala2JavaTraverser {
   }
 
   // Java supports tuples only in lambdas AFAIK, but the replacement is not obvious - so rendering it anyway
-  private def traverse(termTuple: Term.Tuple): Unit = {
+  def traverse(termTuple: Term.Tuple): Unit = {
     emit("(")
     traverse(termTuple.args)
     emit(")")
   }
 
   // block of code
-  private def traverse(block: Block): Unit = {
+  def traverse(block: Block): Unit = {
     emitBlockStart()
     traverseBlockContents(block)
     emitBlockEnd()
   }
 
-  private def traverse(`if`: If): Unit = {
+  def traverse(`if`: If): Unit = {
     // TODO handle mods (what is this in an 'if'?...)
     emit("if (")
     traverse(`if`.cond)
@@ -547,7 +317,7 @@ object Scala2JavaTraverser {
     }
   }
 
-  private def traverse(termMatch: Term.Match): Unit = {
+  def traverse(termMatch: Term.Match): Unit = {
     // TODO handle mods (what is this in a 'match'?...)
     emit("switch ")
     emit("(")
@@ -558,7 +328,7 @@ object Scala2JavaTraverser {
     emitBlockEnd()
   }
 
-  private def traverse(`try`: Try): Unit = {
+  def traverse(`try`: Try): Unit = {
     emit("try ")
     traverse(`try`.expr)
     `try`.catchp.foreach(traverseCatchClauseWithCase)
@@ -570,7 +340,7 @@ object Scala2JavaTraverser {
     })
   }
 
-  private def traverse(tryWithHandler: TryWithHandler): Unit = {
+  def traverse(tryWithHandler: TryWithHandler): Unit = {
     emit("try ")
     traverse(tryWithHandler.expr)
     traverseCatchClauseWithHandler(tryWithHandler.catchp)
@@ -583,7 +353,7 @@ object Scala2JavaTraverser {
   }
 
   // lambda definition
-  private def traverse(function: Term.Function): Unit = {
+  def traverse(function: Term.Function): Unit = {
     val outerJavaOwnerContext = javaOwnerContext
     javaOwnerContext = Lambda
     function.params match {
@@ -599,27 +369,27 @@ object Scala2JavaTraverser {
     javaOwnerContext = outerJavaOwnerContext
   }
 
-  private def traverse(partialFunction: Term.PartialFunction): Unit = {
+  def traverse(partialFunction: Term.PartialFunction): Unit = {
     val dummyArgName = "arg"
     emit(dummyArgName)
     emitArrow()
     traverse(Term.Match(expr = Term.Name(dummyArgName), cases = partialFunction.cases))
   }
 
-  private def traverse(anonymousFunction: AnonymousFunction): Unit = {
+  def traverse(anonymousFunction: AnonymousFunction): Unit = {
     traverse(Term.Function(
       params = List(Param(name = Term.Name(JavaPlaceholder), mods = Nil, decltpe = None, default = None)),
       body = anonymousFunction.body))
   }
 
-  private def traverse(`while`: While): Unit = {
+  def traverse(`while`: While): Unit = {
     emit("while (")
     traverse(`while`.expr)
     emit(") ")
     traverse(`while`.body)
   }
 
-  private def traverse(`do`: Do): Unit = {
+  def traverse(`do`: Do): Unit = {
     emit("do ")
     traverse(`do`.body)
     emit("while (")
@@ -627,43 +397,43 @@ object Scala2JavaTraverser {
     emit(")")
   }
 
-  private def traverse(`for`: For): Unit = {
+  def traverse(`for`: For): Unit = {
     traverseFor(`for`.enums, `for`.body)
   }
 
-  private def traverse(forYield: ForYield): Unit = {
+  def traverse(forYield: ForYield): Unit = {
     traverseFor(forYield.enums, forYield.body)
   }
 
-  private def traverse(`new`: New): Unit = {
+  def traverse(`new`: New): Unit = {
     emit("new ")
     traverse(`new`.init)
   }
 
-  private def traverse(newAnonymous: NewAnonymous): Unit = {
+  def traverse(newAnonymous: NewAnonymous): Unit = {
     emit("new ")
     traverse(newAnonymous.templ)
   }
 
   // Underscore as expression - won't compile in java directly unless it is an anonymous function
-  private def traverse(ignored: Term.Placeholder): Unit = {
+  def traverse(ignored: Term.Placeholder): Unit = {
     emit(JavaPlaceholder)
   }
 
   // Function expression with underscore, example:  func _
-  private def traverse(eta: Term.Eta): Unit = {
+  def traverse(eta: Term.Eta): Unit = {
     traverse(eta.expr)
     // TODO - see if can be improved
     emit(s" $JavaPlaceholder")
   }
 
   // Passing vararg expression, in Java probably nothing to change (?)
-  private def traverse(termRepeated: Term.Repeated): Unit = {
+  def traverse(termRepeated: Term.Repeated): Unit = {
     traverse(termRepeated.expr)
   }
 
   // method parameter declaration
-  private def traverse(termParam: Term.Param): Unit = {
+  def traverse(termParam: Term.Param): Unit = {
     traverseAnnotations(termParam.mods.collect { case ann: Annot => ann }, onSameLine = true)
     val mods = javaOwnerContext match {
       case Lambda => termParam.mods
@@ -678,7 +448,7 @@ object Scala2JavaTraverser {
     traverse(termParam.name)
   }
 
-  private def traverse(termInterpolate: Term.Interpolate): Unit = {
+  def traverse(termInterpolate: Term.Interpolate): Unit = {
     // Transform Scala string interpolation to Java String.format()
     termInterpolate.prefix match {
       case Term.Name("s") => traverse(toJavaStringFormatInvocation(termInterpolate.parts, termInterpolate.args))
@@ -686,82 +456,82 @@ object Scala2JavaTraverser {
     }
   }
 
-  private def traverse(termXml: Term.Xml): Unit = {
+  def traverse(termXml: Term.Xml): Unit = {
     // TODO
     emitComment(termXml.toString())
   }
 
 
-  private def traverse(name: Type.Name): Unit = {
+  def traverse(name: Type.Name): Unit = {
     emit(toJavaName(name))
   }
 
   // A scala type selecting expression like: a.B
-  private def traverse(typeSelect: Type.Select): Unit = {
+  def traverse(typeSelect: Type.Select): Unit = {
     traverse(typeSelect.qual)
     emit(".")
     traverse(typeSelect.name)
   }
 
   // A scala type projecting expression like: a#B
-  private def traverse(typeProject: Type.Project): Unit = {
+  def traverse(typeProject: Type.Project): Unit = {
     traverse(typeProject.qual)
     emit(".")
     traverse(typeProject.name)
   }
 
   // A scala expression representing the type of a singleton like: A.type
-  private def traverse(singletonType: Type.Singleton): Unit = {
+  def traverse(singletonType: Type.Singleton): Unit = {
     traverse(singletonType.ref)
     emit(".class")
   }
 
 
   // type with generic args, e.g. F[T]
-  private def traverse(typeApply: Type.Apply): Unit = {
+  def traverse(typeApply: Type.Apply): Unit = {
     traverse(typeApply.tpe)
     traverseGenericTypeList(typeApply.args)
   }
 
   // type with generic args in infix notation, e.g. K Map V
-  private def traverse(ignored: Type.ApplyInfix): Unit = {
+  def traverse(ignored: Type.ApplyInfix): Unit = {
     // TODO
   }
 
   // lambda type
-  private def traverse(functionType: Type.Function): Unit = {
+  def traverse(functionType: Type.Function): Unit = {
     traverse(Type.Apply(Type.Name("Function"), functionType.params :+ functionType.res))
   }
 
   //tuple as type, cannot be translated directly into Java
-  private def traverse(tupleType: Type.Tuple): Unit = {
+  def traverse(tupleType: Type.Tuple): Unit = {
     emitComment(tupleType.toString())
   }
 
   // type with parent, e.g.  A with B
   // approximated by Java "extends" but might not compile
-  private def traverse(typeWith: Type.With): Unit = {
+  def traverse(typeWith: Type.With): Unit = {
     traverse(typeWith.lhs)
     emit(" extends ")
     traverse(typeWith.rhs)
   }
 
   // A {def f: Int }
-  private def traverse(refinedType: Type.Refine): Unit = {
+  def traverse(refinedType: Type.Refine): Unit = {
     refinedType.tpe.foreach(traverse)
     // TODO try to convert to Java type with inheritance
     emitComment(s" ${refinedType.stats.toString()}")
   }
 
   // type with existential constraint e.g.:  A[B] forSome {B <: Number with Serializable}
-  private def traverse(existentialType: Type.Existential): Unit = {
+  def traverse(existentialType: Type.Existential): Unit = {
     traverse(existentialType.tpe)
     // TODO - convert to Java if there is one simple where clause
     emitComment(existentialType.stats.toString())
   }
 
   // type with annotation, e.g.: T @annot
-  private def traverse(annotatedType: Type.Annotate): Unit = {
+  def traverse(annotatedType: Type.Annotate): Unit = {
     traverseAnnotations(annotatedType.annots)
     emit(" ")
     traverse(annotatedType.tpe)
@@ -769,18 +539,18 @@ object Scala2JavaTraverser {
 
   // generic lambda type [T] => (T, T)
   // supported only in some dialects (?)
-  private def traverse(ignored: Type.Lambda): Unit = {
+  def traverse(ignored: Type.Lambda): Unit = {
     // TODO
   }
 
   // _ in T[_]
-  private def traverse(placeholderType: Type.Placeholder): Unit = {
+  def traverse(placeholderType: Type.Placeholder): Unit = {
     emit("?")
     traverse(placeholderType.bounds)
   }
 
   // Scala type bounds e.g. T[X <: Y]
-  private def traverse(typeBounds: Type.Bounds): Unit = {
+  def traverse(typeBounds: Type.Bounds): Unit = {
     // Only upper or lower bounds allowed in Java, not both - but if a Scala lower bound is `Null` it can be skipped
     (typeBounds.lo, typeBounds.hi) match {
       case (Some(lo), None) =>
@@ -795,25 +565,25 @@ object Scala2JavaTraverser {
   }
 
   // Type by name, e.g.: =>T in f(x: => T)
-  private def traverse(typeByName: Type.ByName): Unit = {
+  def traverse(typeByName: Type.ByName): Unit = {
     // Java Consumer is the closest I can find
     traverse(Type.Apply(Type.Name("Consumer"), List(typeByName.tpe)))
   }
 
   // Vararg type,e.g.: T*
-  private def traverse(repeatedType: Type.Repeated): Unit = {
+  def traverse(repeatedType: Type.Repeated): Unit = {
     traverse(repeatedType.tpe)
     emitEllipsis()
   }
 
   // Variable in type, e.g.: `t` in case _:List(t) =>
   // Unsupported in Java and no replacement
-  private def traverse(typeVar: Type.Var): Unit = {
+  def traverse(typeVar: Type.Var): Unit = {
     emitComment(typeVar.toString())
   }
 
   // Type param, e.g.: `T` in trait MyTrait[T]
-  private def traverse(typeParam: Type.Param): Unit = {
+  def traverse(typeParam: Type.Param): Unit = {
     // TODO handle mods
     traverse(typeParam.name)
     traverseGenericTypeList(typeParam.tparams)
@@ -822,7 +592,7 @@ object Scala2JavaTraverser {
   }
 
 
-  private def traverse(lit: Lit): Unit = {
+  def traverse(lit: Lit): Unit = {
     val strValue = lit.value match {
       case str: Lit.String => s"\"$str\""
       case Lit.Unit => ""
@@ -832,22 +602,22 @@ object Scala2JavaTraverser {
   }
 
   // Wildcard in pattern match expression - translates to Java "default" ?
-  private def traverse(ignored: Pat.Wildcard): Unit = {
+  def traverse(ignored: Pat.Wildcard): Unit = {
     emitComment("default")
   }
 
   // Vararg in pattern match expression, e.g. `_*` in case List(xs @ _*). Not translatable (?)
-  private def traverse(patternSeqWildcard: Pat.SeqWildcard): Unit = {
+  def traverse(patternSeqWildcard: Pat.SeqWildcard): Unit = {
     emitComment("_*")
   }
 
   // Pattern match variable, e.g. `a` in case a =>
-  private def traverse(patternVar: Pat.Var): Unit = {
+  def traverse(patternVar: Pat.Var): Unit = {
     traverse(patternVar.name)
   }
 
   // Pattern match bind variable, e.g.: a @ A()
-  private def traverse(patternBind: Bind): Unit = {
+  def traverse(patternBind: Bind): Unit = {
     // In Java (when supported) the order is reversed
     traverse(patternBind.rhs)
     emit(" ")
@@ -855,49 +625,49 @@ object Scala2JavaTraverser {
   }
 
   // Pattern match alternative, e.g. 2 | 3. In Java - separated by comma
-  private def traverse(patternAlternative: Alternative): Unit = {
+  def traverse(patternAlternative: Alternative): Unit = {
     traverse(patternAlternative.lhs)
     emit(", ")
     traverse(patternAlternative.rhs)
   }
 
   // Pattern match tuple expression, no Java equivalent
-  private def traverse(patternTuple: Pat.Tuple): Unit = {
+  def traverse(patternTuple: Pat.Tuple): Unit = {
     emitComment(s"(${patternTuple.args.toString()})")
   }
 
   // Pattern match extractor e.g. A(a, b).
   // No Java equivalent (but consider rewriting as a guard ?)
-  private def traverse(patternExtractor: Pat.Extract): Unit = {
+  def traverse(patternExtractor: Pat.Extract): Unit = {
     emitComment(s"${patternExtractor.fun}(${patternExtractor.args})")
   }
 
   // Pattern match extractor infix e.g. a E b.
   // No Java equivalent (but consider rewriting as a guard ?)
-  private def traverse(patternExtractorInfix: Pat.ExtractInfix): Unit = {
+  def traverse(patternExtractorInfix: Pat.ExtractInfix): Unit = {
     emitComment(s"${patternExtractorInfix.lhs} ${patternExtractorInfix.op} ${patternExtractorInfix.rhs}")
   }
 
   // Pattern interpolation e.g. r"Hello (.+)$name" , no Java equivalent
-  private def traverse(patternInterpolation: Pat.Interpolate): Unit = {
+  def traverse(patternInterpolation: Pat.Interpolate): Unit = {
     emitComment(patternInterpolation.toString())
   }
 
   // Pattern match xml
-  private def traverse(patternXml: Pat.Xml): Unit = {
+  def traverse(patternXml: Pat.Xml): Unit = {
     // TODO
     emitComment(patternXml.toString())
   }
 
   // Typed pattern expression. e.g. a: Int
-  private def traverse(typedPattern: Pat.Typed): Unit = {
+  def traverse(typedPattern: Pat.Typed): Unit = {
     traverse(typedPattern.rhs)
     emit(" ")
     traverse(typedPattern.lhs)
   }
 
 
-  private def traverse(`case`: Case): Unit = {
+  def traverse(`case`: Case): Unit = {
     emit("case ")
     traverse(`case`.pat)
     `case`.cond.foreach(cond => {
@@ -912,22 +682,22 @@ object Scala2JavaTraverser {
 
 
   // Type with no explicit name, by default should be left empty in Java (except special handling for `this` and `super`, see above)
-  private def traverse(anonymousName: Name.Anonymous): Unit = {
+  def traverse(anonymousName: Name.Anonymous): Unit = {
   }
 
   // Name that cannot be distinguished between a term and a type, so in Java we will just emit it unchanged (for example, in "import" statement)
-  private def traverse(indeterminateName: Name.Indeterminate): Unit = {
+  def traverse(indeterminateName: Name.Indeterminate): Unit = {
     emit(indeterminateName.value)
   }
 
-  private def traverse(`import`: Import): Unit = {
+  def traverse(`import`: Import): Unit = {
     `import`.importers match {
       case List() => emitComment("Invalid import with no inner importers")
       case importers => importers.foreach(traverse)
     }
   }
 
-  private def traverse(importer: Importer): Unit = {
+  def traverse(importer: Importer): Unit = {
     importer.ref match {
       case Select(Term.Name("scala"), _) =>
       case ref =>
@@ -941,7 +711,7 @@ object Scala2JavaTraverser {
     }
   }
 
-  private def traverse(importee: Importee): Unit = {
+  def traverse(importee: Importee): Unit = {
     importee match {
       case Importee.Name(name) => traverse(name)
       case Importee.Wildcard() => emit("*")
@@ -954,11 +724,11 @@ object Scala2JavaTraverser {
     }
   }
 
-  private def traverse(template: Template): Unit = {
+  def traverse(template: Template): Unit = {
     traverseTemplate(template, None, None)
   }
 
-  private def traverseTemplate(template: Template,
+  def traverseTemplate(template: Template,
                                maybeExplicitPrimaryCtor: Option[Ctor.Primary] = None,
                                maybeClassName: Option[Type.Name] = None): Unit = {
     traverseTemplateInits(template.inits)
@@ -969,12 +739,12 @@ object Scala2JavaTraverser {
     traverseTemplateBody(template.stats, maybeExplicitPrimaryCtor, maybeClassName)
   }
 
-  private def traverse(annotation: Annot): Unit = {
+  def traverse(annotation: Annot): Unit = {
     emit("@")
     traverse(annotation.init)
   }
 
-  private def traverse(init: Init): Unit = {
+  def traverse(init: Init): Unit = {
     traverse(init.tpe)
     init.name match {
       case Name.Anonymous() =>
@@ -1026,7 +796,7 @@ object Scala2JavaTraverser {
     traverseLastStatement(block.stats.last)
   }
 
-  private def traverseGenericTypeList(types: List[Tree]): Unit = {
+  def traverseGenericTypeList(types: List[Tree]): Unit = {
     if (types.nonEmpty) {
       emitTypeArgsStart()
       traverse(list = types, onSameLine = true)
@@ -1130,34 +900,7 @@ object Scala2JavaTraverser {
     javaOwnerContext = outerJavaOwnerContext
   }
 
-  private def traverseMethodParamsAndBody(defDef: Defn.Def): Unit = {
-    traverseMethodParams(defDef)
-    // method body
-    defDef.body match {
-      case block: Block => traverse(block)
-      case stmt: Stat =>
-        emitBlockStart()
-        traverseLastStatement(stmt)
-        emitBlockEnd()
-      case _ => emitStatementEnd()
-    }
-  }
-
-  private def traverseMethodParams(defDecl: Decl.Def): Unit = {
-    emitParametersStart()
-    val params = defDecl.paramss.flatten
-    traverse(params)
-    emitParametersEnd()
-  }
-
-  private def traverseMethodParams(defDef: Defn.Def): Unit = {
-    emitParametersStart()
-    val params = defDef.paramss.flatten
-    traverse(params)
-    emitParametersEnd()
-  }
-
-  private def traverseAnnotations(annotations: List[Annot], onSameLine: Boolean = false): Unit = {
+  def traverseAnnotations(annotations: List[Annot], onSameLine: Boolean = false): Unit = {
     annotations.foreach(annotation => {
       traverse(annotation)
       if (onSameLine) {
@@ -1168,7 +911,7 @@ object Scala2JavaTraverser {
     })
   }
 
-  private def traverse(list: List[_ <: Tree], onSameLine: Boolean = false): Unit = {
+  def traverse(list: List[_ <: Tree], onSameLine: Boolean = false): Unit = {
     list.zipWithIndex.foreach { case (tree, idx) =>
       traverse(tree)
       if (idx < list.size - 1) {
@@ -1180,7 +923,7 @@ object Scala2JavaTraverser {
     }
   }
 
-  private def traverseLastStatement(stmt: Stat): Unit = {
+  def traverseLastStatement(stmt: Stat): Unit = {
     emit("return ")
     traverse(stmt)
     emitStatementEnd()
@@ -1199,7 +942,7 @@ object Scala2JavaTraverser {
     Apply(Select(Term.Name("String"), Term.Name("format")), List(Lit.String(formatParts.mkString("%s"))) ++ interpolationArgs)
   }
 
-  private def resolveJavaClassExplicitModifiers(mods: List[Mod]): List[String] = {
+  def resolveJavaClassExplicitModifiers(mods: List[Mod]): List[String] = {
     val modifierNamesBuilder = List.newBuilder[String]
     if (!mods.exists(_.isInstanceOf[Private]) && !mods.exists(_.isInstanceOf[Protected])) {
       modifierNamesBuilder += "public"
@@ -1209,14 +952,14 @@ object Scala2JavaTraverser {
     modifierNamesBuilder.result()
   }
 
-  private def resolveJavaInterfaceExplicitModifiers(mods: List[Mod]): List[String] = {
+  def resolveJavaInterfaceExplicitModifiers(mods: List[Mod]): List[String] = {
     val modifierNamesBuilder = List.newBuilder[String]
     modifierNamesBuilder += "public"
     modifierNamesBuilder ++= resolveJavaExplicitModifiers(mods, List(classOf[Sealed]))
     modifierNamesBuilder.result()
   }
 
-  private def resolveJavaClassMethodExplicitModifiers(mods: List[Mod]): List[String] = {
+  def resolveJavaClassMethodExplicitModifiers(mods: List[Mod]): List[String] = {
     val modifierNamesBuilder = List.newBuilder[String]
     if (!mods.exists(_.isInstanceOf[Private]) && !mods.exists(_.isInstanceOf[Protected])) {
       modifierNamesBuilder += "public"
@@ -1226,7 +969,7 @@ object Scala2JavaTraverser {
     modifierNamesBuilder.result()
   }
 
-  private def resolveJavaInterfaceMethodExplicitModifiers(mods: List[Mod], hasBody: Boolean): List[String] = {
+  def resolveJavaInterfaceMethodExplicitModifiers(mods: List[Mod], hasBody: Boolean): List[String] = {
     val modifierNamesBuilder = List.newBuilder[String]
     if (!mods.exists(_.isInstanceOf[Private]) && hasBody) {
       modifierNamesBuilder += "default"
@@ -1235,7 +978,7 @@ object Scala2JavaTraverser {
     modifierNamesBuilder.result()
   }
 
-  private def resolveJavaClassDataMemberExplicitModifiers(mods: List[Mod]): List[String] = {
+  def resolveJavaClassDataMemberExplicitModifiers(mods: List[Mod]): List[String] = {
     val modifierNamesBuilder = List.newBuilder[String]
     if (!mods.exists(_.isInstanceOf[Private]) && !mods.exists(_.isInstanceOf[Protected])) {
       modifierNamesBuilder += "public"
@@ -1244,7 +987,7 @@ object Scala2JavaTraverser {
     modifierNamesBuilder.result()
   }
 
-  private def resolveJavaExplicitModifiers(inputMods: List[Mod], allowedMods: List[Class[_ <: Mod]]): List[String] = {
+  def resolveJavaExplicitModifiers(inputMods: List[Mod], allowedMods: List[Class[_ <: Mod]]): List[String] = {
     ScalaModTypeToJavaModifierName.filter { case (mod, _) => inputMods.exists(inputMod => mod.isAssignableFrom(inputMod.getClass)) }
       .filter { case (mod, _) => allowedMods.contains(mod) }
       .map { case (_, modifierName) => modifierName }
