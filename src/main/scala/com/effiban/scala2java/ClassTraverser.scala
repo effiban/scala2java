@@ -22,7 +22,7 @@ object ClassTraverser extends ScalaTreeTraverser[Defn.Class] {
     emitTypeDeclaration(modifiers = JavaModifiersResolver.resolveForClass(classDef.mods),
       typeKeyword = "record",
       name = classDef.name.toString)
-    // TODO - traverse type params
+    TypeParamListTraverser.traverse(classDef.tparams)
     TermParamListTraverser.traverse(classDef.ctor.paramss.flatten)
     val outerJavaOwnerContext = javaOwnerContext
     javaOwnerContext = Class
@@ -34,7 +34,7 @@ object ClassTraverser extends ScalaTreeTraverser[Defn.Class] {
     emitTypeDeclaration(modifiers = JavaModifiersResolver.resolveForClass(classDef.mods),
       typeKeyword = "class",
       name = classDef.name.toString)
-    // TODO - traverse type params
+    TypeParamListTraverser.traverse(classDef.tparams)
 
     val outerJavaOwnerContext = javaOwnerContext
     javaOwnerContext = Class

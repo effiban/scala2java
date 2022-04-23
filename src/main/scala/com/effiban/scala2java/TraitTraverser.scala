@@ -11,7 +11,7 @@ object TraitTraverser extends ScalaTreeTraverser[Trait] {
     emitTypeDeclaration(modifiers = JavaModifiersResolver.resolveForInterface(traitDef.mods),
       typeKeyword = "interface",
       name = traitDef.name.toString)
-    // TODO - traverse type params
+    TypeParamListTraverser.traverse(traitDef.tparams)
     val outerJavaOwnerContext = javaOwnerContext
     javaOwnerContext = Interface
     TemplateTraverser.traverse(traitDef.templ)
