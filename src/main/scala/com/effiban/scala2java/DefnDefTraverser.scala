@@ -19,6 +19,7 @@ object DefnDefTraverser extends ScalaTreeTraverser[Defn.Def] {
     }
     emitModifiers(resolvedModifierNames)
     defDef.decltpe.foreach(GenericTreeTraverser.traverse)
+    emit(" ")
     GenericTreeTraverser.traverse(defDef.name)
     // TODO handle method type params
 
