@@ -3,24 +3,25 @@ package com.effiban.scala2java
 import com.effiban.scala2java.JavaEmitter._
 import com.effiban.scala2java.TraversalContext.javaOwnerContext
 
+import scala.meta.Ctor.Secondary
 import scala.meta.Term.{Assign, Block, Select, This}
 import scala.meta.{Ctor, Decl, Defn, Init, Name, Stat, Template, Term, Type}
 
 object TemplateTraverser extends ScalaTreeTraverser[Template] {
 
   override def traverse(template: Template): Unit = {
-    traverseTemplate(template, None, None)
+    traverse(template, None)
   }
 
-  def traverseTemplate(template: Template,
-                       maybeExplicitPrimaryCtor: Option[Ctor.Primary] = None,
-                       maybeClassName: Option[Type.Name] = None): Unit = {
+  def traverse(template: Template,
+               maybeClassInfo: Option[ClassInfo] = None): Unit = {
     traverseTemplateInits(template.inits)
     template.self.decltpe.foreach(_ => {
       // TODO - consider translating the 'self' type into a Java parent
       emitComment(template.self.toString)
     })
-    traverseTemplateBody(template.stats, maybeExplicitPrimaryCtor, maybeClassName)
+    traverseTemplateBody(statements = template.stats,
+      maybeClassInfo = maybeClassInfo)
   }
 
   private def traverseTemplateInits(inits: List[Init]): Unit = {
@@ -41,15 +42,15 @@ object TemplateTraverser extends ScalaTreeTraverser[Template] {
   }
 
   private def traverseTemplateBody(statements: List[Stat],
-                                   maybeExplicitPrimaryCtor: Option[Ctor.Primary] = None,
-                                   maybeClassName: Option[Type.Name] = None): Unit = {
+                                   maybeClassInfo: Option[ClassInfo] = None): Unit = {
+    // Traversing in parts to fit Java conventions for order of members in a type
     emitBlockStart()
     traverseTypeMembers(statements)
     traverseDataMembers(statements)
-    (maybeExplicitPrimaryCtor, maybeClassName) match {
-      case (Some(primaryCtor), Some(className)) => traverseExplicitPrimaryCtor(primaryCtor, className)
-      case _ =>
-    }
+    maybeClassInfo.foreach(classInfo => {
+      classInfo.maybeExplicitPrimaryCtor.foreach(primaryCtor => traverseExplicitPrimaryCtor(primaryCtor, classInfo.className))
+      traverseSecondaryCtors(statements, classInfo.className)
+    })
     traverseMethods(statements)
     traverseOtherMembers(statements)
     emitBlockEnd()
@@ -85,7 +86,6 @@ object TemplateTraverser extends ScalaTreeTraverser[Template] {
     }
   }
 
-  // Render a Java explicit primary class constructor
   private def traverseExplicitPrimaryCtor(primaryCtor: Ctor.Primary, className: Type.Name): Unit = {
     emitLine()
     AnnotListTraverser.traverseMods(primaryCtor.mods)
@@ -102,6 +102,22 @@ object TemplateTraverser extends ScalaTreeTraverser[Template] {
     })
     BlockTraverser.traverse(block = Block(assignments), shouldReturnValue = false)
 
+    javaOwnerContext = outerJavaOwnerContext
+  }
+
+  private def traverseSecondaryCtors(statements: List[Stat], className: Type.Name): Unit = {
+    statements.collect { case secondaryCtor: Secondary => secondaryCtor }
+      .foreach(secondaryCtor => traverseSecondaryCtor(secondaryCtor, className))
+  }
+
+  private def traverseSecondaryCtor(secondaryCtor: Secondary, className: Type.Name): Unit = {
+    AnnotListTraverser.traverseMods(secondaryCtor.mods)
+    emitModifiers(JavaModifiersResolver.resolveForClassMethod(secondaryCtor.mods))
+    TypeNameTraverser.traverse(className)
+    val outerJavaOwnerContext = javaOwnerContext
+    javaOwnerContext = Method
+    TermParamListTraverser.traverse(secondaryCtor.paramss.flatten)
+    BlockTraverser.traverse(block = Block(secondaryCtor.stats), shouldReturnValue = false, maybeInit = Some(secondaryCtor.init))
     javaOwnerContext = outerJavaOwnerContext
   }
 
@@ -126,6 +142,7 @@ object TemplateTraverser extends ScalaTreeTraverser[Template] {
       case _: Defn.Var =>
       case _: Decl.Def =>
       case _: Defn.Def =>
+      case _: Ctor =>
       case other => StatTraverser.traverse(other)
     }
   }

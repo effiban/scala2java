@@ -1,6 +1,6 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.emit
+import com.effiban.scala2java.JavaEmitter.emitComment
 
 import scala.meta.{Name, Term, Type}
 
@@ -11,7 +11,7 @@ object NameTraverser extends ScalaTreeTraverser[Name] {
     case indeterminateName: Name.Indeterminate => NameIndeterminateTraverser.traverse(indeterminateName)
     case termName: Term.Name => TermNameTraverser.traverse(termName)
     case typeName: Type.Name => TypeNameTraverser.traverse(typeName)
-    case other => emit(s"UNSUPPORTED: $other")
+    case other => emitComment(s"UNSUPPORTED: $other")
   }
 
 }

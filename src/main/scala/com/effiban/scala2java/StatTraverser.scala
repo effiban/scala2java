@@ -1,6 +1,6 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.emit
+import com.effiban.scala2java.JavaEmitter.emitComment
 
 import scala.meta.{Decl, Defn, Import, Pkg, Stat, Term}
 
@@ -12,7 +12,7 @@ object StatTraverser extends ScalaTreeTraverser[Stat] {
     case pkg: Pkg => PkgTraverser.traverse(pkg)
     case defn: Defn => DefnTraverser.traverse(defn)
     case decl: Decl => DeclTraverser.traverse(decl)
-    case other => emit(s"UNSUPPORTED: $other")
+    case other => emitComment(s"UNSUPPORTED: $other")
   }
 
 }

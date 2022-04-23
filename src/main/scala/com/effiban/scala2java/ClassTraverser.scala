@@ -26,7 +26,7 @@ object ClassTraverser extends ScalaTreeTraverser[Defn.Class] {
     TermParamListTraverser.traverse(classDef.ctor.paramss.flatten)
     val outerJavaOwnerContext = javaOwnerContext
     javaOwnerContext = Class
-    TemplateTraverser.traverse(classDef.templ)
+    TemplateTraverser.traverse(template = classDef.templ, maybeClassInfo = Some(ClassInfo(className = classDef.name)))
     javaOwnerContext = outerJavaOwnerContext
   }
 
@@ -38,9 +38,8 @@ object ClassTraverser extends ScalaTreeTraverser[Defn.Class] {
 
     val outerJavaOwnerContext = javaOwnerContext
     javaOwnerContext = Class
-    TemplateTraverser.traverseTemplate(template = classDef.templ,
-      maybeExplicitPrimaryCtor = Some(classDef.ctor),
-      maybeClassName = Some(classDef.name))
+    TemplateTraverser.traverse(template = classDef.templ,
+      maybeClassInfo = Some(ClassInfo(className = classDef.name, maybeExplicitPrimaryCtor = Some(classDef.ctor))))
     javaOwnerContext = outerJavaOwnerContext
   }
 }
