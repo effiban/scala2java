@@ -68,18 +68,18 @@ object GenericTreeTraverser extends ScalaTreeTraverser[Tree] {
     case traitDef: Trait => TraitTraverser.traverse(traitDef)
     case objectDef: Defn.Object => ObjectTraverser.traverse(objectDef)
 
-    case `this`: This => traverse(`this`)
-    case `super`: Super => traverse(`super`)
-    case termName: Term.Name => traverse(termName)
-    case termSelect: Term.Select => traverse(termSelect)
-    case applyUnary: ApplyUnary => traverse(applyUnary)
+    case `this`: This => ThisTraverser.traverse(`this`)
+    case `super`: Super => SuperTraverser.traverse(`super`)
+    case termName: Term.Name => TermNameTraverser.traverse(termName)
+    case termSelect: Term.Select => TermSelectTraverser.traverse(termSelect)
+    case applyUnary: ApplyUnary => ApplyUnaryTraverser.traverse(applyUnary)
 
-    case apply: Term.Apply => traverse(apply)
-    case applyType: ApplyType => traverse(applyType)
-    case applyInfix: Term.ApplyInfix => traverse(applyInfix)
-    case assign: Assign => traverse(assign)
-    case `return`: Return => traverse(`return`)
-    case `throw`: Throw => traverse(`throw`)
+    case apply: Term.Apply => TermApplyTraverser.traverse(apply)
+    case applyType: ApplyType => ApplyTypeTraverser.traverse(applyType)
+    case applyInfix: Term.ApplyInfix => TermApplyInfixTraverser.traverse(applyInfix)
+    case assign: Assign => AssignTraverser.traverse(assign)
+    case `return`: Return => ReturnTraverser.traverse(`return`)
+    case `throw`: Throw => ThrowTraverser.traverse(`throw`)
     case ascribe: Ascribe => traverse(ascribe)
     case annotate: Term.Annotate => traverse(annotate)
     case tuple: Term.Tuple => traverse(tuple)
@@ -156,110 +156,6 @@ object GenericTreeTraverser extends ScalaTreeTraverser[Tree] {
   }
 
   ////////////// TREE TRAVERSERS /////////////////
-
-  def traverse(`this`: This): Unit = {
-    `this`.qual match {
-      case Name.Anonymous() => emit("this")
-      case name => traverse(name)
-    }
-  }
-
-  def traverse(`super`: Super): Unit = {
-    `super`.thisp match {
-      case Name.Anonymous() =>
-      case name =>
-        traverse(name)
-        emit(".")
-    }
-    `super`.superp match {
-      case Name.Anonymous() => emit("super")
-      case name => traverse(name)
-    }
-  }
-
-  def traverse(name: Term.Name): Unit = {
-    emit(toJavaName(name))
-  }
-
-  // qualified name
-  def traverse(termSelect: Term.Select): Unit = {
-    val adjustedTermRef = termSelect match {
-      case Select(Select(Term.Name("scala"), Term.Name("util")), name) => name
-      case Select(Select(Term.Name("scala"), Term.Name("package")), name) => name
-      case Select(Select(Term.Name("scala"), Term.Name("Predef")), name) => name
-      case Select(Select(Term.Name("_root_"), Term.Name("scala")), name) => name
-      case Select(Term.Name("scala"), name) => name
-      case _ => termSelect
-    }
-
-    adjustedTermRef match {
-      case select: Select =>
-        traverse(select.qual)
-        emit(".")
-        traverse(select.name)
-      case name: Term.Name => traverse(name)
-    }
-  }
-
-  def traverse(applyUnary: ApplyUnary): Unit = {
-    traverse(applyUnary.op)
-    traverse(applyUnary.arg)
-  }
-
-
-  // method invocation
-  def traverse(termApply: Term.Apply): Unit = {
-    traverse(termApply.fun)
-    emitParametersStart()
-    traverse(termApply.args)
-    emitParametersEnd()
-  }
-
-  // parametrized type application, e.g.: classOf[X], identity[X], List[X]
-  def traverse(termApplyType: ApplyType): Unit = {
-    termApplyType.fun match {
-      case Term.Name("classOf") =>
-        termApplyType.targs match {
-          case arg :: _ =>
-            traverse(arg)
-            emit(".class")
-          case _ => emit(s"UNPARSEABLE class type: $termApplyType")
-        }
-      case fun =>
-        traverse(fun)
-        if (termApplyType.targs.nonEmpty) {
-          emit(".")
-        }
-        traverseGenericTypeList(termApplyType.targs)
-    }
-  }
-
-  // Infix method invocation, e.g.: a + b
-  def traverse(termApplyInfix: Term.ApplyInfix): Unit = {
-    traverse(termApplyInfix.lhs)
-    emit(" ")
-    traverse(termApplyInfix.op)
-    emit(" ")
-    traverse(termApplyInfix.args)
-  }
-
-  // Variable assignment
-  def traverse(assign: Assign): Unit = {
-    traverse(assign.lhs)
-    emit(" = ")
-    traverse(assign.rhs)
-  }
-
-  def traverse(`return`: Return): Unit = {
-    emit("return ")
-    traverse(`return`.expr)
-  }
-
-  def traverse(`throw`: Throw): Unit = {
-    emit("throw ")
-    traverse(`throw`.expr)
-    emitStatementEnd()
-  }
 
   // Explicitly specified type, e.g.: x = 2:Short
   // Java equivalent is casting
@@ -927,11 +823,6 @@ object GenericTreeTraverser extends ScalaTreeTraverser[Tree] {
     emit("return ")
     traverse(stmt)
     emitStatementEnd()
-  }
-
-  private def toJavaName(termName: Term.Name) = {
-    // TODO - translate built-in Scala method names to Java equivalents
-    termName.value
   }
 
   private def toJavaName(typeName: Type.Name) = {
