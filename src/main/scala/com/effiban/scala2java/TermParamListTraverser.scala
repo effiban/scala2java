@@ -7,10 +7,8 @@ import scala.meta.Term
 object TermParamListTraverser {
 
   def traverse(termParams: List[Term.Param]): Unit = {
-    if (termParams.nonEmpty) {
       ArgumentListTraverser.traverse(args = termParams,
         argTraverser = TermParamTraverser,
         maybeDelimiterType = Some(Parentheses))
-    }
   }
 }
