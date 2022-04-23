@@ -11,12 +11,12 @@ object SuperTraverser extends ScalaTreeTraverser[Super] {
     `super`.thisp match {
       case Name.Anonymous() =>
       case name =>
-        GenericTreeTraverser.traverse(name)
+        NameTraverser.traverse(name)
         emit(".")
     }
     `super`.superp match {
       case Name.Anonymous() => emit("super")
-      case name => GenericTreeTraverser.traverse(name)
+      case name => NameTraverser.traverse(name)
     }
   }
 }

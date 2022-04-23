@@ -10,6 +10,6 @@ object TypeAnnotateTraverser extends ScalaTreeTraverser[Type.Annotate] {
   def traverse(annotatedType: Type.Annotate): Unit = {
     AnnotListTraverser.traverseAnnotations(annotatedType.annots)
     emit(" ")
-    GenericTreeTraverser.traverse(annotatedType.tpe)
+    TypeTraverser.traverse(annotatedType.tpe)
   }
 }

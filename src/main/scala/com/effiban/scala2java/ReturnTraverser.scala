@@ -8,6 +8,6 @@ object ReturnTraverser extends ScalaTreeTraverser[Return] {
 
   override def traverse(`return`: Return): Unit = {
     emit("return ")
-    GenericTreeTraverser.traverse(`return`.expr)
+    TermTraverser.traverse(`return`.expr)
   }
 }

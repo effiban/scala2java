@@ -8,7 +8,7 @@ object TypeRefineTraverser extends ScalaTreeTraverser[Type.Refine] {
 
   // A {def f: Int }
   def traverse(refinedType: Type.Refine): Unit = {
-    refinedType.tpe.foreach(GenericTreeTraverser.traverse)
+    refinedType.tpe.foreach(TypeTraverser.traverse)
     // TODO maybe convert to Java type with inheritance
     emitComment(s" ${refinedType.stats.toString()}")
   }

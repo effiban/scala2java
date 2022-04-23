@@ -9,8 +9,8 @@ object TypeWithTraverser extends ScalaTreeTraverser[Type.With] {
   // type with parent, e.g.  A with B
   // approximated by Java "extends" but might not compile
   def traverse(typeWith: Type.With): Unit = {
-    GenericTreeTraverser.traverse(typeWith.lhs)
+    TypeTraverser.traverse(typeWith.lhs)
     emit(" extends ")
-    GenericTreeTraverser.traverse(typeWith.rhs)
+    TypeTraverser.traverse(typeWith.rhs)
   }
 }

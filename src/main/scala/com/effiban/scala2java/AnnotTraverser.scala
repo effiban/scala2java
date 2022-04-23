@@ -8,6 +8,6 @@ object AnnotTraverser extends ScalaTreeTraverser[Annot] {
 
   override def traverse(annotation: Annot): Unit = {
     emit("@")
-    GenericTreeTraverser.traverse(annotation.init)
+    InitTraverser.traverse(annotation.init)
   }
 }

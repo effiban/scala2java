@@ -11,7 +11,7 @@ object TermAnnotateTraverser extends ScalaTreeTraverser[Term.Annotate] {
   def traverse(termAnnotation: Term.Annotate): Unit = {
     emit("(")
     AnnotListTraverser.traverseAnnotations(termAnnotation.annots, onSameLine = true)
-    GenericTreeTraverser.traverse(termAnnotation.expr)
+    TermTraverser.traverse(termAnnotation.expr)
     emit(")")
   }
 }

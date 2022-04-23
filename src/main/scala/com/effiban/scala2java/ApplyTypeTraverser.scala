@@ -13,12 +13,12 @@ object ApplyTypeTraverser extends ScalaTreeTraverser[ApplyType] {
       case Term.Name("classOf") =>
         termApplyType.targs match {
           case arg :: _ =>
-            GenericTreeTraverser.traverse(arg)
+            TypeTraverser.traverse(arg)
             emit(".class")
           case _ => emit(s"UNPARSEABLE class type: $termApplyType")
         }
       case fun =>
-        GenericTreeTraverser.traverse(fun)
+        TermTraverser.traverse(fun)
         if (termApplyType.targs.nonEmpty) {
           emit(".")
         }

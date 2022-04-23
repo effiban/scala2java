@@ -8,8 +8,8 @@ object TypeProjectTraverser extends ScalaTreeTraverser[Type.Project] {
 
   // A scala type projecting expression like: a#B
   def traverse(typeProject: Type.Project): Unit = {
-    GenericTreeTraverser.traverse(typeProject.qual)
+    TypeTraverser.traverse(typeProject.qual)
     emit(".")
-    GenericTreeTraverser.traverse(typeProject.name)
+    TypeNameTraverser.traverse(typeProject.name)
   }
 }

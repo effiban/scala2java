@@ -9,10 +9,10 @@ object TermApplyInfixTraverser extends ScalaTreeTraverser[Term.ApplyInfix] {
   // Infix method invocation, e.g.: a + b
   def traverse(termApplyInfix: Term.ApplyInfix): Unit = {
     // TODO - verify implementation for multiple RHS args
-    GenericTreeTraverser.traverse(termApplyInfix.lhs)
+    TermTraverser.traverse(termApplyInfix.lhs)
     emit(" ")
-    GenericTreeTraverser.traverse(termApplyInfix.op)
+    TermNameTraverser.traverse(termApplyInfix.op)
     emit(" ")
-    ArgumentListTraverser.traverse(termApplyInfix.args, onSameLine = true)
+    TermListTraverser.traverse(termApplyInfix.args, onSameLine = true)
   }
 }

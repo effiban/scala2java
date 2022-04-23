@@ -16,7 +16,7 @@ object TemplateTraverser extends ScalaTreeTraverser[Template] {
                        maybeExplicitPrimaryCtor: Option[Ctor.Primary] = None,
                        maybeClassName: Option[Type.Name] = None): Unit = {
     traverseTemplateInits(template.inits)
-    template.self.decltpe.foreach(declType => {
+    template.self.decltpe.foreach(_ => {
       // TODO - consider translating the 'self' type into a Java parent
       emitComment(template.self.toString)
     })
@@ -27,7 +27,7 @@ object TemplateTraverser extends ScalaTreeTraverser[Template] {
     val relevantInits = inits.filterNot(init => shouldSkipParent(init.name))
     if (relevantInits.nonEmpty) {
       emitParentNamesPrefix()
-      ArgumentListTraverser.traverse(relevantInits)
+      InitListTraverser.traverse(relevantInits)
     }
   }
 
@@ -56,40 +56,48 @@ object TemplateTraverser extends ScalaTreeTraverser[Template] {
   }
 
   private def traverseTypeMembers(statements: List[Stat]): Unit = {
-    statements.collect {
-      case typeDecl: Decl.Type => typeDecl
-      case typeDefn: Defn.Type => typeDefn
-    }.foreach(typeStat => {
-      GenericTreeTraverser.traverse(typeStat)
-      emitStatementEnd()
-    })
+    statements.foreach {
+      case typeDecl: Decl.Type =>
+        DeclTypeTraverser.traverse(typeDecl)
+        emitStatementEnd()
+      case typeDefn: Defn.Type =>
+        DefnTypeTraverser.traverse(typeDefn)
+        emitStatementEnd()
+      case _ =>
+    }
   }
 
   private def traverseDataMembers(statements: List[Stat]): Unit = {
-    statements.collect {
-      case valDecl: Decl.Val => valDecl
-      case varDecl: Decl.Var => varDecl
-      case valDefn: Defn.Val => valDefn
-      case varDefn: Defn.Var => varDefn
-    }.foreach(dataMember => {
-      GenericTreeTraverser.traverse(dataMember)
-      emitStatementEnd()
-    })
+    statements.foreach {
+      case valDecl: Decl.Val =>
+        DeclValTraverser.traverse(valDecl)
+        emitStatementEnd()
+      case varDecl: Decl.Var =>
+        DeclVarTraverser.traverse(varDecl)
+        emitStatementEnd()
+      case valDefn: Defn.Val =>
+        DefnValTraverser.traverse(valDefn)
+        emitStatementEnd()
+      case varDefn: Defn.Var =>
+        DefnVarTraverser.traverse(varDefn)
+        emitStatementEnd()
+      case _ =>
+    }
   }
 
   // Render a Java explicit primary class constructor
   private def traverseExplicitPrimaryCtor(primaryCtor: Ctor.Primary, className: Type.Name): Unit = {
     AnnotListTraverser.traverseMods(primaryCtor.mods)
     emitModifiers(JavaModifiersResolver.resolveForClassMethod(primaryCtor.mods))
-    GenericTreeTraverser.traverse(className)
+    TypeNameTraverser.traverse(className)
     val outerJavaOwnerContext = javaOwnerContext
     javaOwnerContext = Method
-    ArgumentListTraverser.traverse(primaryCtor.paramss.flatten, maybeDelimiterType = Some(Parentheses))
+    TermParamListTraverser.traverse(primaryCtor.paramss.flatten)
     emitBlockStart()
     // Initialize members explicitly (what is done implicitly for Java records and Scala classes)
     primaryCtor.paramss.flatten.foreach(param => {
       val paramName = Term.Name(param.name.toString())
-      GenericTreeTraverser.traverse(Assign(Select(This(Name.Anonymous()), paramName), paramName))
+      AssignTraverser.traverse(Assign(Select(This(Name.Anonymous()), paramName), paramName))
       emitStatementEnd()
     })
     emitBlockEnd()
@@ -97,10 +105,14 @@ object TemplateTraverser extends ScalaTreeTraverser[Template] {
   }
 
   private def traverseMethods(statements: List[Stat]): Unit = {
-    statements.collect {
-      case defDecl: Decl.Def => defDecl
-      case defDefn: Defn.Def => defDefn
-    }.foreach(elem => GenericTreeTraverser.traverse(elem))
+    statements.foreach {
+      case defDecl: Decl.Def =>
+        DeclDefTraverser.traverse(defDecl)
+        emitStatementEnd()
+      case defDefn: Defn.Def =>
+        DefnDefTraverser.traverse(defDefn)
+      case _ =>
+    }
   }
 
   private def traverseOtherMembers(statements: List[Stat]): Unit = {
@@ -113,7 +125,7 @@ object TemplateTraverser extends ScalaTreeTraverser[Template] {
       case _: Defn.Var =>
       case _: Decl.Def =>
       case _: Defn.Def =>
-      case other => GenericTreeTraverser.traverse(other)
+      case other => StatTraverser.traverse(other)
     }
   }
 }

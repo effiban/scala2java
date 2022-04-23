@@ -8,6 +8,6 @@ object NewAnonymousTraverser extends ScalaTreeTraverser[NewAnonymous] {
 
   def traverse(newAnonymous: NewAnonymous): Unit = {
     emit("new ")
-    GenericTreeTraverser.traverse(newAnonymous.templ)
+    TemplateTraverser.traverse(newAnonymous.templ)
   }
 }

@@ -8,14 +8,14 @@ object CaseTraverser extends ScalaTreeTraverser[Case] {
 
   def traverse(`case`: Case): Unit = {
     emit("case ")
-    GenericTreeTraverser.traverse(`case`.pat)
+    PatTraverser.traverse(`case`.pat)
     `case`.cond.foreach(cond => {
       emit(" && (")
-      GenericTreeTraverser.traverse(cond)
+      TermTraverser.traverse(cond)
       emit(")")
     })
     emitArrow()
-    GenericTreeTraverser.traverse(`case`.body)
+    TermTraverser.traverse(`case`.body)
     emitStatementEnd()
   }
 }

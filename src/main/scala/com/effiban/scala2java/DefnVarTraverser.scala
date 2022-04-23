@@ -18,15 +18,16 @@ object DefnVarTraverser extends ScalaTreeTraverser[Defn.Var] {
     emitModifiers(modifierNames)
     varDef.decltpe match {
       case Some(declType) =>
-        GenericTreeTraverser.traverse(declType)
+        TypeTraverser.traverse(declType)
         emit(" ")
       case None if javaOwnerContext == Method => emit("var ")
       case _ =>
     }
-    varDef.pats.foreach(GenericTreeTraverser.traverse)
+    // TODO - verify this
+    PatListTraverser.traverse(varDef.pats)
     varDef.rhs.foreach { rhs =>
       emit(" = ")
-      GenericTreeTraverser.traverse(rhs)
+      TermTraverser.traverse(rhs)
     }
   }
 }

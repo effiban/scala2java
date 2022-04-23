@@ -10,8 +10,8 @@ object AscribeTraverser extends ScalaTreeTraverser[Ascribe] {
   // Java equivalent is casting. e.g. x = (short)2
   override def traverse(ascribe: Ascribe): Unit = {
     emit("(")
-    GenericTreeTraverser.traverse(ascribe.tpe)
+    TypeTraverser.traverse(ascribe.tpe)
     emit(")")
-    GenericTreeTraverser.traverse(ascribe.expr)
+    TermTraverser.traverse(ascribe.expr)
   }
 }

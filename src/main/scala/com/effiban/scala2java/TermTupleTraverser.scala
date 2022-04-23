@@ -8,6 +8,6 @@ object TermTupleTraverser extends ScalaTreeTraverser[Term.Tuple] {
 
   // Java supports tuples only in lambdas AFAIK, but the replacement is not obvious - so rendering it always
   def traverse(termTuple: Term.Tuple): Unit = {
-    ArgumentListTraverser.traverse(termTuple.args, maybeDelimiterType = Some(Parentheses), onSameLine = true)
+    TermListTraverser.traverse(termTuple.args, maybeDelimiterType = Some(Parentheses), onSameLine = true)
   }
 }

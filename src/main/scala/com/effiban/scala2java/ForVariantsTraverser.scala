@@ -9,7 +9,7 @@ import scala.meta.{Enumerator, Lit, Pat, Term}
 object ForVariantsTraverser {
 
   def traverse(enumerators: List[Enumerator], body: Term): Unit = {
-    GenericTreeTraverser.traverse(translateFor(enumerators, body))
+    TermTraverser.traverse(translateFor(enumerators, body))
   }
 
   private def translateFor(enumerators: List[Enumerator],

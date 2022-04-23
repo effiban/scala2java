@@ -12,11 +12,11 @@ object DefnTypeTraverser extends ScalaTreeTraverser[Defn.Type] {
     emitTypeDeclaration(modifiers = JavaModifiersResolver.resolveForInterface(typeDef.mods),
       typeKeyword = "interface",
       name = typeDef.name.toString)
-    TypeListTraverser.traverse(typeDef.tparams)
+    TypeParamListTraverser.traverse(typeDef.tparams)
     emit(" extends ") // TODO handle bounds properly
     val outerJavaOwnerContext = javaOwnerContext
     javaOwnerContext = Interface
-    GenericTreeTraverser.traverse(typeDef.body)
+    TypeTraverser.traverse(typeDef.body)
     javaOwnerContext = outerJavaOwnerContext
   }
 }

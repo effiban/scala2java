@@ -8,7 +8,7 @@ object TypeRepeatedTraverser extends ScalaTreeTraverser[Type.Repeated] {
 
   // Vararg type,e.g.: T*
   override def traverse(repeatedType: Type.Repeated): Unit = {
-    GenericTreeTraverser.traverse(repeatedType.tpe)
+    TypeTraverser.traverse(repeatedType.tpe)
     emitEllipsis()
   }
 }

@@ -22,13 +22,14 @@ object DefnValTraverser extends ScalaTreeTraverser[Defn.Val] {
     emitModifiers(modifierNames)
     valDef.decltpe match {
       case Some(declType) =>
-        GenericTreeTraverser.traverse(declType)
+        TypeTraverser.traverse(declType)
         emit(" ")
       case None if javaOwnerContext == Method => emit("var ")
       case _ =>
     }
-    valDef.pats.foreach(GenericTreeTraverser.traverse)
+    // TODO verify for non-simple case
+    PatListTraverser.traverse(valDef.pats)
     emit(" = ")
-    GenericTreeTraverser.traverse(valDef.rhs)
+    TermTraverser.traverse(valDef.rhs)
   }
 }

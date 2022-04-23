@@ -8,9 +8,9 @@ object PkgTraverser extends ScalaTreeTraverser[Pkg] {
 
   override def traverse(pkg: Pkg): Unit = {
     emit("package ")
-    GenericTreeTraverser.traverse(pkg.ref)
+    TermRefTraverser.traverse(pkg.ref)
     emitStatementEnd()
     emitLine()
-    pkg.stats.foreach(GenericTreeTraverser.traverse)
+    pkg.stats.foreach(StatTraverser.traverse)
   }
 }

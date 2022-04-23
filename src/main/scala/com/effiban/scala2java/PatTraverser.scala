@@ -2,12 +2,14 @@ package com.effiban.scala2java
 
 import com.effiban.scala2java.JavaEmitter.emitComment
 
-import scala.meta.Pat
 import scala.meta.Pat.{Alternative, Bind}
+import scala.meta.{Lit, Pat, Term}
 
 object PatTraverser extends ScalaTreeTraverser[Pat] {
 
   override def traverse(pat: Pat): Unit = pat match {
+    case lit: Lit => LitTraverser.traverse(lit)
+    case termName: Term.Name => TermNameTraverser.traverse(termName)
     case patternWildcard: Pat.Wildcard => PatWildcardTraverser.traverse(patternWildcard)
     case patternSeqWildcard: Pat.SeqWildcard => PatSeqWildcardTraverser.traverse(patternSeqWildcard)
     case patternVar: Pat.Var => PatVarTraverser.traverse(patternVar)

@@ -14,7 +14,7 @@ object TraitTraverser extends ScalaTreeTraverser[Trait] {
     // TODO - traverse type params
     val outerJavaOwnerContext = javaOwnerContext
     javaOwnerContext = Interface
-    GenericTreeTraverser.traverse(traitDef.templ)
+    TemplateTraverser.traverse(traitDef.templ)
     javaOwnerContext = outerJavaOwnerContext
   }
 }

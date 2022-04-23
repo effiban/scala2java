@@ -17,7 +17,7 @@ object Scala2JavaRunner {
       input.parse[Source].get
     })
 
-    sourceTrees.foreach(GenericTreeTraverser.traverse)
+    sourceTrees.foreach(SourceTraverser.traverse)
   }
 }
 

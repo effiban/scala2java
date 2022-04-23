@@ -16,8 +16,9 @@ object DeclVarTraverser extends ScalaTreeTraverser[Decl.Var] {
       case _ => Nil
     }
     emitModifiers(modifierNames)
-    GenericTreeTraverser.traverse(varDecl.decltpe)
+    TypeTraverser.traverse(varDecl.decltpe)
     emit(" ")
-    varDecl.pats.foreach(GenericTreeTraverser.traverse)
+    // TODO - verify when not simple case
+    PatListTraverser.traverse(varDecl.pats)
   }
 }

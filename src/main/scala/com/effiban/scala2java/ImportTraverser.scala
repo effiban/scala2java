@@ -9,7 +9,7 @@ object ImportTraverser extends ScalaTreeTraverser[Import] {
   override def traverse(`import`: Import): Unit = {
     `import`.importers match {
       case List() => emitComment("Invalid import with no inner importers")
-      case importers => importers.foreach(GenericTreeTraverser.traverse)
+      case importers => importers.foreach(ImporterTraverser.traverse)
     }
   }
 }

@@ -8,7 +8,7 @@ object ThrowTraverser extends ScalaTreeTraverser[Throw] {
 
   override def traverse(`throw`: Throw): Unit = {
     emit("throw ")
-    GenericTreeTraverser.traverse(`throw`.expr)
+    TermTraverser.traverse(`throw`.expr)
     emitStatementEnd()
   }
 }

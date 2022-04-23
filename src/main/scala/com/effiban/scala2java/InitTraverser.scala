@@ -8,16 +8,16 @@ object InitTraverser extends ScalaTreeTraverser[Init] {
 
   // An 'Init' is a parent of a type in its declaration
   override def traverse(init: Init): Unit = {
-    GenericTreeTraverser.traverse(init.tpe)
+    TypeTraverser.traverse(init.tpe)
     init.name match {
       case Name.Anonymous() =>
       case name =>
         emit(" ")
-        GenericTreeTraverser.traverse(name)
+        NameTraverser.traverse(name)
     }
     val args = init.argss.flatten
     if (args.nonEmpty) {
-      ArgumentListTraverser.traverse(init.argss.flatten, maybeDelimiterType = Some(Parentheses))
+      TermListTraverser.traverse(init.argss.flatten, maybeDelimiterType = Some(Parentheses))
     }
   }
 }

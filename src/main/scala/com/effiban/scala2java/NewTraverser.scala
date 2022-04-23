@@ -8,6 +8,6 @@ object NewTraverser extends ScalaTreeTraverser[New] {
 
   override def traverse(`new`: New): Unit = {
     emit("new ")
-    GenericTreeTraverser.traverse(`new`.init)
+    InitTraverser.traverse(`new`.init)
   }
 }

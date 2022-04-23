@@ -8,8 +8,8 @@ object TypeSelectTraverser extends ScalaTreeTraverser[Type.Select] {
 
   // A scala type selecting expression like: a.B
   def traverse(typeSelect: Type.Select): Unit = {
-    GenericTreeTraverser.traverse(typeSelect.qual)
+    TermRefTraverser.traverse(typeSelect.qual)
     emit(".")
-    GenericTreeTraverser.traverse(typeSelect.name)
+    TypeNameTraverser.traverse(typeSelect.name)
   }
 }

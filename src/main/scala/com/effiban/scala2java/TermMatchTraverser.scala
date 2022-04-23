@@ -10,10 +10,10 @@ object TermMatchTraverser extends ScalaTreeTraverser[Term.Match] {
     // TODO handle mods (what is this in a 'match'?...)
     emit("switch ")
     emit("(")
-    GenericTreeTraverser.traverse(termMatch.expr)
+    TermTraverser.traverse(termMatch.expr)
     emit(")")
     emitBlockStart()
-    termMatch.cases.foreach(GenericTreeTraverser.traverse)
+    termMatch.cases.foreach(CaseTraverser.traverse)
     emitBlockEnd()
   }
 }

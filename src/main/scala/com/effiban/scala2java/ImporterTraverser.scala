@@ -14,9 +14,9 @@ object ImporterTraverser extends ScalaTreeTraverser[Importer] {
       case ref =>
         importer.importees.foreach(importee => {
           emit("import ")
-          GenericTreeTraverser.traverse(ref)
+          TermRefTraverser.traverse(ref)
           emit(".")
-          GenericTreeTraverser.traverse(importee)
+          ImporteeTraverser.traverse(importee)
           emitStatementEnd()
         })
     }
