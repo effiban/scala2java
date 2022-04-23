@@ -1,19 +1,18 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.GenericTreeTraverser.{resolveJavaClassDataMemberExplicitModifiers, traverseAnnotations}
 import com.effiban.scala2java.JavaEmitter.{emit, emitModifiers}
 import com.effiban.scala2java.TraversalContext.javaOwnerContext
 
 import scala.meta.Defn
-import scala.meta.Mod.{Annot, ValParam}
+import scala.meta.Mod.ValParam
 
 object DefnVarTraverser extends ScalaTreeTraverser[Defn.Var] {
 
   def traverse(varDef: Defn.Var): Unit = {
     val annotationsOnSameLine = varDef.mods.exists(_.isInstanceOf[ValParam])
-    traverseAnnotations(varDef.mods.collect { case ann: Annot => ann }, annotationsOnSameLine)
+    AnnotListTraverser.traverseMods(varDef.mods, annotationsOnSameLine)
     val modifierNames = varDef.mods match {
-      case modifiers if javaOwnerContext == Class => resolveJavaClassDataMemberExplicitModifiers(modifiers)
+      case modifiers if javaOwnerContext == Class => JavaModifiersResolver.resolveForClassDataMember(modifiers)
       case _ => Nil
     }
     emitModifiers(modifierNames)

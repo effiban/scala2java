@@ -1,7 +1,5 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.GenericTreeTraverser.traverseGenericTypeList
-
 import scala.meta.Type
 
 object TypeParamTraverser extends ScalaTreeTraverser[Type.Param] {
@@ -10,7 +8,7 @@ object TypeParamTraverser extends ScalaTreeTraverser[Type.Param] {
   def traverse(typeParam: Type.Param): Unit = {
     // TODO handle mods
     GenericTreeTraverser.traverse(typeParam.name)
-    traverseGenericTypeList(typeParam.tparams)
+    TypeListTraverser.traverse(typeParam.tparams)
     GenericTreeTraverser.traverse(typeParam.tbounds)
     // TODO handle vbounds and cbounds (which aren't supported in Java, maybe partially ?)
   }

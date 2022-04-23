@@ -1,6 +1,6 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.{emitArrow, emitParametersEnd, emitParametersStart}
+import com.effiban.scala2java.JavaEmitter.{Parentheses, emitArrow}
 import com.effiban.scala2java.TraversalContext.javaOwnerContext
 
 import scala.meta.Term
@@ -14,10 +14,7 @@ object TermFunctionTraverser extends ScalaTreeTraverser[Term.Function] {
     function.params match {
       case Nil =>
       case param :: Nil => GenericTreeTraverser.traverse(param)
-      case _ =>
-        emitParametersStart()
-        GenericTreeTraverser.traverse(function.params)
-        emitParametersEnd()
+      case _ => ArgumentListTraverser.traverse(function.params, maybeDelimiterType = Some(Parentheses))
     }
     emitArrow()
     GenericTreeTraverser.traverse(function.body)

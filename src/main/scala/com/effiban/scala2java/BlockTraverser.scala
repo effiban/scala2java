@@ -1,7 +1,7 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.GenericTreeTraverser.traverseLastStatement
 import com.effiban.scala2java.JavaEmitter.{emitBlockEnd, emitBlockStart, emitStatementEnd}
+import com.effiban.scala2java.LastStatementTraverser.traverseLastStatement
 
 import scala.meta.Term.{Block, If, While}
 
@@ -25,6 +25,7 @@ object BlockTraverser extends ScalaTreeTraverser[Block] {
           case _ => emitStatementEnd()
         }
       })
+    // TODO this is incorrect for `if` and `while`, they do not necessarily return
     traverseLastStatement(block.stats.last)
   }
 }
