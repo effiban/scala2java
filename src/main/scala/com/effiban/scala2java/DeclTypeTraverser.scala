@@ -11,7 +11,7 @@ object DeclTypeTraverser extends ScalaTreeTraverser[Decl.Type] {
     emitTypeDeclaration(modifiers = JavaModifiersResolver.resolveForInterface(typeDecl.mods),
       typeKeyword = "interface",
       name = typeDecl.name.toString)
-    TypeListTraverser.traverse(typeDecl.tparams)
+    TypeParamListTraverser.traverse(typeDecl.tparams)
     // TODO handle bounds properly
   }
 }

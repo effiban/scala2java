@@ -8,7 +8,7 @@ object TypeExistentialTraverser extends ScalaTreeTraverser[Type.Existential] {
 
   // type with existential constraint e.g.:  A[B] forSome {B <: Number with Serializable}
   def traverse(existentialType: Type.Existential): Unit = {
-    GenericTreeTraverser.traverse(existentialType.tpe)
+    TypeTraverser.traverse(existentialType.tpe)
     // TODO - convert to Java for simple cases
     emitComment(existentialType.stats.toString())
   }

@@ -9,19 +9,19 @@ object TryWithHandlerTraverser extends ScalaTreeTraverser[TryWithHandler] {
 
   def traverse(tryWithHandler: TryWithHandler): Unit = {
     emit("try ")
-    GenericTreeTraverser.traverse(tryWithHandler.expr)
+    TermTraverser.traverse(tryWithHandler.expr)
     traverseCatchClause(tryWithHandler.catchp)
     tryWithHandler.finallyp.foreach(finallyp => {
       emit("finally")
       emitBlockStart()
-      GenericTreeTraverser.traverse(finallyp)
+      TermTraverser.traverse(finallyp)
       emitBlockEnd()
     })
   }
 
   private def traverseCatchClause(handler: Term): Unit = {
     emit("catch (")
-    GenericTreeTraverser.traverse(handler)
+    TermTraverser.traverse(handler)
     emit(")")
   }
 }

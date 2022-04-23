@@ -8,9 +8,9 @@ object DoTraverser extends ScalaTreeTraverser[Do] {
 
   override def traverse(`do`: Do): Unit = {
     emit("do ")
-    GenericTreeTraverser.traverse(`do`.body)
+    TermTraverser.traverse(`do`.body)
     emit("while (")
-    GenericTreeTraverser.traverse(`do`.expr)
+    TermTraverser.traverse(`do`.expr)
     emit(")")
   }
 }

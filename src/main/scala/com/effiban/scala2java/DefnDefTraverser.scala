@@ -17,9 +17,9 @@ object DefnDefTraverser extends ScalaTreeTraverser[Defn.Def] {
       case _ => Nil
     }
     emitModifiers(resolvedModifierNames)
-    defDef.decltpe.foreach(GenericTreeTraverser.traverse)
+    defDef.decltpe.foreach(TypeTraverser.traverse)
     emit(" ")
-    GenericTreeTraverser.traverse(defDef.name)
+    TermNameTraverser.traverse(defDef.name)
     // TODO handle method type params
 
     val outerJavaOwnerContext = javaOwnerContext
@@ -29,10 +29,10 @@ object DefnDefTraverser extends ScalaTreeTraverser[Defn.Def] {
   }
 
   private def traverseMethodParamsAndBody(defDef: Defn.Def): Unit = {
-    ArgumentListTraverser.traverse(defDef.paramss.flatten, maybeDelimiterType = Some(Parentheses))
+    TermParamListTraverser.traverse(defDef.paramss.flatten)
     // method body
     defDef.body match {
-      case block: Block => GenericTreeTraverser.traverse(block)
+      case block: Block => BlockTraverser.traverse(block)
       case stmt: Stat =>
         emitBlockStart()
         traverseLastStatement(stmt)

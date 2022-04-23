@@ -8,7 +8,7 @@ object TypeSingletonTraverser extends ScalaTreeTraverser[Type.Singleton] {
 
   // A scala expression representing the type of a singleton like: A.type
   def traverse(singletonType: Type.Singleton): Unit = {
-    GenericTreeTraverser.traverse(singletonType.ref)
+    TermRefTraverser.traverse(singletonType.ref)
     // Not sure about this, might only work sometimes
     emit(".class")
   }

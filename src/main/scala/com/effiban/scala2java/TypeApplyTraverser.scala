@@ -6,7 +6,7 @@ object TypeApplyTraverser extends ScalaTreeTraverser[Type.Apply] {
 
   // type definition with generic args, e.g. F[T]
   def traverse(typeApply: Type.Apply): Unit = {
-    GenericTreeTraverser.traverse(typeApply.tpe)
+    TypeTraverser.traverse(typeApply.tpe)
     TypeListTraverser.traverse(typeApply.args)
   }
 }

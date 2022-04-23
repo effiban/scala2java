@@ -9,7 +9,7 @@ object AnnotListTraverser {
 
   def traverseAnnotations(annotations: List[Annot], onSameLine: Boolean = false): Unit = {
     annotations.foreach(annotation => {
-      GenericTreeTraverser.traverse(annotation)
+      AnnotTraverser.traverse(annotation)
       if (onSameLine) {
         emit(" ")
       } else {

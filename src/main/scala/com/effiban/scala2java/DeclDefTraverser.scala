@@ -16,14 +16,14 @@ object DeclDefTraverser extends ScalaTreeTraverser[Decl.Def] {
       case _ => Nil
     }
     emitModifiers(resolvedModifierNames)
-    GenericTreeTraverser.traverse(defDecl.decltpe)
+    TypeTraverser.traverse(defDecl.decltpe)
     emit(" ")
-    GenericTreeTraverser.traverse(defDecl.name)
+    TermNameTraverser.traverse(defDecl.name)
     // TODO handle method type params
 
     val outerJavaOwnerContext = javaOwnerContext
     javaOwnerContext = Method
-    ArgumentListTraverser.traverse(defDecl.paramss.flatten, maybeDelimiterType = Some(Parentheses))
+    TermParamListTraverser.traverse(defDecl.paramss.flatten)
     javaOwnerContext = outerJavaOwnerContext
   }
 }

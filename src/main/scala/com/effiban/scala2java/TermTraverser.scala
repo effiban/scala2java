@@ -8,6 +8,7 @@ import scala.meta.{Lit, Term}
 object TermTraverser extends ScalaTreeTraverser[Term] {
 
   override def traverse(term: Term): Unit = term match {
+    case termRef: Term.Ref => TermRefTraverser.traverse(termRef)
     case apply: Term.Apply => TermApplyTraverser.traverse(apply)
     case applyType: ApplyType => ApplyTypeTraverser.traverse(applyType)
     case applyInfix: Term.ApplyInfix => TermApplyInfixTraverser.traverse(applyInfix)

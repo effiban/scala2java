@@ -12,10 +12,10 @@ object TypeBoundsTraverser extends ScalaTreeTraverser[Type.Bounds] {
     (typeBounds.lo, typeBounds.hi) match {
       case (Some(lo), None) =>
         emit(" super ")
-        GenericTreeTraverser.traverse(lo)
+        TypeTraverser.traverse(lo)
       case (None, Some(hi)) =>
         emit(" extends ")
-        GenericTreeTraverser.traverse(hi)
+        TypeTraverser.traverse(hi)
       // TODO handle lower bound Null
       case _ => emitComment(typeBounds.toString)
     }

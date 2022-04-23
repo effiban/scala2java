@@ -16,7 +16,7 @@ object ObjectTraverser extends ScalaTreeTraverser[Defn.Object] {
       name = s"${objectDef.name.toString}")
     val outerJavaOwnerContext = javaOwnerContext
     javaOwnerContext = Class
-    GenericTreeTraverser.traverse(objectDef.templ)
+    TemplateTraverser.traverse(objectDef.templ)
     javaOwnerContext = outerJavaOwnerContext
   }
 }

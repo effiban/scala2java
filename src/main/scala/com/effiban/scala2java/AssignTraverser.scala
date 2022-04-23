@@ -8,8 +8,8 @@ object AssignTraverser extends ScalaTreeTraverser[Assign] {
 
   // Variable assignment
   override def traverse(assign: Assign): Unit = {
-    GenericTreeTraverser.traverse(assign.lhs)
+    TermTraverser.traverse(assign.lhs)
     emit(" = ")
-    GenericTreeTraverser.traverse(assign.rhs)
+    TermTraverser.traverse(assign.rhs)
   }
 }

@@ -9,7 +9,7 @@ object TypePlaceholderTraverser extends ScalaTreeTraverser[Type.Placeholder] {
   // Underscore in type param, e.g. T[_]
   override def traverse(placeholderType: Type.Placeholder): Unit = {
     emit("? ")
-    GenericTreeTraverser.traverse(placeholderType.bounds)
+    TypeBoundsTraverser.traverse(placeholderType.bounds)
   }
 
 }

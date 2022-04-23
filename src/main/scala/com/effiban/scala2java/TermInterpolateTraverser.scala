@@ -10,7 +10,7 @@ object TermInterpolateTraverser extends ScalaTreeTraverser[Term.Interpolate] {
   def traverse(termInterpolate: Term.Interpolate): Unit = {
     // Transform Scala string interpolation to Java String.format()
     termInterpolate.prefix match {
-      case Term.Name("s") => GenericTreeTraverser.traverse(toJavaStringFormatInvocation(termInterpolate.parts, termInterpolate.args))
+      case Term.Name("s") => TermApplyTraverser.traverse(toJavaStringFormatInvocation(termInterpolate.parts, termInterpolate.args))
       case _ => emitComment(s"UNRECOGNIZED interpolation: $termInterpolate")
     }
   }

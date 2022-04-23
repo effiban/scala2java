@@ -6,6 +6,6 @@ object PatVarTraverser extends ScalaTreeTraverser[Pat.Var] {
 
   // Pattern match variable, e.g. `a` in case a =>
   def traverse(patternVar: Pat.Var): Unit = {
-    GenericTreeTraverser.traverse(patternVar.name)
+    TermNameTraverser.traverse(patternVar.name)
   }
 }

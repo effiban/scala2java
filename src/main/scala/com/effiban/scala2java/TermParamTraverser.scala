@@ -18,9 +18,9 @@ object TermParamTraverser extends ScalaTreeTraverser[Term.Param] {
     val modifierNames = JavaModifiersResolver.resolve(mods, List(classOf[Final]))
     emitModifiers(modifierNames)
     termParam.decltpe.foreach(declType => {
-      GenericTreeTraverser.traverse(declType)
+      TypeTraverser.traverse(declType)
       emit(" ")
     })
-    GenericTreeTraverser.traverse(termParam.name)
+    NameTraverser.traverse(termParam.name)
   }
 }

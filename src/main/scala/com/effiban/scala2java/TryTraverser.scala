@@ -8,27 +8,27 @@ object TryTraverser extends ScalaTreeTraverser[Term.Try] {
 
   def traverse(`try`: Term.Try): Unit = {
     emit("try ")
-    GenericTreeTraverser.traverse(`try`.expr)
+    TermTraverser.traverse(`try`.expr)
     `try`.catchp.foreach(traverseCatchClause)
     `try`.finallyp.foreach(finallyp => {
       emit("finally")
       emitBlockStart()
-      GenericTreeTraverser.traverse(finallyp)
+      TermTraverser.traverse(finallyp)
       emitBlockEnd()
     })
   }
 
   private def traverseCatchClause(`case`: Case): Unit = {
     emit("catch (")
-    GenericTreeTraverser.traverse(`case`.pat)
+    PatTraverser.traverse(`case`.pat)
     `case`.cond.foreach(cond => {
       emit(" && (")
-      GenericTreeTraverser.traverse(cond)
+      TermTraverser.traverse(cond)
       emit(")")
     })
     emit(")")
     emitBlockStart()
-    GenericTreeTraverser.traverse(`case`.body)
+    TermTraverser.traverse(`case`.body)
     emitBlockEnd()
   }
 }

@@ -10,6 +10,6 @@ object PartialFunctionTraverser extends ScalaTreeTraverser[Term.PartialFunction]
     val dummyArgName = "arg"
     emit(dummyArgName)
     emitArrow()
-    GenericTreeTraverser.traverse(Term.Match(expr = Term.Name(dummyArgName), cases = partialFunction.cases))
+    TermMatchTraverser.traverse(Term.Match(expr = Term.Name(dummyArgName), cases = partialFunction.cases))
   }
 }

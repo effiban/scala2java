@@ -7,6 +7,7 @@ import scala.meta.Type
 object TypeTraverser extends ScalaTreeTraverser[Type] {
 
   override def traverse(`type`: Type): Unit = `type` match {
+    case typeRef: Type.Ref => TypeRefTraverser.traverse(typeRef)
     case typeApply: Type.Apply => TypeApplyTraverser.traverse(typeApply)
     case typeApplyInfix: Type.ApplyInfix => TypeApplyInfixTraverser.traverse(typeApplyInfix)
     case functionType: Type.Function => TypeFunctionTraverser.traverse(functionType)

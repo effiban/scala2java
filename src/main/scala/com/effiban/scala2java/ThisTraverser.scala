@@ -10,7 +10,7 @@ object ThisTraverser extends ScalaTreeTraverser[This] {
   def traverse(`this`: This): Unit = {
     `this`.qual match {
       case Name.Anonymous() => emit("this")
-      case name => GenericTreeTraverser.traverse(name)
+      case name => NameTraverser.traverse(name)
     }
   }
 }

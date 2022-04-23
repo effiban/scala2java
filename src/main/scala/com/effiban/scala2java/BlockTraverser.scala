@@ -17,7 +17,7 @@ object BlockTraverser extends ScalaTreeTraverser[Block] {
   private def traverseBlockContents(block: Block): Unit = {
     block.stats.slice(0, block.stats.length - 1)
       .foreach(stat => {
-        GenericTreeTraverser.traverse(stat)
+        StatTraverser.traverse(stat)
         stat match {
           case _: Block =>
           case _: If =>

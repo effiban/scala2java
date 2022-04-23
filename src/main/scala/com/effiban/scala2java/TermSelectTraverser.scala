@@ -20,10 +20,11 @@ object TermSelectTraverser extends ScalaTreeTraverser[Term.Select] {
 
     adjustedTermRef match {
       case select: Select =>
-        GenericTreeTraverser.traverse(select.qual)
+        TermTraverser.traverse(select.qual)
         emit(".")
-        GenericTreeTraverser.traverse(select.name)
-      case name: Term.Name => GenericTreeTraverser.traverse(name)
+        TermNameTraverser.traverse(select.name)
+      case name: Term.Name => TermNameTraverser.traverse(name)
+      case termRef: Term.Ref => TermRefTraverser.traverse(termRef)
     }
   }
 

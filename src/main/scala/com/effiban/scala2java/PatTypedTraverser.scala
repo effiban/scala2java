@@ -8,8 +8,8 @@ object PatTypedTraverser extends ScalaTreeTraverser[Pat.Typed] {
 
   // Typed pattern expression, e.g. a: Int (in lhs of case clause)
   override def traverse(typedPattern: Pat.Typed): Unit = {
-    GenericTreeTraverser.traverse(typedPattern.rhs)
+    TypeTraverser.traverse(typedPattern.rhs)
     emit(" ")
-    GenericTreeTraverser.traverse(typedPattern.lhs)
+    PatTraverser.traverse(typedPattern.lhs)
   }
 }

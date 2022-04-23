@@ -1,6 +1,6 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.{Parentheses, emitLine, emitTypeDeclaration}
+import com.effiban.scala2java.JavaEmitter.{emitLine, emitTypeDeclaration}
 import com.effiban.scala2java.TraversalContext.javaOwnerContext
 
 import scala.meta.{Defn, Mod}
@@ -23,10 +23,10 @@ object ClassTraverser extends ScalaTreeTraverser[Defn.Class] {
       typeKeyword = "record",
       name = classDef.name.toString)
     // TODO - traverse type params
-    ArgumentListTraverser.traverse(classDef.ctor.paramss.flatten, maybeDelimiterType = Some(Parentheses))
+    TermParamListTraverser.traverse(classDef.ctor.paramss.flatten)
     val outerJavaOwnerContext = javaOwnerContext
     javaOwnerContext = Class
-    GenericTreeTraverser.traverse(classDef.templ)
+    TemplateTraverser.traverse(classDef.templ)
     javaOwnerContext = outerJavaOwnerContext
   }
 

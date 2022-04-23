@@ -10,8 +10,8 @@ object BindTraverser extends ScalaTreeTraverser[Pat.Bind] {
   // Pattern match bind variable, e.g.: a @ A()
   override def traverse(patternBind: Bind): Unit = {
     // In Java (when supported) the order is reversed
-    GenericTreeTraverser.traverse(patternBind.rhs)
+    PatTraverser.traverse(patternBind.rhs)
     emit(" ")
-    GenericTreeTraverser.traverse(patternBind.lhs)
+    PatTraverser.traverse(patternBind.lhs)
   }
 }
