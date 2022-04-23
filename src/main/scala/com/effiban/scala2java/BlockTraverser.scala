@@ -3,28 +3,36 @@ package com.effiban.scala2java
 import com.effiban.scala2java.JavaEmitter.{emitBlockEnd, emitBlockStart, emitStatementEnd}
 
 import scala.meta.Term.{Block, If, Return, While}
-import scala.meta.{Stat, Term}
+import scala.meta.{Init, Stat, Term}
 
 object BlockTraverser extends ScalaTreeTraverser[Block] {
 
   override def traverse(block: Block): Unit = {
-    traverse(block, shouldReturnValue = false)
+    traverse(block, shouldReturnValue = false, maybeInit = None)
   }
 
-  def traverse(block: Block, shouldReturnValue: Boolean): Unit = {
+  // The 'init' param is passed by constructors, whose first statement must be a call to super or other ctor.
+  // 'Init' does not inherit from 'Stat' so we can't add it to the Block
+  def traverse(block: Block, shouldReturnValue: Boolean, maybeInit: Option[Init] = None): Unit = {
     emitBlockStart()
+    maybeInit.foreach(init => {
+      InitTraverser.traverse(init)
+      emitStatementEnd()
+    })
     traverseContents(block, shouldReturnValue)
     emitBlockEnd()
   }
 
   private def traverseContents(block: Block, shouldReturnValue: Boolean): Unit = {
-    block.stats.slice(0, block.stats.length - 1)
-      .foreach(stat => traverseStatement(stat))
+    if (block.stats.nonEmpty) {
+      block.stats.slice(0, block.stats.length - 1)
+        .foreach(stat => traverseStatement(stat))
 
-    block.stats.last match {
-      case lastIf: If => IfTraverser.traverseIf(`if` = lastIf, shouldReturnValue = shouldReturnValue)
-      case lastTerm: Term if shouldReturnValue => traverseStatement(Return(lastTerm))
-      case lastStat => traverseStatement(lastStat)
+      block.stats.last match {
+        case lastIf: If => IfTraverser.traverseIf(`if` = lastIf, shouldReturnValue = shouldReturnValue)
+        case lastTerm: Term if shouldReturnValue => traverseStatement(Return(lastTerm))
+        case lastStat => traverseStatement(lastStat)
+      }
     }
   }
 
