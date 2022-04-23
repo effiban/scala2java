@@ -87,6 +87,7 @@ object TemplateTraverser extends ScalaTreeTraverser[Template] {
 
   // Render a Java explicit primary class constructor
   private def traverseExplicitPrimaryCtor(primaryCtor: Ctor.Primary, className: Type.Name): Unit = {
+    emitLine()
     AnnotListTraverser.traverseMods(primaryCtor.mods)
     emitModifiers(JavaModifiersResolver.resolveForClassMethod(primaryCtor.mods))
     TypeNameTraverser.traverse(className)
