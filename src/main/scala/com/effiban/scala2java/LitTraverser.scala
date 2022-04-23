@@ -8,10 +8,10 @@ object LitTraverser extends ScalaTreeTraverser[Lit] {
 
   // Literals in the code
   def traverse(lit: Lit): Unit = {
-    val strValue = lit.value match {
-      case str: Lit.String => s"\"$str\""
-      case Lit.Unit => ""
-      case other => other.toString
+    val strValue = lit match {
+      case str: Lit.String => s"\"${str.value}\""
+      case _: Lit.Unit => ""
+      case other => other.value.toString
     }
     emit(strValue)
   }
