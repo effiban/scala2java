@@ -1,15 +1,14 @@
 package com.effiban.scala2java
 
 import com.effiban.scala2java.JavaEmitter._
-import com.effiban.scala2java.TraversalConstants.JavaPlaceholder
 import com.effiban.scala2java.TraversalContext.javaOwnerContext
 
 import scala.meta.Defn.Trait
 import scala.meta.Mod.{Abstract, Annot, Final, Private, Protected, Sealed}
 import scala.meta.Name.Indeterminate
 import scala.meta.Pat.{Alternative, Bind}
-import scala.meta.Term.{AnonymousFunction, Apply, ApplyType, ApplyUnary, Ascribe, Assign, Block, Do, Eta, For, ForYield, If, New, NewAnonymous, Param, Return, Select, Super, This, Throw, Try, TryWithHandler, While}
-import scala.meta.{Case, Ctor, Decl, Defn, Enumerator, Import, Importee, Importer, Init, Lit, Mod, Name, Pat, Pkg, Source, Stat, Template, Term, Tree, Type}
+import scala.meta.Term.{AnonymousFunction, ApplyType, ApplyUnary, Ascribe, Assign, Block, Do, Eta, For, ForYield, If, New, NewAnonymous, Return, Select, Super, This, Throw, Try, TryWithHandler, While}
+import scala.meta.{Case, Ctor, Decl, Defn, Import, Importee, Importer, Init, Lit, Mod, Name, Pat, Pkg, Source, Stat, Template, Term, Tree, Type}
 
 object GenericTreeTraverser extends ScalaTreeTraverser[Tree] {
 
@@ -90,18 +89,18 @@ object GenericTreeTraverser extends ScalaTreeTraverser[Tree] {
     case `function`: Term.Function => TermFunctionTraverser.traverse(`function`)
     case partialFunction: Term.PartialFunction => PartialFunctionTraverser.traverse(partialFunction)
     case anonFunction: AnonymousFunction => AnonymousFunctionTraverser.traverse(anonFunction)
-    case `while`: While => traverse(`while`)
-    case `do`: Do => traverse(`do`)
-    case `for`: For => traverse(`for`)
-    case forYield: ForYield => traverse(forYield)
-    case `new`: New => traverse(`new`)
-    case newAnonymous: NewAnonymous => traverse(newAnonymous)
-    case placeholder: Term.Placeholder => traverse(placeholder)
-    case eta: Eta => traverse(eta)
-    case repeated: Term.Repeated => traverse(repeated)
-    case param: Term.Param => traverse(param)
-    case interpolate: Term.Interpolate => traverse(interpolate)
-    case xml: Term.Xml => traverse(xml)
+    case `while`: While => WhileTraverser.traverse(`while`)
+    case `do`: Do => DoTraverser.traverse(`do`)
+    case `for`: For => ForTraverser.traverse(`for`)
+    case forYield: ForYield => ForYieldTraverser.traverse(forYield)
+    case `new`: New => NewTraverser.traverse(`new`)
+    case newAnonymous: NewAnonymous => NewAnonymousTraverser.traverse(newAnonymous)
+    case termPlaceholder: Term.Placeholder => TermPlaceholderTraverser.traverse(termPlaceholder)
+    case eta: Eta => EtaTraverser.traverse(eta)
+    case termRepeated: Term.Repeated => TermRepeatedTraverser.traverse(termRepeated)
+    case termParam: Term.Param => TermParamTraverser.traverse(termParam)
+    case interpolate: Term.Interpolate => TermInterpolateTraverser.traverse(interpolate)
+    case xml: Term.Xml => TermXmlTraverser.traverse(xml)
 
     case typeName: Type.Name => traverse(typeName)
     case typeSelect: Type.Select => traverse(typeSelect)
@@ -155,86 +154,6 @@ object GenericTreeTraverser extends ScalaTreeTraverser[Tree] {
   }
 
   ////////////// TREE TRAVERSERS /////////////////
-
-  def traverse(`while`: While): Unit = {
-    emit("while (")
-    traverse(`while`.expr)
-    emit(") ")
-    traverse(`while`.body)
-  }
-
-  def traverse(`do`: Do): Unit = {
-    emit("do ")
-    traverse(`do`.body)
-    emit("while (")
-    traverse(`do`.expr)
-    emit(")")
-  }
-
-  def traverse(`for`: For): Unit = {
-    traverseFor(`for`.enums, `for`.body)
-  }
-
-  def traverse(forYield: ForYield): Unit = {
-    traverseFor(forYield.enums, forYield.body)
-  }
-
-  def traverse(`new`: New): Unit = {
-    emit("new ")
-    traverse(`new`.init)
-  }
-
-  def traverse(newAnonymous: NewAnonymous): Unit = {
-    emit("new ")
-    traverse(newAnonymous.templ)
-  }
-
-  // Underscore as expression - won't compile in java directly unless it is an anonymous function
-  def traverse(ignored: Term.Placeholder): Unit = {
-    emit(JavaPlaceholder)
-  }
-
-  // Function expression with underscore, example:  func _
-  def traverse(eta: Term.Eta): Unit = {
-    traverse(eta.expr)
-    // TODO - see if can be improved
-    emit(s" $JavaPlaceholder")
-  }
-
-  // Passing vararg expression, in Java probably nothing to change (?)
-  def traverse(termRepeated: Term.Repeated): Unit = {
-    traverse(termRepeated.expr)
-  }
-
-  // method parameter declaration
-  def traverse(termParam: Term.Param): Unit = {
-    traverseAnnotations(termParam.mods.collect { case ann: Annot => ann }, onSameLine = true)
-    val mods = javaOwnerContext match {
-      case Lambda => termParam.mods
-      case _ => termParam.mods :+ Final()
-    }
-    val modifierNames = resolveJavaExplicitModifiers(mods, List(classOf[Final]))
-    emitModifiers(modifierNames)
-    termParam.decltpe.foreach(declType => {
-      traverse(declType)
-      emit(" ")
-    })
-    traverse(termParam.name)
-  }
-
-  def traverse(termInterpolate: Term.Interpolate): Unit = {
-    // Transform Scala string interpolation to Java String.format()
-    termInterpolate.prefix match {
-      case Term.Name("s") => traverse(toJavaStringFormatInvocation(termInterpolate.parts, termInterpolate.args))
-      case _ => emitComment(s"UNPARSEABLE interpolation: $termInterpolate")
-    }
-  }
-
-  def traverse(termXml: Term.Xml): Unit = {
-    // TODO
-    emitComment(termXml.toString())
-  }
-
 
   def traverse(name: Type.Name): Unit = {
     emit(toJavaName(name))
@@ -673,10 +592,6 @@ object GenericTreeTraverser extends ScalaTreeTraverser[Tree] {
     ScalaTypeNameToJavaTypeName.getOrElse(typeName.value, typeName.value)
   }
 
-  private def toJavaStringFormatInvocation(formatParts: List[Lit], interpolationArgs: List[Term]) = {
-    Apply(Select(Term.Name("String"), Term.Name("format")), List(Lit.String(formatParts.mkString("%s"))) ++ interpolationArgs)
-  }
-
   def resolveJavaClassExplicitModifiers(mods: List[Mod]): List[String] = {
     val modifierNamesBuilder = List.newBuilder[String]
     if (!mods.exists(_.isInstanceOf[Private]) && !mods.exists(_.isInstanceOf[Protected])) {
@@ -728,54 +643,5 @@ object GenericTreeTraverser extends ScalaTreeTraverser[Tree] {
       .map { case (_, modifierName) => modifierName }
       .toList
       .sortBy(modifierName => JavaModifierNamePosition.getOrElse(modifierName, Int.MaxValue))
-  }
-
-  private def pat2Param(pat: Pat) = {
-    // TODO - improve
-    val name = pat match {
-      case Pat.Wildcard() => JavaPlaceholder
-      case _ => pat.toString()
-    }
-    Param(mods = List.empty, name = Term.Name(name), decltpe = None, default = None)
-  }
-
-  private def traverseFor(enumerators: List[Enumerator], body: Term): Unit = {
-    traverse(translateFor(enumerators, body))
-  }
-
-  private def translateFor(enumerators: List[Enumerator],
-                           body: Term,
-                           maybeCurrentParam: Option[Param] = None): Term = {
-    enumerators match {
-      case Nil =>
-        emitComment("ERROR - for comprehension without enumerators")
-        Lit.Unit()
-      case theEnumerators =>
-        val currentEnumerator :: nextEnumerators = theEnumerators
-
-        val (nextParam, currentTerm) = currentEnumerator match {
-          case Enumerator.Generator(pat, term) => (pat2Param(pat), term)
-          case Enumerator.CaseGenerator(pat, term) => (pat2Param(pat), term)
-          case Enumerator.Val(pat, term) => (pat2Param(pat), term)
-          //TODO handle guard, for now returning dummy values
-          case Enumerator.Guard(cond) => (Param(Nil, Term.Name(""), None, None), Lit.Unit())
-        }
-
-        val currentTranslated = maybeCurrentParam match {
-          case Some(currentParam) => Term.Function(List(currentParam), currentTerm)
-          case None => currentTerm
-        }
-
-        nextEnumerators match {
-          case Nil =>
-            // Next statement is last (yield)
-            val nextTranslated = Term.Function(List(nextParam), body)
-            Apply(Select(currentTranslated, Term.Name("map")), List(nextTranslated))
-          case theNextEnumerators =>
-            // Next statement is not last - recursively translate the rest
-            val nextTranslated = translateFor(theNextEnumerators, body, Some(nextParam))
-            Apply(Select(currentTranslated, Term.Name("flatMap")), List(nextTranslated))
-        }
-    }
   }
 }
