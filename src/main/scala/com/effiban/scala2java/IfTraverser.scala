@@ -2,6 +2,7 @@ package com.effiban.scala2java
 
 import com.effiban.scala2java.JavaEmitter.{emit, emitBlockEnd, emitBlockStart}
 
+import scala.meta.Lit
 import scala.meta.Term.{Block, If}
 
 object IfTraverser extends ScalaTreeTraverser[If] {
@@ -23,6 +24,7 @@ object IfTraverser extends ScalaTreeTraverser[If] {
       case block: Block =>
         emit("else")
         BlockTraverser.traverse(block)
+      case Lit.Unit() =>
       case stmt =>
         emit("else")
         emitBlockStart()
