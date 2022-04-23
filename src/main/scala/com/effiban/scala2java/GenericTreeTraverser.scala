@@ -1,6 +1,7 @@
 package com.effiban.scala2java
 
 import com.effiban.scala2java.JavaEmitter._
+import com.effiban.scala2java.TraversalConstants.JavaPlaceholder
 import com.effiban.scala2java.TraversalContext.javaOwnerContext
 
 import scala.meta.Defn.Trait
@@ -48,8 +49,6 @@ object GenericTreeTraverser extends ScalaTreeTraverser[Tree] {
     "Nothing" -> "Void"
   )
 
-  private val JavaPlaceholder = "__"
-
   override def traverse(tree: Tree): Unit = tree match {
     case source: Source => SourceTraverser.traverse(source)
 
@@ -80,17 +79,17 @@ object GenericTreeTraverser extends ScalaTreeTraverser[Tree] {
     case assign: Assign => AssignTraverser.traverse(assign)
     case `return`: Return => ReturnTraverser.traverse(`return`)
     case `throw`: Throw => ThrowTraverser.traverse(`throw`)
-    case ascribe: Ascribe => traverse(ascribe)
-    case annotate: Term.Annotate => traverse(annotate)
-    case tuple: Term.Tuple => traverse(tuple)
-    case block: Block => traverse(block)
-    case `if`: If => traverse(`if`)
-    case `match`: Term.Match => traverse(`match`)
-    case `try`: Try => traverse(`try`)
-    case tryWithHandler: TryWithHandler => traverse(tryWithHandler)
-    case `function`: Term.Function => traverse(`function`)
-    case partialFunction: Term.PartialFunction => traverse(partialFunction)
-    case anonFunction: Term.AnonymousFunction => traverse(anonFunction)
+    case ascribe: Ascribe => AscribeTraverser.traverse(ascribe)
+    case annotate: Term.Annotate => TermAnnotateTraverser.traverse(annotate)
+    case tuple: Term.Tuple => TermTupleTraverser.traverse(tuple)
+    case block: Block => BlockTraverser.traverse(block)
+    case `if`: If => IfTraverser.traverse(`if`)
+    case `match`: Term.Match => TermMatchTraverser.traverse(`match`)
+    case `try`: Try => TryTraverser.traverse(`try`)
+    case tryWithHandler: TryWithHandler => TryWithHandlerTraverser.traverse(tryWithHandler)
+    case `function`: Term.Function => TermFunctionTraverser.traverse(`function`)
+    case partialFunction: Term.PartialFunction => PartialFunctionTraverser.traverse(partialFunction)
+    case anonFunction: AnonymousFunction => AnonymousFunctionTraverser.traverse(anonFunction)
     case `while`: While => traverse(`while`)
     case `do`: Do => traverse(`do`)
     case `for`: For => traverse(`for`)
@@ -156,127 +155,6 @@ object GenericTreeTraverser extends ScalaTreeTraverser[Tree] {
   }
 
   ////////////// TREE TRAVERSERS /////////////////
-
-  // Explicitly specified type, e.g.: x = 2:Short
-  // Java equivalent is casting
-  def traverse(ascribe: Ascribe): Unit = {
-    emit("(")
-    traverse(ascribe.tpe)
-    emit(")")
-    traverse(ascribe.expr)
-  }
-
-  // Expression annotation, e.g.:  (x: @annot) match ....
-  // Partially supported in Java, so it will be rendered if it is a Java annotation
-  def traverse(termAnnotation: Term.Annotate): Unit = {
-    emit("(")
-    traverseAnnotations(termAnnotation.annots, onSameLine = true)
-    traverse(termAnnotation.expr)
-    emit(")")
-  }
-
-  // Java supports tuples only in lambdas AFAIK, but the replacement is not obvious - so rendering it anyway
-  def traverse(termTuple: Term.Tuple): Unit = {
-    emit("(")
-    traverse(termTuple.args)
-    emit(")")
-  }
-
-  // block of code
-  def traverse(block: Block): Unit = {
-    emitBlockStart()
-    traverseBlockContents(block)
-    emitBlockEnd()
-  }
-
-  def traverse(`if`: If): Unit = {
-    // TODO handle mods (what is this in an 'if'?...)
-    emit("if (")
-    traverse(`if`.cond)
-    emit(")")
-    `if`.thenp match {
-      case block: Block => traverse(block)
-      case stmt =>
-        emitBlockStart()
-        traverseLastStatement(stmt)
-        emitBlockEnd()
-    }
-    `if`.elsep match {
-      case block: Block =>
-        emit("else")
-        traverse(block)
-      case stmt =>
-        emit("else")
-        emitBlockStart()
-        traverseLastStatement(stmt)
-        emitBlockEnd()
-    }
-  }
-
-  def traverse(termMatch: Term.Match): Unit = {
-    // TODO handle mods (what is this in a 'match'?...)
-    emit("switch ")
-    emit("(")
-    traverse(termMatch.expr)
-    emit(")")
-    emitBlockStart()
-    termMatch.cases.foreach(traverse)
-    emitBlockEnd()
-  }
-
-  def traverse(`try`: Try): Unit = {
-    emit("try ")
-    traverse(`try`.expr)
-    `try`.catchp.foreach(traverseCatchClauseWithCase)
-    `try`.finallyp.foreach(finallyp => {
-      emit("finally")
-      emitBlockStart()
-      traverse(finallyp)
-      emitBlockEnd()
-    })
-  }
-
-  def traverse(tryWithHandler: TryWithHandler): Unit = {
-    emit("try ")
-    traverse(tryWithHandler.expr)
-    traverseCatchClauseWithHandler(tryWithHandler.catchp)
-    tryWithHandler.finallyp.foreach(finallyp => {
-      emit("finally")
-      emitBlockStart()
-      traverse(finallyp)
-      emitBlockEnd()
-    })
-  }
-
-  // lambda definition
-  def traverse(function: Term.Function): Unit = {
-    val outerJavaOwnerContext = javaOwnerContext
-    javaOwnerContext = Lambda
-    function.params match {
-      case Nil =>
-      case param :: Nil => traverse(param)
-      case _ =>
-        emitParametersStart()
-        traverse(function.params)
-        emitParametersEnd()
-    }
-    emitArrow()
-    traverse(function.body)
-    javaOwnerContext = outerJavaOwnerContext
-  }
-
-  def traverse(partialFunction: Term.PartialFunction): Unit = {
-    val dummyArgName = "arg"
-    emit(dummyArgName)
-    emitArrow()
-    traverse(Term.Match(expr = Term.Name(dummyArgName), cases = partialFunction.cases))
-  }
-
-  def traverse(anonymousFunction: AnonymousFunction): Unit = {
-    traverse(Term.Function(
-      params = List(Param(name = Term.Name(JavaPlaceholder), mods = Nil, decltpe = None, default = None)),
-      body = anonymousFunction.body))
-  }
 
   def traverse(`while`: While): Unit = {
     emit("while (")
@@ -657,40 +535,6 @@ object GenericTreeTraverser extends ScalaTreeTraverser[Tree] {
   }
 
   ////////////// INTERNAL METHODS /////////////////
-
-  private def traverseCatchClauseWithCase(`case`: Case): Unit = {
-    emit("catch (")
-    traverse(`case`.pat)
-    `case`.cond.foreach(cond => {
-      emit(" && (")
-      traverse(cond)
-      emit(")")
-    })
-    emit(")")
-    emitBlockStart()
-    traverse(`case`.body)
-    emitBlockEnd()
-  }
-
-  private def traverseCatchClauseWithHandler(handler: Term): Unit = {
-    emit("catch (")
-    traverse(handler)
-    emit(")")
-  }
-
-  private def traverseBlockContents(block: Block): Unit = {
-    block.stats.slice(0, block.stats.length - 1)
-      .foreach(stat => {
-        traverse(stat)
-        stat match {
-          case _: Block =>
-          case _: If =>
-          case _: While =>
-          case _ => emitStatementEnd()
-        }
-      })
-    traverseLastStatement(block.stats.last)
-  }
 
   def traverseGenericTypeList(types: List[Tree]): Unit = {
     if (types.nonEmpty) {
