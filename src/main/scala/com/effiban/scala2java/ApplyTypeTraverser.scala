@@ -1,6 +1,5 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.GenericTreeTraverser.traverseGenericTypeList
 import com.effiban.scala2java.JavaEmitter.emit
 
 import scala.meta.Term
@@ -23,7 +22,7 @@ object ApplyTypeTraverser extends ScalaTreeTraverser[ApplyType] {
         if (termApplyType.targs.nonEmpty) {
           emit(".")
         }
-        traverseGenericTypeList(termApplyType.targs)
+        TypeListTraverser.traverse(termApplyType.targs)
     }
   }
 }

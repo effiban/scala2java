@@ -1,6 +1,5 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.GenericTreeTraverser.traverseLastStatement
 import com.effiban.scala2java.JavaEmitter.{emit, emitBlockEnd, emitBlockStart}
 
 import scala.meta.Term.{Block, If}
@@ -16,9 +15,10 @@ object IfTraverser extends ScalaTreeTraverser[If] {
       case block: Block => GenericTreeTraverser.traverse(block)
       case stmt =>
         emitBlockStart()
-        traverseLastStatement(stmt)
+        GenericTreeTraverser.traverse(stmt)
         emitBlockEnd()
     }
+    // TODO handle empty else (how is this done??)
     `if`.elsep match {
       case block: Block =>
         emit("else")
@@ -26,7 +26,7 @@ object IfTraverser extends ScalaTreeTraverser[If] {
       case stmt =>
         emit("else")
         emitBlockStart()
-        traverseLastStatement(stmt)
+        GenericTreeTraverser.traverse(stmt)
         emitBlockEnd()
     }
   }

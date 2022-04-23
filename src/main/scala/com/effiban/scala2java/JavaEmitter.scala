@@ -4,6 +4,12 @@ object JavaEmitter {
   var indentationLevel = 0
   var indentationRequired = false
 
+  sealed trait DualDelimiterType
+  case object Parentheses extends DualDelimiterType
+  case object SquareBracket extends DualDelimiterType
+  case object CurlyBrace extends DualDelimiterType
+  case object AngleBracket extends DualDelimiterType
+
   def emitTypeDeclaration(modifiers: List[String], typeKeyword: String, name: String): Unit = {
     emitModifiers(modifiers)
     emit(s"$typeKeyword $name")
@@ -40,26 +46,18 @@ object JavaEmitter {
     emitLine("}")
   }
 
-  def emitParametersStart(): Unit = {
-    emit("(")
+  def emitArgumentsStart(delimType: DualDelimiterType): Unit = {
+    emitStartDelimiter(delimType)
     indentationLevel += 1
   }
 
-  def emitParametersEnd(): Unit = {
-    emit(")")
+  def emitArgumentsEnd(delimType: DualDelimiterType): Unit = {
+    emitEndDelimiter(delimType)
     indentationLevel -= 1
   }
 
   def emitListSeparator(): Unit = {
     emit(", ")
-  }
-
-  def emitTypeArgsStart(): Unit = {
-    emit("<")
-  }
-
-  def emitTypeArgsEnd(): Unit = {
-    emit(">")
   }
 
   def emitComment(comment: String): Unit = {
@@ -86,6 +84,26 @@ object JavaEmitter {
   private def emitLineBreak(): Unit = {
     emit("\n")
     indentationRequired = true
+  }
+
+  private def emitStartDelimiter(delimType: DualDelimiterType): Unit = {
+    val delimStr = delimType match {
+      case Parentheses => "("
+      case SquareBracket => "["
+      case CurlyBrace => "{"
+      case AngleBracket => "<"
+    }
+    emit(delimStr)
+  }
+
+  private def emitEndDelimiter(delimType: DualDelimiterType): Unit = {
+    val delimStr = delimType match {
+      case Parentheses => ")"
+      case SquareBracket => "]"
+      case CurlyBrace => "}"
+      case AngleBracket => ">"
+    }
+    emit(delimStr)
   }
 
   private def indentation() = "\t" * indentationLevel

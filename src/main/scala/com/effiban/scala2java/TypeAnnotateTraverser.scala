@@ -1,6 +1,5 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.GenericTreeTraverser.traverseAnnotations
 import com.effiban.scala2java.JavaEmitter.emit
 
 import scala.meta.Type
@@ -9,7 +8,7 @@ object TypeAnnotateTraverser extends ScalaTreeTraverser[Type.Annotate] {
 
   // type with annotation, e.g.: T @annot
   def traverse(annotatedType: Type.Annotate): Unit = {
-    traverseAnnotations(annotatedType.annots)
+    AnnotListTraverser.traverseAnnotations(annotatedType.annots)
     emit(" ")
     GenericTreeTraverser.traverse(annotatedType.tpe)
   }

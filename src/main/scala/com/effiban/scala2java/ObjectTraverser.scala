@@ -1,6 +1,5 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.GenericTreeTraverser.resolveJavaClassExplicitModifiers
 import com.effiban.scala2java.JavaEmitter.{emitComment, emitLine, emitTypeDeclaration}
 import com.effiban.scala2java.TraversalContext.javaOwnerContext
 
@@ -12,7 +11,7 @@ object ObjectTraverser extends ScalaTreeTraverser[Defn.Object] {
     emitLine()
     emitComment("originally a Scala object")
     emitLine()
-    emitTypeDeclaration(modifiers = resolveJavaClassExplicitModifiers(objectDef.mods),
+    emitTypeDeclaration(modifiers = JavaModifiersResolver.resolveForClass(objectDef.mods),
       typeKeyword = "class",
       name = s"${objectDef.name.toString}")
     val outerJavaOwnerContext = javaOwnerContext

@@ -13,6 +13,6 @@ object TermApplyInfixTraverser extends ScalaTreeTraverser[Term.ApplyInfix] {
     emit(" ")
     GenericTreeTraverser.traverse(termApplyInfix.op)
     emit(" ")
-    GenericTreeTraverser.traverse(termApplyInfix.args)
+    ArgumentListTraverser.traverse(termApplyInfix.args, onSameLine = true)
   }
 }
