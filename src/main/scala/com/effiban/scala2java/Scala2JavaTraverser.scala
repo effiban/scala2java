@@ -13,9 +13,7 @@ object Scala2JavaTraverser {
 
   private sealed trait JavaOwnerContext
 
-  private case object RegularClass extends JavaOwnerContext
-
-  private case object ClassFromObject extends JavaOwnerContext
+  private case object Class extends JavaOwnerContext
 
   private case object Interface extends JavaOwnerContext
 
@@ -190,8 +188,7 @@ object Scala2JavaTraverser {
     traverseAnnotations(valDecl.mods.collect { case ann: Annot => ann }, annotationsOnSameLine)
     val mods = valDecl.mods :+ Final()
     val modifierNames = javaOwnerContext match {
-      case RegularClass => resolveJavaClassDataMemberExplicitModifiers(mods)
-      case ClassFromObject => resolveJavaClassFromObjectDataMemberExplicitModifiers(mods)
+      case Class => resolveJavaClassDataMemberExplicitModifiers(mods)
       case _ if javaOwnerContext == Interface => Nil
       // The only possible modifier for a local var is 'final'
       case Method => resolveJavaExplicitModifiers(mods, List(classOf[Final]))
@@ -207,8 +204,7 @@ object Scala2JavaTraverser {
     val annotationsOnSameLine = varDecl.mods.exists(_.isInstanceOf[ValParam])
     traverseAnnotations(varDecl.mods.collect { case ann: Annot => ann }, annotationsOnSameLine)
     val modifierNames = javaOwnerContext match {
-      case RegularClass => resolveJavaClassDataMemberExplicitModifiers(varDecl.mods)
-      case ClassFromObject => resolveJavaClassFromObjectDataMemberExplicitModifiers(varDecl.mods)
+      case Class => resolveJavaClassDataMemberExplicitModifiers(varDecl.mods)
       case _ => Nil
     }
     emitModifiers(modifierNames)
@@ -222,8 +218,7 @@ object Scala2JavaTraverser {
     traverseAnnotations(defDecl.mods.collect { case ann: Annot => ann })
     val resolvedModifierNames = javaOwnerContext match {
       case Interface => resolveJavaInterfaceMethodExplicitModifiers(defDecl.mods, hasBody = false)
-      case RegularClass => resolveJavaClassMethodExplicitModifiers(defDecl.mods)
-      case ClassFromObject => resolveJavaClassFromObjectMethodExplicitModifiers(defDecl.mods)
+      case Class => resolveJavaClassMethodExplicitModifiers(defDecl.mods)
       case _ => Nil
     }
     emitModifiers(resolvedModifierNames)
@@ -252,8 +247,7 @@ object Scala2JavaTraverser {
     traverseAnnotations(valDef.mods.collect { case ann: Annot => ann }, annotationsOnSameLine)
     val mods = valDef.mods :+ Final()
     val modifierNames = mods match {
-      case modifiers if javaOwnerContext == RegularClass => resolveJavaClassDataMemberExplicitModifiers(modifiers)
-      case modifiers if javaOwnerContext == ClassFromObject => resolveJavaClassFromObjectDataMemberExplicitModifiers(modifiers)
+      case modifiers if javaOwnerContext == Class => resolveJavaClassDataMemberExplicitModifiers(modifiers)
       case _ if javaOwnerContext == Interface => Nil
       // The only possible modifier for a method param or local var is 'final' (if it's immutable as determined above)
       case modifiers if javaOwnerContext == Method => resolveJavaExplicitModifiers(modifiers, List(classOf[Final]))
@@ -276,8 +270,7 @@ object Scala2JavaTraverser {
     val annotationsOnSameLine = varDef.mods.exists(_.isInstanceOf[ValParam])
     traverseAnnotations(varDef.mods.collect { case ann: Annot => ann }, annotationsOnSameLine)
     val modifierNames = varDef.mods match {
-      case modifiers if javaOwnerContext == RegularClass => resolveJavaClassDataMemberExplicitModifiers(modifiers)
-      case modifiers if javaOwnerContext == ClassFromObject => resolveJavaClassFromObjectDataMemberExplicitModifiers(modifiers)
+      case modifiers if javaOwnerContext == Class => resolveJavaClassDataMemberExplicitModifiers(modifiers)
       case _ => Nil
     }
     emitModifiers(modifierNames)
@@ -300,8 +293,7 @@ object Scala2JavaTraverser {
     traverseAnnotations(defDef.mods.collect { case ann: Annot => ann })
     val resolvedModifierNames = javaOwnerContext match {
       case Interface => resolveJavaInterfaceMethodExplicitModifiers(defDef.mods, hasBody = true)
-      case RegularClass => resolveJavaClassMethodExplicitModifiers(defDef.mods)
-      case ClassFromObject => resolveJavaClassFromObjectMethodExplicitModifiers(defDef.mods)
+      case Class => resolveJavaClassMethodExplicitModifiers(defDef.mods)
       case _ => Nil
     }
     emitModifiers(resolvedModifierNames)
@@ -351,7 +343,7 @@ object Scala2JavaTraverser {
     traverse(classDef.ctor.paramss.flatten)
     emitParametersEnd()
     val outerJavaOwnerContext = javaOwnerContext
-    javaOwnerContext = RegularClass
+    javaOwnerContext = Class
     traverse(classDef.templ)
     javaOwnerContext = outerJavaOwnerContext
   }
@@ -363,7 +355,7 @@ object Scala2JavaTraverser {
     // TODO - traverse type params
 
     val outerJavaOwnerContext = javaOwnerContext
-    javaOwnerContext = RegularClass
+    javaOwnerContext = Class
     traverseTemplate(template = classDef.templ,
       maybeExplicitPrimaryCtor = Some(classDef.ctor),
       maybeClassName = Some(classDef.name))
@@ -385,11 +377,11 @@ object Scala2JavaTraverser {
     emitLine()
     emitComment("originally a Scala object")
     emitLine()
-    emitTypeDeclaration(modifiers = resolveJavaClassExplicitModifiers(objectDef.mods :+ Final()),
+    emitTypeDeclaration(modifiers = resolveJavaClassExplicitModifiers(objectDef.mods),
       typeKeyword = "class",
       name = s"${objectDef.name.toString}")
     val outerJavaOwnerContext = javaOwnerContext
-    javaOwnerContext = ClassFromObject
+    javaOwnerContext = Class
     traverse(objectDef.templ)
     javaOwnerContext = outerJavaOwnerContext
   }
@@ -1234,16 +1226,6 @@ object Scala2JavaTraverser {
     modifierNamesBuilder.result()
   }
 
-  private def resolveJavaClassFromObjectMethodExplicitModifiers(mods: List[Mod]): List[String] = {
-    val modifierNamesBuilder = List.newBuilder[String]
-    if (!mods.exists(_.isInstanceOf[Private]) && !mods.exists(_.isInstanceOf[Protected])) {
-      modifierNamesBuilder += "public"
-    }
-    modifierNamesBuilder ++= resolveJavaExplicitModifiers(mods, List(classOf[Private], classOf[Protected]))
-    modifierNamesBuilder ++= List("static", "final")
-    modifierNamesBuilder.result()
-  }
-
   private def resolveJavaInterfaceMethodExplicitModifiers(mods: List[Mod], hasBody: Boolean): List[String] = {
     val modifierNamesBuilder = List.newBuilder[String]
     if (!mods.exists(_.isInstanceOf[Private]) && hasBody) {
@@ -1259,16 +1241,6 @@ object Scala2JavaTraverser {
       modifierNamesBuilder += "public"
     }
     modifierNamesBuilder ++= resolveJavaExplicitModifiers(mods, List(classOf[Private], classOf[Protected], classOf[Final]))
-    modifierNamesBuilder.result()
-  }
-
-  private def resolveJavaClassFromObjectDataMemberExplicitModifiers(mods: List[Mod]): List[String] = {
-    val modifierNamesBuilder = List.newBuilder[String]
-    if (!mods.exists(_.isInstanceOf[Private]) && !mods.exists(_.isInstanceOf[Protected])) {
-      modifierNamesBuilder += "public"
-    }
-    modifierNamesBuilder ++= resolveJavaExplicitModifiers(mods, List(classOf[Private], classOf[Protected]))
-    modifierNamesBuilder ++= List("static", "final")
     modifierNamesBuilder.result()
   }
 
