@@ -106,18 +106,18 @@ object GenericTreeTraverser extends ScalaTreeTraverser[Tree] {
     case typeVar: Type.Var => TypeVarTraverser.traverse(typeVar)
     case typeParam: Type.Param => TypeParamTraverser.traverse(typeParam)
 
-    case literal: Lit => traverse(literal)
-    case patternWildcard: Pat.Wildcard => traverse(patternWildcard)
-    case patternSeqWildcard: Pat.SeqWildcard => traverse(patternSeqWildcard)
-    case patternVar: Pat.Var => traverse(patternVar)
-    case patternBind: Bind => traverse(patternBind)
-    case patternAlternative: Alternative => traverse(patternAlternative)
-    case patternTuple: Pat.Tuple => traverse(patternTuple)
-    case patternExtract: Pat.Extract => traverse(patternExtract)
-    case patternExtractInfix: Pat.ExtractInfix => traverse(patternExtractInfix)
-    case patternInterpolate: Pat.Interpolate => traverse(patternInterpolate)
-    case patternXml: Pat.Xml => traverse(patternXml)
-    case patternTyped: Pat.Typed => traverse(patternTyped)
+    case literal: Lit => LitTraverser.traverse(literal)
+    case patternWildcard: Pat.Wildcard => PatWildcardTraverser.traverse(patternWildcard)
+    case patternSeqWildcard: Pat.SeqWildcard => PatSeqWildcardTraverser.traverse(patternSeqWildcard)
+    case patternVar: Pat.Var => PatVarTraverser.traverse(patternVar)
+    case patternBind: Bind => BindTraverser.traverse(patternBind)
+    case patternAlternative: Alternative => AlternativeTraverser.traverse(patternAlternative)
+    case patternTuple: Pat.Tuple => PatTupleTraverser.traverse(patternTuple)
+    case patternExtract: Pat.Extract => PatExtractTraverser.traverse(patternExtract)
+    case patternExtractInfix: Pat.ExtractInfix => PatExtractInfixTraverser.traverse(patternExtractInfix)
+    case patternInterpolate: Pat.Interpolate => PatInterpolateTraverser.traverse(patternInterpolate)
+    case patternXml: Pat.Xml => PatXmlTraverser.traverse(patternXml)
+    case patternTyped: Pat.Typed => PatTypedTraverser.traverse(patternTyped)
 
     case `case`: Case => traverse(`case`)
 
@@ -137,81 +137,6 @@ object GenericTreeTraverser extends ScalaTreeTraverser[Tree] {
   }
 
   ////////////// TREE TRAVERSERS /////////////////
-
-  def traverse(lit: Lit): Unit = {
-    val strValue = lit.value match {
-      case str: Lit.String => s"\"$str\""
-      case Lit.Unit => ""
-      case other => other.toString
-    }
-    emit(strValue)
-  }
-
-  // Wildcard in pattern match expression - translates to Java "default" ?
-  def traverse(ignored: Pat.Wildcard): Unit = {
-    emitComment("default")
-  }
-
-  // Vararg in pattern match expression, e.g. `_*` in case List(xs @ _*). Not translatable (?)
-  def traverse(patternSeqWildcard: Pat.SeqWildcard): Unit = {
-    emitComment("_*")
-  }
-
-  // Pattern match variable, e.g. `a` in case a =>
-  def traverse(patternVar: Pat.Var): Unit = {
-    traverse(patternVar.name)
-  }
-
-  // Pattern match bind variable, e.g.: a @ A()
-  def traverse(patternBind: Bind): Unit = {
-    // In Java (when supported) the order is reversed
-    traverse(patternBind.rhs)
-    emit(" ")
-    traverse(patternBind.lhs)
-  }
-
-  // Pattern match alternative, e.g. 2 | 3. In Java - separated by comma
-  def traverse(patternAlternative: Alternative): Unit = {
-    traverse(patternAlternative.lhs)
-    emit(", ")
-    traverse(patternAlternative.rhs)
-  }
-
-  // Pattern match tuple expression, no Java equivalent
-  def traverse(patternTuple: Pat.Tuple): Unit = {
-    emitComment(s"(${patternTuple.args.toString()})")
-  }
-
-  // Pattern match extractor e.g. A(a, b).
-  // No Java equivalent (but consider rewriting as a guard ?)
-  def traverse(patternExtractor: Pat.Extract): Unit = {
-    emitComment(s"${patternExtractor.fun}(${patternExtractor.args})")
-  }
-
-  // Pattern match extractor infix e.g. a E b.
-  // No Java equivalent (but consider rewriting as a guard ?)
-  def traverse(patternExtractorInfix: Pat.ExtractInfix): Unit = {
-    emitComment(s"${patternExtractorInfix.lhs} ${patternExtractorInfix.op} ${patternExtractorInfix.rhs}")
-  }
-
-  // Pattern interpolation e.g. r"Hello (.+)$name" , no Java equivalent
-  def traverse(patternInterpolation: Pat.Interpolate): Unit = {
-    emitComment(patternInterpolation.toString())
-  }
-
-  // Pattern match xml
-  def traverse(patternXml: Pat.Xml): Unit = {
-    // TODO
-    emitComment(patternXml.toString())
-  }
-
-  // Typed pattern expression. e.g. a: Int
-  def traverse(typedPattern: Pat.Typed): Unit = {
-    traverse(typedPattern.rhs)
-    emit(" ")
-    traverse(typedPattern.lhs)
-  }
-
 
   def traverse(`case`: Case): Unit = {
     emit("case ")
