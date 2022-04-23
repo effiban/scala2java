@@ -1,0 +1,16 @@
+.settings/
+.classpath
+.project
+workspace/
+*.iml
+*.ipr
+*.iws
+build/
+target/
+out/
+.gradle/
+venv/
+.idea
+*.sc
+.scala_dependencies
+.env
