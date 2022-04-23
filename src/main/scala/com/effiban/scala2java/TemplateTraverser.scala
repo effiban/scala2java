@@ -3,7 +3,7 @@ package com.effiban.scala2java
 import com.effiban.scala2java.JavaEmitter._
 import com.effiban.scala2java.TraversalContext.javaOwnerContext
 
-import scala.meta.Term.{Assign, Select, This}
+import scala.meta.Term.{Assign, Block, Select, This}
 import scala.meta.{Ctor, Decl, Defn, Init, Name, Stat, Template, Term, Type}
 
 object TemplateTraverser extends ScalaTreeTraverser[Template] {
@@ -94,14 +94,14 @@ object TemplateTraverser extends ScalaTreeTraverser[Template] {
     val outerJavaOwnerContext = javaOwnerContext
     javaOwnerContext = Method
     TermParamListTraverser.traverse(primaryCtor.paramss.flatten)
-    emitBlockStart()
+
     // Initialize members explicitly (what is done implicitly for Java records and Scala classes)
-    primaryCtor.paramss.flatten.foreach(param => {
+    val assignments = primaryCtor.paramss.flatten.map(param => {
       val paramName = Term.Name(param.name.toString())
-      AssignTraverser.traverse(Assign(Select(This(Name.Anonymous()), paramName), paramName))
-      emitStatementEnd()
+      Assign(Select(This(Name.Anonymous()), paramName), paramName)
     })
-    emitBlockEnd()
+    BlockTraverser.traverse(block = Block(assignments), shouldReturnValue = false)
+
     javaOwnerContext = outerJavaOwnerContext
   }
 

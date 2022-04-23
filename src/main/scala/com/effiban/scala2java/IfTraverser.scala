@@ -1,6 +1,6 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.{emit, emitBlockEnd, emitBlockStart}
+import com.effiban.scala2java.JavaEmitter.emit
 
 import scala.meta.Lit
 import scala.meta.Term.{Block, If}
@@ -8,28 +8,26 @@ import scala.meta.Term.{Block, If}
 object IfTraverser extends ScalaTreeTraverser[If] {
 
   override def traverse(`if`: If): Unit = {
+    traverseIf(`if` = `if`, shouldReturnValue = false)
+  }
+
+  def traverseIf(`if`: If, shouldReturnValue: Boolean): Unit = {
     // TODO handle mods (what is this in an 'if'?...)
     emit("if (")
     TermTraverser.traverse(`if`.cond)
     emit(")")
     `if`.thenp match {
-      case block: Block => BlockTraverser.traverse(block)
-      case stmt =>
-        emitBlockStart()
-        TermTraverser.traverse(stmt)
-        emitBlockEnd()
+      case block: Block => BlockTraverser.traverse(block = block, shouldReturnValue = shouldReturnValue)
+      case term => BlockTraverser.traverse(block = Block(List(term)), shouldReturnValue = shouldReturnValue)
     }
-    // TODO handle empty else (how is this done??)
     `if`.elsep match {
       case block: Block =>
         emit("else")
-        BlockTraverser.traverse(block)
+        BlockTraverser.traverse(block = block, shouldReturnValue = shouldReturnValue)
       case Lit.Unit() =>
-      case stmt =>
+      case term =>
         emit("else")
-        emitBlockStart()
-        TermTraverser.traverse(stmt)
-        emitBlockEnd()
+        BlockTraverser.traverse(block = Block(List(term)), shouldReturnValue = shouldReturnValue)
     }
   }
 }
