@@ -8,7 +8,8 @@ object TypeBoundsTraverser extends ScalaTreeTraverser[Type.Bounds] {
 
   // Scala type bounds e.g. X <: Y
   override def traverse(typeBounds: Type.Bounds): Unit = {
-    // Only upper or lower bounds allowed in Java, not both - but if a Scala lower bound is `Null` it can be skipped
+    // Only upper or lower bounds allowed in Java, not both
+    // TODO handle lower bound Null which can be skipped in Java
     (typeBounds.lo, typeBounds.hi) match {
       case (Some(lo), None) =>
         emit(" super ")
@@ -16,8 +17,10 @@ object TypeBoundsTraverser extends ScalaTreeTraverser[Type.Bounds] {
       case (None, Some(hi)) =>
         emit(" extends ")
         TypeTraverser.traverse(hi)
-      // TODO handle lower bound Null
-      case _ => emitComment(typeBounds.toString)
+      case (None, None) =>
+      case _ =>
+        // Both bounds provided - we can only emit a comment
+        emitComment(typeBounds.toString)
     }
   }
 }
