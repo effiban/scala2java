@@ -31,23 +31,6 @@ object GenericTreeTraverser extends ScalaTreeTraverser[Tree] {
     "final" -> 4
   )
 
-  private final val ScalaTypeNameToJavaTypeName = Map(
-    "Any" -> "Object",
-    "AnyRef" -> "Object",
-    "Boolean" -> "boolean",
-    "Byte" -> "byte",
-    "Short" -> "short",
-    "Int" -> "int",
-    "Long" -> "long",
-    "Float" -> "float",
-    "Double" -> "double",
-    "Unit" -> "void",
-    "Seq" -> "List",
-    "Vector" -> "List",
-    "Option" -> "Optional",
-    "Nothing" -> "Void"
-  )
-
   override def traverse(tree: Tree): Unit = tree match {
     case source: Source => SourceTraverser.traverse(source)
 
@@ -102,16 +85,16 @@ object GenericTreeTraverser extends ScalaTreeTraverser[Tree] {
     case interpolate: Term.Interpolate => TermInterpolateTraverser.traverse(interpolate)
     case xml: Term.Xml => TermXmlTraverser.traverse(xml)
 
-    case typeName: Type.Name => traverse(typeName)
-    case typeSelect: Type.Select => traverse(typeSelect)
-    case typeProject: Type.Project => traverse(typeProject)
-    case typeSingleton: Type.Singleton => traverse(typeSingleton)
+    case typeName: Type.Name => TypeNameTraverser.traverse(typeName)
+    case typeSelect: Type.Select => TypeSelectTraverser.traverse(typeSelect)
+    case typeProject: Type.Project => TypeProjectTraverser.traverse(typeProject)
+    case typeSingleton: Type.Singleton => TypeSingletonTraverser.traverse(typeSingleton)
 
-    case typeApply: Type.Apply => traverse(typeApply)
-    case typeApplyInfix: Type.ApplyInfix => traverse(typeApplyInfix)
-    case functionType: Type.Function => traverse(functionType)
-    case tupleType: Type.Tuple => traverse(tupleType)
-    case withType: Type.With => traverse(withType)
+    case typeApply: Type.Apply => TypeApplyTraverser.traverse(typeApply)
+    case typeApplyInfix: Type.ApplyInfix => TypeApplyInfixTraverser.traverse(typeApplyInfix)
+    case functionType: Type.Function => TypeFunctionTraverser.traverse(functionType)
+    case tupleType: Type.Tuple => TypeTupleTraverser.traverse(tupleType)
+    case withType: Type.With => TypeWithTraverser.traverse(withType)
     case typeRefine: Type.Refine => traverse(typeRefine)
     case existentialType: Type.Existential => traverse(existentialType)
     case typeAnnotation: Type.Annotate => traverse(typeAnnotation)
@@ -154,60 +137,6 @@ object GenericTreeTraverser extends ScalaTreeTraverser[Tree] {
   }
 
   ////////////// TREE TRAVERSERS /////////////////
-
-  def traverse(name: Type.Name): Unit = {
-    emit(toJavaName(name))
-  }
-
-  // A scala type selecting expression like: a.B
-  def traverse(typeSelect: Type.Select): Unit = {
-    traverse(typeSelect.qual)
-    emit(".")
-    traverse(typeSelect.name)
-  }
-
-  // A scala type projecting expression like: a#B
-  def traverse(typeProject: Type.Project): Unit = {
-    traverse(typeProject.qual)
-    emit(".")
-    traverse(typeProject.name)
-  }
-
-  // A scala expression representing the type of a singleton like: A.type
-  def traverse(singletonType: Type.Singleton): Unit = {
-    traverse(singletonType.ref)
-    emit(".class")
-  }
-
-
-  // type with generic args, e.g. F[T]
-  def traverse(typeApply: Type.Apply): Unit = {
-    traverse(typeApply.tpe)
-    traverseGenericTypeList(typeApply.args)
-  }
-
-  // type with generic args in infix notation, e.g. K Map V
-  def traverse(ignored: Type.ApplyInfix): Unit = {
-    // TODO
-  }
-
-  // lambda type
-  def traverse(functionType: Type.Function): Unit = {
-    traverse(Type.Apply(Type.Name("Function"), functionType.params :+ functionType.res))
-  }
-
-  //tuple as type, cannot be translated directly into Java
-  def traverse(tupleType: Type.Tuple): Unit = {
-    emitComment(tupleType.toString())
-  }
-
-  // type with parent, e.g.  A with B
-  // approximated by Java "extends" but might not compile
-  def traverse(typeWith: Type.With): Unit = {
-    traverse(typeWith.lhs)
-    emit(" extends ")
-    traverse(typeWith.rhs)
-  }
 
   // A {def f: Int }
   def traverse(refinedType: Type.Refine): Unit = {
@@ -586,10 +515,6 @@ object GenericTreeTraverser extends ScalaTreeTraverser[Tree] {
     emit("return ")
     traverse(stmt)
     emitStatementEnd()
-  }
-
-  private def toJavaName(typeName: Type.Name) = {
-    ScalaTypeNameToJavaTypeName.getOrElse(typeName.value, typeName.value)
   }
 
   def resolveJavaClassExplicitModifiers(mods: List[Mod]): List[String] = {
