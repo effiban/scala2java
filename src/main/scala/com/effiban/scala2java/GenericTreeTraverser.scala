@@ -95,16 +95,16 @@ object GenericTreeTraverser extends ScalaTreeTraverser[Tree] {
     case functionType: Type.Function => TypeFunctionTraverser.traverse(functionType)
     case tupleType: Type.Tuple => TypeTupleTraverser.traverse(tupleType)
     case withType: Type.With => TypeWithTraverser.traverse(withType)
-    case typeRefine: Type.Refine => traverse(typeRefine)
-    case existentialType: Type.Existential => traverse(existentialType)
-    case typeAnnotation: Type.Annotate => traverse(typeAnnotation)
-    case lambdaType: Type.Lambda => traverse(lambdaType)
-    case placeholderType: Type.Placeholder => traverse(placeholderType)
-    case typeBounds: Type.Bounds => traverse(typeBounds)
-    case byNameType: Type.ByName => traverse(byNameType)
-    case repeatedType: Type.Repeated => traverse(repeatedType)
-    case typeVar: Type.Var => traverse(typeVar)
-    case typeParam: Type.Param => traverse(typeParam)
+    case typeRefine: Type.Refine => TypeRefineTraverser.traverse(typeRefine)
+    case existentialType: Type.Existential => TypeExistentialTraverser.traverse(existentialType)
+    case typeAnnotation: Type.Annotate => TypeAnnotateTraverser.traverse(typeAnnotation)
+    case lambdaType: Type.Lambda => TypeLambdaTraverser.traverse(lambdaType)
+    case placeholderType: Type.Placeholder => TypePlaceholderTraverser.traverse(placeholderType)
+    case typeBounds: Type.Bounds => TypeBoundsTraverser.traverse(typeBounds)
+    case byNameType: Type.ByName => TypeByNameTraverser.traverse(byNameType)
+    case repeatedType: Type.Repeated => TypeRepeatedTraverser.traverse(repeatedType)
+    case typeVar: Type.Var => TypeVarTraverser.traverse(typeVar)
+    case typeParam: Type.Param => TypeParamTraverser.traverse(typeParam)
 
     case literal: Lit => traverse(literal)
     case patternWildcard: Pat.Wildcard => traverse(patternWildcard)
@@ -137,82 +137,6 @@ object GenericTreeTraverser extends ScalaTreeTraverser[Tree] {
   }
 
   ////////////// TREE TRAVERSERS /////////////////
-
-  // A {def f: Int }
-  def traverse(refinedType: Type.Refine): Unit = {
-    refinedType.tpe.foreach(traverse)
-    // TODO try to convert to Java type with inheritance
-    emitComment(s" ${refinedType.stats.toString()}")
-  }
-
-  // type with existential constraint e.g.:  A[B] forSome {B <: Number with Serializable}
-  def traverse(existentialType: Type.Existential): Unit = {
-    traverse(existentialType.tpe)
-    // TODO - convert to Java if there is one simple where clause
-    emitComment(existentialType.stats.toString())
-  }
-
-  // type with annotation, e.g.: T @annot
-  def traverse(annotatedType: Type.Annotate): Unit = {
-    traverseAnnotations(annotatedType.annots)
-    emit(" ")
-    traverse(annotatedType.tpe)
-  }
-
-  // generic lambda type [T] => (T, T)
-  // supported only in some dialects (?)
-  def traverse(ignored: Type.Lambda): Unit = {
-    // TODO
-  }
-
-  // _ in T[_]
-  def traverse(placeholderType: Type.Placeholder): Unit = {
-    emit("?")
-    traverse(placeholderType.bounds)
-  }
-
-  // Scala type bounds e.g. T[X <: Y]
-  def traverse(typeBounds: Type.Bounds): Unit = {
-    // Only upper or lower bounds allowed in Java, not both - but if a Scala lower bound is `Null` it can be skipped
-    (typeBounds.lo, typeBounds.hi) match {
-      case (Some(lo), None) =>
-        emit(" super ")
-        traverse(lo)
-      case (None, Some(hi)) =>
-        emit(" extends ")
-        traverse(hi)
-      // TODO handle lower bound Null
-      case _ => emitComment(typeBounds.toString)
-    }
-  }
-
-  // Type by name, e.g.: =>T in f(x: => T)
-  def traverse(typeByName: Type.ByName): Unit = {
-    // Java Consumer is the closest I can find
-    traverse(Type.Apply(Type.Name("Consumer"), List(typeByName.tpe)))
-  }
-
-  // Vararg type,e.g.: T*
-  def traverse(repeatedType: Type.Repeated): Unit = {
-    traverse(repeatedType.tpe)
-    emitEllipsis()
-  }
-
-  // Variable in type, e.g.: `t` in case _:List(t) =>
-  // Unsupported in Java and no replacement
-  def traverse(typeVar: Type.Var): Unit = {
-    emitComment(typeVar.toString())
-  }
-
-  // Type param, e.g.: `T` in trait MyTrait[T]
-  def traverse(typeParam: Type.Param): Unit = {
-    // TODO handle mods
-    traverse(typeParam.name)
-    traverseGenericTypeList(typeParam.tparams)
-    traverse(typeParam.tbounds)
-    // TODO handle vbounds and cbounds (which aren't supported in Java, maybe partially ?)
-  }
-
 
   def traverse(lit: Lit): Unit = {
     val strValue = lit.value match {
