@@ -6,7 +6,9 @@ import com.effiban.scala2java.TraversalContext.javaOwnerContext
 import scala.meta.Decl
 import scala.meta.Mod.ValParam
 
-object DeclVarTraverser extends ScalaTreeTraverser[Decl.Var] {
+trait DeclVarTraverser extends ScalaTreeTraverser[Decl.Var]
+
+object DeclVarTraverser extends DeclVarTraverser {
 
   override def traverse(varDecl: Decl.Var): Unit = {
     val annotationsOnSameLine = varDecl.mods.exists(_.isInstanceOf[ValParam])

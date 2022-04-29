@@ -5,9 +5,11 @@ import com.effiban.scala2java.JavaEmitter.{emit, emitBlockEnd, emitBlockStart}
 import scala.meta.Term
 import scala.meta.Term.TryWithHandler
 
-object TryWithHandlerTraverser extends ScalaTreeTraverser[TryWithHandler] {
+trait TryWithHandlerTraverser extends ScalaTreeTraverser[TryWithHandler]
 
-  def traverse(tryWithHandler: TryWithHandler): Unit = {
+object TryWithHandlerTraverser extends TryWithHandlerTraverser {
+
+  override def traverse(tryWithHandler: TryWithHandler): Unit = {
     emit("try ")
     TermTraverser.traverse(tryWithHandler.expr)
     traverseCatchClause(tryWithHandler.catchp)

@@ -5,7 +5,9 @@ import com.effiban.scala2java.TraversalContext.javaOwnerContext
 
 import scala.meta.Term
 
-object TermFunctionTraverser extends ScalaTreeTraverser[Term.Function] {
+trait TermFunctionTraverser extends ScalaTreeTraverser[Term.Function]
+
+object TermFunctionTraverser extends TermFunctionTraverser {
 
   // lambda definition
   override def traverse(function: Term.Function): Unit = {

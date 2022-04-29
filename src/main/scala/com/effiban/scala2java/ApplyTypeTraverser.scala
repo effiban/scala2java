@@ -5,7 +5,9 @@ import com.effiban.scala2java.JavaEmitter.emit
 import scala.meta.Term
 import scala.meta.Term.ApplyType
 
-object ApplyTypeTraverser extends ScalaTreeTraverser[ApplyType] {
+trait ApplyTypeTraverser extends ScalaTreeTraverser[ApplyType]
+
+object ApplyTypeTraverser extends ApplyTypeTraverser {
 
   // parametrized type application, e.g.: classOf[X], identity[X], List[X]
   override def traverse(termApplyType: ApplyType): Unit = {

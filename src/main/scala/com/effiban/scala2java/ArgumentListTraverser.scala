@@ -4,12 +4,19 @@ import com.effiban.scala2java.JavaEmitter._
 
 import scala.meta.Tree
 
-object ArgumentListTraverser {
-
+trait ArgumentListTraverser {
   def traverse[T <: Tree](args: List[T],
                           argTraverser: ScalaTreeTraverser[T],
                           onSameLine: Boolean = false,
-                          maybeDelimiterType: Option[DualDelimiterType] = None): Unit = {
+                          maybeDelimiterType: Option[DualDelimiterType] = None): Unit
+}
+
+object ArgumentListTraverser extends ArgumentListTraverser {
+
+  override def traverse[T <: Tree](args: List[T],
+                                   argTraverser: ScalaTreeTraverser[T],
+                                   onSameLine: Boolean = false,
+                                   maybeDelimiterType: Option[DualDelimiterType] = None): Unit = {
     maybeDelimiterType.foreach(emitArgumentsStart)
     args.zipWithIndex.foreach { case (tree, idx) =>
       argTraverser.traverse(tree)

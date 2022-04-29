@@ -6,10 +6,12 @@ import com.effiban.scala2java.TraversalContext.javaOwnerContext
 import scala.meta.Mod.Final
 import scala.meta.Term
 
-object TermParamTraverser extends ScalaTreeTraverser[Term.Param] {
+trait TermParamTraverser extends ScalaTreeTraverser[Term.Param]
+
+object TermParamTraverser extends TermParamTraverser {
 
   // method parameter declaration
-  def traverse(termParam: Term.Param): Unit = {
+  override def traverse(termParam: Term.Param): Unit = {
     AnnotListTraverser.traverseMods(termParam.mods, onSameLine = true)
     val mods = javaOwnerContext match {
       case Lambda => termParam.mods

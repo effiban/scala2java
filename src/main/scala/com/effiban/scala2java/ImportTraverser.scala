@@ -4,7 +4,9 @@ import com.effiban.scala2java.JavaEmitter.emitComment
 
 import scala.meta.Import
 
-object ImportTraverser extends ScalaTreeTraverser[Import] {
+trait ImportTraverser extends ScalaTreeTraverser[Import]
+
+object ImportTraverser extends ImportTraverser {
 
   override def traverse(`import`: Import): Unit = {
     `import`.importers match {

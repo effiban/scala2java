@@ -5,7 +5,9 @@ import com.effiban.scala2java.JavaEmitter.emit
 import scala.meta.Name
 import scala.meta.Term.Super
 
-object SuperTraverser extends ScalaTreeTraverser[Super] {
+trait SuperTraverser extends ScalaTreeTraverser[Super]
+
+object SuperTraverser extends SuperTraverser {
 
   def traverse(`super`: Super): Unit = {
     `super`.thisp match {

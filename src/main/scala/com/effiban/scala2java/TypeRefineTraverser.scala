@@ -4,10 +4,12 @@ import com.effiban.scala2java.JavaEmitter.emitComment
 
 import scala.meta.Type
 
-object TypeRefineTraverser extends ScalaTreeTraverser[Type.Refine] {
+trait TypeRefineTraverser extends ScalaTreeTraverser[Type.Refine]
+
+object TypeRefineTraverser extends TypeRefineTraverser {
 
   // A {def f: Int }
-  def traverse(refinedType: Type.Refine): Unit = {
+  override def traverse(refinedType: Type.Refine): Unit = {
     refinedType.tpe.foreach(TypeTraverser.traverse)
     // TODO maybe convert to Java type with inheritance
     emitComment(s" ${refinedType.stats.toString()}")

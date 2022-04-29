@@ -4,7 +4,9 @@ import com.effiban.scala2java.JavaEmitter.emitComment
 
 import scala.meta.Type
 
-object TypeVarTraverser extends ScalaTreeTraverser[Type.Var] {
+trait TypeVarTraverser extends ScalaTreeTraverser[Type.Var]
+
+object TypeVarTraverser extends TypeVarTraverser {
 
   // Variable in type, e.g.: `t` in case _:List(t) =>
   // Unsupported in Java and no replacement I can think of

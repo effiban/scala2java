@@ -5,7 +5,9 @@ import com.effiban.scala2java.TraversalContext.javaOwnerContext
 
 import scala.meta.{Defn, Mod}
 
-object ClassTraverser extends ScalaTreeTraverser[Defn.Class] {
+trait ClassTraverser extends ScalaTreeTraverser[Defn.Class]
+
+object ClassTraverser extends ClassTraverser {
 
   def traverse(classDef: Defn.Class): Unit = {
     emitLine()

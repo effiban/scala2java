@@ -5,7 +5,9 @@ import com.effiban.scala2java.TraversalContext.javaOwnerContext
 
 import scala.meta.Decl
 
-object DeclDefTraverser extends ScalaTreeTraverser[Decl.Def] {
+trait DeclDefTraverser extends ScalaTreeTraverser[Decl.Def]
+
+object DeclDefTraverser extends DeclDefTraverser {
 
   override def traverse(defDecl: Decl.Def): Unit = {
     emitLine()

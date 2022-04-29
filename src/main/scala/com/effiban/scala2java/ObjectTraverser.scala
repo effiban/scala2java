@@ -5,9 +5,11 @@ import com.effiban.scala2java.TraversalContext.javaOwnerContext
 
 import scala.meta.Defn
 
-object ObjectTraverser extends ScalaTreeTraverser[Defn.Object] {
+trait ObjectTraverser extends ScalaTreeTraverser[Defn.Object]
 
-  def traverse(objectDef: Defn.Object): Unit = {
+object ObjectTraverser extends ObjectTraverser {
+
+  override def traverse(objectDef: Defn.Object): Unit = {
     emitLine()
     emitComment("originally a Scala object")
     emitLine()

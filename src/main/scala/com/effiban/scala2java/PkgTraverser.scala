@@ -4,7 +4,9 @@ import com.effiban.scala2java.JavaEmitter.{emit, emitLine, emitStatementEnd}
 
 import scala.meta.Pkg
 
-object PkgTraverser extends ScalaTreeTraverser[Pkg] {
+trait PkgTraverser extends ScalaTreeTraverser[Pkg]
+
+object PkgTraverser extends PkgTraverser {
 
   override def traverse(pkg: Pkg): Unit = {
     emit("package ")

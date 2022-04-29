@@ -4,7 +4,9 @@ import com.effiban.scala2java.JavaEmitter.emitComment
 
 import scala.meta.Pat
 
-object PatInterpolateTraverser extends ScalaTreeTraverser[Pat.Interpolate] {
+trait PatInterpolateTraverser extends ScalaTreeTraverser[Pat.Interpolate]
+
+object PatInterpolateTraverser extends PatInterpolateTraverser {
 
   // Pattern interpolation e.g. r"Hello (.+)$name"
   override def traverse(patternInterpolation: Pat.Interpolate): Unit = {

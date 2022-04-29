@@ -4,9 +4,11 @@ import com.effiban.scala2java.JavaEmitter.{emit, emitBlockEnd, emitBlockStart}
 
 import scala.meta.Term
 
-object TermMatchTraverser extends ScalaTreeTraverser[Term.Match] {
+trait TermMatchTraverser extends ScalaTreeTraverser[Term.Match]
 
-  def traverse(termMatch: Term.Match): Unit = {
+object TermMatchTraverser extends TermMatchTraverser {
+
+  override def traverse(termMatch: Term.Match): Unit = {
     // TODO handle mods (what is this in a 'match'?...)
     emit("switch ")
     emit("(")

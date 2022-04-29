@@ -1,12 +1,14 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.AngleBracket
-
 import scala.meta.Type
 
-object TypeParamListTraverser {
+trait TypeParamListTraverser {
+  def traverse(typeParams: List[Type.Param]): Unit
+}
 
-  def traverse(typeParams: List[Type.Param]): Unit = {
+object TypeParamListTraverser extends TypeParamListTraverser {
+
+  override def traverse(typeParams: List[Type.Param]): Unit = {
     if (typeParams.nonEmpty) {
       ArgumentListTraverser.traverse(args = typeParams,
         argTraverser = TypeParamTraverser,

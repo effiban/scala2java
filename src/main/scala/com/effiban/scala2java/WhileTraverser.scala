@@ -4,8 +4,11 @@ import com.effiban.scala2java.JavaEmitter.emit
 
 import scala.meta.Term.While
 
-object WhileTraverser extends ScalaTreeTraverser[While] {
-  def traverse(`while`: While): Unit = {
+trait WhileTraverser extends ScalaTreeTraverser[While]
+
+object WhileTraverser extends WhileTraverser {
+
+  override def traverse(`while`: While): Unit = {
     emit("while (")
     TermTraverser.traverse(`while`.expr)
     emit(") ")

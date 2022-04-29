@@ -5,13 +5,17 @@ import com.effiban.scala2java.JavaEmitter.emit
 import scala.meta.Lit
 import scala.meta.Term.{Block, If}
 
-object IfTraverser extends ScalaTreeTraverser[If] {
+trait IfTraverser extends ScalaTreeTraverser[If] {
+  def traverseIf(`if`: If, shouldReturnValue: Boolean): Unit
+}
+
+object IfTraverser extends IfTraverser {
 
   override def traverse(`if`: If): Unit = {
     traverseIf(`if` = `if`, shouldReturnValue = false)
   }
 
-  def traverseIf(`if`: If, shouldReturnValue: Boolean): Unit = {
+  override def traverseIf(`if`: If, shouldReturnValue: Boolean): Unit = {
     // TODO handle mods (what is this in an 'if'?...)
     emit("if (")
     TermTraverser.traverse(`if`.cond)

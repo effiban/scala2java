@@ -4,7 +4,9 @@ import com.effiban.scala2java.JavaEmitter.{emit, emitComment}
 
 import scala.meta.Importee
 
-object ImporteeTraverser extends ScalaTreeTraverser[Importee] {
+trait ImporteeTraverser extends ScalaTreeTraverser[Importee]
+
+object ImporteeTraverser extends ImporteeTraverser {
 
   // A single imported element within an Importer (can be one name, wildcard etc. see below)
   override def traverse(importee: Importee): Unit = {

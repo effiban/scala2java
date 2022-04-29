@@ -4,7 +4,9 @@ import com.effiban.scala2java.JavaEmitter.emitComment
 
 import scala.meta.Term
 
-object TermXmlTraverser extends ScalaTreeTraverser[Term.Xml] {
+trait TermXmlTraverser extends ScalaTreeTraverser[Term.Xml]
+
+object TermXmlTraverser extends TermXmlTraverser {
 
   override def traverse(termXml: Term.Xml): Unit = {
     // TODO

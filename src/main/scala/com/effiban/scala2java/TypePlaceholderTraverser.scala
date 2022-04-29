@@ -4,7 +4,9 @@ import com.effiban.scala2java.JavaEmitter.emit
 
 import scala.meta.Type
 
-object TypePlaceholderTraverser extends ScalaTreeTraverser[Type.Placeholder] {
+trait TypePlaceholderTraverser extends ScalaTreeTraverser[Type.Placeholder]
+
+object TypePlaceholderTraverser extends TypePlaceholderTraverser {
 
   // Underscore in type param, e.g. T[_]
   override def traverse(placeholderType: Type.Placeholder): Unit = {

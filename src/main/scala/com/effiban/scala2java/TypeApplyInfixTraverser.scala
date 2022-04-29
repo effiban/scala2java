@@ -4,7 +4,9 @@ import com.effiban.scala2java.JavaEmitter.emitComment
 
 import scala.meta.Type
 
-object TypeApplyInfixTraverser extends ScalaTreeTraverser[Type.ApplyInfix] {
+trait TypeApplyInfixTraverser extends ScalaTreeTraverser[Type.ApplyInfix]
+
+object TypeApplyInfixTraverser extends TypeApplyInfixTraverser {
 
   // type with generic args in infix notation, e.g. K Map V
   override def traverse(typeApplyInfix: Type.ApplyInfix): Unit = {

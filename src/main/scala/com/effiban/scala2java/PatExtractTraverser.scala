@@ -4,7 +4,9 @@ import com.effiban.scala2java.JavaEmitter.emitComment
 
 import scala.meta.Pat
 
-object PatExtractTraverser extends ScalaTreeTraverser[Pat.Extract] {
+trait PatExtractTraverser extends ScalaTreeTraverser[Pat.Extract]
+
+object PatExtractTraverser extends PatExtractTraverser {
 
   // Pattern match extractor e.g. A(a, b).
   // No Java equivalent (but consider rewriting as a guard ?)
