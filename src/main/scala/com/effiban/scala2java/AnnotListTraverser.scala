@@ -5,9 +5,13 @@ import com.effiban.scala2java.JavaEmitter.{emit, emitLine}
 import scala.meta.Mod
 import scala.meta.Mod.Annot
 
-object AnnotListTraverser {
+trait AnnotListTraverser {
+  def traverseAnnotations(annotations: List[Annot], onSameLine: Boolean = false): Unit
+}
 
-  def traverseAnnotations(annotations: List[Annot], onSameLine: Boolean = false): Unit = {
+object AnnotListTraverser extends AnnotListTraverser {
+
+  override def traverseAnnotations(annotations: List[Annot], onSameLine: Boolean = false): Unit = {
     annotations.foreach(annotation => {
       AnnotTraverser.traverse(annotation)
       if (onSameLine) {

@@ -7,14 +7,20 @@ import scala.meta.Ctor.Secondary
 import scala.meta.Term.{Assign, Block, Select, This}
 import scala.meta.{Ctor, Decl, Defn, Init, Name, Stat, Template, Term, Type}
 
-object TemplateTraverser extends ScalaTreeTraverser[Template] {
+trait TemplateTraverser extends ScalaTreeTraverser[Template] {
+
+  def traverse(template: Template,
+               maybeClassInfo: Option[ClassInfo] = None): Unit
+}
+
+object TemplateTraverser extends TemplateTraverser {
 
   override def traverse(template: Template): Unit = {
     traverse(template, None)
   }
 
-  def traverse(template: Template,
-               maybeClassInfo: Option[ClassInfo] = None): Unit = {
+  override def traverse(template: Template,
+                        maybeClassInfo: Option[ClassInfo] = None): Unit = {
     traverseTemplateInits(template.inits)
     template.self.decltpe.foreach(_ => {
       // TODO - consider translating the 'self' type into a Java parent

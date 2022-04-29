@@ -4,7 +4,9 @@ import com.effiban.scala2java.JavaEmitter.{emit, emitArrow, emitStatementEnd}
 
 import scala.meta.Case
 
-object CaseTraverser extends ScalaTreeTraverser[Case] {
+trait CaseTraverser extends ScalaTreeTraverser[Case]
+
+object CaseTraverser extends CaseTraverser {
 
   def traverse(`case`: Case): Unit = {
     emit("case ")

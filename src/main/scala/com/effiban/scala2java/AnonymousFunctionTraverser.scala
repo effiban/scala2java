@@ -5,7 +5,9 @@ import com.effiban.scala2java.TraversalConstants.JavaPlaceholder
 import scala.meta.Term
 import scala.meta.Term.{AnonymousFunction, Param}
 
-object AnonymousFunctionTraverser extends ScalaTreeTraverser[AnonymousFunction] {
+trait AnonymousFunctionTraverser extends ScalaTreeTraverser[AnonymousFunction]
+
+object AnonymousFunctionTraverser extends AnonymousFunctionTraverser {
 
   override def traverse(anonymousFunction: AnonymousFunction): Unit = {
     TermFunctionTraverser.traverse(Term.Function(

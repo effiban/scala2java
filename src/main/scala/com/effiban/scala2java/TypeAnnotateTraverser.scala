@@ -4,10 +4,12 @@ import com.effiban.scala2java.JavaEmitter.emit
 
 import scala.meta.Type
 
-object TypeAnnotateTraverser extends ScalaTreeTraverser[Type.Annotate] {
+trait TypeAnnotateTraverser extends ScalaTreeTraverser[Type.Annotate]
+
+object TypeAnnotateTraverser extends TypeAnnotateTraverser {
 
   // type with annotation, e.g.: T @annot
-  def traverse(annotatedType: Type.Annotate): Unit = {
+  override def traverse(annotatedType: Type.Annotate): Unit = {
     AnnotListTraverser.traverseAnnotations(annotatedType.annots)
     emit(" ")
     TypeTraverser.traverse(annotatedType.tpe)

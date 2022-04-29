@@ -4,7 +4,9 @@ import com.effiban.scala2java.JavaEmitter.emitComment
 
 import scala.meta.Type
 
-object TypeLambdaTraverser extends ScalaTreeTraverser[Type.Lambda] {
+trait TypeLambdaTraverser extends ScalaTreeTraverser[Type.Lambda]
+
+object TypeLambdaTraverser extends TypeLambdaTraverser {
 
   // generic lambda type [T] => (T, T)
   // According to documentation supported only in some dialects (what does this mean?)

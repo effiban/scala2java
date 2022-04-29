@@ -4,7 +4,9 @@ import com.effiban.scala2java.JavaEmitter.emit
 
 import scala.meta.Mod.Annot
 
-object AnnotTraverser extends ScalaTreeTraverser[Annot] {
+trait AnnotTraverser extends ScalaTreeTraverser[Annot]
+
+object AnnotTraverser extends AnnotTraverser {
 
   override def traverse(annotation: Annot): Unit = {
     emit("@")

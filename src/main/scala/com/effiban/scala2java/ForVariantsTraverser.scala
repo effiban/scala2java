@@ -6,9 +6,13 @@ import com.effiban.scala2java.TraversalConstants.JavaPlaceholder
 import scala.meta.Term.{Apply, Param, Select}
 import scala.meta.{Enumerator, Lit, Pat, Term}
 
-object ForVariantsTraverser {
+trait ForVariantsTraverser {
+  def traverse(enumerators: List[Enumerator], body: Term): Unit
+}
 
-  def traverse(enumerators: List[Enumerator], body: Term): Unit = {
+object ForVariantsTraverser extends ForVariantsTraverser {
+
+  override def traverse(enumerators: List[Enumerator], body: Term): Unit = {
     TermTraverser.traverse(translateFor(enumerators, body))
   }
 

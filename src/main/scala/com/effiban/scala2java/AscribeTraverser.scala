@@ -4,7 +4,9 @@ import com.effiban.scala2java.JavaEmitter.emit
 
 import scala.meta.Term.Ascribe
 
-object AscribeTraverser extends ScalaTreeTraverser[Ascribe] {
+trait AscribeTraverser extends ScalaTreeTraverser[Ascribe]
+
+object AscribeTraverser extends AscribeTraverser {
 
   // Explicitly specified type, e.g.: x = 2:Short
   // Java equivalent is casting. e.g. x = (short)2

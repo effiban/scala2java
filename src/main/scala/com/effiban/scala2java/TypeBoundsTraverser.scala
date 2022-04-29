@@ -4,7 +4,9 @@ import com.effiban.scala2java.JavaEmitter.{emit, emitComment}
 
 import scala.meta.Type
 
-object TypeBoundsTraverser extends ScalaTreeTraverser[Type.Bounds] {
+trait TypeBoundsTraverser extends ScalaTreeTraverser[Type.Bounds]
+
+object TypeBoundsTraverser extends TypeBoundsTraverser {
 
   // Scala type bounds e.g. X <: Y
   override def traverse(typeBounds: Type.Bounds): Unit = {

@@ -4,7 +4,9 @@ import com.effiban.scala2java.JavaEmitter.emit
 
 import scala.meta.Term.New
 
-object NewTraverser extends ScalaTreeTraverser[New] {
+trait NewTraverser extends ScalaTreeTraverser[New]
+
+object NewTraverser extends NewTraverser {
 
   override def traverse(`new`: New): Unit = {
     emit("new ")

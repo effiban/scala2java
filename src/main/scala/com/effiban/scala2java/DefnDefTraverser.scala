@@ -6,8 +6,11 @@ import com.effiban.scala2java.TraversalContext.javaOwnerContext
 import scala.meta.Term.Block
 import scala.meta.{Defn, Term, Type}
 
-object DefnDefTraverser extends ScalaTreeTraverser[Defn.Def] {
-  def traverse(defDef: Defn.Def): Unit = {
+trait DefnDefTraverser extends ScalaTreeTraverser[Defn.Def]
+
+object DefnDefTraverser extends DefnDefTraverser {
+
+  override def traverse(defDef: Defn.Def): Unit = {
     emitLine()
     AnnotListTraverser.traverseMods(defDef.mods)
     val resolvedModifierNames = javaOwnerContext match {

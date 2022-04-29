@@ -4,7 +4,9 @@ import com.effiban.scala2java.JavaEmitter.{emit, emitArrow}
 
 import scala.meta.Term
 
-object PartialFunctionTraverser extends ScalaTreeTraverser[Term.PartialFunction] {
+trait PartialFunctionTraverser extends ScalaTreeTraverser[Term.PartialFunction]
+
+object PartialFunctionTraverser extends PartialFunctionTraverser {
 
   override def traverse(partialFunction: Term.PartialFunction): Unit = {
     val dummyArgName = "arg"

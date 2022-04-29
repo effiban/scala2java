@@ -4,7 +4,9 @@ import com.effiban.scala2java.JavaEmitter.emitComment
 
 import scala.meta.{Name, Term, Type}
 
-object NameTraverser extends ScalaTreeTraverser[Name] {
+trait NameTraverser extends ScalaTreeTraverser[Name]
+
+object NameTraverser extends NameTraverser {
 
   override def traverse(name: Name): Unit = name match {
     case anonName: Name.Anonymous => NameAnonymousTraverser.traverse(anonName)

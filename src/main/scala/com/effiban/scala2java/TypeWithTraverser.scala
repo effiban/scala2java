@@ -4,11 +4,13 @@ import com.effiban.scala2java.JavaEmitter.emit
 
 import scala.meta.Type
 
-object TypeWithTraverser extends ScalaTreeTraverser[Type.With] {
+trait TypeWithTraverser extends ScalaTreeTraverser[Type.With]
+
+object TypeWithTraverser extends TypeWithTraverser {
 
   // type with parent, e.g.  A with B
   // approximated by Java "extends" but might not compile
-  def traverse(typeWith: Type.With): Unit = {
+  override def traverse(typeWith: Type.With): Unit = {
     TypeTraverser.traverse(typeWith.lhs)
     emit(" extends ")
     TypeTraverser.traverse(typeWith.rhs)

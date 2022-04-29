@@ -1,7 +1,5 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.Parentheses
-
 import scala.meta.Term
 
 object TermParamListTraverser {

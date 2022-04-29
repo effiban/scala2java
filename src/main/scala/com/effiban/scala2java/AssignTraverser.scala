@@ -4,7 +4,9 @@ import com.effiban.scala2java.JavaEmitter.emit
 
 import scala.meta.Term.Assign
 
-object AssignTraverser extends ScalaTreeTraverser[Assign] {
+trait AssignTraverser extends ScalaTreeTraverser[Assign]
+
+object AssignTraverser extends AssignTraverser {
 
   // Variable assignment
   override def traverse(assign: Assign): Unit = {

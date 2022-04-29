@@ -4,7 +4,9 @@ import com.effiban.scala2java.JavaEmitter.emitComment
 
 import scala.meta.Decl
 
-object DeclTraverser extends ScalaTreeTraverser[Decl] {
+trait DeclTraverser extends ScalaTreeTraverser[Decl]
+
+object DeclTraverser extends DeclTraverser {
 
   override def traverse(decl: Decl): Unit = decl match {
     case valDecl: Decl.Val => DeclValTraverser.traverse(valDecl)

@@ -4,7 +4,9 @@ import com.effiban.scala2java.JavaEmitter.emit
 
 import scala.meta.Pat
 
-object PatTypedTraverser extends ScalaTreeTraverser[Pat.Typed] {
+trait PatTypedTraverser extends ScalaTreeTraverser[Pat.Typed]
+
+object PatTypedTraverser extends PatTypedTraverser {
 
   // Typed pattern expression, e.g. a: Int (in lhs of case clause)
   override def traverse(typedPattern: Pat.Typed): Unit = {

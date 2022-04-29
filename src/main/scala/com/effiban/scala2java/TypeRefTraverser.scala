@@ -4,7 +4,9 @@ import com.effiban.scala2java.JavaEmitter.emitComment
 
 import scala.meta.Type
 
-object TypeRefTraverser extends ScalaTreeTraverser[Type.Ref] {
+trait TypeRefTraverser extends ScalaTreeTraverser[Type.Ref]
+
+object TypeRefTraverser extends TypeRefTraverser {
 
   override def traverse(typeRef: Type.Ref): Unit = typeRef match {
     case typeName: Type.Name => TypeNameTraverser.traverse(typeName)

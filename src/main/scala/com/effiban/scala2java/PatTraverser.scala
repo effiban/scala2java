@@ -5,7 +5,9 @@ import com.effiban.scala2java.JavaEmitter.emitComment
 import scala.meta.Pat.{Alternative, Bind}
 import scala.meta.{Lit, Pat, Term}
 
-object PatTraverser extends ScalaTreeTraverser[Pat] {
+trait PatTraverser extends ScalaTreeTraverser[Pat]
+
+object PatTraverser extends PatTraverser {
 
   override def traverse(pat: Pat): Unit = pat match {
     case lit: Lit => LitTraverser.traverse(lit)

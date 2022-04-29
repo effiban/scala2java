@@ -5,7 +5,9 @@ import com.effiban.scala2java.JavaEmitter.emitComment
 import scala.meta.Term.{AnonymousFunction, ApplyType, Ascribe, Assign, Block, Do, Eta, For, ForYield, If, New, NewAnonymous, Return, Throw, Try, TryWithHandler, While}
 import scala.meta.{Lit, Term}
 
-object TermTraverser extends ScalaTreeTraverser[Term] {
+trait TermTraverser extends ScalaTreeTraverser[Term]
+
+object TermTraverser extends TermTraverser {
 
   override def traverse(term: Term): Unit = term match {
     case termRef: Term.Ref => TermRefTraverser.traverse(termRef)

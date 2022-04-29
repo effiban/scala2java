@@ -4,7 +4,9 @@ import com.effiban.scala2java.JavaEmitter.emitComment
 
 import scala.meta.{Decl, Defn, Import, Pkg, Stat, Term}
 
-object StatTraverser extends ScalaTreeTraverser[Stat] {
+trait StatTraverser extends ScalaTreeTraverser[Stat]
+
+object StatTraverser extends StatTraverser {
 
   override def traverse(stat: Stat): Unit = stat match {
     case term: Term => TermTraverser.traverse(term)

@@ -4,11 +4,13 @@ import com.effiban.scala2java.JavaEmitter.emit
 
 import scala.meta.Term
 
-object TermAnnotateTraverser extends ScalaTreeTraverser[Term.Annotate] {
+trait TermAnnotateTraverser extends ScalaTreeTraverser[Term.Annotate]
+
+object TermAnnotateTraverser extends TermAnnotateTraverser {
 
   // Expression annotation, e.g.:  (x: @annot) match ....
   // Partially supported in Java, so it will be rendered properly if it is a Java annotation
-  def traverse(termAnnotation: Term.Annotate): Unit = {
+  override def traverse(termAnnotation: Term.Annotate): Unit = {
     emit("(")
     AnnotListTraverser.traverseAnnotations(termAnnotation.annots, onSameLine = true)
     TermTraverser.traverse(termAnnotation.expr)

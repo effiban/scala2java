@@ -5,7 +5,9 @@ import com.effiban.scala2java.JavaEmitter.emit
 import scala.meta.Term
 import scala.meta.Term.Select
 
-object TermSelectTraverser extends ScalaTreeTraverser[Term.Select] {
+trait TermSelectTraverser extends ScalaTreeTraverser[Term.Select]
+
+object TermSelectTraverser extends TermSelectTraverser {
 
   // qualified name
   override def traverse(termSelect: Term.Select): Unit = {

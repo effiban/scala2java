@@ -3,7 +3,22 @@ package com.effiban.scala2java
 import scala.meta.Mod
 import scala.meta.Mod.{Abstract, Final, Private, Protected, Sealed}
 
-object JavaModifiersResolver {
+trait JavaModifiersResolver {
+
+  def resolveForClass(mods: List[Mod]): List[String]
+
+  def resolveForInterface(mods: List[Mod]): List[String]
+
+  def resolveForClassMethod(mods: List[Mod]): List[String]
+
+  def resolveForInterfaceMethod(mods: List[Mod], hasBody: Boolean): List[String]
+
+  def resolveForClassDataMember(mods: List[Mod]): List[String]
+
+  def resolve(inputMods: List[Mod], allowedMods: List[Class[_ <: Mod]]): List[String]
+}
+
+object JavaModifiersResolver extends JavaModifiersResolver {
 
   private final val ScalaModTypeToJavaModifierName: Map[Class[_ <: Mod], String] = Map(
     classOf[Private] -> "private",
@@ -24,7 +39,7 @@ object JavaModifiersResolver {
     "final" -> 4
   )
 
-  def resolveForClass(mods: List[Mod]): List[String] = {
+  override def resolveForClass(mods: List[Mod]): List[String] = {
     val modifierNamesBuilder = List.newBuilder[String]
     if (!mods.exists(_.isInstanceOf[Private]) && !mods.exists(_.isInstanceOf[Protected])) {
       modifierNamesBuilder += "public"
@@ -34,14 +49,14 @@ object JavaModifiersResolver {
     modifierNamesBuilder.result()
   }
 
-  def resolveForInterface(mods: List[Mod]): List[String] = {
+  override def resolveForInterface(mods: List[Mod]): List[String] = {
     val modifierNamesBuilder = List.newBuilder[String]
     modifierNamesBuilder += "public"
     modifierNamesBuilder ++= resolve(mods, List(classOf[Sealed]))
     modifierNamesBuilder.result()
   }
 
-  def resolveForClassMethod(mods: List[Mod]): List[String] = {
+  override def resolveForClassMethod(mods: List[Mod]): List[String] = {
     val modifierNamesBuilder = List.newBuilder[String]
     if (!mods.exists(_.isInstanceOf[Private]) && !mods.exists(_.isInstanceOf[Protected])) {
       modifierNamesBuilder += "public"
@@ -60,7 +75,7 @@ object JavaModifiersResolver {
     modifierNamesBuilder.result()
   }
 
-  def resolveForClassDataMember(mods: List[Mod]): List[String] = {
+  override def resolveForClassDataMember(mods: List[Mod]): List[String] = {
     val modifierNamesBuilder = List.newBuilder[String]
     if (!mods.exists(_.isInstanceOf[Private]) && !mods.exists(_.isInstanceOf[Protected])) {
       modifierNamesBuilder += "public"
@@ -69,7 +84,7 @@ object JavaModifiersResolver {
     modifierNamesBuilder.result()
   }
 
-  def resolve(inputMods: List[Mod], allowedMods: List[Class[_ <: Mod]]): List[String] = {
+  override def resolve(inputMods: List[Mod], allowedMods: List[Class[_ <: Mod]]): List[String] = {
     ScalaModTypeToJavaModifierName.filter { case (mod, _) => inputMods.exists(inputMod => mod.isAssignableFrom(inputMod.getClass)) }
       .filter { case (mod, _) => allowedMods.contains(mod) }
       .map { case (_, modifierName) => modifierName }

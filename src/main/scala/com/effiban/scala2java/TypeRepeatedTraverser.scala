@@ -4,7 +4,9 @@ import com.effiban.scala2java.JavaEmitter.emitEllipsis
 
 import scala.meta.Type
 
-object TypeRepeatedTraverser extends ScalaTreeTraverser[Type.Repeated] {
+trait TypeRepeatedTraverser extends ScalaTreeTraverser[Type.Repeated]
+
+object TypeRepeatedTraverser extends TypeRepeatedTraverser {
 
   // Vararg type,e.g.: T*
   override def traverse(repeatedType: Type.Repeated): Unit = {

@@ -4,10 +4,12 @@ import com.effiban.scala2java.JavaEmitter.emitComment
 
 import scala.meta.Pat
 
-object PatXmlTraverser extends ScalaTreeTraverser[Pat.Xml] {
+trait PatXmlTraverser extends ScalaTreeTraverser[Pat.Xml]
+
+object PatXmlTraverser extends PatXmlTraverser {
 
   // Pattern match xml
-  def traverse(patternXml: Pat.Xml): Unit = {
+  override def traverse(patternXml: Pat.Xml): Unit = {
     // TODO
     emitComment(patternXml.toString())
   }

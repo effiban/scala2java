@@ -5,7 +5,11 @@ import com.effiban.scala2java.JavaEmitter.{emitBlockEnd, emitBlockStart, emitSta
 import scala.meta.Term.{Block, If, Return, While}
 import scala.meta.{Init, Stat, Term}
 
-object BlockTraverser extends ScalaTreeTraverser[Block] {
+trait BlockTraverser extends ScalaTreeTraverser[Block] {
+  def traverse(block: Block, shouldReturnValue: Boolean, maybeInit: Option[Init] = None): Unit
+}
+
+object BlockTraverser extends BlockTraverser {
 
   override def traverse(block: Block): Unit = {
     traverse(block, shouldReturnValue = false, maybeInit = None)
@@ -13,7 +17,7 @@ object BlockTraverser extends ScalaTreeTraverser[Block] {
 
   // The 'init' param is passed by constructors, whose first statement must be a call to super or other ctor.
   // 'Init' does not inherit from 'Stat' so we can't add it to the Block
-  def traverse(block: Block, shouldReturnValue: Boolean, maybeInit: Option[Init] = None): Unit = {
+  override def traverse(block: Block, shouldReturnValue: Boolean, maybeInit: Option[Init] = None): Unit = {
     emitBlockStart()
     maybeInit.foreach(init => {
       InitTraverser.traverse(init)

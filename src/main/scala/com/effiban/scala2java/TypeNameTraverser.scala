@@ -4,7 +4,9 @@ import com.effiban.scala2java.JavaEmitter.emit
 
 import scala.meta.Type
 
-object TypeNameTraverser extends ScalaTreeTraverser[Type.Name] {
+trait TypeNameTraverser extends ScalaTreeTraverser[Type.Name]
+
+object TypeNameTraverser extends TypeNameTraverser {
 
   private final val ScalaTypeNameToJavaTypeName = Map(
     "Any" -> "Object",
@@ -23,7 +25,7 @@ object TypeNameTraverser extends ScalaTreeTraverser[Type.Name] {
     "Nothing" -> "Void"
   )
 
-  def traverse(name: Type.Name): Unit = {
+  override def traverse(name: Type.Name): Unit = {
     emit(toJavaName(name))
   }
 

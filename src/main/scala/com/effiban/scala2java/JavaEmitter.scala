@@ -1,42 +1,67 @@
 package com.effiban.scala2java
 
-object JavaEmitter {
+trait JavaEmitter {
+
+  def emitTypeDeclaration(modifiers: List[String], typeKeyword: String, name: String): Unit
+
+  def emitModifiers(modifiers: List[String]): Unit
+
+  def emitParentNamesPrefix(): Unit
+
+  def emitStatementEnd(): Unit
+
+  def emitArrow(): Unit
+
+  def emitBlockStart(): Unit
+
+  def emitBlockEnd(): Unit
+
+  def emitArgumentsStart(delimType: DualDelimiterType): Unit
+
+  def emitArgumentsEnd(delimType: DualDelimiterType): Unit
+
+  def emitListSeparator(): Unit
+
+  def emitComment(comment: String): Unit
+
+  def emitLine(str: String = ""): Unit
+
+  def emitEllipsis(): Unit
+
+  def emit(str: String): Unit
+}
+
+object JavaEmitter extends JavaEmitter {
   var indentationLevel = 0
   var indentationRequired = false
 
-  sealed trait DualDelimiterType
-  case object Parentheses extends DualDelimiterType
-  case object SquareBracket extends DualDelimiterType
-  case object CurlyBrace extends DualDelimiterType
-  case object AngleBracket extends DualDelimiterType
-
-  def emitTypeDeclaration(modifiers: List[String], typeKeyword: String, name: String): Unit = {
+  override def emitTypeDeclaration(modifiers: List[String], typeKeyword: String, name: String): Unit = {
     emitModifiers(modifiers)
     emit(s"$typeKeyword $name")
   }
 
-  def emitModifiers(modifiers: List[String]): Unit = {
+  override def emitModifiers(modifiers: List[String]): Unit = {
     emit(modifiers.mkString(" "))
     if (modifiers.nonEmpty) {
       emit(" ")
     }
   }
 
-  def emitParentNamesPrefix(): Unit = {
+  override def emitParentNamesPrefix(): Unit = {
     // TODO - fix, handle class vs. interface
     emit(s" implements ")
   }
 
-  def emitStatementEnd(): Unit = {
+  override def emitStatementEnd(): Unit = {
     emit(";")
     emitLineBreak()
   }
 
-  def emitArrow(): Unit = {
+  override def emitArrow(): Unit = {
     emit(" -> ")
   }
 
-  def emitBlockStart(): Unit = {
+  override def emitBlockStart(): Unit = {
     emitLine(" {")
     indentationLevel += 1
   }
@@ -46,34 +71,34 @@ object JavaEmitter {
     emitLine("}")
   }
 
-  def emitArgumentsStart(delimType: DualDelimiterType): Unit = {
+  override def emitArgumentsStart(delimType: DualDelimiterType): Unit = {
     emitStartDelimiter(delimType)
     indentationLevel += 1
   }
 
-  def emitArgumentsEnd(delimType: DualDelimiterType): Unit = {
+  override def emitArgumentsEnd(delimType: DualDelimiterType): Unit = {
     emitEndDelimiter(delimType)
     indentationLevel -= 1
   }
 
-  def emitListSeparator(): Unit = {
+  override def emitListSeparator(): Unit = {
     emit(", ")
   }
 
-  def emitComment(comment: String): Unit = {
+  override def emitComment(comment: String): Unit = {
     emit(s"/* $comment */")
   }
 
-  def emitLine(str: String = ""): Unit = {
+  override def emitLine(str: String = ""): Unit = {
     emit(str)
     emitLineBreak()
   }
 
-  def emitEllipsis(): Unit = {
+  override def emitEllipsis(): Unit = {
     emit("...")
   }
 
-  def emit(str: String): Unit = {
+  override def emit(str: String): Unit = {
     if (indentationRequired) {
       print(indentation())
       indentationRequired = false

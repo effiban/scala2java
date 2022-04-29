@@ -6,7 +6,9 @@ import com.effiban.scala2java.TraversalContext.javaOwnerContext
 import scala.meta.Defn
 import scala.meta.Mod.{Final, ValParam}
 
-object DefnValTraverser extends ScalaTreeTraverser[Defn.Val] {
+trait DefnValTraverser extends ScalaTreeTraverser[Defn.Val]
+
+object DefnValTraverser extends DefnValTraverser {
 
   def traverse(valDef: Defn.Val): Unit = {
     val annotationsOnSameLine = valDef.mods.exists(_.isInstanceOf[ValParam])
@@ -15,7 +17,7 @@ object DefnValTraverser extends ScalaTreeTraverser[Defn.Val] {
     val modifierNames = mods match {
       case modifiers if javaOwnerContext == Class => JavaModifiersResolver.resolveForClassDataMember(modifiers)
       case _ if javaOwnerContext == Interface => Nil
-      // The only possible modifier for a method param or local var is 'final' (if it's immutable as determined above)
+      // The only possible modifier for a method param or local var is 'final'
       case modifiers if javaOwnerContext == Method => JavaModifiersResolver.resolve(modifiers, List(classOf[Final]))
       case _ => Nil
     }

@@ -5,7 +5,9 @@ import com.effiban.scala2java.JavaEmitter.emit
 import scala.meta.Pat
 import scala.meta.Pat.Bind
 
-object BindTraverser extends ScalaTreeTraverser[Pat.Bind] {
+trait BindTraverser extends ScalaTreeTraverser[Pat.Bind]
+
+object BindTraverser extends BindTraverser {
 
   // Pattern match bind variable, e.g.: a @ A()
   override def traverse(patternBind: Bind): Unit = {

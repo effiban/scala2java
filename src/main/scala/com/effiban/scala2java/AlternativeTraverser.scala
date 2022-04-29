@@ -4,7 +4,9 @@ import com.effiban.scala2java.JavaEmitter.emit
 
 import scala.meta.Pat.Alternative
 
-object AlternativeTraverser extends ScalaTreeTraverser[Alternative] {
+trait AlternativeTraverser extends ScalaTreeTraverser[Alternative]
+
+object AlternativeTraverser extends AlternativeTraverser {
 
   // Pattern match alternative, e.g. 2 | 3. In Java - separated by comma
   override def traverse(patternAlternative: Alternative): Unit = {
