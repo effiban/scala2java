@@ -9,7 +9,8 @@ trait IfTraverser extends ScalaTreeTraverser[If] {
   def traverseIf(`if`: If, shouldReturnValue: Boolean): Unit
 }
 
-object IfTraverser extends IfTraverser {
+private[scala2java] class IfTraverserImpl(termTraverser: => TermTraverser,
+                                          blockTraverser: => BlockTraverser) extends IfTraverser {
 
   override def traverse(`if`: If): Unit = {
     traverseIf(`if` = `if`, shouldReturnValue = false)
@@ -18,20 +19,22 @@ object IfTraverser extends IfTraverser {
   override def traverseIf(`if`: If, shouldReturnValue: Boolean): Unit = {
     // TODO handle mods (what is this in an 'if'?...)
     emit("if (")
-    TermTraverser.traverse(`if`.cond)
+    termTraverser.traverse(`if`.cond)
     emit(")")
     `if`.thenp match {
-      case block: Block => BlockTraverser.traverse(block = block, shouldReturnValue = shouldReturnValue)
-      case term => BlockTraverser.traverse(block = Block(List(term)), shouldReturnValue = shouldReturnValue)
+      case block: Block => blockTraverser.traverse(block = block, shouldReturnValue = shouldReturnValue)
+      case term => blockTraverser.traverse(block = Block(List(term)), shouldReturnValue = shouldReturnValue)
     }
     `if`.elsep match {
       case block: Block =>
         emit("else")
-        BlockTraverser.traverse(block = block, shouldReturnValue = shouldReturnValue)
+        blockTraverser.traverse(block = block, shouldReturnValue = shouldReturnValue)
       case Lit.Unit() =>
       case term =>
         emit("else")
-        BlockTraverser.traverse(block = Block(List(term)), shouldReturnValue = shouldReturnValue)
+        blockTraverser.traverse(block = Block(List(term)), shouldReturnValue = shouldReturnValue)
     }
   }
 }
+
+object IfTraverser extends IfTraverserImpl(TermTraverser, BlockTraverser)

@@ -9,16 +9,19 @@ trait TermListTraverser {
                maybeDelimiterType: Option[DualDelimiterType] = None): Unit
 }
 
-object TermListTraverser extends TermListTraverser {
+private[scala2java] class TermListTraverserImpl(argumentListTraverser: => ArgumentListTraverser,
+                                                termTraverser: => TermTraverser) extends TermListTraverser {
 
   override def traverse(terms: List[Term],
                         onSameLine: Boolean = false,
                         maybeDelimiterType: Option[DualDelimiterType] = None): Unit = {
     if (terms.nonEmpty) {
-      ArgumentListTraverser.traverse(args = terms,
-        argTraverser = TermTraverser,
+      argumentListTraverser.traverse(args = terms,
+        argTraverser = termTraverser,
         onSameLine = onSameLine,
         maybeDelimiterType = maybeDelimiterType)
     }
   }
 }
+
+object TermListTraverser extends TermListTraverserImpl(ArgumentListTraverser, TermTraverser)

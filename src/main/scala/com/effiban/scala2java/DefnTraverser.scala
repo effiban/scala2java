@@ -7,16 +7,32 @@ import scala.meta.Defn.Trait
 
 trait DefnTraverser extends ScalaTreeTraverser[Defn]
 
-object DefnTraverser extends DefnTraverser {
+private[scala2java] class DefnTraverserImpl(defnValTraverser: => DefnValTraverser,
+                                            defnVarTraverser: => DefnVarTraverser,
+                                            defnDefTraverser: => DefnDefTraverser,
+                                            defnTypeTraverser: => DefnTypeTraverser,
+                                            classTraverser: => ClassTraverser,
+                                            traitTraverser: => TraitTraverser,
+                                            objectTraverser: => ObjectTraverser) extends DefnTraverser {
 
   override def traverse(defn: Defn): Unit = defn match {
-    case valDef: Defn.Val => DefnValTraverser.traverse(valDef)
-    case varDef: Defn.Var => DefnVarTraverser.traverse(varDef)
-    case defDef: Defn.Def => DefnDefTraverser.traverse(defDef)
-    case typeDef: Defn.Type => DefnTypeTraverser.traverse(typeDef)
-    case classDef: Defn.Class => ClassTraverser.traverse(classDef)
-    case traitDef: Trait => TraitTraverser.traverse(traitDef)
-    case objectDef: Defn.Object => ObjectTraverser.traverse(objectDef)
+    case valDef: Defn.Val => defnValTraverser.traverse(valDef)
+    case varDef: Defn.Var => defnVarTraverser.traverse(varDef)
+    case defDef: Defn.Def => defnDefTraverser.traverse(defDef)
+    case typeDef: Defn.Type => defnTypeTraverser.traverse(typeDef)
+    case classDef: Defn.Class => classTraverser.traverse(classDef)
+    case traitDef: Trait => traitTraverser.traverse(traitDef)
+    case objectDef: Defn.Object => objectTraverser.traverse(objectDef)
     case _ => emitComment(s"UNSUPPORTED: $defn")
   }
 }
+
+object DefnTraverser extends DefnTraverserImpl(
+  DefnValTraverser,
+  DefnVarTraverser,
+  DefnDefTraverser,
+  DefnTypeTraverser,
+  ClassTraverser,
+  TraitTraverser,
+  ObjectTraverser
+)

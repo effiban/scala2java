@@ -6,23 +6,53 @@ import scala.meta.Type
 
 trait TypeTraverser extends ScalaTreeTraverser[Type]
 
-object TypeTraverser extends TypeTraverser {
+private[scala2java] class TypeTraverserImpl(typeRefTraverser: => TypeRefTraverser,
+                                            typeApplyTraverser: => TypeApplyTraverser,
+                                            typeApplyInfixTraverser: => TypeApplyInfixTraverser,
+                                            typeFunctionTraverser: => TypeFunctionTraverser,
+                                            typeTupleTraverser: => TypeTupleTraverser,
+                                            typeWithTraverser: => TypeWithTraverser,
+                                            typeRefineTraverser: => TypeRefineTraverser,
+                                            typeExistentialTraverser: => TypeExistentialTraverser,
+                                            typeAnnotateTraverser: => TypeAnnotateTraverser,
+                                            typeLambdaTraverser: => TypeLambdaTraverser,
+                                            typePlaceholderTraverser: => TypePlaceholderTraverser,
+                                            typeByNameTraverser: => TypeByNameTraverser,
+                                            typeRepeatedTraverser: => TypeRepeatedTraverser,
+                                            typeVarTraverser: => TypeVarTraverser) extends TypeTraverser {
 
   override def traverse(`type`: Type): Unit = `type` match {
-    case typeRef: Type.Ref => TypeRefTraverser.traverse(typeRef)
-    case typeApply: Type.Apply => TypeApplyTraverser.traverse(typeApply)
-    case typeApplyInfix: Type.ApplyInfix => TypeApplyInfixTraverser.traverse(typeApplyInfix)
-    case functionType: Type.Function => TypeFunctionTraverser.traverse(functionType)
-    case tupleType: Type.Tuple => TypeTupleTraverser.traverse(tupleType)
-    case withType: Type.With => TypeWithTraverser.traverse(withType)
-    case typeRefine: Type.Refine => TypeRefineTraverser.traverse(typeRefine)
-    case existentialType: Type.Existential => TypeExistentialTraverser.traverse(existentialType)
-    case typeAnnotation: Type.Annotate => TypeAnnotateTraverser.traverse(typeAnnotation)
-    case lambdaType: Type.Lambda => TypeLambdaTraverser.traverse(lambdaType)
-    case placeholderType: Type.Placeholder => TypePlaceholderTraverser.traverse(placeholderType)
-    case byNameType: Type.ByName => TypeByNameTraverser.traverse(byNameType)
-    case repeatedType: Type.Repeated => TypeRepeatedTraverser.traverse(repeatedType)
-    case typeVar: Type.Var => TypeVarTraverser.traverse(typeVar)
+    case typeRef: Type.Ref => typeRefTraverser.traverse(typeRef)
+    case typeApply: Type.Apply => typeApplyTraverser.traverse(typeApply)
+    case typeApplyInfix: Type.ApplyInfix => typeApplyInfixTraverser.traverse(typeApplyInfix)
+    case functionType: Type.Function => typeFunctionTraverser.traverse(functionType)
+    case tupleType: Type.Tuple => typeTupleTraverser.traverse(tupleType)
+    case withType: Type.With => typeWithTraverser.traverse(withType)
+    case typeRefine: Type.Refine => typeRefineTraverser.traverse(typeRefine)
+    case existentialType: Type.Existential => typeExistentialTraverser.traverse(existentialType)
+    case typeAnnotation: Type.Annotate => typeAnnotateTraverser.traverse(typeAnnotation)
+    case lambdaType: Type.Lambda => typeLambdaTraverser.traverse(lambdaType)
+    case placeholderType: Type.Placeholder => typePlaceholderTraverser.traverse(placeholderType)
+    case byNameType: Type.ByName => typeByNameTraverser.traverse(byNameType)
+    case repeatedType: Type.Repeated => typeRepeatedTraverser.traverse(repeatedType)
+    case typeVar: Type.Var => typeVarTraverser.traverse(typeVar)
     case _ => emitComment(s"UNSUPPORTED: ${`type`}")
   }
 }
+
+object TypeTraverser extends TypeTraverserImpl(
+  TypeRefTraverser,
+  TypeApplyTraverser,
+  TypeApplyInfixTraverser,
+  TypeFunctionTraverser,
+  TypeTupleTraverser,
+  TypeWithTraverser,
+  TypeRefineTraverser,
+  TypeExistentialTraverser,
+  TypeAnnotateTraverser,
+  TypeLambdaTraverser,
+  TypePlaceholderTraverser,
+  TypeByNameTraverser,
+  TypeRepeatedTraverser,
+  TypeVarTraverser
+)

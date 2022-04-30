@@ -7,7 +7,8 @@ import scala.meta.{Importer, Term}
 
 trait ImporterTraverser extends ScalaTreeTraverser[Importer]
 
-object ImporterTraverser extends ImporterTraverser {
+private[scala2java] class ImporterTraverserImpl(termRefTraverser: => TermRefTraverser,
+                                                importeeTraverser: => ImporteeTraverser) extends ImporterTraverser {
 
   // In Scala there can be several `import` statements on same line (not just the final name) - each one is called an 'Importer'
   override def traverse(importer: Importer): Unit = {
@@ -16,11 +17,13 @@ object ImporterTraverser extends ImporterTraverser {
       case ref =>
         importer.importees.foreach(importee => {
           emit("import ")
-          TermRefTraverser.traverse(ref)
+          termRefTraverser.traverse(ref)
           emit(".")
-          ImporteeTraverser.traverse(importee)
+          importeeTraverser.traverse(importee)
           emitStatementEnd()
         })
     }
   }
 }
+
+object ImporterTraverser extends ImporterTraverserImpl(TermRefTraverser, ImporteeTraverser)

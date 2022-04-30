@@ -6,12 +6,14 @@ import scala.meta.Pat.Alternative
 
 trait AlternativeTraverser extends ScalaTreeTraverser[Alternative]
 
-object AlternativeTraverser extends AlternativeTraverser {
+private[scala2java] class AlternativeTraverserImpl(patTraverser: => PatTraverser) extends AlternativeTraverser {
 
   // Pattern match alternative, e.g. 2 | 3. In Java - separated by comma
   override def traverse(patternAlternative: Alternative): Unit = {
-    PatTraverser.traverse(patternAlternative.lhs)
+    patTraverser.traverse(patternAlternative.lhs)
     emit(", ")
-    PatTraverser.traverse(patternAlternative.rhs)
+    patTraverser.traverse(patternAlternative.rhs)
   }
 }
+
+object AlternativeTraverser extends AlternativeTraverserImpl(PatTraverser)

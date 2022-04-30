@@ -6,12 +6,14 @@ import scala.meta.Type
 
 trait TypePlaceholderTraverser extends ScalaTreeTraverser[Type.Placeholder]
 
-object TypePlaceholderTraverser extends TypePlaceholderTraverser {
+private[scala2java] class TypePlaceholderTraverserImpl(typeBoundsTraverser: => TypeBoundsTraverser) extends TypePlaceholderTraverser {
 
   // Underscore in type param, e.g. T[_]
   override def traverse(placeholderType: Type.Placeholder): Unit = {
     emit("? ")
-    TypeBoundsTraverser.traverse(placeholderType.bounds)
+    typeBoundsTraverser.traverse(placeholderType.bounds)
   }
 
 }
+
+object TypePlaceholderTraverser extends TypePlaceholderTraverserImpl(TypeBoundsTraverser)

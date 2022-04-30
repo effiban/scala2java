@@ -6,10 +6,12 @@ import scala.meta.Term.NewAnonymous
 
 trait NewAnonymousTraverser extends ScalaTreeTraverser[NewAnonymous]
 
-object NewAnonymousTraverser extends NewAnonymousTraverser {
+private[scala2java] class NewAnonymousTraverserImpl(templateTraverser: => TemplateTraverser) extends NewAnonymousTraverser {
 
   override def traverse(newAnonymous: NewAnonymous): Unit = {
     emit("new ")
-    TemplateTraverser.traverse(newAnonymous.templ)
+    templateTraverser.traverse(newAnonymous.templ)
   }
 }
+
+object NewAnonymousTraverser extends NewAnonymousTraverserImpl(TemplateTraverser)

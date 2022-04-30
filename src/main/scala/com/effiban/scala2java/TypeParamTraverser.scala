@@ -4,14 +4,18 @@ import scala.meta.Type
 
 trait TypeParamTraverser extends ScalaTreeTraverser[Type.Param]
 
-object TypeParamTraverser extends TypeParamTraverser {
+private[scala2java] class TypeParamTraverserImpl(nameTraverser: => NameTraverser,
+                                                 typeParamListTraverser: => TypeParamListTraverser,
+                                                 typeBoundsTraverser: => TypeBoundsTraverser) extends TypeParamTraverser {
 
   // Type param declaration, e.g.: `T` in trait MyTrait[T]
   override def traverse(typeParam: Type.Param): Unit = {
     // TODO handle mods
-    NameTraverser.traverse(typeParam.name)
-    TypeParamListTraverser.traverse(typeParam.tparams)
-    TypeBoundsTraverser.traverse(typeParam.tbounds)
+    nameTraverser.traverse(typeParam.name)
+    typeParamListTraverser.traverse(typeParam.tparams)
+    typeBoundsTraverser.traverse(typeParam.tbounds)
     // TODO handle vbounds and cbounds (which aren't supported in Java, maybe partially ?)
   }
 }
+
+object TypeParamTraverser extends TypeParamTraverserImpl(NameTraverser, TypeParamListTraverser, TypeBoundsTraverser)

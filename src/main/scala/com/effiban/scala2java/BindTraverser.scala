@@ -7,13 +7,15 @@ import scala.meta.Pat.Bind
 
 trait BindTraverser extends ScalaTreeTraverser[Pat.Bind]
 
-object BindTraverser extends BindTraverser {
+private[scala2java] class BindTraverserImpl(patTraverser: => PatTraverser) extends BindTraverser {
 
   // Pattern match bind variable, e.g.: a @ A()
   override def traverse(patternBind: Bind): Unit = {
     // In Java (when supported) the order is reversed
-    PatTraverser.traverse(patternBind.rhs)
+    patTraverser.traverse(patternBind.rhs)
     emit(" ")
-    PatTraverser.traverse(patternBind.lhs)
+    patTraverser.traverse(patternBind.lhs)
   }
 }
+
+object BindTraverser extends BindTraverserImpl(PatTraverser)

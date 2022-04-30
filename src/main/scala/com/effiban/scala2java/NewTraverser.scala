@@ -6,10 +6,12 @@ import scala.meta.Term.New
 
 trait NewTraverser extends ScalaTreeTraverser[New]
 
-object NewTraverser extends NewTraverser {
+private[scala2java] class NewTraverserImpl(initTraverser: => InitTraverser) extends NewTraverser {
 
   override def traverse(`new`: New): Unit = {
     emit("new ")
-    InitTraverser.traverse(`new`.init)
+    initTraverser.traverse(`new`.init)
   }
 }
+
+object NewTraverser extends NewTraverserImpl(InitTraverser)

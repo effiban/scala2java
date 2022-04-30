@@ -6,13 +6,16 @@ trait PatListTraverser {
   def traverse(pats: List[Pat]): Unit
 }
 
-object PatListTraverser extends PatListTraverser {
+private[scala2java] class PatListTraverserImpl(argumentListTraverser: => ArgumentListTraverser,
+                                               patTraverser: => PatTraverser) extends PatListTraverser {
 
   override def traverse(pats: List[Pat]): Unit = {
     if (pats.nonEmpty) {
-      ArgumentListTraverser.traverse(args = pats,
-        argTraverser = PatTraverser,
+      argumentListTraverser.traverse(args = pats,
+        argTraverser = patTraverser,
         onSameLine = true)
     }
   }
 }
+
+object PatListTraverser extends PatListTraverserImpl(ArgumentListTraverser, PatTraverser)

@@ -6,12 +6,15 @@ import scala.meta.Type
 
 trait TypeSelectTraverser extends ScalaTreeTraverser[Type.Select]
 
-object TypeSelectTraverser extends TypeSelectTraverser {
+private[scala2java] class TypeSelectTraverserImpl(termRefTraverser: => TermRefTraverser,
+                                                  typeNameTraverser: => TypeNameTraverser) extends TypeSelectTraverser {
 
   // A scala type selecting expression like: a.B
   override def traverse(typeSelect: Type.Select): Unit = {
-    TermRefTraverser.traverse(typeSelect.qual)
+    termRefTraverser.traverse(typeSelect.qual)
     emit(".")
-    TypeNameTraverser.traverse(typeSelect.name)
+    typeNameTraverser.traverse(typeSelect.name)
   }
 }
+
+object TypeSelectTraverser extends TypeSelectTraverserImpl(TermRefTraverser, TypeNameTraverser)

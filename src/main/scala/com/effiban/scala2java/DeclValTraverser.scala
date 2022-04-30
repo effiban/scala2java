@@ -8,23 +8,33 @@ import scala.meta.Mod.{Final, ValParam}
 
 trait DeclValTraverser extends ScalaTreeTraverser[Decl.Val]
 
-object DeclValTraverser extends DeclValTraverser {
+private[scala2java] class DeclValTraverserImpl(annotListTraverser: => AnnotListTraverser,
+                                               typeTraverser: => TypeTraverser,
+                                               patListTraverser: => PatListTraverser,
+                                               javaModifiersResolver: JavaModifiersResolver) extends DeclValTraverser {
 
   override def traverse(valDecl: Decl.Val): Unit = {
     val annotationsOnSameLine = valDecl.mods.exists(_.isInstanceOf[ValParam])
-    AnnotListTraverser.traverseMods(valDecl.mods, annotationsOnSameLine)
+    annotListTraverser.traverseMods(valDecl.mods, annotationsOnSameLine)
     val mods = valDecl.mods :+ Final()
     val modifierNames = javaOwnerContext match {
-      case Class => JavaModifiersResolver.resolveForClassDataMember(mods)
+      case Class => javaModifiersResolver.resolveForClassDataMember(mods)
       case _ if javaOwnerContext == Interface => Nil
       // The only possible modifier for a local var is 'final'
-      case Method => JavaModifiersResolver.resolve(mods, List(classOf[Final]))
+      case Method => javaModifiersResolver.resolve(mods, List(classOf[Final]))
       case _ => Nil
     }
     emitModifiers(modifierNames)
-    TypeTraverser.traverse(valDecl.decltpe)
+    typeTraverser.traverse(valDecl.decltpe)
     emit(" ")
     // TODO - verify when not simple case
-    PatListTraverser.traverse(valDecl.pats)
+    patListTraverser.traverse(valDecl.pats)
   }
 }
+
+object DeclValTraverser extends DeclValTraverserImpl(
+  AnnotListTraverser,
+  TypeTraverser,
+  PatListTraverser,
+  JavaModifiersResolver
+)

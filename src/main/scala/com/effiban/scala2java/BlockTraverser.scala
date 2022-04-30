@@ -9,7 +9,9 @@ trait BlockTraverser extends ScalaTreeTraverser[Block] {
   def traverse(block: Block, shouldReturnValue: Boolean, maybeInit: Option[Init] = None): Unit
 }
 
-object BlockTraverser extends BlockTraverser {
+private[scala2java] class BlockTraverserImpl(initTraverser: => InitTraverser,
+                                             ifTraverser: => IfTraverser,
+                                             statTraverser: => StatTraverser) extends BlockTraverser {
 
   override def traverse(block: Block): Unit = {
     traverse(block, shouldReturnValue = false, maybeInit = None)
@@ -20,7 +22,7 @@ object BlockTraverser extends BlockTraverser {
   override def traverse(block: Block, shouldReturnValue: Boolean, maybeInit: Option[Init] = None): Unit = {
     emitBlockStart()
     maybeInit.foreach(init => {
-      InitTraverser.traverse(init)
+      initTraverser.traverse(init)
       emitStatementEnd()
     })
     traverseContents(block, shouldReturnValue)
@@ -33,7 +35,7 @@ object BlockTraverser extends BlockTraverser {
         .foreach(stat => traverseStatement(stat))
 
       block.stats.last match {
-        case lastIf: If => IfTraverser.traverseIf(`if` = lastIf, shouldReturnValue = shouldReturnValue)
+        case lastIf: If => ifTraverser.traverseIf(`if` = lastIf, shouldReturnValue = shouldReturnValue)
         case lastTerm: Term if shouldReturnValue => traverseStatement(Return(lastTerm))
         case lastStat => traverseStatement(lastStat)
       }
@@ -41,7 +43,7 @@ object BlockTraverser extends BlockTraverser {
   }
 
   private def traverseStatement(stat: Stat): Unit = {
-    StatTraverser.traverse(stat)
+    statTraverser.traverse(stat)
     stat match {
       case _: Block =>
       case _: If =>
@@ -50,3 +52,5 @@ object BlockTraverser extends BlockTraverser {
     }
   }
 }
+
+object BlockTraverser extends BlockTraverserImpl(InitTraverser, IfTraverser, StatTraverser)

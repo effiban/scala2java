@@ -7,7 +7,9 @@ import scala.meta.Term
 
 trait TermFunctionTraverser extends ScalaTreeTraverser[Term.Function]
 
-object TermFunctionTraverser extends TermFunctionTraverser {
+private[scala2java] class TermFunctionTraverserImpl(termParamTraverser: => TermParamTraverser,
+                                                    termParamListTraverser: => TermParamListTraverser,
+                                                    termTraverser: => TermTraverser) extends TermFunctionTraverser {
 
   // lambda definition
   override def traverse(function: Term.Function): Unit = {
@@ -15,11 +17,17 @@ object TermFunctionTraverser extends TermFunctionTraverser {
     javaOwnerContext = Lambda
     function.params match {
       case Nil =>
-      case param :: Nil => TermParamTraverser.traverse(param)
-      case _ => TermParamListTraverser.traverse(function.params)
+      case param :: Nil => termParamTraverser.traverse(param)
+      case _ => termParamListTraverser.traverse(function.params)
     }
     emitArrow()
-    TermTraverser.traverse(function.body)
+    termTraverser.traverse(function.body)
     javaOwnerContext = outerJavaOwnerContext
   }
 }
+
+object TermFunctionTraverser extends TermFunctionTraverserImpl(
+  TermParamTraverser,
+  TermParamListTraverser,
+    TermTraverser
+)

@@ -6,12 +6,15 @@ import scala.meta.Type
 
 trait TypeProjectTraverser extends ScalaTreeTraverser[Type.Project]
 
-object TypeProjectTraverser extends TypeProjectTraverser {
+private[scala2java] class TypeProjectTraverserImpl(typeTraverser: => TypeTraverser,
+                                                   typeNameTraverser: => TypeNameTraverser) extends TypeProjectTraverser {
 
   // A scala type projecting expression like: a#B
   override def traverse(typeProject: Type.Project): Unit = {
-    TypeTraverser.traverse(typeProject.qual)
+    typeTraverser.traverse(typeProject.qual)
     emit(".")
-    TypeNameTraverser.traverse(typeProject.name)
+    typeNameTraverser.traverse(typeProject.name)
   }
 }
+
+object TypeProjectTraverser extends TypeProjectTraverserImpl(TypeTraverser, TypeNameTraverser)

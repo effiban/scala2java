@@ -6,15 +6,19 @@ import scala.meta.Term
 
 trait TermApplyInfixTraverser extends ScalaTreeTraverser[Term.ApplyInfix]
 
-object TermApplyInfixTraverser extends TermApplyInfixTraverser {
+private[scala2java] class TermApplyInfixTraverserImpl(termTraverser: => TermTraverser,
+                                                      termNameTraverser: => TermNameTraverser,
+                                                      termListTraverser: => TermListTraverser) extends TermApplyInfixTraverser {
 
   // Infix method invocation, e.g.: a + b
   override def traverse(termApplyInfix: Term.ApplyInfix): Unit = {
     // TODO - verify implementation for multiple RHS args
-    TermTraverser.traverse(termApplyInfix.lhs)
+    termTraverser.traverse(termApplyInfix.lhs)
     emit(" ")
-    TermNameTraverser.traverse(termApplyInfix.op)
+    termNameTraverser.traverse(termApplyInfix.op)
     emit(" ")
-    TermListTraverser.traverse(termApplyInfix.args, onSameLine = true)
+    termListTraverser.traverse(termApplyInfix.args, onSameLine = true)
   }
 }
+
+object TermApplyInfixTraverser extends TermApplyInfixTraverserImpl(TermTraverser, TermNameTraverser, TermListTraverser)

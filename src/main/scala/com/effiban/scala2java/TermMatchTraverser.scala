@@ -6,16 +6,18 @@ import scala.meta.Term
 
 trait TermMatchTraverser extends ScalaTreeTraverser[Term.Match]
 
-object TermMatchTraverser extends TermMatchTraverser {
+private[scala2java] class TermMatchTraverserImpl(termTraverser: => TermTraverser) extends TermMatchTraverser {
 
   override def traverse(termMatch: Term.Match): Unit = {
     // TODO handle mods (what is this in a 'match'?...)
     emit("switch ")
     emit("(")
-    TermTraverser.traverse(termMatch.expr)
+    termTraverser.traverse(termMatch.expr)
     emit(")")
     emitBlockStart()
     termMatch.cases.foreach(CaseTraverser.traverse)
     emitBlockEnd()
   }
 }
+
+object TermMatchTraverser extends TermMatchTraverserImpl(TermTraverser)

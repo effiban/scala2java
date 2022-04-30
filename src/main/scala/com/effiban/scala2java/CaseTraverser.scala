@@ -6,18 +6,21 @@ import scala.meta.Case
 
 trait CaseTraverser extends ScalaTreeTraverser[Case]
 
-object CaseTraverser extends CaseTraverser {
+private[scala2java] class CaseTraverserImpl(patTraverser: => PatTraverser,
+                                            termTraverser: => TermTraverser) extends CaseTraverser {
 
   def traverse(`case`: Case): Unit = {
     emit("case ")
-    PatTraverser.traverse(`case`.pat)
+    patTraverser.traverse(`case`.pat)
     `case`.cond.foreach(cond => {
       emit(" && (")
-      TermTraverser.traverse(cond)
+      termTraverser.traverse(cond)
       emit(")")
     })
     emitArrow()
-    TermTraverser.traverse(`case`.body)
+    termTraverser.traverse(`case`.body)
     emitStatementEnd()
   }
 }
+
+object CaseTraverser extends CaseTraverserImpl(PatTraverser, TermTraverser)

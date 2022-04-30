@@ -6,10 +6,12 @@ import scala.meta.Mod.Annot
 
 trait AnnotTraverser extends ScalaTreeTraverser[Annot]
 
-object AnnotTraverser extends AnnotTraverser {
+private[scala2java] class AnnotTraverserImpl(initTraverser: => InitTraverser) extends AnnotTraverser {
 
   override def traverse(annotation: Annot): Unit = {
     emit("@")
-    InitTraverser.traverse(annotation.init)
+    initTraverser.traverse(annotation.init)
   }
 }
+
+object AnnotTraverser extends AnnotTraverserImpl(InitTraverser)

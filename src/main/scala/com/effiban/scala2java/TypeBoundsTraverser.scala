@@ -6,7 +6,7 @@ import scala.meta.Type
 
 trait TypeBoundsTraverser extends ScalaTreeTraverser[Type.Bounds]
 
-object TypeBoundsTraverser extends TypeBoundsTraverser {
+private[scala2java] class TypeBoundsTraverserImpl(typeTraverser: => TypeTraverser) extends TypeBoundsTraverser {
 
   // Scala type bounds e.g. X <: Y
   override def traverse(typeBounds: Type.Bounds): Unit = {
@@ -15,10 +15,10 @@ object TypeBoundsTraverser extends TypeBoundsTraverser {
     (typeBounds.lo, typeBounds.hi) match {
       case (Some(lo), None) =>
         emit(" super ")
-        TypeTraverser.traverse(lo)
+        typeTraverser.traverse(lo)
       case (None, Some(hi)) =>
         emit(" extends ")
-        TypeTraverser.traverse(hi)
+        typeTraverser.traverse(hi)
       case (None, None) =>
       case _ =>
         // Both bounds provided - we can only emit a comment
@@ -26,3 +26,5 @@ object TypeBoundsTraverser extends TypeBoundsTraverser {
     }
   }
 }
+
+object TypeBoundsTraverser extends TypeBoundsTraverserImpl(TypeTraverser)

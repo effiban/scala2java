@@ -7,12 +7,14 @@ import scala.meta.Term.This
 
 trait ThisTraverser extends ScalaTreeTraverser[This]
 
-object ThisTraverser extends ThisTraverser {
+private[scala2java] class ThisTraverserImpl(nameTraverser: => NameTraverser) extends ThisTraverser {
 
   override def traverse(`this`: This): Unit = {
     `this`.qual match {
       case Name.Anonymous() => emit("this")
-      case name => NameTraverser.traverse(name)
+      case name => nameTraverser.traverse(name)
     }
   }
 }
+
+object ThisTraverser extends ThisTraverserImpl(NameTraverser)

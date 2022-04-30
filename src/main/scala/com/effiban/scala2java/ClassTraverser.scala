@@ -7,11 +7,15 @@ import scala.meta.{Defn, Mod}
 
 trait ClassTraverser extends ScalaTreeTraverser[Defn.Class]
 
-object ClassTraverser extends ClassTraverser {
+private[scala2java] class ClassTraverserImpl(annotListTraverser: => AnnotListTraverser,
+                                             typeParamListTraverser: => TypeParamListTraverser,
+                                             termParamListTraverser: => TermParamListTraverser,
+                                             templateTraverser: => TemplateTraverser,
+                                             javaModifiersResolver: JavaModifiersResolver) extends ClassTraverser {
 
   def traverse(classDef: Defn.Class): Unit = {
     emitLine()
-    AnnotListTraverser.traverseMods(classDef.mods)
+    annotListTraverser.traverseMods(classDef.mods)
 
     if (classDef.mods.exists(_.isInstanceOf[Mod.Case])) {
       traverseCaseClassDef(classDef)
@@ -21,27 +25,35 @@ object ClassTraverser extends ClassTraverser {
   }
 
   private def traverseCaseClassDef(classDef: Defn.Class): Unit = {
-    emitTypeDeclaration(modifiers = JavaModifiersResolver.resolveForClass(classDef.mods),
+    emitTypeDeclaration(modifiers = javaModifiersResolver.resolveForClass(classDef.mods),
       typeKeyword = "record",
       name = classDef.name.toString)
-    TypeParamListTraverser.traverse(classDef.tparams)
-    TermParamListTraverser.traverse(classDef.ctor.paramss.flatten)
+    typeParamListTraverser.traverse(classDef.tparams)
+    termParamListTraverser.traverse(classDef.ctor.paramss.flatten)
     val outerJavaOwnerContext = javaOwnerContext
     javaOwnerContext = Class
-    TemplateTraverser.traverse(template = classDef.templ, maybeClassInfo = Some(ClassInfo(className = classDef.name)))
+    templateTraverser.traverse(template = classDef.templ, maybeClassInfo = Some(ClassInfo(className = classDef.name)))
     javaOwnerContext = outerJavaOwnerContext
   }
 
   private def traverseRegularClassDef(classDef: Defn.Class): Unit = {
-    emitTypeDeclaration(modifiers = JavaModifiersResolver.resolveForClass(classDef.mods),
+    emitTypeDeclaration(modifiers = javaModifiersResolver.resolveForClass(classDef.mods),
       typeKeyword = "class",
       name = classDef.name.toString)
-    TypeParamListTraverser.traverse(classDef.tparams)
+    typeParamListTraverser.traverse(classDef.tparams)
 
     val outerJavaOwnerContext = javaOwnerContext
     javaOwnerContext = Class
-    TemplateTraverser.traverse(template = classDef.templ,
+    templateTraverser.traverse(template = classDef.templ,
       maybeClassInfo = Some(ClassInfo(className = classDef.name, maybeExplicitPrimaryCtor = Some(classDef.ctor))))
     javaOwnerContext = outerJavaOwnerContext
   }
 }
+
+object ClassTraverser extends ClassTraverserImpl(
+  AnnotListTraverser,
+  TypeParamListTraverser,
+  TermParamListTraverser,
+  TemplateTraverser,
+  JavaModifiersResolver
+)

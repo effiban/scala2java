@@ -7,12 +7,12 @@ import scala.meta.{Lit, Term}
 
 trait TermInterpolateTraverser extends ScalaTreeTraverser[Term.Interpolate]
 
-object TermInterpolateTraverser extends TermInterpolateTraverser {
+private[scala2java] class TermInterpolateTraverserImpl(termApplyTraverser: => TermApplyTraverser) extends TermInterpolateTraverser {
 
   override def traverse(termInterpolate: Term.Interpolate): Unit = {
     // Transform Scala string interpolation to Java String.format()
     termInterpolate.prefix match {
-      case Term.Name("s") => TermApplyTraverser.traverse(toJavaStringFormatInvocation(termInterpolate.parts, termInterpolate.args))
+      case Term.Name("s") => termApplyTraverser.traverse(toJavaStringFormatInvocation(termInterpolate.parts, termInterpolate.args))
       case _ => emitComment(s"UNRECOGNIZED interpolation: $termInterpolate")
     }
   }
@@ -21,3 +21,5 @@ object TermInterpolateTraverser extends TermInterpolateTraverser {
     Apply(Select(Term.Name("String"), Term.Name("format")), List(Lit.String(formatParts.mkString("%s"))) ++ interpolationArgs)
   }
 }
+
+object TermInterpolateTraverser extends TermInterpolateTraverserImpl(TermApplyTraverser)

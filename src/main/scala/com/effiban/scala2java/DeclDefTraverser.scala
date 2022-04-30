@@ -7,25 +7,37 @@ import scala.meta.Decl
 
 trait DeclDefTraverser extends ScalaTreeTraverser[Decl.Def]
 
-object DeclDefTraverser extends DeclDefTraverser {
+private[scala2java] class DeclDefTraverserImpl(annotListTraverser: => AnnotListTraverser,
+                                               typeTraverser: => TypeTraverser,
+                                               termNameTraverser: => TermNameTraverser,
+                                               termParamListTraverser: => TermParamListTraverser,
+                                               javaModifiersResolver: JavaModifiersResolver) extends DeclDefTraverser {
 
   override def traverse(defDecl: Decl.Def): Unit = {
     emitLine()
-    AnnotListTraverser.traverseMods(defDecl.mods)
+    annotListTraverser.traverseMods(defDecl.mods)
     val resolvedModifierNames = javaOwnerContext match {
-      case Interface => JavaModifiersResolver.resolveForInterfaceMethod(defDecl.mods, hasBody = false)
-      case Class => JavaModifiersResolver.resolveForClassMethod(defDecl.mods)
+      case Interface => javaModifiersResolver.resolveForInterfaceMethod(defDecl.mods, hasBody = false)
+      case Class => javaModifiersResolver.resolveForClassMethod(defDecl.mods)
       case _ => Nil
     }
     emitModifiers(resolvedModifierNames)
-    TypeTraverser.traverse(defDecl.decltpe)
+    typeTraverser.traverse(defDecl.decltpe)
     emit(" ")
-    TermNameTraverser.traverse(defDecl.name)
+    termNameTraverser.traverse(defDecl.name)
     // TODO handle method type params
 
     val outerJavaOwnerContext = javaOwnerContext
     javaOwnerContext = Method
-    TermParamListTraverser.traverse(defDecl.paramss.flatten)
+    termParamListTraverser.traverse(defDecl.paramss.flatten)
     javaOwnerContext = outerJavaOwnerContext
   }
 }
+
+object DeclDefTraverser extends DeclDefTraverserImpl(
+  AnnotListTraverser,
+  TypeTraverser,
+  TermNameTraverser,
+  TermParamListTraverser,
+  JavaModifiersResolver
+)

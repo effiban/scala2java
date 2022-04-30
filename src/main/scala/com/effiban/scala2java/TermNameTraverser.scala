@@ -4,7 +4,9 @@ import com.effiban.scala2java.JavaEmitter.emit
 
 import scala.meta.Term
 
-object TermNameTraverser extends ScalaTreeTraverser[Term.Name] {
+trait TermNameTraverser extends ScalaTreeTraverser[Term.Name]
+
+object TermNameTraverser extends TermNameTraverser {
 
   override def traverse(name: Term.Name): Unit = {
     emit(toJavaName(name))

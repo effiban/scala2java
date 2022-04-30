@@ -6,13 +6,15 @@ import scala.meta.Term.Do
 
 trait DoTraverser extends ScalaTreeTraverser[Do]
 
-object DoTraverser extends DoTraverser {
+private[scala2java] class DoTraverserImpl(termTraverser: => TermTraverser) extends DoTraverser {
 
   override def traverse(`do`: Do): Unit = {
     emit("do ")
-    TermTraverser.traverse(`do`.body)
+    termTraverser.traverse(`do`.body)
     emit("while (")
-    TermTraverser.traverse(`do`.expr)
+    termTraverser.traverse(`do`.expr)
     emit(")")
   }
 }
+
+object DoTraverser extends DoTraverserImpl(TermTraverser)

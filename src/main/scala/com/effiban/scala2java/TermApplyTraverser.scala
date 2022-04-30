@@ -2,11 +2,16 @@ package com.effiban.scala2java
 
 import scala.meta.Term
 
-object TermApplyTraverser extends ScalaTreeTraverser[Term.Apply] {
+trait TermApplyTraverser extends ScalaTreeTraverser[Term.Apply]
+
+private[scala2java] class TermApplyTraverserImpl(termTraverser: => TermTraverser,
+                                                 termListTraverser: => TermListTraverser) extends TermApplyTraverser {
 
   // method invocation
   override def traverse(termApply: Term.Apply): Unit = {
-    TermTraverser.traverse(termApply.fun)
-    TermListTraverser.traverse(termApply.args, maybeDelimiterType = Some(Parentheses))
+    termTraverser.traverse(termApply.fun)
+    termListTraverser.traverse(termApply.args, maybeDelimiterType = Some(Parentheses))
   }
 }
+
+object TermApplyTraverser extends TermApplyTraverserImpl(TermTraverser, TermListTraverser)

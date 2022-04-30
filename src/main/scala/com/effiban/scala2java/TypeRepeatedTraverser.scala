@@ -6,11 +6,13 @@ import scala.meta.Type
 
 trait TypeRepeatedTraverser extends ScalaTreeTraverser[Type.Repeated]
 
-object TypeRepeatedTraverser extends TypeRepeatedTraverser {
+private[scala2java] class TypeRepeatedTraverserImpl(typeTraverser: => TypeTraverser) extends TypeRepeatedTraverser {
 
   // Vararg type,e.g.: T*
   override def traverse(repeatedType: Type.Repeated): Unit = {
-    TypeTraverser.traverse(repeatedType.tpe)
+    typeTraverser.traverse(repeatedType.tpe)
     emitEllipsis()
   }
 }
+
+object TypeRepeatedTraverser extends TypeRepeatedTraverserImpl(TypeTraverser)

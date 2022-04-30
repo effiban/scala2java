@@ -6,12 +6,15 @@ import scala.meta.Pat
 
 trait PatTypedTraverser extends ScalaTreeTraverser[Pat.Typed]
 
-object PatTypedTraverser extends PatTypedTraverser {
+private[scala2java] class PatTypedTraverserImpl(typeTraverser: => TypeTraverser,
+                                                patTraverser: => PatTraverser) extends PatTypedTraverser {
 
   // Typed pattern expression, e.g. a: Int (in lhs of case clause)
   override def traverse(typedPattern: Pat.Typed): Unit = {
-    TypeTraverser.traverse(typedPattern.rhs)
+    typeTraverser.traverse(typedPattern.rhs)
     emit(" ")
-    PatTraverser.traverse(typedPattern.lhs)
+    patTraverser.traverse(typedPattern.lhs)
   }
 }
+
+object PatTypedTraverser extends PatTypedTraverserImpl(TypeTraverser, PatTraverser)
