@@ -13,7 +13,21 @@ trait TemplateTraverser extends ScalaTreeTraverser[Template] {
                maybeClassInfo: Option[ClassInfo] = None): Unit
 }
 
-object TemplateTraverser extends TemplateTraverser {
+private[scala2java] class TemplateTraverserImpl(initListTraverser: => InitListTraverser,
+                                                declTypeTraverser: => DeclTypeTraverser,
+                                                defnTypeTraverser: => DefnTypeTraverser,
+                                                declValTraverser: => DeclValTraverser,
+                                                declVarTraverser: => DeclVarTraverser,
+                                                defnValTraverser: => DefnValTraverser,
+                                                defnVarTraverser: => DefnVarTraverser,
+                                                annotListTraverser: => AnnotListTraverser,
+                                                typeNameTraverser: => TypeNameTraverser,
+                                                termParamListTraverser: => TermParamListTraverser,
+                                                blockTraverser: => BlockTraverser,
+                                                declDefTraverser: => DeclDefTraverser,
+                                                defnDefTraverser: => DefnDefTraverser,
+                                                statTraverser: => StatTraverser,
+                                                javaModifiersResolver: JavaModifiersResolver) extends TemplateTraverser {
 
   override def traverse(template: Template): Unit = {
     traverse(template, None)
@@ -34,7 +48,7 @@ object TemplateTraverser extends TemplateTraverser {
     val relevantInits = inits.filterNot(init => shouldSkipParent(init.name))
     if (relevantInits.nonEmpty) {
       emitParentNamesPrefix()
-      InitListTraverser.traverse(relevantInits)
+      initListTraverser.traverse(relevantInits)
     }
   }
 
@@ -65,10 +79,10 @@ object TemplateTraverser extends TemplateTraverser {
   private def traverseTypeMembers(statements: List[Stat]): Unit = {
     statements.foreach {
       case typeDecl: Decl.Type =>
-        DeclTypeTraverser.traverse(typeDecl)
+        declTypeTraverser.traverse(typeDecl)
         emitStatementEnd()
       case typeDefn: Defn.Type =>
-        DefnTypeTraverser.traverse(typeDefn)
+        defnTypeTraverser.traverse(typeDefn)
         emitStatementEnd()
       case _ =>
     }
@@ -77,16 +91,16 @@ object TemplateTraverser extends TemplateTraverser {
   private def traverseDataMembers(statements: List[Stat]): Unit = {
     statements.foreach {
       case valDecl: Decl.Val =>
-        DeclValTraverser.traverse(valDecl)
+        declValTraverser.traverse(valDecl)
         emitStatementEnd()
       case varDecl: Decl.Var =>
-        DeclVarTraverser.traverse(varDecl)
+        declVarTraverser.traverse(varDecl)
         emitStatementEnd()
       case valDefn: Defn.Val =>
-        DefnValTraverser.traverse(valDefn)
+        defnValTraverser.traverse(valDefn)
         emitStatementEnd()
       case varDefn: Defn.Var =>
-        DefnVarTraverser.traverse(varDefn)
+        defnVarTraverser.traverse(varDefn)
         emitStatementEnd()
       case _ =>
     }
@@ -94,19 +108,19 @@ object TemplateTraverser extends TemplateTraverser {
 
   private def traverseExplicitPrimaryCtor(primaryCtor: Ctor.Primary, className: Type.Name): Unit = {
     emitLine()
-    AnnotListTraverser.traverseMods(primaryCtor.mods)
-    emitModifiers(JavaModifiersResolver.resolveForClassMethod(primaryCtor.mods))
-    TypeNameTraverser.traverse(className)
+    annotListTraverser.traverseMods(primaryCtor.mods)
+    emitModifiers(javaModifiersResolver.resolveForClassMethod(primaryCtor.mods))
+    typeNameTraverser.traverse(className)
     val outerJavaOwnerContext = javaOwnerContext
     javaOwnerContext = Method
-    TermParamListTraverser.traverse(primaryCtor.paramss.flatten)
+    termParamListTraverser.traverse(primaryCtor.paramss.flatten)
 
     // Initialize members explicitly (what is done implicitly for Java records and Scala classes)
     val assignments = primaryCtor.paramss.flatten.map(param => {
       val paramName = Term.Name(param.name.toString())
       Assign(Select(This(Name.Anonymous()), paramName), paramName)
     })
-    BlockTraverser.traverse(block = Block(assignments), shouldReturnValue = false)
+    blockTraverser.traverse(block = Block(assignments), shouldReturnValue = false)
 
     javaOwnerContext = outerJavaOwnerContext
   }
@@ -117,23 +131,23 @@ object TemplateTraverser extends TemplateTraverser {
   }
 
   private def traverseSecondaryCtor(secondaryCtor: Secondary, className: Type.Name): Unit = {
-    AnnotListTraverser.traverseMods(secondaryCtor.mods)
-    emitModifiers(JavaModifiersResolver.resolveForClassMethod(secondaryCtor.mods))
-    TypeNameTraverser.traverse(className)
+    annotListTraverser.traverseMods(secondaryCtor.mods)
+    emitModifiers(javaModifiersResolver.resolveForClassMethod(secondaryCtor.mods))
+    typeNameTraverser.traverse(className)
     val outerJavaOwnerContext = javaOwnerContext
     javaOwnerContext = Method
-    TermParamListTraverser.traverse(secondaryCtor.paramss.flatten)
-    BlockTraverser.traverse(block = Block(secondaryCtor.stats), shouldReturnValue = false, maybeInit = Some(secondaryCtor.init))
+    termParamListTraverser.traverse(secondaryCtor.paramss.flatten)
+    blockTraverser.traverse(block = Block(secondaryCtor.stats), shouldReturnValue = false, maybeInit = Some(secondaryCtor.init))
     javaOwnerContext = outerJavaOwnerContext
   }
 
   private def traverseMethods(statements: List[Stat]): Unit = {
     statements.foreach {
       case defDecl: Decl.Def =>
-        DeclDefTraverser.traverse(defDecl)
+        declDefTraverser.traverse(defDecl)
         emitStatementEnd()
       case defDefn: Defn.Def =>
-        DefnDefTraverser.traverse(defDefn)
+        defnDefTraverser.traverse(defDefn)
       case _ =>
     }
   }
@@ -153,3 +167,21 @@ object TemplateTraverser extends TemplateTraverser {
     }
   }
 }
+
+object TemplateTraverser extends TemplateTraverserImpl(
+  InitListTraverser,
+  DeclTypeTraverser,
+  DefnTypeTraverser,
+  DeclValTraverser,
+  DeclVarTraverser,
+  DefnValTraverser,
+  DefnVarTraverser,
+  AnnotListTraverser,
+  TypeNameTraverser,
+  TermParamListTraverser,
+  BlockTraverser,
+  DeclDefTraverser,
+  DefnDefTraverser,
+  StatTraverser,
+  JavaModifiersResolver
+)

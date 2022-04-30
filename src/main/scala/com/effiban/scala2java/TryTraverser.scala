@@ -6,31 +6,34 @@ import scala.meta.{Case, Term}
 
 trait TryTraverser extends ScalaTreeTraverser[Term.Try]
 
-object TryTraverser extends TryTraverser {
+private[scala2java] class TryTraverserImpl(termTraverser: => TermTraverser,
+                                           patTraverser: => PatTraverser) extends TryTraverser {
 
   override def traverse(`try`: Term.Try): Unit = {
     emit("try ")
-    TermTraverser.traverse(`try`.expr)
+    termTraverser.traverse(`try`.expr)
     `try`.catchp.foreach(traverseCatchClause)
     `try`.finallyp.foreach(finallyp => {
       emit("finally")
       emitBlockStart()
-      TermTraverser.traverse(finallyp)
+      termTraverser.traverse(finallyp)
       emitBlockEnd()
     })
   }
 
   private def traverseCatchClause(`case`: Case): Unit = {
     emit("catch (")
-    PatTraverser.traverse(`case`.pat)
+    patTraverser.traverse(`case`.pat)
     `case`.cond.foreach(cond => {
       emit(" && (")
-      TermTraverser.traverse(cond)
+      termTraverser.traverse(cond)
       emit(")")
     })
     emit(")")
     emitBlockStart()
-    TermTraverser.traverse(`case`.body)
+    termTraverser.traverse(`case`.body)
     emitBlockEnd()
   }
 }
+
+object TryTraverser extends TryTraverserImpl(TermTraverser, PatTraverser)

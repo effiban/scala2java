@@ -7,18 +7,22 @@ import scala.meta.Defn
 
 trait ObjectTraverser extends ScalaTreeTraverser[Defn.Object]
 
-object ObjectTraverser extends ObjectTraverser {
+private[scala2java] class ObjectTraverserImpl(templateTraverser: => TemplateTraverser,
+                                              javaModifiersResolver: JavaModifiersResolver) extends ObjectTraverser {
 
   override def traverse(objectDef: Defn.Object): Unit = {
     emitLine()
     emitComment("originally a Scala object")
     emitLine()
-    emitTypeDeclaration(modifiers = JavaModifiersResolver.resolveForClass(objectDef.mods),
+    emitTypeDeclaration(modifiers = javaModifiersResolver.resolveForClass(objectDef.mods),
       typeKeyword = "class",
       name = s"${objectDef.name.toString}")
     val outerJavaOwnerContext = javaOwnerContext
     javaOwnerContext = Class
-    TemplateTraverser.traverse(objectDef.templ)
+    templateTraverser.traverse(objectDef.templ)
     javaOwnerContext = outerJavaOwnerContext
   }
 }
+
+object ObjectTraverser extends ObjectTraverserImpl(TemplateTraverser, JavaModifiersResolver)
+

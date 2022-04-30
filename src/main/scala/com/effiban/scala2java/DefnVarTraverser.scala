@@ -8,28 +8,39 @@ import scala.meta.Mod.ValParam
 
 trait DefnVarTraverser extends ScalaTreeTraverser[Defn.Var]
 
-object DefnVarTraverser extends DefnVarTraverser {
+private[scala2java] class DefnVarTraverserImpl(annotListTraverser: => AnnotListTraverser,
+                                               typeTraverser: => TypeTraverser,
+                                               patListTraverser: => PatListTraverser,
+                                               termTraverser: => TermTraverser,
+                                               javaModifiersResolver: JavaModifiersResolver) extends DefnVarTraverser {
 
   override def traverse(varDef: Defn.Var): Unit = {
     val annotationsOnSameLine = varDef.mods.exists(_.isInstanceOf[ValParam])
-    AnnotListTraverser.traverseMods(varDef.mods, annotationsOnSameLine)
+    annotListTraverser.traverseMods(varDef.mods, annotationsOnSameLine)
     val modifierNames = varDef.mods match {
-      case modifiers if javaOwnerContext == Class => JavaModifiersResolver.resolveForClassDataMember(modifiers)
+      case modifiers if javaOwnerContext == Class => javaModifiersResolver.resolveForClassDataMember(modifiers)
       case _ => Nil
     }
     emitModifiers(modifierNames)
     varDef.decltpe match {
       case Some(declType) =>
-        TypeTraverser.traverse(declType)
+        typeTraverser.traverse(declType)
         emit(" ")
       case None if javaOwnerContext == Method => emit("var ")
       case _ =>
     }
     // TODO - verify this
-    PatListTraverser.traverse(varDef.pats)
+    patListTraverser.traverse(varDef.pats)
     varDef.rhs.foreach { rhs =>
       emit(" = ")
-      TermTraverser.traverse(rhs)
+      termTraverser.traverse(rhs)
     }
   }
 }
+
+object DefnVarTraverser extends DefnVarTraverserImpl(AnnotListTraverser,
+  TypeTraverser,
+  PatListTraverser,
+  TermTraverser,
+  JavaModifiersResolver
+)

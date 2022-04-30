@@ -6,20 +6,24 @@ import scala.meta.{Init, Name}
 
 trait InitTraverser extends ScalaTreeTraverser[Init]
 
-object InitTraverser extends InitTraverser {
+private[scala2java] class InitTraverserImpl(typeTraverser: => TypeTraverser,
+                                            nameTraverser: => NameTraverser,
+                                            termListTraverser: => TermListTraverser) extends InitTraverser {
 
   // An 'Init' is a parent of a type in its declaration
   override def traverse(init: Init): Unit = {
-    TypeTraverser.traverse(init.tpe)
+    typeTraverser.traverse(init.tpe)
     init.name match {
       case Name.Anonymous() =>
       case name =>
         emit(" ")
-        NameTraverser.traverse(name)
+        nameTraverser.traverse(name)
     }
     val args = init.argss.flatten
     if (args.nonEmpty) {
-      TermListTraverser.traverse(init.argss.flatten, maybeDelimiterType = Some(Parentheses))
+      termListTraverser.traverse(init.argss.flatten, maybeDelimiterType = Some(Parentheses))
     }
   }
 }
+
+object InitTraverser extends InitTraverserImpl(TypeTraverser, NameTraverser, TermListTraverser)

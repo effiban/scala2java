@@ -7,39 +7,101 @@ import scala.meta.{Lit, Term}
 
 trait TermTraverser extends ScalaTreeTraverser[Term]
 
-object TermTraverser extends TermTraverser {
+private[scala2java] class TermTraverserImpl(termRefTraverser: => TermRefTraverser,
+                                            termApplyTraverser: => TermApplyTraverser,
+                                            applyTypeTraverser: => ApplyTypeTraverser,
+                                            termApplyInfixTraverser: => TermApplyInfixTraverser,
+                                            assignTraverser: => AssignTraverser,
+                                            returnTraverser: => ReturnTraverser,
+                                            throwTraverser: => ThrowTraverser,
+                                            ascribeTraverser: => AscribeTraverser,
+                                            termAnnotateTraverser: => TermAnnotateTraverser,
+                                            termTupleTraverser: => TermTupleTraverser,
+                                            blockTraverser: => BlockTraverser,
+                                            ifTraverser: => IfTraverser,
+                                            termMatchTraverser: => TermMatchTraverser,
+                                            tryTraverser: => TryTraverser,
+                                            tryWithHandlerTraverser: => TryWithHandlerTraverser,
+                                            termFunctionTraverser: => TermFunctionTraverser,
+                                            partialFunctionTraverser: => PartialFunctionTraverser,
+                                            anonymousFunctionTraverser: => AnonymousFunctionTraverser,
+                                            whileTraverser: => WhileTraverser,
+                                            doTraverser: => DoTraverser,
+                                            forTraverser: => ForTraverser,
+                                            forYieldTraverser: => ForYieldTraverser,
+                                            newTraverser: => NewTraverser,
+                                            newAnonymousTraverser: => NewAnonymousTraverser,
+                                            termPlaceholderTraverser: => TermPlaceholderTraverser,
+                                            etaTraverser: => EtaTraverser,
+                                            termRepeatedTraverser: => TermRepeatedTraverser,
+                                            termInterpolateTraverser: => TermInterpolateTraverser,
+                                            termXmlTraverser: => TermXmlTraverser,
+                                            litTraverser: => LitTraverser) extends TermTraverser {
 
   override def traverse(term: Term): Unit = term match {
-    case termRef: Term.Ref => TermRefTraverser.traverse(termRef)
-    case apply: Term.Apply => TermApplyTraverser.traverse(apply)
-    case applyType: ApplyType => ApplyTypeTraverser.traverse(applyType)
-    case applyInfix: Term.ApplyInfix => TermApplyInfixTraverser.traverse(applyInfix)
-    case assign: Assign => AssignTraverser.traverse(assign)
-    case `return`: Return => ReturnTraverser.traverse(`return`)
-    case `throw`: Throw => ThrowTraverser.traverse(`throw`)
-    case ascribe: Ascribe => AscribeTraverser.traverse(ascribe)
-    case annotate: Term.Annotate => TermAnnotateTraverser.traverse(annotate)
-    case tuple: Term.Tuple => TermTupleTraverser.traverse(tuple)
-    case block: Block => BlockTraverser.traverse(block)
-    case `if`: If => IfTraverser.traverse(`if`)
-    case `match`: Term.Match => TermMatchTraverser.traverse(`match`)
-    case `try`: Try => TryTraverser.traverse(`try`)
-    case tryWithHandler: TryWithHandler => TryWithHandlerTraverser.traverse(tryWithHandler)
-    case `function`: Term.Function => TermFunctionTraverser.traverse(`function`)
-    case partialFunction: Term.PartialFunction => PartialFunctionTraverser.traverse(partialFunction)
-    case anonFunction: AnonymousFunction => AnonymousFunctionTraverser.traverse(anonFunction)
-    case `while`: While => WhileTraverser.traverse(`while`)
-    case `do`: Do => DoTraverser.traverse(`do`)
-    case `for`: For => ForTraverser.traverse(`for`)
-    case forYield: ForYield => ForYieldTraverser.traverse(forYield)
-    case `new`: New => NewTraverser.traverse(`new`)
-    case newAnonymous: NewAnonymous => NewAnonymousTraverser.traverse(newAnonymous)
-    case termPlaceholder: Term.Placeholder => TermPlaceholderTraverser.traverse(termPlaceholder)
-    case eta: Eta => EtaTraverser.traverse(eta)
-    case termRepeated: Term.Repeated => TermRepeatedTraverser.traverse(termRepeated)
-    case interpolate: Term.Interpolate => TermInterpolateTraverser.traverse(interpolate)
-    case xml: Term.Xml => TermXmlTraverser.traverse(xml)
-    case literal: Lit => LitTraverser.traverse(literal)
+    case termRef: Term.Ref => termRefTraverser.traverse(termRef)
+    case apply: Term.Apply => termApplyTraverser.traverse(apply)
+    case applyType: ApplyType => applyTypeTraverser.traverse(applyType)
+    case applyInfix: Term.ApplyInfix => termApplyInfixTraverser.traverse(applyInfix)
+    case assign: Assign => assignTraverser.traverse(assign)
+    case `return`: Return => returnTraverser.traverse(`return`)
+    case `throw`: Throw => throwTraverser.traverse(`throw`)
+    case ascribe: Ascribe => ascribeTraverser.traverse(ascribe)
+    case annotate: Term.Annotate => termAnnotateTraverser.traverse(annotate)
+    case tuple: Term.Tuple => termTupleTraverser.traverse(tuple)
+    case block: Block => blockTraverser.traverse(block)
+    case `if`: If => ifTraverser.traverse(`if`)
+    case `match`: Term.Match => termMatchTraverser.traverse(`match`)
+    case `try`: Try => tryTraverser.traverse(`try`)
+    case tryWithHandler: TryWithHandler => tryWithHandlerTraverser.traverse(tryWithHandler)
+    case `function`: Term.Function => termFunctionTraverser.traverse(`function`)
+    case partialFunction: Term.PartialFunction => partialFunctionTraverser.traverse(partialFunction)
+    case anonFunction: AnonymousFunction => anonymousFunctionTraverser.traverse(anonFunction)
+    case `while`: While => whileTraverser.traverse(`while`)
+    case `do`: Do => doTraverser.traverse(`do`)
+    case `for`: For => forTraverser.traverse(`for`)
+    case forYield: ForYield => forYieldTraverser.traverse(forYield)
+    case `new`: New => newTraverser.traverse(`new`)
+    case newAnonymous: NewAnonymous => newAnonymousTraverser.traverse(newAnonymous)
+    case termPlaceholder: Term.Placeholder => termPlaceholderTraverser.traverse(termPlaceholder)
+    case eta: Eta => etaTraverser.traverse(eta)
+    case termRepeated: Term.Repeated => termRepeatedTraverser.traverse(termRepeated)
+    case interpolate: Term.Interpolate => termInterpolateTraverser.traverse(interpolate)
+    case xml: Term.Xml => termXmlTraverser.traverse(xml)
+    case literal: Lit => litTraverser.traverse(literal)
     case _ => emitComment(s"UNSUPPORTED: $term")
   }
 }
+
+object TermTraverser extends TermTraverserImpl(
+  TermRefTraverser,
+  TermApplyTraverser,
+  ApplyTypeTraverser,
+  TermApplyInfixTraverser,
+  AssignTraverser,
+  ReturnTraverser,
+  ThrowTraverser,
+  AscribeTraverser,
+  TermAnnotateTraverser,
+  TermTupleTraverser,
+  BlockTraverser,
+  IfTraverser,
+  TermMatchTraverser,
+  TryTraverser,
+  TryWithHandlerTraverser,
+  TermFunctionTraverser,
+  PartialFunctionTraverser,
+  AnonymousFunctionTraverser,
+  WhileTraverser,
+  DoTraverser,
+  ForTraverser,
+  ForYieldTraverser,
+  NewTraverser,
+  NewAnonymousTraverser,
+  TermPlaceholderTraverser,
+  EtaTraverser,
+  TermRepeatedTraverser,
+  TermInterpolateTraverser,
+  TermXmlTraverser,
+  LitTraverser
+)

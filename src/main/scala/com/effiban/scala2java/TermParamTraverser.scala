@@ -8,21 +8,31 @@ import scala.meta.Term
 
 trait TermParamTraverser extends ScalaTreeTraverser[Term.Param]
 
-object TermParamTraverser extends TermParamTraverser {
+private[scala2java] class TermParamTraverserImpl(annotListTraverser: => AnnotListTraverser,
+                                                 typeTraverser: => TypeTraverser,
+                                                 nameTraverser: => NameTraverser,
+                                                 javaModifiersResolver: JavaModifiersResolver) extends TermParamTraverser {
 
   // method parameter declaration
   override def traverse(termParam: Term.Param): Unit = {
-    AnnotListTraverser.traverseMods(termParam.mods, onSameLine = true)
+    annotListTraverser.traverseMods(termParam.mods, onSameLine = true)
     val mods = javaOwnerContext match {
       case Lambda => termParam.mods
       case _ => termParam.mods :+ Final()
     }
-    val modifierNames = JavaModifiersResolver.resolve(mods, List(classOf[Final]))
+    val modifierNames = javaModifiersResolver.resolve(mods, List(classOf[Final]))
     emitModifiers(modifierNames)
     termParam.decltpe.foreach(declType => {
-      TypeTraverser.traverse(declType)
+      typeTraverser.traverse(declType)
       emit(" ")
     })
-    NameTraverser.traverse(termParam.name)
+    nameTraverser.traverse(termParam.name)
   }
 }
+
+object TermParamTraverser extends TermParamTraverserImpl(
+  AnnotListTraverser,
+  TypeTraverser,
+  NameTraverser,
+  JavaModifiersResolver
+)

@@ -7,7 +7,9 @@ import scala.meta.Term.Select
 
 trait TermSelectTraverser extends ScalaTreeTraverser[Term.Select]
 
-object TermSelectTraverser extends TermSelectTraverser {
+private[scala2java] class TermSelectTraverserImpl(termTraverser: => TermTraverser,
+                                                  termNameTraverser: => TermNameTraverser,
+                                                  termRefTraverser: => TermRefTraverser) extends TermSelectTraverser {
 
   // qualified name
   override def traverse(termSelect: Term.Select): Unit = {
@@ -22,12 +24,18 @@ object TermSelectTraverser extends TermSelectTraverser {
 
     adjustedTermRef match {
       case select: Select =>
-        TermTraverser.traverse(select.qual)
+        termTraverser.traverse(select.qual)
         emit(".")
-        TermNameTraverser.traverse(select.name)
-      case name: Term.Name => TermNameTraverser.traverse(name)
-      case termRef: Term.Ref => TermRefTraverser.traverse(termRef)
+        termNameTraverser.traverse(select.name)
+      case name: Term.Name => termNameTraverser.traverse(name)
+      case termRef: Term.Ref => termRefTraverser.traverse(termRef)
     }
   }
 
 }
+
+object TermSelectTraverser extends TermSelectTraverserImpl(
+  TermTraverser,
+  TermNameTraverser,
+  TermRefTraverser
+)

@@ -6,12 +6,14 @@ import scala.meta.Term.Assign
 
 trait AssignTraverser extends ScalaTreeTraverser[Assign]
 
-object AssignTraverser extends AssignTraverser {
+private[scala2java] class AssignTraverserImpl(termTraverser: => TermTraverser) extends AssignTraverser {
 
   // Variable assignment
   override def traverse(assign: Assign): Unit = {
-    TermTraverser.traverse(assign.lhs)
+    termTraverser.traverse(assign.lhs)
     emit(" = ")
-    TermTraverser.traverse(assign.rhs)
+    termTraverser.traverse(assign.rhs)
   }
 }
+
+object AssignTraverser extends AssignTraverserImpl(TermTraverser)

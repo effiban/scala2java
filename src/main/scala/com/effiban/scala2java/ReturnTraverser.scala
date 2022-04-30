@@ -6,10 +6,12 @@ import scala.meta.Term.Return
 
 trait ReturnTraverser extends ScalaTreeTraverser[Return]
 
-object ReturnTraverser extends ReturnTraverser {
+private[scala2java] class ReturnTraverserImpl(termTraverser: => TermTraverser) extends ReturnTraverser {
 
   override def traverse(`return`: Return): Unit = {
     emit("return ")
-    TermTraverser.traverse(`return`.expr)
+    termTraverser.traverse(`return`.expr)
   }
 }
+
+object ReturnTraverser extends ReturnTraverserImpl(TermTraverser)

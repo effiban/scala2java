@@ -6,12 +6,15 @@ import scala.meta.Type
 
 trait TypeAnnotateTraverser extends ScalaTreeTraverser[Type.Annotate]
 
-object TypeAnnotateTraverser extends TypeAnnotateTraverser {
+private[scala2java] class TypeAnnotateTraverserImpl(annotListTraverser: => AnnotListTraverser,
+                                                    typeTraverser: => TypeTraverser) extends TypeAnnotateTraverser {
 
   // type with annotation, e.g.: T @annot
   override def traverse(annotatedType: Type.Annotate): Unit = {
-    AnnotListTraverser.traverseAnnotations(annotatedType.annots)
+    annotListTraverser.traverseAnnotations(annotatedType.annots)
     emit(" ")
-    TypeTraverser.traverse(annotatedType.tpe)
+    typeTraverser.traverse(annotatedType.tpe)
   }
 }
+
+object TypeAnnotateTraverser extends TypeAnnotateTraverserImpl(AnnotListTraverser, TypeTraverser)

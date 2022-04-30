@@ -6,11 +6,13 @@ import scala.meta.Term.Throw
 
 trait ThrowTraverser extends ScalaTreeTraverser[Throw]
 
-object ThrowTraverser extends ThrowTraverser {
+private[scala2java] class ThrowTraverserImpl(termTraverser: => TermTraverser) extends ThrowTraverser {
 
   override def traverse(`throw`: Throw): Unit = {
     emit("throw ")
-    TermTraverser.traverse(`throw`.expr)
+    termTraverser.traverse(`throw`.expr)
     emitStatementEnd()
   }
 }
+
+object ThrowTraverser extends ThrowTraverserImpl(TermTraverser)

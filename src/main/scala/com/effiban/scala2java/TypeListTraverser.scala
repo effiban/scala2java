@@ -6,14 +6,17 @@ trait TypeListTraverser {
   def traverse(types: List[Type]): Unit
 }
 
-object TypeListTraverser extends TypeListTraverser {
+private[scala2java] class TypeListTraverserImpl(argumentListTraverser: => ArgumentListTraverser,
+                                                typeTraverser: => TypeTraverser) extends TypeListTraverser {
 
   override def traverse(types: List[Type]): Unit = {
     if (types.nonEmpty) {
-      ArgumentListTraverser.traverse(args = types,
-        argTraverser = TypeTraverser,
+      argumentListTraverser.traverse(args = types,
+        argTraverser = typeTraverser,
         maybeDelimiterType = Some(AngleBracket),
         onSameLine = true)
     }
   }
 }
+
+object TypeListTraverser extends TypeListTraverserImpl(ArgumentListTraverser, TypeTraverser)

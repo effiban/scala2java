@@ -6,13 +6,16 @@ import scala.meta.Pkg
 
 trait PkgTraverser extends ScalaTreeTraverser[Pkg]
 
-object PkgTraverser extends PkgTraverser {
+private[scala2java] class PkgTraverserImpl(termRefTraverser: => TermRefTraverser,
+                                           statTraverser: => StatTraverser) extends PkgTraverser {
 
   override def traverse(pkg: Pkg): Unit = {
     emit("package ")
-    TermRefTraverser.traverse(pkg.ref)
+    termRefTraverser.traverse(pkg.ref)
     emitStatementEnd()
     emitLine()
-    pkg.stats.foreach(StatTraverser.traverse)
+    pkg.stats.foreach(statTraverser.traverse)
   }
 }
+
+object PkgTraverser extends PkgTraverserImpl(TermRefTraverser, StatTraverser)

@@ -7,13 +7,15 @@ import scala.meta.Mod.Annot
 
 trait AnnotListTraverser {
   def traverseAnnotations(annotations: List[Annot], onSameLine: Boolean = false): Unit
+
+  def traverseMods(mods: List[Mod], onSameLine: Boolean = false): Unit
 }
 
-object AnnotListTraverser extends AnnotListTraverser {
+private[scala2java] class AnnotListTraverserImpl(annotTraverser: => AnnotTraverser) extends AnnotListTraverser {
 
   override def traverseAnnotations(annotations: List[Annot], onSameLine: Boolean = false): Unit = {
     annotations.foreach(annotation => {
-      AnnotTraverser.traverse(annotation)
+      annotTraverser.traverse(annotation)
       if (onSameLine) {
         emit(" ")
       } else {
@@ -22,9 +24,12 @@ object AnnotListTraverser extends AnnotListTraverser {
     })
   }
 
-  def traverseMods(mods: List[Mod], onSameLine: Boolean = false): Unit = {
+  override def traverseMods(mods: List[Mod], onSameLine: Boolean = false): Unit = {
     traverseAnnotations(annotations = mods.collect { case annot: Annot => annot },
       onSameLine = onSameLine)
   }
 
 }
+
+object AnnotListTraverser extends AnnotListTraverserImpl(AnnotTraverser)
+

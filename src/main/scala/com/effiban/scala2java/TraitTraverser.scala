@@ -7,16 +7,20 @@ import scala.meta.Defn.Trait
 
 trait TraitTraverser extends ScalaTreeTraverser[Trait]
 
-object TraitTraverser extends TraitTraverser {
+private[scala2java] class TraitTraverserImpl(typeParamListTraverser: => TypeParamListTraverser,
+                                             templateTraverser: => TemplateTraverser,
+                                             javaModifiersResolver: JavaModifiersResolver) extends TraitTraverser {
 
   override def traverse(traitDef: Trait): Unit = {
-    emitTypeDeclaration(modifiers = JavaModifiersResolver.resolveForInterface(traitDef.mods),
+    emitTypeDeclaration(modifiers = javaModifiersResolver.resolveForInterface(traitDef.mods),
       typeKeyword = "interface",
       name = traitDef.name.toString)
-    TypeParamListTraverser.traverse(traitDef.tparams)
+    typeParamListTraverser.traverse(traitDef.tparams)
     val outerJavaOwnerContext = javaOwnerContext
     javaOwnerContext = Interface
-    TemplateTraverser.traverse(traitDef.templ)
+    templateTraverser.traverse(traitDef.templ)
     javaOwnerContext = outerJavaOwnerContext
   }
 }
+
+object TraitTraverser extends TraitTraverserImpl(TypeParamListTraverser, TemplateTraverser, JavaModifiersResolver)

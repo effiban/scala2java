@@ -7,7 +7,7 @@ import scala.meta.Term.Super
 
 trait SuperTraverser extends ScalaTreeTraverser[Super]
 
-object SuperTraverser extends SuperTraverser {
+private[scala2java] class SuperTraverserImpl(nameTraverser: => NameTraverser) extends SuperTraverser {
 
   def traverse(`super`: Super): Unit = {
     `super`.thisp match {
@@ -22,3 +22,5 @@ object SuperTraverser extends SuperTraverser {
     }
   }
 }
+
+object SuperTraverser extends SuperTraverserImpl(NameTraverser)

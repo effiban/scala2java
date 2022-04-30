@@ -6,14 +6,24 @@ import scala.meta.{Name, Term, Type}
 
 trait NameTraverser extends ScalaTreeTraverser[Name]
 
-object NameTraverser extends NameTraverser {
+private[scala2java] class NameTraverserImpl(nameAnonymousTraverser: => NameAnonymousTraverser,
+                                            nameIndeterminateTraverser: => NameIndeterminateTraverser,
+                                            termNameTraverser: => TermNameTraverser,
+                                            typeNameTraverser: => TypeNameTraverser) extends NameTraverser {
 
   override def traverse(name: Name): Unit = name match {
-    case anonName: Name.Anonymous => NameAnonymousTraverser.traverse(anonName)
-    case indeterminateName: Name.Indeterminate => NameIndeterminateTraverser.traverse(indeterminateName)
-    case termName: Term.Name => TermNameTraverser.traverse(termName)
-    case typeName: Type.Name => TypeNameTraverser.traverse(typeName)
+    case anonName: Name.Anonymous => nameAnonymousTraverser.traverse(anonName)
+    case indeterminateName: Name.Indeterminate => nameIndeterminateTraverser.traverse(indeterminateName)
+    case termName: Term.Name => termNameTraverser.traverse(termName)
+    case typeName: Type.Name => typeNameTraverser.traverse(typeName)
     case other => emitComment(s"UNSUPPORTED: $other")
   }
 
 }
+
+object NameTraverser extends NameTraverserImpl(
+  NameAnonymousTraverser,
+  NameIndeterminateTraverser,
+  TermNameTraverser,
+  TypeNameTraverser
+)

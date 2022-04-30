@@ -8,30 +8,43 @@ import scala.meta.Mod.{Final, ValParam}
 
 trait DefnValTraverser extends ScalaTreeTraverser[Defn.Val]
 
-object DefnValTraverser extends DefnValTraverser {
+private[scala2java] class DefnValTraverserImpl(annotListTraverser: => AnnotListTraverser,
+                                               typeTraverser: => TypeTraverser,
+                                               patListTraverser: => PatListTraverser,
+                                               termTraverser: => TermTraverser,
+                                               javaModifiersResolver: JavaModifiersResolver) extends DefnValTraverser {
 
   def traverse(valDef: Defn.Val): Unit = {
     val annotationsOnSameLine = valDef.mods.exists(_.isInstanceOf[ValParam])
-    AnnotListTraverser.traverseMods(valDef.mods, annotationsOnSameLine)
+    annotListTraverser.traverseMods(valDef.mods, annotationsOnSameLine)
     val mods = valDef.mods :+ Final()
     val modifierNames = mods match {
-      case modifiers if javaOwnerContext == Class => JavaModifiersResolver.resolveForClassDataMember(modifiers)
+      case modifiers if javaOwnerContext == Class => javaModifiersResolver.resolveForClassDataMember(modifiers)
       case _ if javaOwnerContext == Interface => Nil
       // The only possible modifier for a method param or local var is 'final'
-      case modifiers if javaOwnerContext == Method => JavaModifiersResolver.resolve(modifiers, List(classOf[Final]))
+      case modifiers if javaOwnerContext == Method => javaModifiersResolver.resolve(modifiers, List(classOf[Final]))
       case _ => Nil
     }
     emitModifiers(modifierNames)
     valDef.decltpe match {
       case Some(declType) =>
-        TypeTraverser.traverse(declType)
+        typeTraverser.traverse(declType)
         emit(" ")
       case None if javaOwnerContext == Method => emit("var ")
       case _ =>
     }
     // TODO verify for non-simple case
-    PatListTraverser.traverse(valDef.pats)
+    patListTraverser.traverse(valDef.pats)
     emit(" = ")
-    TermTraverser.traverse(valDef.rhs)
+    termTraverser.traverse(valDef.rhs)
   }
 }
+
+object DefnValTraverser extends DefnValTraverserImpl(
+  AnnotListTraverser,
+  TypeTraverser,
+  PatListTraverser,
+  TermTraverser,
+  JavaModifiersResolver
+)
+

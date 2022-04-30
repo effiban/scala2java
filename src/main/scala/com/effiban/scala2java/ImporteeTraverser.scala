@@ -6,19 +6,21 @@ import scala.meta.Importee
 
 trait ImporteeTraverser extends ScalaTreeTraverser[Importee]
 
-object ImporteeTraverser extends ImporteeTraverser {
+private[scala2java] class ImporteeTraverserImpl(nameTraverser: => NameTraverser) extends ImporteeTraverser {
 
   // A single imported element within an Importer (can be one name, wildcard etc. see below)
   override def traverse(importee: Importee): Unit = {
     importee match {
-      case Importee.Name(name) => NameTraverser.traverse(name)
+      case Importee.Name(name) => nameTraverser.traverse(name)
       case Importee.Wildcard() => emit("*")
       case Importee.Rename(name, rename) =>
-        NameTraverser.traverse(name)
+        nameTraverser.traverse(name)
         emitComment(s" Renamed in Scala to ${rename.toString}")
       case Importee.Unimport(name) =>
-        NameTraverser.traverse(name)
+        nameTraverser.traverse(name)
         emitComment(s" Hidden (unimported) in Scala")
     }
   }
 }
+
+object ImporteeTraverser extends ImporteeTraverserImpl(NameTraverser)

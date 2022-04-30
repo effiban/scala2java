@@ -4,9 +4,11 @@ import scala.meta.Term.ForYield
 
 trait ForYieldTraverser extends ScalaTreeTraverser[ForYield]
 
-object ForYieldTraverser extends ForYieldTraverser {
+private[scala2java] class ForYieldTraverserImpl(forVariantsTraverser: => ForVariantsTraverser) extends ForYieldTraverser {
 
   override def traverse(forYield: ForYield): Unit = {
-    ForVariantsTraverser.traverse(forYield.enums, forYield.body)
+    forVariantsTraverser.traverse(forYield.enums, forYield.body)
   }
 }
+
+object ForYieldTraverser extends ForYieldTraverserImpl(ForVariantsTraverser)
