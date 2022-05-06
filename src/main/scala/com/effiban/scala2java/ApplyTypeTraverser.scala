@@ -12,7 +12,7 @@ private[scala2java] class ApplyTypeTraverserImpl(typeTraverser: => TypeTraverser
 
   import javaEmitter._
 
-  // parametrized type application, e.g.: classOf[X], identity[X], List[X]
+  // parametrized type application, e.g.: classOf[X], identity[X]
   override def traverse(termApplyType: ApplyType): Unit = {
     termApplyType.fun match {
       case Term.Name("classOf") =>

@@ -9,26 +9,33 @@ trait ArgumentListTraverser {
                           maybeDelimiterType: Option[DualDelimiterType] = None): Unit
 }
 
-class ArgumentListTraverserImpl(javaEmitter: JavaEmitter) extends ArgumentListTraverser {
+class ArgumentListTraverserImpl(implicit javaEmitter: JavaEmitter) extends ArgumentListTraverser {
 
   import javaEmitter._
 
   override def traverse[T <: Tree](args: List[T],
                                    argTraverser: ScalaTreeTraverser[T],
                                    onSameLine: Boolean = false,
-                                   maybeDelimiterType: Option[DualDelimiterType] = None): Unit = {
-    maybeDelimiterType.foreach(emitArgumentsStart)
+                                   maybeWrappingDelimiterType: Option[DualDelimiterType] = None): Unit = {
+    maybeWrappingDelimiterType.foreach(emitArgumentsStart)
     args.zipWithIndex.foreach { case (tree, idx) =>
       argTraverser.traverse(tree)
       if (idx < args.size - 1) {
         emitListSeparator()
-        if (args.size > 2 && !onSameLine) {
-          emitLine()
-        }
+        emitWhitespaceIfNeeded(args.size, onSameLine)
       }
     }
-    maybeDelimiterType.foreach(emitArgumentsEnd)
+    maybeWrappingDelimiterType.foreach(emitArgumentsEnd)
+  }
+
+  private def emitWhitespaceIfNeeded(numArgs: Int, onSameLine: Boolean): Unit = {
+    (numArgs, onSameLine) match {
+      case (1, _) =>
+      case (2, _) => emit(" ") // If only 2 args, multiline will not look good so ignoring the flag
+      case (_, true) => emit(" ")
+      case (_, false) => emitLine()
+    }
   }
 }
 
-object ArgumentListTraverser extends ArgumentListTraverserImpl(JavaEmitter)
+object ArgumentListTraverser extends ArgumentListTraverserImpl

@@ -1,10 +1,11 @@
 plugins {
     id 'java'
     id 'scala'
+    id "com.github.maiflai.scalatest" version "0.32"
 }
 
-group 'org.example'
-version '1.0-SNAPSHOT'
+group 'com.effiban'
+version '1.0'
 
 repositories {
     mavenCentral()
@@ -13,8 +14,10 @@ repositories {
 dependencies {
     implementation 'org.scalameta:scalameta_2.13:4.5.4'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+    testImplementation 'org.scalatest:scalatest_2.13:3.2.12'
+    testImplementation 'org.mockito:mockito-scala_2.13:1.17.5'
+
+    testRuntimeOnly 'com.vladsch.flexmark:flexmark-all:0.64.0'
 }
 
 test {

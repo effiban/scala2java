@@ -13,9 +13,9 @@ private[scala2java] class AscribeTraverserImpl(typeTraverser: => TypeTraverser,
   // Explicitly specified type, e.g.: x = 2:Short
   // Java equivalent is casting. e.g. x = (short)2
   override def traverse(ascribe: Ascribe): Unit = {
-    emit("(")
+    emitStartDelimiter(Parentheses)
     typeTraverser.traverse(ascribe.tpe)
-    emit(")")
+    emitEndDelimiter(Parentheses)
     termTraverser.traverse(ascribe.expr)
   }
 }

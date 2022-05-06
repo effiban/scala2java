@@ -1,44 +1,8 @@
 package com.effiban.scala2java
 
-trait JavaEmitter {
+import java.io.StringWriter
 
-  def emitTypeDeclaration(modifiers: List[String], typeKeyword: String, name: String): Unit
-
-  def emitModifiers(modifiers: List[String]): Unit
-
-  def emitParentNamesPrefix(): Unit
-
-  def emitStatementEnd(): Unit
-
-  def emitArrow(): Unit
-
-  def emitBlockStart(): Unit
-
-  def emitBlockEnd(): Unit
-
-  def emitArgumentsStart(delimType: DualDelimiterType): Unit
-
-  def emitArgumentsEnd(delimType: DualDelimiterType): Unit
-
-  def emitListSeparator(): Unit
-
-  def emitComment(comment: String): Unit
-
-  def emitLine(str: String = ""): Unit
-
-  def emitEllipsis(): Unit
-
-  def emitStartDelimiter(delimType: DualDelimiterType): Unit
-
-  def emitEndDelimiter(delimType: DualDelimiterType): Unit
-
-  def emit(str: String): Unit
-}
-
-private[scala2java] class JavaEmitterImpl extends JavaEmitter {
-  var indentationLevel = 0
-  var indentationRequired = false
-
+class TestJavaEmitter(sw: StringWriter) extends JavaEmitter {
   override def emitTypeDeclaration(modifiers: List[String], typeKeyword: String, name: String): Unit = {
     emitModifiers(modifiers)
     emit(s"$typeKeyword $name")
@@ -52,8 +16,7 @@ private[scala2java] class JavaEmitterImpl extends JavaEmitter {
   }
 
   override def emitParentNamesPrefix(): Unit = {
-    // TODO - fix, handle class vs. interface
-    emit(s" implements ")
+    emit(s" extends/implements ")
   }
 
   override def emitStatementEnd(): Unit = {
@@ -67,22 +30,18 @@ private[scala2java] class JavaEmitterImpl extends JavaEmitter {
 
   override def emitBlockStart(): Unit = {
     emitLine(" {")
-    indentationLevel += 1
   }
 
   override def emitBlockEnd(): Unit = {
-    indentationLevel -= 1
     emitLine("}")
   }
 
   override def emitArgumentsStart(delimType: DualDelimiterType): Unit = {
     emitStartDelimiter(delimType)
-    indentationLevel += 1
   }
 
   override def emitArgumentsEnd(delimType: DualDelimiterType): Unit = {
     emitEndDelimiter(delimType)
-    indentationLevel -= 1
   }
 
   override def emitListSeparator(): Unit = {
@@ -123,19 +82,10 @@ private[scala2java] class JavaEmitterImpl extends JavaEmitter {
   }
 
   override def emit(str: String): Unit = {
-    if (indentationRequired) {
-      print(indentation())
-      indentationRequired = false
-    }
-    print(str)
+    sw.write(str)
   }
 
   private def emitLineBreak(): Unit = {
     emit("\n")
-    indentationRequired = true
   }
-
-  private def indentation() = "\t" * indentationLevel
 }
-
-object JavaEmitter extends JavaEmitterImpl
