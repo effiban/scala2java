@@ -1,13 +1,14 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.emit
-
 import scala.meta.Name
 import scala.meta.Term.Super
 
 trait SuperTraverser extends ScalaTreeTraverser[Super]
 
-private[scala2java] class SuperTraverserImpl(nameTraverser: => NameTraverser) extends SuperTraverser {
+private[scala2java] class SuperTraverserImpl(nameTraverser: => NameTraverser)
+                                            (implicit javaEmitter: JavaEmitter) extends SuperTraverser {
+
+  import javaEmitter._
 
   def traverse(`super`: Super): Unit = {
     `super`.thisp match {

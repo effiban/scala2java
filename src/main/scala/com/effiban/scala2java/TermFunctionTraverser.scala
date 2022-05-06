@@ -9,7 +9,8 @@ trait TermFunctionTraverser extends ScalaTreeTraverser[Term.Function]
 
 private[scala2java] class TermFunctionTraverserImpl(termParamTraverser: => TermParamTraverser,
                                                     termParamListTraverser: => TermParamListTraverser,
-                                                    termTraverser: => TermTraverser) extends TermFunctionTraverser {
+                                                    termTraverser: => TermTraverser)
+                                                   (implicit javaEmitter: JavaEmitter) extends TermFunctionTraverser {
 
   // lambda definition
   override def traverse(function: Term.Function): Unit = {
@@ -29,5 +30,5 @@ private[scala2java] class TermFunctionTraverserImpl(termParamTraverser: => TermP
 object TermFunctionTraverser extends TermFunctionTraverserImpl(
   TermParamTraverser,
   TermParamListTraverser,
-    TermTraverser
+  TermTraverser
 )

@@ -11,7 +11,8 @@ trait DeclVarTraverser extends ScalaTreeTraverser[Decl.Var]
 private[scala2java] class DeclVarTraverserImpl(annotListTraverser: => AnnotListTraverser,
                                                typeTraverser: => TypeTraverser,
                                                patListTraverser: => PatListTraverser,
-                                               javaModifiersResolver: JavaModifiersResolver) extends DeclVarTraverser {
+                                               javaModifiersResolver: JavaModifiersResolver)
+                                              (implicit javaEmitter: JavaEmitter) extends DeclVarTraverser {
 
   override def traverse(varDecl: Decl.Var): Unit = {
     val annotationsOnSameLine = varDecl.mods.exists(_.isInstanceOf[ValParam])

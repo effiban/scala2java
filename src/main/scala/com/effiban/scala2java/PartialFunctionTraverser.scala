@@ -6,7 +6,8 @@ import scala.meta.Term
 
 trait PartialFunctionTraverser extends ScalaTreeTraverser[Term.PartialFunction]
 
-private[scala2java] class PartialFunctionTraverserImpl(termMatchTraverser: => TermMatchTraverser) extends PartialFunctionTraverser {
+private[scala2java] class PartialFunctionTraverserImpl(termMatchTraverser: => TermMatchTraverser)
+                                                      (implicit javaEmitter: JavaEmitter) extends PartialFunctionTraverser {
 
   override def traverse(partialFunction: Term.PartialFunction): Unit = {
     val dummyArgName = "arg"

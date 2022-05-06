@@ -11,7 +11,8 @@ trait BlockTraverser extends ScalaTreeTraverser[Block] {
 
 private[scala2java] class BlockTraverserImpl(initTraverser: => InitTraverser,
                                              ifTraverser: => IfTraverser,
-                                             statTraverser: => StatTraverser) extends BlockTraverser {
+                                             statTraverser: => StatTraverser)
+                                            (implicit javaEmitter: JavaEmitter) extends BlockTraverser {
 
   override def traverse(block: Block): Unit = {
     traverse(block, shouldReturnValue = false, maybeInit = None)

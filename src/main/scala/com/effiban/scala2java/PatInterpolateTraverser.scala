@@ -6,7 +6,7 @@ import scala.meta.Pat
 
 trait PatInterpolateTraverser extends ScalaTreeTraverser[Pat.Interpolate]
 
-object PatInterpolateTraverser extends PatInterpolateTraverser {
+private[scala2java] class PatInterpolateTraverserImpl(javaEmitter: JavaEmitter) extends PatInterpolateTraverser {
 
   // Pattern interpolation e.g. r"Hello (.+)$name"
   override def traverse(patternInterpolation: Pat.Interpolate): Unit = {
@@ -14,3 +14,5 @@ object PatInterpolateTraverser extends PatInterpolateTraverser {
     emitComment(patternInterpolation.toString())
   }
 }
+
+object PatInterpolateTraverser extends PatInterpolateTraverserImpl(JavaEmitter)

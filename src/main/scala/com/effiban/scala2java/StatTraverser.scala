@@ -10,7 +10,8 @@ private[scala2java] class StatTraverserImpl(termTraverser: => TermTraverser,
                                             importTraverser: => ImportTraverser,
                                             pkgTraverser: => PkgTraverser,
                                             defnTraverser: => DefnTraverser,
-                                            declTraverser: => DeclTraverser) extends StatTraverser {
+                                            declTraverser: => DeclTraverser)
+                                           (implicit javaEmitter: JavaEmitter) extends StatTraverser {
 
   override def traverse(stat: Stat): Unit = stat match {
     case term: Term => termTraverser.traverse(term)

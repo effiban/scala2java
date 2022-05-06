@@ -1,6 +1,5 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.{emitComment, emitLine, emitTypeDeclaration}
 import com.effiban.scala2java.TraversalContext.javaOwnerContext
 
 import scala.meta.Defn
@@ -8,7 +7,10 @@ import scala.meta.Defn
 trait ObjectTraverser extends ScalaTreeTraverser[Defn.Object]
 
 private[scala2java] class ObjectTraverserImpl(templateTraverser: => TemplateTraverser,
-                                              javaModifiersResolver: JavaModifiersResolver) extends ObjectTraverser {
+                                              javaModifiersResolver: JavaModifiersResolver)
+                                             (implicit javaEmitter: JavaEmitter) extends ObjectTraverser {
+
+  import javaEmitter._
 
   override def traverse(objectDef: Defn.Object): Unit = {
     emitLine()

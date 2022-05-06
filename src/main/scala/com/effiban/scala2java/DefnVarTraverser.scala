@@ -12,7 +12,8 @@ private[scala2java] class DefnVarTraverserImpl(annotListTraverser: => AnnotListT
                                                typeTraverser: => TypeTraverser,
                                                patListTraverser: => PatListTraverser,
                                                termTraverser: => TermTraverser,
-                                               javaModifiersResolver: JavaModifiersResolver) extends DefnVarTraverser {
+                                               javaModifiersResolver: JavaModifiersResolver)
+                                              (implicit javaEmitter: JavaEmitter) extends DefnVarTraverser {
 
   override def traverse(varDef: Defn.Var): Unit = {
     val annotationsOnSameLine = varDef.mods.exists(_.isInstanceOf[ValParam])

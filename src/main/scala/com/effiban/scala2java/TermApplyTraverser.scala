@@ -5,7 +5,8 @@ import scala.meta.Term
 trait TermApplyTraverser extends ScalaTreeTraverser[Term.Apply]
 
 private[scala2java] class TermApplyTraverserImpl(termTraverser: => TermTraverser,
-                                                 termListTraverser: => TermListTraverser) extends TermApplyTraverser {
+                                                 termListTraverser: => TermListTraverser)
+                                                (implicit javaEmitter: JavaEmitter) extends TermApplyTraverser {
 
   // method invocation
   override def traverse(termApply: Term.Apply): Unit = {

@@ -6,7 +6,7 @@ import scala.meta.Type
 
 trait TypeLambdaTraverser extends ScalaTreeTraverser[Type.Lambda]
 
-object TypeLambdaTraverser extends TypeLambdaTraverser {
+private[scala2java] class TypeLambdaTraverserImpl(javaEmitter: JavaEmitter) extends TypeLambdaTraverser {
 
   // generic lambda type [T] => (T, T)
   // According to documentation supported only in some dialects (what does this mean?)
@@ -15,3 +15,5 @@ object TypeLambdaTraverser extends TypeLambdaTraverser {
     emitComment(lambdaType.toString())
   }
 }
+
+object TypeLambdaTraverser extends TypeLambdaTraverserImpl(JavaEmitter)

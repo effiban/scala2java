@@ -6,7 +6,8 @@ import scala.meta.Type
 
 trait TypeExistentialTraverser extends ScalaTreeTraverser[Type.Existential]
 
-private[scala2java] class TypeExistentialTraverserImpl(typeTraverser: => TypeTraverser) extends TypeExistentialTraverser {
+private[scala2java] class TypeExistentialTraverserImpl(typeTraverser: => TypeTraverser)
+                                                      (implicit javaEmitter: JavaEmitter) extends TypeExistentialTraverser {
 
   // type with existential constraint e.g.:  A[B] forSome {B <: Number with Serializable}
   override def traverse(existentialType: Type.Existential): Unit = {

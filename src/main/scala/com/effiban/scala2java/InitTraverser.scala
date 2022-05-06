@@ -1,14 +1,15 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.emit
-
 import scala.meta.{Init, Name}
 
 trait InitTraverser extends ScalaTreeTraverser[Init]
 
 private[scala2java] class InitTraverserImpl(typeTraverser: => TypeTraverser,
                                             nameTraverser: => NameTraverser,
-                                            termListTraverser: => TermListTraverser) extends InitTraverser {
+                                            termListTraverser: => TermListTraverser)
+                                           (implicit javaEmitter: JavaEmitter) extends InitTraverser {
+
+  import javaEmitter._
 
   // An 'Init' is a parent of a type in its declaration
   override def traverse(init: Init): Unit = {

@@ -11,7 +11,8 @@ trait DeclValTraverser extends ScalaTreeTraverser[Decl.Val]
 private[scala2java] class DeclValTraverserImpl(annotListTraverser: => AnnotListTraverser,
                                                typeTraverser: => TypeTraverser,
                                                patListTraverser: => PatListTraverser,
-                                               javaModifiersResolver: JavaModifiersResolver) extends DeclValTraverser {
+                                               javaModifiersResolver: JavaModifiersResolver)
+                                              (implicit javaEmitter: JavaEmitter) extends DeclValTraverser {
 
   override def traverse(valDecl: Decl.Val): Unit = {
     val annotationsOnSameLine = valDecl.mods.exists(_.isInstanceOf[ValParam])

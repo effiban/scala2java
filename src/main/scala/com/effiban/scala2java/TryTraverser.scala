@@ -7,7 +7,8 @@ import scala.meta.{Case, Term}
 trait TryTraverser extends ScalaTreeTraverser[Term.Try]
 
 private[scala2java] class TryTraverserImpl(termTraverser: => TermTraverser,
-                                           patTraverser: => PatTraverser) extends TryTraverser {
+                                           patTraverser: => PatTraverser)
+                                          (implicit javaEmitter: JavaEmitter) extends TryTraverser {
 
   override def traverse(`try`: Term.Try): Unit = {
     emit("try ")

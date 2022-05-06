@@ -11,7 +11,8 @@ private[scala2java] class TermRefTraverserImpl(thisTraverser: => ThisTraverser,
                                                superTraverser: => SuperTraverser,
                                                termNameTraverser: => TermNameTraverser,
                                                termSelectTraverser: => TermSelectTraverser,
-                                               applyUnaryTraverser: => ApplyUnaryTraverser) extends TermRefTraverser {
+                                               applyUnaryTraverser: => ApplyUnaryTraverser)
+                                              (implicit javaEmitter: JavaEmitter) extends TermRefTraverser {
 
   override def traverse(termRef: Term.Ref): Unit = termRef match {
     case `this`: This => thisTraverser.traverse(`this`)

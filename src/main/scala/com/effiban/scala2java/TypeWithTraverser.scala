@@ -1,12 +1,13 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.emit
-
 import scala.meta.Type
 
 trait TypeWithTraverser extends ScalaTreeTraverser[Type.With]
 
-private[scala2java] class TypeWithTraverserImpl(typeTraverser: => TypeTraverser) extends TypeWithTraverser {
+private[scala2java] class TypeWithTraverserImpl(typeTraverser: => TypeTraverser)
+                                               (implicit javaEmitter: JavaEmitter) extends TypeWithTraverser {
+
+  import javaEmitter._
 
   // type with parent, e.g.  A with B
   // approximated by Java "extends" but might not compile

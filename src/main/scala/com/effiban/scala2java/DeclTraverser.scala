@@ -9,7 +9,8 @@ trait DeclTraverser extends ScalaTreeTraverser[Decl]
 private[scala2java] class DeclTraverserImpl(declValTraverser: => DeclValTraverser,
                                             declVarTraverser: => DeclVarTraverser,
                                             declDefTraverser: => DeclDefTraverser,
-                                            declTypeTraverser: => DeclTypeTraverser) extends DeclTraverser {
+                                            declTypeTraverser: => DeclTypeTraverser)
+                                           (implicit javaEmitter: JavaEmitter) extends DeclTraverser {
 
   override def traverse(decl: Decl): Unit = decl match {
     case valDecl: Decl.Val => declValTraverser.traverse(valDecl)

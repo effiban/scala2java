@@ -9,7 +9,8 @@ trait NameTraverser extends ScalaTreeTraverser[Name]
 private[scala2java] class NameTraverserImpl(nameAnonymousTraverser: => NameAnonymousTraverser,
                                             nameIndeterminateTraverser: => NameIndeterminateTraverser,
                                             termNameTraverser: => TermNameTraverser,
-                                            typeNameTraverser: => TypeNameTraverser) extends NameTraverser {
+                                            typeNameTraverser: => TypeNameTraverser)
+                                           (implicit javaEmitter: JavaEmitter) extends NameTraverser {
 
   override def traverse(name: Name): Unit = name match {
     case anonName: Name.Anonymous => nameAnonymousTraverser.traverse(anonName)

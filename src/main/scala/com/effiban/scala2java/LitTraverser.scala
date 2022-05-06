@@ -1,12 +1,12 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.emit
-
 import scala.meta.Lit
 
 trait LitTraverser extends ScalaTreeTraverser[Lit]
 
-object LitTraverser extends LitTraverser {
+class LitTraverserImpl(javaEmitter: JavaEmitter) extends LitTraverser {
+
+  import javaEmitter._
 
   // Literals in the code
   override def traverse(lit: Lit): Unit = {
@@ -31,3 +31,5 @@ object LitTraverser extends LitTraverser {
     s"\"$str\""
   }
 }
+
+object LitTraverser extends LitTraverserImpl(JavaEmitter)

@@ -11,7 +11,8 @@ trait TermParamTraverser extends ScalaTreeTraverser[Term.Param]
 private[scala2java] class TermParamTraverserImpl(annotListTraverser: => AnnotListTraverser,
                                                  typeTraverser: => TypeTraverser,
                                                  nameTraverser: => NameTraverser,
-                                                 javaModifiersResolver: JavaModifiersResolver) extends TermParamTraverser {
+                                                 javaModifiersResolver: JavaModifiersResolver)
+                                                (implicit javaEmitter: JavaEmitter) extends TermParamTraverser {
 
   // method parameter declaration
   override def traverse(termParam: Term.Param): Unit = {

@@ -1,12 +1,13 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.emit
-
 import scala.meta.Term.While
 
 trait WhileTraverser extends ScalaTreeTraverser[While]
 
-private[scala2java] class WhileTraverserImpl(termTraverser: => TermTraverser) extends WhileTraverser {
+private[scala2java] class WhileTraverserImpl(termTraverser: => TermTraverser)
+                                            (implicit javaEmitter: JavaEmitter) extends WhileTraverser {
+
+  import javaEmitter._
 
   override def traverse(`while`: While): Unit = {
     emit("while (")

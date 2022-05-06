@@ -6,7 +6,7 @@ import scala.meta.Pat
 
 trait PatExtractTraverser extends ScalaTreeTraverser[Pat.Extract]
 
-object PatExtractTraverser extends PatExtractTraverser {
+class PatExtractTraverserImpl(javaEmitter: JavaEmitter) extends PatExtractTraverser {
 
   // Pattern match extractor e.g. A(a, b).
   // No Java equivalent (but consider rewriting as a guard ?)
@@ -14,3 +14,5 @@ object PatExtractTraverser extends PatExtractTraverser {
     emitComment(s"${patternExtractor.fun}(${patternExtractor.args})")
   }
 }
+
+object PatExtractTraverser extends PatExtractTraverserImpl(JavaEmitter)

@@ -1,14 +1,15 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.emit
-
 import scala.meta.Term
 
 trait TermApplyInfixTraverser extends ScalaTreeTraverser[Term.ApplyInfix]
 
 private[scala2java] class TermApplyInfixTraverserImpl(termTraverser: => TermTraverser,
                                                       termNameTraverser: => TermNameTraverser,
-                                                      termListTraverser: => TermListTraverser) extends TermApplyInfixTraverser {
+                                                      termListTraverser: => TermListTraverser)
+                                                     (implicit javaEmitter: JavaEmitter) extends TermApplyInfixTraverser {
+
+  import javaEmitter._
 
   // Infix method invocation, e.g.: a + b
   override def traverse(termApplyInfix: Term.ApplyInfix): Unit = {

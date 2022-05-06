@@ -8,7 +8,8 @@ import scala.meta.{Importer, Term}
 trait ImporterTraverser extends ScalaTreeTraverser[Importer]
 
 private[scala2java] class ImporterTraverserImpl(termRefTraverser: => TermRefTraverser,
-                                                importeeTraverser: => ImporteeTraverser) extends ImporterTraverser {
+                                                importeeTraverser: => ImporteeTraverser)
+                                               (implicit javaEmitter: JavaEmitter) extends ImporterTraverser {
 
   // In Scala there can be several `import` statements on same line (not just the final name) - each one is called an 'Importer'
   override def traverse(importer: Importer): Unit = {

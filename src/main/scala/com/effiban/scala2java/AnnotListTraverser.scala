@@ -1,7 +1,5 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.{emit, emitLine}
-
 import scala.meta.Mod
 import scala.meta.Mod.Annot
 
@@ -11,7 +9,10 @@ trait AnnotListTraverser {
   def traverseMods(mods: List[Mod], onSameLine: Boolean = false): Unit
 }
 
-private[scala2java] class AnnotListTraverserImpl(annotTraverser: => AnnotTraverser) extends AnnotListTraverser {
+private[scala2java] class AnnotListTraverserImpl(annotTraverser: => AnnotTraverser)
+                                                (implicit javaEmitter: JavaEmitter) extends AnnotListTraverser {
+
+  import javaEmitter._
 
   override def traverseAnnotations(annotations: List[Annot], onSameLine: Boolean = false): Unit = {
     annotations.foreach(annotation => {

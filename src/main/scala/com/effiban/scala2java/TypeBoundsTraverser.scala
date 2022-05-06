@@ -6,7 +6,8 @@ import scala.meta.Type
 
 trait TypeBoundsTraverser extends ScalaTreeTraverser[Type.Bounds]
 
-private[scala2java] class TypeBoundsTraverserImpl(typeTraverser: => TypeTraverser) extends TypeBoundsTraverser {
+private[scala2java] class TypeBoundsTraverserImpl(typeTraverser: => TypeTraverser)
+                                                 (implicit javaEmitter: JavaEmitter) extends TypeBoundsTraverser {
 
   // Scala type bounds e.g. X <: Y
   override def traverse(typeBounds: Type.Bounds): Unit = {

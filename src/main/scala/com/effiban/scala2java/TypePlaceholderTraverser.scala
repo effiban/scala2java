@@ -1,12 +1,13 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.emit
-
 import scala.meta.Type
 
 trait TypePlaceholderTraverser extends ScalaTreeTraverser[Type.Placeholder]
 
-private[scala2java] class TypePlaceholderTraverserImpl(typeBoundsTraverser: => TypeBoundsTraverser) extends TypePlaceholderTraverser {
+private[scala2java] class TypePlaceholderTraverserImpl(typeBoundsTraverser: => TypeBoundsTraverser)
+                                                      (implicit javaEmitter: JavaEmitter) extends TypePlaceholderTraverser {
+
+  import javaEmitter._
 
   // Underscore in type param, e.g. T[_]
   override def traverse(placeholderType: Type.Placeholder): Unit = {

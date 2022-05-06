@@ -1,7 +1,5 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.emit
-
 import scala.meta.Term
 import scala.meta.Term.ApplyType
 
@@ -9,7 +7,10 @@ trait ApplyTypeTraverser extends ScalaTreeTraverser[ApplyType]
 
 private[scala2java] class ApplyTypeTraverserImpl(typeTraverser: => TypeTraverser,
                                                  termTraverser: => TermTraverser,
-                                                 typeListTraverser: => TypeListTraverser) extends ApplyTypeTraverser {
+                                                 typeListTraverser: => TypeListTraverser)
+                                                (implicit javaEmitter: JavaEmitter) extends ApplyTypeTraverser {
+
+  import javaEmitter._
 
   // parametrized type application, e.g.: classOf[X], identity[X], List[X]
   override def traverse(termApplyType: ApplyType): Unit = {

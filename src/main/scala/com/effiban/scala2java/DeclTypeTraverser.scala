@@ -7,7 +7,8 @@ import scala.meta.Decl
 trait DeclTypeTraverser extends ScalaTreeTraverser[Decl.Type]
 
 private[scala2java] class DeclTypeTraverserImpl(typeParamListTraverser: => TypeParamListTraverser,
-                                                javaModifiersResolver: JavaModifiersResolver) extends DeclTypeTraverser {
+                                                javaModifiersResolver: JavaModifiersResolver)
+                                               (implicit javaEmitter: JavaEmitter) extends DeclTypeTraverser {
 
   // Scala type declaration : Closest thing in Java is an empty interface with same params
   override def traverse(typeDecl: Decl.Type): Unit = {

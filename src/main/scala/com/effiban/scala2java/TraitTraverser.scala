@@ -9,7 +9,8 @@ trait TraitTraverser extends ScalaTreeTraverser[Trait]
 
 private[scala2java] class TraitTraverserImpl(typeParamListTraverser: => TypeParamListTraverser,
                                              templateTraverser: => TemplateTraverser,
-                                             javaModifiersResolver: JavaModifiersResolver) extends TraitTraverser {
+                                             javaModifiersResolver: JavaModifiersResolver)
+                                            (implicit javaEmitter: JavaEmitter) extends TraitTraverser {
 
   override def traverse(traitDef: Trait): Unit = {
     emitTypeDeclaration(modifiers = javaModifiersResolver.resolveForInterface(traitDef.mods),

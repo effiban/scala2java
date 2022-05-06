@@ -5,7 +5,8 @@ import scala.meta.Term.ApplyUnary
 trait ApplyUnaryTraverser extends ScalaTreeTraverser[ApplyUnary]
 
 private[scala2java] class ApplyUnaryTraverserImpl(termNameTraverser: => TermNameTraverser,
-                                                  termTraverser: => TermTraverser) extends ApplyUnaryTraverser {
+                                                  termTraverser: => TermTraverser)
+                                                 (implicit javaEmitter: JavaEmitter) extends ApplyUnaryTraverser {
 
   override def traverse(applyUnary: ApplyUnary): Unit = {
     termNameTraverser.traverse(applyUnary.op)

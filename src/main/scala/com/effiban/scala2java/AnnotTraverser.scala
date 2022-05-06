@@ -1,12 +1,13 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.emit
-
 import scala.meta.Mod.Annot
 
 trait AnnotTraverser extends ScalaTreeTraverser[Annot]
 
-private[scala2java] class AnnotTraverserImpl(initTraverser: => InitTraverser) extends AnnotTraverser {
+private[scala2java] class AnnotTraverserImpl(initTraverser: => InitTraverser)
+                                            (implicit javaEmitter: JavaEmitter) extends AnnotTraverser {
+
+  import javaEmitter._
 
   override def traverse(annotation: Annot): Unit = {
     emit("@")
