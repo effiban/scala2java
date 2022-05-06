@@ -1,7 +1,13 @@
 plugins {
-    id 'java'
+    id 'java-library'
     id 'scala'
     id "com.github.maiflai.scalatest" version "0.32"
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 group 'com.effiban'
