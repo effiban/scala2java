@@ -3,8 +3,8 @@ package com.effiban.scala2java
 import scala.meta.Lit
 import scala.meta.Term.{Block, If}
 
-trait IfTraverser extends ScalaTreeTraverser[If] {
-  def traverseIf(`if`: If, shouldReturnValue: Boolean): Unit
+trait IfTraverser {
+  def traverse(`if`: If, shouldReturnValue: Boolean = false): Unit
 }
 
 private[scala2java] class IfTraverserImpl(termTraverser: => TermTraverser,
@@ -13,11 +13,7 @@ private[scala2java] class IfTraverserImpl(termTraverser: => TermTraverser,
 
   import javaEmitter._
 
-  override def traverse(`if`: If): Unit = {
-    traverseIf(`if` = `if`, shouldReturnValue = false)
-  }
-
-  override def traverseIf(`if`: If, shouldReturnValue: Boolean): Unit = {
+  override def traverse(`if`: If, shouldReturnValue: Boolean = false): Unit = {
     // TODO handle mods (what is this in an 'if'?...)
     emit("if (")
     termTraverser.traverse(`if`.cond)

@@ -10,12 +10,10 @@ private[scala2java] class BindTraverserImpl(patTraverser: => PatTraverser)
 
   import javaEmitter._
 
-  // Pattern match bind variable, e.g.: a @ A()
+  // Pattern match bind variable, e.g.: a @ A().
   override def traverse(patternBind: Bind): Unit = {
-    // In Java (when supported) the order is reversed
-    patTraverser.traverse(patternBind.rhs)
-    emit(" ")
-    patTraverser.traverse(patternBind.lhs)
+    // TODO - consider supporting in Java by converting to a guard?
+    emitComment(patternBind.toString())
   }
 }
 
