@@ -1,6 +1,5 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.{emitLine, emitTypeDeclaration}
 import com.effiban.scala2java.TraversalContext.javaOwnerContext
 
 import scala.meta.{Defn, Mod}
@@ -11,7 +10,10 @@ private[scala2java] class ClassTraverserImpl(annotListTraverser: => AnnotListTra
                                              typeParamListTraverser: => TypeParamListTraverser,
                                              termParamListTraverser: => TermParamListTraverser,
                                              templateTraverser: => TemplateTraverser,
-                                             javaModifiersResolver: JavaModifiersResolver) extends ClassTraverser {
+                                             javaModifiersResolver: JavaModifiersResolver)
+                                            (implicit javaEmitter: JavaEmitter) extends ClassTraverser {
+
+  import javaEmitter._
 
   def traverse(classDef: Defn.Class): Unit = {
     emitLine()

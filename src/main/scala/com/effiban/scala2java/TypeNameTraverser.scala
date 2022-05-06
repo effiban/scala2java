@@ -1,12 +1,12 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.emit
-
 import scala.meta.Type
 
 trait TypeNameTraverser extends ScalaTreeTraverser[Type.Name]
 
-object TypeNameTraverser extends TypeNameTraverser {
+private[scala2java] class TypeNameTraverserImpl(javaEmitter: JavaEmitter) extends TypeNameTraverser {
+
+  import javaEmitter._
 
   private final val ScalaTypeNameToJavaTypeName = Map(
     "Any" -> "Object",
@@ -33,3 +33,5 @@ object TypeNameTraverser extends TypeNameTraverser {
     ScalaTypeNameToJavaTypeName.getOrElse(typeName.value, typeName.value)
   }
 }
+
+object TypeNameTraverser extends TypeNameTraverserImpl(JavaEmitter)

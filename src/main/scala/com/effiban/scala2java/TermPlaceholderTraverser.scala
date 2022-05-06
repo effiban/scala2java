@@ -7,10 +7,12 @@ import scala.meta.Term
 
 trait TermPlaceholderTraverser extends ScalaTreeTraverser[Term.Placeholder]
 
-object TermPlaceholderTraverser extends TermPlaceholderTraverser {
+private[scala2java] class TermPlaceholderTraverserImpl(javaEmitter: JavaEmitter) extends TermPlaceholderTraverser {
 
   // Underscore as expression - will compile in java only if it is an anonymous function, but rendering always
   override def traverse(ignored: Term.Placeholder): Unit = {
     emit(JavaPlaceholder)
   }
 }
+
+object TermPlaceholderTraverser extends TermPlaceholderTraverserImpl(JavaEmitter)

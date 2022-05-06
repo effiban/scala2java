@@ -9,7 +9,8 @@ trait TypeRefTraverser extends ScalaTreeTraverser[Type.Ref]
 private[scala2java] class TypeRefTraverserImpl(typeNameTraverser: => TypeNameTraverser,
                                                typeSelectTraverser: => TypeSelectTraverser,
                                                typeProjectTraverser: => TypeProjectTraverser,
-                                               typeSingletonTraverser: => TypeSingletonTraverser) extends TypeRefTraverser {
+                                               typeSingletonTraverser: => TypeSingletonTraverser)
+                                              (implicit javaEmitter: JavaEmitter) extends TypeRefTraverser {
 
   override def traverse(typeRef: Type.Ref): Unit = typeRef match {
     case typeName: Type.Name => typeNameTraverser.traverse(typeName)

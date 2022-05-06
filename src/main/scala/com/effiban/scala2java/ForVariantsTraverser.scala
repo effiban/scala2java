@@ -10,7 +10,8 @@ trait ForVariantsTraverser {
   def traverse(enumerators: List[Enumerator], body: Term): Unit
 }
 
-private[scala2java] class ForVariantsTraverserImpl(termTraverser: => TermTraverser) extends ForVariantsTraverser {
+private[scala2java] class ForVariantsTraverserImpl(termTraverser: => TermTraverser)
+                                                  (implicit javaEmitter: JavaEmitter) extends ForVariantsTraverser {
 
   override def traverse(enumerators: List[Enumerator], body: Term): Unit = {
     termTraverser.traverse(translateFor(enumerators, body))

@@ -1,6 +1,5 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter._
 import com.effiban.scala2java.TraversalContext.javaOwnerContext
 
 import scala.meta.Term.Block
@@ -13,7 +12,10 @@ private[scala2java] class DefnDefTraverserImpl(annotListTraverser: => AnnotListT
                                                typeTraverser: => TypeTraverser,
                                                termParamListTraverser: => TermParamListTraverser,
                                                blockTraverser: => BlockTraverser,
-                                               javaModifiersResolver: JavaModifiersResolver) extends DefnDefTraverser {
+                                               javaModifiersResolver: JavaModifiersResolver)
+                                              (implicit javaEmitter: JavaEmitter) extends DefnDefTraverser {
+
+  import javaEmitter._
 
   override def traverse(defDef: Defn.Def): Unit = {
     emitLine()

@@ -6,7 +6,7 @@ import scala.meta.Type
 
 trait TypeApplyInfixTraverser extends ScalaTreeTraverser[Type.ApplyInfix]
 
-object TypeApplyInfixTraverser extends TypeApplyInfixTraverser {
+private[scala2java] class TypeApplyInfixTraverserImpl(javaEmitter: JavaEmitter) extends TypeApplyInfixTraverser {
 
   // type with generic args in infix notation, e.g. K Map V
   override def traverse(typeApplyInfix: Type.ApplyInfix): Unit = {
@@ -14,3 +14,5 @@ object TypeApplyInfixTraverser extends TypeApplyInfixTraverser {
     emitComment(typeApplyInfix.toString())
   }
 }
+
+object TypeApplyInfixTraverser extends TypeApplyInfixTraverserImpl(JavaEmitter)

@@ -6,7 +6,8 @@ import scala.meta.Term
 
 trait TermMatchTraverser extends ScalaTreeTraverser[Term.Match]
 
-private[scala2java] class TermMatchTraverserImpl(termTraverser: => TermTraverser) extends TermMatchTraverser {
+private[scala2java] class TermMatchTraverserImpl(termTraverser: => TermTraverser)
+                                                (implicit javaEmitter: JavaEmitter) extends TermMatchTraverser {
 
   override def traverse(termMatch: Term.Match): Unit = {
     // TODO handle mods (what is this in a 'match'?...)

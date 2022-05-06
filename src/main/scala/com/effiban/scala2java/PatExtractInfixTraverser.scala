@@ -6,7 +6,7 @@ import scala.meta.Pat
 
 trait PatExtractInfixTraverser extends ScalaTreeTraverser[Pat.ExtractInfix]
 
-object PatExtractInfixTraverser extends PatExtractInfixTraverser {
+class PatExtractInfixTraverserImpl(javaEmitter: JavaEmitter) extends PatExtractInfixTraverser {
 
   // Pattern match extractor infix e.g. a E b.
   // No Java equivalent (but consider rewriting as a guard ?)
@@ -14,3 +14,5 @@ object PatExtractInfixTraverser extends PatExtractInfixTraverser {
     emitComment(s"${patternExtractorInfix.lhs} ${patternExtractorInfix.op} ${patternExtractorInfix.rhs}")
   }
 }
+
+object PatExtractInfixTraverser extends PatExtractInfixTraverserImpl(JavaEmitter)

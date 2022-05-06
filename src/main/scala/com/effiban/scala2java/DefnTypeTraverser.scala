@@ -9,7 +9,8 @@ trait DefnTypeTraverser extends ScalaTreeTraverser[Defn.Type]
 
 private[scala2java] class DefnTypeTraverserImpl(typeParamListTraverser: => TypeParamListTraverser,
                                                 typeTraverser: => TypeTraverser,
-                                                javaModifiersResolver: JavaModifiersResolver) extends DefnTypeTraverser {
+                                                javaModifiersResolver: JavaModifiersResolver)
+                                               (implicit javaEmitter: JavaEmitter) extends DefnTypeTraverser {
 
   // Scala type definition : Closest thing in Java is an empty interface extending the same RHS
   override def traverse(typeDef: Defn.Type): Unit = {

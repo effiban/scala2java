@@ -1,13 +1,14 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.emit
-
 import scala.meta.Pat
 import scala.meta.Pat.Bind
 
 trait BindTraverser extends ScalaTreeTraverser[Pat.Bind]
 
-private[scala2java] class BindTraverserImpl(patTraverser: => PatTraverser) extends BindTraverser {
+private[scala2java] class BindTraverserImpl(patTraverser: => PatTraverser)
+                                           (implicit javaEmitter: JavaEmitter) extends BindTraverser {
+
+  import javaEmitter._
 
   // Pattern match bind variable, e.g.: a @ A()
   override def traverse(patternBind: Bind): Unit = {

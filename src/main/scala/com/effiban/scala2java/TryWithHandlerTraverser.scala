@@ -7,7 +7,8 @@ import scala.meta.Term.TryWithHandler
 
 trait TryWithHandlerTraverser extends ScalaTreeTraverser[TryWithHandler]
 
-private[scala2java] class TryWithHandlerTraverserImpl(termTraverser: => TermTraverser) extends TryWithHandlerTraverser {
+private[scala2java] class TryWithHandlerTraverserImpl(termTraverser: => TermTraverser)
+                                                     (implicit javaEmitter: JavaEmitter) extends TryWithHandlerTraverser {
 
   override def traverse(tryWithHandler: TryWithHandler): Unit = {
     emit("try ")

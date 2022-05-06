@@ -6,7 +6,7 @@ import scala.meta.Type
 
 trait TypeTupleTraverser extends ScalaTreeTraverser[Type.Tuple]
 
-object TypeTupleTraverser extends TypeTupleTraverser {
+private[scala2java] class TypeTupleTraverserImpl(javaEmitter: JavaEmitter) extends TypeTupleTraverser {
 
   //tuple as type, e.g. x: (Int, String).
   override def traverse(tupleType: Type.Tuple): Unit = {
@@ -14,3 +14,5 @@ object TypeTupleTraverser extends TypeTupleTraverser {
     emitComment(tupleType.toString())
   }
 }
+
+object TypeTupleTraverser extends TypeTupleTraverserImpl(JavaEmitter)

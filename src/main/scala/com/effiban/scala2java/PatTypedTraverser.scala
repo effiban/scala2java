@@ -1,13 +1,14 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.emit
-
 import scala.meta.Pat
 
 trait PatTypedTraverser extends ScalaTreeTraverser[Pat.Typed]
 
 private[scala2java] class PatTypedTraverserImpl(typeTraverser: => TypeTraverser,
-                                                patTraverser: => PatTraverser) extends PatTypedTraverser {
+                                                patTraverser: => PatTraverser)
+                                               (implicit javaEmitter: JavaEmitter) extends PatTypedTraverser {
+
+  import javaEmitter._
 
   // Typed pattern expression, e.g. a: Int (in lhs of case clause)
   override def traverse(typedPattern: Pat.Typed): Unit = {

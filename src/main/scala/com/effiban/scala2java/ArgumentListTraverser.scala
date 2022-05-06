@@ -1,7 +1,5 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter._
-
 import scala.meta.Tree
 
 trait ArgumentListTraverser {
@@ -11,7 +9,9 @@ trait ArgumentListTraverser {
                           maybeDelimiterType: Option[DualDelimiterType] = None): Unit
 }
 
-object ArgumentListTraverser extends ArgumentListTraverser {
+class ArgumentListTraverserImpl(javaEmitter: JavaEmitter) extends ArgumentListTraverser {
+
+  import javaEmitter._
 
   override def traverse[T <: Tree](args: List[T],
                                    argTraverser: ScalaTreeTraverser[T],
@@ -30,3 +30,5 @@ object ArgumentListTraverser extends ArgumentListTraverser {
     maybeDelimiterType.foreach(emitArgumentsEnd)
   }
 }
+
+object ArgumentListTraverser extends ArgumentListTraverserImpl(JavaEmitter)

@@ -1,7 +1,5 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.emit
-
 import scala.meta.Lit
 import scala.meta.Term.{Block, If}
 
@@ -10,7 +8,10 @@ trait IfTraverser extends ScalaTreeTraverser[If] {
 }
 
 private[scala2java] class IfTraverserImpl(termTraverser: => TermTraverser,
-                                          blockTraverser: => BlockTraverser) extends IfTraverser {
+                                          blockTraverser: => BlockTraverser)
+                                         (implicit javaEmitter: JavaEmitter) extends IfTraverser {
+
+  import javaEmitter._
 
   override def traverse(`if`: If): Unit = {
     traverseIf(`if` = `if`, shouldReturnValue = false)

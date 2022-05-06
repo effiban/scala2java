@@ -19,7 +19,8 @@ private[scala2java] class TypeTraverserImpl(typeRefTraverser: => TypeRefTraverse
                                             typePlaceholderTraverser: => TypePlaceholderTraverser,
                                             typeByNameTraverser: => TypeByNameTraverser,
                                             typeRepeatedTraverser: => TypeRepeatedTraverser,
-                                            typeVarTraverser: => TypeVarTraverser) extends TypeTraverser {
+                                            typeVarTraverser: => TypeVarTraverser)
+                                           (implicit javaEmitter: JavaEmitter) extends TypeTraverser {
 
   override def traverse(`type`: Type): Unit = `type` match {
     case typeRef: Type.Ref => typeRefTraverser.traverse(typeRef)

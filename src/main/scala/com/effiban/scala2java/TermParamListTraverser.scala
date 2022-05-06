@@ -10,9 +10,9 @@ private[scala2java] class TermParamListTraverserImpl(argumentListTraverser: => A
                                                      termParamTraverser: => TermParamTraverser) extends TermParamListTraverser {
 
   override def traverse(termParams: List[Term.Param]): Unit = {
-      argumentListTraverser.traverse(args = termParams,
-        argTraverser = termParamTraverser,
-        maybeDelimiterType = Some(Parentheses))
+    argumentListTraverser.traverse(args = termParams,
+      argTraverser = termParamTraverser,
+      maybeDelimiterType = Some(Parentheses))
   }
 }
 

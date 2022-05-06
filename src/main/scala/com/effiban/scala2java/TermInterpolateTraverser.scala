@@ -7,7 +7,8 @@ import scala.meta.{Lit, Term}
 
 trait TermInterpolateTraverser extends ScalaTreeTraverser[Term.Interpolate]
 
-private[scala2java] class TermInterpolateTraverserImpl(termApplyTraverser: => TermApplyTraverser) extends TermInterpolateTraverser {
+private[scala2java] class TermInterpolateTraverserImpl(termApplyTraverser: => TermApplyTraverser)
+                                                      (implicit javaEmitter: JavaEmitter) extends TermInterpolateTraverser {
 
   override def traverse(termInterpolate: Term.Interpolate): Unit = {
     // Transform Scala string interpolation to Java String.format()

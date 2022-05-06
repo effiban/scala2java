@@ -6,7 +6,8 @@ import scala.meta.Import
 
 trait ImportTraverser extends ScalaTreeTraverser[Import]
 
-private[scala2java] class ImportTraverserImpl(importerTraverser: => ImporterTraverser) extends ImportTraverser {
+private[scala2java] class ImportTraverserImpl(importerTraverser: => ImporterTraverser)
+                                             (implicit javaEmitter: JavaEmitter) extends ImportTraverser {
 
   override def traverse(`import`: Import): Unit = {
     `import`.importers match {

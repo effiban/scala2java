@@ -1,6 +1,5 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter._
 import com.effiban.scala2java.TraversalContext.javaOwnerContext
 
 import scala.meta.Ctor.Secondary
@@ -27,7 +26,10 @@ private[scala2java] class TemplateTraverserImpl(initListTraverser: => InitListTr
                                                 declDefTraverser: => DeclDefTraverser,
                                                 defnDefTraverser: => DefnDefTraverser,
                                                 statTraverser: => StatTraverser,
-                                                javaModifiersResolver: JavaModifiersResolver) extends TemplateTraverser {
+                                                javaModifiersResolver: JavaModifiersResolver)
+                                               (implicit javaEmitter: JavaEmitter) extends TemplateTraverser {
+
+  import javaEmitter._
 
   override def traverse(template: Template): Unit = {
     traverse(template, None)

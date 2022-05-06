@@ -7,7 +7,8 @@ import scala.meta.Case
 trait CaseTraverser extends ScalaTreeTraverser[Case]
 
 private[scala2java] class CaseTraverserImpl(patTraverser: => PatTraverser,
-                                            termTraverser: => TermTraverser) extends CaseTraverser {
+                                            termTraverser: => TermTraverser)
+                                           (implicit javaEmitter: JavaEmitter) extends CaseTraverser {
 
   def traverse(`case`: Case): Unit = {
     emit("case ")

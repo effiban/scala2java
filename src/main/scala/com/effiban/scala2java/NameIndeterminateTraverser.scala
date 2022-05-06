@@ -1,12 +1,12 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.emit
-
 import scala.meta.Name
 
 trait NameIndeterminateTraverser extends ScalaTreeTraverser[Name.Indeterminate]
 
-object NameIndeterminateTraverser extends NameIndeterminateTraverser {
+class NameIndeterminateTraverserImpl(javaEmitter: JavaEmitter) extends NameIndeterminateTraverser {
+
+  import javaEmitter._
 
   // Name that cannot be distinguished between a term and a type (for example, name in an "import" clause)
   // Since it cannot be distinguished, we can assume that the name should be unchanged from Scala (there is no rule to convert by)
@@ -14,3 +14,5 @@ object NameIndeterminateTraverser extends NameIndeterminateTraverser {
     emit(indeterminateName.value)
   }
 }
+
+object NameIndeterminateTraverser extends NameIndeterminateTraverserImpl(JavaEmitter)

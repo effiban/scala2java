@@ -1,7 +1,5 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.emit
-
 import scala.meta.Term
 import scala.meta.Term.Select
 
@@ -9,7 +7,10 @@ trait TermSelectTraverser extends ScalaTreeTraverser[Term.Select]
 
 private[scala2java] class TermSelectTraverserImpl(termTraverser: => TermTraverser,
                                                   termNameTraverser: => TermNameTraverser,
-                                                  termRefTraverser: => TermRefTraverser) extends TermSelectTraverser {
+                                                  termRefTraverser: => TermRefTraverser)
+                                                 (implicit javaEmitter: JavaEmitter) extends TermSelectTraverser {
+
+  import javaEmitter._
 
   // qualified name
   override def traverse(termSelect: Term.Select): Unit = {

@@ -35,8 +35,8 @@ private[scala2java] class TermTraverserImpl(termRefTraverser: => TermRefTraverse
                                             etaTraverser: => EtaTraverser,
                                             termRepeatedTraverser: => TermRepeatedTraverser,
                                             termInterpolateTraverser: => TermInterpolateTraverser,
-                                            termXmlTraverser: => TermXmlTraverser,
-                                            litTraverser: => LitTraverser) extends TermTraverser {
+                                            litTraverser: => LitTraverser)
+                                           (implicit javaEmitter: JavaEmitter) extends TermTraverser {
 
   override def traverse(term: Term): Unit = term match {
     case termRef: Term.Ref => termRefTraverser.traverse(termRef)
@@ -67,7 +67,6 @@ private[scala2java] class TermTraverserImpl(termRefTraverser: => TermRefTraverse
     case eta: Eta => etaTraverser.traverse(eta)
     case termRepeated: Term.Repeated => termRepeatedTraverser.traverse(termRepeated)
     case interpolate: Term.Interpolate => termInterpolateTraverser.traverse(interpolate)
-    case xml: Term.Xml => termXmlTraverser.traverse(xml)
     case literal: Lit => litTraverser.traverse(literal)
     case _ => emitComment(s"UNSUPPORTED: $term")
   }
@@ -102,6 +101,5 @@ object TermTraverser extends TermTraverserImpl(
   EtaTraverser,
   TermRepeatedTraverser,
   TermInterpolateTraverser,
-  TermXmlTraverser,
   LitTraverser
 )

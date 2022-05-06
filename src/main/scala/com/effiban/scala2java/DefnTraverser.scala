@@ -13,7 +13,8 @@ private[scala2java] class DefnTraverserImpl(defnValTraverser: => DefnValTraverse
                                             defnTypeTraverser: => DefnTypeTraverser,
                                             classTraverser: => ClassTraverser,
                                             traitTraverser: => TraitTraverser,
-                                            objectTraverser: => ObjectTraverser) extends DefnTraverser {
+                                            objectTraverser: => ObjectTraverser)
+                                           (implicit javaEmitter: JavaEmitter) extends DefnTraverser {
 
   override def traverse(defn: Defn): Unit = defn match {
     case valDef: Defn.Val => defnValTraverser.traverse(valDef)

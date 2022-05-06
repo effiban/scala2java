@@ -6,7 +6,8 @@ import scala.meta.Type
 
 trait TypeRefineTraverser extends ScalaTreeTraverser[Type.Refine]
 
-private[scala2java] class TypeRefineTraverserImpl(typeTraverser: => TypeTraverser) extends TypeRefineTraverser {
+private[scala2java] class TypeRefineTraverserImpl(typeTraverser: => TypeTraverser)
+                                                 (implicit javaEmitter: JavaEmitter) extends TypeRefineTraverser {
 
   // A {def f: Int }
   override def traverse(refinedType: Type.Refine): Unit = {

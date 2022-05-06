@@ -1,6 +1,5 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter._
 import com.effiban.scala2java.TraversalContext.javaOwnerContext
 
 import scala.meta.Decl
@@ -11,7 +10,10 @@ private[scala2java] class DeclDefTraverserImpl(annotListTraverser: => AnnotListT
                                                typeTraverser: => TypeTraverser,
                                                termNameTraverser: => TermNameTraverser,
                                                termParamListTraverser: => TermParamListTraverser,
-                                               javaModifiersResolver: JavaModifiersResolver) extends DeclDefTraverser {
+                                               javaModifiersResolver: JavaModifiersResolver)
+                                              (implicit javaEmitter: JavaEmitter) extends DeclDefTraverser {
+
+  import javaEmitter._
 
   override def traverse(defDecl: Decl.Def): Unit = {
     emitLine()

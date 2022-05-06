@@ -6,10 +6,12 @@ import scala.meta.Pat
 
 trait PatTupleTraverser extends ScalaTreeTraverser[Pat.Tuple]
 
-object PatTupleTraverser extends PatTupleTraverser {
+private[scala2java] class PatTupleTraverserImpl(javaEmitter: JavaEmitter) extends PatTupleTraverser {
 
   // Pattern match tuple expression, no Java equivalent
   override def traverse(patternTuple: Pat.Tuple): Unit = {
     emitComment(s"(${patternTuple.args.toString()})")
   }
 }
+
+object PatTupleTraverser extends PatTupleTraverserImpl(JavaEmitter)

@@ -17,8 +17,8 @@ private[scala2java] class PatTraverserImpl(termNameTraverser: => TermNameTravers
                                            patExtractTraverser: => PatExtractTraverser,
                                            patExtractInfixTraverser: => PatExtractInfixTraverser,
                                            patInterpolateTraverser: => PatInterpolateTraverser,
-                                           patXmlTraverser: => PatXmlTraverser,
-                                           patTypedTraverser: => PatTypedTraverser) extends PatTraverser {
+                                           patTypedTraverser: => PatTypedTraverser)
+                                          (implicit javaEmitter: JavaEmitter) extends PatTraverser {
 
   override def traverse(pat: Pat): Unit = pat match {
     case lit: Lit => LitTraverser.traverse(lit)
@@ -32,7 +32,6 @@ private[scala2java] class PatTraverserImpl(termNameTraverser: => TermNameTravers
     case patternExtract: Pat.Extract => patExtractTraverser.traverse(patternExtract)
     case patternExtractInfix: Pat.ExtractInfix => patExtractInfixTraverser.traverse(patternExtractInfix)
     case patternInterpolate: Pat.Interpolate => patInterpolateTraverser.traverse(patternInterpolate)
-    case patternXml: Pat.Xml => patXmlTraverser.traverse(patternXml)
     case patternTyped: Pat.Typed => patTypedTraverser.traverse(patternTyped)
     case _ => emitComment(s"UNSUPPORTED: $pat")
   }
@@ -49,6 +48,5 @@ object PatTraverser extends PatTraverserImpl(
   PatExtractTraverser,
   PatExtractInfixTraverser,
   PatInterpolateTraverser,
-  PatXmlTraverser,
   PatTypedTraverser
 )
