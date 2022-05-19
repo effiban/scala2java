@@ -1,24 +1,27 @@
 package com.effiban.scala2java
 
-import org.mockito.ArgumentMatchers.any
+import com.effiban.scala2java.stubs.StubInitTraverser
 
 import scala.meta.Mod.Annot
-import scala.meta.{Init, Name, Type}
+import scala.meta.Term.Assign
+import scala.meta.{Init, Lit, Name, Term, Type}
 
 class AnnotTraverserImplTest extends UnitTestSuite {
 
-  private val initTraverser = mock[InitTraverser]
-
-  private val annotTraverser = new AnnotTraverserImpl(initTraverser)
-
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    doAnswer((init: Init) => outputWriter.write(init.toString())).when(initTraverser).traverse(any[Init])
-  }
+  private val annotTraverser = new AnnotTraverserImpl(new StubInitTraverser)
 
   test("traverse") {
-    annotTraverser.traverse(Annot(Init(tpe = Type.Name("MyAnnot1"), name = Name.Anonymous(), argss = List())))
+    annotTraverser.traverse(
+      Annot(
+        Init(tpe = Type.Name("MyAnnot1"),
+          name = Name.Anonymous(),
+          argss = List(List(
+            Assign(Term.Name("arg1"), Lit.String("val1")),
+            Assign(Term.Name("arg2"), Lit.String("val2"))))
+        )
+      )
+    )
 
-    outputWriter.toString shouldBe "@MyAnnot1"
+    outputWriter.toString shouldBe "@MyAnnot1(arg1 = \"val1\", arg2 = \"val2\")"
   }
 }

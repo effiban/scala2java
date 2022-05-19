@@ -10,7 +10,7 @@ class StubTypeTraverser(implicit javaEmitter: JavaEmitter) extends TypeTraverser
   override def traverse(tpe: Type): Unit = {
     tpe match {
       case name: Type.Name => emit(name.value)
-      case name: Type.AnonymousName =>
+      case _: Type.AnonymousName =>
       case other => throw new IllegalStateException(s"StubTypeTraverser does not support the type $other")
     }
   }

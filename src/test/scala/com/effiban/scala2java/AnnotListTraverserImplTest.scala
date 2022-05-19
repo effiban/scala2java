@@ -1,20 +1,13 @@
 package com.effiban.scala2java
 
-import org.mockito.ArgumentMatchers.any
+import com.effiban.scala2java.stubs.StubAnnotTraverser
 
 import scala.meta.Mod.Annot
 import scala.meta.{Init, Name, Type}
 
 class AnnotListTraverserImplTest extends UnitTestSuite {
 
-  private val annotTraverser = mock[AnnotTraverser]
-
-  private val annotListTraverser = new AnnotListTraverserImpl(annotTraverser)
-
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    doAnswer((annot: Annot) => outputWriter.write(annot.toString())).when(annotTraverser).traverse(any[Annot])
-  }
+  private val annotListTraverser = new AnnotListTraverserImpl(new StubAnnotTraverser)
 
   test("traverseAnnotations() when multi-line") {
     annotListTraverser.traverseAnnotations(
