@@ -20,13 +20,18 @@ private[scala2java] class DefnDefTraverserImpl(annotListTraverser: => AnnotListT
   override def traverse(defDef: Defn.Def): Unit = {
     emitLine()
     annotListTraverser.traverseMods(defDef.mods)
+    print(s"javaOwnerContext=$javaOwnerContext\n")
     val resolvedModifierNames = javaOwnerContext match {
       case Interface => javaModifiersResolver.resolveForInterfaceMethod(defDef.mods, hasBody = true)
       case Class => javaModifiersResolver.resolveForClassMethod(defDef.mods)
       case _ => Nil
     }
+    print(s"resolvedModifierNames=$resolvedModifierNames\n")
     emitModifiers(resolvedModifierNames)
-    defDef.decltpe.foreach(typeTraverser.traverse)
+    defDef.decltpe match {
+      case Some(tpe) => typeTraverser.traverse(tpe)
+      case None => emitComment("UnknownType")
+    }
     emit(" ")
     termNameTraverser.traverse(defDef.name)
     // TODO handle method type params

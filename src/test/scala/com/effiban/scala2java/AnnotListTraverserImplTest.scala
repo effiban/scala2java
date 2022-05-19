@@ -30,7 +30,7 @@ class AnnotListTraverserImplTest extends UnitTestSuite {
         |""".stripMargin
   }
 
-  test("traverseAnnotations() when  single-line") {
+  test("traverseAnnotations() when single-line") {
     annotListTraverser.traverseAnnotations(
       annotations = List(
         Annot(Init(tpe = Type.Name("MyAnnot1"), name = Name.Anonymous(), argss = List())),
@@ -39,6 +39,6 @@ class AnnotListTraverserImplTest extends UnitTestSuite {
       onSameLine = true
     )
 
-    outputWriter.toString shouldBe "@MyAnnot1 @MyAnnot2"
+    outputWriter.toString shouldBe "@MyAnnot1 @MyAnnot2 "
   }
 }

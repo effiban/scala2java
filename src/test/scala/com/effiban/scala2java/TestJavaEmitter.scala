@@ -29,11 +29,14 @@ class TestJavaEmitter(sw: StringWriter) extends JavaEmitter {
   }
 
   override def emitBlockStart(): Unit = {
-    emitLine(" {")
+    emit(" ")
+    emitStartDelimiter(CurlyBrace)
+    emitLineBreak()
   }
 
   override def emitBlockEnd(): Unit = {
-    emitLine("}")
+    emitEndDelimiter(CurlyBrace)
+    emitLineBreak()
   }
 
   override def emitArgumentsStart(delimType: DualDelimiterType): Unit = {
@@ -49,7 +52,14 @@ class TestJavaEmitter(sw: StringWriter) extends JavaEmitter {
   }
 
   override def emitComment(comment: String): Unit = {
-    emit(s"/* $comment */")
+    if (comment.contains("\n")) {
+      val commentLines = comment.split("\n")
+      emitLine("/**")
+      commentLines.foreach(commentLine => emitLine(s"* $commentLine"))
+      emitLine("*/")
+    } else {
+      emit(s"/* $comment */")
+    }
   }
 
   override def emitLine(str: String = ""): Unit = {

@@ -2,8 +2,8 @@ package com.effiban.scala2java
 
 import org.mockito.ArgumentMatchers.any
 
-import scala.meta.Term.{Block, If, Return, While}
-import scala.meta.{Init, Lit, Stat, Term}
+import scala.meta.Term.{Block, If, Return, This, While}
+import scala.meta.{Init, Lit, Name, Stat, Term, Type}
 
 class BlockTraverserImplTest extends UnitTestSuite {
 
@@ -197,6 +197,31 @@ class BlockTraverserImplTest extends UnitTestSuite {
       """ {
         |first_statement;
         |while (x < 3) doSomething()
+        |}
+        |""".stripMargin
+  }
+
+  test("traverse() when an 'init' is passed") {
+    blockTraverser.traverse(
+      Block(
+        List(
+          Term.Name("first_statement"),
+          Term.Name("second_statement")
+        )
+      ),
+      maybeInit = Some(
+        Init(
+          tpe = Type.Singleton(ref = This(Name.Anonymous())),
+          name = Name.Anonymous(),
+          argss = List(List(Lit.String("dummy"))))
+      )
+    )
+
+    outputWriter.toString shouldBe
+      """ {
+        |this("dummy");
+        |first_statement;
+        |second_statement;
         |}
         |""".stripMargin
   }
