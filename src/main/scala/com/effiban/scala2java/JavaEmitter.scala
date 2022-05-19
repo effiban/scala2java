@@ -66,13 +66,16 @@ private[scala2java] class JavaEmitterImpl extends JavaEmitter {
   }
 
   override def emitBlockStart(): Unit = {
-    emitLine(" {")
+    emit(" ")
+    emitStartDelimiter(CurlyBrace)
+    emitLineBreak()
     indentationLevel += 1
   }
 
   override def emitBlockEnd(): Unit = {
     indentationLevel -= 1
-    emitLine("}")
+    emitEndDelimiter(CurlyBrace)
+    emitLineBreak()
   }
 
   override def emitArgumentsStart(delimType: DualDelimiterType): Unit = {
@@ -90,7 +93,14 @@ private[scala2java] class JavaEmitterImpl extends JavaEmitter {
   }
 
   override def emitComment(comment: String): Unit = {
-    emit(s"/* $comment */")
+    if (comment.contains("\n")) {
+      val commentLines = comment.split("\n")
+      emitLine("/**")
+      commentLines.foreach(commentLine => emitLine(s"* $commentLine"))
+      emitLine("*/")
+    } else {
+      emit(s"/* $comment */")
+    }
   }
 
   override def emitLine(str: String = ""): Unit = {

@@ -1,5 +1,6 @@
 package com.effiban.scala2java
 
+import com.effiban.scala2java.TraversalContext.javaOwnerContext
 import org.mockito.MockitoSugar
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
@@ -15,4 +16,9 @@ class UnitTestSuite extends AnyFunSuite
 
   protected val outputWriter: StringWriter = new StringWriter()
   implicit protected val javaEmitter: JavaEmitter = new TestJavaEmitter(outputWriter)
+
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+    javaOwnerContext = NoOwner
+  }
 }

@@ -15,14 +15,14 @@ private[scala2java] class AnnotListTraverserImpl(annotTraverser: => AnnotTravers
   import javaEmitter._
 
   override def traverseAnnotations(annotations: List[Annot], onSameLine: Boolean = false): Unit = {
-    annotations.zipWithIndex.foreach { case (annotation, idx) =>
+    annotations.foreach(annotation => {
       annotTraverser.traverse(annotation)
-      onSameLine match {
-        case true if idx < annotations.size - 1 => emit(" ")
-        case true =>
-        case false => emitLine()
+      if (onSameLine) {
+        emit(" ")
+      } else {
+        emitLine()
       }
-    }
+    })
   }
 
   override def traverseMods(mods: List[Mod], onSameLine: Boolean = false): Unit = {

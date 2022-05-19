@@ -1,6 +1,5 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.{emit, emitModifiers}
 import com.effiban.scala2java.TraversalContext.javaOwnerContext
 
 import scala.meta.Decl
@@ -13,6 +12,7 @@ private[scala2java] class DeclValTraverserImpl(annotListTraverser: => AnnotListT
                                                patListTraverser: => PatListTraverser,
                                                javaModifiersResolver: JavaModifiersResolver)
                                               (implicit javaEmitter: JavaEmitter) extends DeclValTraverser {
+  import javaEmitter._
 
   override def traverse(valDecl: Decl.Val): Unit = {
     val annotationsOnSameLine = valDecl.mods.exists(_.isInstanceOf[ValParam])
@@ -20,6 +20,7 @@ private[scala2java] class DeclValTraverserImpl(annotListTraverser: => AnnotListT
     val mods = valDecl.mods :+ Final()
     val modifierNames = javaOwnerContext match {
       case Class => javaModifiersResolver.resolveForClassDataMember(mods)
+      // TODO replace interface data member (invalid in Java) with method
       case _ if javaOwnerContext == Interface => Nil
       // The only possible modifier for a local var is 'final'
       case Method => javaModifiersResolver.resolve(mods, List(classOf[Final]))

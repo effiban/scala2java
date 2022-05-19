@@ -1,13 +1,12 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.{emit, emitComment}
-
 import scala.meta.Type
 
 trait TypeBoundsTraverser extends ScalaTreeTraverser[Type.Bounds]
 
 private[scala2java] class TypeBoundsTraverserImpl(typeTraverser: => TypeTraverser)
                                                  (implicit javaEmitter: JavaEmitter) extends TypeBoundsTraverser {
+  import javaEmitter._
 
   // Scala type bounds e.g. X <: Y
   override def traverse(typeBounds: Type.Bounds): Unit = {

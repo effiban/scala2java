@@ -1,7 +1,5 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.{emit, emitArrow, emitStatementEnd}
-
 import scala.meta.Case
 
 trait CaseTraverser extends ScalaTreeTraverser[Case]
@@ -10,13 +8,16 @@ private[scala2java] class CaseTraverserImpl(patTraverser: => PatTraverser,
                                             termTraverser: => TermTraverser)
                                            (implicit javaEmitter: JavaEmitter) extends CaseTraverser {
 
+  import javaEmitter._
+
   def traverse(`case`: Case): Unit = {
     emit("case ")
     patTraverser.traverse(`case`.pat)
     `case`.cond.foreach(cond => {
-      emit(" && (")
+      emit(" && ")
+      emitStartDelimiter(Parentheses)
       termTraverser.traverse(cond)
-      emit(")")
+      emitEndDelimiter(Parentheses)
     })
     emitArrow()
     termTraverser.traverse(`case`.body)
