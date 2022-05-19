@@ -1,20 +1,13 @@
 package com.effiban.scala2java
 
-import org.mockito.ArgumentMatchers.any
+import com.effiban.scala2java.stubs.StubTermFunctionTraverser
 
 import scala.meta.Term
 import scala.meta.Term.AnonymousFunction
 
 class AnonymousFunctionTraverserImplTest extends UnitTestSuite {
 
-  private val termFunctionTraverser = mock[TermFunctionTraverser]
-
-  private val anonymousFunctionTraverser = new AnonymousFunctionTraverserImpl(termFunctionTraverser)
-
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    doAnswer((function: Term.Function) => outputWriter.write(function.toString())).when(termFunctionTraverser).traverse(any[Term.Function])
-  }
+  private val anonymousFunctionTraverser = new AnonymousFunctionTraverserImpl(new StubTermFunctionTraverser)
 
   test("traverse") {
     anonymousFunctionTraverser.traverse(AnonymousFunction(

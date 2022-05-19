@@ -1,23 +1,15 @@
 package com.effiban.scala2java
 
-import org.mockito.ArgumentMatchers.any
+import com.effiban.scala2java.stubs.{StubPatTraverser, StubTermTraverser}
 
-import scala.meta.{Case, Lit, Pat, Term}
+import scala.meta.{Case, Lit}
 
 class CaseTraverserImplTest extends UnitTestSuite {
 
-  private val patTraverser = mock[PatTraverser]
-  private val termTraverser = mock[TermTraverser]
-
   private val caseTraverser = new CaseTraverserImpl(
-    patTraverser,
-    termTraverser)
+    new StubPatTraverser(),
+    new StubTermTraverser())
 
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    doAnswer((pat: Pat) => outputWriter.write(pat.toString())).when(patTraverser).traverse(any[Pat])
-    doAnswer((term: Term) => outputWriter.write(term.toString())).when(termTraverser).traverse(any[Term])
-  }
 
   test("traverse() without condition") {
     caseTraverser.traverse(

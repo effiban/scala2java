@@ -1,34 +1,19 @@
 package com.effiban.scala2java
 
-import org.mockito.ArgumentMatchers.any
+import com.effiban.scala2java.stubs._
 
-import scala.meta.Term.{Block, If, Return, This, While}
-import scala.meta.{Init, Lit, Name, Stat, Term, Type}
+import scala.meta.Term.{Block, This}
+import scala.meta.{Init, Lit, Name, Term, Type}
 
 class BlockTraverserImplTest extends UnitTestSuite {
 
-  private val initTraverser = mock[InitTraverser]
-  private val ifTraverser = mock[IfTraverser]
-  private val whileTraverser = mock[WhileTraverser]
-  private val returnTraverser: ReturnTraverser = mock[ReturnTraverser]
-  private val statTraverser = mock[StatTraverser]
-
   private val blockTraverser = new BlockTraverserImpl(
-    initTraverser,
-    ifTraverser,
-    whileTraverser,
-    returnTraverser,
-    statTraverser)
+    new StubInitTraverser(),
+    new StubIfTraverser(),
+    new StubWhileTraverser(),
+    new StubReturnTraverser(),
+    new StubStatTraverser())
 
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    doAnswer((init: Init) => outputWriter.write(init.toString())).when(initTraverser).traverse(any[Init])
-    doAnswer((`if`: If, shouldReturnValue: Boolean) => outputWriter.write(s"${`if`}//shouldReturnValue=$shouldReturnValue\n"))
-      .when(ifTraverser).traverse(any[If], any[Boolean])
-    doAnswer((`while`: While) => outputWriter.write(s"${`while`}\n")).when(whileTraverser).traverse(any[While])
-    doAnswer((`return`: Return) => outputWriter.write(`return`.toString)).when(returnTraverser).traverse(any[Return])
-    doAnswer((stat: Stat) => outputWriter.write(stat.toString())).when(statTraverser).traverse(any[Stat])
-  }
 
   test("traverse() when block is empty") {
     blockTraverser.traverse(Block(List.empty))
@@ -112,7 +97,9 @@ class BlockTraverserImplTest extends UnitTestSuite {
 
     outputWriter.toString shouldBe
       """ {
-        |if (x < 3) doSomething()//shouldReturnValue=false
+        |if (x < 3) {
+        |doSomething()/* shouldReturnValue=false */
+        |}
         |last_statement;
         |}
         |""".stripMargin
@@ -134,7 +121,9 @@ class BlockTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """ {
         |first_statement;
-        |if (x < 3) doSomething()//shouldReturnValue=false
+        |if (x < 3) {
+        |doSomething()/* shouldReturnValue=false */
+        |}
         |}
         |""".stripMargin
   }
@@ -156,7 +145,9 @@ class BlockTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """ {
         |first_statement;
-        |if (x < 3) doSomething()//shouldReturnValue=true
+        |if (x < 3) {
+        |doSomething()/* shouldReturnValue=true */
+        |}
         |}
         |""".stripMargin
   }
@@ -175,7 +166,9 @@ class BlockTraverserImplTest extends UnitTestSuite {
 
     outputWriter.toString shouldBe
       """ {
-        |while (x < 3) doSomething()
+        |while (x < 3) {
+        |doSomething()
+        |}
         |last_statement;
         |}
         |""".stripMargin
@@ -196,7 +189,9 @@ class BlockTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """ {
         |first_statement;
-        |while (x < 3) doSomething()
+        |while (x < 3) {
+        |doSomething()
+        |}
         |}
         |""".stripMargin
   }

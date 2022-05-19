@@ -1,19 +1,14 @@
 package com.effiban.scala2java
 
-import org.mockito.ArgumentMatchers.any
+import com.effiban.scala2java.stubs.StubTermTraverser
 
 import scala.meta.Term
 
 class ArgumentListTraverserImplTest extends UnitTestSuite {
 
-  private val argumentTraverser = mock[ScalaTreeTraverser[Term.Name]]
-
   private val argumentListTraverser = new ArgumentListTraverserImpl()
 
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    doAnswer((termName: Term.Name) => outputWriter.write(termName.toString())).when(argumentTraverser).traverse(any[Term.Name])
-  }
+  private val argumentTraverser = new StubTermTraverser()
 
   test("traverse() when one arg, multi-line and no wrapping delimiter") {
     argumentListTraverser.traverse(

@@ -1,7 +1,5 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.emitComment
-
 import scala.meta.{Decl, Defn, Import, Pkg, Stat, Term}
 
 trait StatTraverser extends ScalaTreeTraverser[Stat]
@@ -12,13 +10,14 @@ private[scala2java] class StatTraverserImpl(termTraverser: => TermTraverser,
                                             defnTraverser: => DefnTraverser,
                                             declTraverser: => DeclTraverser)
                                            (implicit javaEmitter: JavaEmitter) extends StatTraverser {
+  import javaEmitter._
 
   override def traverse(stat: Stat): Unit = stat match {
     case term: Term => termTraverser.traverse(term)
     case `import`: Import => importTraverser.traverse(`import`)
     case pkg: Pkg => pkgTraverser.traverse(pkg)
     case defn: Defn => defnTraverser.traverse(defn)
-    case decl: Decl => DeclTraverser.traverse(decl)
+    case decl: Decl => declTraverser.traverse(decl)
     case other => emitComment(s"UNSUPPORTED: $other")
   }
 
