@@ -1,5 +1,7 @@
 package com.effiban.scala2java
 
 object TraversalConstants {
-  val JavaPlaceholder = "__"
+  final val JavaPlaceholder = "__"
+
+  final val UnknownType = "UnknownType"
 }

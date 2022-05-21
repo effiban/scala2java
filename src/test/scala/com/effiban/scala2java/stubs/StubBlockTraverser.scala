@@ -9,10 +9,12 @@ class StubBlockTraverser(implicit javaEmitter: JavaEmitter) extends BlockTravers
 
   override def traverse(block: Term.Block, shouldReturnValue: Boolean, maybeInit: Option[Init] = None): Unit = {
     emitLine()
+
+    val initStr = maybeInit.map(init => s"\nInput Init: $init").getOrElse("")
+    val shouldReturnValueStr = if (shouldReturnValue) "\nShould return a value" else ""
+
     emitComment(
-      s"""STUB BLOCK
-         |Input Init: ${maybeInit.getOrElse("None")}
-         |Input shouldReturnValue: $shouldReturnValue
+      s"""STUB BLOCK$initStr$shouldReturnValueStr
          |Scala Body:
          |$block""".stripMargin
     )

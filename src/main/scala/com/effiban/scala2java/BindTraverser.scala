@@ -12,7 +12,7 @@ private[scala2java] class BindTraverserImpl(patTraverser: => PatTraverser)
 
   // Pattern match bind variable, e.g.: a @ A().
   override def traverse(patternBind: Bind): Unit = {
-    // TODO - consider supporting in Java by converting to a guard?
+    //TODO - consider supporting in Java by converting to a guard?
     emitComment(patternBind.toString())
   }
 }

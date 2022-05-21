@@ -7,6 +7,7 @@ import scala.meta.Mod.VarParam
 
 trait DeclVarTraverser extends ScalaTreeTraverser[Decl.Var]
 
+//TODO - if Java owner is an interface, the output should be a pair of accessor/mutator methods
 private[scala2java] class DeclVarTraverserImpl(annotListTraverser: => AnnotListTraverser,
                                                typeTraverser: => TypeTraverser,
                                                patListTraverser: => PatListTraverser,
@@ -24,7 +25,7 @@ private[scala2java] class DeclVarTraverserImpl(annotListTraverser: => AnnotListT
     emitModifiers(modifierNames)
     typeTraverser.traverse(varDecl.decltpe)
     emit(" ")
-    // TODO - verify when not simple case
+    //TODO - verify when not simple case
     patListTraverser.traverse(varDecl.pats)
   }
 }

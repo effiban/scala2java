@@ -10,7 +10,7 @@ private[scala2java] class TypeTupleTraverserImpl(javaEmitter: JavaEmitter) exten
 
   //tuple as type, e.g. x: (Int, String).
   override def traverse(tupleType: Type.Tuple): Unit = {
-    // TODO if only 2 params, can be translated into Java Map.Entry or Apache Pair
+    //TODO if only 2 params, can be translated into Java Map.Entry or Apache Pair
     emitComment(tupleType.toString())
   }
 }

@@ -76,8 +76,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |public int myMethod(int param1, int param2)
         |/**
         |* STUB BLOCK
-        |* Input Init: None
-        |* Input shouldReturnValue: true
+        |* Should return a value
         |* Scala Body:
         |* {
         |*   doSomething(param1)
@@ -116,8 +115,6 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |public Unit myMethod(int param1, int param2)
         |/**
         |* STUB BLOCK
-        |* Input Init: None
-        |* Input shouldReturnValue: false
         |* Scala Body:
         |* {
         |*   doSomething(param1)
@@ -156,8 +153,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |public /* UnknownType */ myMethod(int param1, int param2)
         |/**
         |* STUB BLOCK
-        |* Input Init: None
-        |* Input shouldReturnValue: true
+        |* Should return a value
         |* Scala Body:
         |* {
         |*   doSomething(param1)
@@ -201,8 +197,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |public int myMethod(int param1, int param2)
         |/**
         |* STUB BLOCK
-        |* Input Init: None
-        |* Input shouldReturnValue: true
+        |* Should return a value
         |* Scala Body:
         |* {
         |*   doSomething(param1)
@@ -243,8 +238,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |default int myMethod(int param1, int param2)
         |/**
         |* STUB BLOCK
-        |* Input Init: None
-        |* Input shouldReturnValue: true
+        |* Should return a value
         |* Scala Body:
         |* {
         |*   doSomething(param1)
@@ -284,8 +278,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |default int myMethod(int param1, int param2, int param3, int param4)
         |/**
         |* STUB BLOCK
-        |* Input Init: None
-        |* Input shouldReturnValue: true
+        |* Should return a value
         |* Scala Body:
         |* {
         |*   doSomething(param1)

@@ -39,7 +39,7 @@ private[scala2java] class TemplateTraverserImpl(initListTraverser: => InitListTr
                         maybeClassInfo: Option[ClassInfo] = None): Unit = {
     traverseTemplateInits(template.inits)
     template.self.decltpe.foreach(_ => {
-      // TODO - consider translating the 'self' type into a Java parent
+      //TODO - consider translating the 'self' type into a Java parent
       emitComment(template.self.toString)
     })
     traverseTemplateBody(statements = template.stats,
@@ -122,7 +122,7 @@ private[scala2java] class TemplateTraverserImpl(initListTraverser: => InitListTr
       val paramName = Term.Name(param.name.toString())
       Assign(Select(This(Name.Anonymous()), paramName), paramName)
     })
-    blockTraverser.traverse(block = Block(assignments), shouldReturnValue = false)
+    blockTraverser.traverse(block = Block(assignments))
 
     javaOwnerContext = outerJavaOwnerContext
   }
@@ -139,7 +139,7 @@ private[scala2java] class TemplateTraverserImpl(initListTraverser: => InitListTr
     val outerJavaOwnerContext = javaOwnerContext
     javaOwnerContext = Method
     termParamListTraverser.traverse(secondaryCtor.paramss.flatten)
-    blockTraverser.traverse(block = Block(secondaryCtor.stats), shouldReturnValue = false, maybeInit = Some(secondaryCtor.init))
+    blockTraverser.traverse(block = Block(secondaryCtor.stats), maybeInit = Some(secondaryCtor.init))
     javaOwnerContext = outerJavaOwnerContext
   }
 

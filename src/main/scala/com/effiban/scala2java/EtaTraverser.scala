@@ -9,7 +9,7 @@ private[scala2java] class EtaTraverserImpl(termTraverser: => TermTraverser) exte
 
   // Eta expansion: Method translated into function, e.g.:  myMethod _
   def traverse(eta: Term.Eta): Unit = {
-    // TODO - this will probably not compile in Java, see how it can be improved
+    //TODO - this will probably not compile in Java, see how it can be improved
     termTraverser.traverse(eta.expr)
   }
 }

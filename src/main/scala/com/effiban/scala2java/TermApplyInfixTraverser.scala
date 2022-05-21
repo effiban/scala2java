@@ -13,7 +13,7 @@ private[scala2java] class TermApplyInfixTraverserImpl(termTraverser: => TermTrav
 
   // Infix method invocation, e.g.: a + b
   override def traverse(termApplyInfix: Term.ApplyInfix): Unit = {
-    // TODO - verify implementation for multiple RHS args
+    //TODO - verify implementation for multiple RHS args
     termTraverser.traverse(termApplyInfix.lhs)
     emit(" ")
     termNameTraverser.traverse(termApplyInfix.op)

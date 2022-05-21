@@ -12,7 +12,7 @@ private[scala2java] class TypeExistentialTraverserImpl(typeTraverser: => TypeTra
   // type with existential constraint e.g.:  A[B] forSome {B <: Number with Serializable}
   override def traverse(existentialType: Type.Existential): Unit = {
     typeTraverser.traverse(existentialType.tpe)
-    // TODO - convert to Java for simple cases
+    //TODO - convert to Java for simple cases
     emitComment(existentialType.stats.toString())
   }
 }

@@ -23,7 +23,7 @@ class LitTraverserImpl(javaEmitter: JavaEmitter) extends LitTraverser {
   }
 
   private def escapeString(str: String) = {
-    // TODO - escape properly
+    //TODO - escape properly
     str.replace("\n", "\\n")
   }
 

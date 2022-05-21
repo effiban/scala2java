@@ -12,6 +12,6 @@ class StubTermTraverser(implicit javaEmitter: JavaEmitter) extends TermTraverser
       case name: Term.Name => emit(name.value)
       case litStr: Lit.String => emit(s"\"${litStr.value}\"")
       case lit: Lit => emit(lit.value.toString)
-      case other => throw new IllegalStateException(s"StubTermTraverser does not support the term $other")
+      case other => emit(other.toString())
     }
 }

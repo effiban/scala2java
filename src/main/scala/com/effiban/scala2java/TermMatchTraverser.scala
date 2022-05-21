@@ -10,7 +10,7 @@ private[scala2java] class TermMatchTraverserImpl(termTraverser: => TermTraverser
                                                 (implicit javaEmitter: JavaEmitter) extends TermMatchTraverser {
 
   override def traverse(termMatch: Term.Match): Unit = {
-    // TODO handle mods (what is this in a 'match'?...)
+    //TODO handle mods (what is this in a 'match'?...)
     emit("switch ")
     emit("(")
     termTraverser.traverse(termMatch.expr)

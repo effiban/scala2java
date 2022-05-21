@@ -1,7 +1,7 @@
 package com.effiban.scala2java
 
-import scala.meta.Lit
 import scala.meta.Term.{Block, If}
+import scala.meta.{Lit, Term}
 
 trait IfTraverser {
   def traverse(`if`: If, shouldReturnValue: Boolean = false): Unit
@@ -14,22 +14,23 @@ private[scala2java] class IfTraverserImpl(termTraverser: => TermTraverser,
   import javaEmitter._
 
   override def traverse(`if`: If, shouldReturnValue: Boolean = false): Unit = {
-    // TODO handle mods (what is this in an 'if'?...)
+    //TODO handle mods (what do they represent in an 'if'?...)
     emit("if (")
     termTraverser.traverse(`if`.cond)
     emit(")")
-    `if`.thenp match {
+    traverseClause(`if`.thenp, shouldReturnValue)
+    `if`.elsep match {
+      case Lit.Unit() =>
+      case elsep =>
+        emit("else")
+        traverseClause(elsep, shouldReturnValue)
+    }
+  }
+
+  private def traverseClause(clause: Term, shouldReturnValue: Boolean): Unit = {
+    clause match {
       case block: Block => blockTraverser.traverse(block = block, shouldReturnValue = shouldReturnValue)
       case term => blockTraverser.traverse(block = Block(List(term)), shouldReturnValue = shouldReturnValue)
-    }
-    `if`.elsep match {
-      case block: Block =>
-        emit("else")
-        blockTraverser.traverse(block = block, shouldReturnValue = shouldReturnValue)
-      case Lit.Unit() =>
-      case term =>
-        emit("else")
-        blockTraverser.traverse(block = Block(List(term)), shouldReturnValue = shouldReturnValue)
     }
   }
 }

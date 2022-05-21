@@ -13,7 +13,7 @@ private[scala2java] class TermNameTraverserImpl(implicit javaEmitter: JavaEmitte
   }
 
   private def toJavaName(termName: Term.Name) = {
-    // TODO - translate built-in Scala method names to Java equivalents
+    //TODO - translate built-in Scala method names to Java equivalents
     termName.value
   }
 }

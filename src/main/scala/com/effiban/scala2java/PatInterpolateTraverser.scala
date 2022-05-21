@@ -10,7 +10,7 @@ private[scala2java] class PatInterpolateTraverserImpl(javaEmitter: JavaEmitter) 
 
   // Pattern interpolation e.g. r"Hello (.+)$name"
   override def traverse(patternInterpolation: Pat.Interpolate): Unit = {
-    // TODO consider rewriting with Java Pattern and Matcher
+    //TODO consider rewriting with Java Pattern and Matcher
     emitComment(patternInterpolation.toString())
   }
 }

@@ -8,7 +8,7 @@ private[scala2java] class TypeFunctionTraverserImpl(typeApplyTraverser: => TypeA
 
   // function type, e.g.: Int => String
   override def traverse(functionType: Type.Function): Unit = {
-    // TODO - handle more than one input param (in Java we can use BiFunction for 2, but more than that will have to be a comment)
+    //TODO - handle more than one input param (in Java we can use BiFunction for 2, but more than that will have to be a comment)
     typeApplyTraverser.traverse(Type.Apply(Type.Name("Function"), functionType.params :+ functionType.res))
   }
 }
