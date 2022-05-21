@@ -10,7 +10,7 @@ private[scala2java] class TypeApplyInfixTraverserImpl(javaEmitter: JavaEmitter) 
 
   // type with generic args in infix notation, e.g. K Map V
   override def traverse(typeApplyInfix: Type.ApplyInfix): Unit = {
-    // TODO
+    //TODO
     emitComment(typeApplyInfix.toString())
   }
 }

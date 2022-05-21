@@ -12,7 +12,7 @@ private[scala2java] class TypeRefineTraverserImpl(typeTraverser: => TypeTraverse
   // A {def f: Int }
   override def traverse(refinedType: Type.Refine): Unit = {
     refinedType.tpe.foreach(typeTraverser.traverse)
-    // TODO maybe convert to Java type with inheritance
+    //TODO maybe convert to Java type with inheritance
     emitComment(s" ${refinedType.stats.toString()}")
   }
 }

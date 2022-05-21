@@ -1,7 +1,5 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.emitComment
-
 import scala.meta.Term.{AnonymousFunction, ApplyType, Ascribe, Assign, Block, Do, Eta, For, ForYield, If, New, NewAnonymous, Return, Throw, Try, TryWithHandler, While}
 import scala.meta.{Lit, Term}
 
@@ -37,6 +35,8 @@ private[scala2java] class TermTraverserImpl(termRefTraverser: => TermRefTraverse
                                             termInterpolateTraverser: => TermInterpolateTraverser,
                                             litTraverser: => LitTraverser)
                                            (implicit javaEmitter: JavaEmitter) extends TermTraverser {
+
+  import javaEmitter._
 
   override def traverse(term: Term): Unit = term match {
     case termRef: Term.Ref => termRefTraverser.traverse(termRef)

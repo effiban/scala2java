@@ -8,7 +8,7 @@ private[scala2java] class TermRepeatedTraverserImpl(termTraverser: => TermTraver
 
   // Passing vararg param
   override def traverse(termRepeated: Term.Repeated): Unit = {
-    // TODO may need to transform to array in Java
+    //TODO may need to transform to array in Java
     termTraverser.traverse(termRepeated.expr)
   }
 }

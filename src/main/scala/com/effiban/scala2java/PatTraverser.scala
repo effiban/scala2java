@@ -1,7 +1,5 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.emitComment
-
 import scala.meta.Pat.{Alternative, Bind}
 import scala.meta.{Lit, Pat, Term}
 
@@ -19,6 +17,7 @@ private[scala2java] class PatTraverserImpl(termNameTraverser: => TermNameTravers
                                            patInterpolateTraverser: => PatInterpolateTraverser,
                                            patTypedTraverser: => PatTypedTraverser)
                                           (implicit javaEmitter: JavaEmitter) extends PatTraverser {
+  import javaEmitter._
 
   override def traverse(pat: Pat): Unit = pat match {
     case lit: Lit => LitTraverser.traverse(lit)

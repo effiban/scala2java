@@ -27,7 +27,7 @@ private[scala2java] class DeclDefTraverserImpl(annotListTraverser: => AnnotListT
     typeTraverser.traverse(defDecl.decltpe)
     emit(" ")
     termNameTraverser.traverse(defDecl.name)
-    // TODO handle method type params
+    //TODO handle method type params
 
     val outerJavaOwnerContext = javaOwnerContext
     javaOwnerContext = Method

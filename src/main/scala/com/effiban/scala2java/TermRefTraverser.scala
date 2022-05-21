@@ -1,7 +1,5 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.emitComment
-
 import scala.meta.Term
 import scala.meta.Term.{ApplyUnary, Super, This}
 
@@ -13,6 +11,7 @@ private[scala2java] class TermRefTraverserImpl(thisTraverser: => ThisTraverser,
                                                termSelectTraverser: => TermSelectTraverser,
                                                applyUnaryTraverser: => ApplyUnaryTraverser)
                                               (implicit javaEmitter: JavaEmitter) extends TermRefTraverser {
+  import javaEmitter._
 
   override def traverse(termRef: Term.Ref): Unit = termRef match {
     case `this`: This => thisTraverser.traverse(`this`)

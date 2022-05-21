@@ -52,7 +52,7 @@ private[scala2java] class JavaEmitterImpl extends JavaEmitter {
   }
 
   override def emitParentNamesPrefix(): Unit = {
-    // TODO - fix, handle class vs. interface
+    //TODO - fix, handle class vs. interface
     emit(s" implements ")
   }
 

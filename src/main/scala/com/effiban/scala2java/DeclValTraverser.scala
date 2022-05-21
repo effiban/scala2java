@@ -7,6 +7,7 @@ import scala.meta.Mod.{Final, ValParam}
 
 trait DeclValTraverser extends ScalaTreeTraverser[Decl.Val]
 
+//TODO - if Java owner is an interface, the output should be an accessor method
 private[scala2java] class DeclValTraverserImpl(annotListTraverser: => AnnotListTraverser,
                                                typeTraverser: => TypeTraverser,
                                                patListTraverser: => PatListTraverser,
@@ -20,7 +21,7 @@ private[scala2java] class DeclValTraverserImpl(annotListTraverser: => AnnotListT
     val mods = valDecl.mods :+ Final()
     val modifierNames = javaOwnerContext match {
       case Class => javaModifiersResolver.resolveForClassDataMember(mods)
-      // TODO replace interface data member (invalid in Java) with method
+      //TODO replace interface data member (invalid in Java) with method
       case _ if javaOwnerContext == Interface => Nil
       // The only possible modifier for a local var is 'final'
       case Method => javaModifiersResolver.resolve(mods, List(classOf[Final]))
@@ -29,7 +30,7 @@ private[scala2java] class DeclValTraverserImpl(annotListTraverser: => AnnotListT
     emitModifiers(modifierNames)
     typeTraverser.traverse(valDecl.decltpe)
     emit(" ")
-    // TODO - verify when not simple case
+    //TODO - verify when not simple case
     patListTraverser.traverse(valDecl.pats)
   }
 }

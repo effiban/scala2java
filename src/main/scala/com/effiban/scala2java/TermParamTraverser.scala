@@ -1,6 +1,5 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.{emit, emitModifiers}
 import com.effiban.scala2java.TraversalContext.javaOwnerContext
 
 import scala.meta.Mod.Final
@@ -13,6 +12,7 @@ private[scala2java] class TermParamTraverserImpl(annotListTraverser: => AnnotLis
                                                  nameTraverser: => NameTraverser,
                                                  javaModifiersResolver: JavaModifiersResolver)
                                                 (implicit javaEmitter: JavaEmitter) extends TermParamTraverser {
+  import javaEmitter._
 
   // method parameter declaration
   override def traverse(termParam: Term.Param): Unit = {
