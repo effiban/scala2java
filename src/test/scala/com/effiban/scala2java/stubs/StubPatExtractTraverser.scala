@@ -7,5 +7,6 @@ import scala.meta.Pat
 class StubPatExtractTraverser(implicit javaEmitter: JavaEmitter) extends PatExtractTraverser {
   import javaEmitter._
 
-  override def traverse(patternExtractor: Pat.Extract): Unit = emitComment(s"${patternExtractor.fun}(${patternExtractor.args.mkString(", ")})")
+  override def traverse(patternExtractor: Pat.Extract): Unit =
+    emitComment(s"${patternExtractor.fun}(${patternExtractor.args.mkString(", ")})")
 }
