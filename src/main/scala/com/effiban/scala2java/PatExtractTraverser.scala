@@ -1,12 +1,11 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.emitComment
-
 import scala.meta.Pat
 
 trait PatExtractTraverser extends ScalaTreeTraverser[Pat.Extract]
 
-class PatExtractTraverserImpl(javaEmitter: JavaEmitter) extends PatExtractTraverser {
+class PatExtractTraverserImpl(implicit javaEmitter: JavaEmitter) extends PatExtractTraverser {
+  import javaEmitter._
 
   /**
    * Pattern match extractor e.g. {{{MyRecord(a, b)}}}
@@ -17,4 +16,4 @@ class PatExtractTraverserImpl(javaEmitter: JavaEmitter) extends PatExtractTraver
   }
 }
 
-object PatExtractTraverser extends PatExtractTraverserImpl(JavaEmitter)
+object PatExtractTraverser extends PatExtractTraverserImpl()
