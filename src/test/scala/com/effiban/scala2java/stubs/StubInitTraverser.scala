@@ -13,10 +13,6 @@ class StubInitTraverser(implicit javaEmitter: JavaEmitter) extends InitTraverser
       case Type.Singleton(This(Name.Anonymous())) => "this"
       case tpe => tpe.toString()
     }
-    val name = init.name match {
-      case Name.Anonymous() => ""
-      case nm => s" $nm"
-    }
-    emit(s"$tpe$name(${init.argss.flatten.mkString(", ")})")
+    emit(s"$tpe(${init.argss.flatten.mkString(", ")})")
   }
 }
