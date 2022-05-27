@@ -1,25 +1,19 @@
 package com.effiban.scala2java
 
-import scala.meta.{Init, Name}
+import scala.meta.Init
 
 trait InitTraverser extends ScalaTreeTraverser[Init]
 
 private[scala2java] class InitTraverserImpl(typeTraverser: => TypeTraverser,
-                                            nameTraverser: => NameTraverser,
                                             termListTraverser: => TermListTraverser)
                                            (implicit javaEmitter: JavaEmitter) extends InitTraverser {
-
-  import javaEmitter._
 
   // An 'Init' is a parent of a type in its declaration
   override def traverse(init: Init): Unit = {
     typeTraverser.traverse(init.tpe)
-    init.name match {
-      case Name.Anonymous() =>
-      case name =>
-        emit(" ")
-        nameTraverser.traverse(name)
-    }
+
+    // TODO handle name (not sure what this is for, it seems to be Name.Anonymous always)
+
     val args = init.argss.flatten
     if (args.nonEmpty) {
       termListTraverser.traverse(init.argss.flatten, maybeDelimiterType = Some(Parentheses))
@@ -27,4 +21,4 @@ private[scala2java] class InitTraverserImpl(typeTraverser: => TypeTraverser,
   }
 }
 
-object InitTraverser extends InitTraverserImpl(TypeTraverser, NameTraverser, TermListTraverser)
+object InitTraverser extends InitTraverserImpl(TypeTraverser, TermListTraverser)

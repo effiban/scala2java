@@ -1,18 +1,21 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.emitComment
-
 import scala.meta.Pat
 
 trait PatExtractInfixTraverser extends ScalaTreeTraverser[Pat.ExtractInfix]
 
-class PatExtractInfixTraverserImpl(javaEmitter: JavaEmitter) extends PatExtractInfixTraverser {
+class PatExtractInfixTraverserImpl(patExtractTraverser: PatExtractTraverser) extends PatExtractInfixTraverser {
 
-  // Pattern match extractor infix e.g. a E b.
-  // No Java equivalent (but consider rewriting as a guard ?)
-  override def traverse(patternExtractorInfix: Pat.ExtractInfix): Unit = {
-    emitComment(s"${patternExtractorInfix.lhs} ${patternExtractorInfix.op} ${patternExtractorInfix.rhs}")
+  /**
+   * Pattern match extractor in infix notation, e.g. {{{a MyRecord b}}}
+   * Rewriting as a [[Pat.Extract]], e.g. {{{MyRecord(a, b)}}} which is closer to Java, although not yet supported either.
+   *
+   * @see [[PatExtractTraverser]]
+   */
+  override def traverse(patExtractInfix: Pat.ExtractInfix): Unit = {
+    val patExtract = Pat.Extract(patExtractInfix.op, patExtractInfix.lhs :: patExtractInfix.rhs)
+    patExtractTraverser.traverse(patExtract)
   }
 }
 
-object PatExtractInfixTraverser extends PatExtractInfixTraverserImpl(JavaEmitter)
+object PatExtractInfixTraverser extends PatExtractInfixTraverserImpl(PatExtractTraverser)

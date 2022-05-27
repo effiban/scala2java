@@ -8,10 +8,12 @@ trait PatExtractTraverser extends ScalaTreeTraverser[Pat.Extract]
 
 class PatExtractTraverserImpl(javaEmitter: JavaEmitter) extends PatExtractTraverser {
 
-  // Pattern match extractor e.g. A(a, b).
-  // No Java equivalent (but consider rewriting as a guard ?)
+  /**
+   * Pattern match extractor e.g. {{{MyRecord(a, b)}}}
+   */
   override def traverse(patternExtractor: Pat.Extract): Unit = {
-    emitComment(s"${patternExtractor.fun}(${patternExtractor.args})")
+    //TODO - unsupported in Java, but consider transforming it to a guard
+    emitComment(s"${patternExtractor.fun}(${patternExtractor.args.mkString(", ")})")
   }
 }
 

@@ -6,7 +6,8 @@ import scala.meta.Defn
 
 trait ObjectTraverser extends ScalaTreeTraverser[Defn.Object]
 
-private[scala2java] class ObjectTraverserImpl(templateTraverser: => TemplateTraverser,
+private[scala2java] class ObjectTraverserImpl(annotListTraverser: => AnnotListTraverser,
+                                              templateTraverser: => TemplateTraverser,
                                               javaModifiersResolver: JavaModifiersResolver)
                                              (implicit javaEmitter: JavaEmitter) extends ObjectTraverser {
 
@@ -16,6 +17,7 @@ private[scala2java] class ObjectTraverserImpl(templateTraverser: => TemplateTrav
     emitLine()
     emitComment("originally a Scala object")
     emitLine()
+    annotListTraverser.traverseMods(objectDef.mods)
     emitTypeDeclaration(modifiers = javaModifiersResolver.resolveForClass(objectDef.mods),
       typeKeyword = "class",
       name = s"${objectDef.name.toString}")
@@ -26,5 +28,8 @@ private[scala2java] class ObjectTraverserImpl(templateTraverser: => TemplateTrav
   }
 }
 
-object ObjectTraverser extends ObjectTraverserImpl(TemplateTraverser, JavaModifiersResolver)
+object ObjectTraverser extends ObjectTraverserImpl(
+  AnnotListTraverser,
+  TemplateTraverser,
+  JavaModifiersResolver)
 

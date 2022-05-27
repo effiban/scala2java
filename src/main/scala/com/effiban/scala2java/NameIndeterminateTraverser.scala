@@ -4,7 +4,7 @@ import scala.meta.Name
 
 trait NameIndeterminateTraverser extends ScalaTreeTraverser[Name.Indeterminate]
 
-class NameIndeterminateTraverserImpl(javaEmitter: JavaEmitter) extends NameIndeterminateTraverser {
+class NameIndeterminateTraverserImpl(implicit javaEmitter: JavaEmitter) extends NameIndeterminateTraverser {
 
   import javaEmitter._
 
@@ -15,4 +15,4 @@ class NameIndeterminateTraverserImpl(javaEmitter: JavaEmitter) extends NameIndet
   }
 }
 
-object NameIndeterminateTraverser extends NameIndeterminateTraverserImpl(JavaEmitter)
+object NameIndeterminateTraverser extends NameIndeterminateTraverserImpl()
