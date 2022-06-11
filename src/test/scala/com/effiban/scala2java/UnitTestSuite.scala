@@ -4,13 +4,14 @@ import com.effiban.scala2java.TraversalContext.javaOwnerContext
 import org.mockito.MockitoSugar
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.{BeforeAndAfterEach, OneInstancePerTest}
+import org.scalatest.{BeforeAndAfterEach, OneInstancePerTest, OptionValues}
 
 import java.io.StringWriter
 
 class UnitTestSuite extends AnyFunSuite
   with MockitoSugar
   with Matchers
+  with OptionValues
   with OneInstancePerTest
   with BeforeAndAfterEach {
 

@@ -6,7 +6,7 @@ trait JavaEmitter {
 
   def emitModifiers(modifiers: List[String]): Unit
 
-  def emitParentNamesPrefix(): Unit
+  def emitInheritanceKeyword(): Unit
 
   def emitStatementEnd(): Unit
 
@@ -51,7 +51,7 @@ private[scala2java] class JavaEmitterImpl extends JavaEmitter {
     }
   }
 
-  override def emitParentNamesPrefix(): Unit = {
+  override def emitInheritanceKeyword(): Unit = {
     //TODO - fix, handle class vs. interface
     emit(s" implements ")
   }

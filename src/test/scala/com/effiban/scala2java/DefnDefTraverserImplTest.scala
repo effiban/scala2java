@@ -125,6 +125,51 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     verifyModifiersResolverInvocationForClassMethod()
   }
 
+  test("traverse() for constructor") {
+    javaOwnerContext = Class
+
+    val modifiers: List[Mod] = List(
+      Mod.Annot(
+        Init(tpe = Type.Name(AnnotationName), name = Name.Anonymous(), argss = List())
+      )
+    )
+
+    val defnDef = Defn.Def(
+      mods = modifiers,
+      name = Term.Name("MyClass"),
+      tparams = Nil,
+      paramss = List(methodParams1),
+      decltpe = Some(Type.AnonymousName()),
+      body = Term.Apply(fun = Term.Name("doSomething"), args = List(Term.Name("param1")))
+    )
+
+    when(javaModifiersResolver.resolveForClassMethod(any[List[Mod]])).thenReturn(List(PublicModifierStr))
+
+    val init = Init(
+      tpe = Type.Singleton(Term.This(qual = Name.Anonymous())),
+      name = Name.Anonymous(),
+      argss = List(List(Term.Name("superParam1")))
+    )
+
+    defnDefTraverser.traverse(defnDef = defnDef, maybeInit = Some(init))
+
+    outputWriter.toString shouldBe
+      """
+        |@MyAnnotation
+        |public MyClass(int param1, int param2)
+        |/**
+        |* STUB BLOCK
+        |* Input Init: this(superParam1)
+        |* Scala Body:
+        |* {
+        |*   doSomething(param1)
+        |* }
+        |*/
+        |""".stripMargin
+
+    verifyModifiersResolverInvocationForClassMethod()
+  }
+
   test("traverse() for class method with one statement missing return type") {
     javaOwnerContext = Class
 
