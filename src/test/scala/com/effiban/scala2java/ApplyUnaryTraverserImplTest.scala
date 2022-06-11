@@ -1,15 +1,25 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.stubs.{StubTermNameTraverser, StubTermTraverser}
+import com.effiban.scala2java.matchers.TreeMatcher.eqTree
+import com.effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 
 import scala.meta.Term
 
 class ApplyUnaryTraverserImplTest extends UnitTestSuite {
 
-  private val applyUnaryTraverser = new ApplyUnaryTraverserImpl(new StubTermNameTraverser, new StubTermTraverser)
+  private val termNameTraverser = mock[TermNameTraverser]
+  private val termTraverser = mock[TermTraverser]
+
+  private val applyUnaryTraverser = new ApplyUnaryTraverserImpl(termNameTraverser, termTraverser)
 
   test("traverse") {
-    applyUnaryTraverser.traverse(Term.ApplyUnary(op = Term.Name("!"), arg = Term.Name("myFlag")))
+    val op = Term.Name("!")
+    val arg = Term.Name("myFlag")
+
+    doWrite("!").when(termNameTraverser).traverse(eqTree(op))
+    doWrite("myFlag").when(termTraverser).traverse(eqTree(arg))
+
+    applyUnaryTraverser.traverse(Term.ApplyUnary(op = op, arg = arg))
 
     outputWriter.toString shouldBe "!myFlag"
   }

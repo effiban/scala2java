@@ -15,7 +15,7 @@ class UnitTestSuite extends AnyFunSuite
   with OneInstancePerTest
   with BeforeAndAfterEach {
 
-  protected val outputWriter: StringWriter = new StringWriter()
+  implicit protected val outputWriter: StringWriter = new StringWriter()
   implicit protected val javaEmitter: JavaEmitter = new TestJavaEmitter(outputWriter)
 
   override def beforeEach(): Unit = {

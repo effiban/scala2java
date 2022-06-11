@@ -1,15 +1,24 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.stubs.StubTermTraverser
+import com.effiban.scala2java.matchers.TreeMatcher.eqTree
+import com.effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 
 import scala.meta.{Lit, Term}
 
 class AssignTraverserImplTest extends UnitTestSuite {
 
-  private val assignTraverser = new AssignTraverserImpl(new StubTermTraverser)
+  private val termTraverser = mock[TermTraverser]
+
+  private val assignTraverser = new AssignTraverserImpl(termTraverser)
 
   test("traverse") {
-    assignTraverser.traverse(Term.Assign(lhs = Term.Name("myVal"), rhs = Lit.Int(3)))
+    val lhs = Term.Name("myVal")
+    val rhs = Lit.Int(3)
+
+    doWrite("myVal").when(termTraverser).traverse(eqTree(lhs))
+    doWrite("3").when(termTraverser).traverse(eqTree(rhs))
+
+    assignTraverser.traverse(Term.Assign(lhs = lhs, rhs = rhs))
 
     outputWriter.toString shouldBe "myVal = 3"
   }
