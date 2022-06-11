@@ -73,9 +73,11 @@ class DefnTraverserImplTest extends UnitTestSuite {
     defnTraverser.traverse(defnDef)
 
     outputWriter.toString shouldBe
-      """int myMethod() {
-        |doSomething()
-        |}
+      """/**
+        |* STUB METHOD
+        |* Scala Body:
+        |* def myMethod: Int = doSomething()
+        |*/
         |""".stripMargin
   }
 

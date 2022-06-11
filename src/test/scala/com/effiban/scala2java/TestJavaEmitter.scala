@@ -15,7 +15,7 @@ class TestJavaEmitter(sw: StringWriter) extends JavaEmitter {
     }
   }
 
-  override def emitParentNamesPrefix(): Unit = {
+  override def emitInheritanceKeyword(): Unit = {
     emit(s" extends/implements ")
   }
 

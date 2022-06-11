@@ -4,9 +4,11 @@ import com.effiban.scala2java.TraversalConstants.UnknownType
 import com.effiban.scala2java.TraversalContext.javaOwnerContext
 
 import scala.meta.Term.Block
-import scala.meta.{Defn, Term, Type}
+import scala.meta.{Defn, Init, Term, Type}
 
-trait DefnDefTraverser extends ScalaTreeTraverser[Defn.Def]
+trait DefnDefTraverser {
+  def traverse(defnDef: Defn.Def, maybeInit: Option[Init] = None): Unit
+}
 
 private[scala2java] class DefnDefTraverserImpl(annotListTraverser: => AnnotListTraverser,
                                                termNameTraverser: => TermNameTraverser,
@@ -18,42 +20,50 @@ private[scala2java] class DefnDefTraverserImpl(annotListTraverser: => AnnotListT
 
   import javaEmitter._
 
-  override def traverse(defDef: Defn.Def): Unit = {
+  override def traverse(defnDef: Defn.Def, maybeInit: Option[Init] = None): Unit = {
     emitLine()
-    annotListTraverser.traverseMods(defDef.mods)
+    annotListTraverser.traverseMods(defnDef.mods)
     val resolvedModifierNames = javaOwnerContext match {
-      case Interface => javaModifiersResolver.resolveForInterfaceMethod(defDef.mods, hasBody = true)
-      case Class => javaModifiersResolver.resolveForClassMethod(defDef.mods)
+      case Interface => javaModifiersResolver.resolveForInterfaceMethod(defnDef.mods, hasBody = true)
+      case Class => javaModifiersResolver.resolveForClassMethod(defnDef.mods)
       case _ => Nil
     }
     emitModifiers(resolvedModifierNames)
-    defDef.decltpe match {
-      case Some(tpe) => typeTraverser.traverse(tpe)
-      case None => emitComment(UnknownType)
+    defnDef.decltpe match {
+      case Some(Type.AnonymousName()) =>
+      case Some(tpe) =>
+        typeTraverser.traverse(tpe)
+        emit(" ")
+      case None =>
+        emitComment(UnknownType)
+        emit(" ")
     }
-    emit(" ")
-    termNameTraverser.traverse(defDef.name)
+    termNameTraverser.traverse(defnDef.name)
     //TODO handle method type params
 
     val outerJavaOwnerContext = javaOwnerContext
     javaOwnerContext = Method
-    traverseMethodParamsAndBody(defDef)
+    traverseMethodParamsAndBody(defnDef, maybeInit)
     javaOwnerContext = outerJavaOwnerContext
   }
 
-  private def traverseMethodParamsAndBody(defDef: Defn.Def): Unit = {
+  private def traverseMethodParamsAndBody(defDef: Defn.Def, maybeInit: Option[Init] = None): Unit = {
     termParamListTraverser.traverse(defDef.paramss.flatten)
     val withReturnValue = defDef.decltpe match {
       case Some(Type.Name("Unit")) => false
+      case Some(Type.AnonymousName()) => false
       case Some(_) => true
       // Taking a "reasonable" chance here - if the Scala method has no declared type and inferred type is void,
       // there will be an incorrect 'return' (as opposed to the opposite case when it would be missing)
       case None => true
     }
-    defDef.body match {
-      case block: Block => blockTraverser.traverse(block = block, shouldReturnValue = withReturnValue)
-      case term: Term => blockTraverser.traverse(block = Block(List(term)), shouldReturnValue = withReturnValue)
+    val block = defDef.body match {
+      case blk: Block => blk
+      case term: Term => Block(List(term))
     }
+    blockTraverser.traverse(block = block,
+        shouldReturnValue = withReturnValue,
+        maybeInit = maybeInit)
   }
 }
 
