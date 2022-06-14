@@ -1,23 +1,36 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.stubs.StubTermFunctionTraverser
+import com.effiban.scala2java.TraversalConstants.JavaPlaceholder
+import com.effiban.scala2java.matchers.TreeMatcher.eqTree
+import com.effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 
 import scala.meta.Term
-import scala.meta.Term.AnonymousFunction
+import scala.meta.Term.{AnonymousFunction, Param}
 
 class AnonymousFunctionTraverserImplTest extends UnitTestSuite {
 
-  private val anonymousFunctionTraverser = new AnonymousFunctionTraverserImpl(new StubTermFunctionTraverser)
+  private val termFunctionTraverser = mock[TermFunctionTraverser]
+
+  private val anonymousFunctionTraverser = new AnonymousFunctionTraverserImpl(termFunctionTraverser)
 
   test("traverse") {
-    anonymousFunctionTraverser.traverse(AnonymousFunction(
-      Term.Block(
-        List(Term.Name("dummy_statement_1"), Term.Name("dummy_statement_2"))
-      )))
+    val functionBody = Term.Block(
+      List(Term.Name("dummy_statement_1"), Term.Name("dummy_statement_2"))
+    )
+    val function = Term.Function(
+      params = List(Param(name = Term.Name(JavaPlaceholder), mods = Nil, decltpe = None, default = None)),
+      body = functionBody)
 
-    outputWriter.toString shouldBe """__ => {
-                            |  dummy_statement_1
-                            |  dummy_statement_2
-                            |}""".stripMargin
+    val expectedOutput =
+      """__ => {
+        |  dummy_statement_1
+        |  dummy_statement_2
+        |}""".stripMargin
+
+    doWrite(expectedOutput).when(termFunctionTraverser).traverse(eqTree(function))
+
+    anonymousFunctionTraverser.traverse(AnonymousFunction(functionBody))
+
+    outputWriter.toString shouldBe expectedOutput
   }
 }

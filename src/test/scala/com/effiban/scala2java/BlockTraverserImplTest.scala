@@ -1,18 +1,53 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.stubs._
+import com.effiban.scala2java.matchers.TreeMatcher.eqTree
+import com.effiban.scala2java.stubbers.OutputWriterStubber.doWrite
+import org.mockito.ArgumentMatchers
 
-import scala.meta.Term.{Block, This}
+import scala.meta.Term.{Block, Return, This}
 import scala.meta.{Init, Lit, Name, Term, Type}
 
 class BlockTraverserImplTest extends UnitTestSuite {
 
+  private val SimpleStatement1Val = "statement1"
+  private val SimpleStatement2Val = "statement2"
+
+  private val IfStatementVal =
+    """if (x < 3) {
+       |    doSomething();
+       |}""".stripMargin
+
+  private val WhileStatementVal =
+    """while (x < 3) {
+      |    doSomething();
+      |}""".stripMargin
+
+  private val SimpleStatement1 = Term.Name(SimpleStatement1Val)
+  private val SimpleStatement2 = Term.Name(SimpleStatement2Val)
+
+  private val IfStatement = Term.If(
+    cond = Term.ApplyInfix(lhs = Term.Name("x"), op = Term.Name("<"), targs = List.empty, args = List(Lit.Int(3))),
+    thenp = Term.Apply(fun = Term.Name("doSomething"), args = List.empty),
+    elsep = Lit.Unit()
+  )
+
+  private val WhileStatement = Term.While(
+    expr = Term.ApplyInfix(lhs = Term.Name("x"), op = Term.Name("<"), targs = List.empty, args = List(Lit.Int(3))),
+    body = Term.Apply(fun = Term.Name("doSomething"), args = List.empty)
+  )
+
+  private val initTraverser = mock[InitTraverser]
+  private val ifTraverser = mock[IfTraverser]
+  private val whileTraverser = mock[WhileTraverser]
+  private val returnTraverser = mock[ReturnTraverser]
+  private val statTraverser = mock[StatTraverser]
+
   private val blockTraverser = new BlockTraverserImpl(
-    new StubInitTraverser(),
-    new StubIfTraverser(),
-    new StubWhileTraverser(),
-    new StubReturnTraverser(),
-    new StubStatTraverser())
+    initTraverser,
+    ifTraverser,
+    whileTraverser,
+    returnTraverser,
+    statTraverser)
 
 
   test("traverse() when block is empty") {
@@ -25,198 +60,221 @@ class BlockTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() when block has one regular statement and should not return") {
-    blockTraverser.traverse(Block(List(Term.Name("some_statement"))))
+    doWrite(SimpleStatement1Val).when(statTraverser).traverse(eqTree(SimpleStatement1))
+
+    blockTraverser.traverse(Block(List(SimpleStatement1)))
 
     outputWriter.toString shouldBe
-      """ {
-        |some_statement;
-        |}
-        |""".stripMargin
+      s""" {
+         |$SimpleStatement1Val;
+         |}
+         |""".stripMargin
   }
 
   test("traverse() when block has two regular statements and should not return") {
+    doWrite(SimpleStatement1Val).when(statTraverser).traverse(eqTree(SimpleStatement1))
+    doWrite(SimpleStatement2Val).when(statTraverser).traverse(eqTree(SimpleStatement2))
+
     blockTraverser.traverse(
       Block(
         List(
-          Term.Name("some_statement"),
-          Term.Name("last_statement"),
+          SimpleStatement1,
+          SimpleStatement2,
         ))
     )
 
     outputWriter.toString shouldBe
-      """ {
-        |some_statement;
-        |last_statement;
-        |}
-        |""".stripMargin
+      s""" {
+         |$SimpleStatement1Val;
+         |$SimpleStatement2Val;
+         |}
+         |""".stripMargin
   }
 
   test("traverse() when block has one regular statement and should return") {
+    doWrite(s"return $SimpleStatement1Val").when(returnTraverser).traverse(eqTree(Return(SimpleStatement1)))
+
     blockTraverser.traverse(
-      block = Block(List(Term.Name("some_statement"))),
+      block = Block(List(SimpleStatement1)),
       shouldReturnValue = true
     )
 
     outputWriter.toString shouldBe
-      """ {
-        |return some_statement;
+      s""" {
+        |return $SimpleStatement1Val;
         |}
         |""".stripMargin
   }
 
   test("traverse() when block has two regular statements and should return") {
+    doWrite(SimpleStatement1Val).when(statTraverser).traverse(eqTree(SimpleStatement1))
+    doWrite(s"return $SimpleStatement2Val").when(returnTraverser).traverse(eqTree(Return(SimpleStatement2)))
+
     blockTraverser.traverse(
       Block(
         List(
-          Term.Name("some_statement"),
-          Term.Name("last_statement"),
+          SimpleStatement1,
+          SimpleStatement2,
         )),
       shouldReturnValue = true
     )
 
     outputWriter.toString shouldBe
-      """ {
-        |some_statement;
-        |return last_statement;
+      s""" {
+        |$SimpleStatement1Val;
+        |return $SimpleStatement2Val;
         |}
         |""".stripMargin
   }
 
   test("traverse() when block has an 'if' statement that is not the last") {
+    doWrite(
+      s"""$IfStatementVal
+         |""".stripMargin
+    ).when(ifTraverser).traverse(eqTree(IfStatement), shouldReturnValue = ArgumentMatchers.eq(false))
+    doWrite(SimpleStatement2Val).when(statTraverser).traverse(eqTree(SimpleStatement2))
+
     blockTraverser.traverse(
       Block(
         List(
-          Term.If(cond = Term.ApplyInfix(lhs = Term.Name("x"), op = Term.Name("<"), targs = List.empty, args = List(Lit.Int(3))),
-            thenp = Term.Apply(fun = Term.Name("doSomething"), args = List.empty),
-            elsep = Lit.Unit()
-          ),
-          Term.Name("last_statement")
+          IfStatement,
+          SimpleStatement2
         )
       )
     )
 
     outputWriter.toString shouldBe
-      """ {
-        |if (x < 3) {
-        |doSomething()/* shouldReturnValue=false */
-        |}
-        |last_statement;
+      s""" {
+        |$IfStatementVal
+        |$SimpleStatement2Val;
         |}
         |""".stripMargin
   }
 
   test("traverse() when block has an 'if' statement that is the last and should not return") {
+    doWrite(SimpleStatement1Val).when(statTraverser).traverse(eqTree(SimpleStatement1))
+    doWrite(
+      s"""$IfStatementVal
+         |""".stripMargin
+    ).when(ifTraverser).traverse(eqTree(IfStatement), shouldReturnValue = ArgumentMatchers.eq(false))
+
     blockTraverser.traverse(
       Block(
         List(
-          Term.Name("first_statement"),
-          Term.If(cond = Term.ApplyInfix(lhs = Term.Name("x"), op = Term.Name("<"), targs = List.empty, args = List(Lit.Int(3))),
-            thenp = Term.Apply(fun = Term.Name("doSomething"), args = List.empty),
-            elsep = Lit.Unit()
-          )
+          SimpleStatement1,
+          IfStatement
         )
       )
     )
 
     outputWriter.toString shouldBe
-      """ {
-        |first_statement;
-        |if (x < 3) {
-        |doSomething()/* shouldReturnValue=false */
-        |}
+      s""" {
+        |$SimpleStatement1Val;
+        |$IfStatementVal
         |}
         |""".stripMargin
   }
 
   test("traverse() when block has an 'if' statement that is the last and should return") {
+    doWrite(SimpleStatement1Val).when(statTraverser).traverse(eqTree(SimpleStatement1))
+    doWrite(
+      s"""$IfStatementVal
+         |""".stripMargin
+    ).when(ifTraverser).traverse(eqTree(IfStatement), shouldReturnValue = ArgumentMatchers.eq(true))
+
     blockTraverser.traverse(
       Block(
         List(
-          Term.Name("first_statement"),
-          Term.If(cond = Term.ApplyInfix(lhs = Term.Name("x"), op = Term.Name("<"), targs = List.empty, args = List(Lit.Int(3))),
-            thenp = Term.Apply(fun = Term.Name("doSomething"), args = List.empty),
-            elsep = Lit.Unit()
-          )
+          SimpleStatement1,
+          IfStatement
         )
       ),
       shouldReturnValue = true
     )
 
     outputWriter.toString shouldBe
-      """ {
-        |first_statement;
-        |if (x < 3) {
-        |doSomething()/* shouldReturnValue=true */
-        |}
+      s""" {
+        |$SimpleStatement1Val;
+        |$IfStatementVal
         |}
         |""".stripMargin
   }
 
   test("traverse() when block has a 'while' statement that is not the last") {
+    doWrite(
+      s"""$WhileStatementVal
+         |""".stripMargin
+    ).when(whileTraverser).traverse(eqTree(WhileStatement))
+    doWrite(SimpleStatement2Val).when(statTraverser).traverse(eqTree(SimpleStatement2))
+
     blockTraverser.traverse(
       Block(
         List(
-          Term.While(expr = Term.ApplyInfix(lhs = Term.Name("x"), op = Term.Name("<"), targs = List.empty, args = List(Lit.Int(3))),
-            body = Term.Apply(fun = Term.Name("doSomething"), args = List.empty)
-          ),
-          Term.Name("last_statement")
+          WhileStatement,
+          SimpleStatement2
         )
       )
     )
 
     outputWriter.toString shouldBe
-      """ {
-        |while (x < 3) {
-        |doSomething()
-        |}
-        |last_statement;
+      s""" {
+        |$WhileStatementVal
+        |$SimpleStatement2Val;
         |}
         |""".stripMargin
   }
 
   test("traverse() when block has a 'while' statement that is the last") {
+    doWrite(SimpleStatement1Val).when(statTraverser).traverse(eqTree(SimpleStatement1))
+    doWrite(
+      s"""$WhileStatementVal
+         |""".stripMargin
+    ).when(whileTraverser).traverse(eqTree(WhileStatement))
+
     blockTraverser.traverse(
       Block(
         List(
-          Term.Name("first_statement"),
-          Term.While(expr = Term.ApplyInfix(lhs = Term.Name("x"), op = Term.Name("<"), targs = List.empty, args = List(Lit.Int(3))),
-            body = Term.Apply(fun = Term.Name("doSomething"), args = List.empty)
-          )
+          SimpleStatement1,
+          WhileStatement
         )
       )
     )
 
     outputWriter.toString shouldBe
-      """ {
-        |first_statement;
-        |while (x < 3) {
-        |doSomething()
-        |}
+      s""" {
+        |$SimpleStatement1Val;
+        |$WhileStatementVal
         |}
         |""".stripMargin
   }
 
   test("traverse() when an 'init' is passed") {
+    val init = Init(
+      tpe = Type.Singleton(ref = This(Name.Anonymous())),
+      name = Name.Anonymous(),
+      argss = List(List(Lit.String("dummy")))
+    )
+    val initVal = "this(dummy)"
+
+    doWrite(initVal).when(initTraverser).traverse(eqTree(init))
+    doWrite(SimpleStatement1Val).when(statTraverser).traverse(eqTree(SimpleStatement1))
+    doWrite(SimpleStatement2Val).when(statTraverser).traverse(eqTree(SimpleStatement2))
+
     blockTraverser.traverse(
       Block(
         List(
-          Term.Name("first_statement"),
-          Term.Name("second_statement")
+          SimpleStatement1,
+          SimpleStatement2
         )
       ),
-      maybeInit = Some(
-        Init(
-          tpe = Type.Singleton(ref = This(Name.Anonymous())),
-          name = Name.Anonymous(),
-          argss = List(List(Lit.String("dummy"))))
-      )
+      maybeInit = Some(init)
     )
 
     outputWriter.toString shouldBe
-      """ {
-        |this("dummy");
-        |first_statement;
-        |second_statement;
+      s""" {
+        |$initVal;
+        |$SimpleStatement1Val;
+        |$SimpleStatement2Val;
         |}
         |""".stripMargin
   }
