@@ -68,6 +68,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     termParamListTraverser,
     templateTraverser,
     javaModifiersResolver)
+
   test("traverse() for one list of ctor args") {
     val modifiers: List[Mod] = List(
       Mod.Annot(

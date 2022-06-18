@@ -1,16 +1,20 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.stubs.StubTermNameTraverser
+import com.effiban.scala2java.matchers.TreeMatcher.eqTree
 
 import scala.meta.{Pat, Term}
 
 class PatVarTraverserImplTest extends UnitTestSuite {
 
-  val patVarTraverser = new PatVarTraverserImpl(new StubTermNameTraverser())
+  private val termNameTraverser = mock[TermNameTraverser]
+
+  private val patVarTraverser = new PatVarTraverserImpl(termNameTraverser)
 
   test("traverse()") {
-    patVarTraverser.traverse(Pat.Var(Term.Name("x")))
+    val termName = Term.Name("x")
 
-    outputWriter.toString shouldBe "x"
+    patVarTraverser.traverse(Pat.Var(termName))
+
+    verify(termNameTraverser).traverse(eqTree(termName))
   }
 }
