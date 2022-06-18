@@ -1,6 +1,7 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.stubs.StubForVariantTraverser
+import com.effiban.scala2java.matchers.TreeListMatcher.eqTreeList
+import com.effiban.scala2java.matchers.TreeMatcher.eqTree
 
 import scala.meta.Enumerator.Generator
 import scala.meta.Term.ForYield
@@ -8,26 +9,27 @@ import scala.meta.{Pat, Term}
 
 class ForYieldTraverserImplTest extends UnitTestSuite {
 
-  private val forYieldTraverser = new ForYieldTraverserImpl(new StubForVariantTraverser())
+  private val forVariantTraverser = mock[ForVariantTraverser]
+
+  private val forYieldTraverser = new ForYieldTraverserImpl(forVariantTraverser)
 
   test("traverse") {
+    val enumerators = List(
+      Generator(pat = Pat.Var(Term.Name("x")), rhs = Term.Name("xs")),
+      Generator(pat = Pat.Var(Term.Name("y")), rhs = Term.Name("ys"))
+    )
+
+    val body = Term.Name("result")
+
     val forYield = ForYield(
-      enums = List(
-        Generator(pat = Pat.Var(Term.Name("x")), rhs = Term.Name("xs")),
-        Generator(pat = Pat.Var(Term.Name("y")), rhs = Term.Name("ys"))
-      ),
-      body = Term.Name("result")
+      enums = enumerators,
+      body = body
     )
     forYieldTraverser.traverse(forYield)
 
-    outputWriter.toString shouldBe
-      """|/**
-         |* STUB 'FOR':
-         |* Enumerators: List(x <- xs, y <- ys)
-         |* Body: result
-         |* Final Function Name: "map"
-         |*/
-         |""".stripMargin
+    verify(forVariantTraverser).traverse(
+      enumerators = eqTreeList(enumerators),
+      body = eqTree(body),
+      finalFunctionName = eqTree(Term.Name("map")))
   }
-
 }

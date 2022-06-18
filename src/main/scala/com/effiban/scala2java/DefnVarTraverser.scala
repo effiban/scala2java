@@ -4,7 +4,6 @@ import com.effiban.scala2java.TraversalConstants.UnknownType
 import com.effiban.scala2java.TraversalContext.javaOwnerContext
 
 import scala.meta.Defn
-import scala.meta.Mod.ValParam
 
 trait DefnVarTraverser extends ScalaTreeTraverser[Defn.Var]
 
@@ -18,8 +17,7 @@ private[scala2java] class DefnVarTraverserImpl(annotListTraverser: => AnnotListT
   import javaEmitter._
 
   override def traverse(varDef: Defn.Var): Unit = {
-    val annotationsOnSameLine = varDef.mods.exists(_.isInstanceOf[ValParam])
-    annotListTraverser.traverseMods(varDef.mods, annotationsOnSameLine)
+    annotListTraverser.traverseMods(varDef.mods)
     val modifierNames = varDef.mods match {
       case modifiers if javaOwnerContext == Class => javaModifiersResolver.resolveForClassDataMember(modifiers)
       case _ => Nil

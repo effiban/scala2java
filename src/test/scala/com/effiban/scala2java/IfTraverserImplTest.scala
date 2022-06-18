@@ -1,16 +1,21 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.stubs.{StubBlockTraverser, StubTermTraverser}
+import com.effiban.scala2java.matchers.TreeMatcher.eqTree
+import com.effiban.scala2java.stubbers.OutputWriterStubber.doWrite
+import org.mockito.ArgumentMatchers
 
 import scala.meta.Term.{Apply, ApplyInfix, Block, If}
 import scala.meta.{Lit, Term}
 
 class IfTraverserImplTest extends UnitTestSuite {
 
-  private val ifTraverser = new IfTraverserImpl(new StubTermTraverser(), new StubBlockTraverser())
+  private val termTraverser = mock[TermTraverser]
+  private val blockTraverser = mock[BlockTraverser]
 
-  private val x: Term.Name = Term.Name("x")
-  private val y: Term.Name = Term.Name("y")
+  private val ifTraverser = new IfTraverserImpl(termTraverser, blockTraverser)
+
+  private val x = Term.Name("x")
+  private val y = Term.Name("y")
 
   private val operation1: Term.Name = Term.Name("operation1")
   private val operation2: Term.Name = Term.Name("operation2")
@@ -50,19 +55,24 @@ class IfTraverserImplTest extends UnitTestSuite {
       elsep = Lit.Unit()
     )
 
+    doWrite("x < 3").when(termTraverser).traverse(eqTree(Condition))
+    doWrite(
+      """ {
+        |  /* BODY */
+        |}
+        |""".stripMargin).when(blockTraverser).traverse(
+      block = eqTree(ThenBlock),
+      shouldReturnValue = ArgumentMatchers.eq(false),
+      maybeInit = ArgumentMatchers.eq(None)
+    )
+
     ifTraverser.traverse(`if`)
 
     outputWriter.toString shouldBe
-    """if (x < 3)
-      |/**
-      |* STUB BLOCK
-      |* Scala Body:
-      |* {
-      |*   operation1(x)
-      |*   operation2(y)
-      |* }
-      |*/
-      |""".stripMargin
+      """if (x < 3) {
+        |  /* BODY */
+        |}
+        |""".stripMargin
   }
 
   test("traverse() when 'then' is a block, no 'else', and should return") {
@@ -72,19 +82,23 @@ class IfTraverserImplTest extends UnitTestSuite {
       elsep = Lit.Unit()
     )
 
+    doWrite("x < 3").when(termTraverser).traverse(eqTree(Condition))
+    doWrite(
+      """ {
+        |  /* BODY */
+        |}
+        |""".stripMargin).when(blockTraverser).traverse(
+      block = eqTree(ThenBlock),
+      shouldReturnValue = ArgumentMatchers.eq(true),
+      maybeInit = ArgumentMatchers.eq(None)
+    )
+
     ifTraverser.traverse(`if`, shouldReturnValue = true)
 
     outputWriter.toString shouldBe
-      """if (x < 3)
-        |/**
-        |* STUB BLOCK
-        |* Should return a value
-        |* Scala Body:
-        |* {
-        |*   operation1(x)
-        |*   operation2(y)
-        |* }
-        |*/
+      """if (x < 3) {
+        |  /* BODY */
+        |}
         |""".stripMargin
   }
 
@@ -95,39 +109,23 @@ class IfTraverserImplTest extends UnitTestSuite {
       elsep = Lit.Unit()
     )
 
+    doWrite("x < 3").when(termTraverser).traverse(eqTree(Condition))
+    doWrite(
+      """ {
+        |  /* BODY */
+        |}
+        |""".stripMargin).when(blockTraverser).traverse(
+      block = eqTree(Block(List(ThenStatement))),
+      shouldReturnValue = ArgumentMatchers.eq(false),
+      maybeInit = ArgumentMatchers.eq(None)
+    )
+
     ifTraverser.traverse(`if`)
 
     outputWriter.toString shouldBe
-      """if (x < 3)
-        |/**
-        |* STUB BLOCK
-        |* Scala Body:
-        |* {
-        |*   operation1(x)
-        |* }
-        |*/
-        |""".stripMargin
-  }
-
-  test("traverse() when 'then' is a single statement, no 'else' and should return") {
-    val `if` = If(
-      cond = Condition,
-      thenp = ThenStatement,
-      elsep = Lit.Unit()
-    )
-
-    ifTraverser.traverse(`if`, shouldReturnValue = true)
-
-    outputWriter.toString shouldBe
-      """if (x < 3)
-        |/**
-        |* STUB BLOCK
-        |* Should return a value
-        |* Scala Body:
-        |* {
-        |*   operation1(x)
-        |* }
-        |*/
+      """if (x < 3) {
+        |  /* BODY */
+        |}
         |""".stripMargin
   }
 
@@ -138,26 +136,36 @@ class IfTraverserImplTest extends UnitTestSuite {
       elsep = ElseBlock
     )
 
+    doWrite("x < 3").when(termTraverser).traverse(eqTree(Condition))
+    doWrite(
+      """ {
+        |  /* THEN BODY */
+        |}
+        |""".stripMargin).when(blockTraverser).traverse(
+      block = eqTree(Block(List(ThenStatement))),
+      shouldReturnValue = ArgumentMatchers.eq(false),
+      maybeInit = ArgumentMatchers.eq(None)
+    )
+    doWrite(
+      """ {
+        |  /* ELSE BODY */
+        |}
+        |""".stripMargin)
+      .when(blockTraverser).traverse(
+      block = eqTree(ElseBlock),
+      shouldReturnValue = ArgumentMatchers.eq(false),
+      maybeInit = ArgumentMatchers.eq(None)
+    )
+
     ifTraverser.traverse(`if`)
 
     outputWriter.toString shouldBe
-      """if (x < 3)
-        |/**
-        |* STUB BLOCK
-        |* Scala Body:
-        |* {
-        |*   operation1(x)
-        |* }
-        |*/
-        |else
-        |/**
-        |* STUB BLOCK
-        |* Scala Body:
-        |* {
-        |*   otherOperation1(x)
-        |*   otherOperation2(y)
-        |* }
-        |*/
+      """if (x < 3) {
+        |  /* THEN BODY */
+        |}
+        |else {
+        |  /* ELSE BODY */
+        |}
         |""".stripMargin
   }
 
@@ -168,29 +176,35 @@ class IfTraverserImplTest extends UnitTestSuite {
       elsep = ElseBlock
     )
 
+    doWrite("x < 3").when(termTraverser).traverse(eqTree(Condition))
+    doWrite(
+      """ {
+        |  /* THEN BODY */
+        |}
+        |""".stripMargin).when(blockTraverser).traverse(
+      block = eqTree(Block(List(ThenStatement))),
+      shouldReturnValue = ArgumentMatchers.eq(true),
+      maybeInit = ArgumentMatchers.eq(None)
+    )
+    doWrite(
+      """ {
+        |  /* ELSE BODY */
+        |}
+        |""".stripMargin).when(blockTraverser).traverse(
+      block = eqTree(ElseBlock),
+      shouldReturnValue = ArgumentMatchers.eq(true),
+      maybeInit = ArgumentMatchers.eq(None)
+    )
+
     ifTraverser.traverse(`if`, shouldReturnValue = true)
 
-    outputWriter.toString shouldBe
-      """if (x < 3)
-        |/**
-        |* STUB BLOCK
-        |* Should return a value
-        |* Scala Body:
-        |* {
-        |*   operation1(x)
-        |* }
-        |*/
-        |else
-        |/**
-        |* STUB BLOCK
-        |* Should return a value
-        |* Scala Body:
-        |* {
-        |*   otherOperation1(x)
-        |*   otherOperation2(y)
-        |* }
-        |*/
-        |""".stripMargin
+    """if (x < 3) {
+      |  /* THEN BODY */
+      |}
+      |else {
+      |  /* ELSE BODY */
+      |}
+      |""".stripMargin
   }
 
   test("traverse() when 'else' is a single statement, and should not return") {
@@ -200,56 +214,35 @@ class IfTraverserImplTest extends UnitTestSuite {
       elsep = ElseStatement
     )
 
+    doWrite("x < 3").when(termTraverser).traverse(eqTree(Condition))
+    doWrite(
+      """ {
+        |  /* THEN BODY */
+        |}
+        |""".stripMargin).when(blockTraverser).traverse(
+      block = eqTree(Block(List(ThenStatement))),
+      shouldReturnValue = ArgumentMatchers.eq(false),
+      maybeInit = ArgumentMatchers.eq(None)
+    )
+    doWrite(
+      """ {
+        |  /* ELSE BODY */
+        |}
+        |""".stripMargin).when(blockTraverser).traverse(
+      block = eqTree(Block(List(ElseStatement))),
+      shouldReturnValue = ArgumentMatchers.eq(false),
+      maybeInit = ArgumentMatchers.eq(None)
+    )
+
     ifTraverser.traverse(`if`)
 
     outputWriter.toString shouldBe
-      """if (x < 3)
-        |/**
-        |* STUB BLOCK
-        |* Scala Body:
-        |* {
-        |*   operation1(x)
-        |* }
-        |*/
-        |else
-        |/**
-        |* STUB BLOCK
-        |* Scala Body:
-        |* {
-        |*   otherOperation1(x)
-        |* }
-        |*/
-        |""".stripMargin
-  }
-
-  test("traverse() when 'else' is a single statement, and should return") {
-    val `if` = If(
-      cond = Condition,
-      thenp = ThenStatement,
-      elsep = ElseStatement
-    )
-
-    ifTraverser.traverse(`if`, shouldReturnValue = true)
-
-    outputWriter.toString shouldBe
-      """if (x < 3)
-        |/**
-        |* STUB BLOCK
-        |* Should return a value
-        |* Scala Body:
-        |* {
-        |*   operation1(x)
-        |* }
-        |*/
-        |else
-        |/**
-        |* STUB BLOCK
-        |* Should return a value
-        |* Scala Body:
-        |* {
-        |*   otherOperation1(x)
-        |* }
-        |*/
+      """if (x < 3) {
+        |  /* THEN BODY */
+        |}
+        |else {
+        |  /* ELSE BODY */
+        |}
         |""".stripMargin
   }
 }

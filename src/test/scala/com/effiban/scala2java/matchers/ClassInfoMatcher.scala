@@ -21,6 +21,8 @@ class ClassInfoMatcher(expectedClassInfo: ClassInfo) extends ArgumentMatcher[Cla
       case _ => false
     }
   }
+
+  override def toString: String = s"Matcher for: $expectedClassInfo"
 }
 
 object ClassInfoMatcher {

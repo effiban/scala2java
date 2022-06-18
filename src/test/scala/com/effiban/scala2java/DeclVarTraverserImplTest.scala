@@ -31,27 +31,6 @@ class DeclVarTraverserImplTest extends UnitTestSuite {
     javaModifiersResolver)
 
 
-  test("traverse() when it is a ctor. param") {
-    javaOwnerContext = Class
-
-    val modifiers = List(TheAnnot, Mod.VarParam())
-
-    val declVar = Decl.Var(
-      mods = modifiers,
-      pats = List(MyVarPat),
-      decltpe = IntType
-    )
-
-    doWrite("@MyAnnotation ").when(annotListTraverser).traverseMods(mods = eqTreeList(modifiers), onSameLine = ArgumentMatchers.eq(true))
-    when(javaModifiersResolver.resolveForClassDataMember(eqTreeList(modifiers))).thenReturn(JavaPrivateModifiers)
-    doWrite("int").when(typeTraverser).traverse(eqTree(IntType))
-    doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
-
-    declVarTraverser.traverse(declVar)
-
-    outputWriter.toString shouldBe "@MyAnnotation private int myVar"
-  }
-
   test("traverse() when it is a class member") {
     javaOwnerContext = Class
 

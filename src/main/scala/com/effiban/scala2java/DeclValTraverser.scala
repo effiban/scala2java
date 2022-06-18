@@ -3,7 +3,7 @@ package com.effiban.scala2java
 import com.effiban.scala2java.TraversalContext.javaOwnerContext
 
 import scala.meta.Decl
-import scala.meta.Mod.{Final, ValParam}
+import scala.meta.Mod.Final
 
 trait DeclValTraverser extends ScalaTreeTraverser[Decl.Val]
 
@@ -16,8 +16,7 @@ private[scala2java] class DeclValTraverserImpl(annotListTraverser: => AnnotListT
   import javaEmitter._
 
   override def traverse(valDecl: Decl.Val): Unit = {
-    val annotationsOnSameLine = valDecl.mods.exists(_.isInstanceOf[ValParam])
-    annotListTraverser.traverseMods(valDecl.mods, annotationsOnSameLine)
+    annotListTraverser.traverseMods(valDecl.mods)
     val mods = valDecl.mods :+ Final()
     val modifierNames = javaOwnerContext match {
       case Class => javaModifiersResolver.resolveForClassDataMember(mods)
