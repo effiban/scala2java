@@ -2,6 +2,7 @@ package com.effiban.scala2java
 
 import com.effiban.scala2java.TraversalContext.javaOwnerContext
 import com.effiban.scala2java.stubs.{StubAnnotListTraverser, StubPatListTraverser, StubTermTraverser, StubTypeTraverser}
+import com.effiban.scala2java.testtrees.TypeNames
 import org.mockito.ArgumentMatchers.any
 import org.mockito.captor.ArgCaptor
 
@@ -36,7 +37,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
     val defnVar = Defn.Var(
       mods = modifiers,
       pats = List(Pat.Var(Term.Name("myVar"))),
-      decltpe = Some(Type.Name("int")),
+      decltpe = Some(TypeNames.Int),
       rhs = Some(Lit.Int(3))
     )
 
@@ -46,7 +47,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
 
     outputWriter.toString shouldBe
       """@MyAnnotation
-        |private int myVar = 3""".stripMargin
+        |private Int myVar = 3""".stripMargin
 
     verifyModifiersResolverInvocationForClassDataMember()
   }
@@ -63,7 +64,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
     val defnVar = Defn.Var(
       mods = modifiers,
       pats = List(Pat.Var(Term.Name("myVar"))),
-      decltpe = Some(Type.Name("int")),
+      decltpe = Some(TypeNames.Int),
       rhs = None
     )
 
@@ -73,7 +74,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
 
     outputWriter.toString shouldBe
       """@MyAnnotation
-        |private int myVar""".stripMargin
+        |private Int myVar""".stripMargin
 
     verifyModifiersResolverInvocationForClassDataMember()
   }
@@ -117,7 +118,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
     val defnVar = Defn.Var(
       mods = modifiers,
       pats = List(Pat.Var(Term.Name("myVar"))),
-      decltpe = Some(Type.Name("int")),
+      decltpe = Some(TypeNames.Int),
       rhs = Some(Lit.Int(3))
     )
 
@@ -125,7 +126,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
 
     outputWriter.toString shouldBe
       """@MyAnnotation
-        |int myVar = 3""".stripMargin
+        |Int myVar = 3""".stripMargin
   }
 
   test("traverse() when it is an interface member - typed without value") {
@@ -140,7 +141,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
     val defnVar = Defn.Var(
       mods = modifiers,
       pats = List(Pat.Var(Term.Name("myVar"))),
-      decltpe = Some(Type.Name("int")),
+      decltpe = Some(TypeNames.Int),
       rhs = None
     )
 
@@ -148,7 +149,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
 
     outputWriter.toString shouldBe
       """@MyAnnotation
-        |int myVar""".stripMargin
+        |Int myVar""".stripMargin
   }
 
   test("traverse() when it is an interface member - untyped with value") {
@@ -186,7 +187,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
     val defnVar = Defn.Var(
       mods = modifiers,
       pats = List(Pat.Var(Term.Name("myVar"))),
-      decltpe = Some(Type.Name("int")),
+      decltpe = Some(TypeNames.Int),
       rhs = Some(Lit.Int(3))
     )
 
@@ -194,7 +195,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
 
     outputWriter.toString shouldBe
       """@MyAnnotation
-        |int myVar = 3""".stripMargin
+        |Int myVar = 3""".stripMargin
   }
 
   test("traverse() when it is a local variable - typed without value") {
@@ -209,7 +210,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
     val defnVar = Defn.Var(
       mods = modifiers,
       pats = List(Pat.Var(Term.Name("myVar"))),
-      decltpe = Some(Type.Name("int")),
+      decltpe = Some(TypeNames.Int),
       rhs = None
     )
 
@@ -217,7 +218,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
 
     outputWriter.toString shouldBe
       """@MyAnnotation
-        |int myVar""".stripMargin
+        |Int myVar""".stripMargin
   }
 
   test("traverse() when it is a local variable - untyped with value") {

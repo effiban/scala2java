@@ -23,8 +23,8 @@ class AnonymousFunctionTraverserImplTest extends UnitTestSuite {
 
     val expectedOutput =
       """__ => {
-        |  dummy_statement_1
-        |  dummy_statement_2
+        |  dummy_statement_1;
+        |  dummy_statement_2;
         |}""".stripMargin
 
     doWrite(expectedOutput).when(termFunctionTraverser).traverse(eqTree(function))

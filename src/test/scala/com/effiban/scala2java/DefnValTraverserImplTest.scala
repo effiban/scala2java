@@ -2,6 +2,7 @@ package com.effiban.scala2java
 
 import com.effiban.scala2java.TraversalContext.javaOwnerContext
 import com.effiban.scala2java.stubs.{StubAnnotListTraverser, StubPatListTraverser, StubTermTraverser, StubTypeTraverser}
+import com.effiban.scala2java.testtrees.TypeNames
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.mockito.captor.ArgCaptor
@@ -39,7 +40,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
     val defnVal = Defn.Val(
       mods = modifiers,
       pats = List(Pat.Var(Term.Name("myVal"))),
-      decltpe = Some(Type.Name("int")),
+      decltpe = Some(TypeNames.Int),
       rhs = Lit.Int(3)
     )
 
@@ -49,7 +50,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
 
     outputWriter.toString shouldBe
       """@MyAnnotation
-        |private final int myVal = 3""".stripMargin
+        |private final Int myVal = 3""".stripMargin
 
     verifyModifiersResolverInvocationForClassDataMember()
   }
@@ -93,7 +94,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
     val defnVal = Defn.Val(
       mods = modifiers,
       pats = List(Pat.Var(Term.Name("myVal"))),
-      decltpe = Some(Type.Name("int")),
+      decltpe = Some(TypeNames.Int),
       rhs = Lit.Int(3)
     )
 
@@ -101,7 +102,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
 
     outputWriter.toString shouldBe
       """@MyAnnotation
-        |int myVal = 3""".stripMargin
+        |Int myVal = 3""".stripMargin
   }
 
   test("traverse() when it is an interface member - untyped") {
@@ -139,7 +140,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
     val defnVal = Defn.Val(
       mods = modifiers,
       pats = List(Pat.Var(Term.Name("myVal"))),
-      decltpe = Some(Type.Name("int")),
+      decltpe = Some(TypeNames.Int),
       rhs = Lit.Int(3)
     )
 
@@ -149,7 +150,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
 
     outputWriter.toString shouldBe
       """@MyAnnotation
-        |final int myVal = 3""".stripMargin
+        |final Int myVal = 3""".stripMargin
 
     verifyModifiersResolverInvocationForLocalVar()
   }

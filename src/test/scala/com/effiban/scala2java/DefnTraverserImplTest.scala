@@ -1,6 +1,8 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.stubs._
+import com.effiban.scala2java.matchers.TreeMatcher.eqTree
+import com.effiban.scala2java.testtrees.TypeNames
+import org.mockito.ArgumentMatchers
 
 import scala.meta.Ctor.Primary
 import scala.meta.Term.Apply
@@ -8,55 +10,49 @@ import scala.meta.{Decl, Defn, Lit, Name, Pat, Self, Template, Term, Type}
 
 class DefnTraverserImplTest extends UnitTestSuite {
 
+  private val defnValTraverser  = mock[DefnValTraverser]
+  private val defnVarTraverser  = mock[DefnVarTraverser]
+  private val defnDefTraverser  = mock[DefnDefTraverser]
+  private val defnTypeTraverser = mock[DefnTypeTraverser]
+  private val classTraverser    = mock[ClassTraverser]
+  private val traitTraverser    = mock[TraitTraverser]
+  private val objectTraverser   = mock[ObjectTraverser]
+
   private val defnTraverser = new DefnTraverserImpl(
-    new StubDefnValTraverser,
-    new StubDefnVarTraverser,
-    new StubDefnDefTraverser,
-    new StubDefnTypeTraverser,
-    new StubClassTraverser,
-    new StubTraitTraverser,
-    new StubObjectTraverser)
+    defnValTraverser,
+    defnVarTraverser,
+    defnDefTraverser,
+    defnTypeTraverser,
+    classTraverser,
+    traitTraverser,
+    objectTraverser)
 
   test("traverse() for Defn.Val") {
 
     val defnVal = Defn.Val(
       mods = List(),
       pats = List(Pat.Var(Term.Name("myVal"))),
-      decltpe = Some(Type.Name("Int")),
+      decltpe = Some(TypeNames.Int),
       rhs = Lit.Int(3)
     )
 
     defnTraverser.traverse(defnVal)
 
-    outputWriter.toString shouldBe "int myVal = 3"
+    verify(defnValTraverser).traverse(eqTree(defnVal))
   }
 
-  test("traverse() for Defn.Var when has RHS") {
+  test("traverse() for Defn.Var") {
 
     val defnVar = Defn.Var(
       mods = List(),
       pats = List(Pat.Var(Term.Name("myVar"))),
-      decltpe = Some(Type.Name("Int")),
+      decltpe = Some(TypeNames.Int),
       rhs = Some(Lit.Int(3))
     )
 
     defnTraverser.traverse(defnVar)
 
-    outputWriter.toString shouldBe "int myVar = 3"
-  }
-
-  test("traverse() for Defn.Var when has no RHS") {
-
-    val defnVar = Defn.Var(
-      mods = List(),
-      pats = List(Pat.Var(Term.Name("myVar"))),
-      decltpe = Some(Type.Name("Int")),
-      rhs = None
-    )
-
-    defnTraverser.traverse(defnVar)
-
-    outputWriter.toString shouldBe "int myVar"
+    verify(defnVarTraverser).traverse(eqTree(defnVar))
   }
 
   test("traverse() for Defn.Def") {
@@ -66,19 +62,13 @@ class DefnTraverserImplTest extends UnitTestSuite {
       name = Term.Name("myMethod"),
       tparams = List(),
       paramss = List(),
-      decltpe = Some(Type.Name("Int")),
+      decltpe = Some(TypeNames.Int),
       body = Term.Apply(Term.Name("doSomething"), List())
     )
 
     defnTraverser.traverse(defnDef)
 
-    outputWriter.toString shouldBe
-      """/**
-        |* STUB METHOD
-        |* Scala Body:
-        |* def myMethod: Int = doSomething()
-        |*/
-        |""".stripMargin
+    verify(defnDefTraverser).traverse(defnDef = eqTree(defnDef), maybeInit = ArgumentMatchers.eq(None))
   }
 
   test("traverse() for Defn.Type") {
@@ -92,11 +82,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
 
     defnTraverser.traverse(defnType)
 
-    outputWriter.toString shouldBe
-      """interface MyType {
-        |/* MyOtherType */
-        |}
-        |""".stripMargin
+    verify(defnTypeTraverser).traverse(eqTree(defnType))
   }
 
   test("traverse() for Defn.Class") {
@@ -122,12 +108,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
 
     defnTraverser.traverse(defnClass)
 
-    outputWriter.toString shouldBe
-      """/**
-        |* STUB CLASS - Scala code:
-        |* class MyClass(param1: Int, param2: String) { doSomething("input") }
-        |*/
-        |""".stripMargin
+    verify(classTraverser).traverse(eqTree(defnClass))
   }
 
   test("traverse() for Trait") {
@@ -149,7 +130,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
           Decl.Val(
             mods = List(),
             pats = List(Pat.Var(Term.Name("x"))),
-            decltpe = Type.Name("Int")
+            decltpe = TypeNames.Int
           )
         )
       )
@@ -157,12 +138,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
 
     defnTraverser.traverse(defnTrait)
 
-    outputWriter.toString shouldBe
-      """/**
-        |* STUB TRAIT - Scala code:
-        |* trait MyTrait { val x: Int }
-        |*/
-        |""".stripMargin
+    verify(traitTraverser).traverse(eqTree(defnTrait))
   }
 
   test("traverse() for Object") {
@@ -178,7 +154,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
           Defn.Val(
             mods = List(),
             pats = List(Pat.Var(Term.Name("x"))),
-            decltpe = Some(Type.Name("Int")),
+            decltpe = Some(TypeNames.Int),
             rhs = Lit.Int(3)
           )
         )
@@ -186,13 +162,6 @@ class DefnTraverserImplTest extends UnitTestSuite {
     )
 
     defnTraverser.traverse(defnObject)
-
-    outputWriter.toString shouldBe
-      """/**
-        |* STUB OBJECT - Scala code:
-        |* object MyObject { val x: Int = 3 }
-        |*/
-        |""".stripMargin
   }
 
   private def termParam(name: String, typeName: String) = {

@@ -1,29 +1,34 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.stubs.{StubDeclDefTraverser, StubDeclTypeTraverser, StubDeclValTraverser, StubDeclVarTraverser}
+import com.effiban.scala2java.testtrees.TypeNames
 
 import scala.meta.Type.Bounds
 import scala.meta.{Decl, Pat, Term, Type}
 
 class DeclTraverserImplTest extends UnitTestSuite {
 
+  private val declValTraverser =  mock[DeclValTraverser]
+  private val declVarTraverser =  mock[DeclVarTraverser]
+  private val declDefTraverser =  mock[DeclDefTraverser]
+  private val declTypeTraverser = mock[DeclTypeTraverser]
+
   private val declTraverser = new DeclTraverserImpl(
-    new StubDeclValTraverser,
-    new StubDeclVarTraverser,
-    new StubDeclDefTraverser,
-    new StubDeclTypeTraverser)
+    declValTraverser,
+    declVarTraverser,
+    declDefTraverser,
+    declTypeTraverser)
 
   test("traverse() a Decl.Val") {
 
     val declVal = Decl.Val(
       mods = List(),
       pats = List(Pat.Var(Term.Name("myVal"))),
-      decltpe = Type.Name("Int")
+      decltpe = TypeNames.Int
     )
 
     declTraverser.traverse(declVal)
 
-    outputWriter.toString shouldBe "int myVal"
+    verify(declValTraverser).traverse(declVal)
   }
 
   test("traverse() a Decl.Var") {
@@ -31,12 +36,12 @@ class DeclTraverserImplTest extends UnitTestSuite {
     val declVar = Decl.Var(
       mods = List(),
       pats = List(Pat.Var(Term.Name("myVar"))),
-      decltpe = Type.Name("Int")
+      decltpe = TypeNames.Int
     )
 
     declTraverser.traverse(declVar)
 
-    outputWriter.toString shouldBe "int myVar"
+    verify(declVarTraverser).traverse(declVar)
   }
 
   test("traverse() a Decl.Def") {
@@ -46,12 +51,12 @@ class DeclTraverserImplTest extends UnitTestSuite {
       name = Term.Name("myMethod"),
       tparams = List(),
       paramss = List(),
-      decltpe = Type.Name("Int")
+      decltpe = TypeNames.Int
     )
 
     declTraverser.traverse(declDef)
 
-    outputWriter.toString shouldBe "int myMethod()"
+    verify(declDefTraverser).traverse(declDef)
   }
 
   test("traverse() a Decl.Type") {
@@ -65,9 +70,6 @@ class DeclTraverserImplTest extends UnitTestSuite {
 
     declTraverser.traverse(declType)
 
-    outputWriter.toString shouldBe
-      """interface MyType {
-        |}
-        |""".stripMargin
+    verify(declTypeTraverser).traverse(declType)
   }
 }
