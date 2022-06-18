@@ -1,15 +1,14 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.stubs.{StubTermNameTraverser, StubTypeNameTraverser}
-import org.mockito.ArgumentMatchers.any
+import com.effiban.scala2java.matchers.TreeMatcher.eqTree
 
 import scala.meta.{Name, Term, Type}
 
 class NameTraverserImplTest extends UnitTestSuite {
 
-  private val nameIndeterminateTraverser = spy(new StubNameIndeterminateTraverser())
-  private val termNameTraverser = spy(new StubTermNameTraverser())
-  private val typeNameTraverser = spy(new StubTypeNameTraverser())
+  private val nameIndeterminateTraverser = mock[NameIndeterminateTraverser]
+  private val termNameTraverser = mock[TermNameTraverser]
+  private val typeNameTraverser = mock[TypeNameTraverser]
 
   private val nameTraverser = new NameTraverserImpl(StubNameAnonymousTraverser,
     nameIndeterminateTraverser,
@@ -18,24 +17,31 @@ class NameTraverserImplTest extends UnitTestSuite {
 
   test("traverse for Name.Anonymous") {
     nameTraverser.traverse(Name.Anonymous())
+
     outputWriter.toString shouldBe ""
   }
 
   test("traverse for Name.Indeterminate") {
-    nameTraverser.traverse(Name.Indeterminate("myName"))
-    outputWriter.toString shouldBe "myName"
-    verify(nameIndeterminateTraverser).traverse(any())
+    val name = Name.Indeterminate("myName")
+
+    nameTraverser.traverse(name)
+
+    verify(nameIndeterminateTraverser).traverse(eqTree(name))
   }
 
   test("traverse for Term.Name") {
-    nameTraverser.traverse(Term.Name("myTermName"))
-    outputWriter.toString shouldBe "myTermName"
-    verify(termNameTraverser).traverse(any())
+    val name = Term.Name("myTermName")
+
+    nameTraverser.traverse(name)
+
+    verify(termNameTraverser).traverse(eqTree(name))
   }
 
   test("traverse for Term.Type") {
-    nameTraverser.traverse(Type.Name("myTypeName"))
-    outputWriter.toString shouldBe "myTypeName"
-    verify(typeNameTraverser).traverse(any())
+    val name = Type.Name("myTypeName")
+
+    nameTraverser.traverse(name)
+
+    verify(typeNameTraverser).traverse(eqTree(name))
   }
 }
