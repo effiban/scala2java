@@ -1,18 +1,30 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.stubs.{StubImporteeTraverser, StubTermRefTraverser}
+import com.effiban.scala2java.matchers.TreeMatcher.eqTree
+import com.effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 
 import scala.meta.{Importee, Importer, Name, Term}
 
 class ImporterTraverserImplTest extends UnitTestSuite {
 
-  private val importerTraverser = new ImporterTraverserImpl(new StubTermRefTraverser(), new StubImporteeTraverser())
+  private val termRefTraverser = mock[TermRefTraverser]
+  private val importeeTraverser = mock[ImporteeTraverser]
+
+  private val importerTraverser = new ImporterTraverserImpl(termRefTraverser, importeeTraverser)
+
 
   test("traverse when not a 'scala' importer, and there is one importee") {
+    val termRef = Term.Name("mypackage")
+    val importee = Importee.Name(Name.Indeterminate("myclass"))
+
     val importer = Importer(
-      ref = Term.Name("mypackage"),
-      importees = List(Importee.Name(Name.Indeterminate("myclass")))
+      ref = termRef,
+      importees = List(importee)
     )
+
+    doWrite("mypackage").when(termRefTraverser).traverse(eqTree(termRef))
+    doWrite("myclass").when(importeeTraverser).traverse(eqTree(importee))
+
     importerTraverser.traverse(importer)
 
     outputWriter.toString shouldBe
@@ -21,13 +33,19 @@ class ImporterTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse when not a 'scala' importer, and there are two importees") {
+    val termRef = Term.Name("mypackage")
+    val importee1 = Importee.Name(Name.Indeterminate("myclass1"))
+    val importee2 = Importee.Name(Name.Indeterminate("myclass2"))
+
     val importer = Importer(
       ref = Term.Name("mypackage"),
-      importees = List(
-        Importee.Name(Name.Indeterminate("myclass1")),
-        Importee.Name(Name.Indeterminate("myclass2"))
-      )
+      importees = List(importee1, importee2)
     )
+
+    doWrite("mypackage").when(termRefTraverser).traverse(eqTree(termRef))
+    doWrite("myclass1").when(importeeTraverser).traverse(eqTree(importee1))
+    doWrite("myclass2").when(importeeTraverser).traverse(eqTree(importee2))
+
     importerTraverser.traverse(importer)
 
     outputWriter.toString shouldBe
@@ -47,6 +65,8 @@ class ImporterTraverserImplTest extends UnitTestSuite {
     importerTraverser.traverse(importer)
 
     outputWriter.toString shouldBe ""
+
+    verifyNoMoreInteractions(termRefTraverser, importeeTraverser)
   }
 
   test("traverse when ref starts with 'scala' should skip it") {
@@ -60,5 +80,7 @@ class ImporterTraverserImplTest extends UnitTestSuite {
     importerTraverser.traverse(importer)
 
     outputWriter.toString shouldBe ""
+
+    verifyNoMoreInteractions(termRefTraverser, importeeTraverser)
   }
 }

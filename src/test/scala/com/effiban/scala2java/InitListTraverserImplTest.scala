@@ -1,27 +1,37 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.stubs.{StubArgumentListTraverser, StubInitTraverser}
+import com.effiban.scala2java.matchers.TreeListMatcher.eqTreeList
+import org.mockito.ArgumentMatchers
 
 import scala.meta.{Init, Name, Term, Type}
 
 class InitListTraverserImplTest extends UnitTestSuite {
 
-  private val initListTraverser = new InitListTraverserImpl(new StubArgumentListTraverser(), new StubInitTraverser())
+  private val argumentListTraverser = mock[ArgumentListTraverser]
+  private val initTraverser = mock[InitTraverser]
+
+  private val initListTraverser = new InitListTraverserImpl(argumentListTraverser, initTraverser)
 
 
   test("traverse() when no inits") {
     initListTraverser.traverse(Nil)
 
     outputWriter.toString shouldBe ""
+
+    verifyNoMoreInteractions(argumentListTraverser)
   }
 
   test("traverse() when one init") {
-
     val init = Init(tpe = Type.Name("MyType"), name = Name.Anonymous(), argss = List(List(Term.Name("arg1"), Term.Name("arg2"))))
 
     initListTraverser.traverse(List(init))
 
-    outputWriter.toString shouldBe "MyType(arg1, arg2)"
+    verify(argumentListTraverser).traverse(
+      args = eqTreeList(List(init)),
+      argTraverser = ArgumentMatchers.eq(initTraverser),
+      onSameLine = ArgumentMatchers.eq(false),
+      maybeDelimiterType = ArgumentMatchers.eq(None)
+    )
   }
 
   test("traverse() when two inits") {
@@ -30,8 +40,11 @@ class InitListTraverserImplTest extends UnitTestSuite {
 
     initListTraverser.traverse(List(init1, init2))
 
-    outputWriter.toString shouldBe
-      """MyType1(arg1, arg2),
-      |MyType2(arg3, arg4)""".stripMargin
+    verify(argumentListTraverser).traverse(
+      args = eqTreeList(List(init1, init2)),
+      argTraverser = ArgumentMatchers.eq(initTraverser),
+      onSameLine = ArgumentMatchers.eq(false),
+      maybeDelimiterType = ArgumentMatchers.eq(None)
+    )
   }
 }

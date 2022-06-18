@@ -1,12 +1,15 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.stubs.StubImporterTraverser
+import com.effiban.scala2java.matchers.TreeMatcher.eqTree
+import com.effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 
 import scala.meta.{Import, Importee, Importer, Name, Term}
 
 class ImportTraverserImplTest extends UnitTestSuite {
 
-  private val importTraverser = new ImportTraverserImpl(new StubImporterTraverser())
+  private val importerTraverser = mock[ImporterTraverser]
+
+  private val importTraverser = new ImportTraverserImpl(importerTraverser)
 
   test("traverse") {
     val importer1 = Importer(
@@ -17,6 +20,13 @@ class ImportTraverserImplTest extends UnitTestSuite {
       ref = Term.Name("mypackage2"),
       importees = List(Importee.Name(Name.Indeterminate("myclass2")))
     )
+
+    doWrite("""import mypackage1.myclass1;
+           |""".stripMargin)
+      .when(importerTraverser).traverse(eqTree(importer1))
+    doWrite("""import mypackage2.myclass2;
+              |""".stripMargin)
+      .when(importerTraverser).traverse(eqTree(importer2))
 
     importTraverser.traverse(Import(List(importer1, importer2)))
 
