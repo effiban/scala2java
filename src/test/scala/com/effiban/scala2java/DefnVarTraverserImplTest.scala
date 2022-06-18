@@ -4,7 +4,6 @@ import com.effiban.scala2java.TraversalContext.javaOwnerContext
 import com.effiban.scala2java.matchers.TreeListMatcher.eqTreeList
 import com.effiban.scala2java.matchers.TreeMatcher.eqTree
 import com.effiban.scala2java.stubbers.OutputWriterStubber.doWrite
-import com.effiban.scala2java.stubs.StubPatListTraverser
 import com.effiban.scala2java.testtrees.TypeNames
 import org.mockito.ArgumentMatchers
 
@@ -24,7 +23,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
 
   private val annotListTraverser = mock[AnnotListTraverser]
   private val typeTraverser = mock[TypeTraverser]
-  private val patListTraverser = mock[StubPatListTraverser]
+  private val patListTraverser = mock[PatListTraverser]
   private val termTraverser = mock[TermTraverser]
   private val javaModifiersResolver = mock[JavaModifiersResolver]
 

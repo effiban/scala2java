@@ -6,11 +6,13 @@ import scala.meta.{Name, Term, Type}
 
 class NameTraverserImplTest extends UnitTestSuite {
 
+  private val nameAnonymousTraverser = mock[NameAnonymousTraverser]
   private val nameIndeterminateTraverser = mock[NameIndeterminateTraverser]
   private val termNameTraverser = mock[TermNameTraverser]
   private val typeNameTraverser = mock[TypeNameTraverser]
 
-  private val nameTraverser = new NameTraverserImpl(StubNameAnonymousTraverser,
+
+  private val nameTraverser = new NameTraverserImpl(nameAnonymousTraverser,
     nameIndeterminateTraverser,
     termNameTraverser,
     typeNameTraverser)
@@ -18,7 +20,7 @@ class NameTraverserImplTest extends UnitTestSuite {
   test("traverse for Name.Anonymous") {
     nameTraverser.traverse(Name.Anonymous())
 
-    outputWriter.toString shouldBe ""
+    verify(nameAnonymousTraverser).traverse(eqTree(Name.Anonymous()))
   }
 
   test("traverse for Name.Indeterminate") {
