@@ -1,95 +1,105 @@
 package com.effiban.scala2java
 
 import com.effiban.scala2java.TraversalContext.javaOwnerContext
-import com.effiban.scala2java.stubs.{StubAnnotListTraverser, StubPatListTraverser, StubTypeTraverser}
+import com.effiban.scala2java.matchers.TreeListMatcher.eqTreeList
+import com.effiban.scala2java.matchers.TreeMatcher.eqTree
+import com.effiban.scala2java.stubbers.OutputWriterStubber.doWrite
+import com.effiban.scala2java.stubs.StubPatListTraverser
+import com.effiban.scala2java.testtrees.TypeNames
 import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchers.any
-import org.mockito.captor.ArgCaptor
 
 import scala.meta.Mod.Final
 import scala.meta.{Decl, Init, Mod, Name, Pat, Term, Type}
 
 class DeclValTraverserImplTest extends UnitTestSuite {
 
-  private val AnnotationName = "MyAnnotation"
-  private val PrivateFinalModifiers = List("private", "final")
-  private val FinalModifiers = List("final")
+  private val JavaPrivateFinalModifiers = List("private", "final")
+  private val JavaFinalModifiers = List("final")
+  private val IntType = TypeNames.Int
+  private val MyValPat = Pat.Var(Term.Name("myVal"))
 
+  private val TheAnnot = Mod.Annot(
+    Init(tpe = Type.Name("MyAnnotation"), name = Name.Anonymous(), argss = List())
+  )
+
+  private val annotListTraverser = mock[AnnotListTraverser]
+  private val typeTraverser = mock[TypeTraverser]
+  private val patListTraverser = mock[StubPatListTraverser]
   private val javaModifiersResolver = mock[JavaModifiersResolver]
 
-  private val modsCaptor = ArgCaptor[List[Mod]]
-
   private val declValTraverser = new DeclValTraverserImpl(
-    new StubAnnotListTraverser,
-    new StubTypeTraverser,
-    new StubPatListTraverser,
+    annotListTraverser,
+    typeTraverser,
+    patListTraverser,
     javaModifiersResolver)
+
 
   test("traverse() when it is a ctor. param") {
     javaOwnerContext = Class
 
-    val modifiers: List[Mod] = List(
-      Mod.Annot(
-        Init(tpe = Type.Name(AnnotationName), name = Name.Anonymous(), argss = List())
-      ),
-      Mod.ValParam()
-    )
+    val initialModifiers: List[Mod] = List(TheAnnot, Mod.ValParam())
+    val adjustedModifiers = initialModifiers :+ Final()
 
     val declVal = Decl.Val(
-      mods = modifiers,
-      pats = List(Pat.Var(Term.Name("myVal"))),
-      decltpe = Type.Name("int")
+      mods = initialModifiers,
+      pats = List(MyValPat),
+      decltpe = IntType
     )
 
-    when(javaModifiersResolver.resolveForClassDataMember(any[List[Mod]])).thenReturn(PrivateFinalModifiers)
+    doWrite("@MyAnnotation ").when(annotListTraverser).traverseMods(mods = eqTreeList(initialModifiers), onSameLine = ArgumentMatchers.eq(true))
+    when(javaModifiersResolver.resolveForClassDataMember(eqTreeList(adjustedModifiers))).thenReturn(JavaPrivateFinalModifiers)
+    doWrite("int").when(typeTraverser).traverse(eqTree(IntType))
+    doWrite("myVal").when(patListTraverser).traverse(eqTreeList(List(MyValPat)))
 
     declValTraverser.traverse(declVal)
 
     outputWriter.toString shouldBe "@MyAnnotation private final int myVal"
-
-    verifyModifiersResolverInvocationForClassCtorParam()
   }
 
   test("traverse() when it is a class member") {
     javaOwnerContext = Class
 
-    val modifiers: List[Mod] = List(
-      Mod.Annot(
-        Init(tpe = Type.Name(AnnotationName), name = Name.Anonymous(), argss = List())
-      )
-    )
+    val initialModifiers: List[Mod] = List(TheAnnot)
+    val adjustedModifiers = initialModifiers :+ Final()
 
     val declVal = Decl.Val(
-      mods = modifiers,
-      pats = List(Pat.Var(Term.Name("myVal"))),
-      decltpe = Type.Name("int")
+      mods = initialModifiers,
+      pats = List(MyValPat),
+      decltpe = IntType
     )
 
-    when(javaModifiersResolver.resolveForClassDataMember(any[List[Mod]])).thenReturn(PrivateFinalModifiers)
+    doWrite(
+      """@MyAnnotation
+        |""".stripMargin)
+      .when(annotListTraverser).traverseMods(mods = eqTreeList(initialModifiers), onSameLine = ArgumentMatchers.eq(false))
+    when(javaModifiersResolver.resolveForClassDataMember(eqTreeList(adjustedModifiers))).thenReturn(JavaPrivateFinalModifiers)
+    doWrite("int").when(typeTraverser).traverse(eqTree(IntType))
+    doWrite("myVal").when(patListTraverser).traverse(eqTreeList(List(MyValPat)))
 
     declValTraverser.traverse(declVal)
 
     outputWriter.toString shouldBe
       """@MyAnnotation
         |private final int myVal""".stripMargin
-
-    verifyModifiersResolverInvocationForClassDataMember()
   }
 
   test("traverse() when it is an interface member") {
     javaOwnerContext = Interface
 
-    val modifiers: List[Mod] = List(
-      Mod.Annot(
-        Init(tpe = Type.Name(AnnotationName), name = Name.Anonymous(), argss = List())
-      )
-    )
+    val modifiers: List[Mod] = List(TheAnnot)
 
     val declVal = Decl.Val(
       mods = modifiers,
-      pats = List(Pat.Var(Term.Name("myVal"))),
-      decltpe = Type.Name("int")
+      pats = List(MyValPat),
+      decltpe = IntType
     )
+
+    doWrite(
+      """@MyAnnotation
+        |""".stripMargin)
+      .when(annotListTraverser).traverseMods(mods = eqTreeList(modifiers), onSameLine = ArgumentMatchers.eq(false))
+    doWrite("int").when(typeTraverser).traverse(eqTree(IntType))
+    doWrite("myVal").when(patListTraverser).traverse(eqTreeList(List(MyValPat)))
 
     declValTraverser.traverse(declVal)
 
@@ -101,78 +111,27 @@ class DeclValTraverserImplTest extends UnitTestSuite {
   test("traverse() when it is a local variable") {
     javaOwnerContext = Method
 
-    val modifiers: List[Mod] = List(
-      Mod.Annot(
-        Init(tpe = Type.Name(AnnotationName), name = Name.Anonymous(), argss = List())
-      )
-    )
+    val initialModifiers: List[Mod] = List(TheAnnot)
+    val adjustedModifiers = initialModifiers :+ Final()
 
     val declVal = Decl.Val(
-      mods = modifiers,
-      pats = List(Pat.Var(Term.Name("myVal"))),
-      decltpe = Type.Name("int")
+      mods = initialModifiers,
+      pats = List(MyValPat),
+      decltpe = IntType
     )
 
-    when(javaModifiersResolver.resolve(any[List[Mod]], ArgumentMatchers.eq(List(classOf[Final])))).thenReturn(FinalModifiers)
+    doWrite(
+      """@MyAnnotation
+        |""".stripMargin)
+      .when(annotListTraverser).traverseMods(mods = eqTreeList(initialModifiers), onSameLine = ArgumentMatchers.eq(false))
+    when(javaModifiersResolver.resolve(eqTreeList(adjustedModifiers), ArgumentMatchers.eq(List(classOf[Final])))).thenReturn(JavaFinalModifiers)
+    doWrite("int").when(typeTraverser).traverse(eqTree(IntType))
+    doWrite("myVal").when(patListTraverser).traverse(eqTreeList(List(MyValPat)))
 
     declValTraverser.traverse(declVal)
 
     outputWriter.toString shouldBe
       """@MyAnnotation
         |final int myVal""".stripMargin
-
-    verifyModifiersResolverInvocationForLocalVar()
-  }
-
-  private def verifyModifiersResolverInvocationForClassCtorParam() = {
-    verify(javaModifiersResolver).resolveForClassDataMember(modsCaptor.capture)
-    val actualMods = modsCaptor.value
-    verifyNumModifiersPassedToResolver(actualMods, 3)
-    verifyAnnotationPassedToResolver(actualMods.head)
-    verifyValParamPassedToResolverAsSecondModifier(actualMods(1))
-    verifyFinalPassedToResolver(actualMods, 2)
-  }
-
-  private def verifyModifiersResolverInvocationForClassDataMember() = {
-    verify(javaModifiersResolver).resolveForClassDataMember(modsCaptor.capture)
-    val actualMods = modsCaptor.value
-    verifyNumModifiersPassedToResolver(actualMods, 2)
-    verifyAnnotationPassedToResolver(actualMods.head)
-    verifyFinalPassedToResolver(actualMods, 1)
-  }
-
-  private def verifyModifiersResolverInvocationForLocalVar() = {
-    verify(javaModifiersResolver).resolve(modsCaptor.capture, ArgumentMatchers.eq(List(classOf[Final])))
-    val actualMods = modsCaptor.value
-    verifyNumModifiersPassedToResolver(actualMods, 2)
-    verifyAnnotationPassedToResolver(actualMods.head)
-    verifyFinalPassedToResolver(actualMods, 1)
-  }
-
-  private def verifyNumModifiersPassedToResolver(actualMods: List[Mod], expectedNumMods: Int) = {
-    withClue("Incorrect number of modifiers passed to JavaModifiersResolver: ") {
-      actualMods.size shouldBe expectedNumMods
-    }
-  }
-
-  private def verifyAnnotationPassedToResolver(actualMod: Mod) = {
-    withClue("Incorrect type of modifier passed to resolver: ") {
-      actualMod shouldBe a[Mod.Annot]
-    }
-    withClue("Incorrect name of annotation passed to resolver: ") {
-      actualMod.asInstanceOf[Mod.Annot].init.tpe.toString() shouldBe AnnotationName
-    }
-  }
-
-  private def verifyValParamPassedToResolverAsSecondModifier(actualSecondMod: Mod) = {
-    withClue(s"Incorrect type of second modifier passed to resolver: ") {
-      actualSecondMod shouldBe a[Mod.ValParam]
-    }
-  }
-
-  private def verifyFinalPassedToResolver(actualMods: List[Mod], idx: Int) = {
-    withClue(s"Incorrect type of modifier passed to resolver at index $idx: ") {
-      actualMods(idx) shouldBe a[Mod.Final]
-    }
   }
 }

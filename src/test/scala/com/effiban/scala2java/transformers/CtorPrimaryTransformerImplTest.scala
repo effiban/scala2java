@@ -1,11 +1,12 @@
 package com.effiban.scala2java.transformers
 
 import com.effiban.scala2java.TraversalContext.javaOwnerContext
+import com.effiban.scala2java.testtrees.TypeNames
 import com.effiban.scala2java.{Class, UnitTestSuite}
 import org.mockito.ArgumentMatchers.any
 
 import scala.meta.Term.{Assign, Block, This}
-import scala.meta.{Ctor, Defn, Init, Lit, Mod, Name, Self, Template, Term, Type}
+import scala.meta.{Ctor, Defn, Init, Lit, Mod, Name, Term, Type}
 
 class CtorPrimaryTransformerImplTest extends UnitTestSuite {
 
@@ -162,15 +163,6 @@ class CtorPrimaryTransformerImplTest extends UnitTestSuite {
   }
   
   private def termParamInt(name: String) = {
-    Term.Param(mods = List(), name = Term.Name(name), decltpe = Some(Type.Name("Int")), default = None)
-  }
-
-  private def templateWithInits(inits: List[Init] = Nil): Template = {
-    Template(
-      early = Nil,
-      inits = inits,
-      self = Self(name = Name.Anonymous(), decltpe = None),
-      stats  = Nil
-    )
+    Term.Param(mods = List(), name = Term.Name(name), decltpe = Some(TypeNames.Int), default = None)
   }
 }

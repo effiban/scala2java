@@ -1,6 +1,7 @@
 package com.effiban.scala2java.transformers
 
 import com.effiban.scala2java.TraversalContext.javaOwnerContext
+import com.effiban.scala2java.testtrees.TypeNames
 import com.effiban.scala2java.{Class, UnitTestSuite}
 
 import scala.meta.Term.Block
@@ -142,6 +143,6 @@ class CtorSecondaryTransformerTest extends UnitTestSuite {
   }
 
   private def termParamInt(name: String) = {
-    Term.Param(mods = List(), name = Term.Name(name), decltpe = Some(Type.Name("Int")), default = None)
+    Term.Param(mods = List(), name = Term.Name(name), decltpe = Some(TypeNames.Int), default = None)
   }
 }

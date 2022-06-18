@@ -1,5 +1,6 @@
 package com.effiban.scala2java.stubs
 
+import com.effiban.scala2java.testtrees.TypeNames
 import com.effiban.scala2java.{DefnVarTraverser, JavaEmitter}
 
 import scala.meta.{Defn, Type}
@@ -9,7 +10,7 @@ class StubDefnVarTraverser(implicit javaEmitter: JavaEmitter) extends DefnVarTra
 
   override def traverse(varDefn: Defn.Var): Unit = {
     val tpe = varDefn.decltpe match {
-      case Some(Type.Name("Int")) => "int"
+      case Some(TypeNames.Int) => "int"
       case Some(Type.Name("String")) => "String"
       case Some(aType) => throw new IllegalStateException(s"StubDefnVarTraverser does not support the type $aType")
       case None =>

@@ -1,8 +1,11 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.stubs.{StubAnnotListTraverser, StubTemplateTraverser, StubTermParamListTraverser, StubTypeParamListTraverser}
-import org.mockito.ArgumentMatchers.any
-import org.mockito.captor.ArgCaptor
+import com.effiban.scala2java.matchers.ClassInfoMatcher
+import com.effiban.scala2java.matchers.SomeMatcher.eqSome
+import com.effiban.scala2java.matchers.TreeListMatcher.eqTreeList
+import com.effiban.scala2java.matchers.TreeMatcher.eqTree
+import com.effiban.scala2java.stubbers.OutputWriterStubber.doWrite
+import org.mockito.ArgumentMatchers
 
 import scala.meta.Term.Block
 import scala.meta.Type.Bounds
@@ -11,9 +14,11 @@ import scala.meta.{Ctor, Defn, Init, Mod, Name, Self, Template, Term, Type}
 class CaseClassTraverserImplTest extends UnitTestSuite {
 
   private val AnnotationName = "MyAnnotation"
-  private val ModifierStr = "public"
+  private val JavaModifier = "public"
 
-  private val typeParams = List(
+  private val ClassName = Type.Name("MyRecord")
+
+  private val TypeParams = List(
     Type.Param(
       mods = List(),
       name = Type.Name("T"),
@@ -24,177 +29,133 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     )
   )
 
-  private val ctorArgs1 = List(
+  private val CtorArgs1 = List(
     termParam("arg1", "Int"),
     termParam("arg2", "Int")
   )
-  private val ctorArgs2 = List(
+  private val CtorArgs2 = List(
     termParam("arg3", "Int"),
     termParam("arg4", "Int")
   )
 
-  private val emptyTemplate = Template(
+  private val TheTemplate = Template(
     early = List(),
     inits = List(),
-    self = Self(Name.Anonymous(), None),
-    stats = List()
-  )
-
-  private val javaModifiersResolver = mock[JavaModifiersResolver]
-
-  private val modsCaptor = ArgCaptor[List[Mod]]
-
-  private val classTraverser = new CaseClassTraverserImpl(
-    new StubAnnotListTraverser,
-    new StubTypeParamListTraverser,
-    new StubTermParamListTraverser,
-    new StubTemplateTraverser,
-    javaModifiersResolver)
-
-
-  test("traverse() for one list of ctor args and no body") {
-    val modifiers: List[Mod] = List(
-      Mod.Annot(
-        Init(tpe = Type.Name(AnnotationName), name = Name.Anonymous(), argss = List())
-      ),
-      Mod.Case()
-    )
-
-    val cls = Defn.Class(
-      mods = modifiers,
-      name = Type.Name("MyRecord"),
-      tparams = typeParams,
-      ctor = Ctor.Primary(mods = List(), name = Name.Anonymous(), paramss = List(ctorArgs1)),
-      templ = emptyTemplate
-    )
-
-    when(javaModifiersResolver.resolveForClass(any[List[Mod]])).thenReturn(List(ModifierStr))
-
-    classTraverser.traverse(cls)
-
-    outputWriter.toString shouldBe
-      """
-        |@MyAnnotation
-        |public record MyRecord<T>(int arg1, int arg2)
-        |/**
-        |* STUB TEMPLATE
-        |* Input ClassInfo: ClassInfo(MyRecord,None)
-        |* Scala Body: None
-        |*/
-        |""".stripMargin
-
-    verifyModifiersResolverInvocation()
-  }
-
-  test("traverse() for two lists of ctor args and no body") {
-    val modifiers: List[Mod] = List(
-      Mod.Annot(
-        Init(tpe = Type.Name(AnnotationName), name = Name.Anonymous(), argss = List())
-      ),
-      Mod.Case()
-    )
-
-    val cls = Defn.Class(
-      mods = modifiers,
-      name = Type.Name("MyRecord"),
-      tparams = typeParams,
-      ctor = Ctor.Primary(mods = List(), name = Name.Anonymous(), paramss = List(ctorArgs1, ctorArgs2)),
-      templ = emptyTemplate
-    )
-
-    when(javaModifiersResolver.resolveForClass(any[List[Mod]])).thenReturn(List(ModifierStr))
-
-    classTraverser.traverse(cls)
-
-    outputWriter.toString shouldBe
-      """
-        |@MyAnnotation
-        |public record MyRecord<T>(int arg1, int arg2, int arg3, int arg4)
-        |/**
-        |* STUB TEMPLATE
-        |* Input ClassInfo: ClassInfo(MyRecord,None)
-        |* Scala Body: None
-        |*/
-        |""".stripMargin
-
-    verifyModifiersResolverInvocation()
-  }
-
-  test("traverse() for one list of ctor args and a body") {
-    val modifiers: List[Mod] = List(
-      Mod.Annot(
-        Init(tpe = Type.Name(AnnotationName), name = Name.Anonymous(), argss = List())
-      ),
-      Mod.Case()
-    )
-
-    val cls = Defn.Class(
-      mods = modifiers,
-      name = Type.Name("MyRecord"),
-      tparams = typeParams,
-      ctor = Ctor.Primary(mods = List(), name = Name.Anonymous(), paramss = List(ctorArgs1)),
-      templ = Template(
-        early = List(),
-        inits = List(),
-        self = Self(name = Name.Anonymous(), decltpe = None),
-        stats = List(
-          Defn.Def(
-            mods = List(),
-            name = Term.Name("MyMethod"),
-            tparams = List(),
-            paramss = List(List(termParam("myParam", "String"))),
-            decltpe = Some(Type.Name("String")),
-            body = Block(List())
-          )
-        )
+    self = Self(name = Name.Anonymous(), decltpe = None),
+    stats = List(
+      Defn.Def(
+        mods = List(),
+        name = Term.Name("MyMethod"),
+        tparams = List(),
+        paramss = List(List(termParam("myParam", "String"))),
+        decltpe = Some(Type.Name("String")),
+        body = Block(List())
       )
     )
+  )
 
-    when(javaModifiersResolver.resolveForClass(any[List[Mod]])).thenReturn(List(ModifierStr))
+  private val annotListTraverser = mock[AnnotListTraverser]
+  private val typeParamListTraverser = mock[TypeParamListTraverser]
+  private val termParamListTraverser = mock[TermParamListTraverser]
+  private val templateTraverser = mock[TemplateTraverser]
+  private val javaModifiersResolver = mock[JavaModifiersResolver]
+
+
+
+  private val classTraverser = new CaseClassTraverserImpl(
+    annotListTraverser,
+    typeParamListTraverser,
+    termParamListTraverser,
+    templateTraverser,
+    javaModifiersResolver)
+  test("traverse() for one list of ctor args") {
+    val modifiers: List[Mod] = List(
+      Mod.Annot(
+        Init(tpe = Type.Name(AnnotationName), name = Name.Anonymous(), argss = List())
+      ),
+      Mod.Case()
+    )
+
+    val primaryCtor = Ctor.Primary(mods = List(), name = Name.Anonymous(), paramss = List(CtorArgs1))
+
+    val cls = Defn.Class(
+      mods = modifiers,
+      name = ClassName,
+      tparams = TypeParams,
+      ctor = primaryCtor,
+      templ = TheTemplate
+    )
+
+    doWrite(
+      """@MyAnnotation
+        |""".stripMargin)
+      .when(annotListTraverser).traverseMods(eqTreeList(modifiers), onSameLine = ArgumentMatchers.eq(false))
+    when(javaModifiersResolver.resolveForClass(eqTreeList(modifiers))).thenReturn(List(JavaModifier))
+    doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
+    doWrite("(int arg1, int arg2)").when(termParamListTraverser).traverse(eqTreeList(CtorArgs1))
+    doWrite(
+      """ {
+        | /* BODY */
+        |}
+        |""".stripMargin)
+      .when(templateTraverser).traverse(eqTree(TheTemplate), eqSome(ClassInfo(ClassName, None), new ClassInfoMatcher(_))
+    )
 
     classTraverser.traverse(cls)
 
     outputWriter.toString shouldBe
       """
         |@MyAnnotation
-        |public record MyRecord<T>(int arg1, int arg2)
-        |/**
-        |* STUB TEMPLATE
-        |* Input ClassInfo: ClassInfo(MyRecord,None)
-        |* Scala Body:
-        |* { def MyMethod(myParam: String): String = {} }
-        |*/
+        |public record MyRecord<T>(int arg1, int arg2) {
+        | /* BODY */
+        |}
         |""".stripMargin
+  }
 
-    verifyModifiersResolverInvocation()
+  test("traverse() for two lists of ctor args") {
+    val modifiers: List[Mod] = List(
+      Mod.Annot(
+        Init(tpe = Type.Name(AnnotationName), name = Name.Anonymous(), argss = List())
+      ),
+      Mod.Case()
+    )
+
+    val primaryCtor = Ctor.Primary(mods = List(), name = Name.Anonymous(), paramss = List(CtorArgs1, CtorArgs2))
+
+    val cls = Defn.Class(
+      mods = modifiers,
+      name = ClassName,
+      tparams = TypeParams,
+      ctor = primaryCtor,
+      templ = TheTemplate
+    )
+
+    doWrite(
+      """@MyAnnotation
+        |""".stripMargin)
+      .when(annotListTraverser).traverseMods(eqTreeList(modifiers), onSameLine = ArgumentMatchers.eq(false))
+    when(javaModifiersResolver.resolveForClass(eqTreeList(modifiers))).thenReturn(List(JavaModifier))
+    doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
+    doWrite("(int arg1, int arg2, int arg3, int arg4)").when(termParamListTraverser).traverse(eqTreeList(CtorArgs1 ++ CtorArgs2))
+    doWrite(
+      """ {
+        | /* BODY */
+        |}
+        |""".stripMargin)
+      .when(templateTraverser).traverse(eqTree(TheTemplate), eqSome(ClassInfo(ClassName, None), new ClassInfoMatcher(_)))
+
+    classTraverser.traverse(cls)
+
+    outputWriter.toString shouldBe
+      """
+        |@MyAnnotation
+        |public record MyRecord<T>(int arg1, int arg2, int arg3, int arg4) {
+        | /* BODY */
+        |}
+        |""".stripMargin
   }
 
   private def termParam(name: String, typeName: String) = {
     Term.Param(mods = List(), name = Term.Name(name), decltpe = Some(Type.Name(typeName)), default = None)
-  }
-
-  private def verifyModifiersResolverInvocation() = {
-    verify(javaModifiersResolver).resolveForClass(modsCaptor.capture)
-    val actualMods = modsCaptor.value
-    verifyTwoModifiersPassedToResolver(actualMods)
-    verifyAnnotationPassedToResolver(actualMods.head)
-    withClue("Incorrect second modifier passed to resolver: ") {
-      actualMods(1) shouldBe a[Mod.Case]
-    }
-  }
-
-  private def verifyTwoModifiersPassedToResolver(actualMods: List[Mod]) = {
-    withClue("Incorrect number of modifiers passed to JavaModifiersResolver: ") {
-      actualMods.size shouldBe 2
-    }
-  }
-
-  private def verifyAnnotationPassedToResolver(actualMod: Mod) = {
-    withClue("Incorrect type of modifier passed to resolver: ") {
-      actualMod shouldBe a[Mod.Annot]
-    }
-    withClue("Incorrect name of annotation passed to resolver: ") {
-      actualMod.asInstanceOf[Mod.Annot].init.tpe.toString() shouldBe AnnotationName
-    }
   }
 }

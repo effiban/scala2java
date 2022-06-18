@@ -1,18 +1,22 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.stubs.StubTypeParamListTraverser
-import org.mockito.ArgumentMatchers.any
-import org.mockito.captor.ArgCaptor
+import com.effiban.scala2java.matchers.TreeListMatcher.eqTreeList
+import com.effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 
 import scala.meta.Type.Bounds
 import scala.meta.{Decl, Init, Mod, Name, Type}
 
 class DeclTypeTraverserImplTest extends UnitTestSuite {
 
-  private val AnnotationName = "MyAnnotation"
-  private val ModifierStr = "private"
+  private val JavaModifier = "private"
 
-  private val typeParams = List(
+  private val Modifiers: List[Mod] = List(
+    Mod.Annot(
+      Init(tpe = Type.Name("MyAnnotation"), name = Name.Anonymous(), argss = List())
+    )
+  )
+
+  private val TypeParams = List(
     Type.Param(
       mods = List(),
       name = Type.Name("T"),
@@ -23,30 +27,25 @@ class DeclTypeTraverserImplTest extends UnitTestSuite {
     )
   )
 
+  private val typeParamListTraverser = mock[TypeParamListTraverser]
   private val javaModifiersResolver = mock[JavaModifiersResolver]
 
-  private val modsCaptor = ArgCaptor[List[Mod]]
-
   private val declTypeTraverser = new DeclTypeTraverserImpl(
-    new StubTypeParamListTraverser,
+    typeParamListTraverser,
     javaModifiersResolver)
 
 
   test("traverse()") {
-    val modifiers: List[Mod] = List(
-      Mod.Annot(
-        Init(tpe = Type.Name(AnnotationName), name = Name.Anonymous(), argss = List())
-      )
-    )
 
     val declType = Decl.Type(
-      mods = modifiers,
+      mods = Modifiers,
       name = Type.Name("MyType"),
-      tparams = typeParams,
+      tparams = TypeParams,
       bounds = Bounds(lo = None, hi = Some(Type.Name("T")))
     )
 
-    when(javaModifiersResolver.resolveForInterface(any[List[Mod]])).thenReturn(List(ModifierStr))
+    when(javaModifiersResolver.resolveForInterface(eqTreeList(Modifiers))).thenReturn(List(JavaModifier))
+    doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
 
     declTypeTraverser.traverse(declType)
 
@@ -55,33 +54,5 @@ class DeclTypeTraverserImplTest extends UnitTestSuite {
         |private interface MyType<T> {
         |}
         |""".stripMargin
-
-    verifyModifiersResolverInvocationForInterface()
-  }
-
-  private def verifyModifiersResolverInvocationForInterface() = {
-    verify(javaModifiersResolver).resolveForInterface(modsCaptor.capture)
-    verifyModifiersPassedToResolver()
-  }
-
-  private def verifyModifiersPassedToResolver() = {
-    val actualMods = modsCaptor.value
-    verifyOneModifierPassedToResolver(actualMods)
-    verifyAnnotationPassedToResolver(actualMods.head)
-  }
-
-  private def verifyOneModifierPassedToResolver(actualMods: List[Mod]) = {
-    withClue("Incorrect number of modifiers passed to JavaModifiersResolver: ") {
-      actualMods.size shouldBe 1
-    }
-  }
-
-  private def verifyAnnotationPassedToResolver(actualMod: Mod) = {
-    withClue("Incorrect type of modifier passed to resolver: ") {
-      actualMod shouldBe a[Mod.Annot]
-    }
-    withClue("Incorrect name of annotation passed to resolver: ") {
-      actualMod.asInstanceOf[Mod.Annot].init.tpe.toString() shouldBe AnnotationName
-    }
   }
 }
