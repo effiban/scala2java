@@ -9,7 +9,6 @@ trait RegularClassTraverser extends ScalaTreeTraverser[Defn.Class]
 
 private[scala2java] class RegularClassTraverserImpl(annotListTraverser: => AnnotListTraverser,
                                                     typeParamListTraverser: => TypeParamListTraverser,
-                                                    termParamListTraverser: => TermParamListTraverser,
                                                     templateTraverser: => TemplateTraverser,
                                                     paramToDeclValTransformer: ParamToDeclValTransformer,
                                                     javaModifiersResolver: JavaModifiersResolver)
@@ -26,7 +25,9 @@ private[scala2java] class RegularClassTraverserImpl(annotListTraverser: => Annot
     typeParamListTraverser.traverse(classDef.tparams)
     val outerJavaOwnerContext = javaOwnerContext
     javaOwnerContext = Class
-    val explicitMemberDecls = classDef.ctor.paramss.flatten.map(ParamToDeclValTransformer.transform)
+    val explicitMemberDecls = classDef.ctor.paramss.flatten.map(x =>
+      paramToDeclValTransformer.transform(x)
+    )
     val enrichedStats = explicitMemberDecls ++ classDef.templ.stats
     val enrichedTemplate = classDef.templ.copy(stats = enrichedStats)
     templateTraverser.traverse(template = enrichedTemplate,
@@ -38,7 +39,6 @@ private[scala2java] class RegularClassTraverserImpl(annotListTraverser: => Annot
 object RegularClassTraverser extends RegularClassTraverserImpl(
   AnnotListTraverser,
   TypeParamListTraverser,
-  TermParamListTraverser,
   TemplateTraverser,
   ParamToDeclValTransformer,
   JavaModifiersResolver

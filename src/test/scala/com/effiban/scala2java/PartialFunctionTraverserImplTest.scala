@@ -7,6 +7,7 @@ import scala.meta.{Case, Pat, Term}
 class PartialFunctionTraverserImplTest extends UnitTestSuite {
 
   private val termFunctionTraverser = mock[TermFunctionTraverser]
+
   private val partialFunctionTraverser = new PartialFunctionTraverserImpl(termFunctionTraverser)
 
   test("traverse") {

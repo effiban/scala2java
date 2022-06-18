@@ -1,69 +1,88 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.stubs._
+import com.effiban.scala2java.matchers.TreeMatcher.eqTree
 
 import scala.meta.Pat.{Alternative, Bind}
 import scala.meta.{Lit, Pat, Term, Type}
 
 class PatTraverserImplTest extends UnitTestSuite {
 
+  private val TermName: Term.Name = Term.Name("x")
+
+  private val termNameTraverser = mock[TermNameTraverser]
+  private val patWildcardTraverser = mock[PatWildcardTraverser]
+  private val patSeqWildcardTraverser = mock[PatSeqWildcardTraverser]
+  private val patVarTraverser = mock[PatVarTraverser]
+  private val bindTraverser = mock[BindTraverser]
+  private val alternativeTraverser = mock[AlternativeTraverser]
+  private val patTupleTraverser = mock[PatTupleTraverser]
+  private val patExtractTraverser = mock[PatExtractTraverser]
+  private val patExtractInfixTraverser = mock[PatExtractInfixTraverser]
+  private val patInterpolateTraverser = mock[PatInterpolateTraverser]
+  private val patTypedTraverser = mock[PatTypedTraverser]
+
   val patTraverser = new PatTraverserImpl(
-    new StubTermNameTraverser,
-    new StubPatWildcardTraverser,
-    new StubPatSeqWildcardTraverser,
-    new StubPatVarTraverser,
-    new StubBindTraverser,
-    new StubAlternativeTraverser,
-    new StubPatTupleTraverser,
-    new StubPatExtractTraverser,
-    new StubPatExtractInfixTraverser,
-    new StubPatInterpolateTraverser,
-    new StubPatTypedTraverser)
+    termNameTraverser,
+    patWildcardTraverser,
+    patSeqWildcardTraverser,
+    patVarTraverser,
+    bindTraverser,
+    alternativeTraverser,
+    patTupleTraverser,
+    patExtractTraverser,
+    patExtractInfixTraverser,
+    patInterpolateTraverser,
+    patTypedTraverser)
 
 
   test("traverse Term.Name") {
-    patTraverser.traverse(Term.Name("x"))
-    outputWriter.toString shouldBe "x"
+    patTraverser.traverse(TermName)
+    verify(termNameTraverser).traverse(eqTree(TermName))
   }
 
   test("traverse Pat.Wildcard") {
     patTraverser.traverse(Pat.Wildcard())
-    outputWriter.toString shouldBe "default"
+    verify(patWildcardTraverser).traverse(eqTree(Pat.Wildcard()))
   }
 
   test("traverse Pat.SeqWildcard") {
     patTraverser.traverse(Pat.SeqWildcard())
-    outputWriter.toString shouldBe "/* ... */"
+    verify(patSeqWildcardTraverser).traverse(eqTree(Pat.SeqWildcard()))
   }
 
   test("traverse Pat.Var") {
-    patTraverser.traverse(Pat.Var(Term.Name("x")))
-    outputWriter.toString shouldBe "x"
+    patTraverser.traverse(Pat.Var(TermName))
+    verify(patVarTraverser).traverse(eqTree(Pat.Var(TermName)))
   }
 
   test("traverse Bind") {
-    patTraverser.traverse(Bind(lhs = Pat.Var(Term.Name("x")), rhs = Term.Name("X")))
-    outputWriter.toString shouldBe "/* x @ X */"
+    val bind = Bind(lhs = Pat.Var(TermName), rhs = Term.Name("X"))
+    patTraverser.traverse(bind)
+    verify(bindTraverser).traverse(eqTree(bind))
   }
 
   test("traverse Alternative") {
-    patTraverser.traverse(Alternative(lhs = Lit.Int(2), rhs = Lit.Int(3)))
-    outputWriter.toString shouldBe "2, 3"
+    val alternative = Alternative(lhs = Lit.Int(2), rhs = Lit.Int(3))
+    patTraverser.traverse(alternative)
+    verify(alternativeTraverser).traverse(eqTree(alternative))
   }
 
   test("traverse Pat.Tuple") {
-    patTraverser.traverse(Pat.Tuple(List(Lit.String("myName"), Lit.Int(2), Lit.Boolean(true))))
-    outputWriter.toString shouldBe """/* ("myName", 2, true) */"""
+    val tuple = Pat.Tuple(List(Lit.String("myName"), Lit.Int(2), Lit.Boolean(true)))
+    patTraverser.traverse(tuple)
+    verify(patTupleTraverser).traverse(eqTree(tuple))
   }
 
   test("traverse Pat.Extract") {
-    patTraverser.traverse(Pat.Extract(fun = Term.Name("MyRecord"), args = List(Pat.Var(Term.Name("x")), Lit.Int(3))))
-    outputWriter.toString shouldBe "/* MyRecord(x, 3) */"
+    val patExtract = Pat.Extract(fun = Term.Name("MyRecord"), args = List(Pat.Var(TermName), Lit.Int(3)))
+    patTraverser.traverse(patExtract)
+    verify(patExtractTraverser).traverse(eqTree(patExtract))
   }
 
   test("traverse Pat.ExtractInfix") {
-    patTraverser.traverse(Pat.ExtractInfix(lhs = Pat.Var(Term.Name("x")), op = Term.Name("MyRecord"), rhs = List(Lit.Int(3))))
-    outputWriter.toString shouldBe "/* MyRecord(x, 3) */"
+    val patExtractInfix = Pat.ExtractInfix(lhs = Pat.Var(TermName), op = Term.Name("MyRecord"), rhs = List(Lit.Int(3)))
+    patTraverser.traverse(patExtractInfix)
+    verify(patExtractInfixTraverser).traverse(eqTree(patExtractInfix))
   }
 
   test("traverse Pat.Interpolate") {
@@ -73,12 +92,12 @@ class PatTraverserImplTest extends UnitTestSuite {
       args = List(Term.Name("name"))
     )
     patTraverser.traverse(patInterpolate)
-    outputWriter.toString shouldBe """/* r"Hello ${`name`}, have a (.+) day" */"""
+    verify(patInterpolateTraverser).traverse(eqTree(patInterpolate))
   }
 
   test("traverse Pat.Typed") {
-    val patTyped = Pat.Typed(lhs = Pat.Var(Term.Name("x")), rhs = Type.Name("MyType"))
+    val patTyped = Pat.Typed(lhs = Pat.Var(TermName), rhs = Type.Name("MyType"))
     patTraverser.traverse(patTyped)
-    outputWriter.toString shouldBe "MyType x"
+    verify(patTypedTraverser).traverse(eqTree(patTyped))
   }
 }
