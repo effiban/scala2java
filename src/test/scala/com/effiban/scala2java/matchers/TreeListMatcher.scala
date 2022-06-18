@@ -10,6 +10,8 @@ class TreeListMatcher[T <: Tree](expected: List[T]) extends ArgumentMatcher[List
   override def matches(actual: List[T]): Boolean = {
     actual.structure == expected.structure
   }
+
+  override def toString: String = s"Matcher for: $expected"
 }
 
 object TreeListMatcher {

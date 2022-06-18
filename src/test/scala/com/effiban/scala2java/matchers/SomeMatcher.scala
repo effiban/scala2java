@@ -13,6 +13,8 @@ class SomeMatcher[T](expectedVal: T,
       case _ => false
     }
   }
+
+  override def toString: String = s"Matcher for: Some($expectedVal)"
 }
 
 object SomeMatcher {

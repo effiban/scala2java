@@ -1,81 +1,142 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.stubs.StubTermTraverser
+import com.effiban.scala2java.TraversalConstants.JavaPlaceholder
+import com.effiban.scala2java.matchers.TreeMatcher.eqTree
 
 import scala.meta.Enumerator.{CaseGenerator, Generator}
+import scala.meta.Term.Select
 import scala.meta.{Enumerator, Pat, Term}
 
 class ForVariantTraverserImplTest extends UnitTestSuite {
 
+  private val X = Term.Name("x")
+  private val Y = Term.Name("y")
+  private val Z = Term.Name("z")
+
+  private val Xs = Term.Name("xs")
+  private val Ys = Term.Name("ys")
+  private val Zs = Term.Name("zs")
+
+  private val ParamX = paramOf(X)
+  private val ParamY = paramOf(Y)
+  private val ParamZ = paramOf(Z)
+
+  private val PatX = Pat.Var(X)
+  private val PatY = Pat.Var(Y)
+  private val PatZ = Pat.Var(Z)
+
   private val MapFunctionName = Term.Name("map")
+  private val FlatMapFunctionName = Term.Name("flatMap")
+  private val ResultFunctionName = Term.Name("result")
 
-  private val forVariantTraverser = new ForVariantTraverserImpl(new StubTermTraverser())
+  private val termTraverser = mock[TermTraverser]
 
+
+  private val forVariantTraverser = new ForVariantTraverserImpl(termTraverser)
   test("traverse() for one Generator with a variable in the LHS") {
-    val x = Term.Name("x")
-
-    val enums = List(
-      Generator(pat = Pat.Var(x), rhs = Term.Name("xs")),
+    val enumerators = List(
+      Generator(pat = PatX, rhs = Xs),
     )
-    val body = Term.Apply(Term.Name("result"), List(x))
+    val inputBody = Term.Apply(ResultFunctionName, List(X))
 
-    forVariantTraverser.traverse(enums, body, MapFunctionName)
+    val expectedTranslatedFor =
+      Term.Apply(
+        fun = Select(Xs, MapFunctionName),
+        args = List(Term.Function(params = List(ParamX), body = inputBody))
+      )
 
-    outputWriter.toString shouldBe "xs.map(x => result(x))"
+    forVariantTraverser.traverse(enumerators, inputBody, MapFunctionName)
+
+    verify(termTraverser).traverse(eqTree(expectedTranslatedFor))
   }
 
   test("traverse() for one Generator enumerator with a wildcard in the LHS") {
-    val enums = List(
-      Generator(pat = Pat.Wildcard(), rhs = Term.Name("xs")),
+    val enumerators = List(
+      Generator(pat = Pat.Wildcard(), rhs = Xs)
     )
-    val body = Term.Apply(Term.Name("result"), Nil)
+    val inputBody = Term.Apply(ResultFunctionName, Nil)
 
-    forVariantTraverser.traverse(enums, body, MapFunctionName)
+    val expectedTranslatedFor =
+      Term.Apply(
+        fun = Select(Xs, MapFunctionName),
+        args = List(Term.Function(params = List(paramOf(Term.Name(JavaPlaceholder))), body = inputBody))
+      )
 
-    outputWriter.toString shouldBe "xs.map(__ => result())"
+    forVariantTraverser.traverse(enumerators, inputBody, MapFunctionName)
+
+    verify(termTraverser).traverse(eqTree(expectedTranslatedFor))
   }
 
   test("traverse() for one CaseGenerator enumerator with a variable in the LHS") {
-    val x = Term.Name("x")
-
-    val enums = List(
-      CaseGenerator(pat = Pat.Var(x), rhs = Term.Name("xs")),
+    val enumerators = List(
+      CaseGenerator(pat = PatX, rhs = Xs),
     )
-    val body = Term.Apply(Term.Name("result"), List(x))
+    val inputBody = Term.Apply(ResultFunctionName, List(X))
 
-    forVariantTraverser.traverse(enums, body, MapFunctionName)
+    val expectedTranslatedFor =
+      Term.Apply(
+        fun = Select(Xs, MapFunctionName),
+        args = List(Term.Function(params = List(ParamX), body = inputBody))
+      )
 
-    outputWriter.toString shouldBe "xs.map(x => result(x))"
+    forVariantTraverser.traverse(enumerators, inputBody, MapFunctionName)
+
+    verify(termTraverser).traverse(eqTree(expectedTranslatedFor))
   }
 
   test("traverse() for one Val enumerator with a variable in the LHS") {
-    val x = Term.Name("x")
-
-    val enums = List(
-      Enumerator.Val(pat = Pat.Var(x), rhs = Term.Name("xs")),
+    val enumerators = List(
+      Enumerator.Val(pat = PatX, rhs = Xs),
     )
-    val body = Term.Apply(Term.Name("result"), List(x))
+    val inputBody = Term.Apply(ResultFunctionName, List(X))
 
-    forVariantTraverser.traverse(enums, body, MapFunctionName)
+    val expectedTranslatedFor =
+      Term.Apply(
+        fun = Select(Xs, MapFunctionName),
+        args = List(Term.Function(params = List(ParamX), body = inputBody))
+      )
 
-    outputWriter.toString shouldBe "xs.map(x => result(x))"
+    forVariantTraverser.traverse(enumerators, inputBody, MapFunctionName)
+
+    verify(termTraverser).traverse(eqTree(expectedTranslatedFor))
   }
 
   test("traverse() for three enumerators") {
-    val x = Term.Name("x")
-    val y = Term.Name("y")
-    val z = Term.Name("z")
+    val enumerators = List(
+      Generator(pat = PatX, rhs = Xs),
+      Generator(pat = PatY, rhs = Ys),
+      Generator(pat = PatZ, rhs = Zs)
+    )
+    val inputBody = Term.Apply(ResultFunctionName, List(X, Y, Z))
 
-    val enums = List(
-        Generator(pat = Pat.Var(x), rhs = Term.Name("xs")),
-        Generator(pat = Pat.Var(y), rhs = Term.Name("ys")),
-        Generator(pat = Pat.Var(z), rhs = Term.Name("zs"))
+    // xs.flatMap(x => ys.flatMap(y => zs.map(z => result(x, y, z))))
+    val expectedTranslatedFor =
+      Term.Apply(
+        fun = Select(Xs, FlatMapFunctionName),
+        args = List(Term.Function(
+          params = List(ParamX),
+          body = Term.Apply(
+            fun = Select(Ys, FlatMapFunctionName),
+            args = List(Term.Function(
+              params = List(ParamY),
+              body = Term.Apply(
+                fun = Select(Zs, MapFunctionName),
+                args = List(Term.Function(
+                  params = List(ParamZ),
+                  body = inputBody
+                ))
+              )
+            ))
+          )
+        ))
       )
-    val body = Term.Apply(Term.Name("result"), List(x, y, z))
 
-    forVariantTraverser.traverse(enums, body, MapFunctionName)
+    forVariantTraverser.traverse(enumerators, inputBody, MapFunctionName)
 
-    outputWriter.toString shouldBe "xs.flatMap(x => ys.flatMap(y => zs.map(z => result(x, y, z))))"
+    verify(termTraverser).traverse(eqTree(expectedTranslatedFor))
   }
 
+  private def paramOf(termName: Term.Name) = {
+    Term.Param(mods = List.empty, name = termName, decltpe = None, default = None)
+  }
 }
