@@ -15,7 +15,7 @@ class ClassInfoMatcher(expectedClassInfo: ClassInfo) extends ArgumentMatcher[Cla
   }
 
   private def explicitPrimaryCtorMatches(actualClassInfo: ClassInfo) = {
-    (actualClassInfo.maybeExplicitPrimaryCtor, expectedClassInfo.maybeExplicitPrimaryCtor) match {
+    (actualClassInfo.maybePrimaryCtor, expectedClassInfo.maybePrimaryCtor) match {
       case (Some(actualPrimaryCtor), Some(expectedPrimaryCtor)) => new TreeMatcher(expectedPrimaryCtor).matches(actualPrimaryCtor)
       case (None, None) => true
       case _ => false

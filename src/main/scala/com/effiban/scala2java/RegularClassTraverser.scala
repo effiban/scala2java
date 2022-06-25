@@ -31,7 +31,7 @@ private[scala2java] class RegularClassTraverserImpl(annotListTraverser: => Annot
     val enrichedStats = explicitMemberDecls ++ classDef.templ.stats
     val enrichedTemplate = classDef.templ.copy(stats = enrichedStats)
     templateTraverser.traverse(template = enrichedTemplate,
-      maybeClassInfo = Some(ClassInfo(className = classDef.name, maybeExplicitPrimaryCtor = Some(classDef.ctor))))
+      maybeClassInfo = Some(ClassInfo(className = classDef.name, maybePrimaryCtor = Some(classDef.ctor))))
     javaOwnerContext = outerJavaOwnerContext
   }
 }

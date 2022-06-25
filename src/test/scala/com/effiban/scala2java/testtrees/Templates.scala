@@ -1,13 +1,13 @@
 package com.effiban.scala2java.testtrees
 
-import scala.meta.{Name, Self, Template}
+import scala.meta.Template
 
 object Templates {
 
   val Empty: Template = Template(
     early = Nil,
     inits = Nil,
-    self = Self(name = Name.Anonymous(), decltpe = None),
+    self = Selfs.Empty,
     stats  = Nil
   )
 }

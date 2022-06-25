@@ -25,7 +25,7 @@ private[scala2java] class CaseClassTraverserImpl(annotListTraverser: => AnnotLis
     termParamListTraverser.traverse(classDef.ctor.paramss.flatten)
     val outerJavaOwnerContext = javaOwnerContext
     javaOwnerContext = Class
-    templateTraverser.traverse(template = classDef.templ, maybeClassInfo = Some(ClassInfo(className = classDef.name, maybeExplicitPrimaryCtor = None)))
+    templateTraverser.traverse(template = classDef.templ, maybeClassInfo = Some(ClassInfo(className = classDef.name, maybePrimaryCtor = None)))
     javaOwnerContext = outerJavaOwnerContext
   }
 }
