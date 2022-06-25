@@ -14,7 +14,7 @@ private[scala2java] class TermInterpolateTraverserImpl(termApplyTraverser: => Te
     // Transform Scala string interpolation to Java String.format()
     termInterpolate.prefix match {
       case Term.Name("s") => termApplyTraverser.traverse(toJavaStringFormatInvocation(termInterpolate.parts, termInterpolate.args))
-      case _ => emitComment(s"UNRECOGNIZED interpolation: $termInterpolate")
+      case _ => emitComment(s"UNSUPPORTED interpolation: $termInterpolate")
     }
   }
 

@@ -14,12 +14,13 @@ private[scala2java] class SuperTraverserImpl(nameTraverser: => NameTraverser)
     `super`.thisp match {
       case Name.Anonymous() =>
       case name =>
-        NameTraverser.traverse(name)
+        nameTraverser.traverse(name)
         emit(".")
     }
+    emit("super")
     `super`.superp match {
-      case Name.Anonymous() => emit("super")
-      case name => NameTraverser.traverse(name)
+      case Name.Anonymous() =>
+      case name => emitComment(s"extends ${name.value}")
     }
   }
 }

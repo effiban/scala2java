@@ -11,14 +11,16 @@ trait TemplateTraverser extends ScalaTreeTraverser[Template] {
 }
 
 private[scala2java] class TemplateTraverserImpl(initListTraverser: => InitListTraverser,
+                                                selfTraverser: => SelfTraverser,
                                                 statTraverser: => StatTraverser,
                                                 ctorPrimaryTraverser: => CtorPrimaryTraverser,
                                                 ctorSecondaryTraverser: => CtorSecondaryTraverser,
-                                                javaTemplateStatOrdering: JavaTemplateChildOrdering,
-                                                javaModifiersResolver: JavaModifiersResolver)
+                                                javaTemplateChildOrdering: JavaTemplateChildOrdering)
                                                (implicit javaEmitter: JavaEmitter) extends TemplateTraverser {
 
   import javaEmitter._
+
+  private val ParentsToSkip = Set(Term.Name("AnyRef"), Term.Name("Product"), Term.Name("Serializable"))
 
   override def traverse(template: Template): Unit = {
     traverse(template, None)
@@ -28,11 +30,9 @@ private[scala2java] class TemplateTraverserImpl(initListTraverser: => InitListTr
                maybeClassInfo: Option[ClassInfo] = None): Unit = {
     val relevantInits = template.inits.filterNot(init => shouldSkipParent(init.name))
     traverseTemplateInits(relevantInits)
-    template.self.decltpe.foreach(_ => {
-      //TODO - consider translating the 'self' type into a Java parent
-      emitComment(template.self.toString)
-    })
-    traverseTemplateBody(statements = template.stats,
+    selfTraverser.traverse(template.self)
+    traverseTemplateBody(
+      statements = template.stats,
       inits = relevantInits,
       maybeClassInfo = maybeClassInfo)
   }
@@ -45,19 +45,16 @@ private[scala2java] class TemplateTraverserImpl(initListTraverser: => InitListTr
   }
 
   private def shouldSkipParent(parent: Name): Boolean = {
-    parent match {
-      case Term.Name("AnyRef") | Term.Name("Product") | Term.Name("Serializable") => true
-      case _ => false
-    }
+    ParentsToSkip.exists(parentToSkip => parentToSkip.structure == parent.structure)
   }
 
   private def traverseTemplateBody(statements: List[Stat],
                                    inits: List[Init],
                                    maybeClassInfo: Option[ClassInfo] = None): Unit = {
-    val children = statements ++ maybeClassInfo.flatMap(_.maybeExplicitPrimaryCtor)
+    val children = statements ++ maybeClassInfo.flatMap(_.maybePrimaryCtor)
     val maybeClassName = maybeClassInfo.map(_.className)
     emitBlockStart()
-    children.sorted(JavaTemplateChildOrdering).foreach {
+    children.sorted(javaTemplateChildOrdering).foreach {
       case defnDef: Defn.Def => statTraverser.traverse(defnDef)
       case defnType: Defn.Type => statTraverser.traverse(defnType)
       case primaryCtor: Ctor.Primary => traversePrimaryCtor(primaryCtor, maybeClassName, inits)
@@ -89,9 +86,9 @@ private[scala2java] class TemplateTraverserImpl(initListTraverser: => InitListTr
 
 object TemplateTraverser extends TemplateTraverserImpl(
   InitListTraverser,
+  SelfTraverser,
   StatTraverser,
   CtorPrimaryTraverser,
   CtorSecondaryTraverser,
-  JavaTemplateChildOrdering,
-  JavaModifiersResolver
+  JavaTemplateChildOrdering
 )
