@@ -1,26 +1,25 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.emitComment
+import com.effiban.scala2java.transformers.TermInterpolateTransformer
 
-import scala.meta.Term.{Apply, Select}
-import scala.meta.{Lit, Term}
+import scala.meta.Term
 
 trait TermInterpolateTraverser extends ScalaTreeTraverser[Term.Interpolate]
 
-private[scala2java] class TermInterpolateTraverserImpl(termApplyTraverser: => TermApplyTraverser)
+private[scala2java] class TermInterpolateTraverserImpl(termInterpolateTransformer: TermInterpolateTransformer,
+                                                       termApplyTraverser: => TermApplyTraverser)
                                                       (implicit javaEmitter: JavaEmitter) extends TermInterpolateTraverser {
+  import javaEmitter._
 
   override def traverse(termInterpolate: Term.Interpolate): Unit = {
-    // Transform Scala string interpolation to Java String.format()
-    termInterpolate.prefix match {
-      case Term.Name("s") => termApplyTraverser.traverse(toJavaStringFormatInvocation(termInterpolate.parts, termInterpolate.args))
+    termInterpolateTransformer.transform(termInterpolate) match {
+      case Some(termApply) => termApplyTraverser.traverse(termApply)
       case _ => emitComment(s"UNSUPPORTED interpolation: $termInterpolate")
     }
   }
-
-  private def toJavaStringFormatInvocation(formatParts: List[Lit], interpolationArgs: List[Term]) = {
-    Apply(Select(Term.Name("String"), Term.Name("format")), List(Lit.String(formatParts.mkString("%s"))) ++ interpolationArgs)
-  }
 }
 
-object TermInterpolateTraverser extends TermInterpolateTraverserImpl(TermApplyTraverser)
+object TermInterpolateTraverser extends TermInterpolateTraverserImpl(
+  TermInterpolateTransformer,
+  TermApplyTraverser
+)

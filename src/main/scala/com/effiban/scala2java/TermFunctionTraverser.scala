@@ -1,6 +1,5 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.emitArrow
 import com.effiban.scala2java.TraversalContext.javaOwnerContext
 
 import scala.meta.Term
@@ -12,14 +11,15 @@ private[scala2java] class TermFunctionTraverserImpl(termParamTraverser: => TermP
                                                     termTraverser: => TermTraverser)
                                                    (implicit javaEmitter: JavaEmitter) extends TermFunctionTraverser {
 
+  import javaEmitter._
+
   // lambda definition
   override def traverse(function: Term.Function): Unit = {
     val outerJavaOwnerContext = javaOwnerContext
     javaOwnerContext = Lambda
     function.params match {
-      case Nil =>
       case param :: Nil => termParamTraverser.traverse(param)
-      case _ => termParamListTraverser.traverse(function.params)
+      case _ => termParamListTraverser.traverse(termParams = function.params, onSameLine = true)
     }
     emitArrow()
     termTraverser.traverse(function.body)

@@ -82,7 +82,10 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     when(javaModifiersResolver.resolveForClassMethod(eqTreeList(Modifiers))).thenReturn(List(JavaPublicModifier))
     doWrite("int").when(typeTraverser).traverse(eqTree(TypeNames.Int))
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
-    doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(eqTreeList(MethodParams1))
+    doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
+      termParams = eqTreeList(MethodParams1),
+      onSameLine = ArgumentMatchers.eq(false)
+    )
     doWrite(
       """ {
         |  /* BODY */
@@ -122,7 +125,10 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     when(javaModifiersResolver.resolveForClassMethod(eqTreeList(Modifiers))).thenReturn(List(JavaPublicModifier))
     doWrite("void").when(typeTraverser).traverse(eqTree(TypeNames.Unit))
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
-    doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(eqTreeList(MethodParams1))
+    doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
+      termParams = eqTreeList(MethodParams1),
+      onSameLine = ArgumentMatchers.eq(false)
+    )
     doWrite(
       """ {
         |  /* BODY */
@@ -168,7 +174,10 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     when(javaModifiersResolver.resolveForClassMethod(eqTreeList(Modifiers))).thenReturn(List(JavaPublicModifier))
     doWrite("").when(typeTraverser).traverse(eqTree(TypeNames.Unit))
     doWrite("MyClass").when(termNameTraverser).traverse(eqTree(ClassName))
-    doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(eqTreeList(MethodParams1))
+    doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
+      termParams = eqTreeList(MethodParams1),
+      onSameLine = ArgumentMatchers.eq(false)
+    )
     doWrite(
       """ {
         |  /* BODY */
@@ -207,7 +216,10 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       .when(annotListTraverser).traverseMods(mods = eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
     when(javaModifiersResolver.resolveForClassMethod(eqTreeList(Modifiers))).thenReturn(List(JavaPublicModifier))
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
-    doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(eqTreeList(MethodParams1))
+    doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
+      termParams = eqTreeList(MethodParams1),
+      onSameLine = ArgumentMatchers.eq(false)
+    )
     doWrite(
       """ {
         |  /* BODY */
@@ -249,7 +261,10 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     when(javaModifiersResolver.resolveForClassMethod(eqTreeList(Modifiers))).thenReturn(List(JavaPublicModifier))
     doWrite("int").when(typeTraverser).traverse(eqTree(TypeNames.Int))
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
-    doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(eqTreeList(MethodParams1))
+    doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
+      termParams = eqTreeList(MethodParams1),
+      onSameLine = ArgumentMatchers.eq(false)
+    )
     doWrite(
       """ {
         |  /* BODY */
@@ -290,7 +305,10 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       .thenReturn(List(JavaDefaultModifier))
     doWrite("int").when(typeTraverser).traverse(eqTree(TypeNames.Int))
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
-    doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(eqTreeList(MethodParams1))
+    doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
+      termParams = eqTreeList(MethodParams1),
+      onSameLine = ArgumentMatchers.eq(false)
+    )
     doWrite(
       """ {
         |  /* BODY */
@@ -331,7 +349,10 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       .thenReturn(List(JavaDefaultModifier))
     doWrite("int").when(typeTraverser).traverse(eqTree(TypeNames.Int))
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
-    doWrite("(int param1, int param2, int param3, int param4)").when(termParamListTraverser).traverse(eqTreeList(MethodParams1 ++ MethodParams2))
+    doWrite("(int param1, int param2, int param3, int param4)").when(termParamListTraverser).traverse(
+      termParams = eqTreeList(MethodParams1 ++ MethodParams2),
+      onSameLine = ArgumentMatchers.eq(false)
+    )
     doWrite(
       """ {
         |  /* BODY */

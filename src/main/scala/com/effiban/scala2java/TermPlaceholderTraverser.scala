@@ -6,7 +6,7 @@ import scala.meta.Term
 
 trait TermPlaceholderTraverser extends ScalaTreeTraverser[Term.Placeholder]
 
-private[scala2java] class TermPlaceholderTraverserImpl(javaEmitter: JavaEmitter) extends TermPlaceholderTraverser {
+private[scala2java] class TermPlaceholderTraverserImpl(implicit javaEmitter: JavaEmitter) extends TermPlaceholderTraverser {
   import javaEmitter._
 
   // Underscore as expression - will compile in java only if it is an anonymous function, but rendering always
@@ -15,4 +15,4 @@ private[scala2java] class TermPlaceholderTraverserImpl(javaEmitter: JavaEmitter)
   }
 }
 
-object TermPlaceholderTraverser extends TermPlaceholderTraverserImpl(JavaEmitter)
+object TermPlaceholderTraverser extends TermPlaceholderTraverserImpl

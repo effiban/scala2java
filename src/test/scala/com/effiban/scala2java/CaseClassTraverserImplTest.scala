@@ -93,7 +93,10 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       .when(annotListTraverser).traverseMods(eqTreeList(modifiers), onSameLine = ArgumentMatchers.eq(false))
     when(javaModifiersResolver.resolveForClass(eqTreeList(modifiers))).thenReturn(List(JavaModifier))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
-    doWrite("(int arg1, int arg2)").when(termParamListTraverser).traverse(eqTreeList(CtorArgs1))
+    doWrite("(int arg1, int arg2)").when(termParamListTraverser).traverse(
+      termParams = eqTreeList(CtorArgs1),
+      onSameLine = ArgumentMatchers.eq(false)
+    )
     doWrite(
       """ {
         | /* BODY */
@@ -137,7 +140,10 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       .when(annotListTraverser).traverseMods(eqTreeList(modifiers), onSameLine = ArgumentMatchers.eq(false))
     when(javaModifiersResolver.resolveForClass(eqTreeList(modifiers))).thenReturn(List(JavaModifier))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
-    doWrite("(int arg1, int arg2, int arg3, int arg4)").when(termParamListTraverser).traverse(eqTreeList(CtorArgs1 ++ CtorArgs2))
+    doWrite("(int arg1, int arg2, int arg3, int arg4)").when(termParamListTraverser).traverse(
+      termParams = eqTreeList(CtorArgs1 ++ CtorArgs2),
+      onSameLine = ArgumentMatchers.eq(false)
+    )
     doWrite(
       """ {
         | /* BODY */

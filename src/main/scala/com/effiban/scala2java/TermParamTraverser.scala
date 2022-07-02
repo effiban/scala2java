@@ -28,6 +28,7 @@ private[scala2java] class TermParamTraverserImpl(annotListTraverser: => AnnotLis
       emit(" ")
     })
     nameTraverser.traverse(termParam.name)
+    // TODO handle 'default'
   }
 }
 

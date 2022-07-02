@@ -75,7 +75,10 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     when(javaModifiersResolver.resolveForClassMethod(eqTreeList(Modifiers))).thenReturn(List(JavaModifier))
     doWrite("int").when(typeTraverser).traverse(eqTree(MethodType))
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
-    doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(eqTreeList(MethodParams1))
+    doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
+      termParams = eqTreeList(MethodParams1),
+      onSameLine = ArgumentMatchers.eq(false)
+    )
 
     declDefTraverser.traverse(declDef)
 
@@ -103,7 +106,10 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     when(javaModifiersResolver.resolveForInterfaceMethod(eqTreeList(Modifiers), ArgumentMatchers.eq(false))).thenReturn(List.empty)
     doWrite("int").when(typeTraverser).traverse(eqTree(MethodType))
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
-    doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(eqTreeList(MethodParams1))
+    doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
+      termParams = eqTreeList(MethodParams1),
+      onSameLine = ArgumentMatchers.eq(false)
+    )
 
     declDefTraverser.traverse(declDef)
 
@@ -131,7 +137,10 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     when(javaModifiersResolver.resolveForInterfaceMethod(eqTreeList(Modifiers), ArgumentMatchers.eq(false))).thenReturn(List.empty)
     doWrite("int").when(typeTraverser).traverse(eqTree(MethodType))
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
-    doWrite("(int param1, int param2, int param3, int param4)").when(termParamListTraverser).traverse(eqTreeList(MethodParams1 ++ MethodParams2))
+    doWrite("(int param1, int param2, int param3, int param4)").when(termParamListTraverser).traverse(
+      termParams = eqTreeList(MethodParams1 ++ MethodParams2),
+      onSameLine = ArgumentMatchers.eq(false)
+    )
 
     declDefTraverser.traverse(declDef)
 
