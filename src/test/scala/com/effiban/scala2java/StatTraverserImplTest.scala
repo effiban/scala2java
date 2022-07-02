@@ -2,6 +2,7 @@ package com.effiban.scala2java
 
 import com.effiban.scala2java.matchers.TreeMatcher.eqTree
 import com.effiban.scala2java.stubbers.OutputWriterStubber.doWrite
+import com.effiban.scala2java.testtrees.TypeNames
 
 import scala.meta.Ctor.Primary
 import scala.meta.{Decl, Defn, Import, Importee, Importer, Lit, Name, Pat, Pkg, Self, Template, Term, Type}
@@ -119,7 +120,7 @@ class StatTraverserImplTest extends UnitTestSuite {
           Decl.Val(
             mods = List(),
             pats = List(Pat.Var(Term.Name("myVal"))),
-            decltpe = Type.Name("String")
+            decltpe = TypeNames.String
           )
         )
       )

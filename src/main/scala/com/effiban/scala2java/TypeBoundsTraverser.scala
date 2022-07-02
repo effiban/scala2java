@@ -10,7 +10,7 @@ private[scala2java] class TypeBoundsTraverserImpl(typeTraverser: => TypeTraverse
 
   // Scala type bounds e.g. X <: Y
   override def traverse(typeBounds: Type.Bounds): Unit = {
-    // Only upper or lower bounds allowed in Java, not both
+    //Only upper or lower bounds allowed in Java, not both
     //TODO handle lower bound Null which can be skipped in Java
     (typeBounds.lo, typeBounds.hi) match {
       case (Some(lo), None) =>

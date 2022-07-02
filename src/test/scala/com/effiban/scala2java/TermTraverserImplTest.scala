@@ -1,6 +1,7 @@
 package com.effiban.scala2java
 
 import com.effiban.scala2java.matchers.TreeMatcher.eqTree
+import com.effiban.scala2java.testtrees.TypeNames
 import org.mockito.ArgumentMatchers
 
 import scala.meta.Enumerator.Generator
@@ -226,7 +227,7 @@ class TermTraverserImplTest extends UnitTestSuite {
 
   test("traverse() for Term.Function") {
     val function = Term.Function(
-      params = List(Term.Param(mods = Nil, name = Term.Name("x"), decltpe = Some(Type.Name("Int")), default = None)),
+      params = List(Term.Param(mods = Nil, name = Term.Name("x"), decltpe = Some(TypeNames.Int), default = None)),
       body = Apply(fun = Term.Name("doSomething"), args = List(Term.Name("x")))
     )
     termTraverser.traverse(function)
