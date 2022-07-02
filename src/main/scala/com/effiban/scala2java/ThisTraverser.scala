@@ -12,9 +12,12 @@ private[scala2java] class ThisTraverserImpl(nameTraverser: => NameTraverser)
 
   override def traverse(`this`: This): Unit = {
     `this`.qual match {
-      case Name.Anonymous() => emit("this")
-      case name => nameTraverser.traverse(name)
+      case Name.Anonymous() =>
+      case name =>
+        nameTraverser.traverse(name)
+        emit(".")
     }
+    emit("this")
   }
 }
 

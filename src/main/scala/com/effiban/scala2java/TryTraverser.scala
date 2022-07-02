@@ -1,40 +1,40 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.{emit, emitBlockEnd, emitBlockStart}
+import com.effiban.scala2java.transformers.PatToTermParamTransformer
 
-import scala.meta.{Case, Term}
+import scala.meta.Term
+import scala.meta.Term.Block
 
 trait TryTraverser extends ScalaTreeTraverser[Term.Try]
 
-private[scala2java] class TryTraverserImpl(termTraverser: => TermTraverser,
-                                           patTraverser: => PatTraverser)
+private[scala2java] class TryTraverserImpl(blockTraverser: => BlockTraverser,
+                                           catchHandlerTraverser: => CatchHandlerTraverser,
+                                           finallyTraverser: => FinallyTraverser,
+                                           patToTermParamTransformer: PatToTermParamTransformer)
                                           (implicit javaEmitter: JavaEmitter) extends TryTraverser {
+  import javaEmitter._
 
+  // TODO 1. support return value flag
+  // TODO 2. Support case condition by moving into body
   override def traverse(`try`: Term.Try): Unit = {
-    emit("try ")
-    termTraverser.traverse(`try`.expr)
-    `try`.catchp.foreach(traverseCatchClause)
-    `try`.finallyp.foreach(finallyp => {
-      emit("finally")
-      emitBlockStart()
-      termTraverser.traverse(finallyp)
-      emitBlockEnd()
+    emit("try")
+    `try`.expr match {
+      case block: Block => blockTraverser.traverse(block)
+      case stat => blockTraverser.traverse(Block(List(stat)))
+    }
+    `try`.catchp.foreach(`case` => {
+      patToTermParamTransformer.transform(`case`.pat) match {
+        case Some(param) => catchHandlerTraverser.traverse(param, `case`.body)
+        case None => emitComment(s"UNPARSEABLE catch clause: ${`case`}")
+      }
     })
-  }
-
-  private def traverseCatchClause(`case`: Case): Unit = {
-    emit("catch (")
-    patTraverser.traverse(`case`.pat)
-    `case`.cond.foreach(cond => {
-      emit(" && (")
-      termTraverser.traverse(cond)
-      emit(")")
-    })
-    emit(")")
-    emitBlockStart()
-    termTraverser.traverse(`case`.body)
-    emitBlockEnd()
+    `try`.finallyp.foreach(finallyTraverser.traverse)
   }
 }
 
-object TryTraverser extends TryTraverserImpl(TermTraverser, PatTraverser)
+object TryTraverser extends TryTraverserImpl(
+  BlockTraverser,
+  CatchHandlerTraverser,
+  FinallyTraverser,
+  PatToTermParamTransformer
+)

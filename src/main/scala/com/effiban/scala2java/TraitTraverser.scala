@@ -6,7 +6,8 @@ import scala.meta.Defn.Trait
 
 trait TraitTraverser extends ScalaTreeTraverser[Trait]
 
-private[scala2java] class TraitTraverserImpl(typeParamListTraverser: => TypeParamListTraverser,
+private[scala2java] class TraitTraverserImpl(annotListTraverser: => AnnotListTraverser,
+                                             typeParamListTraverser: => TypeParamListTraverser,
                                              templateTraverser: => TemplateTraverser,
                                              javaModifiersResolver: JavaModifiersResolver)
                                             (implicit javaEmitter: JavaEmitter) extends TraitTraverser {
@@ -15,6 +16,7 @@ private[scala2java] class TraitTraverserImpl(typeParamListTraverser: => TypePara
 
   override def traverse(traitDef: Trait): Unit = {
     emitLine()
+    annotListTraverser.traverseMods(traitDef.mods)
     emitTypeDeclaration(modifiers = javaModifiersResolver.resolveForInterface(traitDef.mods),
       typeKeyword = "interface",
       name = traitDef.name.toString)
@@ -26,4 +28,9 @@ private[scala2java] class TraitTraverserImpl(typeParamListTraverser: => TypePara
   }
 }
 
-object TraitTraverser extends TraitTraverserImpl(TypeParamListTraverser, TemplateTraverser, JavaModifiersResolver)
+object TraitTraverser extends TraitTraverserImpl(
+  AnnotListTraverser,
+  TypeParamListTraverser,
+  TemplateTraverser,
+  JavaModifiersResolver
+)
