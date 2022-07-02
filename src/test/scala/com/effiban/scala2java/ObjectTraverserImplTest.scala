@@ -3,6 +3,7 @@ package com.effiban.scala2java
 import com.effiban.scala2java.matchers.TreeListMatcher.eqTreeList
 import com.effiban.scala2java.matchers.TreeMatcher.eqTree
 import com.effiban.scala2java.stubbers.OutputWriterStubber.doWrite
+import com.effiban.scala2java.testtrees.TypeNames
 import org.mockito.ArgumentMatchers
 
 import scala.meta.Term.Block
@@ -41,7 +42,7 @@ class ObjectTraverserImplTest extends UnitTestSuite {
           name = Term.Name("MyMethod"),
           tparams = List(),
           paramss = List(List(termParam("myParam1", "Int"), termParam("myParam2", "String"))),
-          decltpe = Some(Type.Name("String")),
+          decltpe = Some(TypeNames.String),
           body = Block(List())
         )
       )

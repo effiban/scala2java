@@ -3,7 +3,7 @@ package com.effiban.scala2java
 import com.effiban.scala2java.matchers.TreeListMatcher.eqTreeList
 import com.effiban.scala2java.matchers.TreeMatcher.eqTree
 import com.effiban.scala2java.stubbers.OutputWriterStubber.doWrite
-import com.effiban.scala2java.testtrees.PrimaryCtors
+import com.effiban.scala2java.testtrees.{PrimaryCtors, TypeNames}
 import org.mockito.ArgumentMatchers
 
 import scala.meta.Term.Block
@@ -46,7 +46,7 @@ class TraitTraverserImplTest extends UnitTestSuite {
           paramss = List(List(Term.Param(
             mods = Nil,
             name = Term.Name("myParam"),
-            decltpe = Some(Type.Name("Int")),
+            decltpe = Some(TypeNames.Int),
             default = None
           ))),
           decltpe = Some(Type.Name("String")),

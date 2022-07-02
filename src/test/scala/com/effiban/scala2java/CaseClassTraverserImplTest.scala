@@ -5,6 +5,7 @@ import com.effiban.scala2java.matchers.SomeMatcher.eqSome
 import com.effiban.scala2java.matchers.TreeListMatcher.eqTreeList
 import com.effiban.scala2java.matchers.TreeMatcher.eqTree
 import com.effiban.scala2java.stubbers.OutputWriterStubber.doWrite
+import com.effiban.scala2java.testtrees.TypeNames
 import org.mockito.ArgumentMatchers
 
 import scala.meta.Term.Block
@@ -48,7 +49,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
         name = Term.Name("MyMethod"),
         tparams = List(),
         paramss = List(List(termParam("myParam", "String"))),
-        decltpe = Some(Type.Name("String")),
+        decltpe = Some(TypeNames.String),
         body = Block(List())
       )
     )
