@@ -1,4 +1,4 @@
-package effiban.scala2java
+package effiban.scala2java.entities
 
 object TraversalConstants {
   final val JavaPlaceholder = "__"

@@ -1,5 +1,7 @@
 package effiban.scala2java
 
+import effiban.scala2java.entities._
+
 trait JavaEmitter {
 
   def emitTypeDeclaration(modifiers: List[String], typeKeyword: String, name: String): Unit

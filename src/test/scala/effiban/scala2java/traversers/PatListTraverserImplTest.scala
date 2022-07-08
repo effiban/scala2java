@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.UnitTestSuite
 import effiban.scala2java.matchers.TreeListMatcher.eqTreeList
+import effiban.scala2java.testsuites.UnitTestSuite
 import org.mockito.ArgumentMatchers
 
 import scala.meta.{Pat, Term}

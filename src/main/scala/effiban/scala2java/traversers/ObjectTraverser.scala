@@ -1,8 +1,8 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java
-import effiban.scala2java.TraversalContext.javaOwnerContext
-import effiban.scala2java.{JavaEmitter, JavaModifiersResolver}
+import effiban.scala2java.entities.TraversalContext.javaOwnerContext
+import effiban.scala2java.resolvers.JavaModifiersResolver
+import effiban.scala2java.{JavaEmitter, entities}
 
 import scala.meta.Defn
 
@@ -24,7 +24,7 @@ private[scala2java] class ObjectTraverserImpl(annotListTraverser: => AnnotListTr
       typeKeyword = "class",
       name = s"${objectDef.name.toString}")
     val outerJavaOwnerContext = javaOwnerContext
-    javaOwnerContext = scala2java.Class
+    javaOwnerContext = entities.Class
     templateTraverser.traverse(objectDef.templ)
     javaOwnerContext = outerJavaOwnerContext
   }

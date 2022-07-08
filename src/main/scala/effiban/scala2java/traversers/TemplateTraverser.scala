@@ -1,7 +1,8 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.JavaEmitter
+import effiban.scala2java.entities.ClassInfo
 import effiban.scala2java.orderings.JavaTemplateChildOrdering
-import effiban.scala2java.{ClassInfo, JavaEmitter}
 
 import scala.meta.{Ctor, Defn, Init, Name, Stat, Template, Term, Tree, Type}
 

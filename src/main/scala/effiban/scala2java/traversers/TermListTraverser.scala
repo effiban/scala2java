@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.DualDelimiterType
+import effiban.scala2java.entities.DualDelimiterType
 
 import scala.meta.Term
 

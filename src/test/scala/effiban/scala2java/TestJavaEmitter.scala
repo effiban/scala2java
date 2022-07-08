@@ -1,5 +1,7 @@
 package effiban.scala2java
 
+import effiban.scala2java.entities._
+
 import java.io.StringWriter
 
 class TestJavaEmitter(sw: StringWriter) extends JavaEmitter {

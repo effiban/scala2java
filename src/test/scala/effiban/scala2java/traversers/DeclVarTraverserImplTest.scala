@@ -1,11 +1,13 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.TraversalContext.javaOwnerContext
+import effiban.scala2java.entities.TraversalContext.javaOwnerContext
+import effiban.scala2java.entities.{Class, Interface, Method}
 import effiban.scala2java.matchers.TreeListMatcher.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
+import effiban.scala2java.resolvers.JavaModifiersResolver
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
+import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
-import effiban.scala2java.{Class, Interface, JavaModifiersResolver, Method, UnitTestSuite}
 import org.mockito.ArgumentMatchers
 
 import scala.meta.{Decl, Init, Mod, Name, Pat, Term, Type}

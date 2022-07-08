@@ -1,4 +1,4 @@
-package effiban.scala2java
+package effiban.scala2java.entities
 
 import scala.meta.{Ctor, Type}
 

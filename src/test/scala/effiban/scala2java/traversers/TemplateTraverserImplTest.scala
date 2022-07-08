@@ -1,11 +1,12 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.entities
 import effiban.scala2java.matchers.TreeListMatcher.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.orderings.JavaTemplateChildOrdering
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
+import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.{Selfs, Templates, TypeNames}
-import effiban.scala2java.{ClassInfo, UnitTestSuite}
 import org.mockito.ArgumentMatchers.any
 
 import scala.meta.{Ctor, Decl, Defn, Init, Lit, Name, Pat, Self, Template, Term, Tree, Type}
@@ -146,7 +147,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
 
     templateTraverser.traverse(
       template = Templates.Empty,
-      maybeClassInfo = Some(ClassInfo(className = ClassName, maybePrimaryCtor = Some(PrimaryCtor)))
+      maybeClassInfo = Some(entities.ClassInfo(className = ClassName, maybePrimaryCtor = Some(PrimaryCtor)))
     )
 
     outputWriter.toString shouldBe
@@ -172,7 +173,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
 
     templateTraverser.traverse(
       template = template,
-      maybeClassInfo = Some(ClassInfo(className = ClassName, maybePrimaryCtor = Some(PrimaryCtor)))
+      maybeClassInfo = Some(entities.ClassInfo(className = ClassName, maybePrimaryCtor = Some(PrimaryCtor)))
     )
 
     outputWriter.toString shouldBe
@@ -208,7 +209,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
 
     templateTraverser.traverse(
       template = template,
-      maybeClassInfo = Some(ClassInfo(className = ClassName, maybePrimaryCtor = None))
+      maybeClassInfo = Some(entities.ClassInfo(className = ClassName, maybePrimaryCtor = None))
     )
 
     outputWriter.toString shouldBe
@@ -252,7 +253,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
 
     templateTraverser.traverse(
       template = template,
-      maybeClassInfo = Some(ClassInfo(className = ClassName, maybePrimaryCtor = Some(PrimaryCtor)))
+      maybeClassInfo = Some(entities.ClassInfo(className = ClassName, maybePrimaryCtor = Some(PrimaryCtor)))
     )
 
     outputWriter.toString shouldBe

@@ -1,12 +1,14 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.entities
 import effiban.scala2java.matchers.ClassInfoMatcher
 import effiban.scala2java.matchers.SomeMatcher.eqSome
 import effiban.scala2java.matchers.TreeListMatcher.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
+import effiban.scala2java.resolvers.JavaModifiersResolver
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
+import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.transformers.ParamToDeclValTransformer
-import effiban.scala2java.{ClassInfo, JavaModifiersResolver, UnitTestSuite}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 
@@ -123,7 +125,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(templateTraverser).traverse(
       eqTree(expectedAdjustedTemplate),
-      eqSome(ClassInfo(ClassName, Some(primaryCtor)), new ClassInfoMatcher(_))
+      eqSome(entities.ClassInfo(ClassName, Some(primaryCtor)), new ClassInfoMatcher(_))
     )
 
     classTraverser.traverse(cls)
@@ -184,7 +186,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(templateTraverser).traverse(
       eqTree(expectedAdjustedTemplate),
-      eqSome(ClassInfo(ClassName, Some(primaryCtor)), new ClassInfoMatcher(_))
+      eqSome(entities.ClassInfo(ClassName, Some(primaryCtor)), new ClassInfoMatcher(_))
     )
 
     classTraverser.traverse(cls)

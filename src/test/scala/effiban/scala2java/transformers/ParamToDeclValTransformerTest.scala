@@ -1,7 +1,7 @@
 package effiban.scala2java.transformers
 
-import effiban.scala2java.TraversalConstants.UnknownType
-import effiban.scala2java.UnitTestSuite
+import effiban.scala2java.entities.TraversalConstants.UnknownType
+import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
 
 import scala.meta.Mod.{Final, Private}

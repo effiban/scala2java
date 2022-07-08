@@ -1,6 +1,8 @@
-package effiban.scala2java
+package effiban.scala2java.testsuites
 
-import effiban.scala2java.TraversalContext.javaOwnerContext
+import effiban.scala2java.entities.NoOwner
+import effiban.scala2java.entities.TraversalContext.javaOwnerContext
+import effiban.scala2java.{JavaEmitter, TestJavaEmitter}
 import org.mockito.MockitoSugar
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers

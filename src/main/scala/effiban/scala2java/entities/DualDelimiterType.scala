@@ -1,4 +1,4 @@
-package effiban.scala2java
+package effiban.scala2java.entities
 
 sealed trait DualDelimiterType
 

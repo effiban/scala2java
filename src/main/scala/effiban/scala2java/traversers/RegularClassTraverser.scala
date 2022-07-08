@@ -1,9 +1,10 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java
-import effiban.scala2java.TraversalContext.javaOwnerContext
+import effiban.scala2java.entities.ClassInfo
+import effiban.scala2java.entities.TraversalContext.javaOwnerContext
+import effiban.scala2java.resolvers.JavaModifiersResolver
 import effiban.scala2java.transformers.ParamToDeclValTransformer
-import effiban.scala2java.{ClassInfo, JavaEmitter, JavaModifiersResolver}
+import effiban.scala2java.{JavaEmitter, entities}
 
 import scala.meta.Defn
 
@@ -26,7 +27,7 @@ private[scala2java] class RegularClassTraverserImpl(annotListTraverser: => Annot
       name = classDef.name.value)
     typeParamListTraverser.traverse(classDef.tparams)
     val outerJavaOwnerContext = javaOwnerContext
-    javaOwnerContext = scala2java.Class
+    javaOwnerContext = entities.Class
     val explicitMemberDecls = classDef.ctor.paramss.flatten.map(x =>
       paramToDeclValTransformer.transform(x)
     )
