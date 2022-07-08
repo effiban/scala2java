@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.entities.TraversalConstants.UnknownType
-import effiban.scala2java.entities.TraversalContext.javaOwnerContext
+import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{Interface, Method}
 import effiban.scala2java.resolvers.JavaModifiersResolver
 import effiban.scala2java.{JavaEmitter, entities}
@@ -26,7 +26,7 @@ private[scala2java] class DefnDefTraverserImpl(annotListTraverser: => AnnotListT
   override def traverse(defnDef: Defn.Def, maybeInit: Option[Init] = None): Unit = {
     emitLine()
     annotListTraverser.traverseMods(defnDef.mods)
-    val resolvedModifierNames = javaOwnerContext match {
+    val resolvedModifierNames = javaScope match {
       case Interface => javaModifiersResolver.resolveForInterfaceMethod(defnDef.mods, hasBody = true)
       case entities.Class => javaModifiersResolver.resolveForClassMethod(defnDef.mods)
       case _ => Nil
@@ -44,10 +44,10 @@ private[scala2java] class DefnDefTraverserImpl(annotListTraverser: => AnnotListT
     termNameTraverser.traverse(defnDef.name)
     //TODO handle method type params
 
-    val outerJavaOwnerContext = javaOwnerContext
-    javaOwnerContext = Method
+    val outerJavaScope = javaScope
+    javaScope = Method
     traverseMethodParamsAndBody(defnDef, maybeInit)
-    javaOwnerContext = outerJavaOwnerContext
+    javaScope = outerJavaScope
   }
 
   private def traverseMethodParamsAndBody(defDef: Defn.Def, maybeInit: Option[Init] = None): Unit = {

@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.entities.TraversalConstants.UnknownType
-import effiban.scala2java.entities.TraversalContext.javaOwnerContext
+import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{Interface, Method}
 import effiban.scala2java.resolvers.JavaModifiersResolver
 import effiban.scala2java.{JavaEmitter, entities}
@@ -25,10 +25,10 @@ private[scala2java] class DefnValTraverserImpl(annotListTraverser: => AnnotListT
     annotListTraverser.traverseMods(valDef.mods)
     val mods = valDef.mods :+ Final()
     val modifierNames = mods match {
-      case modifiers if javaOwnerContext == entities.Class => javaModifiersResolver.resolveForClassDataMember(modifiers)
-      case _ if javaOwnerContext == Interface => Nil
+      case modifiers if javaScope == entities.Class => javaModifiersResolver.resolveForClassDataMember(modifiers)
+      case _ if javaScope == Interface => Nil
       // The only possible modifier for a method param or local var is 'final'
-      case modifiers if javaOwnerContext == Method => javaModifiersResolver.resolve(modifiers, List(classOf[Final]))
+      case modifiers if javaScope == Method => javaModifiersResolver.resolve(modifiers, List(classOf[Final]))
       case _ => Nil
     }
     emitModifiers(modifierNames)
@@ -36,7 +36,7 @@ private[scala2java] class DefnValTraverserImpl(annotListTraverser: => AnnotListT
       case Some(declType) =>
         typeTraverser.traverse(declType)
         emit(" ")
-      case None if javaOwnerContext == Method => emit("var ")
+      case None if javaScope == Method => emit("var ")
       case None =>
         emitComment(UnknownType)
         emit(" ")

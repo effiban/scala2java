@@ -1,7 +1,7 @@
 package effiban.scala2java.transformers
 
 import effiban.scala2java.entities.Class
-import effiban.scala2java.entities.TraversalContext.javaOwnerContext
+import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
 import org.mockito.ArgumentMatchers.any
@@ -31,7 +31,7 @@ class CtorPrimaryTransformerImplTest extends UnitTestSuite {
   private val ctorPrimaryTransformer = new CtorPrimaryTransformerImpl(ctorInitsToSuperCallTransformer)
 
   test("traverse() when has no params and no super call") {
-    javaOwnerContext = Class
+    javaScope = Class
 
     val primaryCtor = Ctor.Primary(
       mods = Modifiers,
@@ -56,7 +56,7 @@ class CtorPrimaryTransformerImplTest extends UnitTestSuite {
   }
 
   test("traverse() when has no params and has super call") {
-    javaOwnerContext = Class
+    javaScope = Class
 
     val primaryCtor = Ctor.Primary(
       mods = Modifiers,
@@ -93,7 +93,7 @@ class CtorPrimaryTransformerImplTest extends UnitTestSuite {
 
 
   test("traverse() when has params and no super call") {
-    javaOwnerContext = Class
+    javaScope = Class
 
     val primaryCtor = Ctor.Primary(
       mods = Modifiers,
@@ -123,7 +123,7 @@ class CtorPrimaryTransformerImplTest extends UnitTestSuite {
   }
 
   test("traverse() when has params and super call") {
-    javaOwnerContext = Class
+    javaScope = Class
 
     val primaryCtor = Ctor.Primary(
       mods = Modifiers,

@@ -2,7 +2,7 @@ package effiban.scala2java.traversers
 
 import effiban.scala2java.JavaEmitter
 import effiban.scala2java.entities.Lambda
-import effiban.scala2java.entities.TraversalContext.javaOwnerContext
+import effiban.scala2java.entities.TraversalContext.javaScope
 
 import scala.meta.Term
 
@@ -17,15 +17,15 @@ private[scala2java] class TermFunctionTraverserImpl(termParamTraverser: => TermP
 
   // lambda definition
   override def traverse(function: Term.Function): Unit = {
-    val outerJavaOwnerContext = javaOwnerContext
-    javaOwnerContext = Lambda
+    val outerJavaScope = javaScope
+    javaScope = Lambda
     function.params match {
       case param :: Nil => termParamTraverser.traverse(param)
       case _ => termParamListTraverser.traverse(termParams = function.params, onSameLine = true)
     }
     emitArrow()
     termTraverser.traverse(function.body)
-    javaOwnerContext = outerJavaOwnerContext
+    javaScope = outerJavaScope
   }
 }
 

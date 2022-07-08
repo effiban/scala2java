@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.TraversalContext.javaOwnerContext
+import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{Class, Interface}
 import effiban.scala2java.matchers.SomeMatcher.eqSome
 import effiban.scala2java.matchers.TreeListMatcher.eqTreeList
@@ -67,7 +67,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     javaModifiersResolver)
 
   test("traverse() for class method with one statement returning int") {
-    javaOwnerContext = Class
+    javaScope = Class
 
     val defnDef = Defn.Def(
       mods = Modifiers,
@@ -110,7 +110,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for class method with one statement retuning Unit") {
-    javaOwnerContext = Class
+    javaScope = Class
 
     val defnDef = Defn.Def(
       mods = Modifiers,
@@ -153,7 +153,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for constructor") {
-    javaOwnerContext = Class
+    javaScope = Class
 
     val defnDef = Defn.Def(
       mods = Modifiers,
@@ -202,7 +202,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for class method with one statement missing return type") {
-    javaOwnerContext = Class
+    javaScope = Class
 
     val defnDef = Defn.Def(
       mods = Modifiers,
@@ -244,7 +244,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for class method with block") {
-    javaOwnerContext = Class
+    javaScope = Class
 
     val body = Block(stats = List(Statement1, Statement2))
 
@@ -289,7 +289,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for interface method with one list of params") {
-    javaOwnerContext = Interface
+    javaScope = Interface
 
     val defnDef = Defn.Def(
       mods = Modifiers,
@@ -333,7 +333,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for interface method with two lists of params") {
-    javaOwnerContext = Interface
+    javaScope = Interface
 
     val defnDef = Defn.Def(
       mods = Modifiers,

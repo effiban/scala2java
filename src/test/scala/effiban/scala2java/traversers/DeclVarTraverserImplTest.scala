@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.TraversalContext.javaOwnerContext
+import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{Class, Interface, Method}
 import effiban.scala2java.matchers.TreeListMatcher.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
@@ -34,7 +34,7 @@ class DeclVarTraverserImplTest extends UnitTestSuite {
 
 
   test("traverse() when it is a class member") {
-    javaOwnerContext = Class
+    javaScope = Class
 
     val modifiers = List(TheAnnot)
 
@@ -60,7 +60,7 @@ class DeclVarTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() when it is an interface member") {
-    javaOwnerContext = Interface
+    javaScope = Interface
 
     val modifiers: List[Mod] = List(TheAnnot)
 
@@ -85,7 +85,7 @@ class DeclVarTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() when it is a local variable") {
-    javaOwnerContext = Method
+    javaScope = Method
 
     val modifiers: List[Mod] = List(TheAnnot)
 

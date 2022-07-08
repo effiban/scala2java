@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.TraversalContext.javaOwnerContext
+import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{Class, Interface, Method}
 import effiban.scala2java.matchers.TreeListMatcher.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
@@ -40,7 +40,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
 
 
   test("traverse() when it is a class member - typed") {
-    javaOwnerContext = Class
+    javaScope = Class
 
     val initialModifiers: List[Mod] = List(TheAnnot)
     val adjustedModifiers = initialModifiers :+ Final()
@@ -69,7 +69,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() when it is a class member - untyped") {
-    javaOwnerContext = Class
+    javaScope = Class
 
     val initialModifiers: List[Mod] = List(TheAnnot)
     val adjustedModifiers = initialModifiers :+ Final()
@@ -97,7 +97,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() when it is an interface member - typed") {
-    javaOwnerContext = Interface
+    javaScope = Interface
 
     val modifiers: List[Mod] = List(TheAnnot)
 
@@ -124,7 +124,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() when it is an interface member - untyped") {
-    javaOwnerContext = Interface
+    javaScope = Interface
 
     val modifiers: List[Mod] = List(TheAnnot)
 
@@ -150,7 +150,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() when it is a local variable - typed") {
-    javaOwnerContext = Method
+    javaScope = Method
 
     val initialModifiers: List[Mod] = List(TheAnnot)
     val adjustedModifiers = initialModifiers :+ Final()
@@ -180,7 +180,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() when it is a local variable - untyped") {
-    javaOwnerContext = Method
+    javaScope = Method
 
     val initialModifiers: List[Mod] = List(TheAnnot)
     val adjustedModifiers = initialModifiers :+ Final()
