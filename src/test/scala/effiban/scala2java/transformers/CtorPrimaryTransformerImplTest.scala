@@ -1,8 +1,9 @@
 package effiban.scala2java.transformers
 
-import effiban.scala2java.TraversalContext.javaOwnerContext
+import effiban.scala2java.entities.Class
+import effiban.scala2java.entities.TraversalContext.javaOwnerContext
+import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
-import effiban.scala2java.{Class, UnitTestSuite}
 import org.mockito.ArgumentMatchers.any
 
 import scala.meta.Term.{Assign, Block, This}

@@ -1,6 +1,6 @@
 package effiban.scala2java.transformers
 
-import effiban.scala2java.TraversalConstants.UnknownType
+import effiban.scala2java.entities.TraversalConstants.UnknownType
 
 import scala.meta.Mod.{Final, Private}
 import scala.meta.{Decl, Name, Pat, Term, Type}

@@ -1,7 +1,8 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.entities.AngleBracket
 import effiban.scala2java.matchers.TreeListMatcher.eqTreeList
-import effiban.scala2java.{AngleBracket, UnitTestSuite}
+import effiban.scala2java.testsuites.UnitTestSuite
 import org.mockito.ArgumentMatchers
 
 import scala.meta.Type

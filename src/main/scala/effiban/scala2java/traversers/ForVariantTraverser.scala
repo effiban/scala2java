@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.JavaEmitter
-import effiban.scala2java.TraversalConstants.JavaPlaceholder
+import effiban.scala2java.entities.TraversalConstants.JavaPlaceholder
 
 import scala.meta.Term.{Apply, Param, Select}
 import scala.meta.{Enumerator, Lit, Pat, Term}

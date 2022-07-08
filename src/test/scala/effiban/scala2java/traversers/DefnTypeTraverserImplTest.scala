@@ -2,8 +2,9 @@ package effiban.scala2java.traversers
 
 import effiban.scala2java.matchers.TreeListMatcher.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
+import effiban.scala2java.resolvers.JavaModifiersResolver
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
-import effiban.scala2java.{JavaModifiersResolver, UnitTestSuite}
+import effiban.scala2java.testsuites.UnitTestSuite
 
 import scala.meta.Type.Bounds
 import scala.meta.{Defn, Init, Mod, Name, Type}

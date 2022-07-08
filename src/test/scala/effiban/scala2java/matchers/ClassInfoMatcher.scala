@@ -1,6 +1,6 @@
 package effiban.scala2java.matchers
 
-import effiban.scala2java.ClassInfo
+import effiban.scala2java.entities.ClassInfo
 import org.mockito.ArgumentMatcher
 import org.mockito.ArgumentMatchers.argThat
 

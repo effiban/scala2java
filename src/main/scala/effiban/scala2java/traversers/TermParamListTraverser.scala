@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.Parentheses
+import effiban.scala2java.entities.Parentheses
 
 import scala.meta.Term
 

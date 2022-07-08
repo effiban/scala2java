@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.UnitTestSuite
+import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.Selfs
 
 import scala.meta.{Name, Self, Type}

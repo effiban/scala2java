@@ -1,8 +1,9 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java
-import effiban.scala2java.TraversalContext.javaOwnerContext
-import effiban.scala2java.{ClassInfo, JavaEmitter, JavaModifiersResolver}
+import effiban.scala2java.entities.ClassInfo
+import effiban.scala2java.entities.TraversalContext.javaOwnerContext
+import effiban.scala2java.resolvers.JavaModifiersResolver
+import effiban.scala2java.{JavaEmitter, entities}
 
 import scala.meta.Defn
 
@@ -26,7 +27,7 @@ private[scala2java] class CaseClassTraverserImpl(annotListTraverser: => AnnotLis
     typeParamListTraverser.traverse(classDef.tparams)
     termParamListTraverser.traverse(classDef.ctor.paramss.flatten)
     val outerJavaOwnerContext = javaOwnerContext
-    javaOwnerContext = scala2java.Class
+    javaOwnerContext = entities.Class
     templateTraverser.traverse(template = classDef.templ, maybeClassInfo = Some(ClassInfo(className = classDef.name, maybePrimaryCtor = None)))
     javaOwnerContext = outerJavaOwnerContext
   }

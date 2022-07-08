@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.UnitTestSuite
 import effiban.scala2java.matchers.TreeMatcher.eqTree
+import effiban.scala2java.testsuites.UnitTestSuite
 
 import scala.meta.{Term, Type}
 

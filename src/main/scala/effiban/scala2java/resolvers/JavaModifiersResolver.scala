@@ -1,4 +1,4 @@
-package effiban.scala2java
+package effiban.scala2java.resolvers
 
 import scala.meta.Mod
 import scala.meta.Mod.{Abstract, Final, Private, Protected, Sealed}

@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.AngleBracket
+import effiban.scala2java.entities.AngleBracket
 
 import scala.meta.Type
 

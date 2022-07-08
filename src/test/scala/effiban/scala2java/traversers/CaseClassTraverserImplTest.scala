@@ -1,12 +1,14 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.entities
 import effiban.scala2java.matchers.ClassInfoMatcher
 import effiban.scala2java.matchers.SomeMatcher.eqSome
 import effiban.scala2java.matchers.TreeListMatcher.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
+import effiban.scala2java.resolvers.JavaModifiersResolver
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
+import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
-import effiban.scala2java.{ClassInfo, JavaModifiersResolver, UnitTestSuite}
 import org.mockito.ArgumentMatchers
 
 import scala.meta.Term.Block
@@ -104,7 +106,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
         | /* BODY */
         |}
         |""".stripMargin)
-      .when(templateTraverser).traverse(eqTree(TheTemplate), eqSome(ClassInfo(ClassName, None), new ClassInfoMatcher(_))
+      .when(templateTraverser).traverse(eqTree(TheTemplate), eqSome(entities.ClassInfo(ClassName, None), new ClassInfoMatcher(_))
     )
 
     classTraverser.traverse(cls)
@@ -151,7 +153,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
         | /* BODY */
         |}
         |""".stripMargin)
-      .when(templateTraverser).traverse(eqTree(TheTemplate), eqSome(ClassInfo(ClassName, None), new ClassInfoMatcher(_)))
+      .when(templateTraverser).traverse(eqTree(TheTemplate), eqSome(entities.ClassInfo(ClassName, None), new ClassInfoMatcher(_)))
 
     classTraverser.traverse(cls)
 

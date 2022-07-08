@@ -1,6 +1,7 @@
 package effiban.scala2java.transformers
 
-import effiban.scala2java.UnitTestSuite
+
+import effiban.scala2java.testsuites.UnitTestSuite
 
 import scala.meta.Term.This
 import scala.meta.{Name, Term, Type}

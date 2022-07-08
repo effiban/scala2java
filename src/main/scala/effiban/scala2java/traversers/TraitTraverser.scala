@@ -1,7 +1,9 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.TraversalContext.javaOwnerContext
-import effiban.scala2java.{Interface, JavaEmitter, JavaModifiersResolver}
+import effiban.scala2java.JavaEmitter
+import effiban.scala2java.entities.Interface
+import effiban.scala2java.entities.TraversalContext.javaOwnerContext
+import effiban.scala2java.resolvers.JavaModifiersResolver
 
 import scala.meta.Defn.Trait
 

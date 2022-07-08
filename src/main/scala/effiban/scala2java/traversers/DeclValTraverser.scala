@@ -1,8 +1,9 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java
-import effiban.scala2java.TraversalContext.javaOwnerContext
-import effiban.scala2java.{Interface, JavaEmitter, JavaModifiersResolver, Method}
+import effiban.scala2java.entities.TraversalContext.javaOwnerContext
+import effiban.scala2java.entities.{Interface, Method}
+import effiban.scala2java.resolvers.JavaModifiersResolver
+import effiban.scala2java.{JavaEmitter, entities}
 
 import scala.meta.Decl
 import scala.meta.Mod.Final
@@ -22,7 +23,7 @@ private[scala2java] class DeclValTraverserImpl(annotListTraverser: => AnnotListT
     annotListTraverser.traverseMods(valDecl.mods)
     val mods = valDecl.mods :+ Final()
     val modifierNames = javaOwnerContext match {
-      case scala2java.Class => javaModifiersResolver.resolveForClassDataMember(mods)
+      case entities.Class => javaModifiersResolver.resolveForClassDataMember(mods)
       //TODO replace interface data member (invalid in Java) with method
       case _ if javaOwnerContext == Interface => Nil
       // The only possible modifier for a local var is 'final'

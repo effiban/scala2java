@@ -1,9 +1,10 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java
-import effiban.scala2java.TraversalConstants.UnknownType
-import effiban.scala2java.TraversalContext.javaOwnerContext
-import effiban.scala2java.{Interface, JavaEmitter, JavaModifiersResolver, Method}
+import effiban.scala2java.entities.TraversalConstants.UnknownType
+import effiban.scala2java.entities.TraversalContext.javaOwnerContext
+import effiban.scala2java.entities.{Interface, Method}
+import effiban.scala2java.resolvers.JavaModifiersResolver
+import effiban.scala2java.{JavaEmitter, entities}
 
 import scala.meta.Term.Block
 import scala.meta.{Defn, Init, Term, Type}
@@ -27,7 +28,7 @@ private[scala2java] class DefnDefTraverserImpl(annotListTraverser: => AnnotListT
     annotListTraverser.traverseMods(defnDef.mods)
     val resolvedModifierNames = javaOwnerContext match {
       case Interface => javaModifiersResolver.resolveForInterfaceMethod(defnDef.mods, hasBody = true)
-      case scala2java.Class => javaModifiersResolver.resolveForClassMethod(defnDef.mods)
+      case entities.Class => javaModifiersResolver.resolveForClassMethod(defnDef.mods)
       case _ => Nil
     }
     emitModifiers(resolvedModifierNames)

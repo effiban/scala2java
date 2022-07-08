@@ -1,7 +1,8 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.TraversalContext.javaOwnerContext
-import effiban.scala2java.{JavaEmitter, Lambda}
+import effiban.scala2java.JavaEmitter
+import effiban.scala2java.entities.Lambda
+import effiban.scala2java.entities.TraversalContext.javaOwnerContext
 
 import scala.meta.Term
 
