@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.JavaEmitter
-import effiban.scala2java.entities.Interface
+import effiban.scala2java.entities.JavaScope.Interface
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.resolvers.JavaModifiersResolver
 

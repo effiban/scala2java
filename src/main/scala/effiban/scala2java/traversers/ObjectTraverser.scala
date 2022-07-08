@@ -1,8 +1,9 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.JavaEmitter
+import effiban.scala2java.entities.JavaScope
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.resolvers.JavaModifiersResolver
-import effiban.scala2java.{JavaEmitter, entities}
 
 import scala.meta.Defn
 
@@ -24,7 +25,7 @@ private[scala2java] class ObjectTraverserImpl(annotListTraverser: => AnnotListTr
       typeKeyword = "class",
       name = s"${objectDef.name.toString}")
     val outerJavaScope = javaScope
-    javaScope = entities.Class
+    javaScope = JavaScope.Class
     templateTraverser.traverse(objectDef.templ)
     javaScope = outerJavaScope
   }

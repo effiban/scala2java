@@ -1,7 +1,8 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.entities.JavaScope
+import effiban.scala2java.entities.JavaScope.{Interface, Method}
 import effiban.scala2java.entities.TraversalContext.javaScope
-import effiban.scala2java.entities.{Class, Interface, Method}
 import effiban.scala2java.matchers.TreeListMatcher.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.resolvers.JavaModifiersResolver
@@ -37,7 +38,7 @@ class DeclValTraverserImplTest extends UnitTestSuite {
 
 
   test("traverse() when it is a class member") {
-    javaScope = Class
+    javaScope = JavaScope.Class
 
     val initialModifiers: List[Mod] = List(TheAnnot)
     val adjustedModifiers = initialModifiers :+ Final()
