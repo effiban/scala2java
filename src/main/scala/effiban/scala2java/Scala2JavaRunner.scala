@@ -1,5 +1,7 @@
 package effiban.scala2java
 
+import effiban.scala2java.traversers.SourceTraverser
+
 import scala.meta.Source
 import scala.meta.inputs.Input
 
