@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.Parentheses
+import effiban.scala2java.entities.EnclosingDelimiter.Parentheses
 import effiban.scala2java.matchers.TreeListMatcher.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
@@ -40,7 +40,7 @@ class InitTraverserImplTest extends UnitTestSuite {
       .when(termListTraverser).traverse(
       eqTreeList(ArgList1),
       onSameLine = ArgumentMatchers.eq(false),
-      maybeDelimiterType = ArgumentMatchers.eq(Some(Parentheses))
+      maybeEnclosingDelimiter = ArgumentMatchers.eq(Some(Parentheses))
     )
 
     initTraverser.traverse(init)
@@ -67,7 +67,7 @@ class InitTraverserImplTest extends UnitTestSuite {
       .when(termListTraverser).traverse(
       eqTreeList(ArgList1 ++ ArgList2),
       onSameLine = ArgumentMatchers.eq(false),
-      maybeDelimiterType = ArgumentMatchers.eq(Some(Parentheses))
+      maybeEnclosingDelimiter = ArgumentMatchers.eq(Some(Parentheses))
     )
 
     initTraverser.traverse(init)

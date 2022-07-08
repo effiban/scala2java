@@ -31,7 +31,7 @@ class InitListTraverserImplTest extends UnitTestSuite {
       args = eqTreeList(List(init)),
       argTraverser = ArgumentMatchers.eq(initTraverser),
       onSameLine = ArgumentMatchers.eq(false),
-      maybeDelimiterType = ArgumentMatchers.eq(None)
+      maybeEnclosingDelimiter = ArgumentMatchers.eq(None)
     )
   }
 
@@ -45,7 +45,7 @@ class InitListTraverserImplTest extends UnitTestSuite {
       args = eqTreeList(List(init1, init2)),
       argTraverser = ArgumentMatchers.eq(initTraverser),
       onSameLine = ArgumentMatchers.eq(false),
-      maybeDelimiterType = ArgumentMatchers.eq(None)
+      maybeEnclosingDelimiter = ArgumentMatchers.eq(None)
     )
   }
 }

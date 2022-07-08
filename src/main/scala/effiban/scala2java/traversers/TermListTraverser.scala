@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.DualDelimiterType
+import effiban.scala2java.entities.EnclosingDelimiter.EnclosingDelimiter
 
 import scala.meta.Term
 
@@ -8,7 +8,7 @@ trait TermListTraverser {
 
   def traverse(terms: List[Term],
                onSameLine: Boolean = false,
-               maybeDelimiterType: Option[DualDelimiterType] = None): Unit
+               maybeEnclosingDelimiter: Option[EnclosingDelimiter] = None): Unit
 }
 
 private[scala2java] class TermListTraverserImpl(argumentListTraverser: => ArgumentListTraverser,
@@ -16,12 +16,12 @@ private[scala2java] class TermListTraverserImpl(argumentListTraverser: => Argume
 
   override def traverse(terms: List[Term],
                         onSameLine: Boolean = false,
-                        maybeDelimiterType: Option[DualDelimiterType] = None): Unit = {
+                        maybeEnclosingDelimiter: Option[EnclosingDelimiter] = None): Unit = {
     if (terms.nonEmpty) {
       argumentListTraverser.traverse(args = terms,
         argTraverser = termTraverser,
         onSameLine = onSameLine,
-        maybeDelimiterType = maybeDelimiterType)
+        maybeEnclosingDelimiter = maybeEnclosingDelimiter)
     }
   }
 }

@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.JavaEmitter
-import effiban.scala2java.entities.Parentheses
+import effiban.scala2java.entities.EnclosingDelimiter.Parentheses
 
 import scala.meta.Init
 
@@ -19,7 +19,7 @@ private[scala2java] class InitTraverserImpl(typeTraverser: => TypeTraverser,
 
     val args = init.argss.flatten
     if (args.nonEmpty) {
-      termListTraverser.traverse(init.argss.flatten, maybeDelimiterType = Some(Parentheses))
+      termListTraverser.traverse(init.argss.flatten, maybeEnclosingDelimiter = Some(Parentheses))
     }
   }
 }

@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.Parentheses
+import effiban.scala2java.entities.EnclosingDelimiter.Parentheses
 import effiban.scala2java.matchers.TreeListMatcher.eqTreeList
 import effiban.scala2java.testsuites.UnitTestSuite
 import org.mockito.ArgumentMatchers
@@ -23,7 +23,7 @@ class TermTupleTraverserImplTest extends UnitTestSuite {
     verify(termListTraverser).traverse(
       terms = eqTreeList(terms),
       onSameLine = ArgumentMatchers.eq(true),
-      maybeDelimiterType = ArgumentMatchers.eq(Some(Parentheses))
+      maybeEnclosingDelimiter = ArgumentMatchers.eq(Some(Parentheses))
     )
   }
 }

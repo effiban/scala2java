@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.Parentheses
+import effiban.scala2java.entities.EnclosingDelimiter.Parentheses
 import effiban.scala2java.matchers.TreeListMatcher.eqTreeList
 import effiban.scala2java.testsuites.UnitTestSuite
 import org.mockito.ArgumentMatchers
@@ -22,7 +22,7 @@ class TermParamListTraverserImplTest extends UnitTestSuite {
       args = ArgumentMatchers.eq(Nil),
       argTraverser = ArgumentMatchers.eq(termParamTraverser),
       onSameLine = ArgumentMatchers.eq(false),
-      maybeDelimiterType = ArgumentMatchers.eq(Some(Parentheses))
+      maybeEnclosingDelimiter = ArgumentMatchers.eq(Some(Parentheses))
     )
   }
 
@@ -35,7 +35,7 @@ class TermParamListTraverserImplTest extends UnitTestSuite {
       args = eqTreeList(List(param)),
       argTraverser = ArgumentMatchers.eq(termParamTraverser),
       onSameLine = ArgumentMatchers.eq(false),
-      maybeDelimiterType = ArgumentMatchers.eq(Some(Parentheses))
+      maybeEnclosingDelimiter = ArgumentMatchers.eq(Some(Parentheses))
     )
   }
 
@@ -48,7 +48,7 @@ class TermParamListTraverserImplTest extends UnitTestSuite {
       args = eqTreeList(List(param)),
       argTraverser = ArgumentMatchers.eq(termParamTraverser),
       onSameLine = ArgumentMatchers.eq(true),
-      maybeDelimiterType = ArgumentMatchers.eq(Some(Parentheses))
+      maybeEnclosingDelimiter = ArgumentMatchers.eq(Some(Parentheses))
     )
   }
 
@@ -62,7 +62,7 @@ class TermParamListTraverserImplTest extends UnitTestSuite {
       args = eqTreeList(List(param1, param2)),
       argTraverser = ArgumentMatchers.eq(termParamTraverser),
       onSameLine = ArgumentMatchers.eq(false),
-      maybeDelimiterType = ArgumentMatchers.eq(Some(Parentheses))
+      maybeEnclosingDelimiter = ArgumentMatchers.eq(Some(Parentheses))
     )
   }
 
@@ -76,7 +76,7 @@ class TermParamListTraverserImplTest extends UnitTestSuite {
       args = eqTreeList(List(param1, param2)),
       argTraverser = ArgumentMatchers.eq(termParamTraverser),
       onSameLine = ArgumentMatchers.eq(true),
-      maybeDelimiterType = ArgumentMatchers.eq(Some(Parentheses))
+      maybeEnclosingDelimiter = ArgumentMatchers.eq(Some(Parentheses))
     )
   }
 

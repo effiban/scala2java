@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.JavaEmitter
-import effiban.scala2java.entities.DualDelimiterType
+import effiban.scala2java.entities.EnclosingDelimiter.EnclosingDelimiter
 
 import scala.meta.Tree
 
@@ -9,7 +9,7 @@ trait ArgumentListTraverser {
   def traverse[T <: Tree](args: List[T],
                           argTraverser: ScalaTreeTraverser[T],
                           onSameLine: Boolean = false,
-                          maybeDelimiterType: Option[DualDelimiterType] = None): Unit
+                          maybeEnclosingDelimiter: Option[EnclosingDelimiter] = None): Unit
 }
 
 class ArgumentListTraverserImpl(implicit javaEmitter: JavaEmitter) extends ArgumentListTraverser {
@@ -19,8 +19,8 @@ class ArgumentListTraverserImpl(implicit javaEmitter: JavaEmitter) extends Argum
   override def traverse[T <: Tree](args: List[T],
                                    argTraverser: ScalaTreeTraverser[T],
                                    onSameLine: Boolean = false,
-                                   maybeWrappingDelimiterType: Option[DualDelimiterType] = None): Unit = {
-    maybeWrappingDelimiterType.foreach(emitArgumentsStart)
+                                   maybeEnclosingDelimiter: Option[EnclosingDelimiter] = None): Unit = {
+    maybeEnclosingDelimiter.foreach(emitArgumentsStart)
     args.zipWithIndex.foreach { case (tree, idx) =>
       argTraverser.traverse(tree)
       if (idx < args.size - 1) {
@@ -28,7 +28,7 @@ class ArgumentListTraverserImpl(implicit javaEmitter: JavaEmitter) extends Argum
         emitWhitespaceIfNeeded(args.size, onSameLine)
       }
     }
-    maybeWrappingDelimiterType.foreach(emitArgumentsEnd)
+    maybeEnclosingDelimiter.foreach(emitArgumentsEnd)
   }
 
   private def emitWhitespaceIfNeeded(numArgs: Int, onSameLine: Boolean): Unit = {
