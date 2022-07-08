@@ -1,11 +1,11 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
 import effiban.scala2java.entities.JavaScope
 import effiban.scala2java.entities.JavaScope.Method
 import effiban.scala2java.entities.TraversalConstants.UnknownType
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.resolvers.JavaModifiersResolver
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Defn
 
@@ -17,9 +17,9 @@ private[scala2java] class DefnVarTraverserImpl(annotListTraverser: => AnnotListT
                                                patListTraverser: => PatListTraverser,
                                                termTraverser: => TermTraverser,
                                                javaModifiersResolver: JavaModifiersResolver)
-                                              (implicit javaEmitter: JavaEmitter) extends DefnVarTraverser {
+                                              (implicit javaWriter: JavaWriter) extends DefnVarTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   override def traverse(varDef: Defn.Var): Unit = {
     annotListTraverser.traverseMods(varDef.mods)
@@ -27,21 +27,21 @@ private[scala2java] class DefnVarTraverserImpl(annotListTraverser: => AnnotListT
       case modifiers if javaScope == JavaScope.Class => javaModifiersResolver.resolveForClassDataMember(modifiers)
       case _ => Nil
     }
-    emitModifiers(modifierNames)
+    writeModifiers(modifierNames)
     varDef.decltpe match {
       case Some(declType) =>
         typeTraverser.traverse(declType)
-        emit(" ")
-      case None if javaScope == Method => emit("var ")
+        write(" ")
+      case None if javaScope == Method => write("var ")
       case None =>
-        emitComment(UnknownType)
-        emit(" ")
+        writeComment(UnknownType)
+        write(" ")
       case _ =>
     }
     //TODO - verify this
     patListTraverser.traverse(varDef.pats)
     varDef.rhs.foreach { rhs =>
-      emit(" = ")
+      write(" = ")
       termTraverser.traverse(rhs)
     }
   }

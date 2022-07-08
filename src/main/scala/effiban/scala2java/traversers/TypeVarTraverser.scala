@@ -1,19 +1,19 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Type
 
 trait TypeVarTraverser extends ScalaTreeTraverser[Type.Var]
 
-private[scala2java] class TypeVarTraverserImpl(implicit javaEmitter: JavaEmitter) extends TypeVarTraverser {
+private[scala2java] class TypeVarTraverserImpl(implicit javaWriter: JavaWriter) extends TypeVarTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   // Variable in type, e.g.: `t` in case _:List(t) =>
   // Unsupported in Java and no replacement I can think of
   override def traverse(typeVar: Type.Var): Unit = {
-    emitComment(typeVar.toString())
+    writeComment(typeVar.toString())
   }
 }
 

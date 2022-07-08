@@ -1,9 +1,9 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
 import effiban.scala2java.entities.JavaScope.Lambda
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.resolvers.JavaModifiersResolver
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Mod.Final
 import scala.meta.Term
@@ -14,9 +14,9 @@ private[scala2java] class TermParamTraverserImpl(annotListTraverser: => AnnotLis
                                                  typeTraverser: => TypeTraverser,
                                                  nameTraverser: => NameTraverser,
                                                  javaModifiersResolver: JavaModifiersResolver)
-                                                (implicit javaEmitter: JavaEmitter) extends TermParamTraverser {
+                                                (implicit javaWriter: JavaWriter) extends TermParamTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   // method parameter declaration
   override def traverse(termParam: Term.Param): Unit = {
@@ -26,10 +26,10 @@ private[scala2java] class TermParamTraverserImpl(annotListTraverser: => AnnotLis
       case _ => termParam.mods :+ Final()
     }
     val modifierNames = javaModifiersResolver.resolve(mods, List(classOf[Final]))
-    emitModifiers(modifierNames)
+    writeModifiers(modifierNames)
     termParam.decltpe.foreach(declType => {
       typeTraverser.traverse(declType)
-      emit(" ")
+      write(" ")
     })
     nameTraverser.traverse(termParam.name)
     // TODO handle 'default'

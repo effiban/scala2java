@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term
 
@@ -8,19 +8,19 @@ trait TermMatchTraverser extends ScalaTreeTraverser[Term.Match]
 
 private[scala2java] class TermMatchTraverserImpl(termTraverser: => TermTraverser,
                                                  caseTraverser: => CaseTraverser)
-                                                (implicit javaEmitter: JavaEmitter) extends TermMatchTraverser {
+                                                (implicit javaWriter: JavaWriter) extends TermMatchTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   override def traverse(termMatch: Term.Match): Unit = {
     //TODO handle mods (what is this in a 'match'?...)
-    emit("switch ")
-    emit("(")
+    write("switch ")
+    write("(")
     termTraverser.traverse(termMatch.expr)
-    emit(")")
-    emitBlockStart()
+    write(")")
+    writeBlockStart()
     termMatch.cases.foreach(caseTraverser.traverse)
-    emitBlockEnd()
+    writeBlockEnd()
   }
 }
 

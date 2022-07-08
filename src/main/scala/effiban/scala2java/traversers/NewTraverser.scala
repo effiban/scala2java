@@ -1,18 +1,18 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term.New
 
 trait NewTraverser extends ScalaTreeTraverser[New]
 
 private[scala2java] class NewTraverserImpl(initTraverser: => InitTraverser)
-                                          (implicit javaEmitter: JavaEmitter) extends NewTraverser {
+                                          (implicit javaWriter: JavaWriter) extends NewTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   override def traverse(`new`: New): Unit = {
-    emit("new ")
+    write("new ")
     initTraverser.traverse(`new`.init)
   }
 }

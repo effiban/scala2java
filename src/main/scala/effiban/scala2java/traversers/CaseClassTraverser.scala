@@ -1,9 +1,9 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{ClassInfo, JavaScope}
 import effiban.scala2java.resolvers.JavaModifiersResolver
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Defn
 
@@ -14,14 +14,14 @@ private[scala2java] class CaseClassTraverserImpl(annotListTraverser: => AnnotLis
                                                  termParamListTraverser: => TermParamListTraverser,
                                                  templateTraverser: => TemplateTraverser,
                                                  javaModifiersResolver: JavaModifiersResolver)
-                                                (implicit javaEmitter: JavaEmitter) extends CaseClassTraverser {
+                                                (implicit javaWriter: JavaWriter) extends CaseClassTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   def traverse(classDef: Defn.Class): Unit = {
-    emitLine()
+    writeLine()
     annotListTraverser.traverseMods(classDef.mods)
-    emitTypeDeclaration(modifiers = javaModifiersResolver.resolveForClass(classDef.mods),
+    writeTypeDeclaration(modifiers = javaModifiersResolver.resolveForClass(classDef.mods),
       typeKeyword = "record",
       name = classDef.name.value)
     typeParamListTraverser.traverse(classDef.tparams)

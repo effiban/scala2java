@@ -1,18 +1,18 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term.Throw
 
 trait ThrowTraverser extends ScalaTreeTraverser[Throw]
 
 private[scala2java] class ThrowTraverserImpl(termTraverser: => TermTraverser)
-                                            (implicit javaEmitter: JavaEmitter) extends ThrowTraverser {
+                                            (implicit javaWriter: JavaWriter) extends ThrowTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   override def traverse(`throw`: Throw): Unit = {
-    emit("throw ")
+    write("throw ")
     termTraverser.traverse(`throw`.expr)
   }
 }

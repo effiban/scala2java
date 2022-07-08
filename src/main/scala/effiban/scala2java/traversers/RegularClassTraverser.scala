@@ -1,10 +1,10 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{ClassInfo, JavaScope}
 import effiban.scala2java.resolvers.JavaModifiersResolver
 import effiban.scala2java.transformers.ParamToDeclValTransformer
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Defn
 
@@ -15,14 +15,14 @@ private[scala2java] class RegularClassTraverserImpl(annotListTraverser: => Annot
                                                     templateTraverser: => TemplateTraverser,
                                                     paramToDeclValTransformer: ParamToDeclValTransformer,
                                                     javaModifiersResolver: JavaModifiersResolver)
-                                                   (implicit javaEmitter: JavaEmitter) extends RegularClassTraverser {
+                                                   (implicit javaWriter: JavaWriter) extends RegularClassTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   def traverse(classDef: Defn.Class): Unit = {
-    emitLine()
+    writeLine()
     annotListTraverser.traverseMods(classDef.mods)
-    emitTypeDeclaration(modifiers = javaModifiersResolver.resolveForClass(classDef.mods),
+    writeTypeDeclaration(modifiers = javaModifiersResolver.resolveForClass(classDef.mods),
       typeKeyword = "class",
       name = classDef.name.value)
     typeParamListTraverser.traverse(classDef.tparams)

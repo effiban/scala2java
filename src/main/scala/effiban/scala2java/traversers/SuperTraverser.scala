@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Name
 import scala.meta.Term.Super
@@ -8,21 +8,21 @@ import scala.meta.Term.Super
 trait SuperTraverser extends ScalaTreeTraverser[Super]
 
 private[scala2java] class SuperTraverserImpl(nameTraverser: => NameTraverser)
-                                            (implicit javaEmitter: JavaEmitter) extends SuperTraverser {
+                                            (implicit javaWriter: JavaWriter) extends SuperTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   def traverse(`super`: Super): Unit = {
     `super`.thisp match {
       case Name.Anonymous() =>
       case name =>
         nameTraverser.traverse(name)
-        emit(".")
+        write(".")
     }
-    emit("super")
+    write("super")
     `super`.superp match {
       case Name.Anonymous() =>
-      case name => emitComment(s"extends ${name.value}")
+      case name => writeComment(s"extends ${name.value}")
     }
   }
 }

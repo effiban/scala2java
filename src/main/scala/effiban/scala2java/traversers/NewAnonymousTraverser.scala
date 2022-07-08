@@ -1,18 +1,18 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term.NewAnonymous
 
 trait NewAnonymousTraverser extends ScalaTreeTraverser[NewAnonymous]
 
 private[scala2java] class NewAnonymousTraverserImpl(templateTraverser: => TemplateTraverser)
-                                                   (implicit javaEmitter: JavaEmitter) extends NewAnonymousTraverser {
+                                                   (implicit javaWriter: JavaWriter) extends NewAnonymousTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   override def traverse(newAnonymous: NewAnonymous): Unit = {
-    emit("new ")
+    write("new ")
     templateTraverser.traverse(newAnonymous.templ)
   }
 }

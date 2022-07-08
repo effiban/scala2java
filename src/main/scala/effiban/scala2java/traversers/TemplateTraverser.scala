@@ -1,8 +1,8 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
 import effiban.scala2java.entities.ClassInfo
 import effiban.scala2java.orderings.JavaTemplateChildOrdering
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.{Ctor, Defn, Init, Name, Stat, Template, Term, Tree, Type}
 
@@ -18,9 +18,9 @@ private[scala2java] class TemplateTraverserImpl(initListTraverser: => InitListTr
                                                 ctorPrimaryTraverser: => CtorPrimaryTraverser,
                                                 ctorSecondaryTraverser: => CtorSecondaryTraverser,
                                                 javaTemplateChildOrdering: JavaTemplateChildOrdering)
-                                               (implicit javaEmitter: JavaEmitter) extends TemplateTraverser {
+                                               (implicit javaWriter: JavaWriter) extends TemplateTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   private val ParentsToSkip = Set(Term.Name("AnyRef"), Term.Name("Product"), Term.Name("Serializable"))
 
@@ -41,7 +41,7 @@ private[scala2java] class TemplateTraverserImpl(initListTraverser: => InitListTr
 
   private def traverseTemplateInits(relevantInits: List[Init]): Unit = {
     if (relevantInits.nonEmpty) {
-      emitInheritanceKeyword()
+      writeInheritanceKeyword()
       initListTraverser.traverse(relevantInits)
     }
   }
@@ -55,7 +55,7 @@ private[scala2java] class TemplateTraverserImpl(initListTraverser: => InitListTr
                                    maybeClassInfo: Option[ClassInfo] = None): Unit = {
     val children = statements ++ maybeClassInfo.flatMap(_.maybePrimaryCtor)
     val maybeClassName = maybeClassInfo.map(_.className)
-    emitBlockStart()
+    writeBlockStart()
     children.sorted(javaTemplateChildOrdering).foreach {
       case defnDef: Defn.Def => statTraverser.traverse(defnDef)
       case defnType: Defn.Type => statTraverser.traverse(defnType)
@@ -63,10 +63,10 @@ private[scala2java] class TemplateTraverserImpl(initListTraverser: => InitListTr
       case secondaryCtor: Ctor.Secondary => traverseSecondaryCtor(secondaryCtor, maybeClassName)
       case stat: Stat =>
         statTraverser.traverse(stat)
-        emitStatementEnd()
+        writeStatementEnd()
       case unexpected: Tree => throw new IllegalStateException(s"Unexpected template child: $unexpected")
     }
-    emitBlockEnd()
+    writeBlockEnd()
   }
 
   def traversePrimaryCtor(primaryCtor: Ctor.Primary,

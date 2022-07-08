@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.{Decl, Defn, Import, Pkg, Stat, Term}
 
@@ -11,9 +11,9 @@ private[scala2java] class StatTraverserImpl(termTraverser: => TermTraverser,
                                             pkgTraverser: => PkgTraverser,
                                             defnTraverser: => DefnTraverser,
                                             declTraverser: => DeclTraverser)
-                                           (implicit javaEmitter: JavaEmitter) extends StatTraverser {
+                                           (implicit javaWriter: JavaWriter) extends StatTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   override def traverse(stat: Stat): Unit = stat match {
     case term: Term => termTraverser.traverse(term)
@@ -21,7 +21,7 @@ private[scala2java] class StatTraverserImpl(termTraverser: => TermTraverser,
     case pkg: Pkg => pkgTraverser.traverse(pkg)
     case defn: Defn => defnTraverser.traverse(defn)
     case decl: Decl => declTraverser.traverse(decl)
-    case other => emitComment(s"UNSUPPORTED: $other")
+    case other => writeComment(s"UNSUPPORTED: $other")
   }
 
 }

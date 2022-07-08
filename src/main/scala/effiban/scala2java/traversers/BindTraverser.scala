@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Pat
 import scala.meta.Pat.Bind
@@ -8,14 +8,14 @@ import scala.meta.Pat.Bind
 trait BindTraverser extends ScalaTreeTraverser[Pat.Bind]
 
 private[scala2java] class BindTraverserImpl(patTraverser: => PatTraverser)
-                                           (implicit javaEmitter: JavaEmitter) extends BindTraverser {
+                                           (implicit javaWriter: JavaWriter) extends BindTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   // Pattern match bind variable, e.g.: a @ A().
   override def traverse(patternBind: Bind): Unit = {
     //TODO - consider supporting in Java by converting to a guard?
-    emitComment(patternBind.toString())
+    writeComment(patternBind.toString())
   }
 }
 

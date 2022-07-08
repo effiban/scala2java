@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
-import effiban.scala2java.JavaEmitter.emitComment
+import effiban.scala2java.writers.JavaWriter
+import effiban.scala2java.writers.JavaWriter.writeComment
 
 import scala.meta.Type
 
@@ -11,14 +11,14 @@ private[scala2java] class TypeRefTraverserImpl(typeNameTraverser: => TypeNameTra
                                                typeSelectTraverser: => TypeSelectTraverser,
                                                typeProjectTraverser: => TypeProjectTraverser,
                                                typeSingletonTraverser: => TypeSingletonTraverser)
-                                              (implicit javaEmitter: JavaEmitter) extends TypeRefTraverser {
+                                              (implicit javaWriter: JavaWriter) extends TypeRefTraverser {
 
   override def traverse(typeRef: Type.Ref): Unit = typeRef match {
     case typeName: Type.Name => typeNameTraverser.traverse(typeName)
     case typeSelect: Type.Select => typeSelectTraverser.traverse(typeSelect)
     case typeProject: Type.Project => typeProjectTraverser.traverse(typeProject)
     case typeSingleton: Type.Singleton => typeSingletonTraverser.traverse(typeSingleton)
-    case _ => emitComment(s"UNSUPPORTED: $typeRef")
+    case _ => writeComment(s"UNSUPPORTED: $typeRef")
   }
 }
 

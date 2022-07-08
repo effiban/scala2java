@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term
 import scala.meta.Term.ApplyType
@@ -10,9 +10,9 @@ trait ApplyTypeTraverser extends ScalaTreeTraverser[ApplyType]
 private[scala2java] class ApplyTypeTraverserImpl(typeTraverser: => TypeTraverser,
                                                  termTraverser: => TermTraverser,
                                                  typeListTraverser: => TypeListTraverser)
-                                                (implicit javaEmitter: JavaEmitter) extends ApplyTypeTraverser {
+                                                (implicit javaWriter: JavaWriter) extends ApplyTypeTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   // parametrized type application, e.g.: classOf[X], identity[X]
   override def traverse(termApplyType: ApplyType): Unit = {
@@ -21,13 +21,13 @@ private[scala2java] class ApplyTypeTraverserImpl(typeTraverser: => TypeTraverser
         termApplyType.targs match {
           case arg :: _ =>
             typeTraverser.traverse(arg)
-            emit(".class")
-          case _ => emit(s"UNPARSEABLE class type: $termApplyType")
+            write(".class")
+          case _ => write(s"UNPARSEABLE class type: $termApplyType")
         }
       case fun =>
         termTraverser.traverse(fun)
         if (termApplyType.targs.nonEmpty) {
-          emit(".")
+          write(".")
         }
         typeListTraverser.traverse(termApplyType.targs)
     }

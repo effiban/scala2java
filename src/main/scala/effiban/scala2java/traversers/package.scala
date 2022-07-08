@@ -1,6 +1,8 @@
 package effiban.scala2java
 
+import effiban.scala2java.writers.JavaWriter
+
 package object traversers {
 
-  implicit val javaEmitter: JavaEmitter = JavaEmitter
+  implicit val javaWriter: JavaWriter = JavaWriter
 }

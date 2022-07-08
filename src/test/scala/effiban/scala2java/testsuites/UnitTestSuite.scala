@@ -2,7 +2,8 @@ package effiban.scala2java.testsuites
 
 import effiban.scala2java.entities.JavaScope.NoScope
 import effiban.scala2java.entities.TraversalContext.javaScope
-import effiban.scala2java.{JavaEmitter, TestJavaEmitter}
+import effiban.scala2java.testwriters.TestJavaWriter
+import effiban.scala2java.writers.JavaWriter
 import org.mockito.MockitoSugar
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
@@ -18,7 +19,7 @@ class UnitTestSuite extends AnyFunSuite
   with BeforeAndAfterEach {
 
   implicit protected val outputWriter: StringWriter = new StringWriter()
-  implicit protected val javaEmitter: JavaEmitter = new TestJavaEmitter(outputWriter)
+  implicit protected val javaWriter: JavaWriter = new TestJavaWriter(outputWriter)
 
   override def beforeEach(): Unit = {
     super.beforeEach()

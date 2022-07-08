@@ -1,9 +1,9 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
 import effiban.scala2java.entities.JavaScope.Interface
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.resolvers.JavaModifiersResolver
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Defn.Trait
 
@@ -13,14 +13,14 @@ private[scala2java] class TraitTraverserImpl(annotListTraverser: => AnnotListTra
                                              typeParamListTraverser: => TypeParamListTraverser,
                                              templateTraverser: => TemplateTraverser,
                                              javaModifiersResolver: JavaModifiersResolver)
-                                            (implicit javaEmitter: JavaEmitter) extends TraitTraverser {
+                                            (implicit javaWriter: JavaWriter) extends TraitTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   override def traverse(traitDef: Trait): Unit = {
-    emitLine()
+    writeLine()
     annotListTraverser.traverseMods(traitDef.mods)
-    emitTypeDeclaration(modifiers = javaModifiersResolver.resolveForInterface(traitDef.mods),
+    writeTypeDeclaration(modifiers = javaModifiersResolver.resolveForInterface(traitDef.mods),
       typeKeyword = "interface",
       name = traitDef.name.toString)
     typeParamListTraverser.traverse(traitDef.tparams)

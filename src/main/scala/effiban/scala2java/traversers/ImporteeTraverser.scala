@@ -1,29 +1,29 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Importee
 
 trait ImporteeTraverser extends ScalaTreeTraverser[Importee]
 
 private[scala2java] class ImporteeTraverserImpl(nameTraverser: => NameTraverser)
-                                               (implicit javaEmitter: JavaEmitter) extends ImporteeTraverser {
+                                               (implicit javaWriter: JavaWriter) extends ImporteeTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   // A single imported element within an Importer (can be one name, wildcard etc. see below)
   override def traverse(importee: Importee): Unit = {
     importee match {
       case Importee.Name(name) => nameTraverser.traverse(name)
-      case Importee.Wildcard() => emit("*")
+      case Importee.Wildcard() => write("*")
       case Importee.Rename(name, rename) =>
         nameTraverser.traverse(name)
-        emit(" ")
-        emitComment(s"Renamed in Scala to '${rename.toString}'")
+        write(" ")
+        writeComment(s"Renamed in Scala to '${rename.toString}'")
       case Importee.Unimport(name) =>
         nameTraverser.traverse(name)
-        emit(" ")
-        emitComment(s"Hidden (unimported) in Scala")
+        write(" ")
+        writeComment(s"Hidden (unimported) in Scala")
     }
   }
 }

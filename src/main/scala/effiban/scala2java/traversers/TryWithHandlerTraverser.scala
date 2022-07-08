@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term
 import scala.meta.Term.{Block, TryWithHandler}
@@ -10,13 +10,13 @@ trait TryWithHandlerTraverser extends ScalaTreeTraverser[TryWithHandler]
 private[scala2java] class TryWithHandlerTraverserImpl(blockTraverser: => BlockTraverser,
                                                       catchHandlerTraverser: => CatchHandlerTraverser,
                                                       finallyTraverser: => FinallyTraverser)
-                                                     (implicit javaEmitter: JavaEmitter) extends TryWithHandlerTraverser {
+                                                     (implicit javaWriter: JavaWriter) extends TryWithHandlerTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   // TODO support return value flag
   override def traverse(tryWithHandler: TryWithHandler): Unit = {
-    emit("try")
+    write("try")
     tryWithHandler.expr match {
       case block: Block => blockTraverser.traverse(block)
       case stat => blockTraverser.traverse(Block(List(stat)))
@@ -24,8 +24,8 @@ private[scala2java] class TryWithHandlerTraverserImpl(blockTraverser: => BlockTr
     tryWithHandler.catchp match {
       case Term.Function(List(param), body) => catchHandlerTraverser.traverse(param, body)
       case _ =>
-        emitComment(s"UNPARSEABLE catch handler: ${tryWithHandler.catchp}")
-        emitLine()
+        writeComment(s"UNPARSEABLE catch handler: ${tryWithHandler.catchp}")
+        writeLine()
     }
     tryWithHandler.finallyp.foreach(finallyTraverser.traverse)
   }

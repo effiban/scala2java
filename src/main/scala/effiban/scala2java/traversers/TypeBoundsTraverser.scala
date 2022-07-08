@@ -1,15 +1,15 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Type
 
 trait TypeBoundsTraverser extends ScalaTreeTraverser[Type.Bounds]
 
 private[scala2java] class TypeBoundsTraverserImpl(typeTraverser: => TypeTraverser)
-                                                 (implicit javaEmitter: JavaEmitter) extends TypeBoundsTraverser {
+                                                 (implicit javaWriter: JavaWriter) extends TypeBoundsTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   // Scala type bounds e.g. X <: Y
   override def traverse(typeBounds: Type.Bounds): Unit = {
@@ -17,15 +17,15 @@ private[scala2java] class TypeBoundsTraverserImpl(typeTraverser: => TypeTraverse
     //TODO handle lower bound Null which can be skipped in Java
     (typeBounds.lo, typeBounds.hi) match {
       case (Some(lo), None) =>
-        emit(" super ")
+        write(" super ")
         typeTraverser.traverse(lo)
       case (None, Some(hi)) =>
-        emit(" extends ")
+        write(" extends ")
         typeTraverser.traverse(hi)
       case (None, None) =>
       case _ =>
-        // Both bounds provided - we can only emit a comment
-        emitComment(typeBounds.toString)
+        // Both bounds provided - we can only write a comment
+        writeComment(typeBounds.toString)
     }
   }
 }

@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
 import effiban.scala2java.entities.EnclosingDelimiter.Parentheses
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Init
 
@@ -9,7 +9,7 @@ trait InitTraverser extends ScalaTreeTraverser[Init]
 
 private[scala2java] class InitTraverserImpl(typeTraverser: => TypeTraverser,
                                             termListTraverser: => TermListTraverser)
-                                           (implicit javaEmitter: JavaEmitter) extends InitTraverser {
+                                           (implicit javaWriter: JavaWriter) extends InitTraverser {
 
   // An 'Init' is a parent of a type in its declaration
   override def traverse(init: Init): Unit = {

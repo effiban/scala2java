@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term
 import scala.meta.Term.Block
@@ -8,13 +8,13 @@ import scala.meta.Term.Block
 trait FinallyTraverser extends ScalaTreeTraverser[Term]
 
 private[scala2java] class FinallyTraverserImpl(blockTraverser: => BlockTraverser)
-                                              (implicit javaEmitter: JavaEmitter) extends FinallyTraverser {
+                                              (implicit javaWriter: JavaWriter) extends FinallyTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   // TODO support return value flag
   override def traverse(finallyp: Term): Unit = {
-    emit("finally")
+    write("finally")
     finallyp match {
       case block: Block => blockTraverser.traverse(block)
       case term => blockTraverser.traverse(Block(List(term)))

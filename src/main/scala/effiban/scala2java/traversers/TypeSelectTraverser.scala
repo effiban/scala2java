@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Type
 
@@ -8,14 +8,14 @@ trait TypeSelectTraverser extends ScalaTreeTraverser[Type.Select]
 
 private[scala2java] class TypeSelectTraverserImpl(termRefTraverser: => TermRefTraverser,
                                                   typeNameTraverser: => TypeNameTraverser)
-                                                 (implicit javaEmitter: JavaEmitter) extends TypeSelectTraverser {
+                                                 (implicit javaWriter: JavaWriter) extends TypeSelectTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   // A scala type selecting expression like: a.B
   override def traverse(typeSelect: Type.Select): Unit = {
     termRefTraverser.traverse(typeSelect.qual)
-    emit(".")
+    write(".")
     typeNameTraverser.traverse(typeSelect.name)
   }
 }

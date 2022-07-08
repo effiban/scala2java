@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Pat
 
@@ -8,14 +8,14 @@ trait PatTypedTraverser extends ScalaTreeTraverser[Pat.Typed]
 
 private[scala2java] class PatTypedTraverserImpl(typeTraverser: => TypeTraverser,
                                                 patTraverser: => PatTraverser)
-                                               (implicit javaEmitter: JavaEmitter) extends PatTypedTraverser {
+                                               (implicit javaWriter: JavaWriter) extends PatTypedTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   // Typed pattern expression, e.g. a: Int (in lhs of case clause)
   override def traverse(typedPattern: Pat.Typed): Unit = {
     typeTraverser.traverse(typedPattern.rhs)
-    emit(" ")
+    write(" ")
     patTraverser.traverse(typedPattern.lhs)
   }
 }

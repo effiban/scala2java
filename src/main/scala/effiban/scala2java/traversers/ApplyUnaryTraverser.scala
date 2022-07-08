@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term.ApplyUnary
 
@@ -8,7 +8,7 @@ trait ApplyUnaryTraverser extends ScalaTreeTraverser[ApplyUnary]
 
 private[scala2java] class ApplyUnaryTraverserImpl(termNameTraverser: => TermNameTraverser,
                                                   termTraverser: => TermTraverser)
-                                                 (implicit javaEmitter: JavaEmitter) extends ApplyUnaryTraverser {
+                                                 (implicit javaWriter: JavaWriter) extends ApplyUnaryTraverser {
 
   override def traverse(applyUnary: ApplyUnary): Unit = {
     termNameTraverser.traverse(applyUnary.op)
