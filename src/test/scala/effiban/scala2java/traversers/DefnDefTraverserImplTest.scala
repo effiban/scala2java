@@ -1,7 +1,8 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.entities.JavaScope
+import effiban.scala2java.entities.JavaScope.Interface
 import effiban.scala2java.entities.TraversalContext.javaScope
-import effiban.scala2java.entities.{Class, Interface}
 import effiban.scala2java.matchers.SomeMatcher.eqSome
 import effiban.scala2java.matchers.TreeListMatcher.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher
@@ -67,7 +68,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     javaModifiersResolver)
 
   test("traverse() for class method with one statement returning int") {
-    javaScope = Class
+    javaScope = JavaScope.Class
 
     val defnDef = Defn.Def(
       mods = Modifiers,
@@ -110,7 +111,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for class method with one statement retuning Unit") {
-    javaScope = Class
+    javaScope = JavaScope.Class
 
     val defnDef = Defn.Def(
       mods = Modifiers,
@@ -153,7 +154,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for constructor") {
-    javaScope = Class
+    javaScope = JavaScope.Class
 
     val defnDef = Defn.Def(
       mods = Modifiers,
@@ -202,7 +203,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for class method with one statement missing return type") {
-    javaScope = Class
+    javaScope = JavaScope.Class
 
     val defnDef = Defn.Def(
       mods = Modifiers,
@@ -244,7 +245,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for class method with block") {
-    javaScope = Class
+    javaScope = JavaScope.Class
 
     val body = Block(stats = List(Statement1, Statement2))
 

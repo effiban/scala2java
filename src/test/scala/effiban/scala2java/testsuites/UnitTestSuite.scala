@@ -1,6 +1,6 @@
 package effiban.scala2java.testsuites
 
-import effiban.scala2java.entities.NoOwner
+import effiban.scala2java.entities.JavaScope.NoScope
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.{JavaEmitter, TestJavaEmitter}
 import org.mockito.MockitoSugar
@@ -22,6 +22,6 @@ class UnitTestSuite extends AnyFunSuite
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    javaScope = NoOwner
+    javaScope = NoScope
   }
 }

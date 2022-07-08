@@ -1,8 +1,9 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.JavaEmitter
+import effiban.scala2java.entities.JavaScope
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.resolvers.JavaModifiersResolver
-import effiban.scala2java.{JavaEmitter, entities}
 
 import scala.meta.Decl
 
@@ -20,7 +21,7 @@ private[scala2java] class DeclVarTraverserImpl(annotListTraverser: => AnnotListT
   override def traverse(varDecl: Decl.Var): Unit = {
     annotListTraverser.traverseMods(varDecl.mods)
     val modifierNames = javaScope match {
-      case entities.Class => javaModifiersResolver.resolveForClassDataMember(varDecl.mods)
+      case JavaScope.Class => javaModifiersResolver.resolveForClassDataMember(varDecl.mods)
       case _ => Nil
     }
     emitModifiers(modifierNames)
