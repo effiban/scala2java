@@ -2,14 +2,14 @@ package com.effiban.scala2java
 
 import com.effiban.scala2java.matchers.TreeMatcher.eqTree
 import com.effiban.scala2java.stubbers.OutputWriterStubber.doWrite
-import com.effiban.scala2java.transformers.TypeSingletonTransformer
+import com.effiban.scala2java.transformers.TypeSingletonToTermTransformer
 
 import scala.meta.{Term, Type}
 
 class TypeSingletonTraverserImplTest extends UnitTestSuite {
 
   private val termTraverser = mock[TermTraverser]
-  private val typeSingletonTransformer = mock[TypeSingletonTransformer]
+  private val typeSingletonTransformer = mock[TypeSingletonToTermTransformer]
 
   private val typeSingletonTraverser = new TypeSingletonTraverserImpl(termTraverser, typeSingletonTransformer)
 

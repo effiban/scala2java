@@ -16,13 +16,13 @@ object TermInterpolateTransformer extends TermInterpolateTransformer {
       // TODO handle other interpolations
       case _ => None
     }
-
   }
 
   private def toJavaStringFormat(termInterpolate: Term.Interpolate) = {
+    val concatenatedParts = termInterpolate.parts.map(_.value).mkString("%s")
     Apply(
       fun = Select(Term.Name("String"), Term.Name("format")),
-      args = List(Lit.String(termInterpolate.parts.mkString("%s"))) ++ termInterpolate.args
+      args = List(Lit.String(concatenatedParts)) ++ termInterpolate.args
     )
   }
 }

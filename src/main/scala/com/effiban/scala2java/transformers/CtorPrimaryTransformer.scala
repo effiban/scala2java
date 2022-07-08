@@ -9,7 +9,7 @@ trait CtorPrimaryTransformer {
                 inits: List[Init]): Defn.Def
 }
 
-private[transformers] class CtorPrimaryStatTransformerImpl(templateInitsToSuperCallTransformer: TemplateInitsToSuperCallTransformer)
+private[transformers] class CtorPrimaryTransformerImpl(templateInitsToSuperCallTransformer: TemplateInitsToSuperCallTransformer)
   extends CtorPrimaryTransformer {
 
   def transform(primaryCtor: Ctor.Primary,
@@ -34,4 +34,4 @@ private[transformers] class CtorPrimaryStatTransformerImpl(templateInitsToSuperC
   }
 }
 
-object CtorPrimaryTransformer extends CtorPrimaryStatTransformerImpl(TemplateInitsToSuperCallTransformer)
+object CtorPrimaryTransformer extends CtorPrimaryTransformerImpl(TemplateInitsToSuperCallTransformer)
