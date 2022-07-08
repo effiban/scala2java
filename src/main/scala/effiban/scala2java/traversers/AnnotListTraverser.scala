@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Mod
 import scala.meta.Mod.Annot
@@ -12,16 +12,16 @@ trait AnnotListTraverser {
 }
 
 private[scala2java] class AnnotListTraverserImpl(annotTraverser: => AnnotTraverser)
-                                                (implicit javaEmitter: JavaEmitter) extends AnnotListTraverser {
-  import javaEmitter._
+                                                (implicit javaWriter: JavaWriter) extends AnnotListTraverser {
+  import javaWriter._
 
   override def traverseAnnotations(annotations: List[Annot], onSameLine: Boolean = false): Unit = {
     annotations.foreach(annotation => {
       annotTraverser.traverse(annotation)
       if (onSameLine) {
-        emit(" ")
+        write(" ")
       } else {
-        emitLine()
+        writeLine()
       }
     })
   }

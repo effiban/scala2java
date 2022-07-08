@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term
 import scala.meta.Term.{ApplyUnary, Super, This}
@@ -12,9 +12,9 @@ private[scala2java] class TermRefTraverserImpl(thisTraverser: => ThisTraverser,
                                                termNameTraverser: => TermNameTraverser,
                                                termSelectTraverser: => TermSelectTraverser,
                                                applyUnaryTraverser: => ApplyUnaryTraverser)
-                                              (implicit javaEmitter: JavaEmitter) extends TermRefTraverser {
+                                              (implicit javaWriter: JavaWriter) extends TermRefTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   override def traverse(termRef: Term.Ref): Unit = termRef match {
     case `this`: This => thisTraverser.traverse(`this`)
@@ -22,7 +22,7 @@ private[scala2java] class TermRefTraverserImpl(thisTraverser: => ThisTraverser,
     case termName: Term.Name => termNameTraverser.traverse(termName)
     case termSelect: Term.Select => termSelectTraverser.traverse(termSelect)
     case applyUnary: ApplyUnary => applyUnaryTraverser.traverse(applyUnary)
-    case _ => emitComment(s"UNSUPPORTED: $termRef")
+    case _ => writeComment(s"UNSUPPORTED: $termRef")
   }
 }
 

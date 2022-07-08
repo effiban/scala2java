@@ -1,20 +1,20 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term.Assign
 
 trait AssignTraverser extends ScalaTreeTraverser[Assign]
 
 private[scala2java] class AssignTraverserImpl(termTraverser: => TermTraverser)
-                                             (implicit javaEmitter: JavaEmitter) extends AssignTraverser {
+                                             (implicit javaWriter: JavaWriter) extends AssignTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   // Variable assignment
   override def traverse(assign: Assign): Unit = {
     termTraverser.traverse(assign.lhs)
-    emit(" = ")
+    write(" = ")
     termTraverser.traverse(assign.rhs)
   }
 }

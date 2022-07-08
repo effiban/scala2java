@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Type
 
@@ -8,14 +8,14 @@ trait TypeAnnotateTraverser extends ScalaTreeTraverser[Type.Annotate]
 
 private[scala2java] class TypeAnnotateTraverserImpl(annotListTraverser: => AnnotListTraverser,
                                                     typeTraverser: => TypeTraverser)
-                                                   (implicit javaEmitter: JavaEmitter) extends TypeAnnotateTraverser {
+                                                   (implicit javaWriter: JavaWriter) extends TypeAnnotateTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   // type with annotation, e.g.: T @annot
   override def traverse(annotatedType: Type.Annotate): Unit = {
     annotListTraverser.traverseAnnotations(annotations = annotatedType.annots, onSameLine = true)
-    emit(" ")
+    write(" ")
     typeTraverser.traverse(annotatedType.tpe)
   }
 }

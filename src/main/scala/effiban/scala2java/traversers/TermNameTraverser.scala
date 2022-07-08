@@ -1,17 +1,17 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term
 
 trait TermNameTraverser extends ScalaTreeTraverser[Term.Name]
 
-private[scala2java] class TermNameTraverserImpl(implicit javaEmitter: JavaEmitter) extends TermNameTraverser {
+private[scala2java] class TermNameTraverserImpl(implicit javaWriter: JavaWriter) extends TermNameTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   override def traverse(name: Term.Name): Unit = {
-    emit(toJavaName(name))
+    write(toJavaName(name))
   }
 
   private def toJavaName(termName: Term.Name) = {

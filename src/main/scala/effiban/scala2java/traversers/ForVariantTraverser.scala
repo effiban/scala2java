@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
 import effiban.scala2java.entities.TraversalConstants.JavaPlaceholder
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term.{Apply, Param, Select}
 import scala.meta.{Enumerator, Lit, Pat, Term}
@@ -11,9 +11,9 @@ trait ForVariantTraverser {
 }
 
 private[scala2java] class ForVariantTraverserImpl(termTraverser: => TermTraverser)
-                                                 (implicit javaEmitter: JavaEmitter) extends ForVariantTraverser {
+                                                 (implicit javaWriter: JavaWriter) extends ForVariantTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   override def traverse(enumerators: List[Enumerator],
                         body: Term,
@@ -26,7 +26,7 @@ private[scala2java] class ForVariantTraverserImpl(termTraverser: => TermTraverse
                            finalFunctionName: Term.Name): Term = {
     enumerators match {
       case Nil =>
-        emitComment("ERROR - for comprehension without enumerators")
+        writeComment("ERROR - for comprehension without enumerators")
         Lit.Unit()
       case theEnumerators =>
         val currentEnumerator :: nextEnumerators = theEnumerators

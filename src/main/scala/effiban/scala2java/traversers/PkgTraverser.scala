@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Pkg
 
@@ -8,15 +8,15 @@ trait PkgTraverser extends ScalaTreeTraverser[Pkg]
 
 private[scala2java] class PkgTraverserImpl(termRefTraverser: => TermRefTraverser,
                                            statTraverser: => StatTraverser)
-                                          (implicit javaEmitter: JavaEmitter) extends PkgTraverser {
+                                          (implicit javaWriter: JavaWriter) extends PkgTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   override def traverse(pkg: Pkg): Unit = {
-    emit("package ")
+    write("package ")
     termRefTraverser.traverse(pkg.ref)
-    emitStatementEnd()
-    emitLine()
+    writeStatementEnd()
+    writeLine()
     pkg.stats.foreach(statTraverser.traverse)
   }
 }

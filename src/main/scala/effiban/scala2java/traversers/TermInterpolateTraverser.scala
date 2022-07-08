@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
 import effiban.scala2java.transformers.TermInterpolateTransformer
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term
 
@@ -9,14 +9,14 @@ trait TermInterpolateTraverser extends ScalaTreeTraverser[Term.Interpolate]
 
 private[scala2java] class TermInterpolateTraverserImpl(termInterpolateTransformer: TermInterpolateTransformer,
                                                        termApplyTraverser: => TermApplyTraverser)
-                                                      (implicit javaEmitter: JavaEmitter) extends TermInterpolateTraverser {
+                                                      (implicit javaWriter: JavaWriter) extends TermInterpolateTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   override def traverse(termInterpolate: Term.Interpolate): Unit = {
     termInterpolateTransformer.transform(termInterpolate) match {
       case Some(termApply) => termApplyTraverser.traverse(termApply)
-      case _ => emitComment(s"UNSUPPORTED interpolation: $termInterpolate")
+      case _ => writeComment(s"UNSUPPORTED interpolation: $termInterpolate")
     }
   }
 }

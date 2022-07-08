@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term.{AnonymousFunction, ApplyType, Ascribe, Assign, Block, Do, Eta, For, ForYield, If, New, NewAnonymous, Return, Throw, Try, TryWithHandler, While}
 import scala.meta.{Lit, Term}
@@ -36,9 +36,9 @@ private[scala2java] class TermTraverserImpl(termRefTraverser: => TermRefTraverse
                                             termRepeatedTraverser: => TermRepeatedTraverser,
                                             termInterpolateTraverser: => TermInterpolateTraverser,
                                             litTraverser: => LitTraverser)
-                                           (implicit javaEmitter: JavaEmitter) extends TermTraverser {
+                                           (implicit javaWriter: JavaWriter) extends TermTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   override def traverse(term: Term): Unit = term match {
     case termRef: Term.Ref => termRefTraverser.traverse(termRef)
@@ -70,7 +70,7 @@ private[scala2java] class TermTraverserImpl(termRefTraverser: => TermRefTraverse
     case termRepeated: Term.Repeated => termRepeatedTraverser.traverse(termRepeated)
     case interpolate: Term.Interpolate => termInterpolateTraverser.traverse(interpolate)
     case literal: Lit => litTraverser.traverse(literal)
-    case _ => emitComment(s"UNSUPPORTED: $term")
+    case _ => writeComment(s"UNSUPPORTED: $term")
   }
 }
 

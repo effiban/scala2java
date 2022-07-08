@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Name
 import scala.meta.Term.This
@@ -8,18 +8,18 @@ import scala.meta.Term.This
 trait ThisTraverser extends ScalaTreeTraverser[This]
 
 private[scala2java] class ThisTraverserImpl(nameTraverser: => NameTraverser)
-                                           (implicit javaEmitter: JavaEmitter) extends ThisTraverser {
+                                           (implicit javaWriter: JavaWriter) extends ThisTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   override def traverse(`this`: This): Unit = {
     `this`.qual match {
       case Name.Anonymous() =>
       case name =>
         nameTraverser.traverse(name)
-        emit(".")
+        write(".")
     }
-    emit("this")
+    write("this")
   }
 }
 

@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term
 import scala.meta.Term.Block
@@ -11,13 +11,13 @@ trait CatchHandlerTraverser {
 
 private[scala2java] class CatchHandlerTraverserImpl(termParamListTraverser: => TermParamListTraverser,
                                                     blockTraverser: => BlockTraverser)
-                                                   (implicit javaEmitter: JavaEmitter) extends CatchHandlerTraverser {
+                                                   (implicit javaWriter: JavaWriter) extends CatchHandlerTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   // TODO - support return value flag
   override def traverse(param: Term.Param, body: Term): Unit = {
-    emit("catch ")
+    write("catch ")
     termParamListTraverser.traverse(termParams = List(param), onSameLine = true)
     body match {
       case block: Block => blockTraverser.traverse(block)

@@ -1,14 +1,14 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Lit
 
 trait LitTraverser extends ScalaTreeTraverser[Lit]
 
-class LitTraverserImpl(implicit javaEmitter: JavaEmitter) extends LitTraverser {
+class LitTraverserImpl(implicit javaWriter: JavaWriter) extends LitTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   // Literals in the code
   override def traverse(lit: Lit): Unit = {
@@ -20,7 +20,7 @@ class LitTraverserImpl(implicit javaEmitter: JavaEmitter) extends LitTraverser {
       case _: Lit.Null => "null"
       case other => other.value.toString
     }
-    emit(strValue)
+    write(strValue)
   }
 
   private def fixString(str: String) = {

@@ -1,8 +1,8 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
 import effiban.scala2java.entities.JavaScope.Lambda
 import effiban.scala2java.entities.TraversalContext.javaScope
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term
 
@@ -11,9 +11,9 @@ trait TermFunctionTraverser extends ScalaTreeTraverser[Term.Function]
 private[scala2java] class TermFunctionTraverserImpl(termParamTraverser: => TermParamTraverser,
                                                     termParamListTraverser: => TermParamListTraverser,
                                                     termTraverser: => TermTraverser)
-                                                   (implicit javaEmitter: JavaEmitter) extends TermFunctionTraverser {
+                                                   (implicit javaWriter: JavaWriter) extends TermFunctionTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   // lambda definition
   override def traverse(function: Term.Function): Unit = {
@@ -23,7 +23,7 @@ private[scala2java] class TermFunctionTraverserImpl(termParamTraverser: => TermP
       case param :: Nil => termParamTraverser.traverse(param)
       case _ => termParamListTraverser.traverse(termParams = function.params, onSameLine = true)
     }
-    emitArrow()
+    writeArrow()
     termTraverser.traverse(function.body)
     javaScope = outerJavaScope
   }

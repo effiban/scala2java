@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term.{Block, If, Return, While}
 import scala.meta.{Init, Stat, Term}
@@ -14,20 +14,20 @@ private[scala2java] class BlockTraverserImpl(initTraverser: => InitTraverser,
                                              whileTraverser: WhileTraverser,
                                              returnTraverser: ReturnTraverser,
                                              statTraverser: => StatTraverser)
-                                            (implicit javaEmitter: JavaEmitter) extends BlockTraverser {
+                                            (implicit javaWriter: JavaWriter) extends BlockTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   // The 'init' param is passed by constructors, whose first statement must be a call to super or other ctor.
   // 'Init' does not inherit from 'Stat' so we can't add it to the Block
   override def traverse(block: Block, shouldReturnValue: Boolean = false, maybeInit: Option[Init] = None): Unit = {
-    emitBlockStart()
+    writeBlockStart()
     maybeInit.foreach(init => {
       initTraverser.traverse(init)
-      emitStatementEnd()
+      writeStatementEnd()
     })
     traverseContents(block, shouldReturnValue)
-    emitBlockEnd()
+    writeBlockEnd()
   }
 
   private def traverseContents(block: Block, shouldReturnValue: Boolean): Unit = {
@@ -44,10 +44,10 @@ private[scala2java] class BlockTraverserImpl(initTraverser: => InitTraverser,
       case `while`: While => whileTraverser.traverse(`while`)
       case term: Term if shouldReturnValue =>
         returnTraverser.traverse(Return(term))
-        emitStatementEnd();
+        writeStatementEnd();
       case _ =>
         statTraverser.traverse(stat)
-        emitStatementEnd()
+        writeStatementEnd()
     }
   }
 }

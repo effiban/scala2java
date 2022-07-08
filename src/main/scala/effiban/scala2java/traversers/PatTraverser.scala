@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Pat.{Alternative, Bind}
 import scala.meta.{Lit, Pat, Term}
@@ -18,9 +18,9 @@ private[scala2java] class PatTraverserImpl(termNameTraverser: => TermNameTravers
                                            patExtractInfixTraverser: => PatExtractInfixTraverser,
                                            patInterpolateTraverser: => PatInterpolateTraverser,
                                            patTypedTraverser: => PatTypedTraverser)
-                                          (implicit javaEmitter: JavaEmitter) extends PatTraverser {
+                                          (implicit javaWriter: JavaWriter) extends PatTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   override def traverse(pat: Pat): Unit = pat match {
     case lit: Lit => LitTraverser.traverse(lit)
@@ -35,7 +35,7 @@ private[scala2java] class PatTraverserImpl(termNameTraverser: => TermNameTravers
     case patternExtractInfix: Pat.ExtractInfix => patExtractInfixTraverser.traverse(patternExtractInfix)
     case patternInterpolate: Pat.Interpolate => patInterpolateTraverser.traverse(patternInterpolate)
     case patternTyped: Pat.Typed => patTypedTraverser.traverse(patternTyped)
-    case _ => emitComment(s"UNSUPPORTED: $pat")
+    case _ => writeComment(s"UNSUPPORTED: $pat")
   }
 }
 

@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term.{Block, If}
 import scala.meta.{Lit, Term}
@@ -11,20 +11,20 @@ trait IfTraverser {
 
 private[scala2java] class IfTraverserImpl(termTraverser: => TermTraverser,
                                           blockTraverser: => BlockTraverser)
-                                         (implicit javaEmitter: JavaEmitter) extends IfTraverser {
+                                         (implicit javaWriter: JavaWriter) extends IfTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   override def traverse(`if`: If, shouldReturnValue: Boolean = false): Unit = {
     //TODO handle mods (what do they represent in an 'if'?...)
-    emit("if (")
+    write("if (")
     termTraverser.traverse(`if`.cond)
-    emit(")")
+    write(")")
     traverseClause(`if`.thenp, shouldReturnValue)
     `if`.elsep match {
       case Lit.Unit() =>
       case elsep =>
-        emit("else")
+        write("else")
         traverseClause(elsep, shouldReturnValue)
     }
   }

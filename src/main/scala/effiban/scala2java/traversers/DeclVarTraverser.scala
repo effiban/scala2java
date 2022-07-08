@@ -1,9 +1,9 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
 import effiban.scala2java.entities.JavaScope
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.resolvers.JavaModifiersResolver
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Decl
 
@@ -14,9 +14,9 @@ private[scala2java] class DeclVarTraverserImpl(annotListTraverser: => AnnotListT
                                                typeTraverser: => TypeTraverser,
                                                patListTraverser: => PatListTraverser,
                                                javaModifiersResolver: JavaModifiersResolver)
-                                              (implicit javaEmitter: JavaEmitter) extends DeclVarTraverser {
+                                              (implicit javaWriter: JavaWriter) extends DeclVarTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   override def traverse(varDecl: Decl.Var): Unit = {
     annotListTraverser.traverseMods(varDecl.mods)
@@ -24,9 +24,9 @@ private[scala2java] class DeclVarTraverserImpl(annotListTraverser: => AnnotListT
       case JavaScope.Class => javaModifiersResolver.resolveForClassDataMember(varDecl.mods)
       case _ => Nil
     }
-    emitModifiers(modifierNames)
+    writeModifiers(modifierNames)
     typeTraverser.traverse(varDecl.decltpe)
-    emit(" ")
+    write(" ")
     //TODO - verify when not simple case
     patListTraverser.traverse(varDecl.pats)
   }

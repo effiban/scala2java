@@ -1,11 +1,11 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
 import effiban.scala2java.entities.JavaScope
 import effiban.scala2java.entities.JavaScope.{Interface, Method}
 import effiban.scala2java.entities.TraversalConstants.UnknownType
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.resolvers.JavaModifiersResolver
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term.Block
 import scala.meta.{Defn, Init, Term, Type}
@@ -20,27 +20,27 @@ private[scala2java] class DefnDefTraverserImpl(annotListTraverser: => AnnotListT
                                                termParamListTraverser: => TermParamListTraverser,
                                                blockTraverser: => BlockTraverser,
                                                javaModifiersResolver: JavaModifiersResolver)
-                                              (implicit javaEmitter: JavaEmitter) extends DefnDefTraverser {
+                                              (implicit javaWriter: JavaWriter) extends DefnDefTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   override def traverse(defnDef: Defn.Def, maybeInit: Option[Init] = None): Unit = {
-    emitLine()
+    writeLine()
     annotListTraverser.traverseMods(defnDef.mods)
     val resolvedModifierNames = javaScope match {
       case Interface => javaModifiersResolver.resolveForInterfaceMethod(defnDef.mods, hasBody = true)
       case JavaScope.Class => javaModifiersResolver.resolveForClassMethod(defnDef.mods)
       case _ => Nil
     }
-    emitModifiers(resolvedModifierNames)
+    writeModifiers(resolvedModifierNames)
     defnDef.decltpe match {
       case Some(Type.AnonymousName()) =>
       case Some(tpe) =>
         typeTraverser.traverse(tpe)
-        emit(" ")
+        write(" ")
       case None =>
-        emitComment(UnknownType)
-        emit(" ")
+        writeComment(UnknownType)
+        write(" ")
     }
     termNameTraverser.traverse(defnDef.name)
     //TODO handle method type params

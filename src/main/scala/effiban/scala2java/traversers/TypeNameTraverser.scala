@@ -1,19 +1,19 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
 import effiban.scala2java.transformers.ScalaToJavaTypeNameTransformer
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Type
 
 trait TypeNameTraverser extends ScalaTreeTraverser[Type.Name]
 
 private[scala2java] class TypeNameTraverserImpl(scalaToJavaTypeNameTransformer: ScalaToJavaTypeNameTransformer)
-                                               (implicit javaEmitter: JavaEmitter) extends TypeNameTraverser {
+                                               (implicit javaWriter: JavaWriter) extends TypeNameTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   override def traverse(name: Type.Name): Unit = {
-    emit(scalaToJavaTypeNameTransformer.transform(name))
+    write(scalaToJavaTypeNameTransformer.transform(name))
   }
 }
 

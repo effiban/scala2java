@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
 import effiban.scala2java.entities.EnclosingDelimiter.Parentheses
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term.Ascribe
 
@@ -9,16 +9,16 @@ trait AscribeTraverser extends ScalaTreeTraverser[Ascribe]
 
 private[scala2java] class AscribeTraverserImpl(typeTraverser: => TypeTraverser,
                                                termTraverser: => TermTraverser)
-                                              (implicit javaEmitter: JavaEmitter) extends AscribeTraverser {
+                                              (implicit javaWriter: JavaWriter) extends AscribeTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   // Explicitly specified type, e.g.: x = 2:Short
   // Java equivalent is casting. e.g. x = (short)2
   override def traverse(ascribe: Ascribe): Unit = {
-    emitStartDelimiter(Parentheses)
+    writeStartDelimiter(Parentheses)
     typeTraverser.traverse(ascribe.tpe)
-    emitEndDelimiter(Parentheses)
+    writeEndDelimiter(Parentheses)
     termTraverser.traverse(ascribe.expr)
   }
 }

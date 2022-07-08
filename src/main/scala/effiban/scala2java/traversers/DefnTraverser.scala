@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
-import effiban.scala2java.JavaEmitter.emitComment
+import effiban.scala2java.writers.JavaWriter
+import effiban.scala2java.writers.JavaWriter.writeComment
 
 import scala.meta.Defn
 import scala.meta.Defn.Trait
@@ -15,7 +15,7 @@ private[scala2java] class DefnTraverserImpl(defnValTraverser: => DefnValTraverse
                                             classTraverser: => ClassTraverser,
                                             traitTraverser: => TraitTraverser,
                                             objectTraverser: => ObjectTraverser)
-                                           (implicit javaEmitter: JavaEmitter) extends DefnTraverser {
+                                           (implicit javaWriter: JavaWriter) extends DefnTraverser {
 
   override def traverse(defn: Defn): Unit = defn match {
     case valDef: Defn.Val => defnValTraverser.traverse(valDef)
@@ -25,7 +25,7 @@ private[scala2java] class DefnTraverserImpl(defnValTraverser: => DefnValTraverse
     case classDef: Defn.Class => classTraverser.traverse(classDef)
     case traitDef: Trait => traitTraverser.traverse(traitDef)
     case objectDef: Defn.Object => objectTraverser.traverse(objectDef)
-    case _ => emitComment(s"UNSUPPORTED: $defn")
+    case _ => writeComment(s"UNSUPPORTED: $defn")
   }
 }
 

@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.JavaEmitter
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Type
 
@@ -20,9 +20,9 @@ private[scala2java] class TypeTraverserImpl(typeRefTraverser: => TypeRefTraverse
                                             typeByNameTraverser: => TypeByNameTraverser,
                                             typeRepeatedTraverser: => TypeRepeatedTraverser,
                                             typeVarTraverser: => TypeVarTraverser)
-                                           (implicit javaEmitter: JavaEmitter) extends TypeTraverser {
+                                           (implicit javaWriter: JavaWriter) extends TypeTraverser {
 
-  import javaEmitter._
+  import javaWriter._
 
   override def traverse(`type`: Type): Unit = `type` match {
     case typeRef: Type.Ref => typeRefTraverser.traverse(typeRef)
@@ -39,7 +39,7 @@ private[scala2java] class TypeTraverserImpl(typeRefTraverser: => TypeRefTraverse
     case byNameType: Type.ByName => typeByNameTraverser.traverse(byNameType)
     case repeatedType: Type.Repeated => typeRepeatedTraverser.traverse(repeatedType)
     case typeVar: Type.Var => typeVarTraverser.traverse(typeVar)
-    case _ => emitComment(s"UNSUPPORTED: ${`type`}")
+    case _ => writeComment(s"UNSUPPORTED: ${`type`}")
   }
 }
 
