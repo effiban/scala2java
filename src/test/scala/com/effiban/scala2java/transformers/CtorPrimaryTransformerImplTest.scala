@@ -27,7 +27,7 @@ class CtorPrimaryTransformerImplTest extends UnitTestSuite {
 
   private val ctorInitsToSuperCallTransformer: TemplateInitsToSuperCallTransformer = mock[TemplateInitsToSuperCallTransformer]
 
-  private val ctorPrimaryTransformer = new CtorPrimaryStatTransformerImpl(ctorInitsToSuperCallTransformer)
+  private val ctorPrimaryTransformer = new CtorPrimaryTransformerImpl(ctorInitsToSuperCallTransformer)
 
   test("traverse() when has no params and no super call") {
     javaOwnerContext = Class

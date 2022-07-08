@@ -7,11 +7,18 @@ import scala.meta.Type
 trait TypeFunctionTraverser extends ScalaTreeTraverser[Type.Function]
 
 private[scala2java] class TypeFunctionTraverserImpl(typeApplyTraverser: => TypeApplyTraverser,
-                                                    scalaToJavaFunctionTypeTransformer: ScalaToJavaFunctionTypeTransformer) extends TypeFunctionTraverser {
+                                                    scalaToJavaFunctionTypeTransformer: ScalaToJavaFunctionTypeTransformer)
+                                                   (implicit javaEmitter: JavaEmitter)
+  extends TypeFunctionTraverser {
+
+  import javaEmitter._
 
   // function type, e.g.: Int => String
   override def traverse(functionType: Type.Function): Unit = {
-    typeApplyTraverser.traverse(scalaToJavaFunctionTypeTransformer.transform(functionType))
+    scalaToJavaFunctionTypeTransformer.transform(functionType) match {
+      case Some(javaFunctionType) => typeApplyTraverser.traverse(javaFunctionType)
+      case None => emitComment(functionType.toString())
+    }
   }
 }
 

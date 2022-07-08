@@ -2,13 +2,13 @@ package com.effiban.scala2java.transformers
 
 import scala.meta.{Term, Type}
 
-trait TypeSingletonTransformer {
+trait TypeSingletonToTermTransformer {
   def transform(singletonType: Type.Singleton): Term
 }
 
-private[scala2java] class TypeSingletonTransformerImpl extends TypeSingletonTransformer {
+object TypeSingletonToTermTransformer extends TypeSingletonToTermTransformer {
 
-  // A scala expression representing the singleton type of a term, e.g.: A.type
+  // A scala expression representing the single type of a term, e.g.: A.type
   override def transform(singletonType: Type.Singleton): Term = {
     singletonType.ref match {
       case `this`: Term.This => `this`
@@ -17,5 +17,3 @@ private[scala2java] class TypeSingletonTransformerImpl extends TypeSingletonTran
     }
   }
 }
-
-object TypeSingletonTransformer extends TypeSingletonTransformerImpl
