@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.TraversalContext.javaOwnerContext
+import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.resolvers.JavaModifiersResolver
 import effiban.scala2java.{JavaEmitter, entities}
 
@@ -23,10 +23,10 @@ private[scala2java] class ObjectTraverserImpl(annotListTraverser: => AnnotListTr
     emitTypeDeclaration(modifiers = javaModifiersResolver.resolveForClass(objectDef.mods),
       typeKeyword = "class",
       name = s"${objectDef.name.toString}")
-    val outerJavaOwnerContext = javaOwnerContext
-    javaOwnerContext = entities.Class
+    val outerJavaScope = javaScope
+    javaScope = entities.Class
     templateTraverser.traverse(objectDef.templ)
-    javaOwnerContext = outerJavaOwnerContext
+    javaScope = outerJavaScope
   }
 }
 

@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.TraversalContext.javaOwnerContext
+import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{Interface, Method}
 import effiban.scala2java.resolvers.JavaModifiersResolver
 import effiban.scala2java.{JavaEmitter, entities}
@@ -21,7 +21,7 @@ private[scala2java] class DeclDefTraverserImpl(annotListTraverser: => AnnotListT
   override def traverse(defDecl: Decl.Def): Unit = {
     emitLine()
     annotListTraverser.traverseMods(defDecl.mods)
-    val resolvedModifierNames = javaOwnerContext match {
+    val resolvedModifierNames = javaScope match {
       case Interface => javaModifiersResolver.resolveForInterfaceMethod(defDecl.mods, hasBody = false)
       case entities.Class => javaModifiersResolver.resolveForClassMethod(defDecl.mods)
       case _ => Nil
@@ -32,10 +32,10 @@ private[scala2java] class DeclDefTraverserImpl(annotListTraverser: => AnnotListT
     termNameTraverser.traverse(defDecl.name)
     //TODO handle method type params
 
-    val outerJavaOwnerContext = javaOwnerContext
-    javaOwnerContext = Method
+    val outerJavaScope = javaScope
+    javaScope = Method
     termParamListTraverser.traverse(defDecl.paramss.flatten)
-    javaOwnerContext = outerJavaOwnerContext
+    javaScope = outerJavaScope
   }
 }
 

@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.TraversalContext.javaOwnerContext
+import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{Lambda, Method}
 import effiban.scala2java.matchers.TreeListMatcher.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
@@ -34,7 +34,7 @@ class TermParamTraverserImplTest extends UnitTestSuite {
   )
 
   test("traverse for regular method") {
-    javaOwnerContext = Method
+    javaScope = Method
 
     val initialMods = List(TheAnnot)
     val adjustedMods = List(TheAnnot) :+ Final()
@@ -59,7 +59,7 @@ class TermParamTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse for lambda with type") {
-    javaOwnerContext = Lambda
+    javaScope = Lambda
 
     val mods = List(TheAnnot)
 
@@ -82,7 +82,7 @@ class TermParamTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse for lambda without type") {
-    javaOwnerContext = Lambda
+    javaScope = Lambda
 
     val mods = List(TheAnnot)
 

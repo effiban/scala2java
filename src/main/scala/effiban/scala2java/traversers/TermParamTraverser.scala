@@ -2,7 +2,7 @@ package effiban.scala2java.traversers
 
 import effiban.scala2java.JavaEmitter
 import effiban.scala2java.entities.Lambda
-import effiban.scala2java.entities.TraversalContext.javaOwnerContext
+import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.resolvers.JavaModifiersResolver
 
 import scala.meta.Mod.Final
@@ -21,7 +21,7 @@ private[scala2java] class TermParamTraverserImpl(annotListTraverser: => AnnotLis
   // method parameter declaration
   override def traverse(termParam: Term.Param): Unit = {
     annotListTraverser.traverseMods(termParam.mods, onSameLine = true)
-    val mods = javaOwnerContext match {
+    val mods = javaScope match {
       case Lambda => termParam.mods
       case _ => termParam.mods :+ Final()
     }

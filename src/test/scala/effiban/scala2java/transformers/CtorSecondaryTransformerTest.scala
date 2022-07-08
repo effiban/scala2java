@@ -1,7 +1,7 @@
 package effiban.scala2java.transformers
 
 import effiban.scala2java.entities.Class
-import effiban.scala2java.entities.TraversalContext.javaOwnerContext
+import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
 
@@ -34,7 +34,7 @@ class CtorSecondaryTransformerTest extends UnitTestSuite {
 
 
   test("traverse() when has no params and no body") {
-    javaOwnerContext = Class
+    javaScope = Class
 
     val secondaryCtor = Ctor.Secondary(
       mods = Modifiers,
@@ -59,7 +59,7 @@ class CtorSecondaryTransformerTest extends UnitTestSuite {
   }
 
   test("traverse() when has params and no body") {
-    javaOwnerContext = Class
+    javaScope = Class
 
     val secondaryCtor = Ctor.Secondary(
       mods = Modifiers,
@@ -84,7 +84,7 @@ class CtorSecondaryTransformerTest extends UnitTestSuite {
   }
 
   test("traverse() when has no params and has body") {
-    javaOwnerContext = Class
+    javaScope = Class
 
     val stats = List(
       Term.Apply(Term.Name("doSomething"), List(Lit.String("param5"), Lit.String("param6"))),
@@ -114,7 +114,7 @@ class CtorSecondaryTransformerTest extends UnitTestSuite {
   }
 
   test("traverse() when has params and body") {
-    javaOwnerContext = Class
+    javaScope = Class
 
     val stats = List(
       Term.Apply(Term.Name("doSomething"), List(Lit.String("param5"), Lit.String("param6"))),

@@ -2,7 +2,7 @@ package effiban.scala2java.traversers
 
 import effiban.scala2java.JavaEmitter
 import effiban.scala2java.entities.Interface
-import effiban.scala2java.entities.TraversalContext.javaOwnerContext
+import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.resolvers.JavaModifiersResolver
 
 import scala.meta.Defn.Trait
@@ -24,10 +24,10 @@ private[scala2java] class TraitTraverserImpl(annotListTraverser: => AnnotListTra
       typeKeyword = "interface",
       name = traitDef.name.toString)
     typeParamListTraverser.traverse(traitDef.tparams)
-    val outerJavaOwnerContext = javaOwnerContext
-    javaOwnerContext = Interface
+    val outerJavaScope = javaScope
+    javaScope = Interface
     templateTraverser.traverse(traitDef.templ)
-    javaOwnerContext = outerJavaOwnerContext
+    javaScope = outerJavaScope
   }
 }
 
