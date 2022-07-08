@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.Parentheses
+import effiban.scala2java.entities.EnclosingDelimiter.Parentheses
 
 import scala.meta.Term
 
@@ -15,7 +15,7 @@ private[scala2java] class TermParamListTraverserImpl(argumentListTraverser: => A
     argumentListTraverser.traverse(args = termParams,
       argTraverser = termParamTraverser,
       onSameLine = onSameLine,
-      maybeDelimiterType = Some(Parentheses))
+      maybeEnclosingDelimiter = Some(Parentheses))
   }
 }
 

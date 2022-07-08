@@ -1,6 +1,6 @@
 package effiban.scala2java
 
-import effiban.scala2java.entities._
+import effiban.scala2java.entities.EnclosingDelimiter._
 
 import java.io.StringWriter
 
@@ -41,11 +41,11 @@ class TestJavaEmitter(sw: StringWriter) extends JavaEmitter {
     emitLineBreak()
   }
 
-  override def emitArgumentsStart(delimType: DualDelimiterType): Unit = {
+  override def emitArgumentsStart(delimType: EnclosingDelimiter): Unit = {
     emitStartDelimiter(delimType)
   }
 
-  override def emitArgumentsEnd(delimType: DualDelimiterType): Unit = {
+  override def emitArgumentsEnd(delimType: EnclosingDelimiter): Unit = {
     emitEndDelimiter(delimType)
   }
 
@@ -73,8 +73,8 @@ class TestJavaEmitter(sw: StringWriter) extends JavaEmitter {
     emit("...")
   }
 
-  override def emitStartDelimiter(delimType: DualDelimiterType): Unit = {
-    val delimStr = delimType match {
+  override def emitStartDelimiter(delim: EnclosingDelimiter): Unit = {
+    val delimStr = delim match {
       case Parentheses => "("
       case SquareBracket => "["
       case CurlyBrace => "{"
@@ -83,8 +83,8 @@ class TestJavaEmitter(sw: StringWriter) extends JavaEmitter {
     emit(delimStr)
   }
 
-  override def emitEndDelimiter(delimType: DualDelimiterType): Unit = {
-    val delimStr = delimType match {
+  override def emitEndDelimiter(delim: EnclosingDelimiter): Unit = {
+    val delimStr = delim match {
       case Parentheses => ")"
       case SquareBracket => "]"
       case CurlyBrace => "}"

@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.AngleBracket
+import effiban.scala2java.entities.EnclosingDelimiter._
 import effiban.scala2java.matchers.TreeListMatcher.eqTreeList
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeBounds
@@ -34,7 +34,7 @@ class TypeParamListTraverserImplTest extends UnitTestSuite {
       args = eqTreeList(List(param)),
       argTraverser = ArgumentMatchers.eq(typeParamTraverser),
       onSameLine = ArgumentMatchers.eq(true),
-      maybeDelimiterType = ArgumentMatchers.eq(Some(AngleBracket))
+      maybeEnclosingDelimiter = ArgumentMatchers.eq(Some(AngleBracket))
     )
   }
 
@@ -49,7 +49,7 @@ class TypeParamListTraverserImplTest extends UnitTestSuite {
       args = eqTreeList(params),
       argTraverser = ArgumentMatchers.eq(typeParamTraverser),
       onSameLine = ArgumentMatchers.eq(true),
-      maybeDelimiterType = ArgumentMatchers.eq(Some(AngleBracket))
+      maybeEnclosingDelimiter = ArgumentMatchers.eq(Some(AngleBracket))
     )
   }
 

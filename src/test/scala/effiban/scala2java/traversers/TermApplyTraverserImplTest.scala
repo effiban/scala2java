@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.Parentheses
+import effiban.scala2java.entities.EnclosingDelimiter.Parentheses
 import effiban.scala2java.matchers.SomeMatcher.eqSome
 import effiban.scala2java.matchers.TreeListMatcher.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
@@ -26,7 +26,7 @@ class TermApplyTraverserImplTest extends UnitTestSuite {
     doWrite("(arg1, arg2)").when(termListTraverser).traverse(
       terms = eqTreeList(termApply.args),
       onSameLine = ArgumentMatchers.eq(false),
-      maybeDelimiterType = eqSome(Parentheses))
+      maybeEnclosingDelimiter = eqSome(Parentheses))
 
     termApplyTraverser.traverse(termApply)
 

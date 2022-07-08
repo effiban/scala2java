@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.JavaEmitter
-import effiban.scala2java.entities.Parentheses
+import effiban.scala2java.entities.EnclosingDelimiter.Parentheses
 
 import scala.meta.Term
 
@@ -14,7 +14,7 @@ private[scala2java] class TermApplyTraverserImpl(termTraverser: => TermTraverser
   // method invocation
   override def traverse(termApply: Term.Apply): Unit = {
     termTraverser.traverse(termApply.fun)
-    termListTraverser.traverse(termApply.args, maybeDelimiterType = Some(Parentheses))
+    termListTraverser.traverse(termApply.args, maybeEnclosingDelimiter = Some(Parentheses))
   }
 }
 

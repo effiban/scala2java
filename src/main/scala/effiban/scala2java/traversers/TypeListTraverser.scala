@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.AngleBracket
+import effiban.scala2java.entities.EnclosingDelimiter._
 
 import scala.meta.Type
 
@@ -15,7 +15,7 @@ private[scala2java] class TypeListTraverserImpl(argumentListTraverser: => Argume
     if (types.nonEmpty) {
       argumentListTraverser.traverse(args = types,
         argTraverser = typeTraverser,
-        maybeDelimiterType = Some(AngleBracket),
+        maybeEnclosingDelimiter = Some(AngleBracket),
         onSameLine = true)
     }
   }

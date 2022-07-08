@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.Parentheses
+import effiban.scala2java.entities.EnclosingDelimiter.Parentheses
 
 import scala.meta.Term
 
@@ -10,7 +10,7 @@ private[scala2java] class TermTupleTraverserImpl(termListTraverser: => TermListT
 
   // Java supports tuples only in lambdas AFAIK, but the replacement is not obvious - so rendering it always
   override def traverse(termTuple: Term.Tuple): Unit = {
-    termListTraverser.traverse(termTuple.args, maybeDelimiterType = Some(Parentheses), onSameLine = true)
+    termListTraverser.traverse(termTuple.args, maybeEnclosingDelimiter = Some(Parentheses), onSameLine = true)
   }
 }
 

@@ -1,6 +1,6 @@
 package effiban.scala2java
 
-import effiban.scala2java.entities._
+import effiban.scala2java.entities.EnclosingDelimiter.{EnclosingDelimiter, _}
 
 trait JavaEmitter {
 
@@ -18,9 +18,9 @@ trait JavaEmitter {
 
   def emitBlockEnd(): Unit
 
-  def emitArgumentsStart(delimType: DualDelimiterType): Unit
+  def emitArgumentsStart(delim: EnclosingDelimiter): Unit
 
-  def emitArgumentsEnd(delimType: DualDelimiterType): Unit
+  def emitArgumentsEnd(delim: EnclosingDelimiter): Unit
 
   def emitListSeparator(): Unit
 
@@ -30,9 +30,9 @@ trait JavaEmitter {
 
   def emitEllipsis(): Unit
 
-  def emitStartDelimiter(delimType: DualDelimiterType): Unit
+  def emitStartDelimiter(delim: EnclosingDelimiter): Unit
 
-  def emitEndDelimiter(delimType: DualDelimiterType): Unit
+  def emitEndDelimiter(delim: EnclosingDelimiter): Unit
 
   def emit(str: String): Unit
 }
@@ -80,13 +80,13 @@ private[scala2java] class JavaEmitterImpl extends JavaEmitter {
     emitLineBreak()
   }
 
-  override def emitArgumentsStart(delimType: DualDelimiterType): Unit = {
-    emitStartDelimiter(delimType)
+  override def emitArgumentsStart(delim: EnclosingDelimiter): Unit = {
+    emitStartDelimiter(delim)
     indentationLevel += 1
   }
 
-  override def emitArgumentsEnd(delimType: DualDelimiterType): Unit = {
-    emitEndDelimiter(delimType)
+  override def emitArgumentsEnd(delim: EnclosingDelimiter): Unit = {
+    emitEndDelimiter(delim)
     indentationLevel -= 1
   }
 
@@ -114,8 +114,8 @@ private[scala2java] class JavaEmitterImpl extends JavaEmitter {
     emit("...")
   }
 
-  override def emitStartDelimiter(delimType: DualDelimiterType): Unit = {
-    val delimStr = delimType match {
+  override def emitStartDelimiter(delim: EnclosingDelimiter): Unit = {
+    val delimStr = delim match {
       case Parentheses => "("
       case SquareBracket => "["
       case CurlyBrace => "{"
@@ -124,8 +124,8 @@ private[scala2java] class JavaEmitterImpl extends JavaEmitter {
     emit(delimStr)
   }
 
-  override def emitEndDelimiter(delimType: DualDelimiterType): Unit = {
-    val delimStr = delimType match {
+  override def emitEndDelimiter(delim: EnclosingDelimiter): Unit = {
+    val delimStr = delim match {
       case Parentheses => ")"
       case SquareBracket => "]"
       case CurlyBrace => "}"

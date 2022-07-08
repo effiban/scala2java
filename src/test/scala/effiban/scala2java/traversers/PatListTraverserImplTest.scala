@@ -32,7 +32,7 @@ class PatListTraverserImplTest extends UnitTestSuite {
       args = eqTreeList(List(pat)),
       argTraverser = ArgumentMatchers.eq(patTraverser),
       onSameLine = ArgumentMatchers.eq(true),
-      maybeDelimiterType = ArgumentMatchers.eq(None)
+      maybeEnclosingDelimiter = ArgumentMatchers.eq(None)
     )
   }
 
@@ -46,7 +46,7 @@ class PatListTraverserImplTest extends UnitTestSuite {
       args = eqTreeList(List(pat1, pat2)),
       argTraverser = ArgumentMatchers.eq(patTraverser),
       onSameLine = ArgumentMatchers.eq(true),
-      maybeDelimiterType = ArgumentMatchers.eq(None)
+      maybeEnclosingDelimiter = ArgumentMatchers.eq(None)
     )
   }
 }

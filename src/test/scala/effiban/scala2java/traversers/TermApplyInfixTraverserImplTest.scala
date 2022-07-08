@@ -33,7 +33,7 @@ class TermApplyInfixTraverserImplTest extends UnitTestSuite {
     doWrite("b").when(termListTraverser).traverse(
       terms = eqTreeList(List(rhs)),
       onSameLine = ArgumentMatchers.eq(true),
-      maybeDelimiterType = ArgumentMatchers.eq(None)
+      maybeEnclosingDelimiter = ArgumentMatchers.eq(None)
     )
 
     termApplyInfixTraverser.traverse(applyInfix)

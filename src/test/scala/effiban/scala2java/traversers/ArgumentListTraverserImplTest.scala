@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.Parentheses
+import effiban.scala2java.entities.EnclosingDelimiter.Parentheses
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
@@ -95,7 +95,7 @@ class ArgumentListTraverserImplTest extends UnitTestSuite {
       args = List.empty,
       argTraverser = argumentTraverser,
       onSameLine = true,
-      maybeWrappingDelimiterType = Some(Parentheses)
+      maybeEnclosingDelimiter = Some(Parentheses)
     )
 
     outputWriter.toString shouldBe "()"
@@ -110,7 +110,7 @@ class ArgumentListTraverserImplTest extends UnitTestSuite {
       args = List(arg1),
       argTraverser = argumentTraverser,
       onSameLine = true,
-      maybeWrappingDelimiterType = Some(Parentheses)
+      maybeEnclosingDelimiter = Some(Parentheses)
     )
 
     outputWriter.toString shouldBe "(arg1)"
@@ -124,7 +124,7 @@ class ArgumentListTraverserImplTest extends UnitTestSuite {
       args = List(arg1, arg2),
       argTraverser = argumentTraverser,
       onSameLine = true,
-      maybeWrappingDelimiterType = Some(Parentheses)
+      maybeEnclosingDelimiter = Some(Parentheses)
     )
 
     outputWriter.toString shouldBe "(arg1, arg2)"
@@ -139,7 +139,7 @@ class ArgumentListTraverserImplTest extends UnitTestSuite {
       args = List(arg1, arg2, arg3),
       argTraverser = argumentTraverser,
       onSameLine = true,
-      maybeWrappingDelimiterType = Some(Parentheses)
+      maybeEnclosingDelimiter = Some(Parentheses)
     )
 
     outputWriter.toString shouldBe "(arg1, arg2, arg3)"
