@@ -1,10 +1,11 @@
 package com.effiban.scala2java
 
-import scala.meta.Term.While
+import scala.meta.Term.{Block, While}
 
 trait WhileTraverser extends ScalaTreeTraverser[While]
 
-private[scala2java] class WhileTraverserImpl(termTraverser: => TermTraverser)
+private[scala2java] class WhileTraverserImpl(termTraverser: => TermTraverser,
+                                             blockTraverser: BlockTraverser)
                                             (implicit javaEmitter: JavaEmitter) extends WhileTraverser {
 
   import javaEmitter._
@@ -12,9 +13,12 @@ private[scala2java] class WhileTraverserImpl(termTraverser: => TermTraverser)
   override def traverse(`while`: While): Unit = {
     emit("while (")
     termTraverser.traverse(`while`.expr)
-    emit(") ")
-    termTraverser.traverse(`while`.body)
+    emit(")")
+    `while`.body match {
+      case block: Block => blockTraverser.traverse(block)
+      case term => blockTraverser.traverse(block = Block(List(term)))
+    }
   }
 }
 
-object WhileTraverser extends WhileTraverserImpl(TermTraverser)
+object WhileTraverser extends WhileTraverserImpl(TermTraverser, BlockTraverser)

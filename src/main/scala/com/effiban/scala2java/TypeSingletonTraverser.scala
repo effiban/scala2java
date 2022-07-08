@@ -1,16 +1,17 @@
 package com.effiban.scala2java
 
+import com.effiban.scala2java.transformers.TypeSingletonTransformer
+
 import scala.meta.Type
 
 trait TypeSingletonTraverser extends ScalaTreeTraverser[Type.Singleton]
 
-private[scala2java] class TypeSingletonTraverserImpl(termRefTraverser: => TermRefTraverser) extends TypeSingletonTraverser {
+private[scala2java] class TypeSingletonTraverserImpl(termTraverser: => TermTraverser,
+                                                     typeSingletonTransformer: TypeSingletonTransformer) extends TypeSingletonTraverser {
 
-  // A scala expression representing a singleton type like: A.type
   override def traverse(singletonType: Type.Singleton): Unit = {
-    termRefTraverser.traverse(singletonType.ref)
-    //TODO not sure if something else is needed in Java...
+    termTraverser.traverse(typeSingletonTransformer.transform(singletonType))
   }
 }
 
-object TypeSingletonTraverser extends TypeSingletonTraverserImpl(TermRefTraverser)
+object TypeSingletonTraverser extends TypeSingletonTraverserImpl(TermTraverser, TypeSingletonTransformer)

@@ -1,12 +1,12 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.emitComment
-
 import scala.meta.Type
 
 trait TypeVarTraverser extends ScalaTreeTraverser[Type.Var]
 
-private[scala2java] class TypeVarTraverserImpl(javaEmitter: JavaEmitter) extends TypeVarTraverser {
+private[scala2java] class TypeVarTraverserImpl(implicit javaEmitter: JavaEmitter) extends TypeVarTraverser {
+
+  import javaEmitter._
 
   // Variable in type, e.g.: `t` in case _:List(t) =>
   // Unsupported in Java and no replacement I can think of
@@ -15,4 +15,4 @@ private[scala2java] class TypeVarTraverserImpl(javaEmitter: JavaEmitter) extends
   }
 }
 
-object TypeVarTraverser extends TypeVarTraverserImpl(JavaEmitter)
+object TypeVarTraverser extends TypeVarTraverserImpl
