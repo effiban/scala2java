@@ -9,7 +9,7 @@ private[scala2java] class TypeWithTraverserImpl(typeTraverser: => TypeTraverser)
 
   import javaEmitter._
 
-  // type with parent, e.g.  A with B
+  // type with parent, e.g. 'A with B' in: type X = A with B
   // approximated by Java "extends" but might not compile
   override def traverse(typeWith: Type.With): Unit = {
     typeTraverser.traverse(typeWith.lhs)

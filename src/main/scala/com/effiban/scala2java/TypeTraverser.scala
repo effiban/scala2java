@@ -1,7 +1,5 @@
 package com.effiban.scala2java
 
-import com.effiban.scala2java.JavaEmitter.emitComment
-
 import scala.meta.Type
 
 trait TypeTraverser extends ScalaTreeTraverser[Type]
@@ -21,6 +19,8 @@ private[scala2java] class TypeTraverserImpl(typeRefTraverser: => TypeRefTraverse
                                             typeRepeatedTraverser: => TypeRepeatedTraverser,
                                             typeVarTraverser: => TypeVarTraverser)
                                            (implicit javaEmitter: JavaEmitter) extends TypeTraverser {
+
+  import javaEmitter._
 
   override def traverse(`type`: Type): Unit = `type` match {
     case typeRef: Type.Ref => typeRefTraverser.traverse(typeRef)
