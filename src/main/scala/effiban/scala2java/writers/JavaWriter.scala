@@ -37,6 +37,8 @@ trait JavaWriter {
   def writeEndDelimiter(delim: EnclosingDelimiter): Unit
 
   def write(str: String): Unit
+
+  def close(): Unit = {}
 }
 
 class JavaWriterImpl(writer: Writer) extends JavaWriter {
@@ -148,6 +150,8 @@ class JavaWriterImpl(writer: Writer) extends JavaWriter {
     }
     writer.write(str)
   }
+
+  override def close(): Unit = writer.close()
 
   private def indentation() = "\t" * indentationLevel
 }
