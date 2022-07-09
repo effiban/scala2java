@@ -21,5 +21,3 @@ private[traversers] class FinallyTraverserImpl(blockTraverser: => BlockTraverser
     }
   }
 }
-
-object FinallyTraverser extends FinallyTraverserImpl(BlockTraverser)

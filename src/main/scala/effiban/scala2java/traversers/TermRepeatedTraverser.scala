@@ -12,5 +12,3 @@ private[traversers] class TermRepeatedTraverserImpl(termTraverser: => TermTraver
     termTraverser.traverse(termRepeated.expr)
   }
 }
-
-object TermRepeatedTraverser extends TermRepeatedTraverserImpl(TermTraverser)

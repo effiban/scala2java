@@ -33,5 +33,3 @@ private[traversers] class AnnotListTraverserImpl(annotTraverser: => AnnotTravers
 
 }
 
-object AnnotListTraverser extends AnnotListTraverserImpl(AnnotTraverser)
-

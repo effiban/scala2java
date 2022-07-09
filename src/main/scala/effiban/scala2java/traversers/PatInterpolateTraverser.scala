@@ -16,5 +16,3 @@ private[traversers] class PatInterpolateTraverserImpl(implicit javaWriter: JavaW
     writeComment(patternInterpolation.toString())
   }
 }
-
-object PatInterpolateTraverser extends PatInterpolateTraverserImpl()

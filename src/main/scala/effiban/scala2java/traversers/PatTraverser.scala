@@ -7,7 +7,8 @@ import scala.meta.{Lit, Pat, Term}
 
 trait PatTraverser extends ScalaTreeTraverser[Pat]
 
-private[traversers] class PatTraverserImpl(termNameTraverser: => TermNameTraverser,
+private[traversers] class PatTraverserImpl(litTraverser: => LitTraverser,
+                                           termNameTraverser: => TermNameTraverser,
                                            patWildcardTraverser: => PatWildcardTraverser,
                                            patSeqWildcardTraverser: => PatSeqWildcardTraverser,
                                            patVarTraverser: => PatVarTraverser,
@@ -23,7 +24,7 @@ private[traversers] class PatTraverserImpl(termNameTraverser: => TermNameTravers
   import javaWriter._
 
   override def traverse(pat: Pat): Unit = pat match {
-    case lit: Lit => LitTraverser.traverse(lit)
+    case lit: Lit => litTraverser.traverse(lit)
     case termName: Term.Name => termNameTraverser.traverse(termName)
     case patternWildcard: Pat.Wildcard => patWildcardTraverser.traverse(patternWildcard)
     case patternSeqWildcard: Pat.SeqWildcard => patSeqWildcardTraverser.traverse(patternSeqWildcard)
@@ -38,17 +39,3 @@ private[traversers] class PatTraverserImpl(termNameTraverser: => TermNameTravers
     case _ => writeComment(s"UNSUPPORTED: $pat")
   }
 }
-
-object PatTraverser extends PatTraverserImpl(
-  TermNameTraverser,
-  PatWildcardTraverser,
-  PatSeqWildcardTraverser,
-  PatVarTraverser,
-  BindTraverser,
-  AlternativeTraverser,
-  PatTupleTraverser,
-  PatExtractTraverser,
-  PatExtractInfixTraverser,
-  PatInterpolateTraverser,
-  PatTypedTraverser
-)

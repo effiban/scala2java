@@ -11,5 +11,3 @@ private[traversers] class SourceTraverserImpl(statTraverser: => StatTraverser) e
     source.stats.foreach(statTraverser.traverse)
   }
 }
-
-object SourceTraverser extends SourceTraverserImpl(StatTraverser)

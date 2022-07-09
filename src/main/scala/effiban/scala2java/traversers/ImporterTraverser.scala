@@ -29,5 +29,3 @@ private[traversers] class ImporterTraverserImpl(termRefTraverser: => TermRefTrav
     }
   }
 }
-
-object ImporterTraverser extends ImporterTraverserImpl(TermRefTraverser, ImporteeTraverser)

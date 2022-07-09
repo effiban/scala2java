@@ -25,8 +25,3 @@ private[traversers] class TermSelectTraverserImpl(termTraverser: => TermTraverse
   }
 
 }
-
-object TermSelectTraverser extends TermSelectTraverserImpl(
-  TermTraverser,
-  TermNameTraverser
-)

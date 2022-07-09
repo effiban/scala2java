@@ -17,5 +17,3 @@ private[traversers] class AlternativeTraverserImpl(patTraverser: => PatTraverser
     patTraverser.traverse(patternAlternative.rhs)
   }
 }
-
-object AlternativeTraverser extends AlternativeTraverserImpl(PatTraverser)

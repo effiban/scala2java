@@ -28,13 +28,3 @@ private[traversers] class DefnTraverserImpl(defnValTraverser: => DefnValTraverse
     case _ => writeComment(s"UNSUPPORTED: $defn")
   }
 }
-
-object DefnTraverser extends DefnTraverserImpl(
-  DefnValTraverser,
-  DefnVarTraverser,
-  DefnDefTraverser,
-  DefnTypeTraverser,
-  ClassTraverser,
-  TraitTraverser,
-  ObjectTraverser
-)

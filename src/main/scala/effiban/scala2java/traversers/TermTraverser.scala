@@ -73,35 +73,3 @@ private[traversers] class TermTraverserImpl(termRefTraverser: => TermRefTraverse
     case _ => writeComment(s"UNSUPPORTED: $term")
   }
 }
-
-object TermTraverser extends TermTraverserImpl(
-  TermRefTraverser,
-  TermApplyTraverser,
-  ApplyTypeTraverser,
-  TermApplyInfixTraverser,
-  AssignTraverser,
-  ReturnTraverser,
-  ThrowTraverser,
-  AscribeTraverser,
-  TermAnnotateTraverser,
-  TermTupleTraverser,
-  BlockTraverser,
-  IfTraverser,
-  TermMatchTraverser,
-  TryTraverser,
-  TryWithHandlerTraverser,
-  TermFunctionTraverser,
-  PartialFunctionTraverser,
-  AnonymousFunctionTraverser,
-  WhileTraverser,
-  DoTraverser,
-  ForTraverser,
-  ForYieldTraverser,
-  NewTraverser,
-  NewAnonymousTraverser,
-  TermPlaceholderTraverser,
-  EtaTraverser,
-  TermRepeatedTraverser,
-  TermInterpolateTraverser,
-  LitTraverser
-)

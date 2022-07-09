@@ -17,5 +17,3 @@ private[traversers] class TypeTupleTraverserImpl(implicit javaWriter: JavaWriter
     writeComment(tupleType.toString())
   }
 }
-
-object TypeTupleTraverser extends TypeTupleTraverserImpl

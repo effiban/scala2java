@@ -22,5 +22,3 @@ private[traversers] class TypeFunctionTraverserImpl(typeApplyTraverser: => TypeA
     }
   }
 }
-
-object TypeFunctionTraverser extends TypeFunctionTraverserImpl(TypeApplyTraverser, ScalaToJavaFunctionTypeTransformer)

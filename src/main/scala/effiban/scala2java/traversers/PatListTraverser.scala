@@ -17,5 +17,3 @@ private[traversers] class PatListTraverserImpl(argumentListTraverser: => Argumen
     }
   }
 }
-
-object PatListTraverser extends PatListTraverserImpl(ArgumentListTraverser, PatTraverser)

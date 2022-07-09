@@ -35,10 +35,3 @@ private[traversers] class TermParamTraverserImpl(annotListTraverser: => AnnotLis
     // TODO handle 'default'
   }
 }
-
-object TermParamTraverser extends TermParamTraverserImpl(
-  AnnotListTraverser,
-  TypeTraverser,
-  NameTraverser,
-  JavaModifiersResolver
-)

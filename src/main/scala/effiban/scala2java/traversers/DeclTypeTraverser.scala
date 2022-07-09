@@ -26,5 +26,3 @@ private[traversers] class DeclTypeTraverserImpl(typeParamListTraverser: => TypeP
     writeBlockEnd()
   }
 }
-
-object DeclTypeTraverser extends DeclTypeTraverserImpl(TypeParamListTraverser, JavaModifiersResolver)

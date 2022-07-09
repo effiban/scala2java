@@ -27,5 +27,3 @@ private[traversers] class ImporteeTraverserImpl(nameTraverser: => NameTraverser)
     }
   }
 }
-
-object ImporteeTraverser extends ImporteeTraverserImpl(NameTraverser)

@@ -16,5 +16,3 @@ private[traversers] class PartialFunctionTraverserImpl(termFunctionTraverser: =>
     termFunctionTraverser.traverse(termFunction)
   }
 }
-
-object PartialFunctionTraverser extends PartialFunctionTraverserImpl(TermFunctionTraverser)

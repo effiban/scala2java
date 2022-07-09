@@ -17,5 +17,3 @@ private[traversers] class TypeLambdaTraverserImpl(implicit javaWriter: JavaWrite
     writeComment(lambdaType.toString())
   }
 }
-
-object TypeLambdaTraverser extends TypeLambdaTraverserImpl

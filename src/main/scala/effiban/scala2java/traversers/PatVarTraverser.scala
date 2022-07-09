@@ -11,5 +11,3 @@ private[traversers] class PatVarTraverserImpl(termNameTraverser: => TermNameTrav
     termNameTraverser.traverse(patternVar.name)
   }
 }
-
-object PatVarTraverser extends PatVarTraverserImpl(TermNameTraverser)

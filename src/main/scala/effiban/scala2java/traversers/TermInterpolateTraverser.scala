@@ -20,8 +20,3 @@ private[traversers] class TermInterpolateTraverserImpl(termInterpolateTransforme
     }
   }
 }
-
-object TermInterpolateTraverser extends TermInterpolateTraverserImpl(
-  TermInterpolateTransformer,
-  TermApplyTraverser
-)

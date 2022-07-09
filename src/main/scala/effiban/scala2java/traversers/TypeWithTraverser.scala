@@ -19,5 +19,3 @@ private[traversers] class TypeWithTraverserImpl(typeTraverser: => TypeTraverser)
     typeTraverser.traverse(typeWith.rhs)
   }
 }
-
-object TypeWithTraverser extends TypeWithTraverserImpl(TypeTraverser)

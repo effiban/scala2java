@@ -17,5 +17,3 @@ class PatExtractInfixTraverserImpl(patExtractTraverser: PatExtractTraverser) ext
     patExtractTraverser.traverse(patExtract)
   }
 }
-
-object PatExtractInfixTraverser extends PatExtractInfixTraverserImpl(PatExtractTraverser)

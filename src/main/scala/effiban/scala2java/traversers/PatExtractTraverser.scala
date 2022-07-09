@@ -18,5 +18,3 @@ class PatExtractTraverserImpl(implicit javaWriter: JavaWriter) extends PatExtrac
     writeComment(s"${patternExtractor.fun}(${patternExtractor.args.mkString(", ")})")
   }
 }
-
-object PatExtractTraverser extends PatExtractTraverserImpl()

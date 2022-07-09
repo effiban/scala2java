@@ -20,5 +20,3 @@ private[traversers] class TypeParamListTraverserImpl(argumentListTraverser: => A
     }
   }
 }
-
-object TypeParamListTraverser extends TypeParamListTraverserImpl(ArgumentListTraverser, TypeParamTraverser)

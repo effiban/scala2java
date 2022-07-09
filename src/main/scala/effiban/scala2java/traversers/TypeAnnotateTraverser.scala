@@ -19,5 +19,3 @@ private[traversers] class TypeAnnotateTraverserImpl(annotListTraverser: => Annot
     typeTraverser.traverse(annotatedType.tpe)
   }
 }
-
-object TypeAnnotateTraverser extends TypeAnnotateTraverserImpl(AnnotListTraverser, TypeTraverser)

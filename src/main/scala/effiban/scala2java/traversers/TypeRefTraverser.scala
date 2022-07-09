@@ -21,10 +21,3 @@ private[traversers] class TypeRefTraverserImpl(typeNameTraverser: => TypeNameTra
     case _ => writeComment(s"UNSUPPORTED: $typeRef")
   }
 }
-
-object TypeRefTraverser extends TypeRefTraverserImpl(
-  TypeNameTraverser,
-  TypeSelectTraverser,
-  TypeProjectTraverser,
-  TypeSingletonTraverser
-)

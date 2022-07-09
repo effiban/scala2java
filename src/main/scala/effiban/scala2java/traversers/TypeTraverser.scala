@@ -42,20 +42,3 @@ private[traversers] class TypeTraverserImpl(typeRefTraverser: => TypeRefTraverse
     case _ => writeComment(s"UNSUPPORTED: ${`type`}")
   }
 }
-
-object TypeTraverser extends TypeTraverserImpl(
-  TypeRefTraverser,
-  TypeApplyTraverser,
-  TypeApplyInfixTraverser,
-  TypeFunctionTraverser,
-  TypeTupleTraverser,
-  TypeWithTraverser,
-  TypeRefineTraverser,
-  TypeExistentialTraverser,
-  TypeAnnotateTraverser,
-  TypeLambdaTraverser,
-  TypePlaceholderTraverser,
-  TypeByNameTraverser,
-  TypeRepeatedTraverser,
-  TypeVarTraverser
-)

@@ -18,5 +18,3 @@ private[traversers] class TermParamListTraverserImpl(argumentListTraverser: => A
       maybeEnclosingDelimiter = Some(Parentheses))
   }
 }
-
-object TermParamListTraverser extends TermParamListTraverserImpl(ArgumentListTraverser, TermParamTraverser)

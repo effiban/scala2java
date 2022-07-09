@@ -23,5 +23,3 @@ private[traversers] class DoTraverserImpl(termTraverser: => TermTraverser,
     write(")")
   }
 }
-
-object DoTraverser extends DoTraverserImpl(TermTraverser, BlockTraverser)

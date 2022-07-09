@@ -19,5 +19,3 @@ private[traversers] class TermNameTraverserImpl(implicit javaWriter: JavaWriter)
     termName.value
   }
 }
-
-object TermNameTraverser extends TermNameTraverserImpl

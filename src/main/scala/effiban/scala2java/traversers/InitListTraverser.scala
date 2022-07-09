@@ -15,5 +15,3 @@ private[traversers] class InitListTraverserImpl(argumentListTraverser: => Argume
     }
   }
 }
-
-object InitListTraverser extends InitListTraverserImpl(ArgumentListTraverser, InitTraverser)

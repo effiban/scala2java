@@ -17,5 +17,3 @@ private[traversers] class TypeParamTraverserImpl(nameTraverser: => NameTraverser
     //TODO handle vbounds and cbounds (which aren't supported in Java, maybe partially ?)
   }
 }
-
-object TypeParamTraverser extends TypeParamTraverserImpl(NameTraverser, TypeParamListTraverser, TypeBoundsTraverser)

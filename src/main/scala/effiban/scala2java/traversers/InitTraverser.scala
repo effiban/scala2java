@@ -23,5 +23,3 @@ private[traversers] class InitTraverserImpl(typeTraverser: => TypeTraverser,
     }
   }
 }
-
-object InitTraverser extends InitTraverserImpl(TypeTraverser, TermListTraverser)

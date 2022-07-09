@@ -22,5 +22,3 @@ private[traversers] class ThisTraverserImpl(nameTraverser: => NameTraverser)
     write("this")
   }
 }
-
-object ThisTraverser extends ThisTraverserImpl(NameTraverser)

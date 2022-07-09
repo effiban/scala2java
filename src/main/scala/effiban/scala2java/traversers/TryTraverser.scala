@@ -33,10 +33,3 @@ private[traversers] class TryTraverserImpl(blockTraverser: => BlockTraverser,
     `try`.finallyp.foreach(finallyTraverser.traverse)
   }
 }
-
-object TryTraverser extends TryTraverserImpl(
-  BlockTraverser,
-  CatchHandlerTraverser,
-  FinallyTraverser,
-  PatToTermParamTransformer
-)

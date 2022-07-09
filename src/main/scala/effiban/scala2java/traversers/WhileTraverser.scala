@@ -22,5 +22,3 @@ private[traversers] class WhileTraverserImpl(termTraverser: => TermTraverser,
     }
   }
 }
-
-object WhileTraverser extends WhileTraverserImpl(TermTraverser, BlockTraverser)

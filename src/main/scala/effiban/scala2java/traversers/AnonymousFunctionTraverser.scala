@@ -15,5 +15,3 @@ private[traversers] class AnonymousFunctionTraverserImpl(termFunctionTraverser: 
       body = anonymousFunction.body))
   }
 }
-
-object AnonymousFunctionTraverser extends AnonymousFunctionTraverserImpl(TermFunctionTraverser)

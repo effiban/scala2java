@@ -36,5 +36,3 @@ private[traversers] class IfTraverserImpl(termTraverser: => TermTraverser,
     }
   }
 }
-
-object IfTraverser extends IfTraverserImpl(TermTraverser, BlockTraverser)

@@ -16,7 +16,4 @@ private[traversers] class TypePlaceholderTraverserImpl(typeBoundsTraverser: => T
     write("?")
     typeBoundsTraverser.traverse(placeholderType.bounds)
   }
-
 }
-
-object TypePlaceholderTraverser extends TypePlaceholderTraverserImpl(TypeBoundsTraverser)

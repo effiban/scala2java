@@ -15,5 +15,3 @@ private[traversers] class TypeByNameTraverserImpl(typeApplyTraverser: => TypeApp
     typeApplyTraverser.traverse(typeByNameToSupplierTypeTransformer.transform(typeByName))
   }
 }
-
-object TypeByNameTraverser extends TypeByNameTraverserImpl(TypeApplyTraverser, TypeByNameToSupplierTypeTransformer)

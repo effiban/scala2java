@@ -16,5 +16,3 @@ class NameIndeterminateTraverserImpl(implicit javaWriter: JavaWriter) extends Na
     write(indeterminateName.value)
   }
 }
-
-object NameIndeterminateTraverser extends NameIndeterminateTraverserImpl()

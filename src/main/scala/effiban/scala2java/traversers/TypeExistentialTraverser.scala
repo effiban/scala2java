@@ -18,5 +18,3 @@ private[traversers] class TypeExistentialTraverserImpl(typeTraverser: => TypeTra
     writeComment(s"forSome ${existentialType.stats.toString()}")
   }
 }
-
-object TypeExistentialTraverser extends TypeExistentialTraverserImpl(TypeTraverser)

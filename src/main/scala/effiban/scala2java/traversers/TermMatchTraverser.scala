@@ -23,5 +23,3 @@ private[traversers] class TermMatchTraverserImpl(termTraverser: => TermTraverser
     writeBlockEnd()
   }
 }
-
-object TermMatchTraverser extends TermMatchTraverserImpl(TermTraverser, CaseTraverser)

@@ -18,5 +18,3 @@ private[traversers] class BindTraverserImpl(patTraverser: => PatTraverser)
     writeComment(patternBind.toString())
   }
 }
-
-object BindTraverser extends BindTraverserImpl(PatTraverser)

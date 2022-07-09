@@ -34,5 +34,3 @@ class LitTraverserImpl(implicit javaWriter: JavaWriter) extends LitTraverser {
 
   private def quoteString(str: String) = s"\"$str\""
 }
-
-object LitTraverser extends LitTraverserImpl()

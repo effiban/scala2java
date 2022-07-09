@@ -25,5 +25,3 @@ private[traversers] class CatchHandlerTraverserImpl(termParamListTraverser: => T
     }
   }
 }
-
-object CatchHandlerTraverser extends CatchHandlerTraverserImpl(TermParamListTraverser, BlockTraverser)

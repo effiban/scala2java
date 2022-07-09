@@ -17,5 +17,3 @@ private[traversers] class SelfTraverserImpl(implicit javaWriter: JavaWriter) ext
     })
   }
 }
-
-object SelfTraverser extends SelfTraverserImpl

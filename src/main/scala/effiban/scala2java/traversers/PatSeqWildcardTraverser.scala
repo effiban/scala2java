@@ -16,5 +16,3 @@ class PatSeqWildcardTraverserImpl(implicit javaWriter: JavaWriter) extends PatSe
     writeComment("...")
   }
 }
-
-object PatSeqWildcardTraverser extends PatSeqWildcardTraverserImpl()

@@ -13,5 +13,3 @@ private[traversers] class PatWildcardTraverserImpl(implicit javaWriter: JavaWrit
   // Wildcard in pattern match expression - translates to Java "default" ?
   override def traverse(ignored: Pat.Wildcard): Unit = write("default")
 }
-
-object PatWildcardTraverser extends PatWildcardTraverserImpl()

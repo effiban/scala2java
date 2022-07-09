@@ -22,10 +22,3 @@ private[traversers] class NameTraverserImpl(nameAnonymousTraverser: => NameAnony
   }
 
 }
-
-object NameTraverser extends NameTraverserImpl(
-  NameAnonymousTraverser,
-  NameIndeterminateTraverser,
-  TermNameTraverser,
-  TypeNameTraverser
-)
