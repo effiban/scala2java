@@ -4,7 +4,7 @@ import scala.meta.Pat
 
 trait PatExtractInfixTraverser extends ScalaTreeTraverser[Pat.ExtractInfix]
 
-class PatExtractInfixTraverserImpl(patExtractTraverser: PatExtractTraverser) extends PatExtractInfixTraverser {
+class PatExtractInfixTraverserImpl(patExtractTraverser: => PatExtractTraverser) extends PatExtractInfixTraverser {
 
   /**
    * Pattern match extractor in infix notation, e.g. {{{a MyRecord b}}}

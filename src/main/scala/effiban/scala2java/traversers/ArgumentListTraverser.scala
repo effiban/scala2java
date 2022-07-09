@@ -7,7 +7,7 @@ import scala.meta.Tree
 
 trait ArgumentListTraverser {
   def traverse[T <: Tree](args: List[T],
-                          argTraverser: ScalaTreeTraverser[T],
+                          argTraverser: => ScalaTreeTraverser[T],
                           onSameLine: Boolean = false,
                           maybeEnclosingDelimiter: Option[EnclosingDelimiter] = None): Unit
 }
@@ -17,7 +17,7 @@ class ArgumentListTraverserImpl(implicit javaWriter: JavaWriter) extends Argumen
   import javaWriter._
 
   override def traverse[T <: Tree](args: List[T],
-                                   argTraverser: ScalaTreeTraverser[T],
+                                   argTraverser: => ScalaTreeTraverser[T],
                                    onSameLine: Boolean = false,
                                    maybeEnclosingDelimiter: Option[EnclosingDelimiter] = None): Unit = {
     maybeEnclosingDelimiter.foreach(writeArgumentsStart)
