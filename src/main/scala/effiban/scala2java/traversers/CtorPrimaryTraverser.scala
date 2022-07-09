@@ -8,7 +8,7 @@ trait CtorPrimaryTraverser {
   def traverse(primaryCtor: Ctor.Primary, className: Type.Name, inits: List[Init]): Unit
 }
 
-private[scala2java] class CtorPrimaryStatTraverserImpl(ctorPrimaryStatTransformer: CtorPrimaryTransformer,
+private[traversers] class CtorPrimaryStatTraverserImpl(ctorPrimaryStatTransformer: CtorPrimaryTransformer,
                                                        defnDefTraverser: DefnDefTraverser) extends CtorPrimaryTraverser {
 
   override def traverse(primaryCtor: Ctor.Primary, className: Type.Name, inits: List[Init]): Unit = {

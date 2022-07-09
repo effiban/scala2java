@@ -7,7 +7,7 @@ import scala.meta.Term.{ApplyUnary, Super, This}
 
 trait TermRefTraverser extends ScalaTreeTraverser[Term.Ref]
 
-private[scala2java] class TermRefTraverserImpl(thisTraverser: => ThisTraverser,
+private[traversers] class TermRefTraverserImpl(thisTraverser: => ThisTraverser,
                                                superTraverser: => SuperTraverser,
                                                termNameTraverser: => TermNameTraverser,
                                                termSelectTraverser: => TermSelectTraverser,

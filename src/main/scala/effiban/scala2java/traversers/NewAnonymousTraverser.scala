@@ -6,7 +6,7 @@ import scala.meta.Term.NewAnonymous
 
 trait NewAnonymousTraverser extends ScalaTreeTraverser[NewAnonymous]
 
-private[scala2java] class NewAnonymousTraverserImpl(templateTraverser: => TemplateTraverser)
+private[traversers] class NewAnonymousTraverserImpl(templateTraverser: => TemplateTraverser)
                                                    (implicit javaWriter: JavaWriter) extends NewAnonymousTraverser {
 
   import javaWriter._

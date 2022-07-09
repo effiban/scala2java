@@ -12,7 +12,7 @@ import scala.meta.Mod.Final
 trait DeclValTraverser extends ScalaTreeTraverser[Decl.Val]
 
 //TODO - if Java owner is an interface, the output should be an accessor method
-private[scala2java] class DeclValTraverserImpl(annotListTraverser: => AnnotListTraverser,
+private[traversers] class DeclValTraverserImpl(annotListTraverser: => AnnotListTraverser,
                                                typeTraverser: => TypeTraverser,
                                                patListTraverser: => PatListTraverser,
                                                javaModifiersResolver: JavaModifiersResolver)

@@ -11,7 +11,7 @@ trait TermListTraverser {
                maybeEnclosingDelimiter: Option[EnclosingDelimiter] = None): Unit
 }
 
-private[scala2java] class TermListTraverserImpl(argumentListTraverser: => ArgumentListTraverser,
+private[traversers] class TermListTraverserImpl(argumentListTraverser: => ArgumentListTraverser,
                                                 termTraverser: => TermTraverser) extends TermListTraverser {
 
   override def traverse(terms: List[Term],

@@ -7,7 +7,7 @@ import scala.meta.Decl
 
 trait DeclTraverser extends ScalaTreeTraverser[Decl]
 
-private[scala2java] class DeclTraverserImpl(declValTraverser: => DeclValTraverser,
+private[traversers] class DeclTraverserImpl(declValTraverser: => DeclValTraverser,
                                             declVarTraverser: => DeclVarTraverser,
                                             declDefTraverser: => DeclDefTraverser,
                                             declTypeTraverser: => DeclTypeTraverser)

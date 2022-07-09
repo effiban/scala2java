@@ -7,7 +7,7 @@ import scala.meta.Term.{Block, TryWithHandler}
 
 trait TryWithHandlerTraverser extends ScalaTreeTraverser[TryWithHandler]
 
-private[scala2java] class TryWithHandlerTraverserImpl(blockTraverser: => BlockTraverser,
+private[traversers] class TryWithHandlerTraverserImpl(blockTraverser: => BlockTraverser,
                                                       catchHandlerTraverser: => CatchHandlerTraverser,
                                                       finallyTraverser: => FinallyTraverser)
                                                      (implicit javaWriter: JavaWriter) extends TryWithHandlerTraverser {

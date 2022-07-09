@@ -7,7 +7,7 @@ import scala.meta.Type
 
 trait TypeNameTraverser extends ScalaTreeTraverser[Type.Name]
 
-private[scala2java] class TypeNameTraverserImpl(scalaToJavaTypeNameTransformer: ScalaToJavaTypeNameTransformer)
+private[traversers] class TypeNameTraverserImpl(scalaToJavaTypeNameTransformer: ScalaToJavaTypeNameTransformer)
                                                (implicit javaWriter: JavaWriter) extends TypeNameTraverser {
 
   import javaWriter._

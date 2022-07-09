@@ -6,7 +6,7 @@ import scala.meta.Mod.Annot
 
 trait AnnotTraverser extends ScalaTreeTraverser[Annot]
 
-private[scala2java] class AnnotTraverserImpl(initTraverser: => InitTraverser)
+private[traversers] class AnnotTraverserImpl(initTraverser: => InitTraverser)
                                             (implicit javaWriter: JavaWriter) extends AnnotTraverser {
   import javaWriter._
 

@@ -6,7 +6,7 @@ import scala.meta.Type
 
 trait TypeRepeatedTraverser extends ScalaTreeTraverser[Type.Repeated]
 
-private[scala2java] class TypeRepeatedTraverserImpl(typeTraverser: => TypeTraverser)
+private[traversers] class TypeRepeatedTraverserImpl(typeTraverser: => TypeTraverser)
                                                    (implicit javaWriter: JavaWriter) extends TypeRepeatedTraverser {
 
   import javaWriter._

@@ -7,7 +7,7 @@ import scala.meta.Type
 
 trait TypeFunctionTraverser extends ScalaTreeTraverser[Type.Function]
 
-private[scala2java] class TypeFunctionTraverserImpl(typeApplyTraverser: => TypeApplyTraverser,
+private[traversers] class TypeFunctionTraverserImpl(typeApplyTraverser: => TypeApplyTraverser,
                                                     scalaToJavaFunctionTypeTransformer: ScalaToJavaFunctionTypeTransformer)
                                                    (implicit javaWriter: JavaWriter)
   extends TypeFunctionTraverser {

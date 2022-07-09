@@ -6,7 +6,7 @@ import scala.meta.Self
 
 trait SelfTraverser extends ScalaTreeTraverser[Self]
 
-private[scala2java] class SelfTraverserImpl(implicit javaWriter: JavaWriter) extends SelfTraverser {
+private[traversers] class SelfTraverserImpl(implicit javaWriter: JavaWriter) extends SelfTraverser {
 
   import javaWriter._
 

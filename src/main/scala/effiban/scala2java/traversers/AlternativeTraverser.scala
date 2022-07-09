@@ -6,7 +6,7 @@ import scala.meta.Pat.Alternative
 
 trait AlternativeTraverser extends ScalaTreeTraverser[Alternative]
 
-private[scala2java] class AlternativeTraverserImpl(patTraverser: => PatTraverser)
+private[traversers] class AlternativeTraverserImpl(patTraverser: => PatTraverser)
                                                   (implicit javaWriter: JavaWriter) extends AlternativeTraverser {
   import javaWriter._
 

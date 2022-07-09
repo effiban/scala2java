@@ -6,7 +6,7 @@ import scala.meta.Pat
 
 trait PatTypedTraverser extends ScalaTreeTraverser[Pat.Typed]
 
-private[scala2java] class PatTypedTraverserImpl(typeTraverser: => TypeTraverser,
+private[traversers] class PatTypedTraverserImpl(typeTraverser: => TypeTraverser,
                                                 patTraverser: => PatTraverser)
                                                (implicit javaWriter: JavaWriter) extends PatTypedTraverser {
 

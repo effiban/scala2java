@@ -6,7 +6,7 @@ import scala.meta.Type
 
 trait TypePlaceholderTraverser extends ScalaTreeTraverser[Type.Placeholder]
 
-private[scala2java] class TypePlaceholderTraverserImpl(typeBoundsTraverser: => TypeBoundsTraverser)
+private[traversers] class TypePlaceholderTraverserImpl(typeBoundsTraverser: => TypeBoundsTraverser)
                                                       (implicit javaWriter: JavaWriter) extends TypePlaceholderTraverser {
 
   import javaWriter._

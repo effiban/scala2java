@@ -6,7 +6,7 @@ import scala.meta.Term.Assign
 
 trait AssignTraverser extends ScalaTreeTraverser[Assign]
 
-private[scala2java] class AssignTraverserImpl(termTraverser: => TermTraverser)
+private[traversers] class AssignTraverserImpl(termTraverser: => TermTraverser)
                                              (implicit javaWriter: JavaWriter) extends AssignTraverser {
 
   import javaWriter._

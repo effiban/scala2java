@@ -7,7 +7,7 @@ import scala.meta.Init
 
 trait InitTraverser extends ScalaTreeTraverser[Init]
 
-private[scala2java] class InitTraverserImpl(typeTraverser: => TypeTraverser,
+private[traversers] class InitTraverserImpl(typeTraverser: => TypeTraverser,
                                             termListTraverser: => TermListTraverser)
                                            (implicit javaWriter: JavaWriter) extends InitTraverser {
 

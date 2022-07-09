@@ -6,7 +6,7 @@ import scala.meta.Type
 
 trait TypeExistentialTraverser extends ScalaTreeTraverser[Type.Existential]
 
-private[scala2java] class TypeExistentialTraverserImpl(typeTraverser: => TypeTraverser)
+private[traversers] class TypeExistentialTraverserImpl(typeTraverser: => TypeTraverser)
                                                       (implicit javaWriter: JavaWriter) extends TypeExistentialTraverser {
 
   import javaWriter._

@@ -7,7 +7,7 @@ import scala.meta.Term
 
 trait TermPlaceholderTraverser extends ScalaTreeTraverser[Term.Placeholder]
 
-private[scala2java] class TermPlaceholderTraverserImpl(implicit javaWriter: JavaWriter) extends TermPlaceholderTraverser {
+private[traversers] class TermPlaceholderTraverserImpl(implicit javaWriter: JavaWriter) extends TermPlaceholderTraverser {
 
   import javaWriter._
 

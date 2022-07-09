@@ -6,7 +6,7 @@ import scala.meta.Pat
 
 trait PatTupleTraverser extends ScalaTreeTraverser[Pat.Tuple]
 
-private[scala2java] class PatTupleTraverserImpl(implicit javaWriter: JavaWriter) extends PatTupleTraverser {
+private[traversers] class PatTupleTraverserImpl(implicit javaWriter: JavaWriter) extends PatTupleTraverser {
 
   import javaWriter._
 

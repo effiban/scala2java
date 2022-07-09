@@ -9,7 +9,7 @@ trait CatchHandlerTraverser {
   def traverse(param: Term.Param, body: Term): Unit
 }
 
-private[scala2java] class CatchHandlerTraverserImpl(termParamListTraverser: => TermParamListTraverser,
+private[traversers] class CatchHandlerTraverserImpl(termParamListTraverser: => TermParamListTraverser,
                                                     blockTraverser: => BlockTraverser)
                                                    (implicit javaWriter: JavaWriter) extends CatchHandlerTraverser {
 

@@ -6,7 +6,7 @@ import scala.meta.Type
 
 trait TypeSingletonTraverser extends ScalaTreeTraverser[Type.Singleton]
 
-private[scala2java] class TypeSingletonTraverserImpl(termTraverser: => TermTraverser,
+private[traversers] class TypeSingletonTraverserImpl(termTraverser: => TermTraverser,
                                                      typeSingletonToTermTransformer: TypeSingletonToTermTransformer)
   extends TypeSingletonTraverser {
 

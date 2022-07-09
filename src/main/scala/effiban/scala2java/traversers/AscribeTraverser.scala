@@ -7,7 +7,7 @@ import scala.meta.Term.Ascribe
 
 trait AscribeTraverser extends ScalaTreeTraverser[Ascribe]
 
-private[scala2java] class AscribeTraverserImpl(typeTraverser: => TypeTraverser,
+private[traversers] class AscribeTraverserImpl(typeTraverser: => TypeTraverser,
                                                termTraverser: => TermTraverser)
                                               (implicit javaWriter: JavaWriter) extends AscribeTraverser {
 

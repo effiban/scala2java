@@ -6,7 +6,7 @@ import scala.meta.Type
 
 trait TypeByNameTraverser extends ScalaTreeTraverser[Type.ByName]
 
-private[scala2java] class TypeByNameTraverserImpl(typeApplyTraverser: => TypeApplyTraverser,
+private[traversers] class TypeByNameTraverserImpl(typeApplyTraverser: => TypeApplyTraverser,
                                                   typeByNameToSupplierTypeTransformer: TypeByNameToSupplierTypeTransformer)
   extends TypeByNameTraverser {
 

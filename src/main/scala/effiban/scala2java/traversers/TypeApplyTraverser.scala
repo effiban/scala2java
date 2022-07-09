@@ -4,7 +4,7 @@ import scala.meta.Type
 
 trait TypeApplyTraverser extends ScalaTreeTraverser[Type.Apply]
 
-private[scala2java] class TypeApplyTraverserImpl(typeTraverser: => TypeTraverser,
+private[traversers] class TypeApplyTraverserImpl(typeTraverser: => TypeTraverser,
                                                  typeListTraverser: => TypeListTraverser) extends TypeApplyTraverser {
 
   // type definition with generic args, e.g. F[T]

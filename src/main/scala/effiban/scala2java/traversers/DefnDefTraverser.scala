@@ -14,7 +14,7 @@ trait DefnDefTraverser {
   def traverse(defnDef: Defn.Def, maybeInit: Option[Init] = None): Unit
 }
 
-private[scala2java] class DefnDefTraverserImpl(annotListTraverser: => AnnotListTraverser,
+private[traversers] class DefnDefTraverserImpl(annotListTraverser: => AnnotListTraverser,
                                                termNameTraverser: => TermNameTraverser,
                                                typeTraverser: => TypeTraverser,
                                                termParamListTraverser: => TermParamListTraverser,

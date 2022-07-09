@@ -7,7 +7,7 @@ import scala.meta.Term.ApplyType
 
 trait ApplyTypeTraverser extends ScalaTreeTraverser[ApplyType]
 
-private[scala2java] class ApplyTypeTraverserImpl(typeTraverser: => TypeTraverser,
+private[traversers] class ApplyTypeTraverserImpl(typeTraverser: => TypeTraverser,
                                                  termTraverser: => TermTraverser,
                                                  typeListTraverser: => TypeListTraverser)
                                                 (implicit javaWriter: JavaWriter) extends ApplyTypeTraverser {

@@ -12,7 +12,7 @@ import scala.meta.Defn
 trait DefnVarTraverser extends ScalaTreeTraverser[Defn.Var]
 
 //TODO - if Java owner is an interface, the output should be a pair of accessor/mutator methods with default impls
-private[scala2java] class DefnVarTraverserImpl(annotListTraverser: => AnnotListTraverser,
+private[traversers] class DefnVarTraverserImpl(annotListTraverser: => AnnotListTraverser,
                                                typeTraverser: => TypeTraverser,
                                                patListTraverser: => PatListTraverser,
                                                termTraverser: => TermTraverser,

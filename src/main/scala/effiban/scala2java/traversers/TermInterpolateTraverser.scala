@@ -7,7 +7,7 @@ import scala.meta.Term
 
 trait TermInterpolateTraverser extends ScalaTreeTraverser[Term.Interpolate]
 
-private[scala2java] class TermInterpolateTraverserImpl(termInterpolateTransformer: TermInterpolateTransformer,
+private[traversers] class TermInterpolateTraverserImpl(termInterpolateTransformer: TermInterpolateTransformer,
                                                        termApplyTraverser: => TermApplyTraverser)
                                                       (implicit javaWriter: JavaWriter) extends TermInterpolateTraverser {
 

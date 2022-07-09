@@ -6,7 +6,7 @@ import scala.meta.Importee
 
 trait ImporteeTraverser extends ScalaTreeTraverser[Importee]
 
-private[scala2java] class ImporteeTraverserImpl(nameTraverser: => NameTraverser)
+private[traversers] class ImporteeTraverserImpl(nameTraverser: => NameTraverser)
                                                (implicit javaWriter: JavaWriter) extends ImporteeTraverser {
 
   import javaWriter._

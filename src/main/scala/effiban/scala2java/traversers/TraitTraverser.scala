@@ -9,7 +9,7 @@ import scala.meta.Defn.Trait
 
 trait TraitTraverser extends ScalaTreeTraverser[Trait]
 
-private[scala2java] class TraitTraverserImpl(annotListTraverser: => AnnotListTraverser,
+private[traversers] class TraitTraverserImpl(annotListTraverser: => AnnotListTraverser,
                                              typeParamListTraverser: => TypeParamListTraverser,
                                              templateTraverser: => TemplateTraverser,
                                              javaModifiersResolver: JavaModifiersResolver)

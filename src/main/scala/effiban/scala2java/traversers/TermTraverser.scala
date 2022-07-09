@@ -7,7 +7,7 @@ import scala.meta.{Lit, Term}
 
 trait TermTraverser extends ScalaTreeTraverser[Term]
 
-private[scala2java] class TermTraverserImpl(termRefTraverser: => TermRefTraverser,
+private[traversers] class TermTraverserImpl(termRefTraverser: => TermRefTraverser,
                                             termApplyTraverser: => TermApplyTraverser,
                                             applyTypeTraverser: => ApplyTypeTraverser,
                                             termApplyInfixTraverser: => TermApplyInfixTraverser,

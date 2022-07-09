@@ -4,7 +4,7 @@ import scala.meta.Term
 
 trait PartialFunctionTraverser extends ScalaTreeTraverser[Term.PartialFunction]
 
-private[scala2java] class PartialFunctionTraverserImpl(termFunctionTraverser: => TermFunctionTraverser) extends PartialFunctionTraverser {
+private[traversers] class PartialFunctionTraverserImpl(termFunctionTraverser: => TermFunctionTraverser) extends PartialFunctionTraverser {
 
   override def traverse(partialFunction: Term.PartialFunction): Unit = {
     // The Java equivalent is a full function (lambda) with a switch clause. We need to add a dummy arg for that.

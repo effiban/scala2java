@@ -6,7 +6,7 @@ import scala.meta.Pat
 
 trait PatWildcardTraverser extends ScalaTreeTraverser[Pat.Wildcard]
 
-private[scala2java] class PatWildcardTraverserImpl(implicit javaWriter: JavaWriter) extends PatWildcardTraverser {
+private[traversers] class PatWildcardTraverserImpl(implicit javaWriter: JavaWriter) extends PatWildcardTraverser {
 
   import javaWriter._
 
