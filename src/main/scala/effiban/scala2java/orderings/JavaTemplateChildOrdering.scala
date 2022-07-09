@@ -20,7 +20,7 @@ object JavaTemplateChildOrdering extends JavaTemplateChildOrdering {
 
   private def positionOf(child: Tree) = {
     ChildOrder.zipWithIndex
-      .filter { case (childType, _) => child.getClass == childType }
+      .filter { case (childType, _) => childType.isAssignableFrom(child.getClass) }
       .map { case (_, idx) => idx }
       .headOption
       .getOrElse(Int.MaxValue)
