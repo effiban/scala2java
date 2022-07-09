@@ -44,7 +44,7 @@ class CtorPrimaryTransformerImplTest extends UnitTestSuite {
       name = Term.Name(ClassName),
       tparams = Nil,
       paramss = Nil,
-      decltpe = None,
+      decltpe = Some(Type.AnonymousName()),
       body = Block(Nil)
     )
 
@@ -80,7 +80,7 @@ class CtorPrimaryTransformerImplTest extends UnitTestSuite {
       name = Term.Name(ClassName),
       tparams = Nil,
       paramss = Nil,
-      decltpe = None,
+      decltpe = Some(Type.AnonymousName()),
       body = Block(List(expectedSuperCall))
     )
 
@@ -111,7 +111,7 @@ class CtorPrimaryTransformerImplTest extends UnitTestSuite {
       name = Term.Name(ClassName),
       tparams = Nil,
       paramss = List(CtorParams),
-      decltpe = None,
+      decltpe = Some(Type.AnonymousName()),
       body = Block(expectedAssignments)
     )
 
@@ -152,7 +152,7 @@ class CtorPrimaryTransformerImplTest extends UnitTestSuite {
       name = Term.Name(ClassName),
       tparams = Nil,
       paramss = List(CtorParams),
-      decltpe = None,
+      decltpe = Some(Type.AnonymousName()),
       body = Block(expectedSuperCall :: expectedAssignments)
     )
 
