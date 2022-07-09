@@ -1,7 +1,6 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.writers.JavaWriter
-import effiban.scala2java.writers.JavaWriter.writeComment
 
 import scala.meta.Defn
 import scala.meta.Defn.Trait
@@ -16,6 +15,8 @@ private[traversers] class DefnTraverserImpl(defnValTraverser: => DefnValTraverse
                                             traitTraverser: => TraitTraverser,
                                             objectTraverser: => ObjectTraverser)
                                            (implicit javaWriter: JavaWriter) extends DefnTraverser {
+
+  import javaWriter._
 
   override def traverse(defn: Defn): Unit = defn match {
     case valDef: Defn.Val => defnValTraverser.traverse(valDef)

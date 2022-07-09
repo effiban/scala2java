@@ -1,7 +1,6 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.writers.JavaWriter
-import effiban.scala2java.writers.JavaWriter.writeComment
 
 import scala.meta.Type
 
@@ -12,6 +11,8 @@ private[traversers] class TypeRefTraverserImpl(typeNameTraverser: => TypeNameTra
                                                typeProjectTraverser: => TypeProjectTraverser,
                                                typeSingletonTraverser: => TypeSingletonTraverser)
                                               (implicit javaWriter: JavaWriter) extends TypeRefTraverser {
+
+  import javaWriter._
 
   override def traverse(typeRef: Type.Ref): Unit = typeRef match {
     case typeName: Type.Name => typeNameTraverser.traverse(typeName)

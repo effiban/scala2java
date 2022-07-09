@@ -2,6 +2,8 @@ package effiban.scala2java.writers
 
 import effiban.scala2java.entities.EnclosingDelimiter.{EnclosingDelimiter, _}
 
+import java.io.Writer
+
 trait JavaWriter {
 
   def writeTypeDeclaration(modifiers: List[String], typeKeyword: String, name: String): Unit
@@ -37,7 +39,7 @@ trait JavaWriter {
   def write(str: String): Unit
 }
 
-private[writers] class JavaWriterImpl extends JavaWriter {
+class JavaWriterImpl(writer: Writer) extends JavaWriter {
   var indentationLevel = 0
   var indentationRequired = false
 
@@ -134,20 +136,18 @@ private[writers] class JavaWriterImpl extends JavaWriter {
     write(delimStr)
   }
 
-  override def write(str: String): Unit = {
-    if (indentationRequired) {
-      print(indentation())
-      indentationRequired = false
-    }
-    print(str)
-  }
-
   private def writeLineBreak(): Unit = {
     write("\n")
     indentationRequired = true
   }
 
+  override def write(str: String): Unit = {
+    if (indentationRequired) {
+      writer.write(indentation())
+      indentationRequired = false
+    }
+    writer.write(str)
+  }
+
   private def indentation() = "\t" * indentationLevel
 }
-
-object JavaWriter extends JavaWriterImpl
