@@ -31,8 +31,3 @@ private[traversers] class ObjectTraverserImpl(annotListTraverser: => AnnotListTr
   }
 }
 
-object ObjectTraverser extends ObjectTraverserImpl(
-  AnnotListTraverser,
-  TemplateTraverser,
-  JavaModifiersResolver)
-

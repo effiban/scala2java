@@ -16,5 +16,3 @@ private[traversers] class NewAnonymousTraverserImpl(templateTraverser: => Templa
     templateTraverser.traverse(newAnonymous.templ)
   }
 }
-
-object NewAnonymousTraverser extends NewAnonymousTraverserImpl(TemplateTraverser)

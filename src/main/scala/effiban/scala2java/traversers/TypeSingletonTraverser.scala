@@ -14,5 +14,3 @@ private[traversers] class TypeSingletonTraverserImpl(termTraverser: => TermTrave
     termTraverser.traverse(typeSingletonToTermTransformer.transform(singletonType))
   }
 }
-
-object TypeSingletonTraverser extends TypeSingletonTraverserImpl(TermTraverser, TypeSingletonToTermTransformer)

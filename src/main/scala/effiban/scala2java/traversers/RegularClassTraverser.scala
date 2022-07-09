@@ -38,11 +38,3 @@ private[traversers] class RegularClassTraverserImpl(annotListTraverser: => Annot
     javaScope = outerJavaScope
   }
 }
-
-object RegularClassTraverser extends RegularClassTraverserImpl(
-  AnnotListTraverser,
-  TypeParamListTraverser,
-  TemplateTraverser,
-  ParamToDeclValTransformer,
-  JavaModifiersResolver
-)

@@ -26,5 +26,3 @@ private[traversers] class SuperTraverserImpl(nameTraverser: => NameTraverser)
     }
   }
 }
-
-object SuperTraverser extends SuperTraverserImpl(NameTraverser)

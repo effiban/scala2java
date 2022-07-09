@@ -16,5 +16,3 @@ private[traversers] class TypeNameTraverserImpl(scalaToJavaTypeNameTransformer: 
     write(scalaToJavaTypeNameTransformer.transform(name))
   }
 }
-
-object TypeNameTraverser extends TypeNameTraverserImpl(ScalaToJavaTypeNameTransformer)

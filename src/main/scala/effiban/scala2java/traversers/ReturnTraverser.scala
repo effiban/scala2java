@@ -16,5 +16,3 @@ private[traversers] class ReturnTraverserImpl(termTraverser: => TermTraverser)
     termTraverser.traverse(`return`.expr)
   }
 }
-
-object ReturnTraverser extends ReturnTraverserImpl(TermTraverser)

@@ -16,5 +16,3 @@ private[traversers] class TermPlaceholderTraverserImpl(implicit javaWriter: Java
     write(JavaPlaceholder)
   }
 }
-
-object TermPlaceholderTraverser extends TermPlaceholderTraverserImpl

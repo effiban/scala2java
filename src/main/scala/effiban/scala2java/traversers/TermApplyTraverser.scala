@@ -17,5 +17,3 @@ private[traversers] class TermApplyTraverserImpl(termTraverser: => TermTraverser
     termListTraverser.traverse(termApply.args, maybeEnclosingDelimiter = Some(Parentheses))
   }
 }
-
-object TermApplyTraverser extends TermApplyTraverserImpl(TermTraverser, TermListTraverser)

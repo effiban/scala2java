@@ -19,5 +19,3 @@ private[traversers] class TypeRefineTraverserImpl(typeTraverser: => TypeTraverse
     writeComment(s"${refinedType.stats.toString()}")
   }
 }
-
-object TypeRefineTraverser extends TypeRefineTraverserImpl(TypeTraverser)

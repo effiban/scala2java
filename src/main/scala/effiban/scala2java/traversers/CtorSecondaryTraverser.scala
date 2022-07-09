@@ -16,5 +16,3 @@ private[traversers] class CtorSecondaryTraverserImpl(ctorSecondaryTransformer: C
     defnDefTraverser.traverse(defnDef, Some(secondaryCtor.init))
   }
 }
-
-object CtorSecondaryTraverser extends CtorSecondaryTraverserImpl(CtorSecondaryTransformer, DefnDefTraverser)

@@ -15,5 +15,3 @@ private[traversers] class ClassTraverserImpl(caseClassTraverser: => CaseClassTra
     }
   }
 }
-
-object ClassTraverser extends ClassTraverserImpl(CaseClassTraverser, RegularClassTraverser)

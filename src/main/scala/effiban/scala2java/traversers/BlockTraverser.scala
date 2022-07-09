@@ -51,11 +51,3 @@ private[traversers] class BlockTraverserImpl(initTraverser: => InitTraverser,
     }
   }
 }
-
-object BlockTraverser extends BlockTraverserImpl(
-  InitTraverser,
-  IfTraverser,
-  WhileTraverser,
-  ReturnTraverser,
-  StatTraverser
-)

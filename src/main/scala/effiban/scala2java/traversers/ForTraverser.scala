@@ -5,11 +5,9 @@ import scala.meta.Term.For
 
 trait ForTraverser extends ScalaTreeTraverser[For]
 
-private[traversers] class ForTraverserImpl(forVariantsTraverser: => ForVariantTraverser) extends ForTraverser {
+private[traversers] class ForTraverserImpl(forVariantTraverser: => ForVariantTraverser) extends ForTraverser {
 
   override def traverse(`for`: For): Unit = {
-    forVariantsTraverser.traverse(`for`.enums, `for`.body, Term.Name("forEach"))
+    forVariantTraverser.traverse(`for`.enums, `for`.body, Term.Name("forEach"))
   }
 }
-
-object ForTraverser extends ForTraverserImpl(ForVariantTraverser)

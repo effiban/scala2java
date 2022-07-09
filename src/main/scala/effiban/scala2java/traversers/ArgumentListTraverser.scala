@@ -40,5 +40,3 @@ class ArgumentListTraverserImpl(implicit javaWriter: JavaWriter) extends Argumen
     }
   }
 }
-
-object ArgumentListTraverser extends ArgumentListTraverserImpl

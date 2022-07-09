@@ -20,5 +20,3 @@ private[traversers] class TypeProjectTraverserImpl(typeTraverser: => TypeTravers
     typeNameTraverser.traverse(typeProject.name)
   }
 }
-
-object TypeProjectTraverser extends TypeProjectTraverserImpl(TypeTraverser, TypeNameTraverser)

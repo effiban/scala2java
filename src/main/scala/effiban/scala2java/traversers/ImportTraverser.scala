@@ -18,5 +18,3 @@ private[traversers] class ImportTraverserImpl(importerTraverser: => ImporterTrav
     }
   }
 }
-
-object ImportTraverser extends ImportTraverserImpl(ImporterTraverser)

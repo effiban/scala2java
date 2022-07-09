@@ -46,10 +46,3 @@ private[traversers] class DefnVarTraverserImpl(annotListTraverser: => AnnotListT
     }
   }
 }
-
-object DefnVarTraverser extends DefnVarTraverserImpl(AnnotListTraverser,
-  TypeTraverser,
-  PatListTraverser,
-  TermTraverser,
-  JavaModifiersResolver
-)

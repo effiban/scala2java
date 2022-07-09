@@ -39,11 +39,3 @@ private[traversers] class DeclDefTraverserImpl(annotListTraverser: => AnnotListT
     javaScope = outerJavaScope
   }
 }
-
-object DeclDefTraverser extends DeclDefTraverserImpl(
-  AnnotListTraverser,
-  TypeTraverser,
-  TermNameTraverser,
-  TermParamListTraverser,
-  JavaModifiersResolver
-)

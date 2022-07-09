@@ -69,9 +69,9 @@ private[traversers] class TemplateTraverserImpl(initListTraverser: => InitListTr
     writeBlockEnd()
   }
 
-  def traversePrimaryCtor(primaryCtor: Ctor.Primary,
-                          maybeClassName: Option[Type.Name],
-                          inits: List[Init]): Unit = {
+  private def traversePrimaryCtor(primaryCtor: Ctor.Primary,
+                                  maybeClassName: Option[Type.Name],
+                                  inits: List[Init]): Unit = {
     maybeClassName match {
       case Some(className) => ctorPrimaryTraverser.traverse(primaryCtor, className, inits)
       case None => throw new IllegalStateException("Primary Ctor. exists but class name was not passed to the TemplateTraverser")
@@ -85,12 +85,3 @@ private[traversers] class TemplateTraverserImpl(initListTraverser: => InitListTr
     }
   }
 }
-
-object TemplateTraverser extends TemplateTraverserImpl(
-  InitListTraverser,
-  SelfTraverser,
-  StatTraverser,
-  CtorPrimaryTraverser,
-  CtorSecondaryTraverser,
-  JavaTemplateChildOrdering
-)

@@ -15,5 +15,3 @@ private[traversers] class AnnotTraverserImpl(initTraverser: => InitTraverser)
     initTraverser.traverse(annotation.init)
   }
 }
-
-object AnnotTraverser extends AnnotTraverserImpl(InitTraverser)

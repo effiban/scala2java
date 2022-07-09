@@ -30,10 +30,3 @@ private[traversers] class TraitTraverserImpl(annotListTraverser: => AnnotListTra
     javaScope = outerJavaScope
   }
 }
-
-object TraitTraverser extends TraitTraverserImpl(
-  AnnotListTraverser,
-  TypeParamListTraverser,
-  TemplateTraverser,
-  JavaModifiersResolver
-)

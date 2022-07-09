@@ -29,5 +29,3 @@ private[traversers] class TypeBoundsTraverserImpl(typeTraverser: => TypeTraverse
     }
   }
 }
-
-object TypeBoundsTraverser extends TypeBoundsTraverserImpl(TypeTraverser)

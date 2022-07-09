@@ -16,5 +16,3 @@ private[traversers] class TypeVarTraverserImpl(implicit javaWriter: JavaWriter) 
     writeComment(typeVar.toString())
   }
 }
-
-object TypeVarTraverser extends TypeVarTraverserImpl

@@ -21,8 +21,3 @@ private[traversers] class DeclTraverserImpl(declValTraverser: => DeclValTraverse
     case _ => writeComment(s"UNSUPPORTED: $decl")
   }
 }
-
-object DeclTraverser extends DeclTraverserImpl(DeclValTraverser,
-  DeclVarTraverser,
-  DeclDefTraverser,
-  DeclTypeTraverser)

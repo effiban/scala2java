@@ -21,5 +21,3 @@ private[traversers] class TermAnnotateTraverserImpl(annotListTraverser: => Annot
     write(")")
   }
 }
-
-object TermAnnotateTraverser extends TermAnnotateTraverserImpl(AnnotListTraverser, TermTraverser)

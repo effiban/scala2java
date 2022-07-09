@@ -16,5 +16,3 @@ private[traversers] class NewTraverserImpl(initTraverser: => InitTraverser)
     initTraverser.traverse(`new`.init)
   }
 }
-
-object NewTraverser extends NewTraverserImpl(InitTraverser)

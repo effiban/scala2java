@@ -19,5 +19,3 @@ private[traversers] class PatTypedTraverserImpl(typeTraverser: => TypeTraverser,
     patTraverser.traverse(typedPattern.lhs)
   }
 }
-
-object PatTypedTraverser extends PatTypedTraverserImpl(TypeTraverser, PatTraverser)

@@ -18,5 +18,3 @@ private[traversers] class AssignTraverserImpl(termTraverser: => TermTraverser)
     termTraverser.traverse(assign.rhs)
   }
 }
-
-object AssignTraverser extends AssignTraverserImpl(TermTraverser)

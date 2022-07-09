@@ -25,11 +25,3 @@ private[traversers] class StatTraverserImpl(termTraverser: => TermTraverser,
   }
 
 }
-
-object StatTraverser extends StatTraverserImpl(
-  TermTraverser,
-  ImportTraverser,
-  PkgTraverser,
-  DefnTraverser,
-  DeclTraverser
-)

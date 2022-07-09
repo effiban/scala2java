@@ -25,5 +25,3 @@ private[traversers] class TermListTraverserImpl(argumentListTraverser: => Argume
     }
   }
 }
-
-object TermListTraverser extends TermListTraverserImpl(ArgumentListTraverser, TermTraverser)

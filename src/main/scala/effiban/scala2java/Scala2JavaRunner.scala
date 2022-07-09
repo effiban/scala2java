@@ -1,6 +1,7 @@
 package effiban.scala2java
 
-import effiban.scala2java.traversers.SourceTraverser
+import effiban.scala2java.traversers.ScalaTreeTraversers
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Source
 import scala.meta.inputs.Input
@@ -19,7 +20,10 @@ object Scala2JavaRunner {
       input.parse[Source].get
     })
 
-    sourceTrees.foreach(SourceTraverser.traverse)
+    implicit val javaWriter: JavaWriter = JavaWriter
+    val traversers = new ScalaTreeTraversers
+
+    sourceTrees.foreach(traversers.SourceTraverser.traverse)
   }
 }
 

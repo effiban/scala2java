@@ -28,9 +28,3 @@ private[traversers] class TermFunctionTraverserImpl(termParamTraverser: => TermP
     javaScope = outerJavaScope
   }
 }
-
-object TermFunctionTraverser extends TermFunctionTraverserImpl(
-  TermParamTraverser,
-  TermParamListTraverser,
-  TermTraverser
-)

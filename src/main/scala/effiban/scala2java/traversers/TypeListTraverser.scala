@@ -20,5 +20,3 @@ private[traversers] class TypeListTraverserImpl(argumentListTraverser: => Argume
     }
   }
 }
-
-object TypeListTraverser extends TypeListTraverserImpl(ArgumentListTraverser, TypeTraverser)

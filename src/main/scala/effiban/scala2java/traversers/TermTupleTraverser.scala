@@ -13,5 +13,3 @@ private[traversers] class TermTupleTraverserImpl(termListTraverser: => TermListT
     termListTraverser.traverse(termTuple.args, maybeEnclosingDelimiter = Some(Parentheses), onSameLine = true)
   }
 }
-
-object TermTupleTraverser extends TermTupleTraverserImpl(TermListTraverser)

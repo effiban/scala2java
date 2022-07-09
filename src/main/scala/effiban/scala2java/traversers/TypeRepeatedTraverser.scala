@@ -17,5 +17,3 @@ private[traversers] class TypeRepeatedTraverserImpl(typeTraverser: => TypeTraver
     writeEllipsis()
   }
 }
-
-object TypeRepeatedTraverser extends TypeRepeatedTraverserImpl(TypeTraverser)

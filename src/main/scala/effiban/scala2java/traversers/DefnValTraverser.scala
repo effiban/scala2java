@@ -49,12 +49,3 @@ private[traversers] class DefnValTraverserImpl(annotListTraverser: => AnnotListT
     termTraverser.traverse(valDef.rhs)
   }
 }
-
-object DefnValTraverser extends DefnValTraverserImpl(
-  AnnotListTraverser,
-  TypeTraverser,
-  PatListTraverser,
-  TermTraverser,
-  JavaModifiersResolver
-)
-

@@ -31,10 +31,3 @@ private[traversers] class DeclVarTraverserImpl(annotListTraverser: => AnnotListT
     patListTraverser.traverse(varDecl.pats)
   }
 }
-
-object DeclVarTraverser extends DeclVarTraverserImpl(
-  AnnotListTraverser,
-  TypeTraverser,
-  PatListTraverser,
-  JavaModifiersResolver
-)

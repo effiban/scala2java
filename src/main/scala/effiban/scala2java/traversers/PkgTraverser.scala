@@ -20,5 +20,3 @@ private[traversers] class PkgTraverserImpl(termRefTraverser: => TermRefTraverser
     pkg.stats.foreach(statTraverser.traverse)
   }
 }
-
-object PkgTraverser extends PkgTraverserImpl(TermRefTraverser, StatTraverser)

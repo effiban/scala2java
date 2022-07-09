@@ -13,5 +13,3 @@ private[traversers] class TypeApplyTraverserImpl(typeTraverser: => TypeTraverser
     typeListTraverser.traverse(typeApply.args)
   }
 }
-
-object TypeApplyTraverser extends TypeApplyTraverserImpl(TypeTraverser, TypeListTraverser)

@@ -70,12 +70,3 @@ private[traversers] class DefnDefTraverserImpl(annotListTraverser: => AnnotListT
         maybeInit = maybeInit)
   }
 }
-
-object DefnDefTraverser extends DefnDefTraverserImpl(
-  AnnotListTraverser,
-  TermNameTraverser,
-  TypeTraverser,
-  TermParamListTraverser,
-  BlockTraverser,
-  JavaModifiersResolver
-)

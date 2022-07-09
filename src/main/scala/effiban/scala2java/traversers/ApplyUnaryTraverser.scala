@@ -15,5 +15,3 @@ private[traversers] class ApplyUnaryTraverserImpl(termNameTraverser: => TermName
     termTraverser.traverse(applyUnary.arg)
   }
 }
-
-object ApplyUnaryTraverser extends ApplyUnaryTraverserImpl(TermNameTraverser, TermTraverser)

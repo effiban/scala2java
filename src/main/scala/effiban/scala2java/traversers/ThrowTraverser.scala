@@ -16,5 +16,3 @@ private[traversers] class ThrowTraverserImpl(termTraverser: => TermTraverser)
     termTraverser.traverse(`throw`.expr)
   }
 }
-
-object ThrowTraverser extends ThrowTraverserImpl(TermTraverser)

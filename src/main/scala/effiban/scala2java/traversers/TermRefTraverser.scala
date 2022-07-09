@@ -25,11 +25,3 @@ private[traversers] class TermRefTraverserImpl(thisTraverser: => ThisTraverser,
     case _ => writeComment(s"UNSUPPORTED: $termRef")
   }
 }
-
-object TermRefTraverser extends TermRefTraverserImpl(
-  ThisTraverser,
-  SuperTraverser,
-  TermNameTraverser,
-  TermSelectTraverser,
-  ApplyUnaryTraverser
-)

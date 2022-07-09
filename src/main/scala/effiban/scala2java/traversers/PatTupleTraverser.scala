@@ -16,5 +16,3 @@ private[traversers] class PatTupleTraverserImpl(implicit javaWriter: JavaWriter)
     writeComment(s"(${patternTuple.args.mkString(", ")})")
   }
 }
-
-object PatTupleTraverser extends PatTupleTraverserImpl()

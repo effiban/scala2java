@@ -22,5 +22,3 @@ private[traversers] class AscribeTraverserImpl(typeTraverser: => TypeTraverser,
     termTraverser.traverse(ascribe.expr)
   }
 }
-
-object AscribeTraverser extends AscribeTraverserImpl(TypeTraverser, TermTraverser)

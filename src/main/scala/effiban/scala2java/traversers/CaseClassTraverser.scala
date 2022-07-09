@@ -32,11 +32,3 @@ private[traversers] class CaseClassTraverserImpl(annotListTraverser: => AnnotLis
     javaScope = outerJavaScope
   }
 }
-
-object CaseClassTraverser extends CaseClassTraverserImpl(
-  AnnotListTraverser,
-  TypeParamListTraverser,
-  TermParamListTraverser,
-  TemplateTraverser,
-  JavaModifiersResolver
-)

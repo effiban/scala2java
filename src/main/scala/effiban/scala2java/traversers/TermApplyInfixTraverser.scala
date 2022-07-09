@@ -25,5 +25,3 @@ private[traversers] class TermApplyInfixTraverserImpl(termTraverser: => TermTrav
     termListTraverser.traverse(termApplyInfix.args, onSameLine = true)
   }
 }
-
-object TermApplyInfixTraverser extends TermApplyInfixTraverserImpl(TermTraverser, TermNameTraverser, TermListTraverser)

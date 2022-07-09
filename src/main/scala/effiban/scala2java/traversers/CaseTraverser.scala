@@ -27,5 +27,3 @@ private[traversers] class CaseTraverserImpl(patTraverser: => PatTraverser,
     writeStatementEnd()
   }
 }
-
-object CaseTraverser extends CaseTraverserImpl(PatTraverser, TermTraverser)

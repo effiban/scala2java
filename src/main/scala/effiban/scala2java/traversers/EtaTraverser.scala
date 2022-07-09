@@ -21,5 +21,3 @@ private[traversers] class EtaTraverserImpl(termTraverser: => TermTraverser)
     termTraverser.traverse(eta.expr)
   }
 }
-
-object EtaTraverser extends EtaTraverserImpl(TermTraverser)

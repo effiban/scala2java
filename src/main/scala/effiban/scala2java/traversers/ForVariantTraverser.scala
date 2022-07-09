@@ -64,5 +64,3 @@ private[traversers] class ForVariantTraverserImpl(termTraverser: => TermTraverse
     Param(mods = List.empty, name = Term.Name(name), decltpe = None, default = None)
   }
 }
-
-object ForVariantTraverser extends ForVariantTraverserImpl(TermTraverser)
