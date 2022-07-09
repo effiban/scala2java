@@ -9,7 +9,7 @@ trait CtorPrimaryTraverser {
 }
 
 private[traversers] class CtorPrimaryTraverserImpl(ctorPrimaryTransformer: CtorPrimaryTransformer,
-                                                   defnDefTraverser: DefnDefTraverser) extends CtorPrimaryTraverser {
+                                                   defnDefTraverser: => DefnDefTraverser) extends CtorPrimaryTraverser {
 
   override def traverse(primaryCtor: Ctor.Primary, className: Type.Name, inits: List[Init]): Unit = {
     val defnDef = ctorPrimaryTransformer.transform(primaryCtor, className, inits)

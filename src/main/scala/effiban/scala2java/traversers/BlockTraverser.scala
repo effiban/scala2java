@@ -11,8 +11,8 @@ trait BlockTraverser {
 
 private[traversers] class BlockTraverserImpl(initTraverser: => InitTraverser,
                                              ifTraverser: => IfTraverser,
-                                             whileTraverser: WhileTraverser,
-                                             returnTraverser: ReturnTraverser,
+                                             whileTraverser: => WhileTraverser,
+                                             returnTraverser: => ReturnTraverser,
                                              statTraverser: => StatTraverser)
                                             (implicit javaWriter: JavaWriter) extends BlockTraverser {
 

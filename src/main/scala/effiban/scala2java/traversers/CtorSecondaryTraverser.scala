@@ -9,7 +9,7 @@ trait CtorSecondaryTraverser {
 }
 
 private[traversers] class CtorSecondaryTraverserImpl(ctorSecondaryTransformer: CtorSecondaryTransformer,
-                                                     defnDefTraverser: DefnDefTraverser) extends CtorSecondaryTraverser {
+                                                     defnDefTraverser: => DefnDefTraverser) extends CtorSecondaryTraverser {
 
   override def traverse(secondaryCtor: Ctor.Secondary, className: Type.Name): Unit = {
     val defnDef = ctorSecondaryTransformer.transform(secondaryCtor, className)
