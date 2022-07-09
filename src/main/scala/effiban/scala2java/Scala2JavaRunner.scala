@@ -23,7 +23,7 @@ object Scala2JavaRunner {
     implicit val javaWriter: JavaWriter = JavaWriter
     val traversers = new ScalaTreeTraversers
 
-    sourceTrees.foreach(traversers.SourceTraverser.traverse)
+    sourceTrees.foreach(traversers.sourceTraverser.traverse)
   }
 }
 

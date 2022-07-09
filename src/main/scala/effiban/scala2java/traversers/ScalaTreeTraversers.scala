@@ -7,411 +7,411 @@ import effiban.scala2java.writers.JavaWriter
 
 class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
 
-  object AlternativeTraverser extends AlternativeTraverserImpl(PatTraverser)
+  private lazy val alternativeTraverser: AlternativeTraverser = new AlternativeTraverserImpl(patTraverser)
 
-  object AnnotListTraverser extends AnnotListTraverserImpl(AnnotTraverser)
+  private lazy val annotListTraverser: AnnotListTraverser = new AnnotListTraverserImpl(annotTraverser)
 
-  object AnnotTraverser extends AnnotTraverserImpl(InitTraverser)
+  private lazy val annotTraverser: AnnotTraverser = new AnnotTraverserImpl(initTraverser)
 
-  object AnonymousFunctionTraverser extends AnonymousFunctionTraverserImpl(TermFunctionTraverser)
+  private lazy val anonymousFunctionTraverser: AnonymousFunctionTraverser = new AnonymousFunctionTraverserImpl(termFunctionTraverser)
 
-  object ApplyTypeTraverser extends ApplyTypeTraverserImpl(TypeTraverser, TermTraverser, TypeListTraverser)
+  private lazy val applyTypeTraverser: ApplyTypeTraverser = new ApplyTypeTraverserImpl(typeTraverser, termTraverser, typeListTraverser)
 
-  object ApplyUnaryTraverser extends ApplyUnaryTraverserImpl(TermNameTraverser, TermTraverser)
+  private lazy val applyUnaryTraverser: ApplyUnaryTraverser = new ApplyUnaryTraverserImpl(termNameTraverser, termTraverser)
 
-  object ArgumentListTraverser extends ArgumentListTraverserImpl
+  private lazy val argumentListTraverser: ArgumentListTraverser = new ArgumentListTraverserImpl
 
-  object AscribeTraverser extends AscribeTraverserImpl(TypeTraverser, TermTraverser)
+  private lazy val ascribeTraverser: AscribeTraverser = new AscribeTraverserImpl(typeTraverser, termTraverser)
 
-  object AssignTraverser extends AssignTraverserImpl(TermTraverser)
+  private lazy val assignTraverser: AssignTraverser = new AssignTraverserImpl(termTraverser)
 
-  object BindTraverser extends BindTraverserImpl(PatTraverser)
+  private lazy val bindTraverser: BindTraverser = new BindTraverserImpl(patTraverser)
 
-  object BlockTraverser extends BlockTraverserImpl(
-    InitTraverser,
-    IfTraverser,
-    WhileTraverser,
-    ReturnTraverser,
-    StatTraverser
+  private lazy val blockTraverser: BlockTraverser = new BlockTraverserImpl(
+    initTraverser,
+    ifTraverser,
+    whileTraverser,
+    returnTraverser,
+    statTraverser
   )
 
-  object CaseClassTraverser extends CaseClassTraverserImpl(
-    AnnotListTraverser,
-    TypeParamListTraverser,
-    TermParamListTraverser,
-    TemplateTraverser,
+  private lazy val caseClassTraverser: CaseClassTraverser = new CaseClassTraverserImpl(
+    annotListTraverser,
+    typeParamListTraverser,
+    termParamListTraverser,
+    templateTraverser,
     JavaModifiersResolver
   )
 
-  object CaseTraverser extends CaseTraverserImpl(PatTraverser, TermTraverser)
+  private lazy val caseTraverser: CaseTraverser = new CaseTraverserImpl(patTraverser, termTraverser)
 
-  object CatchHandlerTraverser extends CatchHandlerTraverserImpl(TermParamListTraverser, BlockTraverser)
+  private lazy val catchHandlerTraverser: CatchHandlerTraverser = new CatchHandlerTraverserImpl(termParamListTraverser, blockTraverser)
 
-  object ClassTraverser extends ClassTraverserImpl(CaseClassTraverser, RegularClassTraverser)
+  private lazy val classTraverser: ClassTraverser = new ClassTraverserImpl(caseClassTraverser, regularClassTraverser)
 
-  object CtorPrimaryTraverser extends CtorPrimaryTraverserImpl(CtorPrimaryTransformer, DefnDefTraverser)
+  private lazy val ctorPrimaryTraverser: CtorPrimaryTraverser = new CtorPrimaryTraverserImpl(CtorPrimaryTransformer, defnDefTraverser)
 
-  object CtorSecondaryTraverser extends CtorSecondaryTraverserImpl(CtorSecondaryTransformer, DefnDefTraverser)
+  private lazy val ctorSecondaryTraverser: CtorSecondaryTraverser = new CtorSecondaryTraverserImpl(CtorSecondaryTransformer, defnDefTraverser)
 
-  object DeclDefTraverser extends DeclDefTraverserImpl(
-    AnnotListTraverser,
-    TypeTraverser,
-    TermNameTraverser,
-    TermParamListTraverser,
+  private lazy val declDefTraverser: DeclDefTraverser = new DeclDefTraverserImpl(
+    annotListTraverser,
+    typeTraverser,
+    termNameTraverser,
+    termParamListTraverser,
     JavaModifiersResolver
   )
 
-  object DeclTraverser extends DeclTraverserImpl(
-    DeclValTraverser,
-    DeclVarTraverser,
-    DeclDefTraverser,
-    DeclTypeTraverser)
+  private lazy val declTraverser: DeclTraverser = new DeclTraverserImpl(
+    declValTraverser,
+    declVarTraverser,
+    declDefTraverser,
+    declTypeTraverser)
 
-  object DeclTypeTraverser extends DeclTypeTraverserImpl(TypeParamListTraverser, JavaModifiersResolver)
+  private lazy val declTypeTraverser: DeclTypeTraverser = new DeclTypeTraverserImpl(typeParamListTraverser, JavaModifiersResolver)
 
-  object DeclValTraverser extends DeclValTraverserImpl(
-    AnnotListTraverser,
-    TypeTraverser,
-    PatListTraverser,
+  private lazy val declValTraverser: DeclValTraverser = new DeclValTraverserImpl(
+    annotListTraverser,
+    typeTraverser,
+    patListTraverser,
     JavaModifiersResolver
   )
 
-  object DeclVarTraverser extends DeclVarTraverserImpl(
-    AnnotListTraverser,
-    TypeTraverser,
-    PatListTraverser,
+  private lazy val declVarTraverser: DeclVarTraverser = new DeclVarTraverserImpl(
+    annotListTraverser,
+    typeTraverser,
+    patListTraverser,
     JavaModifiersResolver
   )
 
-  object DefnDefTraverser extends DefnDefTraverserImpl(
-    AnnotListTraverser,
-    TermNameTraverser,
-    TypeTraverser,
-    TermParamListTraverser,
-    BlockTraverser,
+  private lazy val defnDefTraverser: DefnDefTraverser = new DefnDefTraverserImpl(
+    annotListTraverser,
+    termNameTraverser,
+    typeTraverser,
+    termParamListTraverser,
+    blockTraverser,
     JavaModifiersResolver
   )
 
-  object DefnTraverser extends DefnTraverserImpl(
-    DefnValTraverser,
-    DefnVarTraverser,
-    DefnDefTraverser,
-    DefnTypeTraverser,
-    ClassTraverser,
-    TraitTraverser,
-    ObjectTraverser
+  private lazy val defnTraverser: DefnTraverser = new DefnTraverserImpl(
+    defnValTraverser,
+    defnVarTraverser,
+    defnDefTraverser,
+    defnTypeTraverser,
+    classTraverser,
+    traitTraverser,
+    objectTraverser
   )
 
-  object DefnTypeTraverser extends DefnTypeTraverserImpl(
-    TypeParamListTraverser,
-    TypeTraverser,
+  private lazy val defnTypeTraverser: DefnTypeTraverser = new DefnTypeTraverserImpl(
+    typeParamListTraverser,
+    typeTraverser,
     JavaModifiersResolver
   )
 
-  object DefnValTraverser extends DefnValTraverserImpl(
-    AnnotListTraverser,
-    TypeTraverser,
-    PatListTraverser,
-    TermTraverser,
+  private lazy val defnValTraverser: DefnValTraverser = new DefnValTraverserImpl(
+    annotListTraverser,
+    typeTraverser,
+    patListTraverser,
+    termTraverser,
     JavaModifiersResolver
   )
 
-  object DefnVarTraverser extends DefnVarTraverserImpl(
-    AnnotListTraverser,
-    TypeTraverser,
-    PatListTraverser,
-    TermTraverser,
+  private lazy val defnVarTraverser: DefnVarTraverser = new DefnVarTraverserImpl(
+    annotListTraverser,
+    typeTraverser,
+    patListTraverser,
+    termTraverser,
     JavaModifiersResolver
   )
 
-  object DoTraverser extends DoTraverserImpl(TermTraverser, BlockTraverser)
+  private lazy val doTraverser: DoTraverser = new DoTraverserImpl(termTraverser, blockTraverser)
 
-  object EtaTraverser extends EtaTraverserImpl(TermTraverser)
+  private lazy val etaTraverser: EtaTraverser = new EtaTraverserImpl(termTraverser)
 
-  object FinallyTraverser extends FinallyTraverserImpl(BlockTraverser)
+  private lazy val finallyTraverser: FinallyTraverser = new FinallyTraverserImpl(blockTraverser)
 
-  object ForTraverser extends ForTraverserImpl(ForVariantTraverser)
+  private lazy val forTraverser: ForTraverser = new ForTraverserImpl(forVariantTraverser)
 
-  object ForVariantTraverser extends ForVariantTraverserImpl(TermTraverser)
+  private lazy val forVariantTraverser: ForVariantTraverser = new ForVariantTraverserImpl(termTraverser)
 
-  object ForYieldTraverser extends ForYieldTraverserImpl(ForVariantTraverser)
+  private lazy val forYieldTraverser: ForYieldTraverser = new ForYieldTraverserImpl(forVariantTraverser)
 
-  object IfTraverser extends IfTraverserImpl(TermTraverser, BlockTraverser)
+  private lazy val ifTraverser: IfTraverser = new IfTraverserImpl(termTraverser, blockTraverser)
 
-  object ImporteeTraverser extends ImporteeTraverserImpl(NameTraverser)
+  private lazy val importeeTraverser: ImporteeTraverser = new ImporteeTraverserImpl(nameTraverser)
 
-  object ImporterTraverser extends ImporterTraverserImpl(TermRefTraverser, ImporteeTraverser)
+  private lazy val importerTraverser: ImporterTraverser = new ImporterTraverserImpl(termRefTraverser, importeeTraverser)
 
-  object ImportTraverser extends ImportTraverserImpl(ImporterTraverser)
+  private lazy val importTraverser: ImportTraverser = new ImportTraverserImpl(importerTraverser)
 
-  object InitListTraverser extends InitListTraverserImpl(ArgumentListTraverser, InitTraverser)
+  private lazy val initListTraverser: InitListTraverser = new InitListTraverserImpl(argumentListTraverser, initTraverser)
 
-  object InitTraverser extends InitTraverserImpl(TypeTraverser, TermListTraverser)
+  private lazy val initTraverser: InitTraverser = new InitTraverserImpl(typeTraverser, termListTraverser)
 
-  object LitTraverser extends LitTraverserImpl()
+  private lazy val litTraverser: LitTraverser = new LitTraverserImpl()
 
-  object NameIndeterminateTraverser extends NameIndeterminateTraverserImpl()
+  private lazy val nameIndeterminateTraverser: NameIndeterminateTraverser = new NameIndeterminateTraverserImpl()
 
-  object NameTraverser extends NameTraverserImpl(
+  private lazy val nameTraverser: NameTraverser = new NameTraverserImpl(
     NameAnonymousTraverser,
-    NameIndeterminateTraverser,
-    TermNameTraverser,
-    TypeNameTraverser
+    nameIndeterminateTraverser,
+    termNameTraverser,
+    typeNameTraverser
   )
 
-  object NewAnonymousTraverser extends NewAnonymousTraverserImpl(TemplateTraverser)
+  private lazy val newAnonymousTraverser: NewAnonymousTraverser = new NewAnonymousTraverserImpl(templateTraverser)
 
-  object NewTraverser extends NewTraverserImpl(InitTraverser)
+  private lazy val newTraverser: NewTraverser = new NewTraverserImpl(initTraverser)
 
-  object ObjectTraverser extends ObjectTraverserImpl(
-    AnnotListTraverser,
-    TemplateTraverser,
+  private lazy val objectTraverser: ObjectTraverser = new ObjectTraverserImpl(
+    annotListTraverser,
+    templateTraverser,
     JavaModifiersResolver)
 
-  object PartialFunctionTraverser extends PartialFunctionTraverserImpl(TermFunctionTraverser)
+  private lazy val partialFunctionTraverser: PartialFunctionTraverser = new PartialFunctionTraverserImpl(termFunctionTraverser)
 
-  object PatExtractInfixTraverser extends PatExtractInfixTraverserImpl(PatExtractTraverser)
+  private lazy val patExtractInfixTraverser: PatExtractInfixTraverser = new PatExtractInfixTraverserImpl(patExtractTraverser)
 
-  object PatExtractTraverser extends PatExtractTraverserImpl()
+  private lazy val patExtractTraverser: PatExtractTraverser = new PatExtractTraverserImpl()
 
-  object PatInterpolateTraverser extends PatInterpolateTraverserImpl()
+  private lazy val patInterpolateTraverser: PatInterpolateTraverser = new PatInterpolateTraverserImpl()
 
-  object PatListTraverser extends PatListTraverserImpl(ArgumentListTraverser, PatTraverser)
+  private lazy val patListTraverser: PatListTraverser = new PatListTraverserImpl(argumentListTraverser, patTraverser)
 
-  object PatSeqWildcardTraverser extends PatSeqWildcardTraverserImpl()
+  private lazy val patSeqWildcardTraverser: PatSeqWildcardTraverser = new PatSeqWildcardTraverserImpl()
 
-  object PatTraverser extends PatTraverserImpl(
-    LitTraverser,
-    TermNameTraverser,
-    PatWildcardTraverser,
-    PatSeqWildcardTraverser,
-    PatVarTraverser,
-    BindTraverser,
-    AlternativeTraverser,
-    PatTupleTraverser,
-    PatExtractTraverser,
-    PatExtractInfixTraverser,
-    PatInterpolateTraverser,
-    PatTypedTraverser
+  private lazy val patTraverser: PatTraverser = new PatTraverserImpl(
+    litTraverser,
+    termNameTraverser,
+    patWildcardTraverser,
+    patSeqWildcardTraverser,
+    patVarTraverser,
+    bindTraverser,
+    alternativeTraverser,
+    patTupleTraverser,
+    patExtractTraverser,
+    patExtractInfixTraverser,
+    patInterpolateTraverser,
+    patTypedTraverser
   )
 
-  object PatTupleTraverser extends PatTupleTraverserImpl()
+  private lazy val patTupleTraverser: PatTupleTraverser = new PatTupleTraverserImpl()
 
-  object PatTypedTraverser extends PatTypedTraverserImpl(TypeTraverser, PatTraverser)
+  private lazy val patTypedTraverser: PatTypedTraverser = new PatTypedTraverserImpl(typeTraverser, patTraverser)
 
-  object PatVarTraverser extends PatVarTraverserImpl(TermNameTraverser)
+  private lazy val patVarTraverser: PatVarTraverser = new PatVarTraverserImpl(termNameTraverser)
 
-  object PatWildcardTraverser extends PatWildcardTraverserImpl()
+  private lazy val patWildcardTraverser: PatWildcardTraverser = new PatWildcardTraverserImpl()
 
-  object PkgTraverser extends PkgTraverserImpl(TermRefTraverser, StatTraverser)
+  private lazy val pkgTraverser: PkgTraverser = new PkgTraverserImpl(termRefTraverser, statTraverser)
 
-  object RegularClassTraverser extends RegularClassTraverserImpl(
-    AnnotListTraverser,
-    TypeParamListTraverser,
-    TemplateTraverser,
+  private lazy val regularClassTraverser: RegularClassTraverser = new RegularClassTraverserImpl(
+    annotListTraverser,
+    typeParamListTraverser,
+    templateTraverser,
     ParamToDeclValTransformer,
     JavaModifiersResolver
   )
 
-  object ReturnTraverser extends ReturnTraverserImpl(TermTraverser)
+  private lazy val returnTraverser: ReturnTraverser = new ReturnTraverserImpl(termTraverser)
 
-  object SelfTraverser extends SelfTraverserImpl
+  private lazy val selfTraverser: SelfTraverser = new SelfTraverserImpl
 
-  object SourceTraverser extends SourceTraverserImpl(StatTraverser)
+  lazy val sourceTraverser: SourceTraverser = new SourceTraverserImpl(statTraverser)
 
-  object StatTraverser extends StatTraverserImpl(
-    TermTraverser,
-    ImportTraverser,
-    PkgTraverser,
-    DefnTraverser,
-    DeclTraverser
+  private lazy val statTraverser: StatTraverser = new StatTraverserImpl(
+    termTraverser,
+    importTraverser,
+    pkgTraverser,
+    defnTraverser,
+    declTraverser
   )
 
-  object SuperTraverser extends SuperTraverserImpl(NameTraverser)
+  private lazy val superTraverser: SuperTraverser = new SuperTraverserImpl(nameTraverser)
 
-  object TemplateTraverser extends TemplateTraverserImpl(
-    InitListTraverser,
-    SelfTraverser,
-    StatTraverser,
-    CtorPrimaryTraverser,
-    CtorSecondaryTraverser,
+  private lazy val templateTraverser: TemplateTraverser = new TemplateTraverserImpl(
+    initListTraverser,
+    selfTraverser,
+    statTraverser,
+    ctorPrimaryTraverser,
+    ctorSecondaryTraverser,
     JavaTemplateChildOrdering
   )
 
-  object TermAnnotateTraverser extends TermAnnotateTraverserImpl(AnnotListTraverser, TermTraverser)
+  private lazy val termAnnotateTraverser: TermAnnotateTraverser = new TermAnnotateTraverserImpl(annotListTraverser, termTraverser)
 
-  object TermApplyInfixTraverser extends TermApplyInfixTraverserImpl(
-    TermTraverser,
-    TermNameTraverser,
-    TermListTraverser
+  private lazy val termApplyInfixTraverser: TermApplyInfixTraverser = new TermApplyInfixTraverserImpl(
+    termTraverser,
+    termNameTraverser,
+    termListTraverser
   )
 
-  object TermApplyTraverser extends TermApplyTraverserImpl(TermTraverser, TermListTraverser)
+  private lazy val termApplyTraverser: TermApplyTraverser = new TermApplyTraverserImpl(termTraverser, termListTraverser)
 
-  object TermFunctionTraverser extends TermFunctionTraverserImpl(
-    TermParamTraverser,
-    TermParamListTraverser,
-    TermTraverser
+  private lazy val termFunctionTraverser: TermFunctionTraverser = new TermFunctionTraverserImpl(
+    termParamTraverser,
+    termParamListTraverser,
+    termTraverser
   )
 
-  object TermInterpolateTraverser extends TermInterpolateTraverserImpl(TermInterpolateTransformer, TermApplyTraverser)
+  private lazy val termInterpolateTraverser: TermInterpolateTraverser = new TermInterpolateTraverserImpl(TermInterpolateTransformer, termApplyTraverser)
 
-  object TermListTraverser extends TermListTraverserImpl(ArgumentListTraverser, TermTraverser)
+  private lazy val termListTraverser: TermListTraverser = new TermListTraverserImpl(argumentListTraverser, termTraverser)
 
-  object TermMatchTraverser extends TermMatchTraverserImpl(TermTraverser, CaseTraverser)
+  private lazy val termMatchTraverser: TermMatchTraverser = new TermMatchTraverserImpl(termTraverser, caseTraverser)
 
-  object TermNameTraverser extends TermNameTraverserImpl
+  private lazy val termNameTraverser: TermNameTraverser = new TermNameTraverserImpl
 
-  object TermParamListTraverser extends TermParamListTraverserImpl(ArgumentListTraverser, TermParamTraverser)
+  private lazy val termParamListTraverser: TermParamListTraverser = new TermParamListTraverserImpl(argumentListTraverser, termParamTraverser)
 
-  object TermParamTraverser extends TermParamTraverserImpl(
-    AnnotListTraverser,
-    TypeTraverser,
-    NameTraverser,
+  private lazy val termParamTraverser: TermParamTraverser = new TermParamTraverserImpl(
+    annotListTraverser,
+    typeTraverser,
+    nameTraverser,
     JavaModifiersResolver
   )
 
-  object TermPlaceholderTraverser extends TermPlaceholderTraverserImpl
+  private lazy val termPlaceholderTraverser: TermPlaceholderTraverser = new TermPlaceholderTraverserImpl
 
-  object TermRefTraverser extends TermRefTraverserImpl(
-    ThisTraverser,
-    SuperTraverser,
-    TermNameTraverser,
-    TermSelectTraverser,
-    ApplyUnaryTraverser
+  private lazy val termRefTraverser: TermRefTraverser = new TermRefTraverserImpl(
+    thisTraverser,
+    superTraverser,
+    termNameTraverser,
+    termSelectTraverser,
+    applyUnaryTraverser
   )
 
-  object TermRepeatedTraverser extends TermRepeatedTraverserImpl(TermTraverser)
+  private lazy val termRepeatedTraverser: TermRepeatedTraverser = new TermRepeatedTraverserImpl(termTraverser)
 
-  object TermSelectTraverser extends TermSelectTraverserImpl(TermTraverser, TermNameTraverser)
+  private lazy val termSelectTraverser: TermSelectTraverser = new TermSelectTraverserImpl(termTraverser, termNameTraverser)
 
-  object TermTraverser extends TermTraverserImpl(
-    TermRefTraverser,
-    TermApplyTraverser,
-    ApplyTypeTraverser,
-    TermApplyInfixTraverser,
-    AssignTraverser,
-    ReturnTraverser,
-    ThrowTraverser,
-    AscribeTraverser,
-    TermAnnotateTraverser,
-    TermTupleTraverser,
-    BlockTraverser,
-    IfTraverser,
-    TermMatchTraverser,
-    TryTraverser,
-    TryWithHandlerTraverser,
-    TermFunctionTraverser,
-    PartialFunctionTraverser,
-    AnonymousFunctionTraverser,
-    WhileTraverser,
-    DoTraverser,
-    ForTraverser,
-    ForYieldTraverser,
-    NewTraverser,
-    NewAnonymousTraverser,
-    TermPlaceholderTraverser,
-    EtaTraverser,
-    TermRepeatedTraverser,
-    TermInterpolateTraverser,
-    LitTraverser
+  private lazy val termTraverser: TermTraverser = new TermTraverserImpl(
+    termRefTraverser,
+    termApplyTraverser,
+    applyTypeTraverser,
+    termApplyInfixTraverser,
+    assignTraverser,
+    returnTraverser,
+    throwTraverser,
+    ascribeTraverser,
+    termAnnotateTraverser,
+    termTupleTraverser,
+    blockTraverser,
+    ifTraverser,
+    termMatchTraverser,
+    tryTraverser,
+    tryWithHandlerTraverser,
+    termFunctionTraverser,
+    partialFunctionTraverser,
+    anonymousFunctionTraverser,
+    whileTraverser,
+    doTraverser,
+    forTraverser,
+    forYieldTraverser,
+    newTraverser,
+    newAnonymousTraverser,
+    termPlaceholderTraverser,
+    etaTraverser,
+    termRepeatedTraverser,
+    termInterpolateTraverser,
+    litTraverser
   )
 
-  object TermTupleTraverser extends TermTupleTraverserImpl(TermListTraverser)
+  private lazy val termTupleTraverser: TermTupleTraverser = new TermTupleTraverserImpl(termListTraverser)
 
-  object ThisTraverser extends ThisTraverserImpl(NameTraverser)
+  private lazy val thisTraverser: ThisTraverser = new ThisTraverserImpl(nameTraverser)
 
-  object ThrowTraverser extends ThrowTraverserImpl(TermTraverser)
+  private lazy val throwTraverser: ThrowTraverser = new ThrowTraverserImpl(termTraverser)
 
-  object TraitTraverser extends TraitTraverserImpl(
-    AnnotListTraverser,
-    TypeParamListTraverser,
-    TemplateTraverser,
+  private lazy val traitTraverser: TraitTraverser = new TraitTraverserImpl(
+    annotListTraverser,
+    typeParamListTraverser,
+    templateTraverser,
     JavaModifiersResolver
   )
 
-  object TryTraverser extends TryTraverserImpl(
-    BlockTraverser,
-    CatchHandlerTraverser,
-    FinallyTraverser,
+  private lazy val tryTraverser: TryTraverser = new TryTraverserImpl(
+    blockTraverser,
+    catchHandlerTraverser,
+    finallyTraverser,
     PatToTermParamTransformer
   )
 
-  object TryWithHandlerTraverser extends TryWithHandlerTraverserImpl(
-    BlockTraverser,
-    CatchHandlerTraverser,
-    FinallyTraverser
+  private lazy val tryWithHandlerTraverser: TryWithHandlerTraverser = new TryWithHandlerTraverserImpl(
+    blockTraverser,
+    catchHandlerTraverser,
+    finallyTraverser
   )
 
-  object TypeAnnotateTraverser extends TypeAnnotateTraverserImpl(AnnotListTraverser, TypeTraverser)
+  private lazy val typeAnnotateTraverser: TypeAnnotateTraverser = new TypeAnnotateTraverserImpl(annotListTraverser, typeTraverser)
 
-  object TypeApplyInfixTraverser extends TypeApplyInfixTraverserImpl
+  private lazy val typeApplyInfixTraverser: TypeApplyInfixTraverser = new TypeApplyInfixTraverserImpl
 
-  object TypeApplyTraverser extends TypeApplyTraverserImpl(TypeTraverser, TypeListTraverser)
+  private lazy val typeApplyTraverser: TypeApplyTraverser = new TypeApplyTraverserImpl(typeTraverser, typeListTraverser)
 
-  object TypeBoundsTraverser extends TypeBoundsTraverserImpl(TypeTraverser)
+  private lazy val typeBoundsTraverser: TypeBoundsTraverser = new TypeBoundsTraverserImpl(typeTraverser)
 
-  object TypeByNameTraverser extends TypeByNameTraverserImpl(TypeApplyTraverser, TypeByNameToSupplierTypeTransformer)
+  private lazy val typeByNameTraverser: TypeByNameTraverser = new TypeByNameTraverserImpl(typeApplyTraverser, TypeByNameToSupplierTypeTransformer)
 
-  object TypeExistentialTraverser extends TypeExistentialTraverserImpl(TypeTraverser)
+  private lazy val typeExistentialTraverser: TypeExistentialTraverser = new TypeExistentialTraverserImpl(typeTraverser)
 
-  object TypeFunctionTraverser extends TypeFunctionTraverserImpl(TypeApplyTraverser, ScalaToJavaFunctionTypeTransformer)
+  private lazy val typeFunctionTraverser: TypeFunctionTraverser = new TypeFunctionTraverserImpl(typeApplyTraverser, ScalaToJavaFunctionTypeTransformer)
 
-  object TypeLambdaTraverser extends TypeLambdaTraverserImpl
+  private lazy val typeLambdaTraverser: TypeLambdaTraverser = new TypeLambdaTraverserImpl
 
-  object TypeListTraverser extends TypeListTraverserImpl(ArgumentListTraverser, TypeTraverser)
+  private lazy val typeListTraverser: TypeListTraverser = new TypeListTraverserImpl(argumentListTraverser, typeTraverser)
 
-  object TypeNameTraverser extends TypeNameTraverserImpl(ScalaToJavaTypeNameTransformer)
+  private lazy val typeNameTraverser: TypeNameTraverser = new TypeNameTraverserImpl(ScalaToJavaTypeNameTransformer)
 
-  object TypeParamListTraverser extends TypeParamListTraverserImpl(ArgumentListTraverser, TypeParamTraverser)
+  private lazy val typeParamListTraverser: TypeParamListTraverser = new TypeParamListTraverserImpl(argumentListTraverser, typeParamTraverser)
 
-  object TypeParamTraverser extends TypeParamTraverserImpl(
-    NameTraverser,
-    TypeParamListTraverser,
-    TypeBoundsTraverser
+  private lazy val typeParamTraverser: TypeParamTraverser = new TypeParamTraverserImpl(
+    nameTraverser,
+    typeParamListTraverser,
+    typeBoundsTraverser
   )
 
-  object TypePlaceholderTraverser extends TypePlaceholderTraverserImpl(TypeBoundsTraverser)
+  private lazy val typePlaceholderTraverser: TypePlaceholderTraverser = new TypePlaceholderTraverserImpl(typeBoundsTraverser)
 
-  object TypeProjectTraverser extends TypeProjectTraverserImpl(TypeTraverser, TypeNameTraverser)
+  private lazy val typeProjectTraverser: TypeProjectTraverser = new TypeProjectTraverserImpl(typeTraverser, typeNameTraverser)
 
-  object TypeRefineTraverser extends TypeRefineTraverserImpl(TypeTraverser)
+  private lazy val typeRefineTraverser: TypeRefineTraverser = new TypeRefineTraverserImpl(typeTraverser)
 
-  object TypeRefTraverser extends TypeRefTraverserImpl(
-    TypeNameTraverser,
-    TypeSelectTraverser,
-    TypeProjectTraverser,
-    TypeSingletonTraverser
+  private lazy val typeRefTraverser: TypeRefTraverser = new TypeRefTraverserImpl(
+    typeNameTraverser,
+    typeSelectTraverser,
+    typeProjectTraverser,
+    typeSingletonTraverser
   )
 
-  object TypeRepeatedTraverser extends TypeRepeatedTraverserImpl(TypeTraverser)
+  private lazy val typeRepeatedTraverser: TypeRepeatedTraverser = new TypeRepeatedTraverserImpl(typeTraverser)
 
-  object TypeSelectTraverser extends TypeSelectTraverserImpl(TermRefTraverser, TypeNameTraverser)
+  private lazy val typeSelectTraverser: TypeSelectTraverser = new TypeSelectTraverserImpl(termRefTraverser, typeNameTraverser)
 
-  object TypeSingletonTraverser extends TypeSingletonTraverserImpl(TermTraverser, TypeSingletonToTermTransformer)
+  private lazy val typeSingletonTraverser: TypeSingletonTraverser = new TypeSingletonTraverserImpl(termTraverser, TypeSingletonToTermTransformer)
 
-  object TypeTraverser extends TypeTraverserImpl(
-    TypeRefTraverser,
-    TypeApplyTraverser,
-    TypeApplyInfixTraverser,
-    TypeFunctionTraverser,
-    TypeTupleTraverser,
-    TypeWithTraverser,
-    TypeRefineTraverser,
-    TypeExistentialTraverser,
-    TypeAnnotateTraverser,
-    TypeLambdaTraverser,
-    TypePlaceholderTraverser,
-    TypeByNameTraverser,
-    TypeRepeatedTraverser,
-    TypeVarTraverser
+  private lazy val typeTraverser: TypeTraverser = new TypeTraverserImpl(
+    typeRefTraverser,
+    typeApplyTraverser,
+    typeApplyInfixTraverser,
+    typeFunctionTraverser,
+    typeTupleTraverser,
+    typeWithTraverser,
+    typeRefineTraverser,
+    typeExistentialTraverser,
+    typeAnnotateTraverser,
+    typeLambdaTraverser,
+    typePlaceholderTraverser,
+    typeByNameTraverser,
+    typeRepeatedTraverser,
+    typeVarTraverser
   )
 
-  object TypeTupleTraverser extends TypeTupleTraverserImpl
+  private lazy val typeTupleTraverser: TypeTupleTraverser = new TypeTupleTraverserImpl
 
-  object TypeVarTraverser extends TypeVarTraverserImpl
+  private lazy val typeVarTraverser: TypeVarTraverser = new TypeVarTraverserImpl
 
-  object TypeWithTraverser extends TypeWithTraverserImpl(TypeTraverser)
+  private lazy val typeWithTraverser: TypeWithTraverser = new TypeWithTraverserImpl(typeTraverser)
 
-  object WhileTraverser extends WhileTraverserImpl(TermTraverser, BlockTraverser)
+  private lazy val whileTraverser: WhileTraverser = new WhileTraverserImpl(termTraverser, blockTraverser)
 }
