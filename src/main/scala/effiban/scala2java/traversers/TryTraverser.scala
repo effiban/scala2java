@@ -8,7 +8,7 @@ import scala.meta.Term.Block
 
 trait TryTraverser extends ScalaTreeTraverser[Term.Try]
 
-private[scala2java] class TryTraverserImpl(blockTraverser: => BlockTraverser,
+private[traversers] class TryTraverserImpl(blockTraverser: => BlockTraverser,
                                            catchHandlerTraverser: => CatchHandlerTraverser,
                                            finallyTraverser: => FinallyTraverser,
                                            patToTermParamTransformer: PatToTermParamTransformer)

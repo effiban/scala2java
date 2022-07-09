@@ -6,7 +6,7 @@ import scala.meta.Type
 
 trait TypeProjectTraverser extends ScalaTreeTraverser[Type.Project]
 
-private[scala2java] class TypeProjectTraverserImpl(typeTraverser: => TypeTraverser,
+private[traversers] class TypeProjectTraverserImpl(typeTraverser: => TypeTraverser,
                                                    typeNameTraverser: => TypeNameTraverser)
                                                   (implicit javaWriter: JavaWriter) extends TypeProjectTraverser {
 

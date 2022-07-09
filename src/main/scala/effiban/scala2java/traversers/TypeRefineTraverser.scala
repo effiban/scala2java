@@ -6,7 +6,7 @@ import scala.meta.Type
 
 trait TypeRefineTraverser extends ScalaTreeTraverser[Type.Refine]
 
-private[scala2java] class TypeRefineTraverserImpl(typeTraverser: => TypeTraverser)
+private[traversers] class TypeRefineTraverserImpl(typeTraverser: => TypeTraverser)
                                                  (implicit javaWriter: JavaWriter) extends TypeRefineTraverser {
 
   import javaWriter._

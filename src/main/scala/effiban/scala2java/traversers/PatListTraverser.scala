@@ -6,7 +6,7 @@ trait PatListTraverser {
   def traverse(pats: List[Pat]): Unit
 }
 
-private[scala2java] class PatListTraverserImpl(argumentListTraverser: => ArgumentListTraverser,
+private[traversers] class PatListTraverserImpl(argumentListTraverser: => ArgumentListTraverser,
                                                patTraverser: => PatTraverser) extends PatListTraverser {
 
   override def traverse(pats: List[Pat]): Unit = {

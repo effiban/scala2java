@@ -7,7 +7,7 @@ import scala.meta.Pat.Bind
 
 trait BindTraverser extends ScalaTreeTraverser[Pat.Bind]
 
-private[scala2java] class BindTraverserImpl(patTraverser: => PatTraverser)
+private[traversers] class BindTraverserImpl(patTraverser: => PatTraverser)
                                            (implicit javaWriter: JavaWriter) extends BindTraverser {
 
   import javaWriter._

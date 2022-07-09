@@ -4,7 +4,7 @@ import scala.meta.Source
 
 trait SourceTraverser extends ScalaTreeTraverser[Source]
 
-private[scala2java] class SourceTraverserImpl(statTraverser: => StatTraverser) extends SourceTraverser {
+private[traversers] class SourceTraverserImpl(statTraverser: => StatTraverser) extends SourceTraverser {
 
   // source file
   def traverse(source: Source): Unit = {

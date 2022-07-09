@@ -9,7 +9,7 @@ import scala.meta.Defn
 
 trait CaseClassTraverser extends ScalaTreeTraverser[Defn.Class]
 
-private[scala2java] class CaseClassTraverserImpl(annotListTraverser: => AnnotListTraverser,
+private[traversers] class CaseClassTraverserImpl(annotListTraverser: => AnnotListTraverser,
                                                  typeParamListTraverser: => TypeParamListTraverser,
                                                  termParamListTraverser: => TermParamListTraverser,
                                                  templateTraverser: => TemplateTraverser,

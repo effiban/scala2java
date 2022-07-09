@@ -6,7 +6,7 @@ import scala.meta.{Decl, Defn, Import, Pkg, Stat, Term}
 
 trait StatTraverser extends ScalaTreeTraverser[Stat]
 
-private[scala2java] class StatTraverserImpl(termTraverser: => TermTraverser,
+private[traversers] class StatTraverserImpl(termTraverser: => TermTraverser,
                                             importTraverser: => ImportTraverser,
                                             pkgTraverser: => PkgTraverser,
                                             defnTraverser: => DefnTraverser,

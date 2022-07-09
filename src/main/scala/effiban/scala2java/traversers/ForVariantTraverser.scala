@@ -10,7 +10,7 @@ trait ForVariantTraverser {
   def traverse(enumerators: List[Enumerator], body: Term, finalFunctionName: Term.Name): Unit
 }
 
-private[scala2java] class ForVariantTraverserImpl(termTraverser: => TermTraverser)
+private[traversers] class ForVariantTraverserImpl(termTraverser: => TermTraverser)
                                                  (implicit javaWriter: JavaWriter) extends ForVariantTraverser {
 
   import javaWriter._

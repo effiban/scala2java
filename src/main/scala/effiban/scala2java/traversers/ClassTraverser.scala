@@ -4,7 +4,7 @@ import scala.meta.{Defn, Mod}
 
 trait ClassTraverser extends ScalaTreeTraverser[Defn.Class]
 
-private[scala2java] class ClassTraverserImpl(caseClassTraverser: => CaseClassTraverser,
+private[traversers] class ClassTraverserImpl(caseClassTraverser: => CaseClassTraverser,
                                              regularClassTraverser: => RegularClassTraverser) extends ClassTraverser {
 
   def traverse(classDef: Defn.Class): Unit = {

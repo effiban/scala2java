@@ -6,7 +6,7 @@ import scala.meta.Type
 
 trait TypeTupleTraverser extends ScalaTreeTraverser[Type.Tuple]
 
-private[scala2java] class TypeTupleTraverserImpl(implicit javaWriter: JavaWriter) extends TypeTupleTraverser {
+private[traversers] class TypeTupleTraverserImpl(implicit javaWriter: JavaWriter) extends TypeTupleTraverser {
 
   import javaWriter._
 

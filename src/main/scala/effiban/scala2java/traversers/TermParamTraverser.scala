@@ -10,7 +10,7 @@ import scala.meta.Term
 
 trait TermParamTraverser extends ScalaTreeTraverser[Term.Param]
 
-private[scala2java] class TermParamTraverserImpl(annotListTraverser: => AnnotListTraverser,
+private[traversers] class TermParamTraverserImpl(annotListTraverser: => AnnotListTraverser,
                                                  typeTraverser: => TypeTraverser,
                                                  nameTraverser: => NameTraverser,
                                                  javaModifiersResolver: JavaModifiersResolver)

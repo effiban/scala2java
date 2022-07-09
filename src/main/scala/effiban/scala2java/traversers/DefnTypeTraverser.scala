@@ -7,7 +7,7 @@ import scala.meta.{Defn, Type}
 
 trait DefnTypeTraverser extends ScalaTreeTraverser[Defn.Type]
 
-private[scala2java] class DefnTypeTraverserImpl(typeParamListTraverser: => TypeParamListTraverser,
+private[traversers] class DefnTypeTraverserImpl(typeParamListTraverser: => TypeParamListTraverser,
                                                 typeTraverser: => TypeTraverser,
                                                 javaModifiersResolver: JavaModifiersResolver)
                                                (implicit javaWriter: JavaWriter) extends DefnTypeTraverser {

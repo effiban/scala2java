@@ -8,7 +8,7 @@ import scala.meta.Term
 
 trait TermFunctionTraverser extends ScalaTreeTraverser[Term.Function]
 
-private[scala2java] class TermFunctionTraverserImpl(termParamTraverser: => TermParamTraverser,
+private[traversers] class TermFunctionTraverserImpl(termParamTraverser: => TermParamTraverser,
                                                     termParamListTraverser: => TermParamListTraverser,
                                                     termTraverser: => TermTraverser)
                                                    (implicit javaWriter: JavaWriter) extends TermFunctionTraverser {

@@ -7,7 +7,7 @@ import scala.meta.Term.Select
 
 trait TermSelectTraverser extends ScalaTreeTraverser[Term.Select]
 
-private[scala2java] class TermSelectTraverserImpl(termTraverser: => TermTraverser,
+private[traversers] class TermSelectTraverserImpl(termTraverser: => TermTraverser,
                                                   termNameTraverser: => TermNameTraverser)
                                                  (implicit javaWriter: JavaWriter) extends TermSelectTraverser {
 

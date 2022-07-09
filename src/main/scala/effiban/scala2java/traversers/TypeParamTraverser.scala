@@ -4,7 +4,7 @@ import scala.meta.Type
 
 trait TypeParamTraverser extends ScalaTreeTraverser[Type.Param]
 
-private[scala2java] class TypeParamTraverserImpl(nameTraverser: => NameTraverser,
+private[traversers] class TypeParamTraverserImpl(nameTraverser: => NameTraverser,
                                                  typeParamListTraverser: => TypeParamListTraverser,
                                                  typeBoundsTraverser: => TypeBoundsTraverser) extends TypeParamTraverser {
 

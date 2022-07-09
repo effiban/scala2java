@@ -6,7 +6,7 @@ import scala.meta.Type
 
 trait TypeAnnotateTraverser extends ScalaTreeTraverser[Type.Annotate]
 
-private[scala2java] class TypeAnnotateTraverserImpl(annotListTraverser: => AnnotListTraverser,
+private[traversers] class TypeAnnotateTraverserImpl(annotListTraverser: => AnnotListTraverser,
                                                     typeTraverser: => TypeTraverser)
                                                    (implicit javaWriter: JavaWriter) extends TypeAnnotateTraverser {
 

@@ -6,7 +6,7 @@ import scala.meta.Pat
 
 trait PatInterpolateTraverser extends ScalaTreeTraverser[Pat.Interpolate]
 
-private[scala2java] class PatInterpolateTraverserImpl(implicit javaWriter: JavaWriter) extends PatInterpolateTraverser {
+private[traversers] class PatInterpolateTraverserImpl(implicit javaWriter: JavaWriter) extends PatInterpolateTraverser {
 
   import javaWriter._
 

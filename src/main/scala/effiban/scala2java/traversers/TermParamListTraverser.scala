@@ -8,7 +8,7 @@ trait TermParamListTraverser {
   def traverse(termParams: List[Term.Param], onSameLine: Boolean = false): Unit
 }
 
-private[scala2java] class TermParamListTraverserImpl(argumentListTraverser: => ArgumentListTraverser,
+private[traversers] class TermParamListTraverserImpl(argumentListTraverser: => ArgumentListTraverser,
                                                      termParamTraverser: => TermParamTraverser) extends TermParamListTraverser {
 
   override def traverse(termParams: List[Term.Param], onSameLine: Boolean = false): Unit = {

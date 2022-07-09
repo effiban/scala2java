@@ -6,7 +6,7 @@ import scala.meta.Type
 
 trait TypeSelectTraverser extends ScalaTreeTraverser[Type.Select]
 
-private[scala2java] class TypeSelectTraverserImpl(termRefTraverser: => TermRefTraverser,
+private[traversers] class TypeSelectTraverserImpl(termRefTraverser: => TermRefTraverser,
                                                   typeNameTraverser: => TypeNameTraverser)
                                                  (implicit javaWriter: JavaWriter) extends TypeSelectTraverser {
 

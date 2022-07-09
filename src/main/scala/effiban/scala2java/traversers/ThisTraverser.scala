@@ -7,7 +7,7 @@ import scala.meta.Term.This
 
 trait ThisTraverser extends ScalaTreeTraverser[This]
 
-private[scala2java] class ThisTraverserImpl(nameTraverser: => NameTraverser)
+private[traversers] class ThisTraverserImpl(nameTraverser: => NameTraverser)
                                            (implicit javaWriter: JavaWriter) extends ThisTraverser {
 
   import javaWriter._

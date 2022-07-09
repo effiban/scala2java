@@ -11,7 +11,7 @@ trait AnnotListTraverser {
   def traverseMods(mods: List[Mod], onSameLine: Boolean = false): Unit
 }
 
-private[scala2java] class AnnotListTraverserImpl(annotTraverser: => AnnotTraverser)
+private[traversers] class AnnotListTraverserImpl(annotTraverser: => AnnotTraverser)
                                                 (implicit javaWriter: JavaWriter) extends AnnotListTraverser {
   import javaWriter._
 

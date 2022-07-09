@@ -6,7 +6,7 @@ import scala.meta.Term
 
 trait TermTupleTraverser extends ScalaTreeTraverser[Term.Tuple]
 
-private[scala2java] class TermTupleTraverserImpl(termListTraverser: => TermListTraverser) extends TermTupleTraverser {
+private[traversers] class TermTupleTraverserImpl(termListTraverser: => TermListTraverser) extends TermTupleTraverser {
 
   // Java supports tuples only in lambdas AFAIK, but the replacement is not obvious - so rendering it always
   override def traverse(termTuple: Term.Tuple): Unit = {

@@ -7,7 +7,7 @@ import scala.meta.Term.{AnonymousFunction, Param}
 
 trait AnonymousFunctionTraverser extends ScalaTreeTraverser[AnonymousFunction]
 
-private[scala2java] class AnonymousFunctionTraverserImpl(termFunctionTraverser: => TermFunctionTraverser) extends AnonymousFunctionTraverser {
+private[traversers] class AnonymousFunctionTraverserImpl(termFunctionTraverser: => TermFunctionTraverser) extends AnonymousFunctionTraverser {
 
   override def traverse(anonymousFunction: AnonymousFunction): Unit = {
     termFunctionTraverser.traverse(Term.Function(

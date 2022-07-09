@@ -6,7 +6,7 @@ import scala.meta.Term.New
 
 trait NewTraverser extends ScalaTreeTraverser[New]
 
-private[scala2java] class NewTraverserImpl(initTraverser: => InitTraverser)
+private[traversers] class NewTraverserImpl(initTraverser: => InitTraverser)
                                           (implicit javaWriter: JavaWriter) extends NewTraverser {
 
   import javaWriter._

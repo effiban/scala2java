@@ -4,7 +4,7 @@ import scala.meta.Term
 
 trait TermRepeatedTraverser extends ScalaTreeTraverser[Term.Repeated]
 
-private[scala2java] class TermRepeatedTraverserImpl(termTraverser: => TermTraverser) extends TermRepeatedTraverser {
+private[traversers] class TermRepeatedTraverserImpl(termTraverser: => TermTraverser) extends TermRepeatedTraverser {
 
   // Passing vararg param
   override def traverse(termRepeated: Term.Repeated): Unit = {

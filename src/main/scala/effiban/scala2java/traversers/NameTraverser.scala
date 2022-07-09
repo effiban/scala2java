@@ -7,7 +7,7 @@ import scala.meta.{Name, Term, Type}
 
 trait NameTraverser extends ScalaTreeTraverser[Name]
 
-private[scala2java] class NameTraverserImpl(nameAnonymousTraverser: => NameAnonymousTraverser,
+private[traversers] class NameTraverserImpl(nameAnonymousTraverser: => NameAnonymousTraverser,
                                             nameIndeterminateTraverser: => NameIndeterminateTraverser,
                                             termNameTraverser: => TermNameTraverser,
                                             typeNameTraverser: => TypeNameTraverser)

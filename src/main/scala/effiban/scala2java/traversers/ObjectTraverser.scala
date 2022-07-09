@@ -9,7 +9,7 @@ import scala.meta.Defn
 
 trait ObjectTraverser extends ScalaTreeTraverser[Defn.Object]
 
-private[scala2java] class ObjectTraverserImpl(annotListTraverser: => AnnotListTraverser,
+private[traversers] class ObjectTraverserImpl(annotListTraverser: => AnnotListTraverser,
                                               templateTraverser: => TemplateTraverser,
                                               javaModifiersResolver: JavaModifiersResolver)
                                              (implicit javaWriter: JavaWriter) extends ObjectTraverser {

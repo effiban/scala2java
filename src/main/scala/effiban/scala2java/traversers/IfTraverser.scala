@@ -9,7 +9,7 @@ trait IfTraverser {
   def traverse(`if`: If, shouldReturnValue: Boolean = false): Unit
 }
 
-private[scala2java] class IfTraverserImpl(termTraverser: => TermTraverser,
+private[traversers] class IfTraverserImpl(termTraverser: => TermTraverser,
                                           blockTraverser: => BlockTraverser)
                                          (implicit javaWriter: JavaWriter) extends IfTraverser {
 

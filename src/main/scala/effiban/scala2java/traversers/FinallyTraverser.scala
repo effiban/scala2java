@@ -7,7 +7,7 @@ import scala.meta.Term.Block
 
 trait FinallyTraverser extends ScalaTreeTraverser[Term]
 
-private[scala2java] class FinallyTraverserImpl(blockTraverser: => BlockTraverser)
+private[traversers] class FinallyTraverserImpl(blockTraverser: => BlockTraverser)
                                               (implicit javaWriter: JavaWriter) extends FinallyTraverser {
 
   import javaWriter._

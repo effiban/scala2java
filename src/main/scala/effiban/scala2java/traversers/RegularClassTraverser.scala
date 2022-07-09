@@ -10,7 +10,7 @@ import scala.meta.Defn
 
 trait RegularClassTraverser extends ScalaTreeTraverser[Defn.Class]
 
-private[scala2java] class RegularClassTraverserImpl(annotListTraverser: => AnnotListTraverser,
+private[traversers] class RegularClassTraverserImpl(annotListTraverser: => AnnotListTraverser,
                                                     typeParamListTraverser: => TypeParamListTraverser,
                                                     templateTraverser: => TemplateTraverser,
                                                     paramToDeclValTransformer: ParamToDeclValTransformer,

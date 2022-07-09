@@ -8,7 +8,7 @@ trait TypeParamListTraverser {
   def traverse(typeParams: List[Type.Param]): Unit
 }
 
-private[scala2java] class TypeParamListTraverserImpl(argumentListTraverser: => ArgumentListTraverser,
+private[traversers] class TypeParamListTraverserImpl(argumentListTraverser: => ArgumentListTraverser,
                                                      typeParamTraverser: => TypeParamTraverser) extends TypeParamListTraverser {
 
   override def traverse(typeParams: List[Type.Param]): Unit = {

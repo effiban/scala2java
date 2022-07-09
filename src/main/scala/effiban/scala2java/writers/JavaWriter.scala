@@ -37,7 +37,7 @@ trait JavaWriter {
   def write(str: String): Unit
 }
 
-private[scala2java] class JavaWriterImpl extends JavaWriter {
+private[writers] class JavaWriterImpl extends JavaWriter {
   var indentationLevel = 0
   var indentationRequired = false
 

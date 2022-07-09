@@ -9,7 +9,7 @@ trait BlockTraverser {
   def traverse(block: Block, shouldReturnValue: Boolean = false, maybeInit: Option[Init] = None): Unit
 }
 
-private[scala2java] class BlockTraverserImpl(initTraverser: => InitTraverser,
+private[traversers] class BlockTraverserImpl(initTraverser: => InitTraverser,
                                              ifTraverser: => IfTraverser,
                                              whileTraverser: WhileTraverser,
                                              returnTraverser: ReturnTraverser,

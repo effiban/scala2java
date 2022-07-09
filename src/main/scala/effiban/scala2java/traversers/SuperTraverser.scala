@@ -7,7 +7,7 @@ import scala.meta.Term.Super
 
 trait SuperTraverser extends ScalaTreeTraverser[Super]
 
-private[scala2java] class SuperTraverserImpl(nameTraverser: => NameTraverser)
+private[traversers] class SuperTraverserImpl(nameTraverser: => NameTraverser)
                                             (implicit javaWriter: JavaWriter) extends SuperTraverser {
 
   import javaWriter._

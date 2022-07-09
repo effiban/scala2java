@@ -6,7 +6,7 @@ import scala.meta.Term.ApplyUnary
 
 trait ApplyUnaryTraverser extends ScalaTreeTraverser[ApplyUnary]
 
-private[scala2java] class ApplyUnaryTraverserImpl(termNameTraverser: => TermNameTraverser,
+private[traversers] class ApplyUnaryTraverserImpl(termNameTraverser: => TermNameTraverser,
                                                   termTraverser: => TermTraverser)
                                                  (implicit javaWriter: JavaWriter) extends ApplyUnaryTraverser {
 

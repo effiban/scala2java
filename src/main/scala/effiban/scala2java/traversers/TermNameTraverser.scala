@@ -6,7 +6,7 @@ import scala.meta.Term
 
 trait TermNameTraverser extends ScalaTreeTraverser[Term.Name]
 
-private[scala2java] class TermNameTraverserImpl(implicit javaWriter: JavaWriter) extends TermNameTraverser {
+private[traversers] class TermNameTraverserImpl(implicit javaWriter: JavaWriter) extends TermNameTraverser {
 
   import javaWriter._
 

@@ -6,7 +6,7 @@ trait InitListTraverser {
   def traverse(inits: List[Init]): Unit
 }
 
-private[scala2java] class InitListTraverserImpl(argumentListTraverser: => ArgumentListTraverser,
+private[traversers] class InitListTraverserImpl(argumentListTraverser: => ArgumentListTraverser,
                                                 initTraverser: => InitTraverser) extends InitListTraverser {
 
   override def traverse(inits: List[Init]): Unit = {

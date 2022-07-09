@@ -12,7 +12,7 @@ trait TemplateTraverser extends ScalaTreeTraverser[Template] {
                maybeClassInfo: Option[ClassInfo] = None): Unit
 }
 
-private[scala2java] class TemplateTraverserImpl(initListTraverser: => InitListTraverser,
+private[traversers] class TemplateTraverserImpl(initListTraverser: => InitListTraverser,
                                                 selfTraverser: => SelfTraverser,
                                                 statTraverser: => StatTraverser,
                                                 ctorPrimaryTraverser: => CtorPrimaryTraverser,

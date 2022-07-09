@@ -6,7 +6,7 @@ import scala.meta.Term.Throw
 
 trait ThrowTraverser extends ScalaTreeTraverser[Throw]
 
-private[scala2java] class ThrowTraverserImpl(termTraverser: => TermTraverser)
+private[traversers] class ThrowTraverserImpl(termTraverser: => TermTraverser)
                                             (implicit javaWriter: JavaWriter) extends ThrowTraverser {
 
   import javaWriter._
