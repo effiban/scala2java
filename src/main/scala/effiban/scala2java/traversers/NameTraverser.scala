@@ -1,7 +1,6 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.writers.JavaWriter
-import effiban.scala2java.writers.JavaWriter.writeComment
 
 import scala.meta.{Name, Term, Type}
 
@@ -12,6 +11,8 @@ private[traversers] class NameTraverserImpl(nameAnonymousTraverser: => NameAnony
                                             termNameTraverser: => TermNameTraverser,
                                             typeNameTraverser: => TypeNameTraverser)
                                            (implicit javaWriter: JavaWriter) extends NameTraverser {
+
+  import javaWriter._
 
   override def traverse(name: Name): Unit = name match {
     case anonName: Name.Anonymous => nameAnonymousTraverser.traverse(anonName)

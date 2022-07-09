@@ -1,7 +1,6 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.writers.JavaWriter
-import effiban.scala2java.writers.JavaWriter.writeComment
 
 import scala.meta.Decl
 
@@ -12,6 +11,8 @@ private[traversers] class DeclTraverserImpl(declValTraverser: => DeclValTraverse
                                             declDefTraverser: => DeclDefTraverser,
                                             declTypeTraverser: => DeclTypeTraverser)
                                            (implicit javaWriter: JavaWriter) extends DeclTraverser {
+
+  import javaWriter._
 
   override def traverse(decl: Decl): Unit = decl match {
     case valDecl: Decl.Val => declValTraverser.traverse(valDecl)
