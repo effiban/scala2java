@@ -10,18 +10,14 @@ import scala.meta.inputs.Input
 
 object Scala2JavaTranslator {
 
-  def translate(scalaSourceFiles: List[File]): Unit = {
-
-    val sourceTrees = scalaSourceFiles.map(sourceFile => {
-      val text = Files.readString(sourceFile.toPath)
-      val input = Input.VirtualFile(sourceFile.getAbsolutePath, text)
-      input.parse[Source].get
-    })
+  def translate(scalaSourceFile: File): Unit = {
+    val text = Files.readString(scalaSourceFile.toPath)
+    val input = Input.VirtualFile(scalaSourceFile.getAbsolutePath, text)
+    val sourceTree = input.parse[Source].get
 
     implicit val javaWriter: JavaWriter = ConsoleJavaWriter
     val traversers = new ScalaTreeTraversers
-
-    sourceTrees.foreach(traversers.sourceTraverser.traverse)
+    traversers.sourceTraverser.traverse(sourceTree)
   }
 }
 
