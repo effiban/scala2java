@@ -6,7 +6,7 @@ trait ScalaToJavaTypeNameTransformer {
   def transform(scalaName: Type.Name): String
 }
 
-private[scala2java] class ScalaToJavaTypeNameTransformerImpl extends ScalaToJavaTypeNameTransformer {
+object ScalaToJavaTypeNameTransformer extends ScalaToJavaTypeNameTransformer {
 
   private final val ScalaTypeNameToJavaTypeName = Map(
     "Any" -> "Object",
@@ -28,5 +28,3 @@ private[scala2java] class ScalaToJavaTypeNameTransformerImpl extends ScalaToJava
     ScalaTypeNameToJavaTypeName.getOrElse(scalaName.value, scalaName.value)
   }
 }
-
-object ScalaToJavaTypeNameTransformer extends ScalaToJavaTypeNameTransformerImpl
