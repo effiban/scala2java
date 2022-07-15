@@ -82,7 +82,9 @@ class JavaTemplateChildOrderingTest extends UnitTestSuite {
     (declDef, declType)
   )
 
-  forAll(ChildTypeComparisons) { case (child1: Tree, child2: Tree) =>
-    JavaTemplateChildOrdering.compare(child1, child2) should be < 0
+  test("compare all types") {
+    forAll(ChildTypeComparisons) { case (child1: Tree, child2: Tree) =>
+      JavaTemplateChildOrdering.compare(child1, child2) should be < 0
+    }
   }
 }
