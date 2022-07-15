@@ -19,7 +19,7 @@ jobs: # a collection of steps
           key: v1-gradle-cache-{{ checksum "build.gradle" }}
       - run:
           name: Run tests
-          command: ./gradlew test
+          command: ./gradlew check
       - save_cache:
           paths:
             - ~/.gradle/wrapper

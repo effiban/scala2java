@@ -3,20 +3,21 @@ package effiban.scala2java
 import effiban.scala2java.traversers.ScalaTreeTraversers
 import effiban.scala2java.writers.{ConsoleJavaWriter, JavaWriter, JavaWriterImpl}
 
-import java.io.{File, FileWriter}
-import java.nio.file.{Files, Paths}
+import java.io.FileWriter
+import java.nio.file.{Files, Path, Paths}
 import scala.meta.Source
 import scala.meta.inputs.Input
 
 object Scala2JavaTranslator {
 
-  def translate(scalaFile: File, maybeOutputDir: Option[File] = None): Unit = {
-    val text = Files.readString(scalaFile.toPath)
-    val input = Input.VirtualFile(scalaFile.getAbsolutePath, text)
+  def translate(scalaPath: Path, maybeOutputJavaBasePath: Option[Path] = None): Unit = {
+    val scalaText = Files.readString(scalaPath)
+    val scalaFileName = scalaPath.getFileName.toString
+    val input = Input.VirtualFile(scalaFileName, scalaText)
     val sourceTree = input.parse[Source].get
 
-    implicit val javaWriter: JavaWriter = maybeOutputDir match {
-      case Some(outputDir) => createFileJavaWriter(scalaFile, outputDir)
+    implicit val javaWriter: JavaWriter = maybeOutputJavaBasePath match {
+      case Some(outputJavaBasePath) => createFileJavaWriter(scalaFileName, outputJavaBasePath)
       case None => ConsoleJavaWriter
     }
     try {
@@ -26,10 +27,10 @@ object Scala2JavaTranslator {
     }
   }
 
-  private def createFileJavaWriter(scalaFile: File, outputDir: File) = {
-    outputDir.mkdirs()
-    val javaFileName = scalaFile.getName.replace("scala", "java")
-    val javaFile = Paths.get(outputDir.getAbsolutePath, javaFileName).toFile
+  private def createFileJavaWriter(scalaFileName: String, outputJavaBasePath: Path) = {
+    outputJavaBasePath.toFile.mkdirs()
+    val javaFileName = scalaFileName.replace("scala", "java")
+    val javaFile = Paths.get(outputJavaBasePath.toString, javaFileName).toFile
     new JavaWriterImpl(new FileWriter(javaFile))
   }
 }

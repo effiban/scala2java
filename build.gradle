@@ -10,7 +10,7 @@ java {
     }
 }
 
-group 'com.effiban'
+group 'effiban'
 version '1.0'
 
 repositories {
@@ -19,14 +19,48 @@ repositories {
 
 dependencies {
     implementation 'org.scalameta:scalameta_2.13:4.5.4'
-
-    testImplementation 'org.scalatest:scalatest_2.13:3.2.12'
-    testImplementation 'org.mockito:mockito-scala_2.13:1.17.5'
-
-    testRuntimeOnly 'com.vladsch.flexmark:flexmark-all:0.64.0'
 }
 
-test {
-    useJUnitPlatform()
-    maxParallelForks = 1
+testing {
+    suites {
+        test {
+            dependencies {
+                implementation 'org.scalatest:scalatest_2.13:3.2.12'
+                implementation 'org.mockito:mockito-scala_2.13:1.17.5'
+                runtimeOnly 'com.vladsch.flexmark:flexmark-all:0.64.0'
+            }
+            targets {
+                all {
+                    testTask.configure {
+                        maxParallelForks = 1
+                    }
+                }
+            }
+        }
+        integrationTest(JvmTestSuite) {
+            targets {
+                all {
+                    testTask.configure {
+                        shouldRunAfter(test)
+                    }
+                }
+            }
+        }
+    }
+}
+
+sourceSets {
+    integrationTest {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+
+configurations {
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
+tasks.named('check') {
+    dependsOn(testing.suites.integrationTest)
 }
