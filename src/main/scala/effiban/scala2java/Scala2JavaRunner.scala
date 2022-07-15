@@ -1,6 +1,7 @@
 package effiban.scala2java
 
-import java.io.File
+import effiban.scala2java.Scala2JavaTranslator.translate
+
 import java.nio.file.Paths
 import scala.Console.err
 import scala.sys.exit
@@ -16,8 +17,8 @@ object Scala2JavaRunner {
       case javaOutputDir :: scalaFilePaths => (Some(javaOutputDir), scalaFilePaths)
     }
 
-    val scalaFiles = scalaFilePaths.map(pathStr => Paths.get(pathStr).toFile)
-    scalaFiles.foreach(scalaFile => Scala2JavaTranslator.translate(scalaFile, maybeJavaOutputDir.map(new File(_))))
+    val scalaFiles = scalaFilePaths.map(Paths.get(_))
+    scalaFiles.foreach(scalaFile => translate(scalaFile, maybeJavaOutputDir.map(Paths.get(_))))
   }
 }
 
