@@ -42,8 +42,9 @@ trait JavaWriter {
 }
 
 class JavaWriterImpl(writer: Writer) extends JavaWriter {
-  var indentationLevel = 0
-  var indentationRequired = false
+  private final val indentationLength = 4
+  private var indentationLevel = 0
+  private var indentationRequired = false
 
   override def writeTypeDeclaration(modifiers: List[String], typeKeyword: String, name: String): Unit = {
     writeModifiers(modifiers)
@@ -145,7 +146,9 @@ class JavaWriterImpl(writer: Writer) extends JavaWriter {
 
   override def write(str: String): Unit = {
     if (indentationRequired) {
-      writer.write(indentation())
+      if (!str.isBlank) {
+        writer.write(indentation())
+      }
       indentationRequired = false
     }
     writer.write(str)
@@ -153,5 +156,5 @@ class JavaWriterImpl(writer: Writer) extends JavaWriter {
 
   override def close(): Unit = writer.close()
 
-  private def indentation() = "\t" * indentationLevel
+  private def indentation() = " " * indentationLength * indentationLevel
 }
