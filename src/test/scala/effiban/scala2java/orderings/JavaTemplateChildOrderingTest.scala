@@ -9,7 +9,7 @@ class JavaTemplateChildOrderingTest extends UnitTestSuite {
 
   private val x = Term.Name("x")
   private val myMethod = Term.Name("myMethod")
-  private val myType= Type.Name("MyType")
+  private val myType = Type.Name("MyType")
 
   private val defnVal = Defn.Val(
     mods = Nil,
@@ -27,10 +27,10 @@ class JavaTemplateChildOrderingTest extends UnitTestSuite {
   private val ctorPrimary = PrimaryCtors.Empty
 
   private val init = Init(
-      tpe = Type.Singleton(ref = Term.This(Name.Anonymous())),
-      name = Name.Anonymous(),
-      argss = List(List(Lit.String("param")))
-    )
+    tpe = Type.Singleton(ref = Term.This(Name.Anonymous())),
+    name = Name.Anonymous(),
+    argss = List(List(Lit.String("param")))
+  )
 
   private val ctorSecondary = Ctor.Secondary(
     mods = Nil,
@@ -82,8 +82,8 @@ class JavaTemplateChildOrderingTest extends UnitTestSuite {
     (declDef, declType)
   )
 
-  test("compare all types") {
-    forAll(ChildTypeComparisons) { case (child1: Tree, child2: Tree) =>
+  forAll(ChildTypeComparisons) { case (child1: Tree, child2: Tree) =>
+    test(s"${child1.getClass.getSimpleName} should precede ${child2.getClass.getSimpleName}") {
       JavaTemplateChildOrdering.compare(child1, child2) should be < 0
     }
   }

@@ -23,8 +23,8 @@ class ScalaToJavaTypeNameTransformerTest extends UnitTestSuite {
     ("Option", "Optional")
   )
 
-  test ("transform all mappings") {
-    forAll(TypeMappings) { (scalaType: String, expectedJavaType: String) =>
+  forAll(TypeMappings) { (scalaType: String, expectedJavaType: String) =>
+    test(s"transform $scalaType should return $expectedJavaType") {
       ScalaToJavaTypeNameTransformer.transform(Type.Name(scalaType)) shouldBe expectedJavaType
     }
   }
