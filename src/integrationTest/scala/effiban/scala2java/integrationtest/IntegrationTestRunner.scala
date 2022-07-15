@@ -15,9 +15,8 @@ class IntegrationTestRunner extends AnyFunSuite
   with OptionValues
   with BeforeAndAfterAll {
 
-  private val basePathStr = "effiban/scala2java/integrationtest"
-  private val scalaBasePath = pathOfResource(s"$basePathStr/scala")
-  private val expectedJavaBasePath = pathOfResource(s"$basePathStr/expectedjava")
+  private val scalaBasePath = pathOfResource("scala")
+  private val expectedJavaBasePath = pathOfResource("expectedjava")
   private var outputJavaBasePath: Path = _
 
   override protected def beforeAll(): Unit = {
