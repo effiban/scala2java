@@ -15,8 +15,7 @@ class IntegrationTestRunner extends AnyFunSuite
   with OptionValues
   with BeforeAndAfterAll {
 
-  private val scalaBasePath = pathOfResource("scala")
-  private val expectedJavaBasePath = pathOfResource("expectedjava")
+  private val testFilesBasePath = Paths.get(getClass.getClassLoader.getResource("testfiles").toURI)
   private var outputJavaBasePath: Path = _
 
   override protected def beforeAll(): Unit = {
@@ -33,18 +32,19 @@ class IntegrationTestRunner extends AnyFunSuite
     outputJavaBaseDir.delete()
   }
 
-  Using(Files.walk(scalaBasePath)) { stream =>
+  Using(Files.walk(testFilesBasePath)) { stream =>
     stream.toScala(LazyList)
       .filterNot(Files.isDirectory(_))
+      .filter(_.toString.endsWith(".scala"))
       .foreach(test)
   }
 
   private def test(scalaPath: Path): Unit = {
     val scalaFileName = scalaPath.getFileName.toString
     test(s"translate $scalaFileName to Java") {
-      val relativePath = scalaBasePath.relativize(scalaPath.getParent)
+      val relativePath = testFilesBasePath.relativize(scalaPath.getParent)
       val javaFileName = scalaFileName.replace("scala", "java")
-      val expectedJavaPath = pathOf(expectedJavaBasePath, relativePath, javaFileName)
+      val expectedJavaPath = pathOf(testFilesBasePath, relativePath, javaFileName)
       val outputJavaPath = pathOf(outputJavaBasePath, relativePath, javaFileName)
 
       translate(scalaPath, Some(outputJavaPath.getParent))
@@ -56,7 +56,6 @@ class IntegrationTestRunner extends AnyFunSuite
     }
   }
 
-  private def pathOfResource(resourceName: String) = Paths.get(getClass.getClassLoader.getResource(resourceName).toURI)
   private def pathOf(basePath: Path, relativePath: Path, fileName: String) = Paths.get(basePath.toString, relativePath.toString, fileName)
 
   private def verifyJavaFileContents(outputJavaPath: Path, expectedJavaPath: Path): Unit = {
