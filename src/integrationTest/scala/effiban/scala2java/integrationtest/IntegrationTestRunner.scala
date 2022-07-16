@@ -16,6 +16,7 @@ class IntegrationTestRunner extends AnyFunSuite
   with BeforeAndAfterAll {
 
   private val testFilesBasePath = Paths.get(getClass.getClassLoader.getResource("testfiles").toURI)
+  private val selectedTestPath = Option(System.getenv("INTEGRATION_TEST_PATH")).getOrElse("")
   private var outputJavaBasePath: Path = _
 
   override protected def beforeAll(): Unit = {
@@ -35,6 +36,7 @@ class IntegrationTestRunner extends AnyFunSuite
   Using(Files.walk(testFilesBasePath)) { stream =>
     stream.toScala(LazyList)
       .filterNot(Files.isDirectory(_))
+      .filter(path => selectedTestPath.isBlank || path.toString.contains(selectedTestPath))
       .filter(_.toString.endsWith(".scala"))
       .foreach(test)
   }
