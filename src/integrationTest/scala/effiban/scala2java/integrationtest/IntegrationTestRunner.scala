@@ -42,9 +42,9 @@ class IntegrationTestRunner extends AnyFunSuite
   }
 
   private def test(scalaPath: Path): Unit = {
-    val scalaFileName = scalaPath.getFileName.toString
-    test(s"translate $scalaFileName to Java") {
-      val relativePath = testFilesBasePath.relativize(scalaPath.getParent)
+    val relativePath = testFilesBasePath.relativize(scalaPath.getParent)
+    test(s"translate [$relativePath]") {
+      val scalaFileName = scalaPath.getFileName.toString
       val javaFileName = scalaFileName.replace("scala", "java")
       val expectedJavaPath = pathOf(testFilesBasePath, relativePath, javaFileName)
       val outputJavaPath = pathOf(outputJavaBasePath, relativePath, javaFileName)
