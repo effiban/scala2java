@@ -18,7 +18,20 @@ class JavaTemplateChildOrderingTest extends UnitTestSuite {
     rhs = Lit.Int(2)
   )
 
+  private val defnVar = Defn.Var(
+    mods = Nil,
+    pats = List(Pat.Var(x)),
+    decltpe = None,
+    rhs = Some(Lit.Int(2))
+  )
+
   private val declVal = Decl.Val(
+    mods = Nil,
+    pats = List(Pat.Var(x)),
+    decltpe = TypeNames.Int
+  )
+
+  private val declVar = Decl.Var(
     mods = Nil,
     pats = List(Pat.Var(x)),
     decltpe = TypeNames.Int
@@ -73,8 +86,10 @@ class JavaTemplateChildOrderingTest extends UnitTestSuite {
 
   private val ChildTypeComparisons = Table(
     ("ChildType1", "ChildType2"),
-    (defnVal, declVal),
-    (declVal, ctorPrimary),
+    (defnVal, defnVar),
+    (defnVar, declVal),
+    (declVal, declVar),
+    (declVar, ctorPrimary),
     (ctorPrimary, ctorSecondary),
     (ctorSecondary, defnDef),
     (defnDef, defnType),

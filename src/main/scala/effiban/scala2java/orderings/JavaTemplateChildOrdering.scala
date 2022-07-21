@@ -7,7 +7,9 @@ trait JavaTemplateChildOrdering extends Ordering[Tree]
 object JavaTemplateChildOrdering extends JavaTemplateChildOrdering {
   private val ChildOrder: List[Class[_ <: Tree]] = List[Class[_ <: Tree]](
     classOf[Defn.Val],
+    classOf[Defn.Var],
     classOf[Decl.Val],
+    classOf[Decl.Var],
     classOf[Ctor.Primary],
     classOf[Ctor.Secondary],
     classOf[Defn.Def],
