@@ -1,0 +1,3 @@
+package dummy
+
+trait Sample

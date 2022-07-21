@@ -1,0 +1,3 @@
+package dummy
+
+object Sample
