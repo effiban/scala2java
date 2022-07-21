@@ -52,8 +52,8 @@ class JavaWriterImpl(writer: Writer) extends JavaWriter {
   }
 
   override def writeModifiers(modifiers: List[String]): Unit = {
-    write(modifiers.mkString(" "))
     if (modifiers.nonEmpty) {
+      write(modifiers.mkString(" "))
       write(" ")
     }
   }
