@@ -11,6 +11,6 @@ class PatWildcardTraverserImplTest extends UnitTestSuite {
   test("traverse()") {
     patWildcardTraverser.traverse(Pat.Wildcard())
 
-    outputWriter.toString shouldBe "default"
+    outputWriter.toString shouldBe "__"
   }
 }

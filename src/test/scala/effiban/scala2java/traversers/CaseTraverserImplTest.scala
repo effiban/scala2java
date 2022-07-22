@@ -4,11 +4,11 @@ import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
 
-import scala.meta.{Case, Lit}
+import scala.meta.{Case, Lit, Pat}
 
 class CaseTraverserImplTest extends UnitTestSuite {
 
-  private val Pat = Lit.String("value1")
+  private val StringPat = Lit.String("value1")
   private val Cond = Lit.String("value2")
   private val Body: Lit.Int = Lit.Int(3)
 
@@ -18,12 +18,12 @@ class CaseTraverserImplTest extends UnitTestSuite {
   private val caseTraverser = new CaseTraverserImpl(patTraverser, termTraverser)
 
 
-  test("traverse() without condition") {
-    doWrite(""""value1"""").when(patTraverser).traverse(eqTree(Pat))
+  test("traverse() non-default without condition") {
+    doWrite(""""value1"""").when(patTraverser).traverse(eqTree(StringPat))
     doWrite("3").when(termTraverser).traverse(eqTree(Body))
 
     caseTraverser.traverse(
-      Case(pat = Pat,
+      Case(pat = StringPat,
         cond = None,
         body = Body
       )
@@ -34,20 +34,35 @@ class CaseTraverserImplTest extends UnitTestSuite {
         |""".stripMargin
   }
 
-  test("traverse() with condition") {
-    doWrite(""""value1"""").when(patTraverser).traverse(eqTree(Pat))
-    doWrite(""""value2"""").when(termTraverser).traverse(eqTree(Cond))
+  test("traverse() default case without condition") {
     doWrite("3").when(termTraverser).traverse(eqTree(Body))
 
     caseTraverser.traverse(
-      Case(pat = Pat,
+      Case(pat = Pat.Wildcard(),
+        cond = None,
+        body = Body
+      )
+    )
+
+    outputWriter.toString shouldBe
+      """default -> 3;
+        |""".stripMargin
+  }
+
+  test("traverse() with condition") {
+    doWrite(""""value1"""").when(patTraverser).traverse(eqTree(StringPat))
+    doWrite("x > 2").when(termTraverser).traverse(eqTree(Cond))
+    doWrite("3").when(termTraverser).traverse(eqTree(Body))
+
+    caseTraverser.traverse(
+      Case(pat = StringPat,
         cond = Some(Cond),
         body = Body
       )
     )
 
     outputWriter.toString shouldBe
-      """case "value1" && ("value2") -> 3;
+      """case "value1" && x > 2 -> 3;
         |""".stripMargin
   }
 }
