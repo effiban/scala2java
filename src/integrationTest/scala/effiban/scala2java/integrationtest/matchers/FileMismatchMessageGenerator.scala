@@ -81,7 +81,7 @@ private[matchers] object FileMismatchMessageGenerator {
     val minNumLines = min(actualLines.size, expectedLines.size)
 
     val maybeMismatchingLineNum = (0 until minNumLines)
-      .find(lineNum => actualLines(lineNum) != expectedLines(lineNum))
+      .find(lineNum => actualLines(lineNum).trim != expectedLines(lineNum).trim)
 
     maybeMismatchingLineNum match {
       case Some(mismatchingLineNum) => Some(mismatchingLineNum)
