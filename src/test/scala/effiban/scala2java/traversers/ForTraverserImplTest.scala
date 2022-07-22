@@ -10,9 +10,9 @@ import scala.meta.{Pat, Term}
 
 class ForTraverserImplTest extends UnitTestSuite {
 
-  private val forVariantTraverser = mock[ForVariantTraverser]
+  private val termTraverser = mock[TermTraverser]
 
-  private val forTraverser = new ForTraverserImpl(forVariantTraverser)
+  private val forTraverser = spy(new ForTraverserImpl(termTraverser))
 
 
   test("traverse") {
@@ -27,9 +27,8 @@ class ForTraverserImplTest extends UnitTestSuite {
 
     forTraverser.traverse(`for`)
 
-    verify(forVariantTraverser).traverse(
+    verify(forTraverser).traverse(
       enumerators = eqTreeList(enumerators),
-      body = eqTree(body),
-      finalFunctionName = eqTree(Term.Name("forEach")))
+      body = eqTree(body))
   }
 }

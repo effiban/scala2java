@@ -6,24 +6,21 @@ import effiban.scala2java.writers.JavaWriter
 import scala.meta.Term.{Apply, Param, Select}
 import scala.meta.{Enumerator, Lit, Pat, Term}
 
-trait ForVariantTraverser {
-  def traverse(enumerators: List[Enumerator], body: Term, finalFunctionName: Term.Name): Unit
-}
+private[traversers] trait ForVariantTraverser {
+  val intermediateFunctionName: Term.Name
+  val finalFunctionName: Term.Name
 
-private[traversers] class ForVariantTraverserImpl(termTraverser: => TermTraverser)
-                                                 (implicit javaWriter: JavaWriter) extends ForVariantTraverser {
+  def termTraverser: TermTraverser
+
+  implicit val javaWriter: JavaWriter
 
   import javaWriter._
 
-  override def traverse(enumerators: List[Enumerator],
-                        body: Term,
-                        finalFunctionName: Term.Name): Unit = {
-    termTraverser.traverse(translateFor(enumerators, body, finalFunctionName))
+  def traverse(enumerators: List[Enumerator], body: Term): Unit = {
+    termTraverser.traverse(translateFor(enumerators, body))
   }
 
-  private def translateFor(enumerators: List[Enumerator],
-                           body: Term,
-                           finalFunctionName: Term.Name): Term = {
+  private def translateFor(enumerators: List[Enumerator], body: Term): Term = {
     enumerators match {
       case Nil =>
         writeComment("ERROR - for comprehension without enumerators")
@@ -33,7 +30,7 @@ private[traversers] class ForVariantTraverserImpl(termTraverser: => TermTraverse
 
         val (param, adjustedTerm) = currentEnumerator match {
           case Enumerator.Generator(pat, term) => (pat2Param(pat), term)
-          //TODO should be converted to parial function
+          //TODO should be converted to partial function
           case Enumerator.CaseGenerator(pat, term) => (pat2Param(pat), term)
           //TODO not sure what this is
           case Enumerator.Val(pat, term) => (pat2Param(pat), term)
@@ -46,10 +43,10 @@ private[traversers] class ForVariantTraverserImpl(termTraverser: => TermTraverse
             // This enumerator is the last - next is the final function invocation ('forEach' or 'map')
             Apply(Select(adjustedTerm, finalFunctionName), List(Term.Function(List(param), body)))
           case theNextEnumerators =>
-            // This enumerator is not the last - add a 'flatMap' invocation and recursively translate the rest
+            // This enumerator is not the last - invoke the intermediate function and recursively translate the rest
             Apply(
-              Select(adjustedTerm, Term.Name("flatMap")),
-              List(Term.Function(List(param), translateFor(theNextEnumerators, body, finalFunctionName)))
+              Select(adjustedTerm, intermediateFunctionName),
+              List(Term.Function(List(param), translateFor(theNextEnumerators, body)))
             )
         }
     }
