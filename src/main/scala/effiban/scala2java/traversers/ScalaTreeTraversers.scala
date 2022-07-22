@@ -335,11 +335,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
     PatToTermParamTransformer
   )
 
-  private lazy val tryWithHandlerTraverser: TryWithHandlerTraverser = new TryWithHandlerTraverserImpl(
-    blockTraverser,
-    catchHandlerTraverser,
-    finallyTraverser
-  )
+  private lazy val tryWithHandlerTraverser: TryWithHandlerTraverser = new TryWithHandlerTraverserImpl(blockTraverser, finallyTraverser)
 
   private lazy val typeAnnotateTraverser: TypeAnnotateTraverser = new TypeAnnotateTraverserImpl(annotListTraverser, typeTraverser)
 
