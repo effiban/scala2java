@@ -1,5 +1,6 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.entities.TraversalConstants.JavaPlaceholder
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Pat
@@ -10,6 +11,7 @@ private[traversers] class PatWildcardTraverserImpl(implicit javaWriter: JavaWrit
 
   import javaWriter._
 
-  // Wildcard in pattern match expression - translates to Java "default" ?
-  override def traverse(ignored: Pat.Wildcard): Unit = write("default")
+  // Wildcard in pattern match expression - translates to Java placeholder (but not always supported)
+  // When used alone it should be translated to "default" and this is handled by the parent traverser (CaseTraverser)
+  override def traverse(ignored: Pat.Wildcard): Unit = write(JavaPlaceholder)
 }
