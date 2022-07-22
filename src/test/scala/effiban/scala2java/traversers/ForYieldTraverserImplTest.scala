@@ -10,9 +10,9 @@ import scala.meta.{Pat, Term}
 
 class ForYieldTraverserImplTest extends UnitTestSuite {
 
-  private val forVariantTraverser = mock[ForVariantTraverser]
+  private val termTraverser = mock[TermTraverser]
 
-  private val forYieldTraverser = new ForYieldTraverserImpl(forVariantTraverser)
+  private val forYieldTraverser = spy(new ForYieldTraverserImpl(termTraverser))
 
   test("traverse") {
     val enumerators = List(
@@ -28,9 +28,9 @@ class ForYieldTraverserImplTest extends UnitTestSuite {
     )
     forYieldTraverser.traverse(forYield)
 
-    verify(forVariantTraverser).traverse(
+    verify(forYieldTraverser).traverse(
       enumerators = eqTreeList(enumerators),
-      body = eqTree(body),
-      finalFunctionName = eqTree(Term.Name("map")))
+      body = eqTree(body)
+    )
   }
 }

@@ -3,12 +3,13 @@ package effiban.scala2java.traversers
 import effiban.scala2java.entities.TraversalConstants.JavaPlaceholder
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.testsuites.UnitTestSuite
+import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Enumerator.{CaseGenerator, Generator}
 import scala.meta.Term.Select
 import scala.meta.{Enumerator, Pat, Term}
 
-class ForVariantTraverserImplTest extends UnitTestSuite {
+class ForVariantTraverserTest extends UnitTestSuite {
 
   private val X = Term.Name("x")
   private val Y = Term.Name("y")
@@ -33,7 +34,15 @@ class ForVariantTraverserImplTest extends UnitTestSuite {
   private val termTraverser = mock[TermTraverser]
 
 
-  private val forVariantTraverser = new ForVariantTraverserImpl(termTraverser)
+  private val forVariantTraverser = new ForVariantTraverser {
+    override val intermediateFunctionName: Term.Name = FlatMapFunctionName
+    override val finalFunctionName: Term.Name = MapFunctionName
+
+    override def termTraverser: TermTraverser = ForVariantTraverserTest.this.termTraverser
+
+    override implicit val javaWriter: JavaWriter = ForVariantTraverserTest.this.javaWriter
+  }
+
   test("traverse() for one Generator with a variable in the LHS") {
     val enumerators = List(
       Generator(pat = PatX, rhs = Xs),
@@ -46,7 +55,7 @@ class ForVariantTraverserImplTest extends UnitTestSuite {
         args = List(Term.Function(params = List(ParamX), body = inputBody))
       )
 
-    forVariantTraverser.traverse(enumerators, inputBody, MapFunctionName)
+    forVariantTraverser.traverse(enumerators, inputBody)
 
     verify(termTraverser).traverse(eqTree(expectedTranslatedFor))
   }
@@ -63,7 +72,7 @@ class ForVariantTraverserImplTest extends UnitTestSuite {
         args = List(Term.Function(params = List(paramOf(Term.Name(JavaPlaceholder))), body = inputBody))
       )
 
-    forVariantTraverser.traverse(enumerators, inputBody, MapFunctionName)
+    forVariantTraverser.traverse(enumerators, inputBody)
 
     verify(termTraverser).traverse(eqTree(expectedTranslatedFor))
   }
@@ -80,7 +89,7 @@ class ForVariantTraverserImplTest extends UnitTestSuite {
         args = List(Term.Function(params = List(ParamX), body = inputBody))
       )
 
-    forVariantTraverser.traverse(enumerators, inputBody, MapFunctionName)
+    forVariantTraverser.traverse(enumerators, inputBody)
 
     verify(termTraverser).traverse(eqTree(expectedTranslatedFor))
   }
@@ -97,7 +106,7 @@ class ForVariantTraverserImplTest extends UnitTestSuite {
         args = List(Term.Function(params = List(ParamX), body = inputBody))
       )
 
-    forVariantTraverser.traverse(enumerators, inputBody, MapFunctionName)
+    forVariantTraverser.traverse(enumerators, inputBody)
 
     verify(termTraverser).traverse(eqTree(expectedTranslatedFor))
   }
@@ -132,7 +141,7 @@ class ForVariantTraverserImplTest extends UnitTestSuite {
         ))
       )
 
-    forVariantTraverser.traverse(enumerators, inputBody, MapFunctionName)
+    forVariantTraverser.traverse(enumerators, inputBody)
 
     verify(termTraverser).traverse(eqTree(expectedTranslatedFor))
   }
