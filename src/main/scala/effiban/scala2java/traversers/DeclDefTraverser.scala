@@ -6,11 +6,12 @@ import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.resolvers.JavaModifiersResolver
 import effiban.scala2java.writers.JavaWriter
 
-import scala.meta.Decl
+import scala.meta.{Decl, Type}
 
 trait DeclDefTraverser extends ScalaTreeTraverser[Decl.Def]
 
 private[traversers] class DeclDefTraverserImpl(annotListTraverser: => AnnotListTraverser,
+                                               typeParamListTraverser: => TypeParamListTraverser,
                                                typeTraverser: => TypeTraverser,
                                                termNameTraverser: => TermNameTraverser,
                                                termParamListTraverser: => TermParamListTraverser,
@@ -28,14 +29,23 @@ private[traversers] class DeclDefTraverserImpl(annotListTraverser: => AnnotListT
       case _ => Nil
     }
     writeModifiers(resolvedModifierNames)
+    traverseTypeParams(defDecl.tparams)
     typeTraverser.traverse(defDecl.decltpe)
     write(" ")
     termNameTraverser.traverse(defDecl.name)
-    //TODO handle method type params
 
     val outerJavaScope = javaScope
     javaScope = Method
     termParamListTraverser.traverse(defDecl.paramss.flatten)
     javaScope = outerJavaScope
+  }
+
+  private def traverseTypeParams(tparams: List[Type.Param]): Unit = {
+    tparams match {
+      case Nil =>
+      case typeParams =>
+        typeParamListTraverser.traverse(typeParams)
+        write(" ")
+    }
   }
 }

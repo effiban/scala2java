@@ -53,6 +53,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
   private val Statement2 = Term.Apply(fun = Term.Name("doSomethingElse"), args = List(Term.Name("param2")))
 
   private val annotListTraverser = mock[AnnotListTraverser]
+  private val typeParamListTraverser = mock[TypeParamListTraverser]
   private val termNameTraverser = mock[TermNameTraverser]
   private val typeTraverser = mock[TypeTraverser]
   private val termParamListTraverser = mock[TermParamListTraverser]
@@ -61,6 +62,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
 
   private val defnDefTraverser = new DefnDefTraverserImpl(
     annotListTraverser,
+    typeParamListTraverser,
     termNameTraverser,
     typeTraverser,
     termParamListTraverser,
@@ -73,7 +75,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     val defnDef = Defn.Def(
       mods = Modifiers,
       name = MethodName,
-      tparams = TypeParams,
+      tparams = Nil,
       paramss = List(MethodParams1),
       decltpe = Some(TypeNames.Int),
       body = Statement1
@@ -116,7 +118,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     val defnDef = Defn.Def(
       mods = Modifiers,
       name = MethodName,
-      tparams = TypeParams,
+      tparams = Nil,
       paramss = List(MethodParams1),
       decltpe = Some(TypeNames.Unit),
       body = Statement1
@@ -148,6 +150,50 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       """
         |@MyAnnotation
         |public void myMethod(int param1, int param2) {
+        |  /* BODY */
+        |}
+        |""".stripMargin
+  }
+
+  test("traverse() for class method with type params") {
+    javaScope = JavaScope.Class
+
+    val defnDef = Defn.Def(
+      mods = Modifiers,
+      name = MethodName,
+      tparams = TypeParams,
+      paramss = List(MethodParams1),
+      decltpe = Some(TypeNames.Unit),
+      body = Statement1
+    )
+
+    doWrite(
+      """@MyAnnotation
+        |""".stripMargin)
+      .when(annotListTraverser).traverseMods(mods = eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
+    when(javaModifiersResolver.resolveForClassMethod(eqTreeList(Modifiers))).thenReturn(List(JavaPublicModifier))
+    doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
+    doWrite("void").when(typeTraverser).traverse(eqTree(TypeNames.Unit))
+    doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
+    doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
+      termParams = eqTreeList(MethodParams1),
+      onSameLine = ArgumentMatchers.eq(false)
+    )
+    doWrite(
+      """ {
+        |  /* BODY */
+        |}
+        |""".stripMargin)
+      .when(blockTraverser).traverse(block = eqTree(Block(List(Statement1))),
+      shouldReturnValue = ArgumentMatchers.eq(false),
+      maybeInit = ArgumentMatchers.eq(None))
+
+    defnDefTraverser.traverse(defnDef)
+
+    outputWriter.toString shouldBe
+      """
+        |@MyAnnotation
+        |public <T> void myMethod(int param1, int param2) {
         |  /* BODY */
         |}
         |""".stripMargin
@@ -208,7 +254,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     val defnDef = Defn.Def(
       mods = Modifiers,
       name = MethodName,
-      tparams = TypeParams,
+      tparams = Nil,
       paramss = List(MethodParams1),
       decltpe = None,
       body = Statement1
@@ -252,7 +298,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     val defnDef = Defn.Def(
       mods = Modifiers,
       name = MethodName,
-      tparams = TypeParams,
+      tparams = Nil,
       paramss = List(MethodParams1),
       decltpe = Some(TypeNames.Int),
       body = body
@@ -295,7 +341,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     val defnDef = Defn.Def(
       mods = Modifiers,
       name = MethodName,
-      tparams = TypeParams,
+      tparams = Nil,
       paramss = List(MethodParams1),
       decltpe = Some(TypeNames.Int),
       body = Statement1
@@ -339,7 +385,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     val defnDef = Defn.Def(
       mods = Modifiers,
       name = MethodName,
-      tparams = TypeParams,
+      tparams = Nil,
       paramss = List(MethodParams1, MethodParams2),
       decltpe = Some(TypeNames.Int),
       body = Statement1

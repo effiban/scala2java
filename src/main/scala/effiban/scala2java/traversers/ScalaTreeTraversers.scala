@@ -55,6 +55,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
 
   private lazy val declDefTraverser: DeclDefTraverser = new DeclDefTraverserImpl(
     annotListTraverser,
+    typeParamListTraverser,
     typeTraverser,
     termNameTraverser,
     termParamListTraverser,
@@ -85,6 +86,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
 
   private lazy val defnDefTraverser: DefnDefTraverser = new DefnDefTraverserImpl(
     annotListTraverser,
+    typeParamListTraverser,
     termNameTraverser,
     typeTraverser,
     termParamListTraverser,
