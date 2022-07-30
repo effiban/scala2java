@@ -15,6 +15,7 @@ trait DefnDefTraverser {
 }
 
 private[traversers] class DefnDefTraverserImpl(annotListTraverser: => AnnotListTraverser,
+                                               typeParamListTraverser: => TypeParamListTraverser,
                                                termNameTraverser: => TermNameTraverser,
                                                typeTraverser: => TypeTraverser,
                                                termParamListTraverser: => TermParamListTraverser,
@@ -33,6 +34,7 @@ private[traversers] class DefnDefTraverserImpl(annotListTraverser: => AnnotListT
       case _ => Nil
     }
     writeModifiers(resolvedModifierNames)
+    traverseTypeParams(defnDef.tparams)
     defnDef.decltpe match {
       case Some(Type.AnonymousName()) =>
       case Some(tpe) =>
@@ -43,7 +45,6 @@ private[traversers] class DefnDefTraverserImpl(annotListTraverser: => AnnotListT
         write(" ")
     }
     termNameTraverser.traverse(defnDef.name)
-    //TODO handle method type params
 
     val outerJavaScope = javaScope
     javaScope = Method
@@ -68,5 +69,14 @@ private[traversers] class DefnDefTraverserImpl(annotListTraverser: => AnnotListT
     blockTraverser.traverse(block = block,
         shouldReturnValue = withReturnValue,
         maybeInit = maybeInit)
+  }
+
+  private def traverseTypeParams(tparams: List[Type.Param]): Unit = {
+    tparams match {
+      case Nil =>
+      case typeParams =>
+        typeParamListTraverser.traverse(typeParams)
+        write(" ")
+    }
   }
 }

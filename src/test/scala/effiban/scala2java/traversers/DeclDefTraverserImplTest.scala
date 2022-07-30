@@ -49,12 +49,14 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
 
   private val annotListTraverser = mock[AnnotListTraverser]
   private val typeTraverser = mock[TypeTraverser]
+  private val typeParamListTraverser = mock[TypeParamListTraverser]
   private val termNameTraverser = mock[TermNameTraverser]
   private val termParamListTraverser = mock[TermParamListTraverser]
   private val javaModifiersResolver = mock[JavaModifiersResolver]
 
   private val declDefTraverser = new DeclDefTraverserImpl(
     annotListTraverser,
+    typeParamListTraverser,
     typeTraverser,
     termNameTraverser,
     termParamListTraverser,
@@ -67,7 +69,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     val declDef = Decl.Def(
       mods = Modifiers,
       name = MethodName,
-      tparams = TypeParams,
+      tparams = Nil,
       paramss = List(MethodParams1),
       decltpe = MethodType
     )
@@ -92,13 +94,45 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
         |public int myMethod(int param1, int param2)""".stripMargin
   }
 
+  test("traverse() for class method when has type params") {
+    javaScope = JavaScope.Class
+
+    val declDef = Decl.Def(
+      mods = Modifiers,
+      name = MethodName,
+      tparams = TypeParams,
+      paramss = List(MethodParams1),
+      decltpe = MethodType
+    )
+
+    doWrite(
+      """@MyAnnotation
+        |""".stripMargin)
+      .when(annotListTraverser).traverseMods(mods = eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
+    when(javaModifiersResolver.resolveForClassMethod(eqTreeList(Modifiers))).thenReturn(List(JavaModifier))
+    doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
+    doWrite("int").when(typeTraverser).traverse(eqTree(MethodType))
+    doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
+    doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
+      termParams = eqTreeList(MethodParams1),
+      onSameLine = ArgumentMatchers.eq(false)
+    )
+
+    declDefTraverser.traverse(declDef)
+
+    outputWriter.toString shouldBe
+      """
+        |@MyAnnotation
+        |public <T> int myMethod(int param1, int param2)""".stripMargin
+  }
+
   test("traverse() for interface method when has one list of params") {
     javaScope = Interface
 
     val declDef = Decl.Def(
       mods = Modifiers,
       name = MethodName,
-      tparams = TypeParams,
+      tparams = Nil,
       paramss = List(MethodParams1),
       decltpe = MethodType
     )
@@ -129,7 +163,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     val declDef = Decl.Def(
       mods = Modifiers,
       name = MethodName,
-      tparams = TypeParams,
+      tparams = Nil,
       paramss = List(MethodParams1, MethodParams2),
       decltpe = MethodType
     )
