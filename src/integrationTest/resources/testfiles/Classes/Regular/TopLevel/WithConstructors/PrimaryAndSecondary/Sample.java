@@ -10,7 +10,7 @@ public class Sample {
         this.param2 = param2;
     }
 
-    public /* UnknownType */ Sample(final String param1,
+    public Sample(final String param1,
         final int param2,
         final String param3,
         final int param4) {
