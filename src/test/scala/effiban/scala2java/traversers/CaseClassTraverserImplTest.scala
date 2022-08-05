@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities
+import effiban.scala2java.entities.ClassInfo
 import effiban.scala2java.matchers.ClassInfoMatcher
 import effiban.scala2java.matchers.SomeMatcher.eqSome
 import effiban.scala2java.matchers.TreeListMatcher.eqTreeList
@@ -106,7 +106,63 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
         | /* BODY */
         |}
         |""".stripMargin)
-      .when(templateTraverser).traverse(eqTree(TheTemplate), eqSome(entities.ClassInfo(ClassName, None), new ClassInfoMatcher(_))
+      .when(templateTraverser).traverse(eqTree(TheTemplate), eqSome(ClassInfo(ClassName, None), new ClassInfoMatcher(_))
+    )
+
+    classTraverser.traverse(cls)
+
+    outputWriter.toString shouldBe
+      """
+        |@MyAnnotation
+        |public record MyRecord<T>(int arg1, int arg2) {
+        | /* BODY */
+        |}
+        |""".stripMargin
+  }
+
+  test("traverse() for one list of ctor args with annotation on ctor.") {
+    val modifiers: List[Mod] = List(
+      Mod.Annot(
+        Init(tpe = Type.Name(AnnotationName), name = Name.Anonymous(), argss = List())
+      ),
+      Mod.Case()
+    )
+
+    val primaryCtor = Ctor.Primary(
+      mods = List(
+        Mod.Annot(
+          Init(tpe = Type.Name(AnnotationName), name = Name.Anonymous(), argss = List())
+        )
+      ),
+      name = Name.Anonymous(),
+      paramss = List(CtorArgs1))
+
+    val cls = Defn.Class(
+      mods = modifiers,
+      name = ClassName,
+      tparams = TypeParams,
+      ctor = primaryCtor,
+      templ = TheTemplate
+    )
+
+    doWrite(
+      """@MyAnnotation
+        |""".stripMargin)
+      .when(annotListTraverser).traverseMods(eqTreeList(modifiers), onSameLine = ArgumentMatchers.eq(false))
+    when(javaModifiersResolver.resolveForClass(eqTreeList(modifiers))).thenReturn(List(JavaModifier))
+    doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
+    doWrite("(int arg1, int arg2)").when(termParamListTraverser).traverse(
+      termParams = eqTreeList(CtorArgs1),
+      onSameLine = ArgumentMatchers.eq(false)
+    )
+    doWrite(
+      """ {
+        | /* BODY */
+        |}
+        |""".stripMargin)
+      .when(templateTraverser).traverse(
+      eqTree(TheTemplate),
+      eqSome(ClassInfo(ClassName, Some(primaryCtor)), new ClassInfoMatcher(_))
     )
 
     classTraverser.traverse(cls)
@@ -153,7 +209,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
         | /* BODY */
         |}
         |""".stripMargin)
-      .when(templateTraverser).traverse(eqTree(TheTemplate), eqSome(entities.ClassInfo(ClassName, None), new ClassInfoMatcher(_)))
+      .when(templateTraverser).traverse(eqTree(TheTemplate), eqSome(ClassInfo(ClassName, None), new ClassInfoMatcher(_)))
 
     classTraverser.traverse(cls)
 
