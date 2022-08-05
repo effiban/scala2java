@@ -49,7 +49,7 @@ class CtorSecondaryTransformerTest extends UnitTestSuite {
       name = Term.Name(ClassName),
       tparams = Nil,
       paramss = List(Nil),
-      decltpe = None,
+      decltpe = Some(Type.AnonymousName()),
       body = Block(Nil)
     )
 
@@ -74,7 +74,7 @@ class CtorSecondaryTransformerTest extends UnitTestSuite {
       name = Term.Name(ClassName),
       tparams = Nil,
       paramss = List(CtorParams),
-      decltpe = None,
+      decltpe = Some(Type.AnonymousName()),
       body = Block(Nil)
     )
 
@@ -104,7 +104,7 @@ class CtorSecondaryTransformerTest extends UnitTestSuite {
       name = Term.Name(ClassName),
       tparams = Nil,
       paramss = List(Nil),
-      decltpe = None,
+      decltpe = Some(Type.AnonymousName()),
       body = Block(stats)
     )
 
@@ -134,7 +134,7 @@ class CtorSecondaryTransformerTest extends UnitTestSuite {
       name = Term.Name(ClassName),
       tparams = Nil,
       paramss = List(CtorParams),
-      decltpe = None,
+      decltpe = Some(Type.AnonymousName()),
       body = Block(stats)
     )
 

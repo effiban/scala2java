@@ -17,7 +17,7 @@ object CtorSecondaryTransformer extends CtorSecondaryTransformer {
       name = Term.Name(className.value),
       tparams = Nil,
       paramss = secondaryCtor.paramss,
-      decltpe = None,
+      decltpe = Some(Type.AnonymousName()),
       body = Block(secondaryCtor.stats)
     )
   }
