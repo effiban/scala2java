@@ -28,7 +28,10 @@ private[traversers] class CaseClassTraverserImpl(annotListTraverser: => AnnotLis
     termParamListTraverser.traverse(classDef.ctor.paramss.flatten)
     val outerJavaScope = javaScope
     javaScope = JavaScope.Class
-    templateTraverser.traverse(template = classDef.templ, maybeClassInfo = Some(ClassInfo(className = classDef.name, maybePrimaryCtor = None)))
+    // Even though the Java type is a Record, the constructor must still be explicitly declared if it has modifiers (annotations, visibility, etc.)
+    val maybePrimaryCtor = if (classDef.ctor.mods.nonEmpty) Some(classDef.ctor) else None
+    val classInfo = ClassInfo(className = classDef.name, maybePrimaryCtor = maybePrimaryCtor)
+    templateTraverser.traverse(template = classDef.templ, maybeClassInfo = Some(classInfo))
     javaScope = outerJavaScope
   }
 }
