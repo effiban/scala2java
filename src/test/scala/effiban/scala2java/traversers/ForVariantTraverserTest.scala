@@ -1,9 +1,10 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.TraversalConstants.JavaPlaceholder
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.testsuites.UnitTestSuite
+import effiban.scala2java.transformers.PatToTermParamTransformer
 import effiban.scala2java.writers.JavaWriter
+import org.mockito.ArgumentMatchers.any
 
 import scala.meta.Enumerator.{CaseGenerator, Generator}
 import scala.meta.Term.Select
@@ -32,18 +33,19 @@ class ForVariantTraverserTest extends UnitTestSuite {
   private val ResultFunctionName = Term.Name("result")
 
   private val termTraverser = mock[TermTraverser]
-
+  private val patToTermParamTransformer = mock[PatToTermParamTransformer]
 
   private val forVariantTraverser = new ForVariantTraverser {
     override val intermediateFunctionName: Term.Name = FlatMapFunctionName
     override val finalFunctionName: Term.Name = MapFunctionName
 
     override def termTraverser: TermTraverser = ForVariantTraverserTest.this.termTraverser
+    override def patToTermParamTransformer: PatToTermParamTransformer = ForVariantTraverserTest.this.patToTermParamTransformer
 
     override implicit val javaWriter: JavaWriter = ForVariantTraverserTest.this.javaWriter
   }
 
-  test("traverse() for one Generator with a variable in the LHS") {
+  test("traverse() for one Generator enumerator") {
     val enumerators = List(
       Generator(pat = PatX, rhs = Xs),
     )
@@ -55,29 +57,14 @@ class ForVariantTraverserTest extends UnitTestSuite {
         args = List(Term.Function(params = List(ParamX), body = inputBody))
       )
 
-    forVariantTraverser.traverse(enumerators, inputBody)
-
-    verify(termTraverser).traverse(eqTree(expectedTranslatedFor))
-  }
-
-  test("traverse() for one Generator enumerator with a wildcard in the LHS") {
-    val enumerators = List(
-      Generator(pat = Pat.Wildcard(), rhs = Xs)
-    )
-    val inputBody = Term.Apply(ResultFunctionName, Nil)
-
-    val expectedTranslatedFor =
-      Term.Apply(
-        fun = Select(Xs, MapFunctionName),
-        args = List(Term.Function(params = List(paramOf(Term.Name(JavaPlaceholder))), body = inputBody))
-      )
+    when(patToTermParamTransformer.transform(eqTree(PatX))).thenReturn(Some(ParamX))
 
     forVariantTraverser.traverse(enumerators, inputBody)
 
     verify(termTraverser).traverse(eqTree(expectedTranslatedFor))
   }
 
-  test("traverse() for one CaseGenerator enumerator with a variable in the LHS") {
+  test("traverse() for one CaseGenerator enumerator") {
     val enumerators = List(
       CaseGenerator(pat = PatX, rhs = Xs),
     )
@@ -89,12 +76,14 @@ class ForVariantTraverserTest extends UnitTestSuite {
         args = List(Term.Function(params = List(ParamX), body = inputBody))
       )
 
+    when(patToTermParamTransformer.transform(eqTree(PatX))).thenReturn(Some(ParamX))
+
     forVariantTraverser.traverse(enumerators, inputBody)
 
     verify(termTraverser).traverse(eqTree(expectedTranslatedFor))
   }
 
-  test("traverse() for one Val enumerator with a variable in the LHS") {
+  test("traverse() for one Val enumerator") {
     val enumerators = List(
       Enumerator.Val(pat = PatX, rhs = Xs),
     )
@@ -105,6 +94,8 @@ class ForVariantTraverserTest extends UnitTestSuite {
         fun = Select(Xs, MapFunctionName),
         args = List(Term.Function(params = List(ParamX), body = inputBody))
       )
+
+    when(patToTermParamTransformer.transform(eqTree(PatX))).thenReturn(Some(ParamX))
 
     forVariantTraverser.traverse(enumerators, inputBody)
 
@@ -140,6 +131,15 @@ class ForVariantTraverserTest extends UnitTestSuite {
           )
         ))
       )
+
+    when(patToTermParamTransformer.transform(any[Pat]))
+      .thenAnswer((pat: Pat) => {
+        pat match {
+          case aPat if aPat.structure == PatX.structure => Some(ParamX)
+          case aPat if aPat.structure == PatY.structure => Some(ParamY)
+          case aPat if aPat.structure == PatZ.structure => Some(ParamZ)
+        }
+      })
 
     forVariantTraverser.traverse(enumerators, inputBody)
 

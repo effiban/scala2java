@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.TraversalConstants.JavaPlaceholder
+import effiban.scala2java.transformers.PatToTermParamTransformer
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term.{Apply, Param, Select}
@@ -11,6 +11,7 @@ private[traversers] trait ForVariantTraverser {
   val finalFunctionName: Term.Name
 
   def termTraverser: TermTraverser
+  def patToTermParamTransformer: PatToTermParamTransformer
 
   implicit val javaWriter: JavaWriter
 
@@ -53,11 +54,8 @@ private[traversers] trait ForVariantTraverser {
   }
 
   private def pat2Param(pat: Pat) = {
-    //TODO - improve
-    val name = pat match {
-      case Pat.Wildcard() => JavaPlaceholder
-      case _ => pat.toString()
-    }
-    Param(mods = List.empty, name = Term.Name(name), decltpe = None, default = None)
+    // TODO improve default case
+    patToTermParamTransformer.transform(pat)
+      .getOrElse(Param(mods = List.empty, name = Term.Name(pat.toString()), decltpe = None, default = None))
   }
 }

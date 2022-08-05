@@ -132,9 +132,9 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
 
   private lazy val finallyTraverser: FinallyTraverser = new FinallyTraverserImpl(blockTraverser)
 
-  private lazy val forTraverser: ForTraverser = new ForTraverserImpl(termTraverser)
+  private lazy val forTraverser: ForTraverser = new ForTraverserImpl(termTraverser, PatToTermParamTransformer)
 
-  private lazy val forYieldTraverser: ForYieldTraverser = new ForYieldTraverserImpl(termTraverser)
+  private lazy val forYieldTraverser: ForYieldTraverser = new ForYieldTraverserImpl(termTraverser, PatToTermParamTransformer)
 
   private lazy val ifTraverser: IfTraverser = new IfTraverserImpl(termTraverser, blockTraverser)
 

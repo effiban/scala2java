@@ -1,5 +1,6 @@
 package effiban.scala2java.transformers
 
+import effiban.scala2java.entities.TraversalConstants.JavaPlaceholder
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
 
@@ -26,6 +27,14 @@ class PatToTermParamTransformerTest extends UnitTestSuite {
     val expectedTermParam = termParam(X, Some(TypeNames.String))
 
     val actualMaybeTermParam = PatToTermParamTransformer.transform(patTyped)
+
+    actualMaybeTermParam.value.structure shouldBe expectedTermParam.structure
+  }
+
+  test("transform a Pat.Wildcard") {
+    val expectedTermParam = termParam(Term.Name(JavaPlaceholder))
+
+    val actualMaybeTermParam = PatToTermParamTransformer.transform(Pat.Wildcard())
 
     actualMaybeTermParam.value.structure shouldBe expectedTermParam.structure
   }
