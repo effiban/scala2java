@@ -1,8 +1,9 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.matchers.TreeListMatcher.eqTreeList
+import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.testsuites.UnitTestSuite
-import org.mockito.ArgumentMatchers
+import org.mockito.{ArgumentCaptor, ArgumentMatchers}
 
 import scala.meta.{Init, Name, Term, Type}
 
@@ -10,6 +11,7 @@ class InitListTraverserImplTest extends UnitTestSuite {
 
   private val argumentListTraverser = mock[ArgumentListTraverser]
   private val initTraverser = mock[InitTraverser]
+  private val initTraverserCaptor: ArgumentCaptor[ScalaTreeTraverser[Init]] = ArgumentCaptor.forClass(classOf[ScalaTreeTraverser[Init]])
 
   private val initListTraverser = new InitListTraverserImpl(argumentListTraverser, initTraverser)
 
@@ -29,10 +31,13 @@ class InitListTraverserImplTest extends UnitTestSuite {
 
     verify(argumentListTraverser).traverse(
       args = eqTreeList(List(init)),
-      argTraverser = ArgumentMatchers.eq(initTraverser),
+      argTraverser = initTraverserCaptor.capture(),
       onSameLine = ArgumentMatchers.eq(false),
       maybeEnclosingDelimiter = ArgumentMatchers.eq(None)
     )
+
+    initTraverserCaptor.getValue.traverse(init)
+    verify(initTraverser).traverse(eqTree(init), ArgumentMatchers.eq(false))
   }
 
   test("traverse() when two inits") {
@@ -43,9 +48,12 @@ class InitListTraverserImplTest extends UnitTestSuite {
 
     verify(argumentListTraverser).traverse(
       args = eqTreeList(List(init1, init2)),
-      argTraverser = ArgumentMatchers.eq(initTraverser),
+      argTraverser = initTraverserCaptor.capture(),
       onSameLine = ArgumentMatchers.eq(false),
       maybeEnclosingDelimiter = ArgumentMatchers.eq(None)
     )
+
+    initTraverserCaptor.getValue.traverse(init1)
+    verify(initTraverser).traverse(eqTree(init1), ArgumentMatchers.eq(false))
   }
 }

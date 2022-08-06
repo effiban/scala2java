@@ -1,24 +1,22 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.entities.EnclosingDelimiter.Parentheses
-import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Init
 
-trait InitTraverser extends ScalaTreeTraverser[Init]
+trait InitTraverser {
+  def traverse(init: Init, ignoreArgs: Boolean = false): Unit
+}
 
 private[traversers] class InitTraverserImpl(typeTraverser: => TypeTraverser,
-                                            termListTraverser: => TermListTraverser)
-                                           (implicit javaWriter: JavaWriter) extends InitTraverser {
+                                            termListTraverser: => TermListTraverser) extends InitTraverser {
 
   // An 'Init' is a parent of a type in its declaration
-  override def traverse(init: Init): Unit = {
+  override def traverse(init: Init, ignoreArgs: Boolean = false): Unit = {
     typeTraverser.traverse(init.tpe)
 
-    // TODO handle name (not sure what this is for, it seems to be Name.Anonymous always)
-
     val args = init.argss.flatten
-    if (args.nonEmpty) {
+    if (args.nonEmpty && !ignoreArgs) {
       termListTraverser.traverse(init.argss.flatten, maybeEnclosingDelimiter = Some(Parentheses))
     }
   }

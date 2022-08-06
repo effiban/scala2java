@@ -257,7 +257,7 @@ class BlockTraverserImplTest extends UnitTestSuite {
     )
     val initVal = "this(dummy)"
 
-    doWrite(initVal).when(initTraverser).traverse(eqTree(init))
+    doWrite(initVal).when(initTraverser).traverse(eqTree(init), ArgumentMatchers.eq(false))
     doWrite(SimpleStatement1Val).when(statTraverser).traverse(eqTree(SimpleStatement1))
     doWrite(SimpleStatement2Val).when(statTraverser).traverse(eqTree(SimpleStatement2))
 
