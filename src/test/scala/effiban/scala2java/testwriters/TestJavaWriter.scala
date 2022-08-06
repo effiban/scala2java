@@ -1,6 +1,7 @@
 package effiban.scala2java.testwriters
 
 import effiban.scala2java.entities.EnclosingDelimiter._
+import effiban.scala2java.entities.JavaKeyword
 import effiban.scala2java.writers.JavaWriter
 
 import java.io.StringWriter
@@ -18,8 +19,8 @@ class TestJavaWriter(sw: StringWriter) extends JavaWriter {
     }
   }
 
-  override def writeInheritanceKeyword(): Unit = {
-    write(s" extends/implements ")
+  override def writeKeyword(keyword: JavaKeyword): Unit = {
+    write(keyword.name)
   }
 
   override def writeStatementEnd(): Unit = {

@@ -2,7 +2,7 @@ package effiban.scala2java.traversers
 
 import effiban.scala2java.classifiers.TermApplyInfixClassifier
 import effiban.scala2java.orderings.JavaTemplateChildOrdering
-import effiban.scala2java.resolvers.JavaModifiersResolver
+import effiban.scala2java.resolvers.{JavaInheritanceKeywordResolver, JavaModifiersResolver}
 import effiban.scala2java.transformers._
 import effiban.scala2java.writers.JavaWriter
 
@@ -236,7 +236,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
     statTraverser,
     ctorPrimaryTraverser,
     ctorSecondaryTraverser,
-    JavaTemplateChildOrdering
+    JavaTemplateChildOrdering,
+    JavaInheritanceKeywordResolver
   )
 
   private lazy val termAnnotateTraverser: TermAnnotateTraverser = new TermAnnotateTraverserImpl(annotListTraverser, termTraverser)

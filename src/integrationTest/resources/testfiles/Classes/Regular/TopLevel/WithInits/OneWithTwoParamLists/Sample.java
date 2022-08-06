@@ -1,7 +1,7 @@
 package dummy;
 
 
-public class Sample implements Parent {
+public class Sample extends Parent {
 
     public Sample() {
         super("name1",
