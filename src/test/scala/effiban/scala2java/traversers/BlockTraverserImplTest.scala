@@ -40,6 +40,7 @@ class BlockTraverserImplTest extends UnitTestSuite {
   private val initTraverser = mock[InitTraverser]
   private val ifTraverser = mock[IfTraverser]
   private val whileTraverser = mock[WhileTraverser]
+  private val throwTraverser = mock[ThrowTraverser]
   private val returnTraverser = mock[ReturnTraverser]
   private val statTraverser = mock[StatTraverser]
 
@@ -47,6 +48,7 @@ class BlockTraverserImplTest extends UnitTestSuite {
     initTraverser,
     ifTraverser,
     whileTraverser,
+    throwTraverser,
     returnTraverser,
     statTraverser)
 
@@ -278,5 +280,36 @@ class BlockTraverserImplTest extends UnitTestSuite {
         |$SimpleStatement2Val;
         |}
         |""".stripMargin
+  }
+
+  test("traverse() when block has a 'throw' statement and should return - expecting no 'return'") {
+    val exceptionInit = Init(
+      tpe = Type.Name("IllegalStateException"),
+      name = Name.Anonymous(),
+      argss = List(List(Lit.String("error")))
+    )
+
+    val throwStatement = Term.Throw(expr = Term.New(exceptionInit))
+    val throwStatementVal = """throw new IllegalStateException("error")"""
+
+    doWrite(SimpleStatement1Val).when(statTraverser).traverse(eqTree(SimpleStatement1))
+    doWrite(throwStatementVal).when(throwTraverser).traverse(eqTree(throwStatement))
+
+    blockTraverser.traverse(
+      Block(
+        List(
+          SimpleStatement1,
+          throwStatement
+        )
+      ),
+      shouldReturnValue = true
+    )
+
+    outputWriter.toString shouldBe
+      s""" {
+         |$SimpleStatement1Val;
+         |$throwStatementVal;
+         |}
+         |""".stripMargin
   }
 }

@@ -2,7 +2,7 @@ package effiban.scala2java.traversers
 
 import effiban.scala2java.writers.JavaWriter
 
-import scala.meta.Term.{Block, If, Return, While}
+import scala.meta.Term.{Block, If, Return, Throw, While}
 import scala.meta.{Init, Stat, Term}
 
 trait BlockTraverser {
@@ -12,6 +12,7 @@ trait BlockTraverser {
 private[traversers] class BlockTraverserImpl(initTraverser: => InitTraverser,
                                              ifTraverser: => IfTraverser,
                                              whileTraverser: => WhileTraverser,
+                                             throwTraverser: => ThrowTraverser,
                                              returnTraverser: => ReturnTraverser,
                                              statTraverser: => StatTraverser)
                                             (implicit javaWriter: JavaWriter) extends BlockTraverser {
@@ -42,6 +43,9 @@ private[traversers] class BlockTraverserImpl(initTraverser: => InitTraverser,
       case block: Block => traverse(block, shouldReturnValue)
       case `if`: If => ifTraverser.traverse(`if`, shouldReturnValue)
       case `while`: While => whileTraverser.traverse(`while`)
+      case `throw`: Throw =>
+        throwTraverser.traverse(`throw`)
+        writeStatementEnd()
       case term: Term if shouldReturnValue =>
         returnTraverser.traverse(Return(term))
         writeStatementEnd();

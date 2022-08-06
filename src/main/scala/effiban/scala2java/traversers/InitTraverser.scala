@@ -11,7 +11,7 @@ trait InitTraverser {
 private[traversers] class InitTraverserImpl(typeTraverser: => TypeTraverser,
                                             termListTraverser: => TermListTraverser) extends InitTraverser {
 
-  // An 'Init' is a parent of a type in its declaration
+  // An 'Init' is an instantiated type, such as with `new` or as a parent in a type definition
   override def traverse(init: Init, ignoreArgs: Boolean = false): Unit = {
     typeTraverser.traverse(init.tpe)
 
