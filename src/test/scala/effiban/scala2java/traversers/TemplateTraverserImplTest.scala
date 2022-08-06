@@ -1,9 +1,13 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.entities
+import effiban.scala2java.entities.{JavaKeyword, JavaScope}
+import effiban.scala2java.entities.JavaScope.JavaScope
+import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.matchers.TreeListMatcher.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.orderings.JavaTemplateChildOrdering
+import effiban.scala2java.resolvers.JavaInheritanceKeywordResolver
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.{Selfs, Templates, TypeNames}
@@ -85,6 +89,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
   private val ctorPrimaryTraverser = mock[CtorPrimaryTraverser]
   private val ctorSecondaryTraverser = mock[CtorSecondaryTraverser]
   private val javaTemplateChildOrdering = mock[JavaTemplateChildOrdering]
+  private val javaInheritanceKeywordResolver = mock[JavaInheritanceKeywordResolver]
 
   private val templateTraverser = new TemplateTraverserImpl(
     initListTraverser,
@@ -92,7 +97,8 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     statTraverser,
     ctorPrimaryTraverser,
     ctorSecondaryTraverser,
-    javaTemplateChildOrdering
+    javaTemplateChildOrdering,
+    javaInheritanceKeywordResolver
   )
 
   test("traverse when empty") {
@@ -131,12 +137,14 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       stats = Nil
     )
 
-    expectWriteInits()
+    expectWriteInits(JavaScope.Class)
+
+    javaScope = JavaScope.Class
 
     templateTraverser.traverse(template)
 
     outputWriter.toString shouldBe
-      """ extends/implements Parent1, Parent2 {
+      """ implements Parent1, Parent2 {
         |}
         |""".stripMargin
   }
@@ -168,9 +176,11 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       stats = Nil
     )
 
-    expectWriteInits()
+    expectWriteInits(JavaScope.Class)
     expectWritePrimaryCtor(TheInits)
     expectChildOrdering()
+
+    javaScope = JavaScope.Class
 
     templateTraverser.traverse(
       template = template,
@@ -178,7 +188,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     )
 
     outputWriter.toString shouldBe
-      """ extends/implements Parent1, Parent2 {
+      """ implements Parent1, Parent2 {
         |/*
         |*  PRIMARY CTOR
         |*/
@@ -242,7 +252,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       stats = stats
     )
 
-    expectWriteInits()
+    expectWriteInits(JavaScope.Class)
     expectWriteSelf()
     expectWriteDataMemberDecl()
     expectWriteDataMemberDefn()
@@ -252,13 +262,15 @@ class TemplateTraverserImplTest extends UnitTestSuite {
 
     expectChildOrdering()
 
+    javaScope = JavaScope.Class
+
     templateTraverser.traverse(
       template = template,
       maybeClassInfo = Some(entities.ClassInfo(className = ClassName, maybePrimaryCtor = Some(PrimaryCtor)))
     )
 
     outputWriter.toString shouldBe
-      """ extends/implements Parent1, Parent2/* extends SelfName: SelfType */ {
+      """ implements Parent1, Parent2/* extends SelfName: SelfType */ {
         |/* DATA MEMBER DECL */;
         |/* DATA MEMBER DEFINITION */;
         |/*
@@ -278,7 +290,8 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     Term.Param(mods = List(), name = Term.Name(name), decltpe = Some(Type.Name(typeName)), default = None)
   }
 
-  private def expectWriteInits(): Unit = {
+  private def expectWriteInits(javaScope: JavaScope): Unit = {
+    when(javaInheritanceKeywordResolver.resolve(ArgumentMatchers.eq(javaScope), eqTreeList(TheInits))).thenReturn(JavaKeyword.Implements)
     doWrite("Parent1, Parent2").when(initListTraverser).traverse(eqTreeList(TheInits), ArgumentMatchers.eq(true))
   }
 

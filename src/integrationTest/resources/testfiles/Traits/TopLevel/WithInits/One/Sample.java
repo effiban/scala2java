@@ -1,5 +1,5 @@
 package dummy;
 
 
-public interface Sample implements Parent {
+public interface Sample extends Parent {
 }

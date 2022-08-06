@@ -1,7 +1,9 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.entities.ClassInfo
+import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.orderings.JavaTemplateChildOrdering
+import effiban.scala2java.resolvers.JavaInheritanceKeywordResolver
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.{Ctor, Defn, Init, Name, Stat, Template, Term, Tree, Type}
@@ -17,7 +19,8 @@ private[traversers] class TemplateTraverserImpl(initListTraverser: => InitListTr
                                                 statTraverser: => StatTraverser,
                                                 ctorPrimaryTraverser: => CtorPrimaryTraverser,
                                                 ctorSecondaryTraverser: => CtorSecondaryTraverser,
-                                                javaTemplateChildOrdering: JavaTemplateChildOrdering)
+                                                javaTemplateChildOrdering: JavaTemplateChildOrdering,
+                                                javaInheritanceKeywordResolver: JavaInheritanceKeywordResolver)
                                                (implicit javaWriter: JavaWriter) extends TemplateTraverser {
 
   import javaWriter._
@@ -39,10 +42,13 @@ private[traversers] class TemplateTraverserImpl(initListTraverser: => InitListTr
       maybeClassInfo = maybeClassInfo)
   }
 
-  private def traverseTemplateInits(relevantInits: List[Init]): Unit = {
-    if (relevantInits.nonEmpty) {
-      writeInheritanceKeyword()
-      initListTraverser.traverse(relevantInits, ignoreArgs = true)
+  private def traverseTemplateInits(inits: List[Init]): Unit = {
+    if (inits.nonEmpty) {
+      val inheritanceKeyword = javaInheritanceKeywordResolver.resolve(javaScope, inits)
+      write(" ")
+      writeKeyword(inheritanceKeyword)
+      write(" ")
+      initListTraverser.traverse(inits, ignoreArgs = true)
     }
   }
 
