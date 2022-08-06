@@ -1,16 +1,14 @@
-package effiban.scala2java.traversers
+package effiban.scala2java.transformers
 
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.testsuites.UnitTestSuite
-import effiban.scala2java.transformers.PatToTermParamTransformer
-import effiban.scala2java.writers.JavaWriter
 import org.mockito.ArgumentMatchers.any
 
 import scala.meta.Enumerator.{CaseGenerator, Generator}
 import scala.meta.Term.Select
 import scala.meta.{Enumerator, Pat, Term}
 
-class ForVariantTraverserTest extends UnitTestSuite {
+class ForVariantToTermApplyTransformerTest extends UnitTestSuite {
 
   private val X = Term.Name("x")
   private val Y = Term.Name("y")
@@ -32,26 +30,23 @@ class ForVariantTraverserTest extends UnitTestSuite {
   private val FlatMapFunctionName = Term.Name("flatMap")
   private val ResultFunctionName = Term.Name("result")
 
-  private val termTraverser = mock[TermTraverser]
   private val patToTermParamTransformer = mock[PatToTermParamTransformer]
 
-  private val forVariantTraverser = new ForVariantTraverser {
+  private val forVariantToTermApplyTransformer = new ForVariantToTermApplyTransformer {
+
+    override val patToTermParamTransformer: PatToTermParamTransformer = ForVariantToTermApplyTransformerTest.this.patToTermParamTransformer
+
     override val intermediateFunctionName: Term.Name = FlatMapFunctionName
     override val finalFunctionName: Term.Name = MapFunctionName
-
-    override def termTraverser: TermTraverser = ForVariantTraverserTest.this.termTraverser
-    override def patToTermParamTransformer: PatToTermParamTransformer = ForVariantTraverserTest.this.patToTermParamTransformer
-
-    override implicit val javaWriter: JavaWriter = ForVariantTraverserTest.this.javaWriter
   }
 
-  test("traverse() for one Generator enumerator") {
+  test("transform() for one Generator enumerator") {
     val enumerators = List(
       Generator(pat = PatX, rhs = Xs),
     )
     val inputBody = Term.Apply(ResultFunctionName, List(X))
 
-    val expectedTranslatedFor =
+    val expectedTermApply =
       Term.Apply(
         fun = Select(Xs, MapFunctionName),
         args = List(Term.Function(params = List(ParamX), body = inputBody))
@@ -59,18 +54,18 @@ class ForVariantTraverserTest extends UnitTestSuite {
 
     when(patToTermParamTransformer.transform(eqTree(PatX))).thenReturn(Some(ParamX))
 
-    forVariantTraverser.traverse(enumerators, inputBody)
+    val actualTermApply = forVariantToTermApplyTransformer.transform(enumerators, inputBody)
 
-    verify(termTraverser).traverse(eqTree(expectedTranslatedFor))
+    actualTermApply.structure shouldBe expectedTermApply.structure
   }
 
-  test("traverse() for one CaseGenerator enumerator") {
+  test("transform() for one CaseGenerator enumerator") {
     val enumerators = List(
       CaseGenerator(pat = PatX, rhs = Xs),
     )
     val inputBody = Term.Apply(ResultFunctionName, List(X))
 
-    val expectedTranslatedFor =
+    val expectedTermApply =
       Term.Apply(
         fun = Select(Xs, MapFunctionName),
         args = List(Term.Function(params = List(ParamX), body = inputBody))
@@ -78,18 +73,18 @@ class ForVariantTraverserTest extends UnitTestSuite {
 
     when(patToTermParamTransformer.transform(eqTree(PatX))).thenReturn(Some(ParamX))
 
-    forVariantTraverser.traverse(enumerators, inputBody)
+    val actualTermApply = forVariantToTermApplyTransformer.transform(enumerators, inputBody)
 
-    verify(termTraverser).traverse(eqTree(expectedTranslatedFor))
+    actualTermApply.structure shouldBe expectedTermApply.structure
   }
 
-  test("traverse() for one Val enumerator") {
+  test("transform() for one Val enumerator") {
     val enumerators = List(
       Enumerator.Val(pat = PatX, rhs = Xs),
     )
     val inputBody = Term.Apply(ResultFunctionName, List(X))
 
-    val expectedTranslatedFor =
+    val expectedTermApply =
       Term.Apply(
         fun = Select(Xs, MapFunctionName),
         args = List(Term.Function(params = List(ParamX), body = inputBody))
@@ -97,12 +92,13 @@ class ForVariantTraverserTest extends UnitTestSuite {
 
     when(patToTermParamTransformer.transform(eqTree(PatX))).thenReturn(Some(ParamX))
 
-    forVariantTraverser.traverse(enumerators, inputBody)
+    val actualTermApply = forVariantToTermApplyTransformer.transform(enumerators, inputBody)
 
-    verify(termTraverser).traverse(eqTree(expectedTranslatedFor))
+    actualTermApply.structure shouldBe expectedTermApply.structure
+
   }
 
-  test("traverse() for three enumerators") {
+  test("transform() for three enumerators") {
     val enumerators = List(
       Generator(pat = PatX, rhs = Xs),
       Generator(pat = PatY, rhs = Ys),
@@ -111,7 +107,7 @@ class ForVariantTraverserTest extends UnitTestSuite {
     val inputBody = Term.Apply(ResultFunctionName, List(X, Y, Z))
 
     // xs.flatMap(x => ys.flatMap(y => zs.map(z => result(x, y, z))))
-    val expectedTranslatedFor =
+    val expectedTermApply =
       Term.Apply(
         fun = Select(Xs, FlatMapFunctionName),
         args = List(Term.Function(
@@ -141,9 +137,9 @@ class ForVariantTraverserTest extends UnitTestSuite {
         }
       })
 
-    forVariantTraverser.traverse(enumerators, inputBody)
+    val actualTermApply = forVariantToTermApplyTransformer.transform(enumerators, inputBody)
 
-    verify(termTraverser).traverse(eqTree(expectedTranslatedFor))
+    actualTermApply.structure shouldBe expectedTermApply.structure
   }
 
   private def paramOf(termName: Term.Name) = {
