@@ -7,6 +7,7 @@ import effiban.scala2java.orderings.JavaTemplateChildOrdering
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.{Selfs, Templates, TypeNames}
+import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 
 import scala.meta.{Ctor, Decl, Defn, Init, Lit, Name, Pat, Self, Template, Term, Tree, Type}
@@ -278,7 +279,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
   }
 
   private def expectWriteInits(): Unit = {
-    doWrite("Parent1, Parent2").when(initListTraverser).traverse(eqTreeList(TheInits))
+    doWrite("Parent1, Parent2").when(initListTraverser).traverse(eqTreeList(TheInits), ArgumentMatchers.eq(true))
   }
 
   private def expectWriteSelf(): Unit = {

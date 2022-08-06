@@ -42,7 +42,7 @@ private[traversers] class TemplateTraverserImpl(initListTraverser: => InitListTr
   private def traverseTemplateInits(relevantInits: List[Init]): Unit = {
     if (relevantInits.nonEmpty) {
       writeInheritanceKeyword()
-      initListTraverser.traverse(relevantInits)
+      initListTraverser.traverse(relevantInits, ignoreArgs = true)
     }
   }
 
