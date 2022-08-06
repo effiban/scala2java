@@ -4,6 +4,7 @@ import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TermNames.ScalaTermName
+import effiban.scala2java.transformers.ScalaToJavaTermSelectTransformer
 
 import scala.meta.Term
 
@@ -11,26 +12,33 @@ class TermSelectTraverserImplTest extends UnitTestSuite {
 
   private val termTraverser = mock[TermTraverser]
   private val termNameTraverser = mock[TermNameTraverser]
+  private val scalaToJavaTermSelectTransformer = mock[ScalaToJavaTermSelectTransformer]
 
   private val termSelectTraverser = new TermSelectTraverserImpl(
     termTraverser,
-    termNameTraverser
+    termNameTraverser,
+    scalaToJavaTermSelectTransformer
   )
 
-  test("traverse() for one level non-'scala'") {
+  test("traverse() for non-'scala'") {
     val myClass = Term.Name("MyClass")
     val myMethod = Term.Name("myMethod")
-    val select = Term.Select(qual = myClass, name = myMethod)
+    val myJavaClass = Term.Name("MyJavaClass")
+    val myJavaMethod = Term.Name("myJavaMethod")
+    val scalaSelect = Term.Select(qual = myClass, name = myMethod)
+    val javaSelect = Term.Select(qual = myJavaClass, name = myJavaMethod)
 
-    doWrite("MyClass").when(termTraverser).traverse(eqTree(myClass))
-    doWrite("myMethod").when(termNameTraverser).traverse(eqTree(myMethod))
+    when(scalaToJavaTermSelectTransformer.transform(eqTree(scalaSelect))).thenReturn(javaSelect)
 
-    termSelectTraverser.traverse(select)
+    doWrite("MyJavaClass").when(termTraverser).traverse(eqTree(myJavaClass))
+    doWrite("myJavaMethod").when(termNameTraverser).traverse(eqTree(myJavaMethod))
 
-    outputWriter.toString shouldBe "MyClass.myMethod"
+    termSelectTraverser.traverse(scalaSelect)
+
+    outputWriter.toString shouldBe "MyJavaClass.myJavaMethod"
   }
 
-  test("traverse() for one level with 'scala'") {
+  test("traverse() for 'scala'") {
     val className = Term.Name("SomeClass")
     val select = Term.Select(ScalaTermName, className)
 
@@ -39,36 +47,5 @@ class TermSelectTraverserImplTest extends UnitTestSuite {
     termSelectTraverser.traverse(select)
 
     outputWriter.toString shouldBe "SomeClass"
-  }
-
-  test("traverse() for two levels non-'scala'") {
-    val myPackage = Term.Name("mypackage")
-    val myClass = Term.Name("MyClass")
-    val myMethod = Term.Name("myMethod")
-
-    val selectLevel1 = Term.Select(myPackage, myClass)
-    val selectFull = Term.Select(selectLevel1, myMethod)
-
-    doWrite("mypackage.MyClass").when(termTraverser).traverse(eqTree(selectLevel1))
-    doWrite("myMethod").when(termNameTraverser).traverse(eqTree(myMethod))
-
-    termSelectTraverser.traverse(selectFull)
-
-    outputWriter.toString shouldBe "mypackage.MyClass.myMethod"
-  }
-
-  test("traverse() for two levels with 'scala' at top level") {
-    val someClass = Term.Name("SomeClass")
-    val someMethod = Term.Name("someMethod")
-
-    val selectLevel1 = Term.Select(ScalaTermName, someClass)
-    val selectFull = Term.Select(selectLevel1, someMethod)
-
-    doWrite("SomeClass").when(termTraverser).traverse(eqTree(selectLevel1))
-    doWrite("someMethod").when(termNameTraverser).traverse(eqTree(someMethod))
-
-    termSelectTraverser.traverse(selectFull)
-
-    outputWriter.toString shouldBe "SomeClass.someMethod"
   }
 }

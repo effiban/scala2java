@@ -1,5 +1,6 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.classifiers.TermApplyInfixClassifier
 import effiban.scala2java.orderings.JavaTemplateChildOrdering
 import effiban.scala2java.resolvers.JavaModifiersResolver
 import effiban.scala2java.transformers._
@@ -242,11 +243,18 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
 
   private lazy val termApplyInfixTraverser: TermApplyInfixTraverser = new TermApplyInfixTraverserImpl(
     termTraverser,
+    termApplyTraverser,
     termNameTraverser,
-    termListTraverser
+    termListTraverser,
+    TermApplyInfixClassifier,
+    TermApplyInfixToRangeTransformer
   )
 
-  private lazy val termApplyTraverser: TermApplyTraverser = new TermApplyTraverserImpl(termTraverser, termListTraverser)
+  private lazy val termApplyTraverser: TermApplyTraverser = new TermApplyTraverserImpl(
+    termTraverser,
+    termListTraverser,
+    ScalaToJavaTermApplyTransformer
+  )
 
   private lazy val termFunctionTraverser: TermFunctionTraverser = new TermFunctionTraverserImpl(
     termParamTraverser,
@@ -283,7 +291,11 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
 
   private lazy val termRepeatedTraverser: TermRepeatedTraverser = new TermRepeatedTraverserImpl(termTraverser)
 
-  private lazy val termSelectTraverser: TermSelectTraverser = new TermSelectTraverserImpl(termTraverser, termNameTraverser)
+  private lazy val termSelectTraverser: TermSelectTraverser = new TermSelectTraverserImpl(
+    termTraverser,
+    termNameTraverser,
+    ScalaToJavaTermSelectTransformer
+  )
 
   private lazy val termTraverser: TermTraverser = new TermTraverserImpl(
     termRefTraverser,
