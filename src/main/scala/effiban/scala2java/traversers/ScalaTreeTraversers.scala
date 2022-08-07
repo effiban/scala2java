@@ -32,6 +32,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
     initTraverser,
     ifTraverser,
     whileTraverser,
+    throwTraverser,
     returnTraverser,
     statTraverser
   )
