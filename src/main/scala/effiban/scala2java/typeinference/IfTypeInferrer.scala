@@ -8,18 +8,24 @@ trait IfTypeInferrer extends TypeInferrer[If]
 private[typeinference] class IfTypeInferrerImpl(termTypeInferrer: => TermTypeInferrer) extends IfTypeInferrer {
 
   override def infer(`if`: If): Option[Type] = {
-    val maybeThenType = termTypeInferrer.infer(`if`.thenp)
-    val maybeElseType = termTypeInferrer.infer(`if`.elsep)
-    (`if`.thenp, `if`.elsep) match {
-      case (_, Lit.Unit()) => None
-      case _ => typeIfEqual(maybeThenType, maybeElseType)
+    `if`.elsep match {
+      // This is the case where there is no 'else' clause at all - so there cannot be a defined type
+      case Lit.Unit() => Some(Type.AnonymousName())
+      case _ => inferByComparison(`if`)
     }
   }
 
-  private def typeIfEqual(maybeThenType: Option[Type], maybeElseType: Option[Type]) =
+  private def inferByComparison(`if`: If) = {
+    val maybeThenType = termTypeInferrer.infer(`if`.thenp)
+    val maybeElseType = termTypeInferrer.infer(`if`.elsep)
+
     (maybeThenType, maybeElseType) match {
+      case (Some(thenType), Some(Type.AnonymousName())) => Some(thenType)
+      case (Some(Type.AnonymousName()), Some(elseType)) => Some(elseType)
       case (Some(thenType), Some(elseType)) if thenType.structure == elseType.structure => Some(thenType)
+      // TODO - can improve by finding a common type
       case _ => None
     }
+  }
 }
 
