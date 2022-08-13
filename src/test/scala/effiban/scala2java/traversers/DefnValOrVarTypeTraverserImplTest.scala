@@ -6,7 +6,7 @@ import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
-import effiban.scala2java.typeinference.TermTypeInferer
+import effiban.scala2java.typeinference.TermTypeInferrer
 
 import scala.meta.{Lit, Term}
 
@@ -16,9 +16,9 @@ class DefnValOrVarTypeTraverserImplTest extends UnitTestSuite {
   private val NonInferrableTerm = Term.Apply(Term.Name("externalMethod"), Nil)
 
   private val typeTraverser = mock[TypeTraverser]
-  private val termTypeInferer = mock[TermTypeInferer]
+  private val termTypeInferrer = mock[TermTypeInferrer]
 
-  private val defnValOrVarTypeTraverser = new DefnValOrVarTypeTraverserImpl(typeTraverser, termTypeInferer)
+  private val defnValOrVarTypeTraverser = new DefnValOrVarTypeTraverserImpl(typeTraverser, termTypeInferrer)
 
   test("traverse when has declared type should traverse it") {
     doWrite("Int").when(typeTraverser).traverse(eqTree(TypeNames.Int))
@@ -29,7 +29,7 @@ class DefnValOrVarTypeTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse when has no declared type, has RHS, JavaScope is none, and type is inferred - should traverse it") {
-    when(termTypeInferer.infer(eqTree(LiteralInt))).thenReturn(Some(TypeNames.Int))
+    when(termTypeInferrer.infer(eqTree(LiteralInt))).thenReturn(Some(TypeNames.Int))
     doWrite("Int").when(typeTraverser).traverse(eqTree(TypeNames.Int))
 
     defnValOrVarTypeTraverser.traverse(maybeDeclType = None, maybeRhs = Some(LiteralInt))
@@ -38,7 +38,7 @@ class DefnValOrVarTypeTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse when has no declared type, has RHS, JavaScope is none, and type not inferred - should write 'UnknownType'") {
-    when(termTypeInferer.infer(eqTree(NonInferrableTerm))).thenReturn(None)
+    when(termTypeInferrer.infer(eqTree(NonInferrableTerm))).thenReturn(None)
 
     defnValOrVarTypeTraverser.traverse(maybeDeclType = None, maybeRhs = Some(NonInferrableTerm))
 
