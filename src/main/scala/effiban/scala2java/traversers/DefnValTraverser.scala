@@ -2,7 +2,6 @@ package effiban.scala2java.traversers
 
 import effiban.scala2java.entities.JavaScope
 import effiban.scala2java.entities.JavaScope.{Interface, Method}
-import effiban.scala2java.entities.TraversalConstants.UnknownType
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.resolvers.JavaModifiersResolver
 import effiban.scala2java.writers.JavaWriter
@@ -14,7 +13,7 @@ trait DefnValTraverser extends ScalaTreeTraverser[Defn.Val]
 
 //TODO - if Java owner is an interface, the output should be an accessor method with default impl
 private[traversers] class DefnValTraverserImpl(annotListTraverser: => AnnotListTraverser,
-                                               typeTraverser: => TypeTraverser,
+                                               defnValOrVarTypeTraverser: => DefnValOrVarTypeTraverser,
                                                patListTraverser: => PatListTraverser,
                                                termTraverser: => TermTraverser,
                                                javaModifiersResolver: JavaModifiersResolver)
@@ -33,16 +32,8 @@ private[traversers] class DefnValTraverserImpl(annotListTraverser: => AnnotListT
       case _ => Nil
     }
     writeModifiers(modifierNames)
-    valDef.decltpe match {
-      case Some(declType) =>
-        typeTraverser.traverse(declType)
-        write(" ")
-      case None if javaScope == Method => write("var ")
-      case None =>
-        writeComment(UnknownType)
-        write(" ")
-      case _ =>
-    }
+    defnValOrVarTypeTraverser.traverse(valDef.decltpe, Some(valDef.rhs))
+    write(" ")
     //TODO verify for non-simple case
     patListTraverser.traverse(valDef.pats)
     write(" = ")
