@@ -2,9 +2,9 @@ package effiban.scala2java.typeinference
 
 import scala.meta.{Lit, Type}
 
-trait LitTypeInferer extends TypeInferer[Lit]
+trait LitTypeInferrer extends TypeInferrer[Lit]
 
-object LitTypeInferer extends LitTypeInferer {
+object LitTypeInferrer extends LitTypeInferrer {
 
   override def infer(lit: Lit): Option[Type] = {
     val maybeTypeValue = lit match {

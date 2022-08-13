@@ -3,7 +3,7 @@ package effiban.scala2java.traversers
 import effiban.scala2java.entities.JavaScope.Method
 import effiban.scala2java.entities.TraversalConstants.UnknownType
 import effiban.scala2java.entities.TraversalContext.javaScope
-import effiban.scala2java.typeinference.TermTypeInferer
+import effiban.scala2java.typeinference.TermTypeInferrer
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.{Term, Type}
@@ -13,7 +13,7 @@ trait DefnValOrVarTypeTraverser {
 }
 
 private[traversers] class DefnValOrVarTypeTraverserImpl(typeTraverser: => TypeTraverser,
-                                                        termTypeInferer: TermTypeInferer)
+                                                        termTypeInferrer: => TermTypeInferrer)
                                                        (implicit javaWriter: JavaWriter) extends DefnValOrVarTypeTraverser {
 
   import javaWriter._
@@ -28,7 +28,7 @@ private[traversers] class DefnValOrVarTypeTraverserImpl(typeTraverser: => TypeTr
   }
 
   private def inferTypeIfPossible(rhs: Term): Unit = {
-    termTypeInferer.infer(rhs) match {
+    termTypeInferrer.infer(rhs) match {
       case Some(tpe) => typeTraverser.traverse(tpe)
       case None => handleUnknownType()
     }

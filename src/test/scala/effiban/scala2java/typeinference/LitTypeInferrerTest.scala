@@ -4,7 +4,7 @@ import effiban.scala2java.testsuites.UnitTestSuite
 
 import scala.meta.{Lit, Type}
 
-class LitTypeInfererTest extends UnitTestSuite {
+class LitTypeInferrerTest extends UnitTestSuite {
 
   private val LiteralTypeMappings = Table(
     ("Literal", "MaybeExpectedTypeValue"),
@@ -26,7 +26,7 @@ class LitTypeInfererTest extends UnitTestSuite {
     (literal: Lit, maybeExpectedTypeValue: Option[String]) => {
       val maybeExpectedTypeName = maybeExpectedTypeValue.map(Type.Name(_))
       test(s"Infer $literal should return $maybeExpectedTypeName") {
-        LitTypeInferer.infer(literal).structure shouldBe maybeExpectedTypeName.structure
+        LitTypeInferrer.infer(literal).structure shouldBe maybeExpectedTypeName.structure
       }
     }
   }

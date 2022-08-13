@@ -3,13 +3,13 @@ package effiban.scala2java.typeinference
 import scala.meta.Term.{Ascribe, New, Return}
 import scala.meta.{Lit, Term, Type}
 
-trait TermTypeInferer extends TypeInferer[Term]
+trait TermTypeInferrer extends TypeInferrer[Term]
 
-private[typeinference] class TermTypeInfererImpl(litTypeInferer: LitTypeInferer) extends TermTypeInferer {
+private[typeinference] class TermTypeInferrerImpl(litTypeInferrer: LitTypeInferrer) extends TermTypeInferrer {
 
   override def infer(term: Term): Option[Type] = {
     term match {
-      case lit: Lit => litTypeInferer.infer(lit)
+      case lit: Lit => litTypeInferrer.infer(lit)
       case `return`: Return => infer(`return`.expr)
       case ascribe: Ascribe => Some(ascribe.tpe)
       case `new`: New => Some(`new`.init.tpe)
@@ -25,4 +25,4 @@ private[typeinference] class TermTypeInfererImpl(litTypeInferer: LitTypeInferer)
   }
 }
 
-object TermTypeInferer extends TermTypeInfererImpl(LitTypeInferer)
+object TermTypeInferrer extends TermTypeInferrerImpl(LitTypeInferrer)
