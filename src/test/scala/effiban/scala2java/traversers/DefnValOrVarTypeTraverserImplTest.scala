@@ -1,0 +1,61 @@
+package effiban.scala2java.traversers
+
+import effiban.scala2java.entities.JavaScope
+import effiban.scala2java.entities.TraversalContext.javaScope
+import effiban.scala2java.matchers.TreeMatcher.eqTree
+import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
+import effiban.scala2java.testsuites.UnitTestSuite
+import effiban.scala2java.testtrees.TypeNames
+import effiban.scala2java.typeinference.TermTypeInferer
+
+import scala.meta.{Lit, Term}
+
+class DefnValOrVarTypeTraverserImplTest extends UnitTestSuite {
+
+  private val LiteralInt = Lit.Int(3)
+  private val NonInferrableTerm = Term.Apply(Term.Name("externalMethod"), Nil)
+
+  private val typeTraverser = mock[TypeTraverser]
+  private val termTypeInferer = mock[TermTypeInferer]
+
+  private val defnValOrVarTypeTraverser = new DefnValOrVarTypeTraverserImpl(typeTraverser, termTypeInferer)
+
+  test("traverse when has declared type should traverse it") {
+    doWrite("Int").when(typeTraverser).traverse(eqTree(TypeNames.Int))
+
+    defnValOrVarTypeTraverser.traverse(maybeDeclType = Some(TypeNames.Int), maybeRhs = None)
+
+    outputWriter.toString shouldBe "Int"
+  }
+
+  test("traverse when has no declared type, has RHS, JavaScope is none, and type is inferred - should traverse it") {
+    when(termTypeInferer.infer(eqTree(LiteralInt))).thenReturn(Some(TypeNames.Int))
+    doWrite("Int").when(typeTraverser).traverse(eqTree(TypeNames.Int))
+
+    defnValOrVarTypeTraverser.traverse(maybeDeclType = None, maybeRhs = Some(LiteralInt))
+
+    outputWriter.toString shouldBe "Int"
+  }
+
+  test("traverse when has no declared type, has RHS, JavaScope is none, and type not inferred - should write 'UnknownType'") {
+    when(termTypeInferer.infer(eqTree(NonInferrableTerm))).thenReturn(None)
+
+    defnValOrVarTypeTraverser.traverse(maybeDeclType = None, maybeRhs = Some(NonInferrableTerm))
+
+    outputWriter.toString shouldBe "/* UnknownType */"
+  }
+
+  test("traverse when has no declared type, has no RHS, and JavaScope is none - should write 'UnknownType'") {
+    defnValOrVarTypeTraverser.traverse(maybeDeclType = None, maybeRhs = None)
+
+    outputWriter.toString shouldBe "/* UnknownType */"
+  }
+
+  test("traverse when has no declared type and JavaScope is Method - should write 'var'") {
+    javaScope = JavaScope.Method
+
+    defnValOrVarTypeTraverser.traverse(maybeDeclType = None, maybeRhs = None)
+
+    outputWriter.toString shouldBe "var"
+  }
+}

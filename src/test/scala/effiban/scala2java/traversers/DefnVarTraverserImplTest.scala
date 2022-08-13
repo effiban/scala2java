@@ -3,6 +3,7 @@ package effiban.scala2java.traversers
 import effiban.scala2java.entities.JavaScope
 import effiban.scala2java.entities.JavaScope.{Interface, Method}
 import effiban.scala2java.entities.TraversalContext.javaScope
+import effiban.scala2java.matchers.CombinedMatchers.eqSomeTree
 import effiban.scala2java.matchers.TreeListMatcher.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.resolvers.JavaModifiersResolver
@@ -26,14 +27,14 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
   private val Rhs = Lit.Int(3)
 
   private val annotListTraverser = mock[AnnotListTraverser]
-  private val typeTraverser = mock[TypeTraverser]
+  private val defnValOrVarTypeTraverser = mock[DefnValOrVarTypeTraverser]
   private val patListTraverser = mock[PatListTraverser]
   private val termTraverser = mock[TermTraverser]
   private val javaModifiersResolver = mock[JavaModifiersResolver]
 
   private val defnVarTraverser = new DefnVarTraverserImpl(
     annotListTraverser,
-    typeTraverser,
+    defnValOrVarTypeTraverser,
     patListTraverser,
     termTraverser,
     javaModifiersResolver)
@@ -54,7 +55,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(mods = eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
     when(javaModifiersResolver.resolveForClassDataMember(eqTreeList(Modifiers))).thenReturn(JavaPrivateModifiers)
-    doWrite("int").when(typeTraverser).traverse(eqTree(IntType))
+    doWrite("int").when(defnValOrVarTypeTraverser).traverse(eqSomeTree(IntType), eqSomeTree(Rhs))
     doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
     doWrite("3").when(termTraverser).traverse(eqTree(Rhs))
 
@@ -80,7 +81,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(mods = eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
     when(javaModifiersResolver.resolveForClassDataMember(eqTreeList(Modifiers))).thenReturn(JavaPrivateModifiers)
-    doWrite("int").when(typeTraverser).traverse(eqTree(IntType))
+    doWrite("int").when(defnValOrVarTypeTraverser).traverse(eqSomeTree(IntType), ArgumentMatchers.eq(None))
     doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
 
     defnVarTraverser.traverse(defnVar)
@@ -105,6 +106,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(mods = eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
     when(javaModifiersResolver.resolveForClassDataMember(eqTreeList(Modifiers))).thenReturn(JavaPrivateModifiers)
+    doWrite("int").when(defnValOrVarTypeTraverser).traverse(ArgumentMatchers.eq(None), eqSomeTree(Rhs))
     doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
     doWrite("3").when(termTraverser).traverse(eqTree(Rhs))
 
@@ -112,7 +114,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
 
     outputWriter.toString shouldBe
       """@MyAnnotation
-        |private /* UnknownType */ myVar = 3""".stripMargin
+        |private int myVar = 3""".stripMargin
   }
 
   test("traverse() when it is an interface member - typed with value") {
@@ -129,7 +131,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(mods = eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
-    doWrite("int").when(typeTraverser).traverse(eqTree(IntType))
+    doWrite("int").when(defnValOrVarTypeTraverser).traverse(eqSomeTree(IntType), eqSomeTree(Rhs))
     doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
     doWrite("3").when(termTraverser).traverse(eqTree(Rhs))
 
@@ -154,7 +156,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(mods = eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
-    doWrite("int").when(typeTraverser).traverse(eqTree(IntType))
+    doWrite("int").when(defnValOrVarTypeTraverser).traverse(eqSomeTree(IntType), ArgumentMatchers.eq(None))
     doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
 
     defnVarTraverser.traverse(defnVar)
@@ -178,6 +180,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(mods = eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
+    doWrite("int").when(defnValOrVarTypeTraverser).traverse(ArgumentMatchers.eq(None), eqSomeTree(Rhs))
     doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
     doWrite("3").when(termTraverser).traverse(eqTree(Rhs))
 
@@ -185,7 +188,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
 
     outputWriter.toString shouldBe
       """@MyAnnotation
-        |/* UnknownType */ myVar = 3""".stripMargin
+        |int myVar = 3""".stripMargin
   }
 
   test("traverse() when it is a local variable - typed with value") {
@@ -202,7 +205,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(mods = eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
-    doWrite("int").when(typeTraverser).traverse(eqTree(IntType))
+    doWrite("int").when(defnValOrVarTypeTraverser).traverse(eqSomeTree(IntType), eqSomeTree(Rhs))
     doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
     doWrite("3").when(termTraverser).traverse(eqTree(Rhs))
 
@@ -227,7 +230,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(mods = eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
-    doWrite("int").when(typeTraverser).traverse(eqTree(IntType))
+    doWrite("int").when(defnValOrVarTypeTraverser).traverse(eqSomeTree(IntType), ArgumentMatchers.eq(None))
     doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
 
     defnVarTraverser.traverse(defnVar)
@@ -251,6 +254,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(mods = eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
+    doWrite("var").when(defnValOrVarTypeTraverser).traverse(ArgumentMatchers.eq(None), eqSomeTree(Rhs))
     doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
     doWrite("3").when(termTraverser).traverse(eqTree(Rhs))
 

@@ -1,8 +1,6 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.entities.JavaScope
-import effiban.scala2java.entities.JavaScope.Method
-import effiban.scala2java.entities.TraversalConstants.UnknownType
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.resolvers.JavaModifiersResolver
 import effiban.scala2java.writers.JavaWriter
@@ -13,7 +11,7 @@ trait DefnVarTraverser extends ScalaTreeTraverser[Defn.Var]
 
 //TODO - if Java owner is an interface, the output should be a pair of accessor/mutator methods with default impls
 private[traversers] class DefnVarTraverserImpl(annotListTraverser: => AnnotListTraverser,
-                                               typeTraverser: => TypeTraverser,
+                                               defnValOrVarTypeTraverser: => DefnValOrVarTypeTraverser,
                                                patListTraverser: => PatListTraverser,
                                                termTraverser: => TermTraverser,
                                                javaModifiersResolver: JavaModifiersResolver)
@@ -28,16 +26,8 @@ private[traversers] class DefnVarTraverserImpl(annotListTraverser: => AnnotListT
       case _ => Nil
     }
     writeModifiers(modifierNames)
-    varDef.decltpe match {
-      case Some(declType) =>
-        typeTraverser.traverse(declType)
-        write(" ")
-      case None if javaScope == Method => write("var ")
-      case None =>
-        writeComment(UnknownType)
-        write(" ")
-      case _ =>
-    }
+    defnValOrVarTypeTraverser.traverse(varDef.decltpe, varDef.rhs)
+    write(" ")
     //TODO - verify this
     patListTraverser.traverse(varDef.pats)
     varDef.rhs.foreach { rhs =>
