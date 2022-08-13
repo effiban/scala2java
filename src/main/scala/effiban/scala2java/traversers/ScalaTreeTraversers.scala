@@ -4,7 +4,7 @@ import effiban.scala2java.classifiers.TermApplyInfixClassifier
 import effiban.scala2java.orderings.JavaTemplateChildOrdering
 import effiban.scala2java.resolvers.{JavaInheritanceKeywordResolver, JavaModifiersResolver}
 import effiban.scala2java.transformers._
-import effiban.scala2java.typeinference.TermTypeInferrer
+import effiban.scala2java.typeinference.TypeInferrers.termTypeInferrer
 import effiban.scala2java.writers.JavaWriter
 
 class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
@@ -115,7 +115,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
 
   private lazy val defnValOrVarTypeTraverser: DefnValOrVarTypeTraverser = new DefnValOrVarTypeTraverserImpl(
     typeTraverser,
-    TermTypeInferrer
+    termTypeInferrer
   )
 
   private lazy val defnValTraverser: DefnValTraverser = new DefnValTraverserImpl(

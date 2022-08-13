@@ -9,9 +9,15 @@ import scala.meta.{Init, Lit, Name, Term, Type}
 
 class TermTypeInferrerImplTest extends UnitTestSuite {
 
+  private val ifTypeInferrer = mock[IfTypeInferrer]
+  private val blockTypeInferrer = mock[BlockTypeInferrer]
   private val litTypeInferrer = mock[LitTypeInferrer]
 
-  private val termTypeInferrer = new TermTypeInferrerImpl(litTypeInferrer)
+  private val termTypeInferrer = new TermTypeInferrerImpl(
+    ifTypeInferrer,
+    blockTypeInferrer,
+    litTypeInferrer
+  )
 
   test("infer 'Lit' when 'LitTypeInferrer' returns a result should return it") {
     val literalInt = Lit.Int(3)
