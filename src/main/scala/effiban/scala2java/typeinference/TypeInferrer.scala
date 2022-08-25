@@ -1,7 +1,7 @@
 package effiban.scala2java.typeinference
 
-import scala.meta.{Tree, Type}
+import scala.meta.Type
 
-trait TypeInferrer[T <: Tree] {
-  def infer(tree: T): Option[Type]
+trait TypeInferrer[T] {
+  def infer(source: T): Option[Type]
 }
