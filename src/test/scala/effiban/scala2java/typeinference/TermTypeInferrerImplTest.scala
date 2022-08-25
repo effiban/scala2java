@@ -4,10 +4,24 @@ import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
 
-import scala.meta.Term.{Ascribe, New}
-import scala.meta.{Init, Lit, Name, Term, Type}
+import scala.meta.Enumerator.Generator
+import scala.meta.Term.{Ascribe, Block, ForYield, If, New}
+import scala.meta.{Init, Lit, Name, Pat, Term, Type}
 
 class TermTypeInferrerImplTest extends UnitTestSuite {
+
+  private val Condition = Term.ApplyInfix(
+    lhs = Term.Name("x"),
+    op = Term.Name("<"),
+    targs = Nil,
+    args = List(Lit.Int(3))
+  )
+
+  private val Thenp = Lit.String("abc")
+
+  private val TheIf = If(cond = Condition, thenp = Thenp, elsep = Lit.Unit())
+
+  private val TheBlock = Block(List(Term.Apply(Term.Name("doSoemthing"), Nil)))
 
   private val ifTypeInferrer = mock[IfTypeInferrer]
   private val blockTypeInferrer = mock[BlockTypeInferrer]
@@ -18,6 +32,30 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
     blockTypeInferrer,
     litTypeInferrer
   )
+
+  test("infer 'If' when 'IfTypeInferrer' returns a result should return it") {
+    when(ifTypeInferrer.infer(eqTree(TheIf))).thenReturn(Some(TypeNames.Int))
+
+    termTypeInferrer.infer(TheIf).value.structure shouldBe TypeNames.Int.structure
+  }
+
+  test("infer 'If' when 'IfTypeInferrer' returns None should return None") {
+    when(ifTypeInferrer.infer(eqTree(TheIf))).thenReturn(None)
+
+    termTypeInferrer.infer(TheIf) shouldBe None
+  }
+
+  test("infer 'Block' when 'BlockTypeInferrer' returns a result should return it") {
+    when(blockTypeInferrer.infer(eqTree(TheBlock))).thenReturn(Some(TypeNames.Int))
+
+    termTypeInferrer.infer(TheBlock).value.structure shouldBe TypeNames.Int.structure
+  }
+
+  test("infer 'Block' when 'BlockTypeInferrer' returns None should return None") {
+    when(blockTypeInferrer.infer(eqTree(TheBlock))).thenReturn(None)
+
+    termTypeInferrer.infer(TheBlock) shouldBe None
+  }
 
   test("infer 'Lit' when 'LitTypeInferrer' returns a result should return it") {
     val literalInt = Lit.Int(3)
@@ -62,6 +100,18 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
     when(litTypeInferrer.infer(eqTree(expr))).thenReturn(Some(TypeNames.String))
 
     termTypeInferrer.infer(Term.Repeated(expr)).value.structure shouldBe Type.Apply(Type.Name("Array"), List(TypeNames.String)).structure
+  }
+
+  test("infer 'For.Yield' should return type of its body") {
+    val body = Lit.String("abc")
+    val forYield = ForYield(
+      enums = List(Generator(pat = Pat.Var(Term.Name("x")), rhs = Term.Name("xs"))),
+      body = body
+    )
+
+    when(litTypeInferrer.infer(eqTree(body))).thenReturn(Some(TypeNames.String))
+
+    termTypeInferrer.infer(forYield).value.structure shouldBe TypeNames.String.structure
   }
 
   test("infer 'Term.Interpolate' should return String") {
