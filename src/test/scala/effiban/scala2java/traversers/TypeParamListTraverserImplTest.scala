@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.entities.EnclosingDelimiter._
-import effiban.scala2java.matchers.TreeListMatcher.eqTreeList
+import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeBounds
 import org.mockito.ArgumentMatchers
