@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.entities.TraversalContext.javaScope
-import effiban.scala2java.entities.{ClassInfo, JavaScope}
+import effiban.scala2java.entities.{ClassInfo, JavaTreeType}
 import effiban.scala2java.resolvers.JavaModifiersResolver
 import effiban.scala2java.transformers.ParamToDeclValTransformer
 import effiban.scala2java.writers.JavaWriter
@@ -27,7 +27,7 @@ private[traversers] class RegularClassTraverserImpl(annotListTraverser: => Annot
       name = classDef.name.value)
     typeParamListTraverser.traverse(classDef.tparams)
     val outerJavaScope = javaScope
-    javaScope = JavaScope.Class
+    javaScope = JavaTreeType.Class
     val explicitMemberDecls = classDef.ctor.paramss.flatten.map(x =>
       paramToDeclValTransformer.transform(x)
     )

@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.JavaScope
-import effiban.scala2java.entities.JavaScope.{Interface, Method}
+import effiban.scala2java.entities.JavaTreeType
+import effiban.scala2java.entities.JavaTreeType.{Interface, Method}
 import effiban.scala2java.entities.TraversalConstants.UnknownType
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.resolvers.JavaModifiersResolver
@@ -32,7 +32,7 @@ private[traversers] class DefnDefTraverserImpl(annotListTraverser: => AnnotListT
     annotListTraverser.traverseMods(defnDef.mods)
     val resolvedModifierNames = javaScope match {
       case Interface => javaModifiersResolver.resolveForInterfaceMethod(defnDef.mods, hasBody = true)
-      case JavaScope.Class => javaModifiersResolver.resolveForClassMethod(defnDef.mods)
+      case JavaTreeType.Class => javaModifiersResolver.resolveForClassMethod(defnDef.mods)
       case _ => Nil
     }
     writeModifiers(resolvedModifierNames)

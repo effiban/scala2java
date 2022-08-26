@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.JavaScope.Method
+import effiban.scala2java.entities.JavaTreeType.Method
 import effiban.scala2java.entities.TraversalConstants.UnknownType
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.typeinference.TermTypeInferrer

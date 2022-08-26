@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.JavaScope.{Lambda, Method}
+import effiban.scala2java.entities.JavaTreeType.{Lambda, Method}
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree

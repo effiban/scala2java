@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.JavaScope
+import effiban.scala2java.entities.JavaTreeType
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.resolvers.JavaModifiersResolver
 import effiban.scala2java.writers.JavaWriter
@@ -22,7 +22,7 @@ private[traversers] class DefnVarTraverserImpl(annotListTraverser: => AnnotListT
   override def traverse(varDef: Defn.Var): Unit = {
     annotListTraverser.traverseMods(varDef.mods)
     val modifierNames = varDef.mods match {
-      case modifiers if javaScope == JavaScope.Class => javaModifiersResolver.resolveForClassDataMember(modifiers)
+      case modifiers if javaScope == JavaTreeType.Class => javaModifiersResolver.resolveForClassDataMember(modifiers)
       case _ => Nil
     }
     writeModifiers(modifierNames)

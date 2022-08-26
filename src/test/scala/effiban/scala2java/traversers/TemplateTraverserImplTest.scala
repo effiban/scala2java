@@ -1,9 +1,9 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.entities
-import effiban.scala2java.entities.JavaScope.JavaScope
+import effiban.scala2java.entities.JavaTreeType.JavaTreeType
 import effiban.scala2java.entities.TraversalContext.javaScope
-import effiban.scala2java.entities.{JavaKeyword, JavaScope}
+import effiban.scala2java.entities.{JavaKeyword, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.orderings.JavaTemplateChildOrdering
@@ -137,9 +137,9 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       stats = Nil
     )
 
-    expectWriteInits(JavaScope.Class)
+    expectWriteInits(JavaTreeType.Class)
 
-    javaScope = JavaScope.Class
+    javaScope = JavaTreeType.Class
 
     templateTraverser.traverse(template)
 
@@ -176,11 +176,11 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       stats = Nil
     )
 
-    expectWriteInits(JavaScope.Class)
+    expectWriteInits(JavaTreeType.Class)
     expectWritePrimaryCtor(TheInits)
     expectChildOrdering()
 
-    javaScope = JavaScope.Class
+    javaScope = JavaTreeType.Class
 
     templateTraverser.traverse(
       template = template,
@@ -252,7 +252,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       stats = stats
     )
 
-    expectWriteInits(JavaScope.Class)
+    expectWriteInits(JavaTreeType.Class)
     expectWriteSelf()
     expectWriteDataMemberDecl()
     expectWriteDataMemberDefn()
@@ -262,7 +262,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
 
     expectChildOrdering()
 
-    javaScope = JavaScope.Class
+    javaScope = JavaTreeType.Class
 
     templateTraverser.traverse(
       template = template,
@@ -290,7 +290,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     Term.Param(mods = List(), name = Term.Name(name), decltpe = Some(Type.Name(typeName)), default = None)
   }
 
-  private def expectWriteInits(javaScope: JavaScope): Unit = {
+  private def expectWriteInits(javaScope: JavaTreeType): Unit = {
     when(javaInheritanceKeywordResolver.resolve(ArgumentMatchers.eq(javaScope), eqTreeList(TheInits))).thenReturn(JavaKeyword.Implements)
     doWrite("Parent1, Parent2").when(initListTraverser).traverse(eqTreeList(TheInits), ArgumentMatchers.eq(true))
   }

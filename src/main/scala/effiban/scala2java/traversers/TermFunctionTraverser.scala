@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.JavaScope.Lambda
+import effiban.scala2java.entities.JavaTreeType.Lambda
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.writers.JavaWriter
 

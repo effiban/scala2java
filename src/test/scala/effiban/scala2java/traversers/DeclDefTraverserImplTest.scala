@@ -1,8 +1,8 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.JavaScope.Interface
+import effiban.scala2java.entities.JavaTreeType.Interface
 import effiban.scala2java.entities.TraversalContext.javaScope
-import effiban.scala2java.entities.{JavaModifier, JavaScope}
+import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.resolvers.JavaModifiersResolver
@@ -62,7 +62,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
 
 
   test("traverse() for class method when has one list of params") {
-    javaScope = JavaScope.Class
+    javaScope = JavaTreeType.Class
 
     val declDef = Decl.Def(
       mods = Modifiers,
@@ -93,7 +93,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for class method when has type params") {
-    javaScope = JavaScope.Class
+    javaScope = JavaTreeType.Class
 
     val declDef = Decl.Def(
       mods = Modifiers,

@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.JavaScope
+import effiban.scala2java.entities.JavaTreeType
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
@@ -52,7 +52,7 @@ class DefnValOrVarTypeTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse when has no declared type and JavaScope is Method - should write 'var'") {
-    javaScope = JavaScope.Method
+    javaScope = JavaTreeType.Method
 
     defnValOrVarTypeTraverser.traverse(maybeDeclType = None, maybeRhs = None)
 

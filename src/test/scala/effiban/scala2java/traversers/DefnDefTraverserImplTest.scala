@@ -1,8 +1,8 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.JavaScope.Interface
+import effiban.scala2java.entities.JavaTreeType.Interface
 import effiban.scala2java.entities.TraversalContext.javaScope
-import effiban.scala2java.entities.{JavaModifier, JavaScope}
+import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.SomeMatcher.eqSome
 import effiban.scala2java.matchers.TreeMatcher
@@ -71,7 +71,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     javaModifiersResolver)
 
   test("traverse() for class method with one statement returning int") {
-    javaScope = JavaScope.Class
+    javaScope = JavaTreeType.Class
 
     val defnDef = Defn.Def(
       mods = Modifiers,
@@ -114,7 +114,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for class method with one statement returning Unit") {
-    javaScope = JavaScope.Class
+    javaScope = JavaTreeType.Class
 
     val defnDef = Defn.Def(
       mods = Modifiers,
@@ -157,7 +157,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for class method with type params") {
-    javaScope = JavaScope.Class
+    javaScope = JavaTreeType.Class
 
     val defnDef = Defn.Def(
       mods = Modifiers,
@@ -201,7 +201,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for constructor") {
-    javaScope = JavaScope.Class
+    javaScope = JavaTreeType.Class
 
     val defnDef = Defn.Def(
       mods = Modifiers,
@@ -250,7 +250,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for class method with one statement missing return type when not inferrable") {
-    javaScope = JavaScope.Class
+    javaScope = JavaTreeType.Class
 
     val defnDef = Defn.Def(
       mods = Modifiers,
@@ -293,7 +293,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for class method with one statement missing return type when inferrable") {
-    javaScope = JavaScope.Class
+    javaScope = JavaTreeType.Class
 
     val defnDef = Defn.Def(
       mods = Modifiers,
@@ -337,7 +337,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for class method with block") {
-    javaScope = JavaScope.Class
+    javaScope = JavaTreeType.Class
 
     val body = Block(stats = List(Statement1, Statement2))
 
