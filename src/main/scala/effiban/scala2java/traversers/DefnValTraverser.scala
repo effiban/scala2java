@@ -1,8 +1,8 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.JavaScope
 import effiban.scala2java.entities.JavaScope.{Interface, Method}
 import effiban.scala2java.entities.TraversalContext.javaScope
+import effiban.scala2java.entities.{JavaModifier, JavaScope}
 import effiban.scala2java.resolvers.JavaModifiersResolver
 import effiban.scala2java.writers.JavaWriter
 
@@ -28,7 +28,7 @@ private[traversers] class DefnValTraverserImpl(annotListTraverser: => AnnotListT
       case modifiers if javaScope == JavaScope.Class => javaModifiersResolver.resolveForClassDataMember(modifiers)
       case _ if javaScope == Interface => Nil
       // The only possible modifier for a method param or local var is 'final'
-      case modifiers if javaScope == Method => javaModifiersResolver.resolve(modifiers, List("final"))
+      case modifiers if javaScope == Method => javaModifiersResolver.resolve(modifiers, List(JavaModifier.Final))
       case _ => Nil
     }
     writeModifiers(modifierNames)

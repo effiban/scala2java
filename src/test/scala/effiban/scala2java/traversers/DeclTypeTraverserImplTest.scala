@@ -1,5 +1,6 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.entities.JavaModifier
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.resolvers.JavaModifiersResolver
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
@@ -9,8 +10,6 @@ import scala.meta.Type.Bounds
 import scala.meta.{Decl, Init, Mod, Name, Type}
 
 class DeclTypeTraverserImplTest extends UnitTestSuite {
-
-  private val JavaModifier = "private"
 
   private val Modifiers: List[Mod] = List(
     Mod.Annot(
@@ -46,7 +45,7 @@ class DeclTypeTraverserImplTest extends UnitTestSuite {
       bounds = Bounds(lo = None, hi = Some(Type.Name("T")))
     )
 
-    when(javaModifiersResolver.resolveForInterface(eqTreeList(Modifiers))).thenReturn(List(JavaModifier))
+    when(javaModifiersResolver.resolveForInterface(eqTreeList(Modifiers))).thenReturn(List(JavaModifier.Private))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
 
     declTypeTraverser.traverse(declType)

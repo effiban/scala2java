@@ -1,6 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.entities
+import effiban.scala2java.entities.JavaModifier
 import effiban.scala2java.matchers.ClassInfoMatcher
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.SomeMatcher.eqSome
@@ -26,8 +27,6 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       Init(tpe = Type.Name("MyAnnotation"), name = Name.Anonymous(), argss = List())
     )
   )
-
-  private val JavaModifier = "public"
 
   private val TypeParams = List(
     Type.Param(
@@ -110,7 +109,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
-    when(javaModifiersResolver.resolveForClass(eqTreeList(Modifiers))).thenReturn(List(JavaModifier))
+    when(javaModifiersResolver.resolveForClass(eqTreeList(Modifiers))).thenReturn(List(JavaModifier.Public))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
 
     when(paramToDeclValTransformer.transform(any[Term.Param])).thenAnswer( (ctorArg: Term.Param) => ctorArg match {
@@ -169,7 +168,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
-    when(javaModifiersResolver.resolveForClass(eqTreeList(Modifiers))).thenReturn(List(JavaModifier))
+    when(javaModifiersResolver.resolveForClass(eqTreeList(Modifiers))).thenReturn(List(JavaModifier.Public))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
 
     when(paramToDeclValTransformer.transform(any[Term.Param])).thenAnswer( (ctorArg: Term.Param) => ctorArg match {

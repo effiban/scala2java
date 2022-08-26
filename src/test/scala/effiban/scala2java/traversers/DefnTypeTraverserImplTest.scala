@@ -1,5 +1,6 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.entities.JavaModifier
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.resolvers.JavaModifiersResolver
@@ -10,8 +11,6 @@ import scala.meta.Type.Bounds
 import scala.meta.{Defn, Init, Mod, Name, Type}
 
 class DefnTypeTraverserImplTest extends UnitTestSuite {
-
-  private val JavaModifier = "private"
 
   private val Modifiers: List[Mod.Annot] = List(
     Mod.Annot(
@@ -51,7 +50,7 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
       body = MyOtherType
     )
 
-    when(javaModifiersResolver.resolveForInterface(eqTreeList(Modifiers))).thenReturn(List(JavaModifier))
+    when(javaModifiersResolver.resolveForInterface(eqTreeList(Modifiers))).thenReturn(List(JavaModifier.Private))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     doWrite("MyOtherType").when(typeTraverser).traverse(eqTree(MyOtherType))
 
@@ -72,7 +71,7 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
       bounds = Bounds(lo = None, hi = Some(MyOtherType))
     )
 
-    when(javaModifiersResolver.resolveForInterface(eqTreeList(Modifiers))).thenReturn(List(JavaModifier))
+    when(javaModifiersResolver.resolveForInterface(eqTreeList(Modifiers))).thenReturn(List(JavaModifier.Private))
     doWrite("MyOtherType").when(typeTraverser).traverse(eqTree(MyOtherType))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
 
@@ -93,7 +92,7 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
       bounds = Bounds(lo = Some(MyOtherType), hi = None)
     )
 
-    when(javaModifiersResolver.resolveForInterface(eqTreeList(Modifiers))).thenReturn(List(JavaModifier))
+    when(javaModifiersResolver.resolveForInterface(eqTreeList(Modifiers))).thenReturn(List(JavaModifier.Private))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
 
     defnTypeTraverser.traverse(defnType)

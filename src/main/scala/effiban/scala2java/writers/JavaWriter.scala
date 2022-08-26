@@ -1,15 +1,15 @@
 package effiban.scala2java.writers
 
 import effiban.scala2java.entities.EnclosingDelimiter.{EnclosingDelimiter, _}
-import effiban.scala2java.entities.JavaKeyword
+import effiban.scala2java.entities.{JavaKeyword, JavaModifier}
 
 import java.io.Writer
 
 trait JavaWriter {
 
-  def writeTypeDeclaration(modifiers: List[String], typeKeyword: String, name: String): Unit
+  def writeTypeDeclaration(modifiers: List[JavaModifier], typeKeyword: String, name: String): Unit
 
-  def writeModifiers(modifiers: List[String]): Unit
+  def writeModifiers(modifiers: List[JavaModifier]): Unit
 
   def writeKeyword(keyword: JavaKeyword): Unit
 
@@ -47,14 +47,14 @@ class JavaWriterImpl(writer: Writer) extends JavaWriter {
   private var indentationLevel = 0
   private var indentationRequired = false
 
-  override def writeTypeDeclaration(modifiers: List[String], typeKeyword: String, name: String): Unit = {
+  override def writeTypeDeclaration(modifiers: List[JavaModifier], typeKeyword: String, name: String): Unit = {
     writeModifiers(modifiers)
     write(s"$typeKeyword $name")
   }
 
-  override def writeModifiers(modifiers: List[String]): Unit = {
+  override def writeModifiers(modifiers: List[JavaModifier]): Unit = {
     if (modifiers.nonEmpty) {
-      write(modifiers.mkString(" "))
+      write(modifiers.map(_.name).mkString(" "))
       write(" ")
     }
   }

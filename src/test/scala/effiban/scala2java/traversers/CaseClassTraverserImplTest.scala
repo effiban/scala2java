@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.ClassInfo
+import effiban.scala2java.entities.{ClassInfo, JavaModifier}
 import effiban.scala2java.matchers.ClassInfoMatcher
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.SomeMatcher.eqSome
@@ -18,7 +18,6 @@ import scala.meta.{Ctor, Defn, Init, Mod, Name, Self, Template, Term, Type}
 class CaseClassTraverserImplTest extends UnitTestSuite {
 
   private val AnnotationName = "MyAnnotation"
-  private val JavaModifier = "public"
 
   private val ClassName = Type.Name("MyRecord")
 
@@ -95,7 +94,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(eqTreeList(modifiers), onSameLine = ArgumentMatchers.eq(false))
-    when(javaModifiersResolver.resolveForClass(eqTreeList(modifiers))).thenReturn(List(JavaModifier))
+    when(javaModifiersResolver.resolveForClass(eqTreeList(modifiers))).thenReturn(List(JavaModifier.Public))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     doWrite("(int arg1, int arg2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(CtorArgs1),
@@ -149,7 +148,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(eqTreeList(modifiers), onSameLine = ArgumentMatchers.eq(false))
-    when(javaModifiersResolver.resolveForClass(eqTreeList(modifiers))).thenReturn(List(JavaModifier))
+    when(javaModifiersResolver.resolveForClass(eqTreeList(modifiers))).thenReturn(List(JavaModifier.Public))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     doWrite("(int arg1, int arg2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(CtorArgs1),
@@ -198,7 +197,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(eqTreeList(modifiers), onSameLine = ArgumentMatchers.eq(false))
-    when(javaModifiersResolver.resolveForClass(eqTreeList(modifiers))).thenReturn(List(JavaModifier))
+    when(javaModifiersResolver.resolveForClass(eqTreeList(modifiers))).thenReturn(List(JavaModifier.Public))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     doWrite("(int arg1, int arg2, int arg3, int arg4)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(CtorArgs1 ++ CtorArgs2),

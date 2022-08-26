@@ -1,23 +1,24 @@
 package effiban.scala2java.orderings
 
+import effiban.scala2java.entities.JavaModifier
 import effiban.scala2java.testsuites.UnitTestSuite
 
 class JavaModifierOrderingTest extends UnitTestSuite {
 
   private val ModifierOrderingScenarios = Table(
     ("ModifierName1", "ModifierName2", "ExpectedResult"),
-    ("private", "protected", 0),
-    ("protected", "public", 0),
-    ("public", "default", 0),
-    ("default", "static", -1),
-    ("static", "sealed", -1),
-    ("sealed", "abstract", -1),
-    ("abstract", "final", -1)
+    (JavaModifier.Private, JavaModifier.Protected, 0),
+    (JavaModifier.Protected, JavaModifier.Public, 0),
+    (JavaModifier.Public, JavaModifier.Default, 0),
+    (JavaModifier.Default, JavaModifier.Static, -1),
+    (JavaModifier.Static, JavaModifier.Sealed, -1),
+    (JavaModifier.Sealed, JavaModifier.Abstract, -1),
+    (JavaModifier.Abstract, JavaModifier.Final, -1)
   )
 
-  forAll(ModifierOrderingScenarios) { case (modifierName1: String, modifierName2: String, expectedResult: Int) =>
-    test(s"'$modifierName1' ${comparisonResultToDescription(expectedResult)} '$modifierName2'") {
-      JavaModifierOrdering.compare(modifierName1, modifierName2) shouldBe expectedResult
+  forAll(ModifierOrderingScenarios) { case (modifier1: JavaModifier, modifier2: JavaModifier, expectedResult: Int) =>
+    test(s"'${modifier1.name}' ${comparisonResultToDescription(expectedResult)} '${modifier2.name}'") {
+      JavaModifierOrdering.compare(modifier1, modifier2) shouldBe expectedResult
     }
   }
 
