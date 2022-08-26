@@ -11,6 +11,7 @@ import effiban.scala2java.resolvers.JavaModifiersResolver
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
+import effiban.scala2java.typeinference.TermTypeInferrer
 import org.mockito.ArgumentMatchers
 
 import scala.meta.Term.Block
@@ -58,6 +59,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
   private val typeTraverser = mock[TypeTraverser]
   private val termParamListTraverser = mock[TermParamListTraverser]
   private val blockTraverser = mock[BlockTraverser]
+  private val termTypeInferrer = mock[TermTypeInferrer]
   private val javaModifiersResolver = mock[JavaModifiersResolver]
 
   private val defnDefTraverser = new DefnDefTraverserImpl(
@@ -67,6 +69,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     typeTraverser,
     termParamListTraverser,
     blockTraverser,
+    termTypeInferrer,
     javaModifiersResolver)
 
   test("traverse() for class method with one statement returning int") {
@@ -112,7 +115,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |""".stripMargin
   }
 
-  test("traverse() for class method with one statement retuning Unit") {
+  test("traverse() for class method with one statement returning Unit") {
     javaScope = JavaScope.Class
 
     val defnDef = Defn.Def(
@@ -248,7 +251,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |""".stripMargin
   }
 
-  test("traverse() for class method with one statement missing return type") {
+  test("traverse() for class method with one statement missing return type when not inferrable") {
     javaScope = JavaScope.Class
 
     val defnDef = Defn.Def(
@@ -265,6 +268,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(mods = eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
     when(javaModifiersResolver.resolveForClassMethod(eqTreeList(Modifiers))).thenReturn(List(JavaPublicModifier))
+    when(termTypeInferrer.infer(eqTree(Statement1))).thenReturn(None)
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1),
@@ -285,6 +289,50 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       """
         |@MyAnnotation
         |public /* UnknownType */ myMethod(int param1, int param2) {
+        |  /* BODY */
+        |}
+        |""".stripMargin
+  }
+
+  test("traverse() for class method with one statement missing return type when inferrable") {
+    javaScope = JavaScope.Class
+
+    val defnDef = Defn.Def(
+      mods = Modifiers,
+      name = MethodName,
+      tparams = Nil,
+      paramss = List(MethodParams1),
+      decltpe = None,
+      body = Statement1
+    )
+
+    doWrite(
+      """@MyAnnotation
+        |""".stripMargin)
+      .when(annotListTraverser).traverseMods(mods = eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
+    when(javaModifiersResolver.resolveForClassMethod(eqTreeList(Modifiers))).thenReturn(List(JavaPublicModifier))
+    when(termTypeInferrer.infer(eqTree(Statement1))).thenReturn(Some(TypeNames.String))
+    doWrite("String").when(typeTraverser).traverse(eqTree(TypeNames.String))
+    doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
+    doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
+      termParams = eqTreeList(MethodParams1),
+      onSameLine = ArgumentMatchers.eq(false)
+    )
+    doWrite(
+      """ {
+        |  /* BODY */
+        |}
+        |""".stripMargin)
+      .when(blockTraverser).traverse(block = eqTree(Block(List(Statement1))),
+      shouldReturnValue = ArgumentMatchers.eq(true),
+      maybeInit = ArgumentMatchers.eq(None))
+
+    defnDefTraverser.traverse(defnDef)
+
+    outputWriter.toString shouldBe
+      """
+        |@MyAnnotation
+        |public String myMethod(int param1, int param2) {
         |  /* BODY */
         |}
         |""".stripMargin

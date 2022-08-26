@@ -5,6 +5,7 @@ import effiban.scala2java.entities.JavaScope.{Interface, Method}
 import effiban.scala2java.entities.TraversalConstants.UnknownType
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.resolvers.JavaModifiersResolver
+import effiban.scala2java.typeinference.TermTypeInferrer
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term.Block
@@ -20,6 +21,7 @@ private[traversers] class DefnDefTraverserImpl(annotListTraverser: => AnnotListT
                                                typeTraverser: => TypeTraverser,
                                                termParamListTraverser: => TermParamListTraverser,
                                                blockTraverser: => BlockTraverser,
+                                               termTypeInferrer: => TermTypeInferrer,
                                                javaModifiersResolver: JavaModifiersResolver)
                                               (implicit javaWriter: JavaWriter) extends DefnDefTraverser {
 
@@ -35,15 +37,7 @@ private[traversers] class DefnDefTraverserImpl(annotListTraverser: => AnnotListT
     }
     writeModifiers(resolvedModifierNames)
     traverseTypeParams(defnDef.tparams)
-    defnDef.decltpe match {
-      case Some(Type.AnonymousName()) =>
-      case Some(tpe) =>
-        typeTraverser.traverse(tpe)
-        write(" ")
-      case None =>
-        writeComment(UnknownType)
-        write(" ")
-    }
+    traverseMethodType(defnDef)
     termNameTraverser.traverse(defnDef.name)
 
     val outerJavaScope = javaScope
@@ -76,6 +70,21 @@ private[traversers] class DefnDefTraverserImpl(annotListTraverser: => AnnotListT
       case Nil =>
       case typeParams =>
         typeParamListTraverser.traverse(typeParams)
+        write(" ")
+    }
+  }
+
+  private def traverseMethodType(defnDef: Defn.Def): Unit = {
+    defnDef.decltpe match {
+      case Some(Type.AnonymousName()) =>
+      case Some(tpe) =>
+        typeTraverser.traverse(tpe)
+        write(" ")
+      case None =>
+        termTypeInferrer.infer(defnDef.body) match {
+          case Some(tpe) => typeTraverser.traverse(tpe)
+          case None => writeComment(UnknownType)
+        }
         write(" ")
     }
   }
