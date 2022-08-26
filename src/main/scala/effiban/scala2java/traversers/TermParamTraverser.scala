@@ -25,7 +25,7 @@ private[traversers] class TermParamTraverserImpl(annotListTraverser: => AnnotLis
       case Lambda => termParam.mods
       case _ => termParam.mods :+ Final()
     }
-    val modifierNames = javaModifiersResolver.resolve(mods, List(classOf[Final]))
+    val modifierNames = javaModifiersResolver.resolve(mods, List("final"))
     writeModifiers(modifierNames)
     termParam.decltpe.foreach(declType => {
       typeTraverser.traverse(declType)

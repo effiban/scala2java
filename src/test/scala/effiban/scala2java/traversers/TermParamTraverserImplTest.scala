@@ -48,7 +48,7 @@ class TermParamTraverserImplTest extends UnitTestSuite {
 
     doWrite("@MyAnnotation ")
       .when(annotListTraverser).traverseMods(mods = eqTreeList(initialMods), onSameLine = ArgumentMatchers.eq(true))
-    when(javaModifiersResolver.resolve(eqTreeList(adjustedMods), ArgumentMatchers.eq(List(classOf[Final]))))
+    when(javaModifiersResolver.resolve(eqTreeList(adjustedMods), ArgumentMatchers.eq(List("final"))))
       .thenReturn(JavaFinalModifiers)
     doWrite("int").when(typeTraverser).traverse(eqTree(TypeNames.Int))
     doWrite("myParam").when(nameTraverser).traverse(eqTree(ParamName))
@@ -72,7 +72,7 @@ class TermParamTraverserImplTest extends UnitTestSuite {
 
     doWrite("@MyAnnotation ")
       .when(annotListTraverser).traverseMods(mods = eqTreeList(mods), onSameLine = ArgumentMatchers.eq(true))
-    when(javaModifiersResolver.resolve(eqTreeList(mods), ArgumentMatchers.eq(List(classOf[Final])))).thenReturn(Nil)
+    when(javaModifiersResolver.resolve(eqTreeList(mods), ArgumentMatchers.eq(List("final")))).thenReturn(Nil)
     doWrite("int").when(typeTraverser).traverse(eqTree(TypeNames.Int))
     doWrite("myParam").when(nameTraverser).traverse(eqTree(ParamName))
 
@@ -95,7 +95,7 @@ class TermParamTraverserImplTest extends UnitTestSuite {
 
     doWrite("@MyAnnotation ")
       .when(annotListTraverser).traverseMods(mods = eqTreeList(mods), onSameLine = ArgumentMatchers.eq(true))
-    when(javaModifiersResolver.resolve(eqTreeList(mods), ArgumentMatchers.eq(List(classOf[Final])))).thenReturn(Nil)
+    when(javaModifiersResolver.resolve(eqTreeList(mods), ArgumentMatchers.eq(List("final")))).thenReturn(Nil)
     doWrite("myParam").when(nameTraverser).traverse(eqTree(ParamName))
 
     termParamTraverser.traverse(termParam)
