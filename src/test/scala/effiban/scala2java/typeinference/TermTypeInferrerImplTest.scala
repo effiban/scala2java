@@ -1,12 +1,13 @@
 package effiban.scala2java.typeinference
 
+import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
 
 import scala.meta.Enumerator.Generator
-import scala.meta.Term.{Ascribe, Block, ForYield, If, New}
-import scala.meta.{Init, Lit, Name, Pat, Term, Type}
+import scala.meta.Term.{Ascribe, Block, ForYield, If, Match, New}
+import scala.meta.{Case, Init, Lit, Name, Pat, Term, Type}
 
 class TermTypeInferrerImplTest extends UnitTestSuite {
 
@@ -21,16 +22,37 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
 
   private val TheIf = If(cond = Condition, thenp = Thenp, elsep = Lit.Unit())
 
-  private val TheBlock = Block(List(Term.Apply(Term.Name("doSoemthing"), Nil)))
+  private val TheBlock = Block(List(Term.Apply(Term.Name("doSomething"), Nil)))
+
+  private val MatchCase1 = Case(
+    pat = Lit.String("one"),
+    cond = None,
+    body = Lit.Int(1)
+  )
+  private val MatchCase2 = Case(
+    pat = Lit.String("two"),
+    cond = None,
+    body = Lit.Int(2)
+  )
+  private val MatchCases = List(MatchCase1, MatchCase2)
 
   private val ifTypeInferrer = mock[IfTypeInferrer]
   private val blockTypeInferrer = mock[BlockTypeInferrer]
   private val litTypeInferrer = mock[LitTypeInferrer]
 
+  private val tryTypeInferrer = mock[TryTypeInferrer]
+
+  private val tryWithHandlerTypeInferrer = mock[TryWithHandlerTypeInferrer]
+
+  private val caseListTypeInferrer = mock[CaseListTypeInferrer]
+
   private val termTypeInferrer = new TermTypeInferrerImpl(
     ifTypeInferrer,
     blockTypeInferrer,
-    litTypeInferrer
+    litTypeInferrer,
+    tryTypeInferrer,
+    tryWithHandlerTypeInferrer,
+    caseListTypeInferrer
   )
 
   test("infer 'If' when 'IfTypeInferrer' returns a result should return it") {
@@ -69,6 +91,14 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
     when(litTypeInferrer.infer(eqTree(Lit.Null()))).thenReturn(None)
 
     termTypeInferrer.infer(Lit.Null()) shouldBe None
+  }
+
+  test("infer 'Match' should infer by its case list") {
+    val `match` = Match(expr = Term.Name("x"), cases = MatchCases, mods = Nil)
+
+    when(caseListTypeInferrer.infer(eqTreeList(MatchCases))).thenReturn(Some(TypeNames.Int))
+
+    termTypeInferrer.infer(`match`).value.structure shouldBe TypeNames.Int.structure
   }
 
   test("infer 'Return' should infer by its expression recursively") {
@@ -127,4 +157,6 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
   test("infer 'Term.Apply' should return None") {
     termTypeInferrer.infer(Term.Apply(Term.Name("myMethod"), Nil)) shouldBe None
   }
+
+  // TODO complete the coverage
 }
