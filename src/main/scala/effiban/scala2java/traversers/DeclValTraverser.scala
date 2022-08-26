@@ -1,8 +1,8 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.JavaScope
 import effiban.scala2java.entities.JavaScope.{Interface, Method}
 import effiban.scala2java.entities.TraversalContext.javaScope
+import effiban.scala2java.entities.{JavaModifier, JavaScope}
 import effiban.scala2java.resolvers.JavaModifiersResolver
 import effiban.scala2java.writers.JavaWriter
 
@@ -28,7 +28,7 @@ private[traversers] class DeclValTraverserImpl(annotListTraverser: => AnnotListT
       //TODO replace interface data member (invalid in Java) with method
       case _ if javaScope == Interface => Nil
       // The only possible modifier for a local var is 'final'
-      case Method => javaModifiersResolver.resolve(mods, List("final"))
+      case Method => javaModifiersResolver.resolve(mods, List(JavaModifier.Final))
       case _ => Nil
     }
     writeModifiers(modifierNames)

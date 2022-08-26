@@ -1,8 +1,8 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.JavaScope
 import effiban.scala2java.entities.JavaScope.Interface
 import effiban.scala2java.entities.TraversalContext.javaScope
+import effiban.scala2java.entities.{JavaModifier, JavaScope}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.resolvers.JavaModifiersResolver
@@ -15,8 +15,6 @@ import scala.meta.Type.Bounds
 import scala.meta.{Decl, Init, Mod, Name, Term, Type}
 
 class DeclDefTraverserImplTest extends UnitTestSuite {
-
-  private val JavaModifier = "public"
 
   private val MethodType: Type.Name = TypeNames.Int
   private val MethodName: Term.Name = Term.Name("myMethod")
@@ -78,7 +76,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(mods = eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
-    when(javaModifiersResolver.resolveForClassMethod(eqTreeList(Modifiers))).thenReturn(List(JavaModifier))
+    when(javaModifiersResolver.resolveForClassMethod(eqTreeList(Modifiers))).thenReturn(List(JavaModifier.Public))
     doWrite("int").when(typeTraverser).traverse(eqTree(MethodType))
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
@@ -109,7 +107,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(mods = eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
-    when(javaModifiersResolver.resolveForClassMethod(eqTreeList(Modifiers))).thenReturn(List(JavaModifier))
+    when(javaModifiersResolver.resolveForClassMethod(eqTreeList(Modifiers))).thenReturn(List(JavaModifier.Public))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     doWrite("int").when(typeTraverser).traverse(eqTree(MethodType))
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))

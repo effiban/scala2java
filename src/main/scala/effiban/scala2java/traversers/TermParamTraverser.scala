@@ -1,5 +1,6 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.entities.JavaModifier
 import effiban.scala2java.entities.JavaScope.Lambda
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.resolvers.JavaModifiersResolver
@@ -25,7 +26,7 @@ private[traversers] class TermParamTraverserImpl(annotListTraverser: => AnnotLis
       case Lambda => termParam.mods
       case _ => termParam.mods :+ Final()
     }
-    val modifierNames = javaModifiersResolver.resolve(mods, List("final"))
+    val modifierNames = javaModifiersResolver.resolve(mods, List(JavaModifier.Final))
     writeModifiers(modifierNames)
     termParam.decltpe.foreach(declType => {
       typeTraverser.traverse(declType)

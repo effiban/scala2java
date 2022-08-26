@@ -1,21 +1,23 @@
 package effiban.scala2java.orderings
 
-trait JavaModifierOrdering extends Ordering[String]
+import effiban.scala2java.entities.JavaModifier
+
+trait JavaModifierOrdering extends Ordering[JavaModifier]
 
 object JavaModifierOrdering extends JavaModifierOrdering {
 
-  private final val JavaModifierNamePosition = Map(
-    "private" -> 0,
-    "protected" -> 0,
-    "public" -> 0,
-    "default" -> 0,
-    "static" -> 1,
-    "sealed" -> 2,
-    "abstract" -> 3,
-    "final" -> 4
+  private final val JavaModifierToPosition: Map[JavaModifier, Int] = Map(
+    JavaModifier.Private -> 0,
+    JavaModifier.Protected -> 0,
+    JavaModifier.Public -> 0,
+    JavaModifier.Default -> 0,
+    JavaModifier.Static -> 1,
+    JavaModifier.Sealed -> 2,
+    JavaModifier.Abstract -> 3,
+    JavaModifier.Final -> 4
   )
 
-  override def compare(modifierName1: String, modifierName2: String): Int = positionOf(modifierName1) - positionOf(modifierName2)
+  override def compare(modifier1: JavaModifier, modifier2: JavaModifier): Int = positionOf(modifier1) - positionOf(modifier2)
 
-  private def positionOf(modifierName: String) = JavaModifierNamePosition.getOrElse(modifierName, Int.MaxValue)
+  private def positionOf(modifier: JavaModifier) = JavaModifierToPosition.getOrElse(modifier, Int.MaxValue)
 }

@@ -1,5 +1,6 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.entities.JavaModifier
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.resolvers.JavaModifiersResolver
@@ -14,7 +15,6 @@ import scala.meta.{Defn, Init, Mod, Name, Self, Template, Term, Type}
 class ObjectTraverserImplTest extends UnitTestSuite {
 
   private val AnnotationName = "MyAnnotation"
-  private val ModifierStr = "public"
 
   private val javaModifiersResolver = mock[JavaModifiersResolver]
 
@@ -60,7 +60,7 @@ class ObjectTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(mods = eqTreeList(modifiers), onSameLine = ArgumentMatchers.eq(false))
-    when(javaModifiersResolver.resolveForClass(eqTreeList(modifiers))).thenReturn(List(ModifierStr))
+    when(javaModifiersResolver.resolveForClass(eqTreeList(modifiers))).thenReturn(List(JavaModifier.Public))
     doWrite(
       """ {
         |  /* BODY */

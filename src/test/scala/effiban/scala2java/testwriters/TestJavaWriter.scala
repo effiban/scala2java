@@ -1,19 +1,19 @@
 package effiban.scala2java.testwriters
 
 import effiban.scala2java.entities.EnclosingDelimiter._
-import effiban.scala2java.entities.JavaKeyword
+import effiban.scala2java.entities.{JavaKeyword, JavaModifier}
 import effiban.scala2java.writers.JavaWriter
 
 import java.io.StringWriter
 
 class TestJavaWriter(sw: StringWriter) extends JavaWriter {
-  override def writeTypeDeclaration(modifiers: List[String], typeKeyword: String, name: String): Unit = {
+  override def writeTypeDeclaration(modifiers: List[JavaModifier], typeKeyword: String, name: String): Unit = {
     writeModifiers(modifiers)
     write(s"$typeKeyword $name")
   }
 
-  override def writeModifiers(modifiers: List[String]): Unit = {
-    write(modifiers.mkString(" "))
+  override def writeModifiers(modifiers: List[JavaModifier]): Unit = {
+    write(modifiers.map(_.name).mkString(" "))
     if (modifiers.nonEmpty) {
       write(" ")
     }
