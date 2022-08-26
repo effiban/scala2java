@@ -20,12 +20,10 @@ private[typeinference] class TermTypeInferrerImpl(ifTypeInferrer: => IfTypeInfer
       case `try`: Try => tryTypeInferrer.infer(`try`)
       case tryWithHandler: TryWithHandler => tryWithHandlerTypeInferrer.infer(tryWithHandler)
       case termMatch: Term.Match => caseListTypeInferrer.infer(termMatch.cases)
-      case partialFunction: Term.PartialFunction => caseListTypeInferrer.infer(partialFunction.cases)
       case repeated: Term.Repeated => inferRepeated(repeated)
       case forYield: ForYield => infer(forYield.body)
       case `return`: Return => infer(`return`.expr)
       case assign: Assign => infer(assign.rhs)
-      case function: Term.Function => infer(function.body)
       case ascribe: Ascribe => Some(ascribe.tpe)
       case `new`: New => Some(`new`.init.tpe)
       case _: Term.Interpolate => Some(Type.Name("String"))
@@ -34,7 +32,7 @@ private[typeinference] class TermTypeInferrerImpl(ifTypeInferrer: => IfTypeInfer
       case _: Do => Some(Type.AnonymousName())
       case _: While => Some(Type.AnonymousName())
       case _: Throw => Some(Type.AnonymousName())
-      // TODO - support Tuple, NewAnonymous
+      // TODO - support Tuple, NewAnonymous, Function, PartialFunction
       case _ => None
     }
   }
