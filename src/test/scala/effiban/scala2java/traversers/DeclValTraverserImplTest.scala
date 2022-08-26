@@ -105,7 +105,7 @@ class DeclValTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(mods = eqTreeList(initialModifiers), onSameLine = ArgumentMatchers.eq(false))
-    when(javaModifiersResolver.resolve(eqTreeList(adjustedModifiers), ArgumentMatchers.eq(List(classOf[Final])))).thenReturn(JavaFinalModifiers)
+    when(javaModifiersResolver.resolve(eqTreeList(adjustedModifiers), ArgumentMatchers.eq(List("final")))).thenReturn(JavaFinalModifiers)
     doWrite("int").when(typeTraverser).traverse(eqTree(IntType))
     doWrite("myVal").when(patListTraverser).traverse(eqTreeList(List(MyValPat)))
 

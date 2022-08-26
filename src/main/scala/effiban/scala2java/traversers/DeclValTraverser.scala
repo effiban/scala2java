@@ -28,7 +28,7 @@ private[traversers] class DeclValTraverserImpl(annotListTraverser: => AnnotListT
       //TODO replace interface data member (invalid in Java) with method
       case _ if javaScope == Interface => Nil
       // The only possible modifier for a local var is 'final'
-      case Method => javaModifiersResolver.resolve(mods, List(classOf[Final]))
+      case Method => javaModifiersResolver.resolve(mods, List("final"))
       case _ => Nil
     }
     writeModifiers(modifierNames)

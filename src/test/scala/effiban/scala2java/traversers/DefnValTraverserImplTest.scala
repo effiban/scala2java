@@ -169,7 +169,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(mods = eqTreeList(initialModifiers), onSameLine = ArgumentMatchers.eq(false))
-    when(javaModifiersResolver.resolve(inputMods = eqTreeList(adjustedModifiers), allowedMods = ArgumentMatchers.eq(List(classOf[Final]))))
+    when(javaModifiersResolver.resolve(inputScalaMods = eqTreeList(adjustedModifiers), allowedJavaModifiers = ArgumentMatchers.eq(List("final"))))
       .thenReturn(JavaFinalModifiers)
     doWrite("int").when(defnValOrVarTypeTraverser).traverse(eqSomeTree(IntType), eqSomeTree(Rhs))
     doWrite("myVal").when(patListTraverser).traverse(eqTreeList(List(MyValPat)))
@@ -199,7 +199,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(mods = eqTreeList(initialModifiers), onSameLine = ArgumentMatchers.eq(false))
-    when(javaModifiersResolver.resolve(inputMods = eqTreeList(adjustedModifiers), allowedMods = ArgumentMatchers.eq(List(classOf[Final]))))
+    when(javaModifiersResolver.resolve(inputScalaMods = eqTreeList(adjustedModifiers), allowedJavaModifiers = ArgumentMatchers.eq(List("final"))))
       .thenReturn(JavaFinalModifiers)
     doWrite("var").when(defnValOrVarTypeTraverser).traverse(ArgumentMatchers.eq(None), eqSomeTree(Rhs))
     doWrite("myVal").when(patListTraverser).traverse(eqTreeList(List(MyValPat)))
