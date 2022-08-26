@@ -17,7 +17,6 @@ import scala.meta.{Defn, Init, Lit, Mod, Name, Pat, Term, Type}
 class DefnValTraverserImplTest extends UnitTestSuite {
 
   private val JavaPrivateFinalModifiers = List(JavaModifier.Private, JavaModifier.Final)
-  private val JavaFinalModifiers = List(JavaModifier.Final)
   private val IntType = TypeNames.Int
   private val MyValPat = Pat.Var(Term.Name("myVal"))
   private val Rhs = Lit.Int(3)
@@ -169,8 +168,6 @@ class DefnValTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(mods = eqTreeList(initialModifiers), onSameLine = ArgumentMatchers.eq(false))
-    when(javaModifiersResolver.resolve(inputScalaMods = eqTreeList(adjustedModifiers), allowedJavaModifiers = ArgumentMatchers.eq(List(JavaModifier.Final))))
-      .thenReturn(JavaFinalModifiers)
     doWrite("int").when(defnValOrVarTypeTraverser).traverse(eqSomeTree(IntType), eqSomeTree(Rhs))
     doWrite("myVal").when(patListTraverser).traverse(eqTreeList(List(MyValPat)))
     doWrite("3").when(termTraverser).traverse(eqTree(Rhs))
@@ -199,8 +196,6 @@ class DefnValTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(mods = eqTreeList(initialModifiers), onSameLine = ArgumentMatchers.eq(false))
-    when(javaModifiersResolver.resolve(inputScalaMods = eqTreeList(adjustedModifiers), allowedJavaModifiers = ArgumentMatchers.eq(List(JavaModifier.Final))))
-      .thenReturn(JavaFinalModifiers)
     doWrite("var").when(defnValOrVarTypeTraverser).traverse(ArgumentMatchers.eq(None), eqSomeTree(Rhs))
     doWrite("myVal").when(patListTraverser).traverse(eqTreeList(List(MyValPat)))
     doWrite("3").when(termTraverser).traverse(eqTree(Rhs))
