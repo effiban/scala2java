@@ -5,7 +5,7 @@ import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
 
 import scala.meta.Term.Block
-import scala.meta.{Import, Importee, Importer, Name, Term}
+import scala.meta.{Import, Importee, Importer, Name, Term, Type}
 
 class BlockTypeInferrerImplTest extends UnitTestSuite {
 
@@ -47,14 +47,14 @@ class BlockTypeInferrerImplTest extends UnitTestSuite {
     verifyNoMoreInteractions(termTypeInferrer)
   }
 
-  test("infer when has one Term followed by one non-Term should return None") {
-    blockTypeInferrer.infer(Block(List(Term1, NonTerm))) shouldBe None
+  test("infer when has one Term followed by one non-Term should return Anonymous") {
+    blockTypeInferrer.infer(Block(List(Term1, NonTerm))).value.structure shouldBe Type.AnonymousName().structure
 
     verifyNoMoreInteractions(termTypeInferrer)
   }
 
-  test("infer when block is empty should return None") {
-    blockTypeInferrer.infer(Block(Nil)) shouldBe None
+  test("infer when block is empty should return Anonymous") {
+    blockTypeInferrer.infer(Block(Nil)).value.structure shouldBe Type.AnonymousName().structure
   }
 
 }

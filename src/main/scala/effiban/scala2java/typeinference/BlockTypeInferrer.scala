@@ -9,11 +9,8 @@ private[typeinference] class BlockTypeInferrerImpl(termTypeInferrer: TermTypeInf
 
   override def infer(block: Block): Option[Type] = {
     block.stats match {
-      case _ :+ last => last match {
-        case lastTerm: Term => termTypeInferrer.infer(lastTerm)
-        case _ => None
-      }
-      case Nil => None
+      case _ :+ (lastTerm: Term) => termTypeInferrer.infer(lastTerm)
+      case _ => Some(Type.AnonymousName())
     }
   }
 }

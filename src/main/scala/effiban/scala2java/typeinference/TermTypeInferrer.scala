@@ -34,7 +34,7 @@ private[typeinference] class TermTypeInferrerImpl(ifTypeInferrer: => IfTypeInfer
       case _: Do => Some(Type.AnonymousName())
       case _: While => Some(Type.AnonymousName())
       case _: Throw => Some(Type.AnonymousName())
-      // TODO - support Tuple
+      // TODO - support Tuple, NewAnonymous
       case _ => None
     }
   }
