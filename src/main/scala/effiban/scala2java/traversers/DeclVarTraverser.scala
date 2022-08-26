@@ -22,6 +22,7 @@ private[traversers] class DeclVarTraverserImpl(annotListTraverser: => AnnotListT
     annotListTraverser.traverseMods(varDecl.mods)
     val modifierNames = javaScope match {
       case JavaTreeType.Class => javaModifiersResolver.resolveForClassDataMember(varDecl.mods)
+      //TODO replace mutable interface data member (invalid in Java) with method
       case _ => Nil
     }
     writeModifiers(modifierNames)

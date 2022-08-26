@@ -26,6 +26,7 @@ private[traversers] class DefnValTraverserImpl(annotListTraverser: => AnnotListT
     val mods = valDef.mods :+ Final()
     val modifierNames = mods match {
       case modifiers if javaScope == JavaTreeType.Class => javaModifiersResolver.resolveForClassDataMember(modifiers)
+      //TODO if it is non-public it will be invalid in a Java interface - replace with method
       case _ if javaScope == Interface => Nil
       // The only possible Java modifier for a local var is 'final'
       case modifiers if javaScope == Method => List(JavaModifier.Final)
