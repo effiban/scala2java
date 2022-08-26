@@ -14,7 +14,7 @@ private[typeinference] object CollectiveTypeInferrer extends CollectiveTypeInfer
       // None remaining means no appropriate type - so return the anonymous type (which is different than 'unknown type')
       case Nil => Some(Type.AnonymousName())
       // If all are the same - we have a common type we can return
-      case theMaybeTypes if theMaybeTypes.forall(_ == theMaybeTypes.head) => theMaybeTypes.head
+      case theMaybeTypes if theMaybeTypes.forall(_.structure == theMaybeTypes.head.structure) => theMaybeTypes.head
       // TODO can be improved by finding a common type
       case _ => None
     }
