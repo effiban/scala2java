@@ -94,6 +94,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
     typeTraverser,
     termParamListTraverser,
     blockTraverser,
+    termTypeInferrer,
     JavaModifiersResolver
   )
 
