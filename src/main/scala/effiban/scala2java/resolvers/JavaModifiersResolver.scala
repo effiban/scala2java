@@ -1,5 +1,7 @@
 package effiban.scala2java.resolvers
 
+import effiban.scala2java.orderings.JavaModifierOrdering
+
 import scala.meta.Mod
 import scala.meta.Mod.{Abstract, Final, Private, Protected, Sealed}
 
@@ -26,17 +28,6 @@ object JavaModifiersResolver extends JavaModifiersResolver {
     classOf[Abstract] -> "abstract",
     classOf[Final] -> "final",
     classOf[Sealed] -> "sealed"
-  )
-
-  private final val JavaModifierNamePosition = Map(
-    "private" -> 0,
-    "protected" -> 0,
-    "public" -> 0,
-    "default" -> 0,
-    "static" -> 1,
-    "sealed" -> 2,
-    "abstract" -> 3,
-    "final" -> 4
   )
 
   override def resolveForClass(mods: List[Mod]): List[String] = {
@@ -89,6 +80,6 @@ object JavaModifiersResolver extends JavaModifiersResolver {
       .filter { case (mod, _) => allowedMods.contains(mod) }
       .map { case (_, modifierName) => modifierName }
       .toList
-      .sortBy(modifierName => JavaModifierNamePosition.getOrElse(modifierName, Int.MaxValue))
+      .sorted(JavaModifierOrdering)
   }
 }
