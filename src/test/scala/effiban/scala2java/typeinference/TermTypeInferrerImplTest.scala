@@ -6,7 +6,7 @@ import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
 
 import scala.meta.Enumerator.Generator
-import scala.meta.Term.{Ascribe, Block, ForYield, If, Match, New}
+import scala.meta.Term.{Ascribe, Assign, Block, ForYield, If, Match, New}
 import scala.meta.{Case, Init, Lit, Name, Pat, Term, Type}
 
 class TermTypeInferrerImplTest extends UnitTestSuite {
@@ -107,6 +107,15 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
     when(litTypeInferrer.infer(eqTree(expr))).thenReturn(Some(TypeNames.String))
 
     termTypeInferrer.infer(Term.Return(expr)).value.structure shouldBe TypeNames.String.structure
+  }
+
+  test("infer 'Assign' should infer by type of RHS") {
+    val rhs = Lit.Int(3)
+    val assign = Assign(lhs = Term.Name("x"), rhs = rhs)
+
+    when(litTypeInferrer.infer(eqTree(rhs))).thenReturn(Some(TypeNames.Int))
+
+    termTypeInferrer.infer(assign).value.structure shouldBe TypeNames.Int.structure
   }
 
   test("infer 'Ascribe' should return its type") {

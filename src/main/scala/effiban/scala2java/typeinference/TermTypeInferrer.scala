@@ -1,6 +1,6 @@
 package effiban.scala2java.typeinference
 
-import scala.meta.Term.{Ascribe, Block, ForYield, If, New, Return, Try, TryWithHandler}
+import scala.meta.Term.{Annotate, Ascribe, Assign, Block, Do, For, ForYield, If, New, Return, Throw, Try, TryWithHandler, While}
 import scala.meta.{Lit, Term, Type}
 
 trait TermTypeInferrer extends TypeInferrer[Term]
@@ -20,12 +20,21 @@ private[typeinference] class TermTypeInferrerImpl(ifTypeInferrer: => IfTypeInfer
       case `try`: Try => tryTypeInferrer.infer(`try`)
       case tryWithHandler: TryWithHandler => tryWithHandlerTypeInferrer.infer(tryWithHandler)
       case termMatch: Term.Match => caseListTypeInferrer.infer(termMatch.cases)
+      case partialFunction: Term.PartialFunction => caseListTypeInferrer.infer(partialFunction.cases)
       case repeated: Term.Repeated => inferRepeated(repeated)
       case forYield: ForYield => infer(forYield.body)
       case `return`: Return => infer(`return`.expr)
+      case assign: Assign => infer(assign.rhs)
+      case function: Term.Function => infer(function.body)
       case ascribe: Ascribe => Some(ascribe.tpe)
       case `new`: New => Some(`new`.init.tpe)
       case _: Term.Interpolate => Some(Type.Name("String"))
+      case _: For => Some(Type.AnonymousName())
+      case _: Annotate => Some(Type.AnonymousName())
+      case _: Do => Some(Type.AnonymousName())
+      case _: While => Some(Type.AnonymousName())
+      case _: Throw => Some(Type.AnonymousName())
+      // TODO - support Tuple
       case _ => None
     }
   }
