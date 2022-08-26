@@ -1,5 +1,7 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.entities.JavaTreeType
+import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Pkg
@@ -17,6 +19,10 @@ private[traversers] class PkgTraverserImpl(termRefTraverser: => TermRefTraverser
     termRefTraverser.traverse(pkg.ref)
     writeStatementEnd()
     writeLine()
+
+    val outerJavaScope = javaScope
+    javaScope = JavaTreeType.Package
     pkg.stats.foreach(statTraverser.traverse)
+    javaScope = outerJavaScope
   }
 }
