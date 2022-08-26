@@ -1,6 +1,7 @@
 package effiban.scala2java.resolvers
 
-import effiban.scala2java.entities.JavaModifier
+import effiban.scala2java.entities.TraversalContext.javaScope
+import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 import effiban.scala2java.orderings.JavaModifierOrdering
 import effiban.scala2java.transformers.ScalaToJavaModifierTransformer
 
@@ -27,15 +28,16 @@ object JavaModifiersResolver extends JavaModifiersResolver {
     if (!mods.exists(_.isInstanceOf[Private]) && !mods.exists(_.isInstanceOf[Protected])) {
       modifierNamesBuilder += JavaModifier.Public
     }
-    modifierNamesBuilder ++= resolve(mods,
-      List(JavaModifier.Private, JavaModifier.Protected, JavaModifier.Abstract, JavaModifier.Sealed, JavaModifier.Final))
+    val allowedJavaModifiers = JavaAllowedModifiersResolver.resolve(JavaTreeType.Class, javaScope)
+    modifierNamesBuilder ++= resolve(mods, allowedJavaModifiers)
     modifierNamesBuilder.result()
   }
 
   override def resolveForInterface(mods: List[Mod]): List[JavaModifier] = {
     val modifierNamesBuilder = List.newBuilder[JavaModifier]
     modifierNamesBuilder += JavaModifier.Public
-    modifierNamesBuilder ++= resolve(mods, List(JavaModifier.Sealed))
+    val allowedJavaModifiers = JavaAllowedModifiersResolver.resolve(JavaTreeType.Interface, javaScope)
+    modifierNamesBuilder ++= resolve(mods, allowedJavaModifiers)
     modifierNamesBuilder.result()
   }
 
@@ -44,7 +46,8 @@ object JavaModifiersResolver extends JavaModifiersResolver {
     if (!mods.exists(_.isInstanceOf[Private]) && !mods.exists(_.isInstanceOf[Protected])) {
       modifierNamesBuilder += JavaModifier.Public
     }
-    modifierNamesBuilder ++= resolve(mods, List(JavaModifier.Private, JavaModifier.Protected, JavaModifier.Abstract, JavaModifier.Final))
+    val allowedJavaModifiers = JavaAllowedModifiersResolver.resolve(JavaTreeType.Method, javaScope)
+    modifierNamesBuilder ++= resolve(mods, allowedJavaModifiers)
     modifierNamesBuilder.result()
   }
 
@@ -53,7 +56,8 @@ object JavaModifiersResolver extends JavaModifiersResolver {
     if (!mods.exists(_.isInstanceOf[Private]) && hasBody) {
       modifierNamesBuilder += JavaModifier.Default
     }
-    modifierNamesBuilder ++= resolve(mods, List(JavaModifier.Private))
+    val allowedJavaModifiers = JavaAllowedModifiersResolver.resolve(JavaTreeType.Method, javaScope)
+    modifierNamesBuilder ++= resolve(mods, allowedJavaModifiers)
     modifierNamesBuilder.result()
   }
 
@@ -62,11 +66,12 @@ object JavaModifiersResolver extends JavaModifiersResolver {
     if (!mods.exists(_.isInstanceOf[Private]) && !mods.exists(_.isInstanceOf[Protected])) {
       modifierNamesBuilder += JavaModifier.Public
     }
-    modifierNamesBuilder ++= resolve(mods, List(JavaModifier.Private, JavaModifier.Protected, JavaModifier.Final))
+    val allowedJavaModifiers = JavaAllowedModifiersResolver.resolve(JavaTreeType.DataMember, javaScope)
+    modifierNamesBuilder ++= resolve(mods, allowedJavaModifiers)
     modifierNamesBuilder.result()
   }
 
-  private def resolve(inputScalaMods: List[Mod], allowedJavaModifiers: List[JavaModifier]): List[JavaModifier] = {
+  private def resolve(inputScalaMods: List[Mod], allowedJavaModifiers: Set[JavaModifier]): List[JavaModifier] = {
     inputScalaMods
       .map(ScalaToJavaModifierTransformer.transform)
       .collect { case Some(javaModifier) => javaModifier }
