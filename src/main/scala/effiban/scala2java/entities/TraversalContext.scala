@@ -1,9 +1,9 @@
 package effiban.scala2java.entities
 
-import effiban.scala2java.entities.JavaScope._
+import effiban.scala2java.entities.JavaTreeType._
 
 object TraversalContext {
 
-  var javaScope: JavaScope = NoScope
+  var javaScope: JavaTreeType = Unknown
 
 }

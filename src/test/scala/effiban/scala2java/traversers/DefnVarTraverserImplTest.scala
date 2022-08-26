@@ -1,8 +1,8 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.JavaScope.{Interface, Method}
+import effiban.scala2java.entities.JavaTreeType.{Interface, Method}
 import effiban.scala2java.entities.TraversalContext.javaScope
-import effiban.scala2java.entities.{JavaModifier, JavaScope}
+import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.{eqSomeTree, eqTreeList}
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.resolvers.JavaModifiersResolver
@@ -40,7 +40,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
 
 
   test("traverse() when it is a class member - typed with value") {
-    javaScope = JavaScope.Class
+    javaScope = JavaTreeType.Class
 
     val defnVar = Defn.Var(
       mods = Modifiers,
@@ -66,7 +66,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() when it is a class member - typed without value") {
-    javaScope = JavaScope.Class
+    javaScope = JavaTreeType.Class
 
     val defnVar = Defn.Var(
       mods = Modifiers,
@@ -91,7 +91,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() when it is a class member - untyped with value") {
-    javaScope = JavaScope.Class
+    javaScope = JavaTreeType.Class
 
     val defnVar = Defn.Var(
       mods = Modifiers,

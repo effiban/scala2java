@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.entities.TraversalContext.javaScope
-import effiban.scala2java.entities.{ClassInfo, JavaScope}
+import effiban.scala2java.entities.{ClassInfo, JavaTreeType}
 import effiban.scala2java.resolvers.JavaModifiersResolver
 import effiban.scala2java.writers.JavaWriter
 
@@ -27,7 +27,7 @@ private[traversers] class CaseClassTraverserImpl(annotListTraverser: => AnnotLis
     typeParamListTraverser.traverse(classDef.tparams)
     termParamListTraverser.traverse(classDef.ctor.paramss.flatten)
     val outerJavaScope = javaScope
-    javaScope = JavaScope.Class
+    javaScope = JavaTreeType.Class
     // Even though the Java type is a Record, the constructor must still be explicitly declared if it has modifiers (annotations, visibility, etc.)
     val maybePrimaryCtor = if (classDef.ctor.mods.nonEmpty) Some(classDef.ctor) else None
     val classInfo = ClassInfo(className = classDef.name, maybePrimaryCtor = maybePrimaryCtor)
