@@ -1,17 +1,14 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.JavaModifier
 import effiban.scala2java.entities.JavaScope.{Lambda, Method}
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
-import effiban.scala2java.resolvers.JavaModifiersResolver
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
 import org.mockito.ArgumentMatchers
 
-import scala.meta.Mod.Final
 import scala.meta.{Init, Mod, Name, Term, Type}
 
 class TermParamTraverserImplTest extends UnitTestSuite {
@@ -19,26 +16,22 @@ class TermParamTraverserImplTest extends UnitTestSuite {
   private val TheAnnot = Mod.Annot(
     Init(tpe = Type.Name("MyAnnotation"), name = Name.Anonymous(), argss = List())
   )
-  private val JavaFinalModifiers = List(JavaModifier.Final)
   private val ParamName = Name.Indeterminate("myParam")
 
   private val annotListTraverser = mock[AnnotListTraverser]
   private val typeTraverser = mock[TypeTraverser]
   private val nameTraverser = mock[NameTraverser]
-  private val javaModifiersResolver = mock[JavaModifiersResolver]
 
   private val termParamTraverser = new TermParamTraverserImpl(
     annotListTraverser,
     typeTraverser,
-    nameTraverser,
-    javaModifiersResolver
+    nameTraverser
   )
 
   test("traverse for regular method") {
     javaScope = Method
 
-    val initialMods = List(TheAnnot)
-    val adjustedMods = List(TheAnnot) :+ Final()
+    val mods = List(TheAnnot)
 
     val termParam = Term.Param(
       mods = List(TheAnnot),
@@ -48,9 +41,7 @@ class TermParamTraverserImplTest extends UnitTestSuite {
     )
 
     doWrite("@MyAnnotation ")
-      .when(annotListTraverser).traverseMods(mods = eqTreeList(initialMods), onSameLine = ArgumentMatchers.eq(true))
-    when(javaModifiersResolver.resolve(eqTreeList(adjustedMods), ArgumentMatchers.eq(List(JavaModifier.Final))))
-      .thenReturn(JavaFinalModifiers)
+      .when(annotListTraverser).traverseMods(mods = eqTreeList(mods), onSameLine = ArgumentMatchers.eq(true))
     doWrite("int").when(typeTraverser).traverse(eqTree(TypeNames.Int))
     doWrite("myParam").when(nameTraverser).traverse(eqTree(ParamName))
 
@@ -73,7 +64,6 @@ class TermParamTraverserImplTest extends UnitTestSuite {
 
     doWrite("@MyAnnotation ")
       .when(annotListTraverser).traverseMods(mods = eqTreeList(mods), onSameLine = ArgumentMatchers.eq(true))
-    when(javaModifiersResolver.resolve(eqTreeList(mods), ArgumentMatchers.eq(List(JavaModifier.Final)))).thenReturn(Nil)
     doWrite("int").when(typeTraverser).traverse(eqTree(TypeNames.Int))
     doWrite("myParam").when(nameTraverser).traverse(eqTree(ParamName))
 
@@ -96,7 +86,6 @@ class TermParamTraverserImplTest extends UnitTestSuite {
 
     doWrite("@MyAnnotation ")
       .when(annotListTraverser).traverseMods(mods = eqTreeList(mods), onSameLine = ArgumentMatchers.eq(true))
-    when(javaModifiersResolver.resolve(eqTreeList(mods), ArgumentMatchers.eq(List(JavaModifier.Final)))).thenReturn(Nil)
     doWrite("myParam").when(nameTraverser).traverse(eqTree(ParamName))
 
     termParamTraverser.traverse(termParam)

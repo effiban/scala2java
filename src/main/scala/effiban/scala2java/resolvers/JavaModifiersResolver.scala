@@ -18,8 +18,6 @@ trait JavaModifiersResolver {
   def resolveForInterfaceMethod(mods: List[Mod], hasBody: Boolean): List[JavaModifier]
 
   def resolveForClassDataMember(mods: List[Mod]): List[JavaModifier]
-
-  def resolve(inputScalaMods: List[Mod], allowedJavaModifiers: List[JavaModifier]): List[JavaModifier]
 }
 
 object JavaModifiersResolver extends JavaModifiersResolver {
@@ -68,7 +66,7 @@ object JavaModifiersResolver extends JavaModifiersResolver {
     modifierNamesBuilder.result()
   }
 
-  override def resolve(inputScalaMods: List[Mod], allowedJavaModifiers: List[JavaModifier]): List[JavaModifier] = {
+  private def resolve(inputScalaMods: List[Mod], allowedJavaModifiers: List[JavaModifier]): List[JavaModifier] = {
     inputScalaMods
       .map(ScalaToJavaModifierTransformer.transform)
       .collect { case Some(javaModifier) => javaModifier }
