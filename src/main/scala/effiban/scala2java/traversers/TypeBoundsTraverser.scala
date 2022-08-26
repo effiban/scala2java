@@ -15,6 +15,7 @@ private[traversers] class TypeBoundsTraverserImpl(typeTraverser: => TypeTraverse
   override def traverse(typeBounds: Type.Bounds): Unit = {
     //Only upper or lower bounds allowed in Java, not both
     //TODO handle lower bound Null which can be skipped in Java
+    //TODO - call the traverser with an argument indicating that Java primitives should be boxed
     (typeBounds.lo, typeBounds.hi) match {
       case (Some(lo), None) =>
         write(" super ")

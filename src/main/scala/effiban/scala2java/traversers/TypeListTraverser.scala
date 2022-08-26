@@ -14,6 +14,7 @@ private[traversers] class TypeListTraverserImpl(argumentListTraverser: => Argume
   override def traverse(types: List[Type]): Unit = {
     if (types.nonEmpty) {
       argumentListTraverser.traverse(args = types,
+        // TODO - call the traverser with an argument indicating that Java primitives should be boxed
         argTraverser = typeTraverser,
         maybeEnclosingDelimiter = Some(AngleBracket),
         onSameLine = true)
