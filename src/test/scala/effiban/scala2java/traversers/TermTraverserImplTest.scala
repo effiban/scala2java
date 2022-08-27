@@ -156,7 +156,7 @@ class TermTraverserImplTest extends UnitTestSuite {
     )
     termTraverser.traverse(block)
     verify(blockTraverser).traverse(
-      block = eqTree(block),
+      stat = eqTree(block),
       shouldReturnValue = ArgumentMatchers.eq(false),
       maybeInit = ArgumentMatchers.eq(None)
     )

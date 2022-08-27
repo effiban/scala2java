@@ -98,7 +98,7 @@ class BlockTraverserImplTest extends UnitTestSuite {
     doWrite(s"return $SimpleStatement1Val").when(returnTraverser).traverse(eqTree(Return(SimpleStatement1)))
 
     blockTraverser.traverse(
-      block = Block(List(SimpleStatement1)),
+      stat = Block(List(SimpleStatement1)),
       shouldReturnValue = true
     )
 

@@ -38,7 +38,7 @@ class DoTraverserImplTest extends UnitTestSuite {
       """ {
         |  /* BODY */
         |}""".stripMargin)
-      .when(blockTraverser).traverse(block = eqTree(Block(List(Statement))),
+      .when(blockTraverser).traverse(stat = eqTree(Statement),
       shouldReturnValue = ArgumentMatchers.eq(false),
       maybeInit = ArgumentMatchers.eq(None))
     doWrite("x < 3").when(termTraverser).traverse(eqTree(Expression))
@@ -73,7 +73,7 @@ class DoTraverserImplTest extends UnitTestSuite {
       """ {
         |  /* BODY */
         |}""".stripMargin)
-      .when(blockTraverser).traverse(block = eqTree(body),
+      .when(blockTraverser).traverse(stat = eqTree(body),
       shouldReturnValue = ArgumentMatchers.eq(false),
       maybeInit = ArgumentMatchers.eq(None))
     doWrite("x < 3").when(termTraverser).traverse(eqTree(Expression))

@@ -2,7 +2,7 @@ package effiban.scala2java.traversers
 
 import effiban.scala2java.writers.JavaWriter
 
-import scala.meta.Term.{Block, While}
+import scala.meta.Term.While
 
 trait WhileTraverser extends ScalaTreeTraverser[While]
 
@@ -16,9 +16,6 @@ private[traversers] class WhileTraverserImpl(termTraverser: => TermTraverser,
     write("while (")
     termTraverser.traverse(`while`.expr)
     write(")")
-    `while`.body match {
-      case block: Block => blockTraverser.traverse(block)
-      case term => blockTraverser.traverse(block = Block(List(term)))
-    }
+    blockTraverser.traverse(`while`.body)
   }
 }

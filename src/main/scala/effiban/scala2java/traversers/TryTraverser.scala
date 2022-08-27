@@ -20,10 +20,7 @@ private[traversers] class TryTraverserImpl(blockTraverser: => BlockTraverser,
   // TODO 2. Support case condition by moving into body
   override def traverse(`try`: Term.Try): Unit = {
     write("try")
-    `try`.expr match {
-      case block: Block => blockTraverser.traverse(block)
-      case stat => blockTraverser.traverse(Block(List(stat)))
-    }
+    blockTraverser.traverse(`try`.expr)
     `try`.catchp.foreach(`case` => {
       patToTermParamTransformer.transform(`case`.pat) match {
         case Some(param) => catchHandlerTraverser.traverse(param, `case`.body)

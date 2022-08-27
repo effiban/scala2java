@@ -15,10 +15,7 @@ private[traversers] class TryWithHandlerTraverserImpl(blockTraverser: => BlockTr
   // TODO support return value flag
   override def traverse(tryWithHandler: TryWithHandler): Unit = {
     write("try")
-    tryWithHandler.expr match {
-      case block: Block => blockTraverser.traverse(block)
-      case stat => blockTraverser.traverse(Block(List(stat)))
-    }
+    blockTraverser.traverse(tryWithHandler.expr)
     // The catch handler is some term which evaluates to a partial function, which we cannot handle (without semantic information)
     writeComment(s"UNPARSEABLE catch handler: ${tryWithHandler.catchp}")
     writeLine()

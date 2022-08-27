@@ -19,9 +19,6 @@ private[traversers] class CatchHandlerTraverserImpl(termParamListTraverser: => T
   override def traverse(param: Term.Param, body: Term): Unit = {
     write("catch ")
     termParamListTraverser.traverse(termParams = List(param), onSameLine = true)
-    body match {
-      case block: Block => blockTraverser.traverse(block)
-      case term: Term => blockTraverser.traverse(Block(List(term)))
-    }
+    blockTraverser.traverse(body)
   }
 }
