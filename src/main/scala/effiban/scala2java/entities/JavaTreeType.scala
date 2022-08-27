@@ -8,6 +8,7 @@ object JavaTreeType extends Enumeration {
   Interface,
   Method,
   Lambda,
-  DataMember,
+  Variable,
+  Parameter,
   Unknown = Value
 }

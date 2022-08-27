@@ -2,7 +2,7 @@ package effiban.scala2java.traversers
 
 import effiban.scala2java.entities.JavaTreeType
 import effiban.scala2java.entities.TraversalContext.javaScope
-import effiban.scala2java.resolvers.JavaModifiersResolver
+import effiban.scala2java.resolvers.{JavaModifiersResolver, JavaModifiersResolverParams}
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Defn
@@ -19,14 +19,10 @@ private[traversers] class DefnVarTraverserImpl(annotListTraverser: => AnnotListT
 
   import javaWriter._
 
+  //TODO replace mutable interface data member (invalid in Java) with method
   override def traverse(varDef: Defn.Var): Unit = {
     annotListTraverser.traverseMods(varDef.mods)
-    val modifierNames = varDef.mods match {
-      case modifiers if javaScope == JavaTreeType.Class => javaModifiersResolver.resolveForClassDataMember(modifiers)
-      //TODO replace mutable interface data member (invalid in Java) with method
-      case _ => Nil
-    }
-    writeModifiers(modifierNames)
+    writeModifiers(resolveJavaModifiers(varDef))
     defnValOrVarTypeTraverser.traverse(varDef.decltpe, varDef.rhs)
     write(" ")
     //TODO - verify this
@@ -35,5 +31,15 @@ private[traversers] class DefnVarTraverserImpl(annotListTraverser: => AnnotListT
       write(" = ")
       termTraverser.traverse(rhs)
     }
+  }
+
+  private def resolveJavaModifiers(varDef: Defn.Var) = {
+    val params = JavaModifiersResolverParams(
+      scalaTree = varDef,
+      scalaMods = varDef.mods,
+      javaTreeType = JavaTreeType.Variable,
+      javaScope = javaScope
+    )
+    javaModifiersResolver.resolve(params)
   }
 }

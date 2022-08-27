@@ -1,9 +1,11 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.JavaModifier
+import effiban.scala2java.entities.TraversalContext.javaScope
+import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
+import effiban.scala2java.matchers.JavaModifiersResolverParamsMatcher.eqJavaModifiersResolverParams
 import effiban.scala2java.matchers.TreeMatcher.eqTree
-import effiban.scala2java.resolvers.JavaModifiersResolver
+import effiban.scala2java.resolvers.{JavaModifiersResolver, JavaModifiersResolverParams}
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
@@ -60,7 +62,7 @@ class ObjectTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(mods = eqTreeList(modifiers), onSameLine = ArgumentMatchers.eq(false))
-    when(javaModifiersResolver.resolveForClass(eqTreeList(modifiers))).thenReturn(List(JavaModifier.Public))
+    whenResolveJavaModifiersThenReturnPublic(objectDef, modifiers)
     doWrite(
       """ {
         |  /* BODY */
@@ -82,5 +84,10 @@ class ObjectTraverserImplTest extends UnitTestSuite {
 
   private def termParam(name: String, typeName: String) = {
     Term.Param(mods = List(), name = Term.Name(name), decltpe = Some(Type.Name(typeName)), default = None)
+  }
+
+  private def whenResolveJavaModifiersThenReturnPublic(obj: Defn.Object, modifiers: List[Mod]): Unit = {
+    val expectedResolverParams = JavaModifiersResolverParams(obj, modifiers, JavaTreeType.Class, javaScope)
+    when(javaModifiersResolver.resolve(eqJavaModifiersResolverParams(expectedResolverParams))).thenReturn(List(JavaModifier.Public))
   }
 }

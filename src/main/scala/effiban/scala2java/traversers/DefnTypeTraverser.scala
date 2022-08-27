@@ -1,6 +1,8 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.resolvers.JavaModifiersResolver
+import effiban.scala2java.entities.JavaTreeType
+import effiban.scala2java.entities.TraversalContext.javaScope
+import effiban.scala2java.resolvers.{JavaModifiersResolver, JavaModifiersResolverParams}
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.{Defn, Type}
@@ -16,7 +18,7 @@ private[traversers] class DefnTypeTraverserImpl(typeParamListTraverser: => TypeP
 
   // Scala type definition : Can sometimes be replaced by an empty interface
   override def traverse(typeDef: Defn.Type): Unit = {
-    writeTypeDeclaration(modifiers = javaModifiersResolver.resolveForInterface(typeDef.mods),
+    writeTypeDeclaration(modifiers = resolveJavaModifiers(typeDef),
       typeKeyword = "interface",
       name = typeDef.name.toString)
     typeParamListTraverser.traverse(typeDef.tparams)
@@ -38,5 +40,15 @@ private[traversers] class DefnTypeTraverserImpl(typeParamListTraverser: => TypeP
     }
     writeBlockStart()
     writeBlockEnd()
+  }
+
+  private def resolveJavaModifiers(typeDef: Defn.Type) = {
+    val params = JavaModifiersResolverParams(
+      scalaTree = typeDef,
+      scalaMods = typeDef.mods,
+      javaTreeType = JavaTreeType.Interface,
+      javaScope = javaScope
+    )
+    javaModifiersResolver.resolve(params)
   }
 }

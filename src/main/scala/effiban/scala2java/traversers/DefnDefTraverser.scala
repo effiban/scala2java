@@ -1,10 +1,10 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.entities.JavaTreeType
-import effiban.scala2java.entities.JavaTreeType.{Interface, Method}
+import effiban.scala2java.entities.JavaTreeType.Method
 import effiban.scala2java.entities.TraversalConstants.UnknownType
 import effiban.scala2java.entities.TraversalContext.javaScope
-import effiban.scala2java.resolvers.JavaModifiersResolver
+import effiban.scala2java.resolvers.{JavaModifiersResolver, JavaModifiersResolverParams}
 import effiban.scala2java.typeinference.TermTypeInferrer
 import effiban.scala2java.writers.JavaWriter
 
@@ -30,12 +30,7 @@ private[traversers] class DefnDefTraverserImpl(annotListTraverser: => AnnotListT
   override def traverse(defnDef: Defn.Def, maybeInit: Option[Init] = None): Unit = {
     writeLine()
     annotListTraverser.traverseMods(defnDef.mods)
-    val resolvedModifierNames = javaScope match {
-      case Interface => javaModifiersResolver.resolveForInterfaceMethod(defnDef.mods, hasBody = true)
-      case JavaTreeType.Class => javaModifiersResolver.resolveForClassMethod(defnDef.mods)
-      case _ => Nil
-    }
-    writeModifiers(resolvedModifierNames)
+    writeModifiers(resolveJavaModifiers(defnDef))
     traverseTypeParams(defnDef.tparams)
     traverseMethodType(defnDef)
     termNameTraverser.traverse(defnDef.name)
@@ -87,5 +82,15 @@ private[traversers] class DefnDefTraverserImpl(annotListTraverser: => AnnotListT
         }
         write(" ")
     }
+  }
+
+  private def resolveJavaModifiers(defnDef: Defn.Def) = {
+    val params = JavaModifiersResolverParams(
+      scalaTree = defnDef,
+      scalaMods = defnDef.mods,
+      javaTreeType = JavaTreeType.Method,
+      javaScope = javaScope
+    )
+    javaModifiersResolver.resolve(params)
   }
 }

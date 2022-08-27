@@ -1,12 +1,14 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.entities
-import effiban.scala2java.entities.JavaModifier
+import effiban.scala2java.entities.TraversalContext.javaScope
+import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 import effiban.scala2java.matchers.ClassInfoMatcher
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
+import effiban.scala2java.matchers.JavaModifiersResolverParamsMatcher.eqJavaModifiersResolverParams
 import effiban.scala2java.matchers.SomeMatcher.eqSome
 import effiban.scala2java.matchers.TreeMatcher.eqTree
-import effiban.scala2java.resolvers.JavaModifiersResolver
+import effiban.scala2java.resolvers.{JavaModifiersResolver, JavaModifiersResolverParams}
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.transformers.ParamToDeclValTransformer
@@ -109,7 +111,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
-    when(javaModifiersResolver.resolveForClass(eqTreeList(Modifiers))).thenReturn(List(JavaModifier.Public))
+    whenResolveJavaModifiersThenReturnPublic(cls)
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
 
     when(paramToDeclValTransformer.transform(any[Term.Param])).thenAnswer( (ctorArg: Term.Param) => ctorArg match {
@@ -168,7 +170,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
-    when(javaModifiersResolver.resolveForClass(eqTreeList(Modifiers))).thenReturn(List(JavaModifier.Public))
+    whenResolveJavaModifiersThenReturnPublic(cls)
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
 
     when(paramToDeclValTransformer.transform(any[Term.Param])).thenAnswer( (ctorArg: Term.Param) => ctorArg match {
@@ -214,5 +216,10 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       pats = List(Pat.Var(Term.Name(name))),
       decltpe = Type.Name(typeName)
     )
+  }
+
+  private def whenResolveJavaModifiersThenReturnPublic(cls: Defn.Class): Unit = {
+    val expectedResolverParams = JavaModifiersResolverParams(cls, Modifiers, JavaTreeType.Class, javaScope)
+    when(javaModifiersResolver.resolve(eqJavaModifiersResolverParams(expectedResolverParams))).thenReturn(List(JavaModifier.Public))
   }
 }
