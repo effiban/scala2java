@@ -31,6 +31,7 @@ private[traversers] class RegularClassTraverserImpl(annotListTraverser: => Annot
     val explicitMemberDecls = classDef.ctor.paramss.flatten.map(x =>
       paramToDeclValTransformer.transform(x)
     )
+    // TODO if the ctor. params have 'ValParam' or 'VarParam' modifiers, need to generate accessors/mutators for them as well
     val enrichedStats = explicitMemberDecls ++ classDef.templ.stats
     val enrichedTemplate = classDef.templ.copy(stats = enrichedStats)
     templateTraverser.traverse(template = enrichedTemplate,
