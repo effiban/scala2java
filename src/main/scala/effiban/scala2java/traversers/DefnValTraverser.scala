@@ -1,9 +1,8 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.JavaTreeType.{Interface, Method}
+import effiban.scala2java.entities.JavaTreeType
 import effiban.scala2java.entities.TraversalContext.javaScope
-import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
-import effiban.scala2java.resolvers.JavaModifiersResolver
+import effiban.scala2java.resolvers.{JavaModifiersResolver, JavaModifiersResolverParams}
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Defn
@@ -21,23 +20,25 @@ private[traversers] class DefnValTraverserImpl(annotListTraverser: => AnnotListT
 
   import javaWriter._
 
+  //TODO if it is non-public it will be invalid in a Java interface - replace with method
   def traverse(valDef: Defn.Val): Unit = {
     annotListTraverser.traverseMods(valDef.mods)
-    val mods = valDef.mods :+ Final()
-    val modifierNames = mods match {
-      case modifiers if javaScope == JavaTreeType.Class => javaModifiersResolver.resolveForClassDataMember(modifiers)
-      //TODO if it is non-public it will be invalid in a Java interface - replace with method
-      case _ if javaScope == Interface => Nil
-      // The only possible Java modifier for a local var is 'final'
-      case modifiers if javaScope == Method => List(JavaModifier.Final)
-      case _ => Nil
-    }
-    writeModifiers(modifierNames)
+    writeModifiers(resolveJavaModifiers(valDef))
     defnValOrVarTypeTraverser.traverse(valDef.decltpe, Some(valDef.rhs))
     write(" ")
     //TODO verify for non-simple case
     patListTraverser.traverse(valDef.pats)
     write(" = ")
     termTraverser.traverse(valDef.rhs)
+  }
+
+  private def resolveJavaModifiers(valDef: Defn.Val) = {
+    val params = JavaModifiersResolverParams(
+      scalaTree = valDef,
+      scalaMods = valDef.mods :+ Final(),
+      javaTreeType = JavaTreeType.Variable,
+      javaScope = javaScope
+    )
+    javaModifiersResolver.resolve(params)
   }
 }

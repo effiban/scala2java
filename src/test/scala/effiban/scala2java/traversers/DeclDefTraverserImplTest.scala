@@ -4,8 +4,9 @@ import effiban.scala2java.entities.JavaTreeType.Interface
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
+import effiban.scala2java.matchers.JavaModifiersResolverParamsMatcher.eqJavaModifiersResolverParams
 import effiban.scala2java.matchers.TreeMatcher.eqTree
-import effiban.scala2java.resolvers.JavaModifiersResolver
+import effiban.scala2java.resolvers.{JavaModifiersResolver, JavaModifiersResolverParams}
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
@@ -76,7 +77,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(mods = eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
-    when(javaModifiersResolver.resolveForClassMethod(eqTreeList(Modifiers))).thenReturn(List(JavaModifier.Public))
+    whenResolveJavaModifiers(declDef).thenReturn(List(JavaModifier.Public))
     doWrite("int").when(typeTraverser).traverse(eqTree(MethodType))
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
@@ -107,7 +108,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(mods = eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
-    when(javaModifiersResolver.resolveForClassMethod(eqTreeList(Modifiers))).thenReturn(List(JavaModifier.Public))
+    whenResolveJavaModifiers(declDef).thenReturn(List(JavaModifier.Public))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     doWrite("int").when(typeTraverser).traverse(eqTree(MethodType))
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
@@ -139,7 +140,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(mods = eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
-    when(javaModifiersResolver.resolveForInterfaceMethod(eqTreeList(Modifiers), ArgumentMatchers.eq(false))).thenReturn(List.empty)
+    whenResolveJavaModifiers(declDef).thenReturn(List.empty)
     doWrite("int").when(typeTraverser).traverse(eqTree(MethodType))
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
@@ -170,7 +171,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(mods = eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
-    when(javaModifiersResolver.resolveForInterfaceMethod(eqTreeList(Modifiers), ArgumentMatchers.eq(false))).thenReturn(List.empty)
+    whenResolveJavaModifiers(declDef).thenReturn(List.empty)
     doWrite("int").when(typeTraverser).traverse(eqTree(MethodType))
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
     doWrite("(int param1, int param2, int param3, int param4)").when(termParamListTraverser).traverse(
@@ -188,5 +189,10 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
 
   private def termParamInt(name: String) = {
     Term.Param(mods = List(), name = Term.Name(name), decltpe = Some(TypeNames.Int), default = None)
+  }
+
+  private def whenResolveJavaModifiers(declDef: Decl.Def) = {
+    val expectedResolverParams = JavaModifiersResolverParams(declDef, Modifiers, JavaTreeType.Method, javaScope)
+    when(javaModifiersResolver.resolve(eqJavaModifiersResolverParams(expectedResolverParams)))
   }
 }

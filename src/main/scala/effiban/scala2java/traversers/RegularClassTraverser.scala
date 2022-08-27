@@ -2,7 +2,7 @@ package effiban.scala2java.traversers
 
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{ClassInfo, JavaTreeType}
-import effiban.scala2java.resolvers.JavaModifiersResolver
+import effiban.scala2java.resolvers.{JavaModifiersResolver, JavaModifiersResolverParams}
 import effiban.scala2java.transformers.ParamToDeclValTransformer
 import effiban.scala2java.writers.JavaWriter
 
@@ -22,7 +22,7 @@ private[traversers] class RegularClassTraverserImpl(annotListTraverser: => Annot
   def traverse(classDef: Defn.Class): Unit = {
     writeLine()
     annotListTraverser.traverseMods(classDef.mods)
-    writeTypeDeclaration(modifiers = javaModifiersResolver.resolveForClass(classDef.mods),
+    writeTypeDeclaration(modifiers = resolveJavaModifiers(classDef),
       typeKeyword = "class",
       name = classDef.name.value)
     typeParamListTraverser.traverse(classDef.tparams)
@@ -36,5 +36,15 @@ private[traversers] class RegularClassTraverserImpl(annotListTraverser: => Annot
     templateTraverser.traverse(template = enrichedTemplate,
       maybeClassInfo = Some(ClassInfo(className = classDef.name, maybePrimaryCtor = Some(classDef.ctor))))
     javaScope = outerJavaScope
+  }
+
+  private def resolveJavaModifiers(classDef: Defn.Class) = {
+    val params = JavaModifiersResolverParams(
+      scalaTree = classDef,
+      scalaMods = classDef.mods,
+      javaTreeType = JavaTreeType.Class,
+      javaScope = javaScope
+    )
+    javaModifiersResolver.resolve(params)
   }
 }

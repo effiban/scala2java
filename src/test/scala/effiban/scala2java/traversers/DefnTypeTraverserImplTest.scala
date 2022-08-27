@@ -1,9 +1,11 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.JavaModifier
+import effiban.scala2java.entities.TraversalContext.javaScope
+import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
+import effiban.scala2java.matchers.JavaModifiersResolverParamsMatcher.eqJavaModifiersResolverParams
 import effiban.scala2java.matchers.TreeMatcher.eqTree
-import effiban.scala2java.resolvers.JavaModifiersResolver
+import effiban.scala2java.resolvers.{JavaModifiersResolver, JavaModifiersResolverParams}
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
 
@@ -50,7 +52,7 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
       body = MyOtherType
     )
 
-    when(javaModifiersResolver.resolveForInterface(eqTreeList(Modifiers))).thenReturn(List(JavaModifier.Private))
+    whenResolveJavaModifiersThenReturnPrivate(defnType)
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     doWrite("MyOtherType").when(typeTraverser).traverse(eqTree(MyOtherType))
 
@@ -71,7 +73,7 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
       bounds = Bounds(lo = None, hi = Some(MyOtherType))
     )
 
-    when(javaModifiersResolver.resolveForInterface(eqTreeList(Modifiers))).thenReturn(List(JavaModifier.Private))
+    whenResolveJavaModifiersThenReturnPrivate(defnType)
     doWrite("MyOtherType").when(typeTraverser).traverse(eqTree(MyOtherType))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
 
@@ -92,7 +94,7 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
       bounds = Bounds(lo = Some(MyOtherType), hi = None)
     )
 
-    when(javaModifiersResolver.resolveForInterface(eqTreeList(Modifiers))).thenReturn(List(JavaModifier.Private))
+    whenResolveJavaModifiersThenReturnPrivate(defnType)
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
 
     defnTypeTraverser.traverse(defnType)
@@ -102,4 +104,10 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin
   }
+
+  private def whenResolveJavaModifiersThenReturnPrivate(defnType: Defn.Type): Unit = {
+    val expectedResolverParams = JavaModifiersResolverParams(defnType, Modifiers, JavaTreeType.Interface, javaScope)
+    when(javaModifiersResolver.resolve(eqJavaModifiersResolverParams(expectedResolverParams))).thenReturn(List(JavaModifier.Private))
+  }
+
 }

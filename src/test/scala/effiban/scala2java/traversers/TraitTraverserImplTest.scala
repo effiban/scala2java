@@ -1,14 +1,17 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.JavaModifier
+import effiban.scala2java.entities.TraversalContext.javaScope
+import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
+import effiban.scala2java.matchers.JavaModifiersResolverParamsMatcher.eqJavaModifiersResolverParams
 import effiban.scala2java.matchers.TreeMatcher.eqTree
-import effiban.scala2java.resolvers.JavaModifiersResolver
+import effiban.scala2java.resolvers.{JavaModifiersResolver, JavaModifiersResolverParams}
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.{PrimaryCtors, TypeNames}
 import org.mockito.ArgumentMatchers
 
+import scala.meta.Defn.Trait
 import scala.meta.Term.Block
 import scala.meta.Type.Bounds
 import scala.meta.{Defn, Init, Mod, Name, Self, Template, Term, Type}
@@ -82,7 +85,7 @@ class TraitTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
-    when(javaModifiersResolver.resolveForInterface(eqTreeList(Modifiers))).thenReturn(List(JavaModifier.Public))
+    whenResolveJavaModifiersThenReturnPublic(`trait`)
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
 
     doWrite(
@@ -101,5 +104,10 @@ class TraitTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}
         |""".stripMargin
+  }
+
+  private def whenResolveJavaModifiersThenReturnPublic(`trait`: Trait): Unit = {
+    val expectedResolverParams = JavaModifiersResolverParams(`trait`, Modifiers, JavaTreeType.Interface, javaScope)
+    when(javaModifiersResolver.resolve(eqJavaModifiersResolverParams(expectedResolverParams))).thenReturn(List(JavaModifier.Public))
   }
 }
