@@ -12,6 +12,8 @@ class ScalaToJavaModifierTransformerTest extends UnitTestSuite {
     ("ScalaModifier", "ExpectedMaybeJavaModifier"),
     (Private(Name.Anonymous()), Some(JavaModifier.Private)),
     (Protected(Name.Anonymous()), Some(JavaModifier.Protected)),
+    (Private(Name.Indeterminate("mypkg")), None),
+    (Protected(Name.Indeterminate("mypkg")), None),
     (Sealed(), Some(JavaModifier.Sealed)),
     (Abstract(), Some(JavaModifier.Abstract)),
     (Final(), Some(JavaModifier.Final)),
