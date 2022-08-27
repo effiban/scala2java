@@ -99,7 +99,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}
         |""".stripMargin)
-      .when(blockTraverser).traverse(block = eqTree(Block(List(Statement1))),
+      .when(blockTraverser).traverse(stat = eqTree(Statement1),
       shouldReturnValue = ArgumentMatchers.eq(true),
       maybeInit = ArgumentMatchers.eq(None))
 
@@ -142,7 +142,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}
         |""".stripMargin)
-      .when(blockTraverser).traverse(block = eqTree(Block(List(Statement1))),
+      .when(blockTraverser).traverse(stat = eqTree(Statement1),
       shouldReturnValue = ArgumentMatchers.eq(false),
       maybeInit = ArgumentMatchers.eq(None))
 
@@ -186,7 +186,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}
         |""".stripMargin)
-      .when(blockTraverser).traverse(block = eqTree(Block(List(Statement1))),
+      .when(blockTraverser).traverse(stat = eqTree(Statement1),
       shouldReturnValue = ArgumentMatchers.eq(false),
       maybeInit = ArgumentMatchers.eq(None))
 
@@ -235,7 +235,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}
         |""".stripMargin)
-      .when(blockTraverser).traverse(block = eqTree(Block(List(Statement1))),
+      .when(blockTraverser).traverse(stat = eqTree(Statement1),
       shouldReturnValue = ArgumentMatchers.eq(false),
       maybeInit = eqSome(expectedVal = init, valMatcherGenerator = new TreeMatcher[Init](_)))
 
@@ -278,7 +278,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}
         |""".stripMargin)
-      .when(blockTraverser).traverse(block = eqTree(Block(List(Statement1))),
+      .when(blockTraverser).traverse(stat = eqTree(Statement1),
       shouldReturnValue = ArgumentMatchers.eq(true),
       maybeInit = ArgumentMatchers.eq(None))
 
@@ -322,7 +322,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}
         |""".stripMargin)
-      .when(blockTraverser).traverse(block = eqTree(Block(List(Statement1))),
+      .when(blockTraverser).traverse(stat = eqTree(Statement1),
       shouldReturnValue = ArgumentMatchers.eq(true),
       maybeInit = ArgumentMatchers.eq(None))
 
@@ -367,7 +367,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}
         |""".stripMargin)
-      .when(blockTraverser).traverse(block = eqTree(body),
+      .when(blockTraverser).traverse(stat = eqTree(body),
       shouldReturnValue = ArgumentMatchers.eq(true),
       maybeInit = ArgumentMatchers.eq(None))
 
@@ -410,7 +410,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}
         |""".stripMargin)
-      .when(blockTraverser).traverse(block = eqTree(Block(List(Statement1))),
+      .when(blockTraverser).traverse(stat = eqTree(Statement1),
       shouldReturnValue = ArgumentMatchers.eq(true),
       maybeInit = ArgumentMatchers.eq(None))
 
@@ -453,7 +453,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}
         |""".stripMargin)
-      .when(blockTraverser).traverse(block = eqTree(Block(List(Statement1))),
+      .when(blockTraverser).traverse(stat = eqTree(Statement1),
       shouldReturnValue = ArgumentMatchers.eq(true),
       maybeInit = ArgumentMatchers.eq(None))
 

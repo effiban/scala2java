@@ -23,7 +23,7 @@ class FinallyTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin)
       .when(blockTraverser).traverse(
-      block = eqTree(Block(List(Statement))),
+      stat = eqTree(Statement),
       shouldReturnValue = ArgumentMatchers.eq(false),
       maybeInit = ArgumentMatchers.eq(None)
     )
@@ -44,7 +44,7 @@ class FinallyTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin)
       .when(blockTraverser).traverse(
-      block = eqTree(Block(List(Statement))),
+      stat = eqTree(Block(List(Statement))),
       shouldReturnValue = ArgumentMatchers.eq(false),
       maybeInit = ArgumentMatchers.eq(None)
     )

@@ -2,7 +2,7 @@ package effiban.scala2java.traversers
 
 import effiban.scala2java.writers.JavaWriter
 
-import scala.meta.Term.{Block, Do}
+import scala.meta.Term.Do
 
 trait DoTraverser extends ScalaTreeTraverser[Do]
 
@@ -14,10 +14,7 @@ private[traversers] class DoTraverserImpl(termTraverser: => TermTraverser,
 
   override def traverse(`do`: Do): Unit = {
     write("do")
-    `do`.body match {
-      case block: Block => blockTraverser.traverse(block)
-      case term => blockTraverser.traverse(block = Block(List(term)))
-    }
+    blockTraverser.traverse(`do`.body)
     write(" while (")
     termTraverser.traverse(`do`.expr)
     write(")")

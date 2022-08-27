@@ -35,7 +35,7 @@ class TryWithHandlerTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin)
       .when(blockTraverser).traverse(
-      block = eqTree(Block(List(TryStatement))),
+      stat = eqTree(TryStatement),
       shouldReturnValue = ArgumentMatchers.eq(false),
       maybeInit = ArgumentMatchers.eq(None)
     )
@@ -63,7 +63,7 @@ class TryWithHandlerTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin)
       .when(blockTraverser).traverse(
-      block = eqTree(Block(List(TryStatement))),
+      stat = eqTree(TryStatement),
       shouldReturnValue = ArgumentMatchers.eq(false),
       maybeInit = ArgumentMatchers.eq(None)
     )
@@ -101,7 +101,7 @@ class TryWithHandlerTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin)
       .when(blockTraverser).traverse(
-      block = eqTree(Block(List(TryStatement))),
+      stat = eqTree(Block(List(TryStatement))),
       shouldReturnValue = ArgumentMatchers.eq(false),
       maybeInit = ArgumentMatchers.eq(None)
     )

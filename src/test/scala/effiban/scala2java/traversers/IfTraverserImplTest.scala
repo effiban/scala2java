@@ -62,7 +62,7 @@ class IfTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}
         |""".stripMargin).when(blockTraverser).traverse(
-      block = eqTree(ThenBlock),
+      stat = eqTree(ThenBlock),
       shouldReturnValue = ArgumentMatchers.eq(false),
       maybeInit = ArgumentMatchers.eq(None)
     )
@@ -89,7 +89,7 @@ class IfTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}
         |""".stripMargin).when(blockTraverser).traverse(
-      block = eqTree(ThenBlock),
+      stat = eqTree(ThenBlock),
       shouldReturnValue = ArgumentMatchers.eq(true),
       maybeInit = ArgumentMatchers.eq(None)
     )
@@ -116,7 +116,7 @@ class IfTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}
         |""".stripMargin).when(blockTraverser).traverse(
-      block = eqTree(Block(List(ThenStatement))),
+      stat = eqTree(ThenStatement),
       shouldReturnValue = ArgumentMatchers.eq(false),
       maybeInit = ArgumentMatchers.eq(None)
     )
@@ -143,7 +143,7 @@ class IfTraverserImplTest extends UnitTestSuite {
         |  /* THEN BODY */
         |}
         |""".stripMargin).when(blockTraverser).traverse(
-      block = eqTree(Block(List(ThenStatement))),
+      stat = eqTree(ThenStatement),
       shouldReturnValue = ArgumentMatchers.eq(false),
       maybeInit = ArgumentMatchers.eq(None)
     )
@@ -153,7 +153,7 @@ class IfTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin)
       .when(blockTraverser).traverse(
-      block = eqTree(ElseBlock),
+      stat = eqTree(ElseBlock),
       shouldReturnValue = ArgumentMatchers.eq(false),
       maybeInit = ArgumentMatchers.eq(None)
     )
@@ -183,7 +183,7 @@ class IfTraverserImplTest extends UnitTestSuite {
         |  /* THEN BODY */
         |}
         |""".stripMargin).when(blockTraverser).traverse(
-      block = eqTree(Block(List(ThenStatement))),
+      stat = eqTree(ThenStatement),
       shouldReturnValue = ArgumentMatchers.eq(true),
       maybeInit = ArgumentMatchers.eq(None)
     )
@@ -192,7 +192,7 @@ class IfTraverserImplTest extends UnitTestSuite {
         |  /* ELSE BODY */
         |}
         |""".stripMargin).when(blockTraverser).traverse(
-      block = eqTree(ElseBlock),
+      stat = eqTree(ElseBlock),
       shouldReturnValue = ArgumentMatchers.eq(true),
       maybeInit = ArgumentMatchers.eq(None)
     )
@@ -221,7 +221,7 @@ class IfTraverserImplTest extends UnitTestSuite {
         |  /* THEN BODY */
         |}
         |""".stripMargin).when(blockTraverser).traverse(
-      block = eqTree(Block(List(ThenStatement))),
+      stat = eqTree(ThenStatement),
       shouldReturnValue = ArgumentMatchers.eq(false),
       maybeInit = ArgumentMatchers.eq(None)
     )
@@ -230,7 +230,7 @@ class IfTraverserImplTest extends UnitTestSuite {
         |  /* ELSE BODY */
         |}
         |""".stripMargin).when(blockTraverser).traverse(
-      block = eqTree(Block(List(ElseStatement))),
+      stat = eqTree(ElseStatement),
       shouldReturnValue = ArgumentMatchers.eq(false),
       maybeInit = ArgumentMatchers.eq(None)
     )

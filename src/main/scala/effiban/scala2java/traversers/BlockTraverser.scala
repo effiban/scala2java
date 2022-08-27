@@ -6,7 +6,10 @@ import scala.meta.Term.{Block, If, Return, Throw, While}
 import scala.meta.{Init, Stat, Term}
 
 trait BlockTraverser {
-  def traverse(block: Block, shouldReturnValue: Boolean = false, maybeInit: Option[Init] = None): Unit
+
+  // The input is a Stat and not a Block, because sometimes we want to wrap a single Scala statement in a Java block
+  // (which is convenient for both the translation logic and the formatting)
+  def traverse(stat: Stat, shouldReturnValue: Boolean = false, maybeInit: Option[Init] = None): Unit
 }
 
 private[traversers] class BlockTraverserImpl(initTraverser: => InitTraverser,
@@ -21,7 +24,15 @@ private[traversers] class BlockTraverserImpl(initTraverser: => InitTraverser,
 
   // The 'init' param is passed by constructors, whose first statement must be a call to super or other ctor.
   // 'Init' does not inherit from 'Stat' so we can't add it to the Block
-  override def traverse(block: Block, shouldReturnValue: Boolean = false, maybeInit: Option[Init] = None): Unit = {
+  override def traverse(stat: Stat, shouldReturnValue: Boolean = false, maybeInit: Option[Init] = None): Unit = {
+    val block = stat match {
+      case blk: Block => blk
+      case st => Block(List(st))
+    }
+    traverseBlock(block, shouldReturnValue, maybeInit)
+  }
+
+  private def traverseBlock(block: Block, shouldReturnValue: Boolean = false, maybeInit: Option[Init] = None): Unit = {
     writeBlockStart()
     maybeInit.foreach(init => {
       initTraverser.traverse(init)
