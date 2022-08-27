@@ -22,6 +22,7 @@ private[traversers] class PkgTraverserImpl(termRefTraverser: => TermRefTraverser
 
     val outerJavaScope = javaScope
     javaScope = JavaTreeType.Package
+    // TODO handle specific scenarios  of multiple top-level definitions which are illegal in Java (such as 2 public classes in the same file)
     pkg.stats.foreach(statTraverser.traverse)
     javaScope = outerJavaScope
   }
