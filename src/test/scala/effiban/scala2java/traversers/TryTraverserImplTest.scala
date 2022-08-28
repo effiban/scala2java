@@ -1,5 +1,6 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.entities.Decision.No
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
@@ -77,7 +78,7 @@ class TryTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(blockTraverser).traverse(
       stat = eqTree(TryStatement),
-      shouldReturnValue = ArgumentMatchers.eq(false),
+      shouldReturnValue = ArgumentMatchers.eq(No),
       maybeInit = ArgumentMatchers.eq(None)
     )
 
@@ -104,7 +105,7 @@ class TryTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(blockTraverser).traverse(
       stat = eqTree(Block(List(TryStatement))),
-      shouldReturnValue = ArgumentMatchers.eq(false),
+      shouldReturnValue = ArgumentMatchers.eq(No),
       maybeInit = ArgumentMatchers.eq(None)
     )
 
@@ -133,7 +134,7 @@ class TryTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(blockTraverser).traverse(
       stat = eqTree(TryStatement),
-      shouldReturnValue = ArgumentMatchers.eq(false),
+      shouldReturnValue = ArgumentMatchers.eq(No),
       maybeInit = ArgumentMatchers.eq(None)
     )
 
@@ -175,7 +176,7 @@ class TryTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(blockTraverser).traverse(
       stat = eqTree(TryStatement),
-      shouldReturnValue = ArgumentMatchers.eq(false),
+      shouldReturnValue = ArgumentMatchers.eq(No),
       maybeInit = ArgumentMatchers.eq(None)
     )
 
@@ -231,7 +232,7 @@ class TryTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(blockTraverser).traverse(
       stat = eqTree(TryStatement),
-      shouldReturnValue = ArgumentMatchers.eq(false),
+      shouldReturnValue = ArgumentMatchers.eq(No),
       maybeInit = ArgumentMatchers.eq(None)
     )
 
@@ -283,7 +284,7 @@ class TryTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(blockTraverser).traverse(
       stat = eqTree(TryStatement),
-      shouldReturnValue = ArgumentMatchers.eq(false),
+      shouldReturnValue = ArgumentMatchers.eq(No),
       maybeInit = ArgumentMatchers.eq(None)
     )
 
@@ -335,7 +336,7 @@ class TryTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(blockTraverser).traverse(
       stat = eqTree(TryStatement),
-      shouldReturnValue = ArgumentMatchers.eq(false),
+      shouldReturnValue = ArgumentMatchers.eq(No),
       maybeInit = ArgumentMatchers.eq(None)
     )
 

@@ -1,5 +1,6 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.entities.Decision.{No, Yes}
 import effiban.scala2java.entities.JavaTreeType.Interface
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
@@ -100,7 +101,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin)
       .when(blockTraverser).traverse(stat = eqTree(Statement1),
-      shouldReturnValue = ArgumentMatchers.eq(true),
+      shouldReturnValue = ArgumentMatchers.eq(Yes),
       maybeInit = ArgumentMatchers.eq(None))
 
     defnDefTraverser.traverse(defnDef)
@@ -143,7 +144,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin)
       .when(blockTraverser).traverse(stat = eqTree(Statement1),
-      shouldReturnValue = ArgumentMatchers.eq(false),
+      shouldReturnValue = ArgumentMatchers.eq(No),
       maybeInit = ArgumentMatchers.eq(None))
 
     defnDefTraverser.traverse(defnDef)
@@ -187,7 +188,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin)
       .when(blockTraverser).traverse(stat = eqTree(Statement1),
-      shouldReturnValue = ArgumentMatchers.eq(false),
+      shouldReturnValue = ArgumentMatchers.eq(No),
       maybeInit = ArgumentMatchers.eq(None))
 
     defnDefTraverser.traverse(defnDef)
@@ -236,7 +237,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin)
       .when(blockTraverser).traverse(stat = eqTree(Statement1),
-      shouldReturnValue = ArgumentMatchers.eq(false),
+      shouldReturnValue = ArgumentMatchers.eq(No),
       maybeInit = eqSome(expectedVal = init, valMatcherGenerator = new TreeMatcher[Init](_)))
 
     defnDefTraverser.traverse(defnDef = defnDef, maybeInit = Some(init))
@@ -279,7 +280,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin)
       .when(blockTraverser).traverse(stat = eqTree(Statement1),
-      shouldReturnValue = ArgumentMatchers.eq(true),
+      shouldReturnValue = ArgumentMatchers.eq(Yes),
       maybeInit = ArgumentMatchers.eq(None))
 
     defnDefTraverser.traverse(defnDef)
@@ -323,7 +324,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin)
       .when(blockTraverser).traverse(stat = eqTree(Statement1),
-      shouldReturnValue = ArgumentMatchers.eq(true),
+      shouldReturnValue = ArgumentMatchers.eq(Yes),
       maybeInit = ArgumentMatchers.eq(None))
 
     defnDefTraverser.traverse(defnDef)
@@ -368,7 +369,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin)
       .when(blockTraverser).traverse(stat = eqTree(body),
-      shouldReturnValue = ArgumentMatchers.eq(true),
+      shouldReturnValue = ArgumentMatchers.eq(Yes),
       maybeInit = ArgumentMatchers.eq(None))
 
     defnDefTraverser.traverse(defnDef)
@@ -411,7 +412,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin)
       .when(blockTraverser).traverse(stat = eqTree(Statement1),
-      shouldReturnValue = ArgumentMatchers.eq(true),
+      shouldReturnValue = ArgumentMatchers.eq(Yes),
       maybeInit = ArgumentMatchers.eq(None))
 
     defnDefTraverser.traverse(defnDef)
@@ -454,7 +455,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin)
       .when(blockTraverser).traverse(stat = eqTree(Statement1),
-      shouldReturnValue = ArgumentMatchers.eq(true),
+      shouldReturnValue = ArgumentMatchers.eq(Yes),
       maybeInit = ArgumentMatchers.eq(None))
 
     defnDefTraverser.traverse(defnDef)

@@ -1,5 +1,6 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.entities.Decision.No
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
@@ -39,7 +40,7 @@ class DoTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}""".stripMargin)
       .when(blockTraverser).traverse(stat = eqTree(Statement),
-      shouldReturnValue = ArgumentMatchers.eq(false),
+      shouldReturnValue = ArgumentMatchers.eq(No),
       maybeInit = ArgumentMatchers.eq(None))
     doWrite("x < 3").when(termTraverser).traverse(eqTree(Expression))
 
@@ -74,7 +75,7 @@ class DoTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}""".stripMargin)
       .when(blockTraverser).traverse(stat = eqTree(body),
-      shouldReturnValue = ArgumentMatchers.eq(false),
+      shouldReturnValue = ArgumentMatchers.eq(No),
       maybeInit = ArgumentMatchers.eq(None))
     doWrite("x < 3").when(termTraverser).traverse(eqTree(Expression))
 
