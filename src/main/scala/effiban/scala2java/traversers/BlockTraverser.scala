@@ -1,5 +1,6 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.entities.Decision.{Decision, No, Yes}
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term.{Block, If, Return, Throw, While}
@@ -9,7 +10,7 @@ trait BlockTraverser {
 
   // The input is a Stat and not a Block, because sometimes we want to wrap a single Scala statement in a Java block
   // (which is convenient for both the translation logic and the formatting)
-  def traverse(stat: Stat, shouldReturnValue: Boolean = false, maybeInit: Option[Init] = None): Unit
+  def traverse(stat: Stat, shouldReturnValue: Decision = No, maybeInit: Option[Init] = None): Unit
 }
 
 private[traversers] class BlockTraverserImpl(initTraverser: => InitTraverser,
@@ -24,7 +25,7 @@ private[traversers] class BlockTraverserImpl(initTraverser: => InitTraverser,
 
   // The 'init' param is passed by constructors, whose first statement must be a call to super or other ctor.
   // 'Init' does not inherit from 'Stat' so we can't add it to the Block
-  override def traverse(stat: Stat, shouldReturnValue: Boolean = false, maybeInit: Option[Init] = None): Unit = {
+  override def traverse(stat: Stat, shouldReturnValue: Decision = No, maybeInit: Option[Init] = None): Unit = {
     val block = stat match {
       case blk: Block => blk
       case st => Block(List(st))
@@ -32,7 +33,7 @@ private[traversers] class BlockTraverserImpl(initTraverser: => InitTraverser,
     traverseBlock(block, shouldReturnValue, maybeInit)
   }
 
-  private def traverseBlock(block: Block, shouldReturnValue: Boolean = false, maybeInit: Option[Init] = None): Unit = {
+  private def traverseBlock(block: Block, shouldReturnValue: Decision, maybeInit: Option[Init] = None): Unit = {
     writeBlockStart()
     maybeInit.foreach(init => {
       initTraverser.traverse(init)
@@ -42,14 +43,14 @@ private[traversers] class BlockTraverserImpl(initTraverser: => InitTraverser,
     writeBlockEnd()
   }
 
-  private def traverseContents(block: Block, shouldReturnValue: Boolean): Unit = {
+  private def traverseContents(block: Block, shouldReturnValue: Decision): Unit = {
     if (block.stats.nonEmpty) {
       block.stats.slice(0, block.stats.length - 1).foreach(traverseStatement(_))
       traverseStatement(block.stats.last, shouldReturnValue)
     }
   }
 
-  private def traverseStatement(stat: Stat, shouldReturnValue: Boolean = false): Unit = {
+  private def traverseStatement(stat: Stat, shouldReturnValue: Decision = No): Unit = {
     stat match {
       case block: Block => traverse(block, shouldReturnValue)
       case `if`: If => ifTraverser.traverse(`if`, shouldReturnValue)
@@ -57,9 +58,9 @@ private[traversers] class BlockTraverserImpl(initTraverser: => InitTraverser,
       case `throw`: Throw =>
         throwTraverser.traverse(`throw`)
         writeStatementEnd()
-      case term: Term if shouldReturnValue =>
+      case term: Term if shouldReturnValue == Yes =>
         returnTraverser.traverse(Return(term))
-        writeStatementEnd();
+        writeStatementEnd()
       case _ =>
         statTraverser.traverse(stat)
         writeStatementEnd()

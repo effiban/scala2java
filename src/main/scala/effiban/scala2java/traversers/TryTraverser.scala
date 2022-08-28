@@ -4,7 +4,6 @@ import effiban.scala2java.transformers.PatToTermParamTransformer
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term
-import scala.meta.Term.Block
 
 trait TryTraverser extends ScalaTreeTraverser[Term.Try]
 

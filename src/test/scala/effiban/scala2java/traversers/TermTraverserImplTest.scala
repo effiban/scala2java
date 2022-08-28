@@ -1,5 +1,6 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.entities.Decision.No
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TermNames.PlusTermName
@@ -157,7 +158,7 @@ class TermTraverserImplTest extends UnitTestSuite {
     termTraverser.traverse(block)
     verify(blockTraverser).traverse(
       stat = eqTree(block),
-      shouldReturnValue = ArgumentMatchers.eq(false),
+      shouldReturnValue = ArgumentMatchers.eq(No),
       maybeInit = ArgumentMatchers.eq(None)
     )
   }
@@ -178,7 +179,7 @@ class TermTraverserImplTest extends UnitTestSuite {
       elsep = Lit.Unit()
     )
     termTraverser.traverse(`if`)
-    verify(ifTraverser).traverse(`if` = eqTree(`if`), shouldReturnValue = ArgumentMatchers.eq(false))
+    verify(ifTraverser).traverse(`if` = eqTree(`if`), shouldReturnValue = ArgumentMatchers.eq(No))
   }
 
   test("traverse() for Term.Match") {

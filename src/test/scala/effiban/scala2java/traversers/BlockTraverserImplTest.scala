@@ -1,5 +1,6 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.entities.Decision.{No, Yes}
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
@@ -134,7 +135,7 @@ class BlockTraverserImplTest extends UnitTestSuite {
     doWrite(
       s"""$IfStatementVal
          |""".stripMargin
-    ).when(ifTraverser).traverse(eqTree(IfStatement), shouldReturnValue = ArgumentMatchers.eq(false))
+    ).when(ifTraverser).traverse(eqTree(IfStatement), shouldReturnValue = ArgumentMatchers.eq(No))
     doWrite(SimpleStatement2Val).when(statTraverser).traverse(eqTree(SimpleStatement2))
 
     blockTraverser.traverse(
@@ -159,7 +160,7 @@ class BlockTraverserImplTest extends UnitTestSuite {
     doWrite(
       s"""$IfStatementVal
          |""".stripMargin
-    ).when(ifTraverser).traverse(eqTree(IfStatement), shouldReturnValue = ArgumentMatchers.eq(false))
+    ).when(ifTraverser).traverse(eqTree(IfStatement), shouldReturnValue = ArgumentMatchers.eq(No))
 
     blockTraverser.traverse(
       Block(
@@ -183,7 +184,7 @@ class BlockTraverserImplTest extends UnitTestSuite {
     doWrite(
       s"""$IfStatementVal
          |""".stripMargin
-    ).when(ifTraverser).traverse(eqTree(IfStatement), shouldReturnValue = ArgumentMatchers.eq(true))
+    ).when(ifTraverser).traverse(eqTree(IfStatement), shouldReturnValue = ArgumentMatchers.eq(Yes))
 
     blockTraverser.traverse(
       Block(
