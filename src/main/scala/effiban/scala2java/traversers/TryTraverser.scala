@@ -3,7 +3,7 @@ package effiban.scala2java.traversers
 import effiban.scala2java.transformers.PatToTermParamTransformer
 import effiban.scala2java.writers.JavaWriter
 
-import scala.meta.Term
+import scala.meta.{Term, Type}
 
 trait TryTraverser extends ScalaTreeTraverser[Term.Try]
 
@@ -21,7 +21,7 @@ private[traversers] class TryTraverserImpl(blockTraverser: => BlockTraverser,
     write("try")
     blockTraverser.traverse(`try`.expr)
     `try`.catchp.foreach(`case` => {
-      patToTermParamTransformer.transform(`case`.pat) match {
+      patToTermParamTransformer.transform(`pat` = `case`.pat, maybeDefaultType = Some(Type.Name("Throwable"))) match {
         case Some(param) => catchHandlerTraverser.traverse(param, `case`.body)
         case None => writeComment(s"UNPARSEABLE catch clause: ${`case`}")
       }
