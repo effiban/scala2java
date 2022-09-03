@@ -2,6 +2,7 @@ package effiban.scala2java.transformers
 
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.testsuites.UnitTestSuite
+import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 
 import scala.meta.Enumerator.{CaseGenerator, Generator}
@@ -52,7 +53,7 @@ class ForVariantToTermApplyTransformerTest extends UnitTestSuite {
         args = List(Term.Function(params = List(ParamX), body = inputBody))
       )
 
-    when(patToTermParamTransformer.transform(eqTree(PatX))).thenReturn(Some(ParamX))
+    when(patToTermParamTransformer.transform(eqTree(PatX), ArgumentMatchers.eq(None))).thenReturn(Some(ParamX))
 
     val actualTermApply = forVariantToTermApplyTransformer.transform(enumerators, inputBody)
 
@@ -71,7 +72,7 @@ class ForVariantToTermApplyTransformerTest extends UnitTestSuite {
         args = List(Term.Function(params = List(ParamX), body = inputBody))
       )
 
-    when(patToTermParamTransformer.transform(eqTree(PatX))).thenReturn(Some(ParamX))
+    when(patToTermParamTransformer.transform(eqTree(PatX), ArgumentMatchers.eq(None))).thenReturn(Some(ParamX))
 
     val actualTermApply = forVariantToTermApplyTransformer.transform(enumerators, inputBody)
 
@@ -90,7 +91,7 @@ class ForVariantToTermApplyTransformerTest extends UnitTestSuite {
         args = List(Term.Function(params = List(ParamX), body = inputBody))
       )
 
-    when(patToTermParamTransformer.transform(eqTree(PatX))).thenReturn(Some(ParamX))
+    when(patToTermParamTransformer.transform(eqTree(PatX), ArgumentMatchers.eq(None))).thenReturn(Some(ParamX))
 
     val actualTermApply = forVariantToTermApplyTransformer.transform(enumerators, inputBody)
 
@@ -128,7 +129,7 @@ class ForVariantToTermApplyTransformerTest extends UnitTestSuite {
         ))
       )
 
-    when(patToTermParamTransformer.transform(any[Pat]))
+    when(patToTermParamTransformer.transform(any[Pat], ArgumentMatchers.eq(None)))
       .thenAnswer((pat: Pat) => {
         pat match {
           case aPat if aPat.structure == PatX.structure => Some(ParamX)

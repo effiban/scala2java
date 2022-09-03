@@ -14,10 +14,18 @@ class PatToTermParamTransformerTest extends UnitTestSuite {
   private val Y = Term.Name("y")
   private val PatVarY = Pat.Var(Y)
 
-  test("transform a Pat.Var") {
+  test("transform a Pat.Var with no default declared type") {
     val expectedTermParam = termParam(X)
 
     val actualMaybeTermParam = PatToTermParamTransformer.transform(PatVarX)
+
+    actualMaybeTermParam.value.structure shouldBe expectedTermParam.structure
+  }
+
+  test("transform a Pat.Var with a default declared type") {
+    val expectedTermParam = termParam(X, Some(TypeNames.Int))
+
+    val actualMaybeTermParam = PatToTermParamTransformer.transform(PatVarX, Some(TypeNames.Int))
 
     actualMaybeTermParam.value.structure shouldBe expectedTermParam.structure
   }
@@ -31,10 +39,12 @@ class PatToTermParamTransformerTest extends UnitTestSuite {
     actualMaybeTermParam.value.structure shouldBe expectedTermParam.structure
   }
 
-  test("transform a Pat.Wildcard") {
-    val expectedTermParam = termParam(Term.Name(JavaPlaceholder))
+  test("transform a Pat.Wildcard with a default declared type") {
+    val throwableType = Type.Name("Throwable")
 
-    val actualMaybeTermParam = PatToTermParamTransformer.transform(Pat.Wildcard())
+    val expectedTermParam = termParam(Term.Name(JavaPlaceholder), Some(throwableType))
+
+    val actualMaybeTermParam = PatToTermParamTransformer.transform(Pat.Wildcard(), Some(throwableType))
 
     actualMaybeTermParam.value.structure shouldBe expectedTermParam.structure
   }

@@ -1,6 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.entities.Decision.No
+import effiban.scala2java.matchers.CombinedMatchers.eqSomeTree
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
@@ -51,6 +52,7 @@ class TryTraverserImplTest extends UnitTestSuite {
 
   private val FinallyStatement = Term.Apply(Term.Name("cleanup"), Nil)
 
+  private val ThrowableType = Type.Name("Throwable")
 
   private val blockTraverser = mock[BlockTraverser]
   private val catchHandlerTraverser = mock[CatchHandlerTraverser]
@@ -138,7 +140,7 @@ class TryTraverserImplTest extends UnitTestSuite {
       maybeInit = ArgumentMatchers.eq(None)
     )
 
-    when(patToTermParamTransformer.transform(eqTree(CatchPat1))).thenReturn(Some(CatchParam1))
+    when(patToTermParamTransformer.transform(eqTree(CatchPat1), eqSomeTree(ThrowableType))).thenReturn(Some(CatchParam1))
 
     doWrite(
       """catch (IllegalArgumentException e1) {
@@ -180,7 +182,7 @@ class TryTraverserImplTest extends UnitTestSuite {
       maybeInit = ArgumentMatchers.eq(None)
     )
 
-    when(patToTermParamTransformer.transform(any[Pat]))
+    when(patToTermParamTransformer.transform(any[Pat], eqSomeTree(ThrowableType)))
       .thenAnswer( (pat: Pat) => {
         pat match {
           case aPat if aPat.structure == CatchPat1.structure => Some(CatchParam1)
@@ -236,7 +238,8 @@ class TryTraverserImplTest extends UnitTestSuite {
       maybeInit = ArgumentMatchers.eq(None)
     )
 
-    when(patToTermParamTransformer.transform(eqTree(CatchPat1))).thenReturn(Some(CatchParam1))
+    when(patToTermParamTransformer.transform(eqTree(CatchPat1), eqSomeTree(ThrowableType)))
+      .thenReturn(Some(CatchParam1))
 
     doWrite(
       """catch (IllegalArgumentException e1) {
@@ -288,7 +291,7 @@ class TryTraverserImplTest extends UnitTestSuite {
       maybeInit = ArgumentMatchers.eq(None)
     )
 
-    when(patToTermParamTransformer.transform(any[Pat]))
+    when(patToTermParamTransformer.transform(any[Pat], eqSomeTree(ThrowableType)))
       .thenAnswer( (pat: Pat) => {
         pat match {
           case aPat if aPat.structure == UnsupportedCatchPat.structure => None
@@ -340,7 +343,7 @@ class TryTraverserImplTest extends UnitTestSuite {
       maybeInit = ArgumentMatchers.eq(None)
     )
 
-    when(patToTermParamTransformer.transform(any[Pat]))
+    when(patToTermParamTransformer.transform(any[Pat], eqSomeTree(ThrowableType)))
       .thenAnswer( (pat: Pat) => {
         pat match {
           case aPat if aPat.structure == CatchPat1.structure => Some(CatchParam1)
