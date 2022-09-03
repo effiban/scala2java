@@ -1,22 +1,27 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.entities.Decision.{Decision, Uncertain}
 import effiban.scala2java.entities.JavaTreeType.Lambda
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term
+import scala.meta.Term.Block
 
-trait TermFunctionTraverser extends ScalaTreeTraverser[Term.Function]
+trait TermFunctionTraverser {
+  def traverse(function: Term.Function, shouldBodyReturnValue: Decision = Uncertain): Unit
+}
 
 private[traversers] class TermFunctionTraverserImpl(termParamTraverser: => TermParamTraverser,
                                                     termParamListTraverser: => TermParamListTraverser,
-                                                    termTraverser: => TermTraverser)
+                                                    statTraverser: => StatTraverser,
+                                                    blockTraverser: => BlockTraverser)
                                                    (implicit javaWriter: JavaWriter) extends TermFunctionTraverser {
 
   import javaWriter._
 
   // lambda definition
-  override def traverse(function: Term.Function): Unit = {
+  override def traverse(function: Term.Function, shouldBodyReturnValue: Decision = Uncertain): Unit = {
     val outerJavaScope = javaScope
     javaScope = Lambda
     function.params match {
@@ -24,7 +29,13 @@ private[traversers] class TermFunctionTraverserImpl(termParamTraverser: => TermP
       case _ => termParamListTraverser.traverse(termParams = function.params, onSameLine = true)
     }
     writeArrow()
-    termTraverser.traverse(function.body)
+    function.body match {
+      // Block of size 2 or more
+      case block@Block(_ :: _ :: _) => blockTraverser.traverse(stat = block, shouldReturnValue = shouldBodyReturnValue)
+      // Block of size 1 - treat as a plain stat, because the Java style of lambdas is the same as Scala
+      case Block(stat :: Nil) => statTraverser.traverse(stat)
+      case stat => statTraverser.traverse(stat)
+    }
     javaScope = outerJavaScope
   }
 }

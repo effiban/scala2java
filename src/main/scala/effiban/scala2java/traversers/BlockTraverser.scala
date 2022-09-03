@@ -10,6 +10,7 @@ trait BlockTraverser {
 
   // The input is a Stat and not a Block, because sometimes we want to wrap a single Scala statement in a Java block
   // (which is convenient for both the translation logic and the formatting)
+  // TODO - when expecting a return value which is a lambda, need another flag for returnability inside the lambda body
   def traverse(stat: Stat, shouldReturnValue: Decision = No, maybeInit: Option[Init] = None): Unit
 }
 

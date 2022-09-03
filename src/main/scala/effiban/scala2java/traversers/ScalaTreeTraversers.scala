@@ -272,7 +272,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
   private lazy val termFunctionTraverser: TermFunctionTraverser = new TermFunctionTraverserImpl(
     termParamTraverser,
     termParamListTraverser,
-    termTraverser
+    statTraverser,
+    blockTraverser
   )
 
   private lazy val termInterpolateTraverser: TermInterpolateTraverser = new TermInterpolateTraverserImpl(TermInterpolateTransformer, termApplyTraverser)

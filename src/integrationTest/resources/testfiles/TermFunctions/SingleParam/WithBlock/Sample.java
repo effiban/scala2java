@@ -9,7 +9,7 @@ public class Sample {
     public void foo() {
         x ->  {
             doSomething(x);
-            doSomethingElse(x);
+            /* return? */doSomethingElse(x);
         }
     }
 }

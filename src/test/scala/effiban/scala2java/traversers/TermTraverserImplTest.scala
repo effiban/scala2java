@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.Decision.No
+import effiban.scala2java.entities.Decision.{No, Uncertain}
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TermNames.PlusTermName
@@ -234,7 +234,7 @@ class TermTraverserImplTest extends UnitTestSuite {
       body = Apply(fun = Term.Name("doSomething"), args = List(Term.Name("x")))
     )
     termTraverser.traverse(function)
-    verify(termFunctionTraverser).traverse(eqTree(function))
+    verify(termFunctionTraverser).traverse(eqTree(function), ArgumentMatchers.eq(Uncertain))
   }
 
   test("traverse() for PartialFunction") {
@@ -245,13 +245,13 @@ class TermTraverserImplTest extends UnitTestSuite {
       )
     )
     termTraverser.traverse(partialFunction)
-    verify(partialFunctionTraverser).traverse(eqTree(partialFunction))
+    verify(partialFunctionTraverser).traverse(eqTree(partialFunction), ArgumentMatchers.eq(Uncertain))
   }
 
   test("traverse() for AnonymousFunction") {
     val anonymousFunction = Term.AnonymousFunction(Apply(Term.Name("doSomething"), Nil))
     termTraverser.traverse(anonymousFunction)
-    verify(anonymousFunctionTraverser).traverse(eqTree(anonymousFunction))
+    verify(anonymousFunctionTraverser).traverse(eqTree(anonymousFunction), ArgumentMatchers.eq(Uncertain))
   }
 
   test("traverse() for While") {
