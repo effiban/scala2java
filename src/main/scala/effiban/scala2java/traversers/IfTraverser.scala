@@ -25,6 +25,8 @@ private[traversers] class IfTraverserImpl(termTraverser: => TermTraverser,
     `if`.elsep match {
       case Lit.Unit() =>
       case elsep =>
+        //TODO 1. If the 'then' clause returns a value, traverse the 'else' statement only (no 'else' word and no block)
+        //TODO 2. If the 'else' clause is itself an 'if', don't wrap it in a block
         write("else")
         blockTraverser.traverse(elsep, shouldReturnValue)
     }
