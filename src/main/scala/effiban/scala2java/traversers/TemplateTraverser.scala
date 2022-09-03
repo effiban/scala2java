@@ -79,6 +79,7 @@ private[traversers] class TemplateTraverserImpl(initListTraverser: => InitListTr
                                   maybeClassName: Option[Type.Name],
                                   inits: List[Init]): Unit = {
     maybeClassName match {
+      // TODO skip traversal if the ctor. is public+default+empty, and there are no secondaries
       case Some(className) => ctorPrimaryTraverser.traverse(primaryCtor, className, inits)
       case None => throw new IllegalStateException("Primary Ctor. exists but class name was not passed to the TemplateTraverser")
     }
