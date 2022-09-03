@@ -1,5 +1,6 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.entities.ListTraversalOptions
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.testsuites.UnitTestSuite
@@ -19,9 +20,13 @@ class InitListTraverserImplTest extends UnitTestSuite {
   test("traverse() when no inits") {
     initListTraverser.traverse(Nil)
 
-    outputWriter.toString shouldBe ""
+    verify(argumentListTraverser).traverse(
+      args = ArgumentMatchers.eq(Nil),
+      argTraverser = initTraverserCaptor.capture(),
+      options = ArgumentMatchers.eq(ListTraversalOptions())
+    )
 
-    verifyNoMoreInteractions(argumentListTraverser)
+    verifyNoMoreInteractions(initTraverser)
   }
 
   test("traverse() when one init") {
@@ -32,12 +37,26 @@ class InitListTraverserImplTest extends UnitTestSuite {
     verify(argumentListTraverser).traverse(
       args = eqTreeList(List(init)),
       argTraverser = initTraverserCaptor.capture(),
-      onSameLine = ArgumentMatchers.eq(false),
-      maybeEnclosingDelimiter = ArgumentMatchers.eq(None)
+      options = ArgumentMatchers.eq(ListTraversalOptions())
     )
 
     initTraverserCaptor.getValue.traverse(init)
     verify(initTraverser).traverse(eqTree(init), ArgumentMatchers.eq(false))
+  }
+
+  test("traverse() when one init and args ignored") {
+    val init = Init(tpe = Type.Name("MyType"), name = Name.Anonymous(), argss = List(List(Term.Name("arg1"), Term.Name("arg2"))))
+
+    initListTraverser.traverse(List(init), ignoreArgs = true)
+
+    verify(argumentListTraverser).traverse(
+      args = eqTreeList(List(init)),
+      argTraverser = initTraverserCaptor.capture(),
+      options = ArgumentMatchers.eq(ListTraversalOptions())
+    )
+
+    initTraverserCaptor.getValue.traverse(init)
+    verify(initTraverser).traverse(eqTree(init), ArgumentMatchers.eq(true))
   }
 
   test("traverse() when two inits") {
@@ -49,8 +68,7 @@ class InitListTraverserImplTest extends UnitTestSuite {
     verify(argumentListTraverser).traverse(
       args = eqTreeList(List(init1, init2)),
       argTraverser = initTraverserCaptor.capture(),
-      onSameLine = ArgumentMatchers.eq(false),
-      maybeEnclosingDelimiter = ArgumentMatchers.eq(None)
+      options = ArgumentMatchers.eq(ListTraversalOptions())
     )
 
     initTraverserCaptor.getValue.traverse(init1)

@@ -1,5 +1,6 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.entities.ListTraversalOptions
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.testsuites.UnitTestSuite
 import org.mockito.ArgumentMatchers
@@ -7,6 +8,8 @@ import org.mockito.ArgumentMatchers
 import scala.meta.{Pat, Term}
 
 class PatListTraverserImplTest extends UnitTestSuite {
+
+  private val ExpectedTraversalOptions = ListTraversalOptions(onSameLine = true)
 
   private val argumentListTraverser = mock[ArgumentListTraverser]
   private val patTraverser = mock[PatTraverser]
@@ -17,9 +20,11 @@ class PatListTraverserImplTest extends UnitTestSuite {
   test("traverse() when no pats") {
     patListTraverser.traverse(Nil)
 
-    outputWriter.toString shouldBe ""
-
-    verifyNoMoreInteractions(argumentListTraverser)
+    verify(argumentListTraverser).traverse(
+      args = ArgumentMatchers.eq(Nil),
+      argTraverser = ArgumentMatchers.eq(patTraverser),
+      options = ArgumentMatchers.eq(ExpectedTraversalOptions)
+    )
   }
 
   test("traverse() when one pat") {
@@ -31,8 +36,7 @@ class PatListTraverserImplTest extends UnitTestSuite {
     verify(argumentListTraverser).traverse(
       args = eqTreeList(List(pat)),
       argTraverser = ArgumentMatchers.eq(patTraverser),
-      onSameLine = ArgumentMatchers.eq(true),
-      maybeEnclosingDelimiter = ArgumentMatchers.eq(None)
+      options = ArgumentMatchers.eq(ExpectedTraversalOptions)
     )
   }
 
@@ -45,8 +49,7 @@ class PatListTraverserImplTest extends UnitTestSuite {
     verify(argumentListTraverser).traverse(
       args = eqTreeList(List(pat1, pat2)),
       argTraverser = ArgumentMatchers.eq(patTraverser),
-      onSameLine = ArgumentMatchers.eq(true),
-      maybeEnclosingDelimiter = ArgumentMatchers.eq(None)
+      options = ArgumentMatchers.eq(ExpectedTraversalOptions)
     )
   }
 }

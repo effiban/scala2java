@@ -1,27 +1,20 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.EnclosingDelimiter.EnclosingDelimiter
+import effiban.scala2java.entities.ListTraversalOptions
 
 import scala.meta.Term
 
 trait TermListTraverser {
 
-  def traverse(terms: List[Term],
-               onSameLine: Boolean = false,
-               maybeEnclosingDelimiter: Option[EnclosingDelimiter] = None): Unit
+  def traverse(terms: List[Term], options: ListTraversalOptions = ListTraversalOptions()): Unit
 }
 
 private[traversers] class TermListTraverserImpl(argumentListTraverser: => ArgumentListTraverser,
                                                 termTraverser: => TermTraverser) extends TermListTraverser {
 
-  override def traverse(terms: List[Term],
-                        onSameLine: Boolean = false,
-                        maybeEnclosingDelimiter: Option[EnclosingDelimiter] = None): Unit = {
-    if (terms.nonEmpty) {
-      argumentListTraverser.traverse(args = terms,
-        argTraverser = termTraverser,
-        onSameLine = onSameLine,
-        maybeEnclosingDelimiter = maybeEnclosingDelimiter)
-    }
+  override def traverse(terms: List[Term], options: ListTraversalOptions = ListTraversalOptions()): Unit = {
+    argumentListTraverser.traverse(args = terms,
+      argTraverser = termTraverser,
+      options = options)
   }
 }

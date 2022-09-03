@@ -1,6 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.entities.EnclosingDelimiter.Parentheses
+import effiban.scala2java.entities.ListTraversalOptions
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.testsuites.UnitTestSuite
 import org.mockito.ArgumentMatchers
@@ -18,9 +19,11 @@ class TermListTraverserImplTest extends UnitTestSuite {
   test("traverse() when no terms") {
     termListTraverser.traverse(Nil)
 
-    outputWriter.toString shouldBe ""
-
-    verifyNoMoreInteractions(argumentListTraverser)
+    verify(argumentListTraverser).traverse(
+      args = ArgumentMatchers.eq(Nil),
+      argTraverser = ArgumentMatchers.eq(termTraverser),
+      options = ArgumentMatchers.eq(ListTraversalOptions())
+    )
   }
 
   test("traverse() when one term and the rest default") {
@@ -32,8 +35,7 @@ class TermListTraverserImplTest extends UnitTestSuite {
     verify(argumentListTraverser).traverse(
       args = eqTreeList(List(term)),
       argTraverser = ArgumentMatchers.eq(termTraverser),
-      onSameLine = ArgumentMatchers.eq(false),
-      maybeEnclosingDelimiter = ArgumentMatchers.eq(None)
+      options = ArgumentMatchers.eq(ListTraversalOptions())
     )
   }
 
@@ -41,17 +43,14 @@ class TermListTraverserImplTest extends UnitTestSuite {
 
     val term = Term.Name("x")
 
-    termListTraverser.traverse(
-      terms = List(term),
-      onSameLine = true,
-      maybeEnclosingDelimiter = Some(Parentheses)
-    )
+    val options = ListTraversalOptions(onSameLine = true, maybeEnclosingDelimiter = Some(Parentheses))
+
+    termListTraverser.traverse(terms = List(term), options = options)
 
     verify(argumentListTraverser).traverse(
       args = eqTreeList(List(term)),
       argTraverser = ArgumentMatchers.eq(termTraverser),
-      onSameLine = ArgumentMatchers.eq(true),
-      maybeEnclosingDelimiter = ArgumentMatchers.eq(Some(Parentheses))
+      options = ArgumentMatchers.eq(options)
     )
   }
 
@@ -64,8 +63,7 @@ class TermListTraverserImplTest extends UnitTestSuite {
     verify(argumentListTraverser).traverse(
       args = eqTreeList(List(term1, term2)),
       argTraverser = ArgumentMatchers.eq(termTraverser),
-      onSameLine = ArgumentMatchers.eq(false),
-      maybeEnclosingDelimiter = ArgumentMatchers.eq(None)
+      options = ArgumentMatchers.eq(ListTraversalOptions())
     )
   }
 
@@ -73,17 +71,14 @@ class TermListTraverserImplTest extends UnitTestSuite {
     val term1 = Term.Name("x")
     val term2 = Term.Name("y")
 
-    termListTraverser.traverse(
-      terms = List(term1, term2),
-      onSameLine = true,
-      maybeEnclosingDelimiter = Some(Parentheses)
-    )
+    val options = ListTraversalOptions(onSameLine = true, maybeEnclosingDelimiter = Some(Parentheses))
+
+    termListTraverser.traverse(terms = List(term1, term2), options = options)
 
     verify(argumentListTraverser).traverse(
       args = eqTreeList(List(term1, term2)),
       argTraverser = ArgumentMatchers.eq(termTraverser),
-      onSameLine = ArgumentMatchers.eq(true),
-      maybeEnclosingDelimiter = ArgumentMatchers.eq(Some(Parentheses))
+      options = ArgumentMatchers.eq(options)
     )
   }
 }
