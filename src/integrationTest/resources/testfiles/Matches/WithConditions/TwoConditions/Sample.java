@@ -10,6 +10,5 @@ public class Sample {
         switch (obj) {
             case int x && x > 3 && y > 4 -> println("matches");
         }
-        ;
     }
 }

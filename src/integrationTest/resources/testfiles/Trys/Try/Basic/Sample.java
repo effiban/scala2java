@@ -10,6 +10,5 @@ public class Sample {
         try {
             doSomething;
         }
-        ;
     }
 }

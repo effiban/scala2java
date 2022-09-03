@@ -11,6 +11,5 @@ public class Sample {
             case int __ -> println("integer");
             case double __ -> println("double");
         }
-        ;
     }
 }

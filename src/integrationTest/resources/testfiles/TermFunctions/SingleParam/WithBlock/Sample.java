@@ -11,6 +11,5 @@ public class Sample {
             doSomething(x);
             doSomethingElse(x);
         }
-        ;
     }
 }

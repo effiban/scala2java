@@ -11,6 +11,5 @@ public class Sample {
             case "one" -> println(1);
             default -> println("other");
         }
-        ;
     }
 }

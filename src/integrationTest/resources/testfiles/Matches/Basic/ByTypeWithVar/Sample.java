@@ -11,6 +11,5 @@ public class Sample {
             case int i -> i + 1;
             case double d -> d * 0.5;
         }
-        ;
     }
 }
