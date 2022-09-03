@@ -15,7 +15,7 @@ public class Sample {
                 doSomethingElse(x);
             }
             else {
-                doDefault;
+                doDefault();
             }
         }
     }

@@ -7,7 +7,7 @@ public class Sample {
     }
 
     public int foo() {
-        doSomething;
-        return doSomethingElse;
+        doSomething();
+        return doSomethingElse();
     }
 }

@@ -8,7 +8,7 @@ public class Sample {
 
     public void foo() {
         try {
-            doSomething;
+            doSomething();
         }
         /* UNPARSEABLE catch handler: handleError */
     }

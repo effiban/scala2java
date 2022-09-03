@@ -16,6 +16,7 @@ private[traversers] class TermApplyTraverserImpl(termTraverser: => TermTraverser
   override def traverse(termApply: Term.Apply): Unit = {
     val javaTermApply = scalaToJavaTermApplyTransformer.transform(termApply)
     termTraverser.traverse(javaTermApply.fun)
-    termListTraverser.traverse(javaTermApply.args, ListTraversalOptions(maybeEnclosingDelimiter = Some(Parentheses)))
+    val argsTraversalOptions = ListTraversalOptions(maybeEnclosingDelimiter = Some(Parentheses), traverseEmpty = true)
+    termListTraverser.traverse(javaTermApply.args, argsTraversalOptions)
   }
 }
