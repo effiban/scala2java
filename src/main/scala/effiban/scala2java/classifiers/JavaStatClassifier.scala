@@ -1,27 +1,29 @@
 package effiban.scala2java.classifiers
 
-import scala.meta.Term
-import scala.meta.Term.{Block, For, If, NewAnonymous, TryWithHandler, While}
+import scala.meta.Term.{Block, If, NewAnonymous, TryWithHandler, While}
+import scala.meta.{Ctor, Defn, Stat, Term}
 
-trait JavaTermClassifier {
+trait JavaStatClassifier {
 
-  def requiresStatementEnd(term: Term): Boolean
+  def requiresEndDelimiter(stat: Stat): Boolean
 }
 
-object JavaTermClassifier extends JavaTermClassifier {
+object JavaStatClassifier extends JavaStatClassifier {
 
-  override def requiresStatementEnd(term: Term): Boolean = {
-    term match {
+  override def requiresEndDelimiter(stat: Stat): Boolean = {
+    stat match {
       case _: Block |
            _: If |
            _: While |
-           _: For |
            _: Term.Match |
            _: Term.Try |
            _: TryWithHandler |
            _: Term.Annotate |
            _: NewAnonymous |
-           _: Term.PartialFunction => false
+           _: Term.PartialFunction |
+           _: Ctor.Secondary |
+           _: Defn.Def |
+           _: Defn.Type => false
       case Term.Function(_, body) if hasMultipleStatements(body) => false
       case Term.AnonymousFunction(body) if hasMultipleStatements(body) => false
       case _ => true
