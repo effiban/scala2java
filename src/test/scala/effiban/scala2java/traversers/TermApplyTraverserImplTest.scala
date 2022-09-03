@@ -37,7 +37,7 @@ class TermApplyTraverserImplTest extends UnitTestSuite {
     doWrite("myJavaMethod").when(termTraverser).traverse(eqTree(javaTermApply.fun))
     doWrite("(arg1, arg2)").when(termListTraverser).traverse(
       terms = eqTreeList(javaTermApply.args),
-      ArgumentMatchers.eq(ListTraversalOptions(maybeEnclosingDelimiter = Some(Parentheses)))
+      ArgumentMatchers.eq(ListTraversalOptions(maybeEnclosingDelimiter = Some(Parentheses), traverseEmpty = true))
     )
 
     termApplyTraverser.traverse(scalaTermApply)

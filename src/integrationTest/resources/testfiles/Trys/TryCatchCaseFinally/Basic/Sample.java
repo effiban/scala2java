@@ -8,13 +8,13 @@ public class Sample {
 
     public void foo() {
         try {
-            doSomething;
+            doSomething();
         }
         catch (final Throwable e) {
-            handleError;
+            handleError();
         }
         finally {
-            cleanUp;
+            cleanUp();
         }
     }
 }
