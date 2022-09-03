@@ -1,6 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.entities.EnclosingDelimiter.Parentheses
+import effiban.scala2java.entities.ListTraversalOptions
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
@@ -57,7 +58,7 @@ class ArgumentListTraverserImplTest extends UnitTestSuite {
     argumentListTraverser.traverse(
       args = List(arg1),
       argTraverser = argumentTraverser,
-      onSameLine = true
+      ListTraversalOptions(onSameLine = true)
     )
 
     outputWriter.toString shouldBe "arg1"
@@ -70,7 +71,7 @@ class ArgumentListTraverserImplTest extends UnitTestSuite {
     argumentListTraverser.traverse(
       args = List(arg1, arg2),
       argTraverser = argumentTraverser,
-      onSameLine = true
+      ListTraversalOptions(onSameLine = true)
     )
 
     outputWriter.toString shouldBe "arg1, arg2"
@@ -84,18 +85,29 @@ class ArgumentListTraverserImplTest extends UnitTestSuite {
     argumentListTraverser.traverse(
       args = List(arg1, arg2, arg3),
       argTraverser = argumentTraverser,
-      onSameLine = true
+      ListTraversalOptions(onSameLine = true)
     )
 
     outputWriter.toString shouldBe "arg1, arg2, arg3"
   }
 
-  test("traverse() when no args, single-line and parentheses") {
+  test("traverse() when no args, traverseEmpty=false, single-line and parentheses") {
     argumentListTraverser.traverse(
       args = List.empty,
       argTraverser = argumentTraverser,
-      onSameLine = true,
-      maybeEnclosingDelimiter = Some(Parentheses)
+      ListTraversalOptions(onSameLine = true, maybeEnclosingDelimiter = Some(Parentheses))
+    )
+
+    outputWriter.toString shouldBe ""
+
+    verifyNoMoreInteractions(argumentTraverser)
+  }
+
+  test("traverse() when no args, traverseEmpty=true, single-line and parentheses") {
+    argumentListTraverser.traverse(
+      args = List.empty,
+      argTraverser = argumentTraverser,
+      ListTraversalOptions(onSameLine = true, maybeEnclosingDelimiter = Some(Parentheses), traverseEmpty = true)
     )
 
     outputWriter.toString shouldBe "()"
@@ -109,8 +121,7 @@ class ArgumentListTraverserImplTest extends UnitTestSuite {
     argumentListTraverser.traverse(
       args = List(arg1),
       argTraverser = argumentTraverser,
-      onSameLine = true,
-      maybeEnclosingDelimiter = Some(Parentheses)
+      ListTraversalOptions(onSameLine = true, maybeEnclosingDelimiter = Some(Parentheses))
     )
 
     outputWriter.toString shouldBe "(arg1)"
@@ -123,8 +134,7 @@ class ArgumentListTraverserImplTest extends UnitTestSuite {
     argumentListTraverser.traverse(
       args = List(arg1, arg2),
       argTraverser = argumentTraverser,
-      onSameLine = true,
-      maybeEnclosingDelimiter = Some(Parentheses)
+      ListTraversalOptions(onSameLine = true, maybeEnclosingDelimiter = Some(Parentheses))
     )
 
     outputWriter.toString shouldBe "(arg1, arg2)"
@@ -138,8 +148,7 @@ class ArgumentListTraverserImplTest extends UnitTestSuite {
     argumentListTraverser.traverse(
       args = List(arg1, arg2, arg3),
       argTraverser = argumentTraverser,
-      onSameLine = true,
-      maybeEnclosingDelimiter = Some(Parentheses)
+      ListTraversalOptions(onSameLine = true, maybeEnclosingDelimiter = Some(Parentheses))
     )
 
     outputWriter.toString shouldBe "(arg1, arg2, arg3)"

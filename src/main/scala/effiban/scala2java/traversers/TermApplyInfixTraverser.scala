@@ -1,6 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.classifiers.TermApplyInfixClassifier
+import effiban.scala2java.entities.ListTraversalOptions
 import effiban.scala2java.transformers.TermApplyInfixToRangeTransformer
 import effiban.scala2java.writers.JavaWriter
 
@@ -38,6 +39,6 @@ private[traversers] class TermApplyInfixTraverserImpl(termTraverser: => TermTrav
     write(" ")
     //TODO handle type args
     //TODO - verify implementation for multiple RHS args
-    termListTraverser.traverse(termApplyInfix.args, onSameLine = true)
+    termListTraverser.traverse(termApplyInfix.args, ListTraversalOptions(onSameLine = true))
   }
 }

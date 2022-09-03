@@ -1,5 +1,7 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.entities.ListTraversalOptions
+
 import scala.meta.Pat
 
 trait PatListTraverser {
@@ -10,10 +12,8 @@ private[traversers] class PatListTraverserImpl(argumentListTraverser: => Argumen
                                                patTraverser: => PatTraverser) extends PatListTraverser {
 
   override def traverse(pats: List[Pat]): Unit = {
-    if (pats.nonEmpty) {
       argumentListTraverser.traverse(args = pats,
         argTraverser = patTraverser,
-        onSameLine = true)
-    }
+        ListTraversalOptions(onSameLine = true))
   }
 }

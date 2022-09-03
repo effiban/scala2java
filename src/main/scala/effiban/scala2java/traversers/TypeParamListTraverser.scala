@@ -1,6 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.entities.EnclosingDelimiter._
+import effiban.scala2java.entities.ListTraversalOptions
 
 import scala.meta.Type
 
@@ -12,11 +13,8 @@ private[traversers] class TypeParamListTraverserImpl(argumentListTraverser: => A
                                                      typeParamTraverser: => TypeParamTraverser) extends TypeParamListTraverser {
 
   override def traverse(typeParams: List[Type.Param]): Unit = {
-    if (typeParams.nonEmpty) {
-      argumentListTraverser.traverse(args = typeParams,
-        argTraverser = typeParamTraverser,
-        maybeEnclosingDelimiter = Some(AngleBracket),
-        onSameLine = true)
-    }
+    argumentListTraverser.traverse(args = typeParams,
+      argTraverser = typeParamTraverser,
+      ListTraversalOptions(maybeEnclosingDelimiter = Some(AngleBracket), onSameLine = true))
   }
 }
