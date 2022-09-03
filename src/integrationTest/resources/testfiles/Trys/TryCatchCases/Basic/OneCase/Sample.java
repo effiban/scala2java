@@ -13,6 +13,5 @@ public class Sample {
         catch (final Throwable e) {
             handleError(e);
         }
-        ;
     }
 }

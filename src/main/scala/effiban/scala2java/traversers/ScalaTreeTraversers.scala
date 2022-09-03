@@ -1,7 +1,8 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.classifiers.TermApplyInfixClassifier
+import effiban.scala2java.classifiers.{JavaStatClassifier, TermApplyInfixClassifier}
 import effiban.scala2java.orderings.JavaTemplateChildOrdering
+import effiban.scala2java.resolvers.Resolvers.shouldReturnValueResolver
 import effiban.scala2java.resolvers.{JavaInheritanceKeywordResolver, JavaModifiersResolver}
 import effiban.scala2java.transformers._
 import effiban.scala2java.typeinference.TypeInferrers.termTypeInferrer
@@ -29,13 +30,16 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
 
   private lazy val bindTraverser: BindTraverser = new BindTraverserImpl(patTraverser)
 
+  private lazy val blockStatTraverser: BlockStatTraverser = new BlockStatTraverserImpl(
+    ifTraverser,
+    statTraverser,
+    shouldReturnValueResolver,
+    JavaStatClassifier
+  )
+
   private lazy val blockTraverser: BlockTraverser = new BlockTraverserImpl(
     initTraverser,
-    ifTraverser,
-    whileTraverser,
-    throwTraverser,
-    returnTraverser,
-    statTraverser
+    blockStatTraverser,
   )
 
   private lazy val caseClassTraverser: CaseClassTraverser = new CaseClassTraverserImpl(

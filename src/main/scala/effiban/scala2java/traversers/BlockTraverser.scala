@@ -1,10 +1,10 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.Decision.{Decision, No, Yes}
+import effiban.scala2java.entities.Decision.{Decision, No}
 import effiban.scala2java.writers.JavaWriter
 
-import scala.meta.Term.{Block, If, Return, Throw, While}
-import scala.meta.{Init, Stat, Term}
+import scala.meta.Term.Block
+import scala.meta.{Init, Stat}
 
 trait BlockTraverser {
 
@@ -14,11 +14,7 @@ trait BlockTraverser {
 }
 
 private[traversers] class BlockTraverserImpl(initTraverser: => InitTraverser,
-                                             ifTraverser: => IfTraverser,
-                                             whileTraverser: => WhileTraverser,
-                                             throwTraverser: => ThrowTraverser,
-                                             returnTraverser: => ReturnTraverser,
-                                             statTraverser: => StatTraverser)
+                                             blockStatTraverser: => BlockStatTraverser)
                                             (implicit javaWriter: JavaWriter) extends BlockTraverser {
 
   import javaWriter._
@@ -45,25 +41,8 @@ private[traversers] class BlockTraverserImpl(initTraverser: => InitTraverser,
 
   private def traverseContents(block: Block, shouldReturnValue: Decision): Unit = {
     if (block.stats.nonEmpty) {
-      block.stats.slice(0, block.stats.length - 1).foreach(traverseStatement(_))
-      traverseStatement(block.stats.last, shouldReturnValue)
-    }
-  }
-
-  private def traverseStatement(stat: Stat, shouldReturnValue: Decision = No): Unit = {
-    stat match {
-      case block: Block => traverse(block, shouldReturnValue)
-      case `if`: If => ifTraverser.traverse(`if`, shouldReturnValue)
-      case `while`: While => whileTraverser.traverse(`while`)
-      case `throw`: Throw =>
-        throwTraverser.traverse(`throw`)
-        writeStatementEnd()
-      case term: Term if shouldReturnValue == Yes =>
-        returnTraverser.traverse(Return(term))
-        writeStatementEnd()
-      case _ =>
-        statTraverser.traverse(stat)
-        writeStatementEnd()
+      block.stats.slice(0, block.stats.length - 1).foreach(blockStatTraverser.traverse)
+      blockStatTraverser.traverseLast(block.stats.last, shouldReturnValue)
     }
   }
 }

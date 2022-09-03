@@ -13,6 +13,5 @@ public class Sample {
         finally {
             cleanUp;
         }
-        ;
     }
 }
