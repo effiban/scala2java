@@ -9,15 +9,16 @@ import scala.meta.{Lit, Term}
 class AssignTraverserImplTest extends UnitTestSuite {
 
   private val termTraverser = mock[TermTraverser]
+  private val rhsTermTraverser = mock[RhsTermTraverser]
 
-  private val assignTraverser = new AssignTraverserImpl(termTraverser)
+  private val assignTraverser = new AssignTraverserImpl(termTraverser, rhsTermTraverser)
 
   test("traverse") {
     val lhs = Term.Name("myVal")
     val rhs = Lit.Int(3)
 
     doWrite("myVal").when(termTraverser).traverse(eqTree(lhs))
-    doWrite("3").when(termTraverser).traverse(eqTree(rhs))
+    doWrite("3").when(rhsTermTraverser).traverse(eqTree(rhs))
 
     assignTraverser.traverse(Term.Assign(lhs = lhs, rhs = rhs))
 

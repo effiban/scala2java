@@ -247,4 +247,23 @@ class IfTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin
   }
+
+  test("traverseAsTertiaryOp()") {
+    val lessThanThree = Lit.String("LessThanThree")
+    val threeOrMore = Lit.String("ThreeOrMore")
+
+    val `if` = If(
+      cond = Condition,
+      thenp = lessThanThree,
+      elsep = threeOrMore
+    )
+
+    doWrite("x < 3").when(termTraverser).traverse(eqTree(Condition))
+    doWrite(""""LessThanThree"""").when(termTraverser).traverse(eqTree(lessThanThree))
+    doWrite(""""ThreeOrMore"""").when(termTraverser).traverse(eqTree(threeOrMore))
+
+    ifTraverser.traverseAsTertiaryOp(`if`)
+
+    outputWriter.toString shouldBe """(x < 3) ? "LessThanThree" : "ThreeOrMore""""
+  }
 }
