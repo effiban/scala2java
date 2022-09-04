@@ -14,7 +14,7 @@ trait DefnValTraverser extends ScalaTreeTraverser[Defn.Val]
 private[traversers] class DefnValTraverserImpl(annotListTraverser: => AnnotListTraverser,
                                                defnValOrVarTypeTraverser: => DefnValOrVarTypeTraverser,
                                                patListTraverser: => PatListTraverser,
-                                               termTraverser: => TermTraverser,
+                                               rhsTermTraverser: => RhsTermTraverser,
                                                javaModifiersResolver: JavaModifiersResolver)
                                               (implicit javaWriter: JavaWriter) extends DefnValTraverser {
 
@@ -29,7 +29,7 @@ private[traversers] class DefnValTraverserImpl(annotListTraverser: => AnnotListT
     //TODO verify for non-simple case
     patListTraverser.traverse(valDef.pats)
     write(" = ")
-    termTraverser.traverse(valDef.rhs)
+    rhsTermTraverser.traverse(valDef.rhs)
   }
 
   private def resolveJavaModifiers(valDef: Defn.Val) = {

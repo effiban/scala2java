@@ -26,7 +26,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
 
   private lazy val ascribeTraverser: AscribeTraverser = new AscribeTraverserImpl(typeTraverser, termTraverser)
 
-  private lazy val assignTraverser: AssignTraverser = new AssignTraverserImpl(termTraverser)
+  private lazy val assignTraverser: AssignTraverser = new AssignTraverserImpl(termTraverser, rhsTermTraverser)
 
   private lazy val bindTraverser: BindTraverser = new BindTraverserImpl(patTraverser)
 
@@ -127,7 +127,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
     annotListTraverser,
     defnValOrVarTypeTraverser,
     patListTraverser,
-    termTraverser,
+    rhsTermTraverser,
     JavaModifiersResolver
   )
 
@@ -135,7 +135,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
     annotListTraverser,
     defnValOrVarTypeTraverser,
     patListTraverser,
-    termTraverser,
+    rhsTermTraverser,
     JavaModifiersResolver
   )
 
@@ -227,6 +227,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
   )
 
   private lazy val returnTraverser: ReturnTraverser = new ReturnTraverserImpl(termTraverser)
+
+  private lazy val rhsTermTraverser: RhsTermTraverser = new RhsTermTraverserImpl(ifTraverser, termTraverser)
 
   private lazy val selfTraverser: SelfTraverser = new SelfTraverserImpl
 

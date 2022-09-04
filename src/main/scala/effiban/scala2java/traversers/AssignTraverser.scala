@@ -6,7 +6,8 @@ import scala.meta.Term.Assign
 
 trait AssignTraverser extends ScalaTreeTraverser[Assign]
 
-private[traversers] class AssignTraverserImpl(termTraverser: => TermTraverser)
+private[traversers] class AssignTraverserImpl(termTraverser: => TermTraverser,
+                                              rhsTermTraverser: => RhsTermTraverser)
                                              (implicit javaWriter: JavaWriter) extends AssignTraverser {
 
   import javaWriter._
@@ -15,6 +16,6 @@ private[traversers] class AssignTraverserImpl(termTraverser: => TermTraverser)
   override def traverse(assign: Assign): Unit = {
     termTraverser.traverse(assign.lhs)
     write(" = ")
-    termTraverser.traverse(assign.rhs)
+    rhsTermTraverser.traverse(assign.rhs)
   }
 }

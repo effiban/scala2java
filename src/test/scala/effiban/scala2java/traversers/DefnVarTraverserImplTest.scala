@@ -29,14 +29,14 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
   private val annotListTraverser = mock[AnnotListTraverser]
   private val defnValOrVarTypeTraverser = mock[DefnValOrVarTypeTraverser]
   private val patListTraverser = mock[PatListTraverser]
-  private val termTraverser = mock[TermTraverser]
+  private val rhsTermTraverser = mock[RhsTermTraverser]
   private val javaModifiersResolver = mock[JavaModifiersResolver]
 
   private val defnVarTraverser = new DefnVarTraverserImpl(
     annotListTraverser,
     defnValOrVarTypeTraverser,
     patListTraverser,
-    termTraverser,
+    rhsTermTraverser,
     javaModifiersResolver)
 
 
@@ -57,7 +57,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
     whenResolveJavaModifiers(defnVar).thenReturn(JavaPrivateModifiers)
     doWrite("int").when(defnValOrVarTypeTraverser).traverse(eqSomeTree(IntType), eqSomeTree(Rhs))
     doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
-    doWrite("3").when(termTraverser).traverse(eqTree(Rhs))
+    doWrite("3").when(rhsTermTraverser).traverse(eqTree(Rhs))
 
     defnVarTraverser.traverse(defnVar)
 
@@ -108,7 +108,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
     whenResolveJavaModifiers(defnVar).thenReturn(JavaPrivateModifiers)
     doWrite("int").when(defnValOrVarTypeTraverser).traverse(ArgumentMatchers.eq(None), eqSomeTree(Rhs))
     doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
-    doWrite("3").when(termTraverser).traverse(eqTree(Rhs))
+    doWrite("3").when(rhsTermTraverser).traverse(eqTree(Rhs))
 
     defnVarTraverser.traverse(defnVar)
 
@@ -134,7 +134,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
     whenResolveJavaModifiers(defnVar).thenReturn(Nil)
     doWrite("int").when(defnValOrVarTypeTraverser).traverse(eqSomeTree(IntType), eqSomeTree(Rhs))
     doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
-    doWrite("3").when(termTraverser).traverse(eqTree(Rhs))
+    doWrite("3").when(rhsTermTraverser).traverse(eqTree(Rhs))
 
     defnVarTraverser.traverse(defnVar)
 
@@ -185,7 +185,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
     whenResolveJavaModifiers(defnVar).thenReturn(Nil)
     doWrite("int").when(defnValOrVarTypeTraverser).traverse(ArgumentMatchers.eq(None), eqSomeTree(Rhs))
     doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
-    doWrite("3").when(termTraverser).traverse(eqTree(Rhs))
+    doWrite("3").when(rhsTermTraverser).traverse(eqTree(Rhs))
 
     defnVarTraverser.traverse(defnVar)
 
@@ -211,7 +211,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
     whenResolveJavaModifiers(defnVar).thenReturn(Nil)
     doWrite("int").when(defnValOrVarTypeTraverser).traverse(eqSomeTree(IntType), eqSomeTree(Rhs))
     doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
-    doWrite("3").when(termTraverser).traverse(eqTree(Rhs))
+    doWrite("3").when(rhsTermTraverser).traverse(eqTree(Rhs))
 
     defnVarTraverser.traverse(defnVar)
 
@@ -262,7 +262,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
     whenResolveJavaModifiers(defnVar).thenReturn(Nil)
     doWrite("var").when(defnValOrVarTypeTraverser).traverse(ArgumentMatchers.eq(None), eqSomeTree(Rhs))
     doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
-    doWrite("3").when(termTraverser).traverse(eqTree(Rhs))
+    doWrite("3").when(rhsTermTraverser).traverse(eqTree(Rhs))
 
     defnVarTraverser.traverse(defnVar)
 

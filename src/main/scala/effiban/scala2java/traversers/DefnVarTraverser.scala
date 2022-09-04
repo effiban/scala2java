@@ -13,7 +13,7 @@ trait DefnVarTraverser extends ScalaTreeTraverser[Defn.Var]
 private[traversers] class DefnVarTraverserImpl(annotListTraverser: => AnnotListTraverser,
                                                defnValOrVarTypeTraverser: => DefnValOrVarTypeTraverser,
                                                patListTraverser: => PatListTraverser,
-                                               termTraverser: => TermTraverser,
+                                               rhsTermTraverser: => RhsTermTraverser,
                                                javaModifiersResolver: JavaModifiersResolver)
                                               (implicit javaWriter: JavaWriter) extends DefnVarTraverser {
 
@@ -29,7 +29,7 @@ private[traversers] class DefnVarTraverserImpl(annotListTraverser: => AnnotListT
     patListTraverser.traverse(varDef.pats)
     varDef.rhs.foreach { rhs =>
       write(" = ")
-      termTraverser.traverse(rhs)
+      rhsTermTraverser.traverse(rhs)
     }
   }
 

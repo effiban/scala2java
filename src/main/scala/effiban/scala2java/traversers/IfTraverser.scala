@@ -8,6 +8,8 @@ import scala.meta.Term.If
 
 trait IfTraverser {
   def traverse(`if`: If, shouldReturnValue: Decision = No): Unit
+
+  def traverseAsTertiaryOp(`if`: If): Unit
 }
 
 private[traversers] class IfTraverserImpl(termTraverser: => TermTraverser,
@@ -29,6 +31,18 @@ private[traversers] class IfTraverserImpl(termTraverser: => TermTraverser,
         //TODO 2. If the 'else' clause is itself an 'if', don't wrap it in a block
         write("else")
         blockTraverser.traverse(elsep, shouldReturnValue)
+    }
+  }
+
+  override def traverseAsTertiaryOp(`if`: If): Unit = {
+    write("(")
+    termTraverser.traverse(`if`.cond)
+    write(") ? ")
+    termTraverser.traverse(`if`.thenp)
+    write(" : ")
+    `if`.elsep match {
+      case Lit.Unit() => throw new IllegalStateException("Trying to traverse as a tertiary op with no 'else' clause")
+      case elsep => termTraverser.traverse(elsep)
     }
   }
 }
