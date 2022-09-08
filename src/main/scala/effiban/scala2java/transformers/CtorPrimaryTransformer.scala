@@ -28,7 +28,7 @@ private[transformers] class CtorPrimaryTransformerImpl(templateInitsToSuperCallT
       tparams = Nil,
       paramss = primaryCtor.paramss,
       decltpe = Some(Type.AnonymousName()),
-      body = Block(maybeSuperCall.toList ++ assignments)
+      body = Block(maybeSuperCall.toList ++ assignments ++ terms)
     )
   }
 }

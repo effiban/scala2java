@@ -53,7 +53,7 @@ class CtorSecondaryTransformerTest extends UnitTestSuite {
       body = Block(Nil)
     )
 
-    val actualDefnDef = CtorSecondaryTransformer.transform(secondaryCtor = secondaryCtor, ctorContext = CtorContext(Type.Name(ClassName), Nil))
+    val actualDefnDef = CtorSecondaryTransformer.transform(secondaryCtor = secondaryCtor, ctorContext = CtorContext(Type.Name(ClassName)))
 
     actualDefnDef.structure shouldBe expectedDefnDef.structure
   }
@@ -78,7 +78,7 @@ class CtorSecondaryTransformerTest extends UnitTestSuite {
       body = Block(Nil)
     )
 
-    val actualDefnDef = CtorSecondaryTransformer.transform(secondaryCtor = secondaryCtor, ctorContext = CtorContext(Type.Name(ClassName), Nil))
+    val actualDefnDef = CtorSecondaryTransformer.transform(secondaryCtor = secondaryCtor, ctorContext = CtorContext(Type.Name(ClassName)))
 
     actualDefnDef.structure shouldBe expectedDefnDef.structure
   }
@@ -108,7 +108,7 @@ class CtorSecondaryTransformerTest extends UnitTestSuite {
       body = Block(stats)
     )
 
-    val actualDefnDef = CtorSecondaryTransformer.transform(secondaryCtor = secondaryCtor, ctorContext = CtorContext(Type.Name(ClassName), Nil))
+    val actualDefnDef = CtorSecondaryTransformer.transform(secondaryCtor = secondaryCtor, ctorContext = CtorContext(Type.Name(ClassName)))
 
     actualDefnDef.structure shouldBe expectedDefnDef.structure
   }
@@ -138,7 +138,7 @@ class CtorSecondaryTransformerTest extends UnitTestSuite {
       body = Block(stats)
     )
 
-    val actualDefnDef = CtorSecondaryTransformer.transform(secondaryCtor = secondaryCtor, ctorContext = CtorContext(Type.Name(ClassName), Nil))
+    val actualDefnDef = CtorSecondaryTransformer.transform(secondaryCtor = secondaryCtor, ctorContext = CtorContext(Type.Name(ClassName)))
 
     actualDefnDef.structure shouldBe expectedDefnDef.structure
   }

@@ -21,7 +21,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
     Init(tpe = Type.Name("Parent2"), name = Name.Anonymous(), argss = List())
   )
 
-  private val TheCtorContext = CtorContext(className = ClassName, inits = TheInits)
+  private val CtorContextWithoutTerms = CtorContext(className = ClassName, inits = TheInits)
 
   private val DataMemberDecl = Decl.Val(
     mods = Nil,
@@ -59,7 +59,8 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
     stats = Nil
   )
 
-  private val Statement = Term.Apply(fun = Term.Name("doSomething"), args = List(Term.Name("param1")))
+  private val TermApply1 = Term.Apply(fun = Term.Name("doSomething1"), args = List(Term.Name("param1")))
+  private val TermApply2 = Term.Apply(fun = Term.Name("doSomething2"), args = List(Term.Name("param2")))
 
   private val MethodDefn = Defn.Def(
     mods = Nil,
@@ -67,7 +68,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
     tparams = Nil,
     paramss = List(List(termParam("param", "Int"))),
     decltpe = Some(TypeNames.Int),
-    body = Statement
+    body = TermApply1
   )
 
   private val ChildOrder = List[Tree](
@@ -151,7 +152,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
         |""".stripMargin
   }
 
-  test("traverse when has everything") {
+  test("traverse when has everything except loose terms") {
     val classInfo = ClassInfo(className = ClassName, maybePrimaryCtor = Some(PrimaryCtor))
 
     val stats = List(
@@ -161,11 +162,54 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
       SecondaryCtor
     )
 
-    expectWriteDataMemberDecl(Some(TheCtorContext))
-    expectWriteDataMemberDefn(Some(TheCtorContext))
-    expectWritePrimaryCtor(Some(TheCtorContext))
-    expectWriteSecondaryCtor(Some(TheCtorContext))
-    expectWriteMethodDefn(Some(TheCtorContext))
+    expectWriteDataMemberDecl(Some(CtorContextWithoutTerms))
+    expectWriteDataMemberDefn(Some(CtorContextWithoutTerms))
+    expectWritePrimaryCtor(Some(CtorContextWithoutTerms))
+    expectWriteSecondaryCtor(Some(CtorContextWithoutTerms))
+    expectWriteMethodDefn(Some(CtorContextWithoutTerms))
+
+    expectChildOrdering()
+
+    javaScope = JavaTreeType.Class
+
+    templateBodyTraverser.traverse(stats = stats, inits = TheInits, maybeClassInfo = Some(classInfo))
+
+    outputWriter.toString shouldBe
+      """ {
+        |/* DATA MEMBER DECL */;
+        |/* DATA MEMBER DEFINITION */;
+        |/*
+        |*  PRIMARY CTOR
+        |*/
+        |/*
+        |*  SECONDARY CTOR
+        |*/
+        |/*
+        |*  METHOD DEFINITION
+        |*/
+        |}
+        |""".stripMargin
+  }
+
+  test("traverse when has everything including loose terms") {
+    val classInfo = ClassInfo(className = ClassName, maybePrimaryCtor = Some(PrimaryCtor))
+
+    val stats = List(
+      DataMemberDecl,
+      MethodDefn,
+      DataMemberDefn,
+      SecondaryCtor,
+      TermApply1,
+      TermApply2
+    )
+
+    val expectedCtorContext = CtorContext(className = ClassName, inits = TheInits, terms = List(TermApply1, TermApply2))
+
+    expectWriteDataMemberDecl(Some(expectedCtorContext))
+    expectWriteDataMemberDefn(Some(expectedCtorContext))
+    expectWritePrimaryCtor(Some(expectedCtorContext))
+    expectWriteSecondaryCtor(Some(expectedCtorContext))
+    expectWriteMethodDefn(Some(expectedCtorContext))
 
     expectChildOrdering()
 
