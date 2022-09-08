@@ -251,11 +251,15 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
     JavaStatClassifier
   )
 
+  private lazy val templateBodyTraverser: TemplateBodyTraverser = new TemplateBodyTraverserImpl(
+    templateChildTraverser,
+    JavaTemplateChildOrdering
+  )
+
   private lazy val templateTraverser: TemplateTraverser = new TemplateTraverserImpl(
     initListTraverser,
     selfTraverser,
-    templateChildTraverser,
-    JavaTemplateChildOrdering,
+    templateBodyTraverser,
     JavaInheritanceKeywordResolver
   )
 
