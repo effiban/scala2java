@@ -3,17 +3,17 @@ package effiban.scala2java.traversers
 import effiban.scala2java.entities.JavaTreeType.JavaTreeType
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{ClassInfo, JavaKeyword, JavaTreeType}
-import effiban.scala2java.matchers.CombinedMatchers.{eqSomeTree, eqTreeList}
+import effiban.scala2java.matchers.ClassInfoMatcher
+import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
+import effiban.scala2java.matchers.OptionMatcher.eqOption
 import effiban.scala2java.matchers.TreeMatcher.eqTree
-import effiban.scala2java.orderings.JavaTemplateChildOrdering
 import effiban.scala2java.resolvers.JavaInheritanceKeywordResolver
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.{Selfs, Templates, TypeNames}
 import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchers.any
 
-import scala.meta.{Ctor, Decl, Defn, Init, Lit, Name, Pat, Self, Template, Term, Tree, Type}
+import scala.meta.{Ctor, Defn, Init, Lit, Name, Pat, Self, Stat, Template, Term, Type}
 
 class TemplateTraverserImplTest extends UnitTestSuite {
 
@@ -29,13 +29,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     Init(tpe = Type.Name("Serializable"), name = Name.Anonymous(), argss = List())
   )
 
-  private val TheSelf = Self(name = Name.Indeterminate("SelfName"), decltpe = Some(Type.Name("SelfType")))
-
-  private val DataMemberDecl = Decl.Val(
-    mods = Nil,
-    pats = List(Pat.Var(name = Term.Name("x"))),
-    decltpe = TypeNames.Int
-  )
+  private val NonEmptySelf = Self(name = Name.Indeterminate("SelfName"), decltpe = Some(Type.Name("SelfType")))
 
   private val DataMemberDefn = Defn.Val(
     mods = Nil,
@@ -48,23 +42,11 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     termParam("arg1", "Int"),
     termParam("arg2", "String")
   )
-  private val SecondaryCtorArgs = List(
-    termParam("arg3", "Int"),
-    termParam("arg4", "String")
-  )
 
   private val PrimaryCtor = Ctor.Primary(
     mods = Nil,
     name = Name.Anonymous(),
     paramss = List(PrimaryCtorArgs)
-  )
-
-  private val SecondaryCtor = Ctor.Secondary(
-    mods = Nil,
-    name = Name.Anonymous(),
-    paramss = List(SecondaryCtorArgs),
-    init = Init(tpe = Type.Singleton(Term.This(Name.Anonymous())), name = Name.Anonymous(), argss = List(Nil)),
-    stats = Nil
   )
 
   private val Statement = Term.Apply(fun = Term.Name("doSomething"), args = List(Term.Name("param1")))
@@ -78,66 +60,46 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     body = Statement
   )
 
-  private val ChildOrder = List[Tree](
-    DataMemberDecl,
-    DataMemberDefn,
-    PrimaryCtor,
-    SecondaryCtor,
-    MethodDefn
-  )
-
 
   private val initListTraverser = mock[InitListTraverser]
   private val selfTraverser = mock[SelfTraverser]
-  private val javaTemplateChildOrdering = mock[JavaTemplateChildOrdering]
   private val javaInheritanceKeywordResolver = mock[JavaInheritanceKeywordResolver]
-  private val templateChildTraverser = mock[TemplateChildTraverser]
+  private val templateBodyTraverser = mock[TemplateBodyTraverser]
 
   private val templateTraverser = new TemplateTraverserImpl(
     initListTraverser,
     selfTraverser,
-    templateChildTraverser,
-    javaTemplateChildOrdering,
+    templateBodyTraverser,
     javaInheritanceKeywordResolver
   )
 
   test("traverse when empty") {
 
+    expectWriteSelf()
+    expectTraverseBody(stats = Nil, inits = Nil, maybeClassInfo = None)
+
     templateTraverser.traverse(Templates.Empty)
 
     outputWriter.toString shouldBe
       """ {
+        |  /* BODY */
         |}
         |""".stripMargin
-  }
 
-  test("traverse when has 'self' only") {
-    val template = Template(
-      early = Nil,
-      inits = Nil,
-      self = TheSelf,
-      stats = Nil
-    )
-
-    expectWriteSelf()
-
-    templateTraverser.traverse(template)
-
-    outputWriter.toString shouldBe
-      """/* extends SelfName: SelfType */ {
-        |}
-        |""".stripMargin
+    verifyZeroInteractions(initListTraverser)
   }
 
   test("traverse when has inits only, nothing to skip") {
     val template = Template(
       early = Nil,
       inits = TheNonSkippedInits,
-      self = Self(name = Name.Anonymous(), decltpe = None),
+      self = Selfs.Empty,
       stats = Nil
     )
 
+    expectWriteSelf()
     expectWriteInits(JavaTreeType.Class)
+    expectTraverseBody(stats = Nil, inits = TheNonSkippedInits, maybeClassInfo = None)
 
     javaScope = JavaTreeType.Class
 
@@ -145,6 +107,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
 
     outputWriter.toString shouldBe
       """ implements Parent1, Parent2 {
+        |  /* BODY */
         |}
         |""".stripMargin
   }
@@ -153,11 +116,13 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     val template = Template(
       early = Nil,
       inits = TheNonSkippedInits ++ TheSkippedInits,
-      self = Self(name = Name.Anonymous(), decltpe = None),
+      self = Selfs.Empty,
       stats = Nil
     )
 
+    expectWriteSelf()
     expectWriteInits(JavaTreeType.Class)
+    expectTraverseBody(stats = Nil, inits = TheNonSkippedInits, maybeClassInfo = None)
 
     javaScope = JavaTreeType.Class
 
@@ -165,63 +130,55 @@ class TemplateTraverserImplTest extends UnitTestSuite {
 
     outputWriter.toString shouldBe
       """ implements Parent1, Parent2 {
+        |  /* BODY */
         |}
         |""".stripMargin
   }
 
-  test("traverse when has primary ctor. only") {
-    expectWritePrimaryCtor()
+  test("traverse when has self only") {
+    val template = Template(
+      early = Nil,
+      inits = Nil,
+      self = NonEmptySelf,
+      stats = Nil
+    )
 
-    expectChildOrdering()
+    expectWriteSelf(NonEmptySelf)
+    expectTraverseBody(stats = Nil, inits = Nil, maybeClassInfo = None)
+
+    templateTraverser.traverse(template)
+
+    outputWriter.toString shouldBe
+      """/* extends SelfName: SelfType */ {
+        |  /* BODY */
+        |}
+        |""".stripMargin
+
+    verifyZeroInteractions(initListTraverser)
+  }
+
+  test("traverse when has primary ctor only") {
+    val classInfo = ClassInfo(className = ClassName, maybePrimaryCtor = Some(PrimaryCtor))
+
+    expectWriteSelf()
+    expectTraverseBody(stats = Nil, inits = Nil, maybeClassInfo = Some(classInfo))
 
     templateTraverser.traverse(
       template = Templates.Empty,
-      maybeClassInfo = Some(ClassInfo(className = ClassName, maybePrimaryCtor = Some(PrimaryCtor)))
+      maybeClassInfo = Some(classInfo)
     )
 
     outputWriter.toString shouldBe
       """ {
-        |/*
-        |*  PRIMARY CTOR
-        |*/
-        |}
-        |""".stripMargin
-  }
-
-  test("traverse when has primary ctor. and inits only") {
-    val template = Template(
-      early = Nil,
-      inits = TheNonSkippedInits,
-      self = Selfs.Empty,
-      stats = Nil
-    )
-
-    expectWriteInits(JavaTreeType.Class)
-    expectWritePrimaryCtor(TheNonSkippedInits)
-    expectChildOrdering()
-
-    javaScope = JavaTreeType.Class
-
-    templateTraverser.traverse(
-      template = template,
-      maybeClassInfo = Some(ClassInfo(className = ClassName, maybePrimaryCtor = Some(PrimaryCtor)))
-    )
-
-    outputWriter.toString shouldBe
-      """ implements Parent1, Parent2 {
-        |/*
-        |*  PRIMARY CTOR
-        |*/
+        |  /* BODY */
         |}
         |""".stripMargin
   }
 
   test("traverse when has stats only") {
     val stats = List(
-      DataMemberDecl,
-      MethodDefn,
       DataMemberDefn,
-      SecondaryCtor
+      MethodDefn,
     )
 
     val template = Template(
@@ -231,77 +188,49 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       stats = stats
     )
 
-    expectWriteDataMemberDecl()
-    expectWriteDataMemberDefn()
-    expectWriteSecondaryCtor()
-    expectWriteMethodDefn()
+    expectWriteSelf()
+    expectTraverseBody(stats = stats, inits = Nil, maybeClassInfo = None)
 
-    expectChildOrdering()
-
-    templateTraverser.traverse(
-      template = template,
-      maybeClassInfo = Some(ClassInfo(className = ClassName, maybePrimaryCtor = None))
-    )
+    templateTraverser.traverse(template = template)
 
     outputWriter.toString shouldBe
       """ {
-        |/* DATA MEMBER DECL */;
-        |/* DATA MEMBER DEFINITION */;
-        |/*
-        |*  SECONDARY CTOR
-        |*/
-        |/*
-        |*  METHOD DEFINITION
-        |*/
+        |  /* BODY */
         |}
         |""".stripMargin
+
+    verifyZeroInteractions(initListTraverser)
   }
 
   test("traverse when has everything") {
     val stats = List(
-      DataMemberDecl,
       MethodDefn,
       DataMemberDefn,
-      SecondaryCtor
     )
 
     val template = Template(
       early = Nil,
       inits = TheNonSkippedInits,
-      self = TheSelf,
+      self = NonEmptySelf,
       stats = stats
     )
 
-    expectWriteInits(JavaTreeType.Class)
-    expectWriteSelf()
-    expectWriteDataMemberDecl(TheNonSkippedInits)
-    expectWriteDataMemberDefn(TheNonSkippedInits)
-    expectWritePrimaryCtor(TheNonSkippedInits)
-    expectWriteSecondaryCtor(TheNonSkippedInits)
-    expectWriteMethodDefn(TheNonSkippedInits)
+    val classInfo = ClassInfo(className = ClassName, maybePrimaryCtor = Some(PrimaryCtor))
 
-    expectChildOrdering()
+    expectWriteInits(JavaTreeType.Class)
+    expectWriteSelf(NonEmptySelf)
+    expectTraverseBody(stats = stats, inits = TheNonSkippedInits, maybeClassInfo = Some(classInfo))
 
     javaScope = JavaTreeType.Class
 
     templateTraverser.traverse(
       template = template,
-      maybeClassInfo = Some(ClassInfo(className = ClassName, maybePrimaryCtor = Some(PrimaryCtor)))
+      maybeClassInfo = Some(classInfo)
     )
 
     outputWriter.toString shouldBe
       """ implements Parent1, Parent2/* extends SelfName: SelfType */ {
-        |/* DATA MEMBER DECL */;
-        |/* DATA MEMBER DEFINITION */;
-        |/*
-        |*  PRIMARY CTOR
-        |*/
-        |/*
-        |*  SECONDARY CTOR
-        |*/
-        |/*
-        |*  METHOD DEFINITION
-        |*/
+        |  /* BODY */
         |}
         |""".stripMargin
   }
@@ -315,60 +244,25 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     doWrite("Parent1, Parent2").when(initListTraverser).traverse(eqTreeList(TheNonSkippedInits), ArgumentMatchers.eq(true))
   }
 
-  private def expectWriteSelf(): Unit = {
-    doWrite("/* extends SelfName: SelfType */").when(selfTraverser).traverse(eqTree(TheSelf))
+  private def expectWriteSelf(self: Self = Selfs.Empty): Unit = {
+    val selfStr = self match {
+      case slf if slf.structure == Selfs.Empty.structure => ""
+      case _ => "/* extends SelfName: SelfType */"
+    }
+    doWrite(selfStr).when(selfTraverser).traverse(eqTree(self))
   }
 
-  private def expectWriteDataMemberDecl(inits: List[Init] = Nil): Unit = {
+  private def expectTraverseBody(stats: List[Stat],
+                                 inits: List[Init],
+                                 maybeClassInfo: Option[ClassInfo]): Unit = {
     doWrite(
-      """/* DATA MEMBER DECL */;
+      """ {
+        |  /* BODY */
+        |}
         |""".stripMargin)
-      .when(templateChildTraverser).traverse(eqTree(DataMemberDecl), eqTreeList(inits), eqSomeTree(ClassName))
-  }
-
-  private def expectWriteDataMemberDefn(inits: List[Init] = Nil): Unit = {
-    doWrite(
-    """/* DATA MEMBER DEFINITION */;
-        |""".stripMargin)
-      .when(templateChildTraverser).traverse(eqTree(DataMemberDefn), eqTreeList(inits), eqSomeTree(ClassName))
-  }
-
-  private def expectWritePrimaryCtor(inits: List[Init] = Nil): Unit = {
-    doWrite(
-      """/*
-        |*  PRIMARY CTOR
-        |*/
-        |""".stripMargin)
-      .when(templateChildTraverser).traverse(eqTree(PrimaryCtor), eqTreeList(inits), eqSomeTree(ClassName))
-  }
-
-  private def expectWriteSecondaryCtor(inits: List[Init] = Nil): Unit = {
-    doWrite(
-      """/*
-        |*  SECONDARY CTOR
-        |*/
-        |""".stripMargin)
-      .when(templateChildTraverser).traverse(eqTree(SecondaryCtor), eqTreeList(inits), eqSomeTree(ClassName))
-  }
-
-  private def expectWriteMethodDefn(inits: List[Init] = Nil): Unit = {
-    doWrite(
-      """/*
-        |*  METHOD DEFINITION
-        |*/
-        |""".stripMargin)
-      .when(templateChildTraverser).traverse(eqTree(MethodDefn), eqTreeList(inits), eqSomeTree(ClassName))
-  }
-
-  private def expectChildOrdering() = {
-    when(javaTemplateChildOrdering.compare(any[Tree], any[Tree]))
-      .thenAnswer((tree1: Tree, tree2: Tree) => positionOf(tree1) - positionOf(tree2))
-  }
-
-  private def positionOf(tree: Tree) = {
-    ChildOrder.zipWithIndex
-      .find { case (child, _) => child.structure == tree.structure }
-      .map(_._2)
-      .getOrElse(Int.MaxValue)
+      .when(templateBodyTraverser).traverse(
+      eqTreeList(stats),
+      eqTreeList(inits),
+      eqOption(maybeClassInfo, new ClassInfoMatcher(_)))
   }
 }
