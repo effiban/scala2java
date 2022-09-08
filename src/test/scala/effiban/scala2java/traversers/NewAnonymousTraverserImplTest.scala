@@ -3,6 +3,7 @@ package effiban.scala2java.traversers
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
+import org.mockito.ArgumentMatchers
 
 import scala.meta.Term.NewAnonymous
 import scala.meta.{Init, Name, Self, Template, Term, Type}
@@ -29,7 +30,7 @@ class NewAnonymousTraverserImplTest extends UnitTestSuite {
 
     val newAnonymous = NewAnonymous(template)
 
-    doWrite("/* TEMPLATE BODY */").when(templateTraverser).traverse(eqTree(template))
+    doWrite("/* TEMPLATE BODY */").when(templateTraverser).traverse(eqTree(template), ArgumentMatchers.eq(None))
 
     newAnonymousTraverser.traverse(newAnonymous)
 

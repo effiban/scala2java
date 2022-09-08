@@ -68,7 +68,7 @@ class ObjectTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}
         |""".stripMargin)
-      .when(templateTraverser).traverse(eqTree(template))
+      .when(templateTraverser).traverse(eqTree(template), ArgumentMatchers.eq(None))
 
     objectTraverser.traverse(objectDef)
 
