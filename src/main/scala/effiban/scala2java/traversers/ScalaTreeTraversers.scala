@@ -244,12 +244,17 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
 
   private lazy val superTraverser: SuperTraverser = new SuperTraverserImpl(nameTraverser)
 
+  private lazy val templateChildTraverser: TemplateChildTraverser = new TemplateChildTraverserImpl(
+    ctorPrimaryTraverser,
+    ctorSecondaryTraverser,
+    statTraverser,
+    JavaStatClassifier
+  )
+
   private lazy val templateTraverser: TemplateTraverser = new TemplateTraverserImpl(
     initListTraverser,
     selfTraverser,
-    statTraverser,
-    ctorPrimaryTraverser,
-    ctorSecondaryTraverser,
+    templateChildTraverser,
     JavaTemplateChildOrdering,
     JavaInheritanceKeywordResolver
   )

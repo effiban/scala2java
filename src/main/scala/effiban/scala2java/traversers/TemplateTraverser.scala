@@ -6,9 +6,9 @@ import effiban.scala2java.orderings.JavaTemplateChildOrdering
 import effiban.scala2java.resolvers.JavaInheritanceKeywordResolver
 import effiban.scala2java.writers.JavaWriter
 
-import scala.meta.{Ctor, Defn, Init, Name, Stat, Template, Term, Tree, Type}
+import scala.meta.{Init, Stat, Template, Type}
 
-trait TemplateTraverser extends ScalaTreeTraverser[Template] {
+trait TemplateTraverser {
 
   def traverse(template: Template,
                maybeClassInfo: Option[ClassInfo] = None): Unit
@@ -16,24 +16,18 @@ trait TemplateTraverser extends ScalaTreeTraverser[Template] {
 
 private[traversers] class TemplateTraverserImpl(initListTraverser: => InitListTraverser,
                                                 selfTraverser: => SelfTraverser,
-                                                statTraverser: => StatTraverser,
-                                                ctorPrimaryTraverser: => CtorPrimaryTraverser,
-                                                ctorSecondaryTraverser: => CtorSecondaryTraverser,
+                                                templateChildTraverser: => TemplateChildTraverser,
                                                 javaTemplateChildOrdering: JavaTemplateChildOrdering,
                                                 javaInheritanceKeywordResolver: JavaInheritanceKeywordResolver)
                                                (implicit javaWriter: JavaWriter) extends TemplateTraverser {
 
   import javaWriter._
 
-  private val ParentsToSkip = Set(Term.Name("AnyRef"), Term.Name("Product"), Term.Name("Serializable"))
-
-  override def traverse(template: Template): Unit = {
-    traverse(template, None)
-  }
+  private val ParentsToSkip = Set(Type.Name("AnyRef"), Type.Name("Product"), Type.Name("Serializable"))
 
   def traverse(template: Template,
                maybeClassInfo: Option[ClassInfo] = None): Unit = {
-    val relevantInits = template.inits.filterNot(init => shouldSkipParent(init.name))
+    val relevantInits = template.inits.filterNot(init => shouldSkipParent(init.tpe))
     traverseTemplateInits(relevantInits)
     selfTraverser.traverse(template.self)
     traverseTemplateBody(
@@ -52,7 +46,7 @@ private[traversers] class TemplateTraverserImpl(initListTraverser: => InitListTr
     }
   }
 
-  private def shouldSkipParent(parent: Name): Boolean = {
+  private def shouldSkipParent(parent: Type): Boolean = {
     ParentsToSkip.exists(parentToSkip => parentToSkip.structure == parent.structure)
   }
 
@@ -60,35 +54,10 @@ private[traversers] class TemplateTraverserImpl(initListTraverser: => InitListTr
                                    inits: List[Init],
                                    maybeClassInfo: Option[ClassInfo] = None): Unit = {
     val children = statements ++ maybeClassInfo.flatMap(_.maybePrimaryCtor)
-    val maybeClassName = maybeClassInfo.map(_.className)
     writeBlockStart()
-    children.sorted(javaTemplateChildOrdering).foreach {
-      case defnDef: Defn.Def => statTraverser.traverse(defnDef)
-      case defnType: Defn.Type => statTraverser.traverse(defnType)
-      case primaryCtor: Ctor.Primary => traversePrimaryCtor(primaryCtor, maybeClassName, inits)
-      case secondaryCtor: Ctor.Secondary => traverseSecondaryCtor(secondaryCtor, maybeClassName)
-      case stat: Stat =>
-        statTraverser.traverse(stat)
-        writeStatementEnd()
-      case unexpected: Tree => throw new IllegalStateException(s"Unexpected template child: $unexpected")
-    }
+    children.sorted(javaTemplateChildOrdering).foreach(child =>
+      templateChildTraverser.traverse(child, inits, maybeClassInfo.map(_.className))
+    )
     writeBlockEnd()
-  }
-
-  private def traversePrimaryCtor(primaryCtor: Ctor.Primary,
-                                  maybeClassName: Option[Type.Name],
-                                  inits: List[Init]): Unit = {
-    maybeClassName match {
-      // TODO skip traversal if the ctor. is public+default+empty, and there are no secondaries
-      case Some(className) => ctorPrimaryTraverser.traverse(primaryCtor, className, inits)
-      case None => throw new IllegalStateException("Primary Ctor. exists but class name was not passed to the TemplateTraverser")
-    }
-  }
-
-  private def traverseSecondaryCtor(secondaryCtor: Ctor.Secondary, maybeClassName: Option[Type.Name]): Unit = {
-    maybeClassName match {
-      case Some(className) => ctorSecondaryTraverser.traverse(secondaryCtor, className)
-      case None => throw new IllegalStateException("Secondary Ctor. exists but class name was not passed to the TemplateTraverser")
-    }
   }
 }

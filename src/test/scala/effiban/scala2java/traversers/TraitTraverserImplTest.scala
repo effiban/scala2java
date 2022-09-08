@@ -93,7 +93,7 @@ class TraitTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}
         |""".stripMargin)
-      .when(templateTraverser).traverse(eqTree(TheTemplate))
+      .when(templateTraverser).traverse(eqTree(TheTemplate), ArgumentMatchers.eq(None))
 
     traitTraverser.traverse(`trait`)
 
