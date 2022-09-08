@@ -1,7 +1,7 @@
 package effiban.scala2java.transformers
 
-import effiban.scala2java.entities.JavaTreeType
 import effiban.scala2java.entities.TraversalContext.javaScope
+import effiban.scala2java.entities.{CtorContext, JavaTreeType}
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
 import org.mockito.ArgumentMatchers.any
@@ -50,7 +50,7 @@ class CtorPrimaryTransformerImplTest extends UnitTestSuite {
 
     when(ctorInitsToSuperCallTransformer.transform(any())).thenReturn(None)
 
-    val actualDefnDef = ctorPrimaryTransformer.transform(primaryCtor, Type.Name(ClassName), Nil)
+    val actualDefnDef = ctorPrimaryTransformer.transform(primaryCtor, CtorContext(Type.Name(ClassName), Nil))
 
     actualDefnDef.structure shouldBe expectedDefnDef.structure
   }
@@ -86,7 +86,7 @@ class CtorPrimaryTransformerImplTest extends UnitTestSuite {
 
     when(ctorInitsToSuperCallTransformer.transform(any())).thenReturn(Some(expectedSuperCall))
 
-    val actualDefnDef = ctorPrimaryTransformer.transform(primaryCtor, Type.Name(ClassName), List(inputInit))
+    val actualDefnDef = ctorPrimaryTransformer.transform(primaryCtor, CtorContext(Type.Name(ClassName), List(inputInit)))
 
     actualDefnDef.structure shouldBe expectedDefnDef.structure
   }
@@ -117,7 +117,7 @@ class CtorPrimaryTransformerImplTest extends UnitTestSuite {
 
     when(ctorInitsToSuperCallTransformer.transform(any())).thenReturn(None)
 
-    val actualDefnDef = CtorPrimaryTransformer.transform(primaryCtor, Type.Name(ClassName), Nil)
+    val actualDefnDef = CtorPrimaryTransformer.transform(primaryCtor, CtorContext(Type.Name(ClassName), Nil))
 
     actualDefnDef.structure shouldBe expectedDefnDef.structure
   }
@@ -158,7 +158,7 @@ class CtorPrimaryTransformerImplTest extends UnitTestSuite {
 
     when(ctorInitsToSuperCallTransformer.transform(any())).thenReturn(Some(expectedSuperCall))
 
-    val actualDefnDef = CtorPrimaryTransformer.transform(primaryCtor, Type.Name(ClassName), List(inputInit))
+    val actualDefnDef = CtorPrimaryTransformer.transform(primaryCtor, CtorContext(Type.Name(ClassName), List(inputInit)))
 
     actualDefnDef.structure shouldBe expectedDefnDef.structure
   }

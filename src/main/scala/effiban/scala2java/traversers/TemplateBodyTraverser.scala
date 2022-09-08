@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.ClassInfo
+import effiban.scala2java.entities.{ClassInfo, CtorContext}
 import effiban.scala2java.orderings.JavaTemplateChildOrdering
 import effiban.scala2java.writers.JavaWriter
 
@@ -23,9 +23,10 @@ private[traversers] class TemplateBodyTraverserImpl(templateChildTraverser: => T
                inits: List[Init],
                maybeClassInfo: Option[ClassInfo]): Unit = {
     val children = stats ++ maybeClassInfo.flatMap(_.maybePrimaryCtor)
+    val maybeCtorContext = maybeClassInfo.map(classInfo => CtorContext(classInfo.className, inits))
     writeBlockStart()
     children.sorted(javaTemplateChildOrdering).foreach(child =>
-      templateChildTraverser.traverse(child, inits, maybeClassInfo.map(_.className))
+      templateChildTraverser.traverse(child, maybeCtorContext)
     )
     writeBlockEnd()
   }

@@ -1,5 +1,6 @@
 package effiban.scala2java.matchers
 
+import effiban.scala2java.entities.CtorContext
 import org.mockito.ArgumentMatchers.argThat
 
 import scala.meta.Tree
@@ -16,4 +17,7 @@ object CombinedMatchers {
 
   def eqOptionTreeList[T <: Tree](expected: List[Option[T]]): List[Option[T]] =
     argThat(new ListMatcher(expected, new OptionMatcher[T](_, new TreeMatcher[T](_))))
+
+  def eqOptionCtorContext(expected: Option[CtorContext]): Option[CtorContext] =
+    argThat(new OptionMatcher(expected, new CtorContextMatcher(_)))
 }

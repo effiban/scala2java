@@ -1,7 +1,7 @@
 package effiban.scala2java.transformers
 
-import effiban.scala2java.entities.JavaTreeType
 import effiban.scala2java.entities.TraversalContext.javaScope
+import effiban.scala2java.entities.{CtorContext, JavaTreeType}
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
 
@@ -53,7 +53,7 @@ class CtorSecondaryTransformerTest extends UnitTestSuite {
       body = Block(Nil)
     )
 
-    val actualDefnDef = CtorSecondaryTransformer.transform(secondaryCtor = secondaryCtor, className = Type.Name(ClassName))
+    val actualDefnDef = CtorSecondaryTransformer.transform(secondaryCtor = secondaryCtor, ctorContext = CtorContext(Type.Name(ClassName), Nil))
 
     actualDefnDef.structure shouldBe expectedDefnDef.structure
   }
@@ -78,7 +78,7 @@ class CtorSecondaryTransformerTest extends UnitTestSuite {
       body = Block(Nil)
     )
 
-    val actualDefnDef = CtorSecondaryTransformer.transform(secondaryCtor = secondaryCtor, className = Type.Name(ClassName))
+    val actualDefnDef = CtorSecondaryTransformer.transform(secondaryCtor = secondaryCtor, ctorContext = CtorContext(Type.Name(ClassName), Nil))
 
     actualDefnDef.structure shouldBe expectedDefnDef.structure
   }
@@ -108,7 +108,7 @@ class CtorSecondaryTransformerTest extends UnitTestSuite {
       body = Block(stats)
     )
 
-    val actualDefnDef = CtorSecondaryTransformer.transform(secondaryCtor = secondaryCtor, className = Type.Name(ClassName))
+    val actualDefnDef = CtorSecondaryTransformer.transform(secondaryCtor = secondaryCtor, ctorContext = CtorContext(Type.Name(ClassName), Nil))
 
     actualDefnDef.structure shouldBe expectedDefnDef.structure
   }
@@ -138,7 +138,7 @@ class CtorSecondaryTransformerTest extends UnitTestSuite {
       body = Block(stats)
     )
 
-    val actualDefnDef = CtorSecondaryTransformer.transform(secondaryCtor = secondaryCtor, className = Type.Name(ClassName))
+    val actualDefnDef = CtorSecondaryTransformer.transform(secondaryCtor = secondaryCtor, ctorContext = CtorContext(Type.Name(ClassName), Nil))
 
     actualDefnDef.structure shouldBe expectedDefnDef.structure
   }
