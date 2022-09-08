@@ -1,8 +1,8 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.entities.TraversalContext.javaScope
-import effiban.scala2java.entities.{ClassInfo, JavaTreeType}
-import effiban.scala2java.matchers.CombinedMatchers.{eqOptionTree, eqSomeTree, eqTreeList}
+import effiban.scala2java.entities.{ClassInfo, CtorContext, JavaTreeType}
+import effiban.scala2java.matchers.CombinedMatchers.eqOptionCtorContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.orderings.JavaTemplateChildOrdering
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
@@ -20,6 +20,8 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
     Init(tpe = Type.Name("Parent1"), name = Name.Anonymous(), argss = List()),
     Init(tpe = Type.Name("Parent2"), name = Name.Anonymous(), argss = List())
   )
+
+  private val TheCtorContext = CtorContext(className = ClassName, inits = TheInits)
 
   private val DataMemberDecl = Decl.Val(
     mods = Nil,
@@ -107,7 +109,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
   test("traverse when has primary ctor. only") {
     val classInfo = ClassInfo(className = ClassName, maybePrimaryCtor = Some(PrimaryCtor))
 
-    expectWritePrimaryCtor()
+    expectWritePrimaryCtor(Some(CtorContext(className = ClassName, inits = Nil)))
 
     expectChildOrdering()
 
@@ -159,11 +161,11 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
       SecondaryCtor
     )
 
-    expectWriteDataMemberDecl(TheInits, Some(ClassName))
-    expectWriteDataMemberDefn(TheInits, Some(ClassName))
-    expectWritePrimaryCtor(TheInits)
-    expectWriteSecondaryCtor(TheInits)
-    expectWriteMethodDefn(TheInits, Some(ClassName))
+    expectWriteDataMemberDecl(Some(TheCtorContext))
+    expectWriteDataMemberDefn(Some(TheCtorContext))
+    expectWritePrimaryCtor(Some(TheCtorContext))
+    expectWriteSecondaryCtor(Some(TheCtorContext))
+    expectWriteMethodDefn(Some(TheCtorContext))
 
     expectChildOrdering()
 
@@ -192,45 +194,45 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
     Term.Param(mods = List(), name = Term.Name(name), decltpe = Some(Type.Name(typeName)), default = None)
   }
 
-  private def expectWriteDataMemberDecl(inits: List[Init] = Nil, maybeClassName: Option[Type.Name] = None): Unit = {
+  private def expectWriteDataMemberDecl(maybeCtorContext: Option[CtorContext] = None): Unit = {
     doWrite(
       """/* DATA MEMBER DECL */;
         |""".stripMargin)
-      .when(templateChildTraverser).traverse(eqTree(DataMemberDecl), eqTreeList(inits), eqOptionTree(maybeClassName))
+      .when(templateChildTraverser).traverse(eqTree(DataMemberDecl), eqOptionCtorContext(maybeCtorContext))
   }
 
-  private def expectWriteDataMemberDefn(inits: List[Init] = Nil, maybeClassName: Option[Type.Name] = None): Unit = {
+  private def expectWriteDataMemberDefn(maybeCtorContext: Option[CtorContext] = None): Unit = {
     doWrite(
     """/* DATA MEMBER DEFINITION */;
         |""".stripMargin)
-      .when(templateChildTraverser).traverse(eqTree(DataMemberDefn), eqTreeList(inits), eqOptionTree(maybeClassName))
+      .when(templateChildTraverser).traverse(eqTree(DataMemberDefn), eqOptionCtorContext(maybeCtorContext))
   }
 
-  private def expectWritePrimaryCtor(inits: List[Init] = Nil): Unit = {
+  private def expectWritePrimaryCtor(maybeCtorContext: Option[CtorContext] = None): Unit = {
     doWrite(
       """/*
         |*  PRIMARY CTOR
         |*/
         |""".stripMargin)
-      .when(templateChildTraverser).traverse(eqTree(PrimaryCtor), eqTreeList(inits), eqSomeTree(ClassName))
+      .when(templateChildTraverser).traverse(eqTree(PrimaryCtor), eqOptionCtorContext(maybeCtorContext))
   }
 
-  private def expectWriteSecondaryCtor(inits: List[Init] = Nil): Unit = {
+  private def expectWriteSecondaryCtor(maybeCtorContext: Option[CtorContext] = None): Unit = {
     doWrite(
       """/*
         |*  SECONDARY CTOR
         |*/
         |""".stripMargin)
-      .when(templateChildTraverser).traverse(eqTree(SecondaryCtor), eqTreeList(inits), eqSomeTree(ClassName))
+      .when(templateChildTraverser).traverse(eqTree(SecondaryCtor), eqOptionCtorContext(maybeCtorContext))
   }
 
-  private def expectWriteMethodDefn(inits: List[Init] = Nil, maybeClassName: Option[Type.Name] = None): Unit = {
+  private def expectWriteMethodDefn(maybeCtorContext: Option[CtorContext] = None): Unit = {
     doWrite(
       """/*
         |*  METHOD DEFINITION
         |*/
         |""".stripMargin)
-      .when(templateChildTraverser).traverse(eqTree(MethodDefn), eqTreeList(inits), eqOptionTree(maybeClassName))
+      .when(templateChildTraverser).traverse(eqTree(MethodDefn), eqOptionCtorContext(maybeCtorContext))
   }
 
   private def expectChildOrdering() = {
