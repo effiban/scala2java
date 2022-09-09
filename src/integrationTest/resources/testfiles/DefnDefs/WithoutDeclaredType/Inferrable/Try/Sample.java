@@ -7,15 +7,14 @@ public class Sample {
     }
 
     public String foo() {
-        return try {
-            "ok";
+        try {
+            return "ok";
         }
         catch (final IllegalStateException e) {
-            "illegal state";
+            return "illegal state";
         }
         catch (final IllegalArgumentException e) {
-            "illegal argument";
+            return "illegal argument";
         }
-        ;
     }
 }

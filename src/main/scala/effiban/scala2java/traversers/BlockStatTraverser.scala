@@ -1,12 +1,13 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.classifiers.JavaStatClassifier
+import effiban.scala2java.contexts.TryContext
 import effiban.scala2java.entities.Decision.{Decision, No, Uncertain, Yes}
 import effiban.scala2java.entities.TraversalConstants.UncertainReturn
 import effiban.scala2java.resolvers.ShouldReturnValueResolver
 import effiban.scala2java.writers.JavaWriter
 
-import scala.meta.Term.{If, Return}
+import scala.meta.Term.{If, Return, Try, TryWithHandler}
 import scala.meta.{Stat, Term}
 
 trait BlockStatTraverser {
@@ -17,6 +18,8 @@ trait BlockStatTraverser {
 }
 
 private[traversers] class BlockStatTraverserImpl(ifTraverser: => IfTraverser,
+                                                 tryTraverser: => TryTraverser,
+                                                 tryWithHandlerTraverser: => TryWithHandlerTraverser,
                                                  statTraverser: => StatTraverser,
                                                  shouldReturnValueResolver: => ShouldReturnValueResolver,
                                                  javaStatClassifier: JavaStatClassifier)
@@ -32,6 +35,8 @@ private[traversers] class BlockStatTraverserImpl(ifTraverser: => IfTraverser,
   override def traverseLast(stat: Stat, shouldReturnValue: Decision = No): Unit = {
     stat match {
       case `if`: If => ifTraverser.traverse(`if`, shouldReturnValue)
+      case `try`: Try => tryTraverser.traverse(`try`, TryContext(shouldReturnValue))
+      case tryWithHandler: TryWithHandler => tryWithHandlerTraverser.traverse(tryWithHandler, TryContext(shouldReturnValue))
       case term: Term => traverseLastTerm(term, shouldReturnValue)
       case _ => traverse(stat)
     }

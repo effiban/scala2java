@@ -1,13 +1,14 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.Decision.No
+import effiban.scala2java.contexts.TryContext
+import effiban.scala2java.entities.Decision.{No, Yes}
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
 import org.mockito.ArgumentMatchers
 
+import scala.meta.Term
 import scala.meta.Term.Block
-import scala.meta.{Name, Term, Type}
 
 class TryWithHandlerTraverserImplTest extends UnitTestSuite {
 
@@ -46,6 +47,34 @@ class TryWithHandlerTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """try {
         |  doSomething();
+        |}
+        |/* UNPARSEABLE catch handler: someCatchHandler */
+        |""".stripMargin
+  }
+
+  test("traverse with a single statement and no 'finally', and shouldReturnValue=Yes") {
+    val tryWithHandler = Term.TryWithHandler(
+      expr = TryStatement,
+      catchp = CatchHandler,
+      finallyp = None
+    )
+
+    doWrite(
+      """ {
+        |  return doSomething();
+        |}
+        |""".stripMargin)
+      .when(blockTraverser).traverse(
+      stat = eqTree(TryStatement),
+      shouldReturnValue = ArgumentMatchers.eq(Yes),
+      maybeInit = ArgumentMatchers.eq(None)
+    )
+
+    tryWithHandlerTraverser.traverse(tryWithHandler = tryWithHandler, context = TryContext(shouldReturnValue = Yes))
+
+    outputWriter.toString shouldBe
+      """try {
+        |  return doSomething();
         |}
         |/* UNPARSEABLE catch handler: someCatchHandler */
         |""".stripMargin
@@ -115,9 +144,5 @@ class TryWithHandlerTraverserImplTest extends UnitTestSuite {
         |}
         |/* UNPARSEABLE catch handler: someCatchHandler */
         |""".stripMargin
-  }
-
-  private def termParam(name: Name, decltpe: Type): Term.Param = {
-    Term.Param(mods = Nil, name = name, decltpe = Some(decltpe), default = None)
   }
 }

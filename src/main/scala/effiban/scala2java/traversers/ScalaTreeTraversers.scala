@@ -32,6 +32,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
 
   private lazy val blockStatTraverser: BlockStatTraverser = new BlockStatTraverserImpl(
     ifTraverser,
+    tryTraverser,
+    tryWithHandlerTraverser,
     statTraverser,
     shouldReturnValueResolver,
     JavaStatClassifier

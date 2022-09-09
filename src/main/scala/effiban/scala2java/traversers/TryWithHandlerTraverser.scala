@@ -1,10 +1,13 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.TryContext
 import effiban.scala2java.writers.JavaWriter
 
-import scala.meta.Term.{Block, TryWithHandler}
+import scala.meta.Term.TryWithHandler
 
-trait TryWithHandlerTraverser extends ScalaTreeTraverser[TryWithHandler]
+trait TryWithHandlerTraverser {
+  def traverse(tryWithHandler: TryWithHandler, context: TryContext = TryContext()): Unit
+}
 
 private[traversers] class TryWithHandlerTraverserImpl(blockTraverser: => BlockTraverser,
                                                       finallyTraverser: => FinallyTraverser)
@@ -12,10 +15,9 @@ private[traversers] class TryWithHandlerTraverserImpl(blockTraverser: => BlockTr
 
   import javaWriter._
 
-  // TODO support return value flag
-  override def traverse(tryWithHandler: TryWithHandler): Unit = {
+  override def traverse(tryWithHandler: TryWithHandler, context: TryContext = TryContext()): Unit = {
     write("try")
-    blockTraverser.traverse(tryWithHandler.expr)
+    blockTraverser.traverse(stat = tryWithHandler.expr, shouldReturnValue = context.shouldReturnValue)
     // The catch handler is some term which evaluates to a partial function, which we cannot handle (without semantic information)
     writeComment(s"UNPARSEABLE catch handler: ${tryWithHandler.catchp}")
     writeLine()
