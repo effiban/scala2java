@@ -14,7 +14,6 @@ private[traversers] class TypeBoundsTraverserImpl(typeTraverser: => TypeTraverse
   // Scala type bounds e.g. X <: Y
   override def traverse(typeBounds: Type.Bounds): Unit = {
     //Only upper or lower bounds allowed in Java, not both
-    //TODO handle lower bound Null which can be skipped in Java
     //TODO - call the traverser with an argument indicating that Java primitives should be boxed
     (typeBounds.lo, typeBounds.hi) match {
       case (Some(Type.Name("Null")), None) =>

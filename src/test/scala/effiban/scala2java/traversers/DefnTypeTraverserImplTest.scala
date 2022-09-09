@@ -36,12 +36,14 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
 
   private val typeParamListTraverser = mock[TypeParamListTraverser]
   private val typeTraverser = mock[TypeTraverser]
+  private val typeBoundsTraverser = mock[TypeBoundsTraverser]
   private val javaModifiersResolver = mock[JavaModifiersResolver]
 
   private val defnTypeTraverser = new DefnTypeTraverserImpl(
-  typeParamListTraverser,
-  typeTraverser,
-  javaModifiersResolver)
+    typeParamListTraverser,
+    typeTraverser,
+    typeBoundsTraverser,
+    javaModifiersResolver)
 
 
   test("traverse() when has body and no bounds") {
@@ -65,42 +67,23 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() when has no body and has upper bound") {
+    val bounds = Bounds(lo = None, hi = Some(MyOtherType))
     val defnType = Defn.Type(
       mods = Modifiers,
       name = MyType,
       tparams = TypeParams,
       body = Type.AnonymousName(),
-      bounds = Bounds(lo = None, hi = Some(MyOtherType))
+      bounds = bounds
     )
 
     whenResolveJavaModifiersThenReturnPrivate(defnType)
-    doWrite("MyOtherType").when(typeTraverser).traverse(eqTree(MyOtherType))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
+    doWrite("extends MyOtherType").when(typeBoundsTraverser).traverse(eqTree(bounds))
 
     defnTypeTraverser.traverse(defnType)
 
     outputWriter.toString shouldBe
       """private interface MyType<T> extends MyOtherType {
-        |}
-        |""".stripMargin
-  }
-
-  test("traverse() when has no body and has lower bound") {
-    val defnType = Defn.Type(
-      mods = Modifiers,
-      name = MyType,
-      tparams = TypeParams,
-      body = Type.AnonymousName(),
-      bounds = Bounds(lo = Some(MyOtherType), hi = None)
-    )
-
-    whenResolveJavaModifiersThenReturnPrivate(defnType)
-    doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
-
-    defnTypeTraverser.traverse(defnType)
-
-    outputWriter.toString shouldBe
-      """private interface MyType<T>/* super MyOtherType */ {
         |}
         |""".stripMargin
   }
