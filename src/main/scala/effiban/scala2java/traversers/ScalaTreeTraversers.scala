@@ -115,6 +115,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
   private lazy val defnTypeTraverser: DefnTypeTraverser = new DefnTypeTraverserImpl(
     typeParamListTraverser,
     typeTraverser,
+    typeBoundsTraverser,
     JavaModifiersResolver
   )
 

@@ -5,12 +5,14 @@ import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.resolvers.{JavaModifiersResolver, JavaModifiersResolverParams}
 import effiban.scala2java.writers.JavaWriter
 
+import scala.meta.Type.Bounds
 import scala.meta.{Defn, Type}
 
 trait DefnTypeTraverser extends ScalaTreeTraverser[Defn.Type]
 
 private[traversers] class DefnTypeTraverserImpl(typeParamListTraverser: => TypeParamListTraverser,
                                                 typeTraverser: => TypeTraverser,
+                                                typeBoundsTraverser: => TypeBoundsTraverser,
                                                 javaModifiersResolver: JavaModifiersResolver)
                                                (implicit javaWriter: JavaWriter) extends DefnTypeTraverser {
 
@@ -22,14 +24,11 @@ private[traversers] class DefnTypeTraverserImpl(typeParamListTraverser: => TypeP
       typeKeyword = "interface",
       name = typeDef.name.toString)
     typeParamListTraverser.traverse(typeDef.tparams)
-    // Only an upper bound can be supported by extending in Java
-    (typeDef.bounds.lo, typeDef.bounds.hi) match {
-      case (Some(lo), None) => writeComment(s"super $lo")
-      case (None, Some(hi)) =>
-        write(" extends ")
-        typeTraverser.traverse(hi)
-      case (None, None) =>
-      case _ => writeComment(typeDef.bounds.toString)
+    typeDef.bounds match {
+      case Bounds(None, None) =>
+      case bounds =>
+        write(" ")
+        typeBoundsTraverser.traverse(bounds)
     }
     // If the body type exists, extend it in Java
     typeDef.body match {
