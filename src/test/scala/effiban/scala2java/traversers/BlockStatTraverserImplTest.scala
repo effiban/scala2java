@@ -1,6 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.classifiers.JavaStatClassifier
+import effiban.scala2java.contexts.TryContext
 import effiban.scala2java.entities.Decision.{No, Uncertain, Yes}
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.resolvers.ShouldReturnValueResolver
@@ -9,7 +10,7 @@ import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
 import org.mockito.ArgumentMatchers
 
-import scala.meta.Term.Return
+import scala.meta.Term.{Return, TryWithHandler}
 import scala.meta.{Defn, Lit, Term}
 
 class BlockStatTraverserImplTest extends UnitTestSuite {
@@ -24,6 +25,23 @@ class BlockStatTraverserImplTest extends UnitTestSuite {
   )
   private val TheIfStr =
     """if (x < 3) {
+      |    doSomething();
+      |}""".stripMargin
+
+  private val TheTry = Term.Try(
+    expr = Term.Apply(fun = Term.Name("doSomething"), args = List.empty),
+    catchp = Nil,
+    finallyp = None
+  )
+
+  private val TheTryWithHandler = TryWithHandler(
+    expr = Term.Apply(fun = Term.Name("doSomething"), args = List.empty),
+    catchp = Lit.Unit(),
+    finallyp = None
+  )
+
+  private val TheTryStr =
+    """try {
       |    doSomething();
       |}""".stripMargin
 
@@ -43,12 +61,16 @@ class BlockStatTraverserImplTest extends UnitTestSuite {
 
 
   private val ifTraverser = mock[IfTraverser]
+  private val tryTraverser = mock[TryTraverser]
+  private val tryWithHandlerTraverser = mock[TryWithHandlerTraverser]
   private val statTraverser = mock[StatTraverser]
   private val shouldReturnValueResolver = mock[ShouldReturnValueResolver]
   private val javaTermClassifier = mock[JavaStatClassifier]
 
   private val blockStatTraverser = new BlockStatTraverserImpl(
     ifTraverser,
+    tryTraverser,
+    tryWithHandlerTraverser,
     statTraverser,
     shouldReturnValueResolver,
     javaTermClassifier)
@@ -88,6 +110,22 @@ class BlockStatTraverserImplTest extends UnitTestSuite {
     blockStatTraverser.traverseLast(TheIf, shouldReturnValue = Uncertain)
 
     outputWriter.toString shouldBe TheIfStr
+  }
+
+  test("traverseLast() for a 'Try' when shouldReturnValue=Yes") {
+    doWrite(TheTryStr).when(tryTraverser).traverse(eqTree(TheTry), ArgumentMatchers.eq(TryContext(Yes)))
+
+    blockStatTraverser.traverseLast(TheTry, shouldReturnValue = Yes)
+
+    outputWriter.toString shouldBe TheTryStr
+  }
+
+  test("traverseLast() for a 'TryWithHandler' when shouldReturnValue=Yes") {
+    doWrite(TheTryStr).when(tryWithHandlerTraverser).traverse(eqTree(TheTryWithHandler), ArgumentMatchers.eq(TryContext(Yes)))
+
+    blockStatTraverser.traverseLast(TheTryWithHandler, shouldReturnValue = Yes)
+
+    outputWriter.toString shouldBe TheTryStr
   }
 
   test("traverseLast() for a 'Term.Apply' when shouldReturnValue=Yes, shouldTermReturnValue=Yes and statementEndRequired=true") {

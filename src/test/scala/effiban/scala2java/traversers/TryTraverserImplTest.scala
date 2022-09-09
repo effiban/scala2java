@@ -1,6 +1,7 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.Decision.No
+import effiban.scala2java.contexts.{CatchHandlerContext, TryContext}
+import effiban.scala2java.entities.Decision.{No, Yes}
 import effiban.scala2java.matchers.CombinedMatchers.eqSomeTree
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
@@ -147,7 +148,10 @@ class TryTraverserImplTest extends UnitTestSuite {
         |  log.error(e1);
         |}
         |""".stripMargin)
-      .when(catchHandlerTraverser).traverse(eqTree(CatchParam1), eqTree(CatchStatement1))
+      .when(catchHandlerTraverser).traverse(
+      eqTree(CatchParam1),
+      eqTree(CatchStatement1),
+      ArgumentMatchers.eq(CatchHandlerContext()))
 
     tryTraverser.traverse(`try`)
 
@@ -195,13 +199,22 @@ class TryTraverserImplTest extends UnitTestSuite {
         |  log.error(e1);
         |}
         |""".stripMargin)
-      .when(catchHandlerTraverser).traverse(eqTree(CatchParam1), eqTree(CatchStatement1))
+      .when(catchHandlerTraverser).traverse(
+      eqTree(CatchParam1),
+      eqTree(CatchStatement1),
+      ArgumentMatchers.eq(CatchHandlerContext())
+    )
+
     doWrite(
       """catch (IllegalStateException e2) {
         |  log.error(e2);
         |}
         |""".stripMargin)
-      .when(catchHandlerTraverser).traverse(eqTree(CatchParam2), eqTree(CatchStatement2))
+      .when(catchHandlerTraverser).traverse(
+      eqTree(CatchParam2),
+      eqTree(CatchStatement2),
+      ArgumentMatchers.eq(CatchHandlerContext())
+    )
 
     tryTraverser.traverse(`try`)
 
@@ -246,7 +259,11 @@ class TryTraverserImplTest extends UnitTestSuite {
         |  log.error(e1);
         |}
         |""".stripMargin)
-      .when(catchHandlerTraverser).traverse(eqTree(CatchParam1), eqTree(CatchStatement1))
+      .when(catchHandlerTraverser).traverse(
+      eqTree(CatchParam1),
+      eqTree(CatchStatement1),
+      ArgumentMatchers.eq(CatchHandlerContext())
+    )
 
     doWrite(
       """finally {
@@ -263,6 +280,61 @@ class TryTraverserImplTest extends UnitTestSuite {
         |}
         |catch (IllegalArgumentException e1) {
         |  log.error(e1);
+        |}
+        |finally {
+        |  cleanup();
+        |}
+        |""".stripMargin
+  }
+
+  test("traverse with single statement, one 'catch' case and a 'finally', and shouldReturnValue=Yes") {
+    val `try` = Term.Try(
+      expr = TryStatement,
+      catchp = List(
+        CatchCase1
+      ),
+      finallyp = Some(FinallyStatement)
+    )
+
+    doWrite(
+      """ {
+        |  return doSomething();
+        |}
+        |""".stripMargin)
+      .when(blockTraverser).traverse(
+      stat = eqTree(TryStatement),
+      shouldReturnValue = ArgumentMatchers.eq(Yes),
+      maybeInit = ArgumentMatchers.eq(None)
+    )
+
+    when(patToTermParamTransformer.transform(eqTree(CatchPat1), eqSomeTree(ThrowableType)))
+      .thenReturn(Some(CatchParam1))
+
+    doWrite(
+      """catch (IllegalArgumentException e1) {
+        |  return "failed";
+        |}
+        |""".stripMargin)
+      .when(catchHandlerTraverser).traverse(
+      param = eqTree(CatchParam1),
+      body = eqTree(CatchStatement1),
+      context = ArgumentMatchers.eq(CatchHandlerContext(shouldReturnValue = Yes)))
+
+    doWrite(
+      """finally {
+        |  cleanup();
+        |}
+        |""".stripMargin)
+      .when(finallyTraverser).traverse(eqTree(FinallyStatement))
+
+    tryTraverser.traverse(`try` = `try`, context = TryContext(shouldReturnValue = Yes))
+
+    outputWriter.toString shouldBe
+      """try {
+        |  return doSomething();
+        |}
+        |catch (IllegalArgumentException e1) {
+        |  return "failed";
         |}
         |finally {
         |  cleanup();
@@ -304,7 +376,11 @@ class TryTraverserImplTest extends UnitTestSuite {
         |  log.error(e2);
         |}
         |""".stripMargin)
-      .when(catchHandlerTraverser).traverse(eqTree(CatchParam2), eqTree(CatchStatement2))
+      .when(catchHandlerTraverser).traverse(
+      eqTree(CatchParam2),
+      eqTree(CatchStatement2),
+      ArgumentMatchers.eq(CatchHandlerContext())
+    )
 
     tryTraverser.traverse(`try`)
 
@@ -356,7 +432,11 @@ class TryTraverserImplTest extends UnitTestSuite {
         |  log.error(e1);
         |}
         |""".stripMargin)
-      .when(catchHandlerTraverser).traverse(eqTree(CatchParam1), eqTree(CatchStatement1))
+      .when(catchHandlerTraverser).traverse(
+      eqTree(CatchParam1),
+      eqTree(CatchStatement1),
+      ArgumentMatchers.eq(CatchHandlerContext())
+    )
 
     tryTraverser.traverse(`try`)
 

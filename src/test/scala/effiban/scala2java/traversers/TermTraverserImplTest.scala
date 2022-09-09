@@ -1,5 +1,6 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.TryContext
 import effiban.scala2java.entities.Decision.{No, Uncertain}
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.testsuites.UnitTestSuite
@@ -208,7 +209,7 @@ class TermTraverserImplTest extends UnitTestSuite {
       finallyp = None
     )
     termTraverser.traverse(`try`)
-    verify(tryTraverser).traverse(eqTree(`try`))
+    verify(tryTraverser).traverse(eqTree(`try`), ArgumentMatchers.eq(TryContext()))
   }
 
   test("traverse() for TryWithHandler") {
@@ -225,7 +226,7 @@ class TermTraverserImplTest extends UnitTestSuite {
       finallyp = None
     )
     termTraverser.traverse(tryWithHandler)
-    verify(tryWithHandlerTraverser).traverse(eqTree(tryWithHandler))
+    verify(tryWithHandlerTraverser).traverse(eqTree(tryWithHandler), ArgumentMatchers.eq(TryContext()))
   }
 
   test("traverse() for Term.Function") {

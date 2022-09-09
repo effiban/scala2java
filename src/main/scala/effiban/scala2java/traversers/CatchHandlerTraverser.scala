@@ -1,12 +1,14 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.CatchHandlerContext
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term
-import scala.meta.Term.Block
 
 trait CatchHandlerTraverser {
-  def traverse(param: Term.Param, body: Term): Unit
+  def traverse(param: Term.Param,
+               body: Term,
+               context: CatchHandlerContext = CatchHandlerContext()): Unit
 }
 
 private[traversers] class CatchHandlerTraverserImpl(termParamListTraverser: => TermParamListTraverser,
@@ -15,10 +17,11 @@ private[traversers] class CatchHandlerTraverserImpl(termParamListTraverser: => T
 
   import javaWriter._
 
-  // TODO - support return value flag
-  override def traverse(param: Term.Param, body: Term): Unit = {
+  override def traverse(param: Term.Param,
+                        body: Term,
+                        context: CatchHandlerContext = CatchHandlerContext()): Unit = {
     write("catch ")
     termParamListTraverser.traverse(termParams = List(param), onSameLine = true)
-    blockTraverser.traverse(body)
+    blockTraverser.traverse(body, shouldReturnValue = context.shouldReturnValue)
   }
 }
