@@ -24,7 +24,7 @@ class TypeBoundsTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe " extends T"
   }
 
-  test("traverse() when has lower bound only") {
+  test("traverse() when has lower non-Null bound only") {
     val typeBounds = Type.Bounds(lo = Some(TypeT), hi = None)
 
     doWrite("T").when(typeTraverser).traverse(eqTree(TypeT))
@@ -32,6 +32,14 @@ class TypeBoundsTraverserImplTest extends UnitTestSuite {
     typeBoundsTraverser.traverse(typeBounds)
 
     outputWriter.toString shouldBe " super T"
+  }
+
+  test("traverse() when has lower Null bound only") {
+    val typeBounds = Type.Bounds(lo = Some(Type.Name("Null")), hi = None)
+
+    typeBoundsTraverser.traverse(typeBounds)
+
+    outputWriter.toString shouldBe ""
   }
 
   test("traverse() when has no bounds") {
