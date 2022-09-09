@@ -17,6 +17,7 @@ private[traversers] class TypeBoundsTraverserImpl(typeTraverser: => TypeTraverse
     //TODO handle lower bound Null which can be skipped in Java
     //TODO - call the traverser with an argument indicating that Java primitives should be boxed
     (typeBounds.lo, typeBounds.hi) match {
+      case (Some(Type.Name("Null")), None) =>
       case (Some(lo), None) =>
         write(" super ")
         typeTraverser.traverse(lo)
