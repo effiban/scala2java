@@ -71,9 +71,9 @@ object JavaAllowedModifiersResolver extends JavaAllowedModifiersResolver {
   override def resolve(treeType: JavaTreeType, scope: JavaTreeType): Set[JavaModifier] = {
 
     (treeType, scope) match {
-      case (JavaTreeType.Class, JavaTreeType.Package) => OuterClassAllowedModifiers
-      case (JavaTreeType.Class, JavaTreeType.Class) => InnerClassOfClassAllowedModifiers
-      case (JavaTreeType.Class, JavaTreeType.Interface) => InnerClassOfInterfaceAllowedModifiers
+      case (JavaTreeType.Class | JavaTreeType.Record, JavaTreeType.Package) => OuterClassAllowedModifiers
+      case (JavaTreeType.Class | JavaTreeType.Record, JavaTreeType.Class) => InnerClassOfClassAllowedModifiers
+      case (JavaTreeType.Class | JavaTreeType.Record, JavaTreeType.Interface) => InnerClassOfInterfaceAllowedModifiers
       case (JavaTreeType.Interface, JavaTreeType.Package) => OuterInterfaceAllowedModifiers
       case (JavaTreeType.Interface, JavaTreeType.Class) => InnerInterfaceOfClassAllowedModifiers
       case (JavaTreeType.Interface, JavaTreeType.Interface) => InnerInterfaceOfInterfaceAllowedModifiers

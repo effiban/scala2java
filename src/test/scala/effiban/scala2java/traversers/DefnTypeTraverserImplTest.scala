@@ -1,12 +1,13 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.JavaModifiersContext
+import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext}
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
+import effiban.scala2java.matchers.JavaTreeTypeContextMatcher.eqJavaTreeTypeContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
-import effiban.scala2java.resolvers.JavaModifiersResolver
+import effiban.scala2java.resolvers.{JavaModifiersResolver, JavaTreeTypeResolver}
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
 
@@ -39,12 +40,14 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
   private val typeTraverser = mock[TypeTraverser]
   private val typeBoundsTraverser = mock[TypeBoundsTraverser]
   private val javaModifiersResolver = mock[JavaModifiersResolver]
+  private val javaTreeTypeResolver = mock[JavaTreeTypeResolver]
 
   private val defnTypeTraverser = new DefnTypeTraverserImpl(
     typeParamListTraverser,
     typeTraverser,
     typeBoundsTraverser,
-    javaModifiersResolver)
+    javaModifiersResolver,
+    javaTreeTypeResolver)
 
 
   test("traverse() when has body and no bounds") {
@@ -55,6 +58,7 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
       body = MyOtherType
     )
 
+    whenResolveJavaTreeTypeThenReturnInterface(defnType)
     whenResolveJavaModifiersThenReturnPrivate(defnType)
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     doWrite("MyOtherType").when(typeTraverser).traverse(eqTree(MyOtherType))
@@ -77,6 +81,7 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
       bounds = bounds
     )
 
+    whenResolveJavaTreeTypeThenReturnInterface(defnType)
     whenResolveJavaModifiersThenReturnPrivate(defnType)
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     doWrite("extends MyOtherType").when(typeBoundsTraverser).traverse(eqTree(bounds))
@@ -89,9 +94,13 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
         |""".stripMargin
   }
 
+  private def whenResolveJavaTreeTypeThenReturnInterface(defnType: Defn.Type): Unit = {
+    val expectedContext = JavaTreeTypeContext(defnType, Modifiers)
+    when(javaTreeTypeResolver.resolve(eqJavaTreeTypeContext(expectedContext))).thenReturn(JavaTreeType.Interface)
+  }
+
   private def whenResolveJavaModifiersThenReturnPrivate(defnType: Defn.Type): Unit = {
     val expectedContext = JavaModifiersContext(defnType, Modifiers, JavaTreeType.Interface, javaScope)
     when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedContext))).thenReturn(List(JavaModifier.Private))
   }
-
 }

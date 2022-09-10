@@ -1,13 +1,14 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.{JavaModifiersContext, TemplateContext}
+import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, TemplateContext}
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
+import effiban.scala2java.matchers.JavaTreeTypeContextMatcher.eqJavaTreeTypeContext
 import effiban.scala2java.matchers.TemplateContextMatcher.eqTemplateContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
-import effiban.scala2java.resolvers.JavaModifiersResolver
+import effiban.scala2java.resolvers.{JavaModifiersResolver, JavaTreeTypeResolver}
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.{PrimaryCtors, TypeNames}
@@ -65,12 +66,15 @@ class TraitTraverserImplTest extends UnitTestSuite {
   private val typeParamListTraverser = mock[TypeParamListTraverser]
   private val templateTraverser = mock[TemplateTraverser]
   private val javaModifiersResolver = mock[JavaModifiersResolver]
+  private val javaTreeTypeResolver = mock[JavaTreeTypeResolver]
+
 
   private val traitTraverser = new TraitTraverserImpl(
     annotListTraverser,
     typeParamListTraverser,
     templateTraverser,
-    javaModifiersResolver
+    javaModifiersResolver,
+    javaTreeTypeResolver
   )
 
 
@@ -87,6 +91,7 @@ class TraitTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
+    whenResolveJavaTreeTypeThenReturnInterface(`trait`)
     whenResolveJavaModifiersThenReturnPublic(`trait`)
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
 
@@ -106,6 +111,11 @@ class TraitTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}
         |""".stripMargin
+  }
+
+  private def whenResolveJavaTreeTypeThenReturnInterface(`trait`: Trait): Unit = {
+    val expectedContext = JavaTreeTypeContext(`trait`, Modifiers)
+    when(javaTreeTypeResolver.resolve(eqJavaTreeTypeContext(expectedContext))).thenReturn(JavaTreeType.Interface)
   }
 
   private def whenResolveJavaModifiersThenReturnPublic(`trait`: Trait): Unit = {
