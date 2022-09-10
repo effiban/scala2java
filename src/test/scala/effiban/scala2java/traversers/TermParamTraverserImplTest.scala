@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.JavaTreeType.{Lambda, Method}
+import effiban.scala2java.entities.JavaTreeType.Method
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
@@ -12,7 +12,6 @@ import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
 import org.mockito.ArgumentMatchers
 
-import scala.meta.Mod.Final
 import scala.meta.{Init, Mod, Name, Term, Type}
 
 class TermParamTraverserImplTest extends UnitTestSuite {
@@ -34,56 +33,8 @@ class TermParamTraverserImplTest extends UnitTestSuite {
     javaModifiersResolver
   )
 
-  test("traverse for ctor") {
-    javaScope = JavaTreeType.Class
-
-    val initialMods = List(TheAnnot)
-    val adjustedMods = initialMods :+ Final()
-
-    val termParam = Term.Param(
-      mods = List(TheAnnot),
-      name = ParamName,
-      decltpe = Some(TypeNames.Int),
-      default = None
-    )
-
-    doWrite("@MyAnnotation ")
-      .when(annotListTraverser).traverseMods(mods = eqTreeList(initialMods), onSameLine = ArgumentMatchers.eq(true))
-    whenResolveJavaModifiers(termParam, adjustedMods).thenReturn(List(JavaModifier.Final))
-    doWrite("int").when(typeTraverser).traverse(eqTree(TypeNames.Int))
-    doWrite("myParam").when(nameTraverser).traverse(eqTree(ParamName))
-
-    termParamTraverser.traverse(termParam)
-
-    outputWriter.toString shouldBe "@MyAnnotation final int myParam"
-  }
-
-  test("traverse for method") {
+  test("traverse with type") {
     javaScope = Method
-
-    val initialMods = List(TheAnnot)
-    val adjustedMods = initialMods :+ Final()
-
-    val termParam = Term.Param(
-      mods = List(TheAnnot),
-      name = ParamName,
-      decltpe = Some(TypeNames.Int),
-      default = None
-    )
-
-    doWrite("@MyAnnotation ")
-      .when(annotListTraverser).traverseMods(mods = eqTreeList(initialMods), onSameLine = ArgumentMatchers.eq(true))
-    whenResolveJavaModifiers(termParam, adjustedMods).thenReturn(List(JavaModifier.Final))
-    doWrite("int").when(typeTraverser).traverse(eqTree(TypeNames.Int))
-    doWrite("myParam").when(nameTraverser).traverse(eqTree(ParamName))
-
-    termParamTraverser.traverse(termParam)
-
-    outputWriter.toString shouldBe "@MyAnnotation final int myParam"
-  }
-
-  test("traverse for lambda with type") {
-    javaScope = Lambda
 
     val mods = List(TheAnnot)
 
@@ -96,17 +47,17 @@ class TermParamTraverserImplTest extends UnitTestSuite {
 
     doWrite("@MyAnnotation ")
       .when(annotListTraverser).traverseMods(mods = eqTreeList(mods), onSameLine = ArgumentMatchers.eq(true))
-    whenResolveJavaModifiers(termParam, mods).thenReturn(Nil)
+    whenResolveJavaModifiers(termParam, mods).thenReturn(List(JavaModifier.Final))
     doWrite("int").when(typeTraverser).traverse(eqTree(TypeNames.Int))
     doWrite("myParam").when(nameTraverser).traverse(eqTree(ParamName))
 
     termParamTraverser.traverse(termParam)
 
-    outputWriter.toString shouldBe "@MyAnnotation int myParam"
+    outputWriter.toString shouldBe "@MyAnnotation final int myParam"
   }
 
-  test("traverse for lambda without type") {
-    javaScope = Lambda
+  test("traverse without type") {
+    javaScope = Method
 
     val mods = List(TheAnnot)
 

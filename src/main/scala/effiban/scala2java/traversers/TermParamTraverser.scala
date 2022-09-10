@@ -5,8 +5,7 @@ import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.resolvers.{JavaModifiersResolver, JavaModifiersResolverParams}
 import effiban.scala2java.writers.JavaWriter
 
-import scala.meta.Mod.Final
-import scala.meta.{Mod, Term}
+import scala.meta.Term
 
 trait TermParamTraverser extends ScalaTreeTraverser[Term.Param]
 
@@ -33,15 +32,9 @@ private[traversers] class TermParamTraverserImpl(annotListTraverser: => AnnotLis
   }
 
   private def resolveJavaModifiers(termParam: Term.Param) = {
-    val maybeAddedMod: Option[Mod] = javaScope match {
-      // Can't add final in a Lambda param because it might not have an explicit type,
-      // and we are not adding 'var' there either at this point since it has complicated rules
-      case JavaTreeType.Lambda => None
-      case _ => Some(Final())
-    }
     val params = JavaModifiersResolverParams(
       scalaTree = termParam,
-      scalaMods = termParam.mods :++ maybeAddedMod,
+      scalaMods = termParam.mods,
       javaTreeType = JavaTreeType.Parameter,
       javaScope = javaScope
     )

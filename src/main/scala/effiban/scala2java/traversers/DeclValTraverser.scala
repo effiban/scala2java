@@ -6,7 +6,6 @@ import effiban.scala2java.resolvers.{JavaModifiersResolver, JavaModifiersResolve
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Decl
-import scala.meta.Mod.Final
 
 trait DeclValTraverser extends ScalaTreeTraverser[Decl.Val]
 
@@ -32,7 +31,7 @@ private[traversers] class DeclValTraverserImpl(annotListTraverser: => AnnotListT
   private def resolveJavaModifiers(valDecl: Decl.Val) = {
     val params = JavaModifiersResolverParams(
       scalaTree = valDecl,
-      scalaMods = valDecl.mods :+ Final(),
+      scalaMods = valDecl.mods,
       javaTreeType = JavaTreeType.Variable,
       javaScope = javaScope
     )
