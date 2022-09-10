@@ -1,9 +1,10 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.JavaModifiersContext
-import effiban.scala2java.entities.JavaTreeType
+import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext}
+import effiban.scala2java.entities.JavaTreeType.JavaTreeType
 import effiban.scala2java.entities.TraversalContext.javaScope
-import effiban.scala2java.resolvers.JavaModifiersResolver
+import effiban.scala2java.entities.{JavaTreeTypeToKeywordMapping, JavaTreeTypeToScopeMapping}
+import effiban.scala2java.resolvers.{JavaModifiersResolver, JavaTreeTypeResolver}
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Defn
@@ -12,7 +13,8 @@ trait ObjectTraverser extends ScalaTreeTraverser[Defn.Object]
 
 private[traversers] class ObjectTraverserImpl(annotListTraverser: => AnnotListTraverser,
                                               templateTraverser: => TemplateTraverser,
-                                              javaModifiersResolver: JavaModifiersResolver)
+                                              javaModifiersResolver: JavaModifiersResolver,
+                                              javaTreeTypeResolver: JavaTreeTypeResolver)
                                              (implicit javaWriter: JavaWriter) extends ObjectTraverser {
 
   import javaWriter._
@@ -22,20 +24,21 @@ private[traversers] class ObjectTraverserImpl(annotListTraverser: => AnnotListTr
     writeComment("originally a Scala object")
     writeLine()
     annotListTraverser.traverseMods(objectDef.mods)
-    writeTypeDeclaration(modifiers = resolveJavaModifiers(objectDef),
-      typeKeyword = "class",
+    val javaTreeType = javaTreeTypeResolver.resolve(JavaTreeTypeContext(objectDef, objectDef.mods))
+    writeTypeDeclaration(modifiers = resolveJavaModifiers(objectDef, javaTreeType),
+      typeKeyword = JavaTreeTypeToKeywordMapping(javaTreeType),
       name = s"${objectDef.name.toString}")
     val outerJavaScope = javaScope
-    javaScope = JavaTreeType.Class
+    javaScope = JavaTreeTypeToScopeMapping(javaTreeType)
     templateTraverser.traverse(objectDef.templ)
     javaScope = outerJavaScope
   }
 
-  private def resolveJavaModifiers(objectDef: Defn.Object) = {
+  private def resolveJavaModifiers(objectDef: Defn.Object, javaTreeType: JavaTreeType) = {
     val context = JavaModifiersContext(
       scalaTree = objectDef,
       scalaMods = objectDef.mods,
-      javaTreeType = JavaTreeType.Class,
+      javaTreeType = javaTreeType,
       javaScope = javaScope
     )
     javaModifiersResolver.resolve(context)

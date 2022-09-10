@@ -1,11 +1,12 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.JavaModifiersContext
+import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext}
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
-import effiban.scala2java.resolvers.JavaModifiersResolver
+import effiban.scala2java.matchers.JavaTreeTypeContextMatcher.eqJavaTreeTypeContext
+import effiban.scala2java.resolvers.{JavaModifiersResolver, JavaTreeTypeResolver}
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
 
@@ -33,10 +34,12 @@ class DeclTypeTraverserImplTest extends UnitTestSuite {
 
   private val typeParamListTraverser = mock[TypeParamListTraverser]
   private val javaModifiersResolver = mock[JavaModifiersResolver]
+  private val javaTreeTypeResolver = mock[JavaTreeTypeResolver]
 
   private val declTypeTraverser = new DeclTypeTraverserImpl(
     typeParamListTraverser,
-    javaModifiersResolver)
+    javaModifiersResolver,
+    javaTreeTypeResolver)
 
 
   test("traverse()") {
@@ -48,6 +51,7 @@ class DeclTypeTraverserImplTest extends UnitTestSuite {
       bounds = Bounds(lo = None, hi = Some(Type.Name("T")))
     )
 
+    whenResolveJavaTreeTypeThenReturnInterface(declType)
     whenResolveJavaModifiers(declType).thenReturn(List(JavaModifier.Private))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
 
@@ -60,8 +64,14 @@ class DeclTypeTraverserImplTest extends UnitTestSuite {
         |""".stripMargin
   }
 
+  private def whenResolveJavaTreeTypeThenReturnInterface(declType: Decl.Type): Unit = {
+    val expectedContext = JavaTreeTypeContext(declType, Modifiers)
+    when(javaTreeTypeResolver.resolve(eqJavaTreeTypeContext(expectedContext))).thenReturn(JavaTreeType.Interface)
+  }
+
   private def whenResolveJavaModifiers(declType: Decl.Type) = {
     val expectedContext = JavaModifiersContext(declType, Modifiers, JavaTreeType.Interface, javaScope)
     when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedContext)))
   }
+
 }

@@ -5,6 +5,7 @@ object JavaTreeType extends Enumeration {
 
   val Package,
   Class,
+  Record,
   Interface,
   Method,
   Lambda,

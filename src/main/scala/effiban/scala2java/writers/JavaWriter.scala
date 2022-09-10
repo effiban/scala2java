@@ -7,7 +7,7 @@ import java.io.Writer
 
 trait JavaWriter {
 
-  def writeTypeDeclaration(modifiers: List[JavaModifier], typeKeyword: String, name: String): Unit
+  def writeTypeDeclaration(modifiers: List[JavaModifier], typeKeyword: JavaKeyword, name: String): Unit
 
   def writeModifiers(modifiers: List[JavaModifier]): Unit
 
@@ -47,9 +47,9 @@ class JavaWriterImpl(writer: Writer) extends JavaWriter {
   private var indentationLevel = 0
   private var indentationRequired = false
 
-  override def writeTypeDeclaration(modifiers: List[JavaModifier], typeKeyword: String, name: String): Unit = {
+  override def writeTypeDeclaration(modifiers: List[JavaModifier], typeKeyword: JavaKeyword, name: String): Unit = {
     writeModifiers(modifiers)
-    write(s"$typeKeyword $name")
+    write(s"${typeKeyword.name} $name")
   }
 
   override def writeModifiers(modifiers: List[JavaModifier]): Unit = {

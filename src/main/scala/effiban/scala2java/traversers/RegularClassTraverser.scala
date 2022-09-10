@@ -1,9 +1,10 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.{JavaModifiersContext, TemplateContext}
-import effiban.scala2java.entities.JavaTreeType
+import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, TemplateContext}
+import effiban.scala2java.entities.JavaTreeType.JavaTreeType
 import effiban.scala2java.entities.TraversalContext.javaScope
-import effiban.scala2java.resolvers.JavaModifiersResolver
+import effiban.scala2java.entities.{JavaTreeTypeToKeywordMapping, JavaTreeTypeToScopeMapping}
+import effiban.scala2java.resolvers.{JavaModifiersResolver, JavaTreeTypeResolver}
 import effiban.scala2java.transformers.ParamToDeclValTransformer
 import effiban.scala2java.writers.JavaWriter
 
@@ -15,20 +16,21 @@ private[traversers] class RegularClassTraverserImpl(annotListTraverser: => Annot
                                                     typeParamListTraverser: => TypeParamListTraverser,
                                                     templateTraverser: => TemplateTraverser,
                                                     paramToDeclValTransformer: ParamToDeclValTransformer,
-                                                    javaModifiersResolver: JavaModifiersResolver)
-                                                   (implicit javaWriter: JavaWriter) extends RegularClassTraverser {
+                                                    javaModifiersResolver: JavaModifiersResolver,
+                                                    javaTreeTypeResolver: JavaTreeTypeResolver)(implicit javaWriter: JavaWriter) extends RegularClassTraverser {
 
   import javaWriter._
 
   def traverse(classDef: Defn.Class): Unit = {
     writeLine()
     annotListTraverser.traverseMods(classDef.mods)
-    writeTypeDeclaration(modifiers = resolveJavaModifiers(classDef),
-      typeKeyword = "class",
+    val javaTreeType = javaTreeTypeResolver.resolve(JavaTreeTypeContext(classDef, classDef.mods))
+    writeTypeDeclaration(modifiers = resolveJavaModifiers(classDef, javaTreeType),
+      typeKeyword = JavaTreeTypeToKeywordMapping(javaTreeType),
       name = classDef.name.value)
     typeParamListTraverser.traverse(classDef.tparams)
     val outerJavaScope = javaScope
-    javaScope = JavaTreeType.Class
+    javaScope = JavaTreeTypeToScopeMapping(javaTreeType)
     val explicitMemberDecls = classDef.ctor.paramss.flatten.map(x =>
       paramToDeclValTransformer.transform(x)
     )
@@ -40,11 +42,11 @@ private[traversers] class RegularClassTraverserImpl(annotListTraverser: => Annot
     javaScope = outerJavaScope
   }
 
-  private def resolveJavaModifiers(classDef: Defn.Class) = {
+  private def resolveJavaModifiers(classDef: Defn.Class, javaTreeType: JavaTreeType) = {
     val context = JavaModifiersContext(
       scalaTree = classDef,
       scalaMods = classDef.mods,
-      javaTreeType = JavaTreeType.Class,
+      javaTreeType = javaTreeType,
       javaScope = javaScope
     )
     javaModifiersResolver.resolve(context)

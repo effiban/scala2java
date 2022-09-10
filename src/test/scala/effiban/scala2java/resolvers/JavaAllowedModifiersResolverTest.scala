@@ -1,7 +1,7 @@
 package effiban.scala2java.resolvers
 
+import effiban.scala2java.entities.JavaTreeType.JavaTreeType
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
-import effiban.scala2java.resolvers.JavaAllowedModifiersResolver.resolve
 import effiban.scala2java.testsuites.UnitTestSuite
 
 class JavaAllowedModifiersResolverTest extends UnitTestSuite {
@@ -64,63 +64,32 @@ class JavaAllowedModifiersResolverTest extends UnitTestSuite {
 
   private final val ExpectedParameterAllowedModifiers = Set[JavaModifier](JavaModifier.Final)
 
-  test("resolve() for outer class") {
-    resolve(JavaTreeType.Class, JavaTreeType.Package) shouldBe ExpectedOuterClassAllowedModifiers
-  }
 
-  test("resolve() for inner class of class") {
-    resolve(JavaTreeType.Class, JavaTreeType.Class) shouldBe ExpectedInnerClassOfClassAllowedModifiers
-  }
+  private val AllowedModifiersScenarios = Table(
+    ("JavaTreeType", "JavaScope", "ExpectedAllowedModifiers"),
+    (JavaTreeType.Class, JavaTreeType.Package, ExpectedOuterClassAllowedModifiers),
+    (JavaTreeType.Class, JavaTreeType.Class, ExpectedInnerClassOfClassAllowedModifiers),
+    (JavaTreeType.Class, JavaTreeType.Interface, ExpectedInnerClassOfInterfaceAllowedModifiers),
+    (JavaTreeType.Record, JavaTreeType.Package, ExpectedOuterClassAllowedModifiers),
+    (JavaTreeType.Record, JavaTreeType.Class, ExpectedInnerClassOfClassAllowedModifiers),
+    (JavaTreeType.Record, JavaTreeType.Interface, ExpectedInnerClassOfInterfaceAllowedModifiers),
+    (JavaTreeType.Interface, JavaTreeType.Package, ExpectedOuterInterfaceAllowedModifiers),
+    (JavaTreeType.Interface, JavaTreeType.Class, ExpectedInnerInterfaceOfClassAllowedModifiers),
+    (JavaTreeType.Interface, JavaTreeType.Interface, ExpectedInnerInterfaceOfInterfaceAllowedModifiers),
+    (JavaTreeType.Method, JavaTreeType.Class, ExpectedClassMethodAllowedModifiers),
+    (JavaTreeType.Method, JavaTreeType.Interface, ExpectedInterfaceMethodAllowedModifiers),
+    (JavaTreeType.Variable, JavaTreeType.Class, ExpectedClassVariableAllowedModifiers),
+    (JavaTreeType.Variable, JavaTreeType.Interface, Set.empty),
+    (JavaTreeType.Variable, JavaTreeType.Method, ExpectedLocalVariableAllowedModifiers),
+    (JavaTreeType.Variable, JavaTreeType.Lambda, ExpectedLocalVariableAllowedModifiers),
+    (JavaTreeType.Parameter, JavaTreeType.Class, ExpectedParameterAllowedModifiers),
+    (JavaTreeType.Parameter, JavaTreeType.Method, ExpectedParameterAllowedModifiers),
+    (JavaTreeType.Parameter, JavaTreeType.Lambda, ExpectedParameterAllowedModifiers)
+  )
 
-  test("resolve() for inner class of interface") {
-    resolve(JavaTreeType.Class, JavaTreeType.Interface) shouldBe ExpectedInnerClassOfInterfaceAllowedModifiers
-  }
-
-  test("resolve() for outer interface") {
-    resolve(JavaTreeType.Interface, JavaTreeType.Package) shouldBe ExpectedOuterInterfaceAllowedModifiers
-  }
-
-  test("resolve() for inner interface of class") {
-    resolve(JavaTreeType.Interface, JavaTreeType.Class) shouldBe ExpectedInnerInterfaceOfClassAllowedModifiers
-  }
-
-  test("resolve() for inner interface of interface") {
-    resolve(JavaTreeType.Interface, JavaTreeType.Interface) shouldBe ExpectedInnerInterfaceOfInterfaceAllowedModifiers
-  }
-
-  test("resolve() for class method") {
-    resolve(JavaTreeType.Method, JavaTreeType.Class) shouldBe ExpectedClassMethodAllowedModifiers
-  }
-
-  test("resolve() for interface method") {
-    resolve(JavaTreeType.Method, JavaTreeType.Interface) shouldBe ExpectedInterfaceMethodAllowedModifiers
-  }
-
-  test("resolve() for class variable") {
-    resolve(JavaTreeType.Variable, JavaTreeType.Class) shouldBe ExpectedClassVariableAllowedModifiers
-  }
-
-  test("resolve() for interface variable should return empty") {
-    resolve(JavaTreeType.Variable, JavaTreeType.Interface) shouldBe Set.empty
-  }
-
-  test("resolve() for method variable") {
-    resolve(JavaTreeType.Variable, JavaTreeType.Method) shouldBe ExpectedLocalVariableAllowedModifiers
-  }
-
-  test("resolve() for lambda variable") {
-    resolve(JavaTreeType.Variable, JavaTreeType.Lambda) shouldBe ExpectedLocalVariableAllowedModifiers
-  }
-
-  test("resolve() for class (ctor.) parameter") {
-    resolve(JavaTreeType.Parameter, JavaTreeType.Class) shouldBe ExpectedParameterAllowedModifiers
-  }
-
-  test("resolve() for method parameter") {
-    resolve(JavaTreeType.Parameter, JavaTreeType.Method) shouldBe ExpectedParameterAllowedModifiers
-  }
-
-  test("resolve() for lambda parameter") {
-    resolve(JavaTreeType.Parameter, JavaTreeType.Lambda) shouldBe ExpectedParameterAllowedModifiers
+  forAll(AllowedModifiersScenarios) { case (treeType: JavaTreeType, scope: JavaTreeType, expectedAllowedModifiers: Set[JavaModifier]) =>
+    test(s"Java '$treeType' in scope '$scope' should allow: $expectedAllowedModifiers") {
+      JavaAllowedModifiersResolver.resolve(treeType, scope) shouldBe expectedAllowedModifiers
+    }
   }
 }

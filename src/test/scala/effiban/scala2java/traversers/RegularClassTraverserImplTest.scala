@@ -1,13 +1,14 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.{JavaModifiersContext, TemplateContext}
+import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, TemplateContext}
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
+import effiban.scala2java.matchers.JavaTreeTypeContextMatcher.eqJavaTreeTypeContext
 import effiban.scala2java.matchers.TemplateContextMatcher.eqTemplateContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
-import effiban.scala2java.resolvers.JavaModifiersResolver
+import effiban.scala2java.resolvers.{JavaModifiersResolver, JavaTreeTypeResolver}
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.transformers.ParamToDeclValTransformer
@@ -79,13 +80,15 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
   private val templateTraverser = mock[TemplateTraverser]
   private val paramToDeclValTransformer = mock[ParamToDeclValTransformer]
   private val javaModifiersResolver = mock[JavaModifiersResolver]
+  private val javaTreeTypeResolver = mock[JavaTreeTypeResolver]
 
   private val classTraverser = new RegularClassTraverserImpl(
     annotListTraverser,
     typeParamListTraverser,
     templateTraverser,
     paramToDeclValTransformer,
-    javaModifiersResolver)
+    javaModifiersResolver,
+    javaTreeTypeResolver)
 
 
   test("traverse() for one list of ctor args") {
@@ -110,6 +113,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
+    whenResolveJavaTreeTypeThenReturnClass(cls)
     whenResolveJavaModifiersThenReturnPublic(cls)
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
 
@@ -169,6 +173,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
+    whenResolveJavaTreeTypeThenReturnClass(cls)
     whenResolveJavaModifiersThenReturnPublic(cls)
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
 
@@ -215,6 +220,11 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       pats = List(Pat.Var(Term.Name(name))),
       decltpe = Type.Name(typeName)
     )
+  }
+
+  private def whenResolveJavaTreeTypeThenReturnClass(cls: Defn.Class): Unit = {
+    val expectedContext = JavaTreeTypeContext(cls, Modifiers)
+    when(javaTreeTypeResolver.resolve(eqJavaTreeTypeContext(expectedContext))).thenReturn(JavaTreeType.Class)
   }
 
   private def whenResolveJavaModifiersThenReturnPublic(cls: Defn.Class): Unit = {
