@@ -1,18 +1,18 @@
 package effiban.scala2java.resolvers
 
-import effiban.scala2java.entities.JavaTreeType.JavaTreeType
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 
-import scala.meta.{Defn, Tree}
+import scala.meta.Defn
 
-trait JavaModifierImplyingPublicResolver {
+trait JavaPublicModifierResolver {
 
-  def resolve(scalaTree: Tree, javaTreeType: JavaTreeType, javaScope: JavaTreeType): Option[JavaModifier]
+  def resolve(params: JavaModifiersResolverParams): Option[JavaModifier]
 }
 
-object JavaModifierImplyingPublicResolver extends JavaModifierImplyingPublicResolver {
+object JavaPublicModifierResolver extends JavaPublicModifierResolver {
 
-  override def resolve(scalaTree: Tree, javaTreeType: JavaTreeType, javaScope: JavaTreeType): Option[JavaModifier] = {
+  override def resolve(params: JavaModifiersResolverParams): Option[JavaModifier] = {
+    import params._
     (scalaTree, javaTreeType, javaScope) match {
       case (_: Defn.Def, JavaTreeType.Method, JavaTreeType.Interface) => Some(JavaModifier.Default)
       // A class (ctor.) param is a member in Scala and can be 'public', but for Java we will transfer the 'public' to a generated member

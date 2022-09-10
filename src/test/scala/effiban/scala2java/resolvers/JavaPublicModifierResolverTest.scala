@@ -1,13 +1,13 @@
 package effiban.scala2java.resolvers
 
+import effiban.scala2java.entities.JavaTreeType.JavaTreeType
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
-import effiban.scala2java.resolvers.JavaModifierImplyingPublicResolver.resolve
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.{PrimaryCtors, Templates, TypeNames}
 
-import scala.meta.{Decl, Defn, Lit, Pat, Term, Type}
+import scala.meta.{Decl, Defn, Lit, Pat, Term, Tree, Type}
 
-class JavaModifierImplyingPublicResolverTest extends UnitTestSuite {
+class JavaPublicModifierResolverTest extends UnitTestSuite {
 
   private val TheClass = Defn.Class(
     mods = Nil,
@@ -111,5 +111,14 @@ class JavaModifierImplyingPublicResolverTest extends UnitTestSuite {
 
   test("resolve() for lambda parameter should return None") {
     resolve(TheVal, JavaTreeType.Parameter, JavaTreeType.Lambda) shouldBe None
+  }
+
+  private def resolve(scalaTree: Tree, javaTree: JavaTreeType, javaScope: JavaTreeType): Option[JavaModifier] = {
+    JavaPublicModifierResolver.resolve(JavaModifiersResolverParams(
+      scalaTree = scalaTree,
+      scalaMods = Nil,
+      javaTreeType = javaTree,
+      javaScope = javaScope
+    ))
   }
 }

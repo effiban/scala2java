@@ -11,19 +11,20 @@ trait JavaModifiersResolver {
   def resolve(params: JavaModifiersResolverParams): List[JavaModifier]
 }
 
-object JavaModifiersResolver extends JavaModifiersResolver {
+class JavaModifiersResolverImpl(javaAllowedModifiersResolver: JavaAllowedModifiersResolver,
+                                javaSupplementalModifiersResolver: JavaSupplementalModifiersResolver) extends JavaModifiersResolver {
 
   override def resolve(params: JavaModifiersResolverParams): List[JavaModifier] = {
     import params._
 
     val modifierNamesBuilder = Set.newBuilder[JavaModifier]
 
-    val allowedJavaModifiers = JavaAllowedModifiersResolver.resolve(javaTreeType, javaScope)
+    // Transform the Scala modifiers into corresponding Java modifiers, when allowed
+    val allowedJavaModifiers = javaAllowedModifiersResolver.resolve(javaTreeType, javaScope)
     modifierNamesBuilder ++= transform(scalaMods, allowedJavaModifiers)
 
-    if (scalaModifiersImplyPublic(scalaMods)) {
-      modifierNamesBuilder ++= JavaModifierImplyingPublicResolver.resolve(scalaTree, javaTreeType, javaScope)
-    }
+    // Add additional Java-specific modifiers which are required by the params
+    modifierNamesBuilder ++= javaSupplementalModifiersResolver.resolve(params)
 
     modifierNamesBuilder.result()
       .toList
@@ -37,11 +38,9 @@ object JavaModifiersResolver extends JavaModifiersResolver {
       .distinct
       .filter(allowedJavaModifiers.contains)
   }
-
-  private def scalaModifiersImplyPublic(mods: List[Mod]) = {
-    mods.collect {
-      case m: Mod.Private => m
-      case m: Mod.Protected => m
-    }.isEmpty
-  }
 }
+
+object JavaModifiersResolver extends JavaModifiersResolverImpl(
+  JavaAllowedModifiersResolver,
+  JavaSupplementalModifiersResolver
+)
