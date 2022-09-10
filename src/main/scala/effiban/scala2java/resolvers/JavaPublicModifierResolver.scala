@@ -19,7 +19,7 @@ object JavaPublicModifierResolver extends JavaPublicModifierResolver {
       case (_: Defn.Def, JavaTreeType.Method, JavaTreeType.Interface) => Some(JavaModifier.Default)
       // A class (ctor.) param is a member in Scala and can be 'public', but for Java we will transfer the 'public' to a generated member
       case (_, JavaTreeType.Parameter, JavaTreeType.Class) => None
-      case (_, _, JavaTreeType.Package | JavaTreeType.Class) => Some(JavaModifier.Public)
+      case (_, _, JavaTreeType.Package | JavaTreeType.Class | JavaTreeType.Enum) => Some(JavaModifier.Public)
       case _ => None
     }
   }

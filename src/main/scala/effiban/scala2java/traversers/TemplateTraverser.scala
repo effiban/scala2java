@@ -21,7 +21,11 @@ private[traversers] class TemplateTraverserImpl(initListTraverser: => InitListTr
 
   import javaWriter._
 
-  private val ParentsToSkip = Set(Type.Name("AnyRef"), Type.Name("Product"), Type.Name("Serializable"))
+  private val ParentsToSkip = Set(
+    Type.Name("Product"),
+    Type.Name("Serializable"),
+    Type.Name("Enumeration")
+  )
 
   def traverse(template: Template,
                context: TemplateContext = TemplateContext()): Unit = {

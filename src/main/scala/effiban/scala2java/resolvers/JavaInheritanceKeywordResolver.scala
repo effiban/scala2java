@@ -17,8 +17,11 @@ object JavaInheritanceKeywordResolver extends JavaInheritanceKeywordResolver {
     // The wildcard covers scenarios of both explicit and anonymous classes
     (scope, haveArgs) match {
       case (JavaTreeType.Interface, _) => JavaKeyword.Extends
+      case (JavaTreeType.Class | JavaTreeType.Record, true) => JavaKeyword.Extends
+      case (JavaTreeType.Enum, true) => throw new IllegalStateException("A Java enum cannot extend a class")
+      case (JavaTreeType.Enum, false) => JavaKeyword.Implements
       case (_, true) => JavaKeyword.Extends
-      case (_, false) => JavaKeyword.Implements
+      case _ => JavaKeyword.Implements
       // TODO handle scenario of class having parent class + parent interface
     }
   }

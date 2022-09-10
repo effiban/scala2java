@@ -1,10 +1,11 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.classifiers.JavaStatClassifier
+import effiban.scala2java.classifiers.{DefnValClassifier, JavaStatClassifier}
 import effiban.scala2java.entities.CtorContext
+import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.writers.JavaWriter
 
-import scala.meta.{Ctor, Stat, Tree}
+import scala.meta.{Ctor, Defn, Stat, Tree}
 
 trait TemplateChildTraverser {
   def traverse(child: Tree,
@@ -13,7 +14,9 @@ trait TemplateChildTraverser {
 
 private[traversers] class TemplateChildTraverserImpl(ctorPrimaryTraverser: => CtorPrimaryTraverser,
                                                      ctorSecondaryTraverser: => CtorSecondaryTraverser,
+                                                     enumConstantListTraverser: => EnumConstantListTraverser,
                                                      statTraverser: => StatTraverser,
+                                                     defnValClassifier: DefnValClassifier,
                                                      javaStatClassifier: JavaStatClassifier)
                                                     (implicit javaWriter: JavaWriter) extends TemplateChildTraverser {
 
@@ -23,6 +26,9 @@ private[traversers] class TemplateChildTraverserImpl(ctorPrimaryTraverser: => Ct
                         maybeCtorContext: Option[CtorContext] = None): Unit = child match {
     case primaryCtor: Ctor.Primary => traversePrimaryCtor(primaryCtor, maybeCtorContext)
     case secondaryCtor: Ctor.Secondary => traverseSecondaryCtor(secondaryCtor, maybeCtorContext)
+    case defnVal: Defn.Val if defnValClassifier.isEnumConstantList(defnVal, javaScope) =>
+      enumConstantListTraverser.traverse(defnVal)
+      writeStatementEnd()
     case stat: Stat => traverseNonConstructorStat(stat)
     case unexpected: Tree => throw new IllegalStateException(s"Unexpected template child: $unexpected")
   }

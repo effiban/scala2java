@@ -8,6 +8,7 @@ object JavaTreeTypeToKeywordMapping {
     JavaTreeType.Package -> JavaKeyword.Package,
     JavaTreeType.Class -> JavaKeyword.Class,
     JavaTreeType.Record -> JavaKeyword.Record,
+    JavaTreeType.Enum -> JavaKeyword.Enum,
     JavaTreeType.Interface -> JavaKeyword.Interface
   )
 

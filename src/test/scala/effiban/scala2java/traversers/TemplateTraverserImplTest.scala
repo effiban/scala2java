@@ -26,7 +26,8 @@ class TemplateTraverserImplTest extends UnitTestSuite {
 
   private val TheSkippedInits = List(
     Init(tpe = Type.Name("Product"), name = Name.Anonymous(), argss = List()),
-    Init(tpe = Type.Name("Serializable"), name = Name.Anonymous(), argss = List())
+    Init(tpe = Type.Name("Serializable"), name = Name.Anonymous(), argss = List()),
+    Init(tpe = Type.Name("Enumeration"), name = Name.Anonymous(), argss = List())
   )
 
   private val NonEmptySelf = Self(name = Name.Indeterminate("SelfName"), decltpe = Some(Type.Name("SelfType")))

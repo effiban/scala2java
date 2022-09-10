@@ -50,76 +50,46 @@ class JavaPublicModifierResolverTest extends UnitTestSuite {
     rhs = Lit.Int(3)
   )
 
-  test("resolve() for outer class should return 'public'") {
-    resolve(TheClass, JavaTreeType.Class, JavaTreeType.Package).value shouldBe JavaModifier.Public
+  private val ResolverScenarios = Table(
+    ("Desc", "ScalaTree", "JavaTreeType", "JavaScope", "ExpectedMaybeModifier"),
+    ("outer class", TheClass, JavaTreeType.Class, JavaTreeType.Package, Some(JavaModifier.Public)),
+    ("inner class of class", TheClass, JavaTreeType.Class, JavaTreeType.Class, Some(JavaModifier.Public)),
+    ("inner class of interface", TheClass, JavaTreeType.Class, JavaTreeType.Interface, None),
+    ("outer enum", TheClass, JavaTreeType.Enum, JavaTreeType.Package, Some(JavaModifier.Public)),
+    ("outer interface", TheTrait, JavaTreeType.Interface, JavaTreeType.Package, Some(JavaModifier.Public)),
+    ("inner interface of class", TheTrait, JavaTreeType.Interface, JavaTreeType.Class, Some(JavaModifier.Public)),
+    ("inner interface of interface", TheTrait, JavaTreeType.Interface, JavaTreeType.Interface, None),
+    ("class method", TheDefnDef, JavaTreeType.Method, JavaTreeType.Class, Some(JavaModifier.Public)),
+    ("enum method", TheDefnDef, JavaTreeType.Method, JavaTreeType.Enum, Some(JavaModifier.Public)),
+    ("interface method definition", TheDefnDef, JavaTreeType.Method, JavaTreeType.Interface, Some(JavaModifier.Default)),
+    ("interface method declaration", TheDeclDef, JavaTreeType.Method, JavaTreeType.Interface, None),
+    ("class variable", TheVal, JavaTreeType.Variable, JavaTreeType.Class, Some(JavaModifier.Public)),
+    ("enum variable", TheVal, JavaTreeType.Variable, JavaTreeType.Enum, Some(JavaModifier.Public)),
+    ("interface variable", TheVal, JavaTreeType.Variable, JavaTreeType.Interface, None),
+    ("method variable", TheVal, JavaTreeType.Variable, JavaTreeType.Method, None),
+    ("lambda variable", TheVal, JavaTreeType.Variable, JavaTreeType.Lambda, None),
+    ("class (ctor.) parameter", TheVal, JavaTreeType.Parameter, JavaTreeType.Class, None),
+    ("method parameter", TheVal, JavaTreeType.Parameter, JavaTreeType.Method, None),
+    ("lambda parameter", TheVal, JavaTreeType.Parameter, JavaTreeType.Lambda, None)
+  )
+
+  forAll(ResolverScenarios) { case (
+    desc: String,
+    scalaTree: Tree,
+    javaTreeType: JavaTreeType,
+    javaScope: JavaTreeType,
+    expectedMaybeModifier: Option[JavaModifier]) =>
+    test(s"Public modifier generated for $desc should be: '$expectedMaybeModifier'") {
+      resolve(scalaTree, javaTreeType, javaScope) shouldBe expectedMaybeModifier
+    }
   }
 
-  test("resolve() for inner class of class should return 'public'") {
-    resolve(TheClass, JavaTreeType.Class, JavaTreeType.Class).value shouldBe JavaModifier.Public
-  }
-
-  test("resolve() for inner class of interface should return None") {
-    resolve(TheClass, JavaTreeType.Class, JavaTreeType.Interface) shouldBe None
-  }
-
-  test("resolve() for outer interface should return 'public'") {
-    resolve(TheTrait, JavaTreeType.Interface, JavaTreeType.Package).value shouldBe JavaModifier.Public
-  }
-
-  test("resolve() for inner interface of class should return 'public'") {
-    resolve(TheTrait, JavaTreeType.Interface, JavaTreeType.Class).value shouldBe JavaModifier.Public
-  }
-
-  test("resolve() for inner interface of interface should return None") {
-    resolve(TheTrait, JavaTreeType.Interface, JavaTreeType.Interface) shouldBe None
-  }
-
-  test("resolve() for class method should return 'public'") {
-    resolve(TheDefnDef, JavaTreeType.Method, JavaTreeType.Class).value shouldBe JavaModifier.Public
-  }
-
-  test("resolve() for interface method definition should return 'default'") {
-    resolve(TheDefnDef, JavaTreeType.Method, JavaTreeType.Interface).value shouldBe JavaModifier.Default
-  }
-
-  test("resolve() for interface method declaration should return None") {
-    resolve(TheDeclDef, JavaTreeType.Method, JavaTreeType.Interface) shouldBe None
-  }
-
-  test("resolve() for class variable should return 'public'") {
-    resolve(TheVal, JavaTreeType.Variable, JavaTreeType.Class).value shouldBe JavaModifier.Public
-  }
-
-  test("resolve() for interface variable should return None") {
-    resolve(TheVal, JavaTreeType.Variable, JavaTreeType.Interface) shouldBe None
-  }
-
-  test("resolve() for method variable should return None") {
-    resolve(TheVal, JavaTreeType.Variable, JavaTreeType.Method) shouldBe None
-  }
-
-  test("resolve() for lambda variable should return None") {
-    resolve(TheVal, JavaTreeType.Variable, JavaTreeType.Lambda) shouldBe None
-  }
-
-  test("resolve() for class (ctor.) parameter should return None since the 'public' will be transferred to a generated member") {
-    resolve(TheVal, JavaTreeType.Parameter, JavaTreeType.Class) shouldBe None
-  }
-
-  test("resolve() for method parameter should return None") {
-    resolve(TheVal, JavaTreeType.Parameter, JavaTreeType.Method) shouldBe None
-  }
-
-  test("resolve() for lambda parameter should return None") {
-    resolve(TheVal, JavaTreeType.Parameter, JavaTreeType.Lambda) shouldBe None
-  }
-
-  private def resolve(scalaTree: Tree, javaTree: JavaTreeType, javaScope: JavaTreeType): Option[JavaModifier] = {
+  private def resolve(scalaTree: Tree, javaTreeType: JavaTreeType, javaScope: JavaTreeType): Option[JavaModifier] = {
     JavaPublicModifierResolver.resolve(
       JavaModifiersContext(
         scalaTree = scalaTree,
         scalaMods = Nil,
-        javaTreeType = javaTree,
+        javaTreeType = javaTreeType,
         javaScope = javaScope
       ))
   }

@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.classifiers.{ImporterClassifier, JavaStatClassifier, TermApplyInfixClassifier}
+import effiban.scala2java.classifiers._
 import effiban.scala2java.orderings.JavaTemplateChildOrdering
 import effiban.scala2java.resolvers.Resolvers.shouldReturnValueResolver
 import effiban.scala2java.resolvers.{JavaInheritanceKeywordResolver, JavaModifiersResolver, JavaTreeTypeResolver}
@@ -149,6 +149,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
 
   private lazy val doTraverser: DoTraverser = new DoTraverserImpl(termTraverser, blockTraverser)
 
+  private lazy val enumConstantListTraverser: EnumConstantListTraverser = new EnumConstantListTraverserImpl(argumentListTraverser)
+
   private lazy val etaTraverser: EtaTraverser = new EtaTraverserImpl(termTraverser)
 
   private lazy val finallyTraverser: FinallyTraverser = new FinallyTraverserImpl(blockTraverser)
@@ -257,12 +259,15 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
   private lazy val templateChildTraverser: TemplateChildTraverser = new TemplateChildTraverserImpl(
     ctorPrimaryTraverser,
     ctorSecondaryTraverser,
+    enumConstantListTraverser,
     statTraverser,
+    DefnValClassifier,
     JavaStatClassifier
   )
 
   private lazy val templateBodyTraverser: TemplateBodyTraverser = new TemplateBodyTraverserImpl(
     templateChildTraverser,
+    DefnTypeClassifier,
     JavaTemplateChildOrdering
   )
 
