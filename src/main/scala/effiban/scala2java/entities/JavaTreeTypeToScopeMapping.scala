@@ -8,6 +8,7 @@ object JavaTreeTypeToScopeMapping {
     JavaTreeType.Package -> JavaTreeType.Package,
     JavaTreeType.Class -> JavaTreeType.Class,
     JavaTreeType.Record -> JavaTreeType.Class,
+    JavaTreeType.Enum -> JavaTreeType.Enum,
     JavaTreeType.Interface -> JavaTreeType.Interface
   )
 

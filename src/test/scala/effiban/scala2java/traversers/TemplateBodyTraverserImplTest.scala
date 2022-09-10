@@ -1,5 +1,6 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.classifiers.DefnTypeClassifier
 import effiban.scala2java.contexts.TemplateBodyContext
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{CtorContext, JavaTreeType}
@@ -9,6 +10,7 @@ import effiban.scala2java.orderings.JavaTemplateChildOrdering
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
+import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 
 import scala.meta.{Ctor, Decl, Defn, Init, Lit, Name, Pat, Term, Tree, Type}
@@ -35,6 +37,13 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
     pats = List(Pat.Var(name = Term.Name("y"))),
     decltpe = None,
     rhs = Lit.Int(4)
+  )
+
+  private val TypeDefn = Defn.Type(
+    mods = Nil,
+    name = Type.Name("X"),
+    tparams = Nil,
+    body = Type.Name("Y")
   )
 
   private val PrimaryCtorArgs = List(
@@ -77,16 +86,19 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
     DataMemberDefn,
     PrimaryCtor,
     SecondaryCtor,
-    MethodDefn
+    MethodDefn,
+    TypeDefn,
   )
 
 
   private val javaTemplateChildOrdering = mock[JavaTemplateChildOrdering]
   private val templateChildTraverser = mock[TemplateChildTraverser]
+  private val defnTypeClassifier = mock[DefnTypeClassifier]
 
   private val templateBodyTraverser = new TemplateBodyTraverserImpl(
     templateChildTraverser,
-    javaTemplateChildOrdering,
+    defnTypeClassifier,
+    javaTemplateChildOrdering
   )
 
   test("traverse when empty") {
@@ -127,7 +139,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
   }
 
 
-  test("traverse when has stats only") {
+  test("traverse when has regular stats only") {
     val stats = List(
       DataMemberDecl,
       MethodDefn,
@@ -137,6 +149,66 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
     expectWriteDataMemberDecl()
     expectWriteDataMemberDefn()
     expectWriteMethodDefn()
+
+    expectChildOrdering()
+
+    templateBodyTraverser.traverse(stats = stats)
+
+    outputWriter.toString shouldBe
+      """ {
+        |/* DATA MEMBER DECL */;
+        |/* DATA MEMBER DEFINITION */;
+        |/*
+        |*  METHOD DEFINITION
+        |*/
+        |}
+        |""".stripMargin
+  }
+
+  test("traverse when has regular stats and non-enum type def") {
+    val stats = List(
+      DataMemberDecl,
+      MethodDefn,
+      DataMemberDefn,
+      TypeDefn
+    )
+
+    expectWriteDataMemberDecl()
+    expectWriteDataMemberDefn()
+    expectWriteMethodDefn()
+    when(defnTypeClassifier.isEnumTypeDef(eqTree(TypeDefn), ArgumentMatchers.eq(javaScope))).thenReturn(false)
+    expectWriteTypeDefn()
+
+    expectChildOrdering()
+
+    templateBodyTraverser.traverse(stats = stats)
+
+    outputWriter.toString shouldBe
+      """ {
+        |/* DATA MEMBER DECL */;
+        |/* DATA MEMBER DEFINITION */;
+        |/*
+        |*  METHOD DEFINITION
+        |*/
+        |/*
+        |*  TYPE DEFINITION
+        |*/
+        |}
+        |""".stripMargin
+  }
+
+  test("traverse when has regular stats and enum type def should skip the type def") {
+    val stats = List(
+      DataMemberDecl,
+      MethodDefn,
+      DataMemberDefn,
+      TypeDefn
+    )
+
+    expectWriteDataMemberDecl()
+    expectWriteDataMemberDefn()
+    expectWriteMethodDefn()
+    when(defnTypeClassifier.isEnumTypeDef(eqTree(TypeDefn), ArgumentMatchers.eq(javaScope))).thenReturn(true)
 
     expectChildOrdering()
 
@@ -286,6 +358,15 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
         |*/
         |""".stripMargin)
       .when(templateChildTraverser).traverse(eqTree(MethodDefn), eqOptionCtorContext(maybeCtorContext))
+  }
+
+  private def expectWriteTypeDefn(maybeCtorContext: Option[CtorContext] = None): Unit = {
+    doWrite(
+      """/*
+        |*  TYPE DEFINITION
+        |*/
+        |""".stripMargin)
+      .when(templateChildTraverser).traverse(eqTree(TypeDefn), eqOptionCtorContext(maybeCtorContext))
   }
 
   private def expectChildOrdering() = {

@@ -14,7 +14,7 @@ object JavaRequiresFinalModifierPredicate extends JavaRequiresFinalModifierPredi
     import context._
 
     (scalaTree, javaScope) match {
-      case (_: Decl.Val | _ : Defn.Val, JavaTreeType.Class | Method | Lambda) => true
+      case (_: Decl.Val | _ : Defn.Val, JavaTreeType.Class | JavaTreeType.Enum | Method | Lambda) => true
       // Can't add final in a Lambda param because it might not have an explicit type,
       // and we are not adding 'var' there either at this point since it has complicated rules
       case (_: Term.Param, JavaTreeType.Lambda) => false
