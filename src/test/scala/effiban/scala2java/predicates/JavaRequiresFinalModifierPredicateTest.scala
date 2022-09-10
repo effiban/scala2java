@@ -1,8 +1,8 @@
 package effiban.scala2java.predicates
 
+import effiban.scala2java.contexts.JavaModifiersContext
 import effiban.scala2java.entities.JavaTreeType
 import effiban.scala2java.entities.JavaTreeType.JavaTreeType
-import effiban.scala2java.resolvers.JavaModifiersResolverParams
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
 
@@ -53,12 +53,12 @@ class JavaRequiresFinalModifierPredicateTest extends UnitTestSuite {
   }
 
   private def requiresFinal(scalaTree: Tree, javaScope: JavaTreeType) = {
-    JavaRequiresFinalModifierPredicate.apply(JavaModifiersResolverParams(
-      scalaTree = scalaTree,
-      scalaMods = Nil,
-      javaTreeType = JavaTreeType.Unknown,
-      javaScope = javaScope
-    ))
+    JavaRequiresFinalModifierPredicate.apply(
+      JavaModifiersContext(
+        scalaTree = scalaTree,
+        scalaMods = Nil,
+        javaTreeType = JavaTreeType.Unknown,
+        javaScope = javaScope
+      ))
   }
-
 }

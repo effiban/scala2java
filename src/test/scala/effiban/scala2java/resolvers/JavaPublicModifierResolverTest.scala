@@ -1,5 +1,6 @@
 package effiban.scala2java.resolvers
 
+import effiban.scala2java.contexts.JavaModifiersContext
 import effiban.scala2java.entities.JavaTreeType.JavaTreeType
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 import effiban.scala2java.testsuites.UnitTestSuite
@@ -114,11 +115,12 @@ class JavaPublicModifierResolverTest extends UnitTestSuite {
   }
 
   private def resolve(scalaTree: Tree, javaTree: JavaTreeType, javaScope: JavaTreeType): Option[JavaModifier] = {
-    JavaPublicModifierResolver.resolve(JavaModifiersResolverParams(
-      scalaTree = scalaTree,
-      scalaMods = Nil,
-      javaTreeType = javaTree,
-      javaScope = javaScope
-    ))
+    JavaPublicModifierResolver.resolve(
+      JavaModifiersContext(
+        scalaTree = scalaTree,
+        scalaMods = Nil,
+        javaTreeType = javaTree,
+        javaScope = javaScope
+      ))
   }
 }

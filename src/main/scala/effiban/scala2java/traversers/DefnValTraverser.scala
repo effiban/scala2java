@@ -1,8 +1,9 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.JavaModifiersContext
 import effiban.scala2java.entities.JavaTreeType
 import effiban.scala2java.entities.TraversalContext.javaScope
-import effiban.scala2java.resolvers.{JavaModifiersResolver, JavaModifiersResolverParams}
+import effiban.scala2java.resolvers.JavaModifiersResolver
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Defn
@@ -32,12 +33,12 @@ private[traversers] class DefnValTraverserImpl(annotListTraverser: => AnnotListT
   }
 
   private def resolveJavaModifiers(valDef: Defn.Val) = {
-    val params = JavaModifiersResolverParams(
+    val context = JavaModifiersContext(
       scalaTree = valDef,
       scalaMods = valDef.mods,
       javaTreeType = JavaTreeType.Variable,
       javaScope = javaScope
     )
-    javaModifiersResolver.resolve(params)
+    javaModifiersResolver.resolve(context)
   }
 }

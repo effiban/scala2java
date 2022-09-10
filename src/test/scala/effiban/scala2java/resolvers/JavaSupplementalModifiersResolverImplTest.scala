@@ -1,7 +1,8 @@
 package effiban.scala2java.resolvers
 
+import effiban.scala2java.contexts.JavaModifiersContext
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
-import effiban.scala2java.matchers.JavaModifiersResolverParamsMatcher.eqJavaModifiersResolverParams
+import effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
 import effiban.scala2java.predicates.JavaRequiresFinalModifierPredicate
 import effiban.scala2java.testsuites.UnitTestSuite
 
@@ -18,75 +19,75 @@ class JavaSupplementalModifiersResolverImplTest extends UnitTestSuite {
   )
 
   test("resolve() when scala mods include 'private' and 'final' not required should return empty") {
-    val ResolverParams = JavaModifiersResolverParams(
+    val context = JavaModifiersContext(
       scalaTree = Lit.Int(3),
       scalaMods = List(Mod.Private(Name.Anonymous())),
       javaTreeType = JavaTreeType.Variable,
       javaScope = JavaTreeType.Class
     )
 
-    when(javaRequiresFinalModifierPredicate.apply(eqJavaModifiersResolverParams(ResolverParams))).thenReturn(false)
+    when(javaRequiresFinalModifierPredicate.apply(eqJavaModifiersContext(context))).thenReturn(false)
 
-    javaSupplementalModifiersResolver.resolve(ResolverParams) shouldBe Set.empty
+    javaSupplementalModifiersResolver.resolve(context) shouldBe Set.empty
 
     verifyZeroInteractions(javaPublicModifierResolver)
   }
 
   test("resolve() when scala mods include 'protected' and 'final' not required should return empty") {
-    val ResolverParams = JavaModifiersResolverParams(
+    val context = JavaModifiersContext(
       scalaTree = Lit.Int(3),
       scalaMods = List(Mod.Protected(Name.Anonymous())),
       javaTreeType = JavaTreeType.Variable,
       javaScope = JavaTreeType.Class
     )
 
-    when(javaRequiresFinalModifierPredicate.apply(eqJavaModifiersResolverParams(ResolverParams))).thenReturn(false)
+    when(javaRequiresFinalModifierPredicate.apply(eqJavaModifiersContext(context))).thenReturn(false)
 
-    javaSupplementalModifiersResolver.resolve(ResolverParams) shouldBe Set.empty
+    javaSupplementalModifiersResolver.resolve(context) shouldBe Set.empty
 
     verifyZeroInteractions(javaPublicModifierResolver)
   }
 
   test("resolve() when scala mods are empty and 'final' not required should return ['public']") {
-    val ResolverParams = JavaModifiersResolverParams(
+    val context = JavaModifiersContext(
       scalaTree = Lit.Int(3),
       scalaMods = Nil,
       javaTreeType = JavaTreeType.Variable,
       javaScope = JavaTreeType.Class
     )
 
-    when(javaPublicModifierResolver.resolve(eqJavaModifiersResolverParams(ResolverParams))).thenReturn(Some(JavaModifier.Public))
-    when(javaRequiresFinalModifierPredicate.apply(eqJavaModifiersResolverParams(ResolverParams))).thenReturn(false)
+    when(javaPublicModifierResolver.resolve(eqJavaModifiersContext(context))).thenReturn(Some(JavaModifier.Public))
+    when(javaRequiresFinalModifierPredicate.apply(eqJavaModifiersContext(context))).thenReturn(false)
 
-    javaSupplementalModifiersResolver.resolve(ResolverParams) shouldBe Set(JavaModifier.Public)
+    javaSupplementalModifiersResolver.resolve(context) shouldBe Set(JavaModifier.Public)
   }
 
   test("resolve() when scala mods include 'private' and 'final' is required should return ['final']") {
-    val ResolverParams = JavaModifiersResolverParams(
+    val context = JavaModifiersContext(
       scalaTree = Lit.Int(3),
       scalaMods = List(Mod.Private(Name.Anonymous())),
       javaTreeType = JavaTreeType.Variable,
       javaScope = JavaTreeType.Class
     )
 
-    when(javaRequiresFinalModifierPredicate.apply(eqJavaModifiersResolverParams(ResolverParams))).thenReturn(true)
+    when(javaRequiresFinalModifierPredicate.apply(eqJavaModifiersContext(context))).thenReturn(true)
 
-    javaSupplementalModifiersResolver.resolve(ResolverParams) shouldBe Set(JavaModifier.Final)
+    javaSupplementalModifiersResolver.resolve(context) shouldBe Set(JavaModifier.Final)
 
     verifyZeroInteractions(javaPublicModifierResolver)
   }
 
   test("resolve() when scala mods are empty and 'final' is required should return ['public', 'final']") {
-    val ResolverParams = JavaModifiersResolverParams(
+    val context = JavaModifiersContext(
       scalaTree = Lit.Int(3),
       scalaMods = Nil,
       javaTreeType = JavaTreeType.Variable,
       javaScope = JavaTreeType.Class
     )
 
-    when(javaPublicModifierResolver.resolve(eqJavaModifiersResolverParams(ResolverParams))).thenReturn(Some(JavaModifier.Public))
-    when(javaRequiresFinalModifierPredicate.apply(eqJavaModifiersResolverParams(ResolverParams))).thenReturn(true)
+    when(javaPublicModifierResolver.resolve(eqJavaModifiersContext(context))).thenReturn(Some(JavaModifier.Public))
+    when(javaRequiresFinalModifierPredicate.apply(eqJavaModifiersContext(context))).thenReturn(true)
 
-    javaSupplementalModifiersResolver.resolve(ResolverParams) shouldBe Set(JavaModifier.Public, JavaModifier.Final)
+    javaSupplementalModifiersResolver.resolve(context) shouldBe Set(JavaModifier.Public, JavaModifier.Final)
   }
 }

@@ -1,14 +1,15 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.JavaModifiersContext
 import effiban.scala2java.entities
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 import effiban.scala2java.matchers.ClassInfoMatcher
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
-import effiban.scala2java.matchers.JavaModifiersResolverParamsMatcher.eqJavaModifiersResolverParams
+import effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
 import effiban.scala2java.matchers.SomeMatcher.eqSome
 import effiban.scala2java.matchers.TreeMatcher.eqTree
-import effiban.scala2java.resolvers.{JavaModifiersResolver, JavaModifiersResolverParams}
+import effiban.scala2java.resolvers.JavaModifiersResolver
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.transformers.ParamToDeclValTransformer
@@ -219,7 +220,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
   }
 
   private def whenResolveJavaModifiersThenReturnPublic(cls: Defn.Class): Unit = {
-    val expectedResolverParams = JavaModifiersResolverParams(cls, Modifiers, JavaTreeType.Class, javaScope)
-    when(javaModifiersResolver.resolve(eqJavaModifiersResolverParams(expectedResolverParams))).thenReturn(List(JavaModifier.Public))
+    val expectedContext = JavaModifiersContext(cls, Modifiers, JavaTreeType.Class, javaScope)
+    when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedContext))).thenReturn(List(JavaModifier.Public))
   }
 }
