@@ -1,8 +1,8 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.JavaModifiersContext
+import effiban.scala2java.contexts.{JavaModifiersContext, TemplateContext}
+import effiban.scala2java.entities.JavaTreeType
 import effiban.scala2java.entities.TraversalContext.javaScope
-import effiban.scala2java.entities.{ClassInfo, JavaTreeType}
 import effiban.scala2java.resolvers.JavaModifiersResolver
 import effiban.scala2java.transformers.ParamToDeclValTransformer
 import effiban.scala2java.writers.JavaWriter
@@ -36,7 +36,7 @@ private[traversers] class RegularClassTraverserImpl(annotListTraverser: => Annot
     val enrichedStats = explicitMemberDecls ++ classDef.templ.stats
     val enrichedTemplate = classDef.templ.copy(stats = enrichedStats)
     templateTraverser.traverse(template = enrichedTemplate,
-      maybeClassInfo = Some(ClassInfo(className = classDef.name, maybePrimaryCtor = Some(classDef.ctor))))
+      context = TemplateContext(maybeClassName = Some(classDef.name), maybePrimaryCtor = Some(classDef.ctor)))
     javaScope = outerJavaScope
   }
 

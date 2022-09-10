@@ -1,11 +1,11 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.TemplateContext
 import effiban.scala2java.entities.JavaTreeType.JavaTreeType
 import effiban.scala2java.entities.TraversalContext.javaScope
-import effiban.scala2java.entities.{ClassInfo, JavaKeyword, JavaTreeType}
-import effiban.scala2java.matchers.ClassInfoMatcher
+import effiban.scala2java.entities.{JavaKeyword, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
-import effiban.scala2java.matchers.OptionMatcher.eqOption
+import effiban.scala2java.matchers.TemplateContextMatcher.eqTemplateContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.resolvers.JavaInheritanceKeywordResolver
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
@@ -76,7 +76,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
   test("traverse when empty") {
 
     expectWriteSelf()
-    expectTraverseBody(stats = Nil, inits = Nil, maybeClassInfo = None)
+    expectTraverseBody(stats = Nil, inits = Nil)
 
     templateTraverser.traverse(Templates.Empty)
 
@@ -99,7 +99,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
 
     expectWriteSelf()
     expectWriteInits(JavaTreeType.Class)
-    expectTraverseBody(stats = Nil, inits = TheNonSkippedInits, maybeClassInfo = None)
+    expectTraverseBody(stats = Nil, inits = TheNonSkippedInits)
 
     javaScope = JavaTreeType.Class
 
@@ -122,7 +122,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
 
     expectWriteSelf()
     expectWriteInits(JavaTreeType.Class)
-    expectTraverseBody(stats = Nil, inits = TheNonSkippedInits, maybeClassInfo = None)
+    expectTraverseBody(stats = Nil, inits = TheNonSkippedInits)
 
     javaScope = JavaTreeType.Class
 
@@ -144,7 +144,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     )
 
     expectWriteSelf(NonEmptySelf)
-    expectTraverseBody(stats = Nil, inits = Nil, maybeClassInfo = None)
+    expectTraverseBody(stats = Nil, inits = Nil)
 
     templateTraverser.traverse(template)
 
@@ -158,14 +158,14 @@ class TemplateTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse when has primary ctor only") {
-    val classInfo = ClassInfo(className = ClassName, maybePrimaryCtor = Some(PrimaryCtor))
+    val context = TemplateContext(maybeClassName = Some(ClassName), maybePrimaryCtor = Some(PrimaryCtor))
 
     expectWriteSelf()
-    expectTraverseBody(stats = Nil, inits = Nil, maybeClassInfo = Some(classInfo))
+    expectTraverseBody(stats = Nil, inits = Nil, context = context)
 
     templateTraverser.traverse(
       template = Templates.Empty,
-      maybeClassInfo = Some(classInfo)
+      context = context
     )
 
     outputWriter.toString shouldBe
@@ -189,7 +189,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     )
 
     expectWriteSelf()
-    expectTraverseBody(stats = stats, inits = Nil, maybeClassInfo = None)
+    expectTraverseBody(stats = stats, inits = Nil)
 
     templateTraverser.traverse(template = template)
 
@@ -215,18 +215,15 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       stats = stats
     )
 
-    val classInfo = ClassInfo(className = ClassName, maybePrimaryCtor = Some(PrimaryCtor))
+    val context = TemplateContext(maybeClassName = Some(ClassName), maybePrimaryCtor = Some(PrimaryCtor))
 
     expectWriteInits(JavaTreeType.Class)
     expectWriteSelf(NonEmptySelf)
-    expectTraverseBody(stats = stats, inits = TheNonSkippedInits, maybeClassInfo = Some(classInfo))
+    expectTraverseBody(stats = stats, inits = TheNonSkippedInits, context = context)
 
     javaScope = JavaTreeType.Class
 
-    templateTraverser.traverse(
-      template = template,
-      maybeClassInfo = Some(classInfo)
-    )
+    templateTraverser.traverse(template = template, context = context)
 
     outputWriter.toString shouldBe
       """ implements Parent1, Parent2/* extends SelfName: SelfType */ {
@@ -254,7 +251,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
 
   private def expectTraverseBody(stats: List[Stat],
                                  inits: List[Init],
-                                 maybeClassInfo: Option[ClassInfo]): Unit = {
+                                 context: TemplateContext = TemplateContext()): Unit = {
     doWrite(
       """ {
         |  /* BODY */
@@ -263,6 +260,6 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       .when(templateBodyTraverser).traverse(
       eqTreeList(stats),
       eqTreeList(inits),
-      eqOption(maybeClassInfo, new ClassInfoMatcher(_)))
+      eqTemplateContext(context))
   }
 }

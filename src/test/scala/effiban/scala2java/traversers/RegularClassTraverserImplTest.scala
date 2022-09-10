@@ -1,13 +1,11 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.JavaModifiersContext
-import effiban.scala2java.entities
+import effiban.scala2java.contexts.{JavaModifiersContext, TemplateContext}
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
-import effiban.scala2java.matchers.ClassInfoMatcher
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
-import effiban.scala2java.matchers.SomeMatcher.eqSome
+import effiban.scala2java.matchers.TemplateContextMatcher.eqTemplateContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.resolvers.JavaModifiersResolver
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
@@ -127,7 +125,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(templateTraverser).traverse(
       eqTree(expectedAdjustedTemplate),
-      eqSome(entities.ClassInfo(ClassName, Some(primaryCtor)), new ClassInfoMatcher(_))
+      eqTemplateContext(TemplateContext(Some(ClassName), Some(primaryCtor)))
     )
 
     classTraverser.traverse(cls)
@@ -188,7 +186,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(templateTraverser).traverse(
       eqTree(expectedAdjustedTemplate),
-      eqSome(entities.ClassInfo(ClassName, Some(primaryCtor)), new ClassInfoMatcher(_))
+      eqTemplateContext(TemplateContext(Some(ClassName), Some(primaryCtor)))
     )
 
     classTraverser.traverse(cls)

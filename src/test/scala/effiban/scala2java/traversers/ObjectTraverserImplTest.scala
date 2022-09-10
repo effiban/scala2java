@@ -1,10 +1,11 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.JavaModifiersContext
+import effiban.scala2java.contexts.{JavaModifiersContext, TemplateContext}
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
+import effiban.scala2java.matchers.TemplateContextMatcher.eqTemplateContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.resolvers.JavaModifiersResolver
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
@@ -69,7 +70,7 @@ class ObjectTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}
         |""".stripMargin)
-      .when(templateTraverser).traverse(eqTree(template), ArgumentMatchers.eq(None))
+      .when(templateTraverser).traverse(eqTree(template), eqTemplateContext(TemplateContext()))
 
     objectTraverser.traverse(objectDef)
 
