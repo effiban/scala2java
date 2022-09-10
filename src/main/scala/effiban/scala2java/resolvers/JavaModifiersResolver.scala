@@ -1,5 +1,6 @@
 package effiban.scala2java.resolvers
 
+import effiban.scala2java.contexts.JavaModifiersContext
 import effiban.scala2java.entities.JavaModifier
 import effiban.scala2java.orderings.JavaModifierOrdering
 import effiban.scala2java.transformers.ScalaToJavaModifierTransformer
@@ -8,23 +9,23 @@ import scala.meta.Mod
 
 trait JavaModifiersResolver {
 
-  def resolve(params: JavaModifiersResolverParams): List[JavaModifier]
+  def resolve(context: JavaModifiersContext): List[JavaModifier]
 }
 
 class JavaModifiersResolverImpl(javaAllowedModifiersResolver: JavaAllowedModifiersResolver,
                                 javaSupplementalModifiersResolver: JavaSupplementalModifiersResolver) extends JavaModifiersResolver {
 
-  override def resolve(params: JavaModifiersResolverParams): List[JavaModifier] = {
-    import params._
+  override def resolve(context: JavaModifiersContext): List[JavaModifier] = {
+    import context._
 
     val modifierNamesBuilder = Set.newBuilder[JavaModifier]
 
-    // Transform the Scala modifiers into corresponding Java modifiers, when allowed
+    // Transform the Scala modifiers into corresponding Java modifiers, filtering allowed
     val allowedJavaModifiers = javaAllowedModifiersResolver.resolve(javaTreeType, javaScope)
     modifierNamesBuilder ++= transform(scalaMods, allowedJavaModifiers)
 
-    // Add additional Java-specific modifiers which are required by the params
-    modifierNamesBuilder ++= javaSupplementalModifiersResolver.resolve(params)
+    // Add additional Java-specific modifiers which are required by the context
+    modifierNamesBuilder ++= javaSupplementalModifiersResolver.resolve(context)
 
     modifierNamesBuilder.result()
       .toList

@@ -1,17 +1,17 @@
 package effiban.scala2java.predicates
 
+import effiban.scala2java.contexts.JavaModifiersContext
 import effiban.scala2java.entities.JavaTreeType
 import effiban.scala2java.entities.JavaTreeType.{Lambda, Method}
-import effiban.scala2java.resolvers.JavaModifiersResolverParams
 
 import scala.meta.{Decl, Defn, Term}
 
-trait JavaRequiresFinalModifierPredicate extends Function[JavaModifiersResolverParams, Boolean]
+trait JavaRequiresFinalModifierPredicate extends Function[JavaModifiersContext, Boolean]
 
 object JavaRequiresFinalModifierPredicate extends JavaRequiresFinalModifierPredicate {
 
-  override def apply(params: JavaModifiersResolverParams): Boolean = {
-    import params._
+  override def apply(context: JavaModifiersContext): Boolean = {
+    import context._
 
     (scalaTree, javaScope) match {
       case (_: Decl.Val | _ : Defn.Val, JavaTreeType.Class | Method | Lambda) => true

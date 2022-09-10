@@ -1,5 +1,6 @@
 package effiban.scala2java.resolvers
 
+import effiban.scala2java.contexts.JavaModifiersContext
 import effiban.scala2java.entities.JavaModifier
 import effiban.scala2java.predicates.JavaRequiresFinalModifierPredicate
 
@@ -7,23 +8,23 @@ import scala.meta.Mod
 
 trait JavaSupplementalModifiersResolver {
 
-  def resolve(params: JavaModifiersResolverParams): Set[JavaModifier]
+  def resolve(context: JavaModifiersContext): Set[JavaModifier]
 }
 
 class JavaSupplementalModifiersResolverImpl(javaPublicModifierResolver: JavaPublicModifierResolver,
                                             javaRequiresFinalModifierPredicate: JavaRequiresFinalModifierPredicate)
   extends JavaSupplementalModifiersResolver {
 
-  override def resolve(params: JavaModifiersResolverParams): Set[JavaModifier] = {
-    import params._
+  override def resolve(context: JavaModifiersContext): Set[JavaModifier] = {
+    import context._
 
     val modifierNamesBuilder = Set.newBuilder[JavaModifier]
 
     if (scalaModifiersImplyPublic(scalaMods)) {
-      modifierNamesBuilder ++= javaPublicModifierResolver.resolve(params)
+      modifierNamesBuilder ++= javaPublicModifierResolver.resolve(context)
     }
 
-    if (javaRequiresFinalModifierPredicate.apply(params)) {
+    if (javaRequiresFinalModifierPredicate.apply(context)) {
       modifierNamesBuilder += JavaModifier.Final
     }
 
