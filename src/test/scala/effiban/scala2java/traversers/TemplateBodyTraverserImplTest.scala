@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.TemplateContext
+import effiban.scala2java.contexts.TemplateBodyContext
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{CtorContext, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqOptionCtorContext
@@ -91,7 +91,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
 
   test("traverse when empty") {
 
-    templateBodyTraverser.traverse(stats = Nil, inits = Nil)
+    templateBodyTraverser.traverse(stats = Nil)
 
     outputWriter.toString shouldBe
       """ {
@@ -100,7 +100,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse when has inits only") {
-    templateBodyTraverser.traverse(stats = Nil, inits = TheInits)
+    templateBodyTraverser.traverse(stats = Nil, context = TemplateBodyContext(inits = TheInits))
 
     outputWriter.toString shouldBe
       """ {
@@ -109,13 +109,13 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse when has primary ctor. only") {
-    val context = TemplateContext(maybeClassName = Some(ClassName), maybePrimaryCtor = Some(PrimaryCtor))
+    val context = TemplateBodyContext(maybeClassName = Some(ClassName), maybePrimaryCtor = Some(PrimaryCtor))
 
     expectWritePrimaryCtor(Some(CtorContext(className = ClassName, inits = Nil)))
 
     expectChildOrdering()
 
-    templateBodyTraverser.traverse(stats = Nil, inits = Nil, context = context)
+    templateBodyTraverser.traverse(stats = Nil, context = context)
 
     outputWriter.toString shouldBe
       """ {
@@ -140,7 +140,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
 
     expectChildOrdering()
 
-    templateBodyTraverser.traverse(stats = stats, inits = Nil)
+    templateBodyTraverser.traverse(stats = stats)
 
     outputWriter.toString shouldBe
       """ {
@@ -154,7 +154,11 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse when has everything except loose terms") {
-    val context = TemplateContext(maybeClassName = Some(ClassName), maybePrimaryCtor = Some(PrimaryCtor))
+    val context = TemplateBodyContext(
+      maybeClassName = Some(ClassName),
+      maybePrimaryCtor = Some(PrimaryCtor),
+      inits = TheInits
+    )
 
     val stats = List(
       DataMemberDecl,
@@ -173,7 +177,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
 
     javaScope = JavaTreeType.Class
 
-    templateBodyTraverser.traverse(stats = stats, inits = TheInits, context = context)
+    templateBodyTraverser.traverse(stats = stats, context = context)
 
     outputWriter.toString shouldBe
       """ {
@@ -193,7 +197,11 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse when has everything including loose terms") {
-    val context = TemplateContext(maybeClassName = Some(ClassName), maybePrimaryCtor = Some(PrimaryCtor))
+    val context = TemplateBodyContext(
+      maybeClassName = Some(ClassName),
+      maybePrimaryCtor = Some(PrimaryCtor),
+      inits = TheInits
+    )
 
     val stats = List(
       DataMemberDecl,
@@ -216,7 +224,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
 
     javaScope = JavaTreeType.Class
 
-    templateBodyTraverser.traverse(stats = stats, inits = TheInits, context = context)
+    templateBodyTraverser.traverse(stats = stats, context = context)
 
     outputWriter.toString shouldBe
       """ {

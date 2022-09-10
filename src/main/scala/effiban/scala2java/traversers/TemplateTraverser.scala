@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.TemplateContext
+import effiban.scala2java.contexts.{TemplateBodyContext, TemplateContext}
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.resolvers.JavaInheritanceKeywordResolver
 import effiban.scala2java.writers.JavaWriter
@@ -28,10 +28,12 @@ private[traversers] class TemplateTraverserImpl(initListTraverser: => InitListTr
     val relevantInits = template.inits.filterNot(init => shouldSkipParent(init.tpe))
     traverseTemplateInits(relevantInits)
     selfTraverser.traverse(template.self)
-    templateBodyTraverser.traverse(
-      statements = template.stats,
-      inits = relevantInits,
-      context = context)
+    val bodyContext = TemplateBodyContext(
+      maybeClassName = context.maybeClassName,
+      maybePrimaryCtor = context.maybePrimaryCtor,
+      inits = relevantInits
+    )
+    templateBodyTraverser.traverse(statements = template.stats, context = bodyContext)
   }
 
   private def traverseTemplateInits(inits: List[Init]): Unit = {
