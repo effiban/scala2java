@@ -11,15 +11,14 @@ object TermInterpolateTransformer extends TermInterpolateTransformer {
 
   override def transform(termInterpolate: Term.Interpolate): Option[Term.Apply] = {
     termInterpolate.prefix match {
-      // Transform Scala "s" interpolation into Java String.format(...)
-      case Term.Name("s") => Some(toJavaStringFormat(termInterpolate))
-      // TODO handle other interpolations
+      case Term.Name("s") => Some(toJavaStringFormat(termInterpolate, implicitFormatSpecifier = "%s"))
+      case Term.Name("f") | Term.Name("raw") => Some(toJavaStringFormat(termInterpolate))
       case _ => None
     }
   }
 
-  private def toJavaStringFormat(termInterpolate: Term.Interpolate) = {
-    val concatenatedParts = termInterpolate.parts.map(_.value).mkString("%s")
+  private def toJavaStringFormat(termInterpolate: Term.Interpolate, implicitFormatSpecifier: String = "") = {
+    val concatenatedParts = termInterpolate.parts.map(_.value).mkString(implicitFormatSpecifier)
     Apply(
       fun = Select(Term.Name("String"), Term.Name("format")),
       args = List(Lit.String(concatenatedParts)) ++ termInterpolate.args
