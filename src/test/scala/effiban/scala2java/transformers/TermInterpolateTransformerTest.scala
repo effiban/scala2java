@@ -74,7 +74,7 @@ class TermInterpolateTransformerTest extends UnitTestSuite {
   test("transform 'custom' should return None (unsupported)") {
     val interpolationArgs = List(Term.Name("x"), Term.Name("y"))
 
-    // f"start %s middle %d end"
+    // custom"start %s middle %d end"
     val termInterpolate = Term.Interpolate(
       prefix = Term.Name("custom"),
       parts = List(Lit.String("start "), Lit.String(" middle "), Lit.String(" end")),

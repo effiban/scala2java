@@ -15,14 +15,14 @@ class TypeFunctionTraverserImplTest extends UnitTestSuite {
 
   private val typeFunctionTraverser = new TypeFunctionTraverserImpl(typeApplyTraverser, scalaToJavaFunctionTypeTransformer)
 
-  test("traverse() when transformation is supported") {
+  test("traverse() when corresponding function type is a native Java type") {
     val inputType = TypeNames.Int
     val resultType = TypeNames.String
 
     val scalaFunctionType = Type.Function(params = List(inputType), res = resultType)
     val expectedJavaFunctionType = Type.Apply(Type.Name("Function"), List(inputType, resultType))
 
-    when(scalaToJavaFunctionTypeTransformer.transform(eqTree(scalaFunctionType))).thenReturn(Some(expectedJavaFunctionType))
+    when(scalaToJavaFunctionTypeTransformer.transform(eqTree(scalaFunctionType))).thenReturn(expectedJavaFunctionType)
 
     doWrite("Function<Int, String>").when(typeApplyTraverser).traverse(eqTree(expectedJavaFunctionType))
 
@@ -31,20 +31,23 @@ class TypeFunctionTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe "Function<Int, String>"
   }
 
-  test("traverse() when transformation is unsupported") {
+  test("traverse() when corresponding function type is a JOOL library type") {
     val inType1 = Type.Name("T1")
     val inType2 = Type.Name("T2")
     val inType3 = Type.Name("T3")
+    val inParams = List(inType1, inType2, inType3)
     val resultType = TypeNames.String
 
-    val scalaFunctionType = Type.Function(params = List(inType1, inType2, inType3), res = resultType)
+    val scalaFunctionType = Type.Function(params = inParams, res = resultType)
+    val expectedJavaFunctionType = Type.Apply(Type.Name("Function3"), inParams :+ resultType)
 
-    when(scalaToJavaFunctionTypeTransformer.transform(eqTree(scalaFunctionType))).thenReturn(None)
+    when(scalaToJavaFunctionTypeTransformer.transform(eqTree(scalaFunctionType))).thenReturn(expectedJavaFunctionType)
+
+    doWrite("Function3<T1, T2, T3, String>").when(typeApplyTraverser).traverse(eqTree(expectedJavaFunctionType))
 
     typeFunctionTraverser.traverse(scalaFunctionType)
 
-    outputWriter.toString shouldBe "/* (T1, T2, T3) => String */"
-
-    verifyNoMoreInteractions(typeApplyTraverser)
+    outputWriter.toString shouldBe
+      "/* Requires JOOL (import org.jooq.lambda.function.Function3) */Function3<T1, T2, T3, String>"
   }
 }
