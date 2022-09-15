@@ -1,14 +1,14 @@
-package effiban.scala2java.predicates
+package effiban.scala2java.resolvers
 
 import effiban.scala2java.contexts.JavaModifiersContext
-import effiban.scala2java.entities.JavaTreeType
 import effiban.scala2java.entities.JavaTreeType.JavaTreeType
+import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
 
 import scala.meta.{Decl, Defn, Lit, Pat, Term, Tree}
 
-class JavaRequiresFinalModifierPredicateTest extends UnitTestSuite {
+class JavaFinalModifierResolverTest extends UnitTestSuite {
 
   private val TheDeclVal = Decl.Val(Nil, List(Pat.Var(Term.Name("x"))), TypeNames.Int)
   private val TheDefnVal = Defn.Val(Nil, List(Pat.Var(Term.Name("x"))), None, Lit.Int(3))
@@ -48,12 +48,12 @@ class JavaRequiresFinalModifierPredicateTest extends UnitTestSuite {
       expectedResult: Boolean) =>
 
       test(s"A '$scalaTreeDesc' in the scope '$javaScope' should ${if (expectedResult) "" else "not"} require 'final'") {
-        requiresFinal(scalaTree, javaScope) shouldBe expectedResult
+        resolve(scalaTree, javaScope) shouldBe (if (expectedResult) Some(JavaModifier.Final) else None)
       }
   }
 
-  private def requiresFinal(scalaTree: Tree, javaScope: JavaTreeType) = {
-    JavaRequiresFinalModifierPredicate.apply(
+  private def resolve(scalaTree: Tree, javaScope: JavaTreeType) = {
+    JavaFinalModifierResolver.resolve(
       JavaModifiersContext(
         scalaTree = scalaTree,
         scalaMods = Nil,

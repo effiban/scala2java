@@ -1,14 +1,19 @@
 package effiban.scala2java.resolvers
 
+import effiban.scala2java.classifiers.ModsClassifier
 import effiban.scala2java.contexts.JavaModifiersContext
 import effiban.scala2java.entities.JavaTreeType.JavaTreeType
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
+import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.{PrimaryCtors, Templates, TypeNames}
 
-import scala.meta.{Decl, Defn, Lit, Pat, Term, Tree, Type}
+import scala.meta.{Decl, Defn, Lit, Mod, Name, Pat, Term, Tree, Type}
 
 class JavaPublicModifierResolverTest extends UnitTestSuite {
+
+  private val ScalaModsPublic = List(Mod.Case())
+  private val ScalaModsNonPublic = List(Mod.Private(Name.Anonymous()), Mod.Protected(Name.Anonymous()))
 
   private val TheClass = Defn.Class(
     mods = Nil,
@@ -50,7 +55,9 @@ class JavaPublicModifierResolverTest extends UnitTestSuite {
     rhs = Lit.Int(3)
   )
 
-  private val ResolverScenarios = Table(
+  private val scalaModsClassifier = mock[ModsClassifier]
+
+  private val ScenariosWhenScalaModsPublic = Table(
     ("Desc", "ScalaTree", "JavaTreeType", "JavaScope", "ExpectedMaybeModifier"),
     ("outer class", TheClass, JavaTreeType.Class, JavaTreeType.Package, Some(JavaModifier.Public)),
     ("inner class of class", TheClass, JavaTreeType.Class, JavaTreeType.Class, Some(JavaModifier.Public)),
@@ -73,22 +80,31 @@ class JavaPublicModifierResolverTest extends UnitTestSuite {
     ("lambda parameter", TheVal, JavaTreeType.Parameter, JavaTreeType.Lambda, None)
   )
 
-  forAll(ResolverScenarios) { case (
+  forAll(ScenariosWhenScalaModsPublic) { case (
     desc: String,
     scalaTree: Tree,
     javaTreeType: JavaTreeType,
     javaScope: JavaTreeType,
     expectedMaybeModifier: Option[JavaModifier]) =>
     test(s"Public modifier generated for $desc should be: '$expectedMaybeModifier'") {
-      resolve(scalaTree, javaTreeType, javaScope) shouldBe expectedMaybeModifier
+      when(scalaModsClassifier.arePublic(eqTreeList(ScalaModsPublic))).thenReturn(true)
+      resolve(scalaTree, ScalaModsPublic, javaTreeType, javaScope) shouldBe expectedMaybeModifier
     }
   }
 
-  private def resolve(scalaTree: Tree, javaTreeType: JavaTreeType, javaScope: JavaTreeType): Option[JavaModifier] = {
+  test("No public modifier generated when scala mods are not public") {
+    when(scalaModsClassifier.arePublic(eqTreeList(ScalaModsNonPublic))).thenReturn(false)
+    resolve(TheVal, ScalaModsPublic, JavaTreeType.Parameter, JavaTreeType.Method) shouldBe None
+  }
+
+  private def resolve(scalaTree: Tree,
+                      scalaMods: List[Mod],
+                      javaTreeType: JavaTreeType,
+                      javaScope: JavaTreeType): Option[JavaModifier] = {
     JavaPublicModifierResolver.resolve(
       JavaModifiersContext(
         scalaTree = scalaTree,
-        scalaMods = Nil,
+        scalaMods = scalaMods,
         javaTreeType = javaTreeType,
         javaScope = javaScope
       ))
