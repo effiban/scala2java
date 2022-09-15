@@ -13,7 +13,7 @@ trait JavaModifiersResolver {
 }
 
 class JavaModifiersResolverImpl(javaAllowedModifiersResolver: JavaAllowedModifiersResolver,
-                                javaSupplementalModifiersResolver: JavaSupplementalModifiersResolver) extends JavaModifiersResolver {
+                                javaExtraModifiersResolver: JavaAllExtraModifiersResolver) extends JavaModifiersResolver {
 
   override def resolve(context: JavaModifiersContext): List[JavaModifier] = {
     import context._
@@ -24,8 +24,8 @@ class JavaModifiersResolverImpl(javaAllowedModifiersResolver: JavaAllowedModifie
     val allowedJavaModifiers = javaAllowedModifiersResolver.resolve(javaTreeType, javaScope)
     modifierNamesBuilder ++= transform(scalaMods, allowedJavaModifiers)
 
-    // Add additional Java-specific modifiers which are required by the context
-    modifierNamesBuilder ++= javaSupplementalModifiersResolver.resolve(context)
+    // Add extra Java-specific modifiers which are required by the context
+    modifierNamesBuilder ++= javaExtraModifiersResolver.resolve(context)
 
     modifierNamesBuilder.result()
       .toList
@@ -43,5 +43,5 @@ class JavaModifiersResolverImpl(javaAllowedModifiersResolver: JavaAllowedModifie
 
 object JavaModifiersResolver extends JavaModifiersResolverImpl(
   JavaAllowedModifiersResolver,
-  JavaSupplementalModifiersResolver
+  JavaAllExtraModifiersResolver
 )
