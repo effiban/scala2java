@@ -1,6 +1,8 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.classifiers.ImporterClassifier
+import effiban.scala2java.contexts.StatContext
+import effiban.scala2java.entities.JavaTreeType.Package
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
@@ -10,6 +12,8 @@ import org.mockito.ArgumentMatchers.any
 import scala.meta.{Import, Importee, Importer, Name, Term}
 
 class ImportTraverserImplTest extends UnitTestSuite {
+
+  private val TheStatContext = StatContext(Package)
 
   private val importerTraverser = mock[ImporterTraverser]
   private val importerClassifier = mock[ImporterClassifier]
@@ -33,7 +37,7 @@ class ImportTraverserImplTest extends UnitTestSuite {
               |""".stripMargin)
       .when(importerTraverser).traverse(eqTree(importer2))
 
-    importTraverser.traverse(Import(List(importer1, importer2)))
+    importTraverser.traverse(`import` = Import(List(importer1, importer2)), context = TheStatContext)
 
     outputWriter.toString shouldBe
       """import mypackage1.myclass1;
@@ -73,7 +77,10 @@ class ImportTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(importerTraverser).traverse(eqTree(nonScalaImporter2))
 
-    importTraverser.traverse(Import(List(scalaImporter1, nonScalaImporter1, scalaImporter2, nonScalaImporter2)))
+    importTraverser.traverse(
+      `import` = Import(List(scalaImporter1, nonScalaImporter1, scalaImporter2, nonScalaImporter2)),
+      context = TheStatContext
+    )
 
     outputWriter.toString shouldBe
       """import mypackage1.myclass1;

@@ -41,12 +41,18 @@ class StatTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse Import") {
-    val `import` = Import(List(Importer(ref = Term.Name("somepackage"), importees = List(Importee.Name(Name.Indeterminate("SomeClass"))))))
+    val `import` = Import(
+      List(
+        Importer(
+          ref = Term.Name("somepackage"),
+          importees = List(Importee.Name(Name.Indeterminate("SomeClass"))))
+      )
+    )
 
     doWrite(
       """import somepackage.SomeClass;
         |""".stripMargin)
-      .when(importTraverser).traverse(eqTree(`import`))
+      .when(importTraverser).traverse(eqTree(`import`), ArgumentMatchers.eq(StatContext(Package)))
 
     statTraverser.traverse(`import`, StatContext(Package))
 

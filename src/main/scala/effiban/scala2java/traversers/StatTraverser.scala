@@ -20,7 +20,7 @@ private[traversers] class StatTraverserImpl(termTraverser: => TermTraverser,
 
   override def traverse(stat: Stat, statContext: StatContext = StatContext()): Unit = stat match {
     case term: Term => termTraverser.traverse(term, TermContext(statContext.javaScope))
-    case `import`: Import => importTraverser.traverse(`import`)
+    case `import`: Import => importTraverser.traverse(`import`, statContext)
     case pkg: Pkg => pkgTraverser.traverse(pkg)
     case defn: Defn => defnTraverser.traverse(defn, statContext)
     case decl: Decl => declTraverser.traverse(decl, statContext)
