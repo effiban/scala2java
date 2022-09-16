@@ -1,10 +1,11 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.Decision.{No, Yes}
+import effiban.scala2java.contexts.BlockContext
+import effiban.scala2java.entities.Decision.Yes
+import effiban.scala2java.matchers.BlockContextMatcher.eqBlockContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
-import org.mockito.ArgumentMatchers
 
 import scala.meta.Term.{Apply, ApplyInfix, Block, If}
 import scala.meta.{Lit, Term}
@@ -62,11 +63,8 @@ class IfTraverserImplTest extends UnitTestSuite {
       """ {
         |  /* BODY */
         |}
-        |""".stripMargin).when(blockTraverser).traverse(
-      stat = eqTree(ThenBlock),
-      shouldReturnValue = ArgumentMatchers.eq(No),
-      maybeInit = ArgumentMatchers.eq(None)
-    )
+        |""".stripMargin)
+      .when(blockTraverser).traverse(stat = eqTree(ThenBlock), context = eqBlockContext(BlockContext()))
 
     ifTraverser.traverse(`if`)
 
@@ -91,8 +89,7 @@ class IfTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin).when(blockTraverser).traverse(
       stat = eqTree(ThenBlock),
-      shouldReturnValue = ArgumentMatchers.eq(Yes),
-      maybeInit = ArgumentMatchers.eq(None)
+      context = eqBlockContext(BlockContext(shouldReturnValue = Yes))
     )
 
     ifTraverser.traverse(`if`, shouldReturnValue = true)
@@ -116,11 +113,8 @@ class IfTraverserImplTest extends UnitTestSuite {
       """ {
         |  /* BODY */
         |}
-        |""".stripMargin).when(blockTraverser).traverse(
-      stat = eqTree(ThenStatement),
-      shouldReturnValue = ArgumentMatchers.eq(No),
-      maybeInit = ArgumentMatchers.eq(None)
-    )
+        |""".stripMargin)
+      .when(blockTraverser).traverse(stat = eqTree(ThenStatement), context = eqBlockContext(BlockContext()))
 
     ifTraverser.traverse(`if`)
 
@@ -143,21 +137,14 @@ class IfTraverserImplTest extends UnitTestSuite {
       """ {
         |  /* THEN BODY */
         |}
-        |""".stripMargin).when(blockTraverser).traverse(
-      stat = eqTree(ThenStatement),
-      shouldReturnValue = ArgumentMatchers.eq(No),
-      maybeInit = ArgumentMatchers.eq(None)
-    )
+        |""".stripMargin)
+      .when(blockTraverser).traverse(stat = eqTree(ThenStatement), context = eqBlockContext(BlockContext()))
     doWrite(
       """ {
         |  /* ELSE BODY */
         |}
         |""".stripMargin)
-      .when(blockTraverser).traverse(
-      stat = eqTree(ElseBlock),
-      shouldReturnValue = ArgumentMatchers.eq(No),
-      maybeInit = ArgumentMatchers.eq(None)
-    )
+      .when(blockTraverser).traverse(stat = eqTree(ElseBlock), context = eqBlockContext(BlockContext()))
 
     ifTraverser.traverse(`if`)
 
@@ -184,18 +171,14 @@ class IfTraverserImplTest extends UnitTestSuite {
         |  /* THEN BODY */
         |}
         |""".stripMargin).when(blockTraverser).traverse(
-      stat = eqTree(ThenStatement),
-      shouldReturnValue = ArgumentMatchers.eq(Yes),
-      maybeInit = ArgumentMatchers.eq(None)
+      stat = eqTree(ThenStatement), context = eqBlockContext(BlockContext(shouldReturnValue = Yes))
     )
     doWrite(
       """ {
         |  /* ELSE BODY */
         |}
         |""".stripMargin).when(blockTraverser).traverse(
-      stat = eqTree(ElseBlock),
-      shouldReturnValue = ArgumentMatchers.eq(Yes),
-      maybeInit = ArgumentMatchers.eq(None)
+      stat = eqTree(ElseBlock), context = eqBlockContext(BlockContext(shouldReturnValue = Yes))
     )
 
     ifTraverser.traverse(`if`, shouldReturnValue = true)
@@ -222,18 +205,14 @@ class IfTraverserImplTest extends UnitTestSuite {
         |  /* THEN BODY */
         |}
         |""".stripMargin).when(blockTraverser).traverse(
-      stat = eqTree(ThenStatement),
-      shouldReturnValue = ArgumentMatchers.eq(No),
-      maybeInit = ArgumentMatchers.eq(None)
+      stat = eqTree(ThenStatement), context = eqBlockContext(BlockContext())
     )
     doWrite(
       """ {
         |  /* ELSE BODY */
         |}
         |""".stripMargin).when(blockTraverser).traverse(
-      stat = eqTree(ElseStatement),
-      shouldReturnValue = ArgumentMatchers.eq(No),
-      maybeInit = ArgumentMatchers.eq(None)
+      stat = eqTree(ElseStatement), context = eqBlockContext(BlockContext())
     )
 
     ifTraverser.traverse(`if`)

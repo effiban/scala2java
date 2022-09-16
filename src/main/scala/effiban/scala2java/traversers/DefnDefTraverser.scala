@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.{DefnDefContext, JavaModifiersContext}
+import effiban.scala2java.contexts.{BlockContext, DefnDefContext, JavaModifiersContext}
 import effiban.scala2java.entities.JavaTreeType
 import effiban.scala2java.entities.JavaTreeType.Method
 import effiban.scala2java.entities.TraversalConstants.UnknownType
@@ -51,9 +51,8 @@ private[traversers] class DefnDefTraverserImpl(annotListTraverser: => AnnotListT
       // there will be an incorrect 'return' (as opposed to the opposite case when it would be missing)
       case None => true
     }
-    blockTraverser.traverse(stat = defDef.body,
-        shouldReturnValue = withReturnValue,
-        maybeInit = maybeInit)
+    val blockContext = BlockContext(shouldReturnValue = withReturnValue, maybeInit = maybeInit)
+    blockTraverser.traverse(stat = defDef.body, context = blockContext)
   }
 
   private def traverseTypeParams(tparams: List[Type.Param]): Unit = {

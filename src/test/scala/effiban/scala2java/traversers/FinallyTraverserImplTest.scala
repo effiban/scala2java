@@ -1,10 +1,10 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.Decision.No
+import effiban.scala2java.contexts.BlockContext
+import effiban.scala2java.matchers.BlockContextMatcher.eqBlockContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
-import org.mockito.ArgumentMatchers
 
 import scala.meta.Term
 import scala.meta.Term.Block
@@ -23,11 +23,7 @@ class FinallyTraverserImplTest extends UnitTestSuite {
         |  log(error);
         |}
         |""".stripMargin)
-      .when(blockTraverser).traverse(
-      stat = eqTree(Statement),
-      shouldReturnValue = ArgumentMatchers.eq(No),
-      maybeInit = ArgumentMatchers.eq(None)
-    )
+      .when(blockTraverser).traverse(stat = eqTree(Statement), context = eqBlockContext(BlockContext()))
 
     finallyTraverser.traverse(Statement)
 
@@ -45,10 +41,7 @@ class FinallyTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin)
       .when(blockTraverser).traverse(
-      stat = eqTree(Block(List(Statement))),
-      shouldReturnValue = ArgumentMatchers.eq(No),
-      maybeInit = ArgumentMatchers.eq(None)
-    )
+      stat = eqTree(Block(List(Statement))), context = eqBlockContext(BlockContext()))
 
     finallyTraverser.traverse(Block(List(Statement)))
 

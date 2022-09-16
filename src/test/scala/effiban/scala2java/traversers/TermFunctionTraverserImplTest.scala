@@ -1,7 +1,8 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.StatContext
+import effiban.scala2java.contexts.{BlockContext, StatContext}
 import effiban.scala2java.entities.Decision.{Uncertain, Yes}
+import effiban.scala2java.matchers.BlockContextMatcher.eqBlockContext
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
@@ -101,9 +102,7 @@ class TermFunctionTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}""".stripMargin
     ).when(blockTraverser).traverse(
-      stat = eqTree(functionBody),
-      shouldReturnValue = ArgumentMatchers.eq(Uncertain),
-      maybeInit = ArgumentMatchers.eq(None)
+      stat = eqTree(functionBody), context = eqBlockContext(BlockContext(shouldReturnValue = Uncertain))
     )
 
     termFunctionTraverser.traverse(function)
@@ -130,9 +129,7 @@ class TermFunctionTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}""".stripMargin
     ).when(blockTraverser).traverse(
-      stat = eqTree(functionBody),
-      shouldReturnValue = ArgumentMatchers.eq(Yes),
-      maybeInit = ArgumentMatchers.eq(None)
+      stat = eqTree(functionBody), context = eqBlockContext(BlockContext(shouldReturnValue = Yes))
     )
 
     termFunctionTraverser.traverse(function, shouldBodyReturnValue = Yes)

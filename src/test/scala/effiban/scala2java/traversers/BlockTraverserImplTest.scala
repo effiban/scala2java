@@ -1,5 +1,6 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.BlockContext
 import effiban.scala2java.entities.Decision.{No, Yes}
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
@@ -38,7 +39,7 @@ class BlockTraverserImplTest extends UnitTestSuite {
          |""".stripMargin)
       .when(blockStatTraverser).traverseLast(eqTree(SimpleStatement1), ArgumentMatchers.eq(Yes))
 
-    blockTraverser.traverse(SimpleStatement1, shouldReturnValue = Yes)
+    blockTraverser.traverse(stat = SimpleStatement1, context = BlockContext(shouldReturnValue = Yes))
 
     outputWriter.toString shouldBe
       s""" {
@@ -87,7 +88,10 @@ class BlockTraverserImplTest extends UnitTestSuite {
          |""".stripMargin
     ).when(blockStatTraverser).traverseLast(eqTree(SimpleStatement2), ArgumentMatchers.eq(Yes))
 
-    blockTraverser.traverse(Block(List(SimpleStatement1, SimpleStatement2)), shouldReturnValue = Yes)
+    blockTraverser.traverse(
+      stat = Block(List(SimpleStatement1, SimpleStatement2)),
+      context = BlockContext(shouldReturnValue = Yes)
+    )
 
     outputWriter.toString shouldBe
       s""" {
@@ -138,7 +142,7 @@ class BlockTraverserImplTest extends UnitTestSuite {
          |""".stripMargin)
       .when(blockStatTraverser).traverseLast(eqTree(SimpleStatement1), ArgumentMatchers.eq(No))
 
-    blockTraverser.traverse(stat = Block(List(SimpleStatement1)), maybeInit = Some(init))
+    blockTraverser.traverse(stat = Block(List(SimpleStatement1)), context = BlockContext(maybeInit = Some(init)))
 
     outputWriter.toString shouldBe
       s""" {

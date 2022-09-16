@@ -1,10 +1,10 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.Decision.No
+import effiban.scala2java.contexts.BlockContext
+import effiban.scala2java.matchers.BlockContextMatcher.eqBlockContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
-import org.mockito.ArgumentMatchers
 
 import scala.meta.Term.{ApplyInfix, Block, Do}
 import scala.meta.{Lit, Term}
@@ -39,9 +39,8 @@ class DoTraverserImplTest extends UnitTestSuite {
       """ {
         |  /* BODY */
         |}""".stripMargin)
-      .when(blockTraverser).traverse(stat = eqTree(Statement),
-      shouldReturnValue = ArgumentMatchers.eq(No),
-      maybeInit = ArgumentMatchers.eq(None))
+      .when(blockTraverser).traverse(stat = eqTree(Statement), context = eqBlockContext(BlockContext())
+    )
     doWrite("x < 3").when(termTraverser).traverse(eqTree(Expression))
 
     doTraverser.traverse(`do`)
@@ -74,9 +73,8 @@ class DoTraverserImplTest extends UnitTestSuite {
       """ {
         |  /* BODY */
         |}""".stripMargin)
-      .when(blockTraverser).traverse(stat = eqTree(body),
-      shouldReturnValue = ArgumentMatchers.eq(No),
-      maybeInit = ArgumentMatchers.eq(None))
+      .when(blockTraverser).traverse(stat = eqTree(body), context = eqBlockContext(BlockContext())
+    )
     doWrite("x < 3").when(termTraverser).traverse(eqTree(Expression))
 
     doTraverser.traverse(`do`)

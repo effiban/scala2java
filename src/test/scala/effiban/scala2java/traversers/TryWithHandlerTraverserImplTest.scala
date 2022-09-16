@@ -1,11 +1,11 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.TryContext
-import effiban.scala2java.entities.Decision.{No, Yes}
+import effiban.scala2java.contexts.{BlockContext, TryContext}
+import effiban.scala2java.entities.Decision.Yes
+import effiban.scala2java.matchers.BlockContextMatcher.eqBlockContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
-import org.mockito.ArgumentMatchers
 
 import scala.meta.Term
 import scala.meta.Term.Block
@@ -36,11 +36,7 @@ class TryWithHandlerTraverserImplTest extends UnitTestSuite {
         |  doSomething();
         |}
         |""".stripMargin)
-      .when(blockTraverser).traverse(
-      stat = eqTree(TryStatement),
-      shouldReturnValue = ArgumentMatchers.eq(No),
-      maybeInit = ArgumentMatchers.eq(None)
-    )
+      .when(blockTraverser).traverse(stat = eqTree(TryStatement), context = eqBlockContext(BlockContext()))
 
     tryWithHandlerTraverser.traverse(tryWithHandler)
 
@@ -65,10 +61,7 @@ class TryWithHandlerTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin)
       .when(blockTraverser).traverse(
-      stat = eqTree(TryStatement),
-      shouldReturnValue = ArgumentMatchers.eq(Yes),
-      maybeInit = ArgumentMatchers.eq(None)
-    )
+      stat = eqTree(TryStatement),context = eqBlockContext(BlockContext(shouldReturnValue = Yes)))
 
     tryWithHandlerTraverser.traverse(tryWithHandler = tryWithHandler, context = TryContext(shouldReturnValue = Yes))
 
@@ -92,11 +85,7 @@ class TryWithHandlerTraverserImplTest extends UnitTestSuite {
         |  doSomething();
         |}
         |""".stripMargin)
-      .when(blockTraverser).traverse(
-      stat = eqTree(TryStatement),
-      shouldReturnValue = ArgumentMatchers.eq(No),
-      maybeInit = ArgumentMatchers.eq(None)
-    )
+      .when(blockTraverser).traverse(stat = eqTree(TryStatement), context = eqBlockContext(BlockContext()))
 
     doWrite(
       """finally {
@@ -130,11 +119,7 @@ class TryWithHandlerTraverserImplTest extends UnitTestSuite {
         |  doSomething();
         |}
         |""".stripMargin)
-      .when(blockTraverser).traverse(
-      stat = eqTree(Block(List(TryStatement))),
-      shouldReturnValue = ArgumentMatchers.eq(No),
-      maybeInit = ArgumentMatchers.eq(None)
-    )
+      .when(blockTraverser).traverse(stat = eqTree(Block(List(TryStatement))), context = eqBlockContext(BlockContext()))
 
     tryWithHandlerTraverser.traverse(tryWithHandler)
 

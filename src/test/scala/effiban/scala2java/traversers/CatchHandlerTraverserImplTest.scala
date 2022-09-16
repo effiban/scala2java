@@ -1,6 +1,7 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.Decision.No
+import effiban.scala2java.contexts.BlockContext
+import effiban.scala2java.matchers.BlockContextMatcher.eqBlockContext
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
@@ -31,8 +32,7 @@ class CatchHandlerTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(blockTraverser).traverse(
       stat = eqTree(LogStatement),
-      shouldReturnValue = ArgumentMatchers.eq(No),
-      maybeInit = ArgumentMatchers.eq(None)
+      context = eqBlockContext(BlockContext())
     )
 
     catchHandlerTraverser.traverse(Param, LogStatement)
@@ -55,8 +55,7 @@ class CatchHandlerTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(blockTraverser).traverse(
       stat = eqTree(GetMsgStatement),
-      shouldReturnValue = ArgumentMatchers.eq(No),
-      maybeInit = ArgumentMatchers.eq(None)
+      context = eqBlockContext(BlockContext())
     )
 
     catchHandlerTraverser.traverse(Param, GetMsgStatement)
