@@ -1,8 +1,10 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.TermContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
+import org.mockito.ArgumentMatchers
 
 import scala.meta.{Lit, Term, Type}
 
@@ -17,7 +19,7 @@ class AscribeTraverserImplTest extends UnitTestSuite {
     val typeName = Type.Name("MyType")
 
     doWrite("MyType").when(typeTraverser).traverse(eqTree(typeName))
-    doWrite("22").when(termTraverser).traverse(eqTree(expr))
+    doWrite("22").when(termTraverser).traverse(eqTree(expr), ArgumentMatchers.eq(TermContext()))
 
     ascribeTraverser.traverse(Term.Ascribe(expr = expr, tpe = typeName))
 

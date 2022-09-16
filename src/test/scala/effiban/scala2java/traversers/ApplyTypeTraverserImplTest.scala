@@ -1,9 +1,11 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.TermContext
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
+import org.mockito.ArgumentMatchers
 
 import scala.meta.{Term, Type}
 
@@ -32,7 +34,7 @@ class ApplyTypeTraverserImplTest extends UnitTestSuite {
     val funName = Term.Name("myFunc")
     val typeArgs = List(Type.Name("T1"), Type.Name("T2"))
 
-    doWrite("myFunc").when(termTraverser).traverse(eqTree(funName))
+    doWrite("myFunc").when(termTraverser).traverse(eqTree(funName), ArgumentMatchers.eq(TermContext()))
     doWrite("<T1, T2>").when(typeListTraverser).traverse(eqTreeList(typeArgs))
 
     applyTypeTraverser.traverse(Term.ApplyType(fun = funName, targs = typeArgs))

@@ -1,5 +1,7 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.StatContext
+import effiban.scala2java.entities.JavaTreeType
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
 
@@ -7,6 +9,8 @@ import scala.meta.Type.Bounds
 import scala.meta.{Decl, Pat, Term, Type}
 
 class DeclTraverserImplTest extends UnitTestSuite {
+
+  private val TheStatContext = StatContext(JavaTreeType.Class)
 
   private val declValTraverser =  mock[DeclValTraverser]
   private val declVarTraverser =  mock[DeclVarTraverser]
@@ -27,7 +31,7 @@ class DeclTraverserImplTest extends UnitTestSuite {
       decltpe = TypeNames.Int
     )
 
-    declTraverser.traverse(declVal)
+    declTraverser.traverse(declVal, TheStatContext)
 
     verify(declValTraverser).traverse(declVal)
   }
@@ -40,7 +44,7 @@ class DeclTraverserImplTest extends UnitTestSuite {
       decltpe = TypeNames.Int
     )
 
-    declTraverser.traverse(declVar)
+    declTraverser.traverse(declVar, TheStatContext)
 
     verify(declVarTraverser).traverse(declVar)
   }
@@ -55,7 +59,7 @@ class DeclTraverserImplTest extends UnitTestSuite {
       decltpe = TypeNames.Int
     )
 
-    declTraverser.traverse(declDef)
+    declTraverser.traverse(declDef, TheStatContext)
 
     verify(declDefTraverser).traverse(declDef)
   }
@@ -69,7 +73,7 @@ class DeclTraverserImplTest extends UnitTestSuite {
       bounds = Bounds(lo = None, hi = None)
     )
 
-    declTraverser.traverse(declType)
+    declTraverser.traverse(declType, TheStatContext)
 
     verify(declTypeTraverser).traverse(declType)
   }

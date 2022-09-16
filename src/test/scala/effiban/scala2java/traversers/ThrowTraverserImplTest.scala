@@ -1,7 +1,9 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.TermContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.testsuites.UnitTestSuite
+import org.mockito.ArgumentMatchers
 
 import scala.meta.Term.Throw
 import scala.meta.{Init, Name, Term, Type}
@@ -18,6 +20,6 @@ class ThrowTraverserImplTest extends UnitTestSuite {
 
     throwTraverser.traverse(`throw`)
 
-    verify(termTraverser).traverse(eqTree(exception))
+    verify(termTraverser).traverse(eqTree(exception), ArgumentMatchers.eq(TermContext()))
   }
 }
