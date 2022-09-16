@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.JavaModifiersContext
+import effiban.scala2java.contexts.{JavaModifiersContext, StatContext}
 import effiban.scala2java.entities.JavaTreeType.Interface
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
@@ -18,7 +18,6 @@ import scala.meta.{Decl, Init, Mod, Name, Pat, Term, Type}
 class DeclValTraverserImplTest extends UnitTestSuite {
 
   private val JavaPrivateFinalModifiers = List(JavaModifier.Private, JavaModifier.Final)
-  private val JavaFinalModifiers = List(JavaModifier.Final)
   private val IntType = TypeNames.Int
   private val MyValPat = Pat.Var(Term.Name("myVal"))
 
@@ -57,7 +56,7 @@ class DeclValTraverserImplTest extends UnitTestSuite {
     doWrite("int").when(typeTraverser).traverse(eqTree(IntType))
     doWrite("myVal").when(patListTraverser).traverse(eqTreeList(List(MyValPat)))
 
-    declValTraverser.traverse(declVal)
+    declValTraverser.traverse(declVal, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """@MyAnnotation
@@ -83,7 +82,7 @@ class DeclValTraverserImplTest extends UnitTestSuite {
     doWrite("int").when(typeTraverser).traverse(eqTree(IntType))
     doWrite("myVal").when(patListTraverser).traverse(eqTreeList(List(MyValPat)))
 
-    declValTraverser.traverse(declVal)
+    declValTraverser.traverse(declVal, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """@MyAnnotation
@@ -91,7 +90,7 @@ class DeclValTraverserImplTest extends UnitTestSuite {
   }
 
   private def whenResolveJavaModifiers(declVal: Decl.Val, modifiers: List[Mod]) = {
-    val expectedContext = JavaModifiersContext(declVal, modifiers, JavaTreeType.Variable, javaScope)
-    when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedContext)))
+    val expectedJavaModifiersContext = JavaModifiersContext(declVal, modifiers, JavaTreeType.Variable, javaScope)
+    when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedJavaModifiersContext)))
   }
 }

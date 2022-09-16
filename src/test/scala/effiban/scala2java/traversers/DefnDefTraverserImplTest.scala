@@ -475,7 +475,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
   }
 
   private def whenResolveJavaModifiers(defnDef: Defn.Def) = {
-    val expectedContext = JavaModifiersContext(defnDef, Modifiers, JavaTreeType.Method, javaScope)
-    when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedContext)))
+    val expectedJavaModifiersContext = JavaModifiersContext(defnDef, Modifiers, JavaTreeType.Method, javaScope)
+    when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedJavaModifiersContext)))
   }
 }
