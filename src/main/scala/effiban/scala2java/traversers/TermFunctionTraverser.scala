@@ -1,5 +1,6 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.BlockContext
 import effiban.scala2java.entities.Decision.{Decision, Uncertain}
 import effiban.scala2java.entities.JavaTreeType.Lambda
 import effiban.scala2java.entities.TraversalContext.javaScope
@@ -31,7 +32,7 @@ private[traversers] class TermFunctionTraverserImpl(termParamTraverser: => TermP
     writeArrow()
     function.body match {
       // Block of size 2 or more
-      case block@Block(_ :: _ :: _) => blockTraverser.traverse(stat = block, shouldReturnValue = shouldBodyReturnValue)
+      case block@Block(_ :: _ :: _) => blockTraverser.traverse(stat = block, context = BlockContext(shouldReturnValue = shouldBodyReturnValue))
       // Block of size 1 - treat as a plain stat, because the Java style of lambdas is the same as Scala
       case Block(stat :: Nil) => statTraverser.traverse(stat)
       case stat => statTraverser.traverse(stat)

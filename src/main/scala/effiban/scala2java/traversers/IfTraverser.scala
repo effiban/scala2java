@@ -1,5 +1,6 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.BlockContext
 import effiban.scala2java.entities.Decision.{Decision, No}
 import effiban.scala2java.writers.JavaWriter
 
@@ -23,14 +24,14 @@ private[traversers] class IfTraverserImpl(termTraverser: => TermTraverser,
     write("if (")
     termTraverser.traverse(`if`.cond)
     write(")")
-    blockTraverser.traverse(`if`.thenp, shouldReturnValue)
+    blockTraverser.traverse(`if`.thenp, BlockContext(shouldReturnValue = shouldReturnValue))
     `if`.elsep match {
       case Lit.Unit() =>
       case elsep =>
         //TODO 1. If the 'then' clause returns a value, traverse the 'else' statement only (no 'else' word and no block)
         //TODO 2. If the 'else' clause is itself an 'if', don't wrap it in a block
         write("else")
-        blockTraverser.traverse(elsep, shouldReturnValue)
+        blockTraverser.traverse(elsep, BlockContext(shouldReturnValue = shouldReturnValue))
     }
   }
 

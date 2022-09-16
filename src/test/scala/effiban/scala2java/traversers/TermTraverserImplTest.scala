@@ -1,7 +1,8 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.TryContext
+import effiban.scala2java.contexts.{BlockContext, TryContext}
 import effiban.scala2java.entities.Decision.{No, Uncertain}
+import effiban.scala2java.matchers.BlockContextMatcher.eqBlockContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TermNames.PlusTermName
@@ -157,11 +158,7 @@ class TermTraverserImplTest extends UnitTestSuite {
       )
     )
     termTraverser.traverse(block)
-    verify(blockTraverser).traverse(
-      stat = eqTree(block),
-      shouldReturnValue = ArgumentMatchers.eq(No),
-      maybeInit = ArgumentMatchers.eq(None)
-    )
+    verify(blockTraverser).traverse(stat = eqTree(block), context = eqBlockContext(BlockContext()))
   }
 
   test("traverse() for If") {

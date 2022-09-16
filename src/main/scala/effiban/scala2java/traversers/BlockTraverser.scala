@@ -1,17 +1,17 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.Decision.{Decision, No}
+import effiban.scala2java.contexts.BlockContext
+import effiban.scala2java.entities.Decision.Decision
 import effiban.scala2java.writers.JavaWriter
 
+import scala.meta.Stat
 import scala.meta.Term.Block
-import scala.meta.{Init, Stat}
 
 trait BlockTraverser {
 
   // The input is a Stat and not a Block, because sometimes we want to wrap a single Scala statement in a Java block
   // (which is convenient for both the translation logic and the formatting)
-  // TODO - when expecting a return value which is a lambda, need another flag for returnability inside the lambda body
-  def traverse(stat: Stat, shouldReturnValue: Decision = No, maybeInit: Option[Init] = None): Unit
+  def traverse(stat: Stat, context: BlockContext = BlockContext()): Unit
 }
 
 private[traversers] class BlockTraverserImpl(initTraverser: => InitTraverser,
@@ -20,17 +20,17 @@ private[traversers] class BlockTraverserImpl(initTraverser: => InitTraverser,
 
   import javaWriter._
 
-  // The 'init' param is passed by constructors, whose first statement must be a call to super or other ctor.
-  // 'Init' does not inherit from 'Stat' so we can't add it to the Block
-  override def traverse(stat: Stat, shouldReturnValue: Decision = No, maybeInit: Option[Init] = None): Unit = {
+  override def traverse(stat: Stat, context: BlockContext = BlockContext()): Unit = {
     val block = stat match {
       case blk: Block => blk
       case st => Block(List(st))
     }
-    traverseBlock(block, shouldReturnValue, maybeInit)
+    traverseBlock(block, context)
   }
 
-  private def traverseBlock(block: Block, shouldReturnValue: Decision, maybeInit: Option[Init] = None): Unit = {
+  private def traverseBlock(block: Block, context: BlockContext): Unit = {
+    import context._
+
     writeBlockStart()
     maybeInit.foreach(init => {
       initTraverser.traverse(init)

@@ -1,7 +1,8 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.{CatchHandlerContext, TryContext}
-import effiban.scala2java.entities.Decision.{No, Yes}
+import effiban.scala2java.contexts.{BlockContext, CatchHandlerContext, TryContext}
+import effiban.scala2java.entities.Decision.Yes
+import effiban.scala2java.matchers.BlockContextMatcher.eqBlockContext
 import effiban.scala2java.matchers.CombinedMatchers.eqSomeTree
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
@@ -79,11 +80,7 @@ class TryTraverserImplTest extends UnitTestSuite {
         |  doSomething();
         |}
         |""".stripMargin)
-      .when(blockTraverser).traverse(
-      stat = eqTree(TryStatement),
-      shouldReturnValue = ArgumentMatchers.eq(No),
-      maybeInit = ArgumentMatchers.eq(None)
-    )
+      .when(blockTraverser).traverse(stat = eqTree(TryStatement), context = eqBlockContext(BlockContext()))
 
     tryTraverser.traverse(`try`)
 
@@ -106,11 +103,7 @@ class TryTraverserImplTest extends UnitTestSuite {
         |  doSomething();
         |}
         |""".stripMargin)
-      .when(blockTraverser).traverse(
-      stat = eqTree(Block(List(TryStatement))),
-      shouldReturnValue = ArgumentMatchers.eq(No),
-      maybeInit = ArgumentMatchers.eq(None)
-    )
+      .when(blockTraverser).traverse(stat = eqTree(Block(List(TryStatement))), context = eqBlockContext(BlockContext()))
 
     tryTraverser.traverse(`try`)
 
@@ -135,11 +128,7 @@ class TryTraverserImplTest extends UnitTestSuite {
         |  doSomething();
         |}
         |""".stripMargin)
-      .when(blockTraverser).traverse(
-      stat = eqTree(TryStatement),
-      shouldReturnValue = ArgumentMatchers.eq(No),
-      maybeInit = ArgumentMatchers.eq(None)
-    )
+      .when(blockTraverser).traverse(stat = eqTree(TryStatement),context = eqBlockContext(BlockContext()))
 
     when(patToTermParamTransformer.transform(eqTree(CatchPat1), eqSomeTree(ThrowableType))).thenReturn(Some(CatchParam1))
 
@@ -180,11 +169,7 @@ class TryTraverserImplTest extends UnitTestSuite {
         |  doSomething();
         |}
         |""".stripMargin)
-      .when(blockTraverser).traverse(
-      stat = eqTree(TryStatement),
-      shouldReturnValue = ArgumentMatchers.eq(No),
-      maybeInit = ArgumentMatchers.eq(None)
-    )
+      .when(blockTraverser).traverse(stat = eqTree(TryStatement), context = eqBlockContext(BlockContext()))
 
     when(patToTermParamTransformer.transform(any[Pat], eqSomeTree(ThrowableType)))
       .thenAnswer( (pat: Pat) => {
@@ -245,11 +230,7 @@ class TryTraverserImplTest extends UnitTestSuite {
         |  doSomething();
         |}
         |""".stripMargin)
-      .when(blockTraverser).traverse(
-      stat = eqTree(TryStatement),
-      shouldReturnValue = ArgumentMatchers.eq(No),
-      maybeInit = ArgumentMatchers.eq(None)
-    )
+      .when(blockTraverser).traverse(stat = eqTree(TryStatement), context = eqBlockContext(BlockContext()))
 
     when(patToTermParamTransformer.transform(eqTree(CatchPat1), eqSomeTree(ThrowableType)))
       .thenReturn(Some(CatchParam1))
@@ -302,10 +283,7 @@ class TryTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin)
       .when(blockTraverser).traverse(
-      stat = eqTree(TryStatement),
-      shouldReturnValue = ArgumentMatchers.eq(Yes),
-      maybeInit = ArgumentMatchers.eq(None)
-    )
+      stat = eqTree(TryStatement),context = eqBlockContext(BlockContext(shouldReturnValue = Yes)))
 
     when(patToTermParamTransformer.transform(eqTree(CatchPat1), eqSomeTree(ThrowableType)))
       .thenReturn(Some(CatchParam1))
@@ -357,11 +335,7 @@ class TryTraverserImplTest extends UnitTestSuite {
         |  doSomething();
         |}
         |""".stripMargin)
-      .when(blockTraverser).traverse(
-      stat = eqTree(TryStatement),
-      shouldReturnValue = ArgumentMatchers.eq(No),
-      maybeInit = ArgumentMatchers.eq(None)
-    )
+      .when(blockTraverser).traverse(stat = eqTree(TryStatement), context = eqBlockContext(BlockContext()))
 
     when(patToTermParamTransformer.transform(any[Pat], eqSomeTree(ThrowableType)))
       .thenAnswer( (pat: Pat) => {
@@ -413,11 +387,7 @@ class TryTraverserImplTest extends UnitTestSuite {
         |  doSomething();
         |}
         |""".stripMargin)
-      .when(blockTraverser).traverse(
-      stat = eqTree(TryStatement),
-      shouldReturnValue = ArgumentMatchers.eq(No),
-      maybeInit = ArgumentMatchers.eq(None)
-    )
+      .when(blockTraverser).traverse(stat = eqTree(TryStatement), context = eqBlockContext(BlockContext()))
 
     when(patToTermParamTransformer.transform(any[Pat], eqSomeTree(ThrowableType)))
       .thenAnswer( (pat: Pat) => {
