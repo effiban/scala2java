@@ -1,6 +1,5 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.TermContext
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
@@ -30,7 +29,7 @@ class TermAnnotateTraverserImplTest extends UnitTestSuite {
     doWrite("@MyAnnot1 @MyAnnot2 ")
       .when(annotListTraverser).traverseAnnotations(annotations = eqTreeList(annots), onSameLine = ArgumentMatchers.eq(true))
 
-    doWrite("myName").when(termTraverser).traverse(eqTree(termName), ArgumentMatchers.eq(TermContext()))
+    doWrite("myName").when(termTraverser).traverse(eqTree(termName))
 
     termAnnotateTraverser.traverse(termAnnotate)
 

@@ -1,11 +1,9 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.TermContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.transformers.TypeSingletonToTermTransformer
-import org.mockito.ArgumentMatchers
 
 import scala.meta.{Term, Type}
 
@@ -22,7 +20,7 @@ class TypeSingletonTraverserImplTest extends UnitTestSuite {
     val singletonType = Type.Singleton(initialTermRef)
 
     when(typeSingletonTransformer.transform(eqTree(singletonType))).thenReturn(transformedTermRef)
-    doWrite("transformed").when(termTraverser).traverse(eqTree(transformedTermRef), ArgumentMatchers.eq(TermContext()))
+    doWrite("transformed").when(termTraverser).traverse(eqTree(transformedTermRef))
 
     typeSingletonTraverser.traverse(singletonType)
 

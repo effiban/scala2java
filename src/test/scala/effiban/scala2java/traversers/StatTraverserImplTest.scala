@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.{StatContext, TermContext}
+import effiban.scala2java.contexts.StatContext
 import effiban.scala2java.entities.JavaTreeType
 import effiban.scala2java.entities.JavaTreeType.{Method, Package, Unknown}
 import effiban.scala2java.matchers.TreeMatcher.eqTree
@@ -33,7 +33,7 @@ class StatTraverserImplTest extends UnitTestSuite {
   test("traverse Term.Name") {
     val termName = Term.Name("myName")
 
-    doWrite("myName").when(termTravserser).traverse(eqTree(termName), ArgumentMatchers.eq(TermContext(JavaTreeType.Class)))
+    doWrite("myName").when(termTravserser).traverse(eqTree(termName))
 
     statTraverser.traverse(termName, StatContext(JavaTreeType.Class))
 
