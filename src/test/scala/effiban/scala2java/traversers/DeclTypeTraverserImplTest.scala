@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext}
+import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, StatContext}
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
@@ -55,7 +55,7 @@ class DeclTypeTraverserImplTest extends UnitTestSuite {
     whenResolveJavaModifiers(declType).thenReturn(List(JavaModifier.Private))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
 
-    declTypeTraverser.traverse(declType)
+    declTypeTraverser.traverse(declType, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """
@@ -65,13 +65,13 @@ class DeclTypeTraverserImplTest extends UnitTestSuite {
   }
 
   private def whenResolveJavaTreeTypeThenReturnInterface(declType: Decl.Type): Unit = {
-    val expectedContext = JavaTreeTypeContext(declType, Modifiers)
-    when(javaTreeTypeResolver.resolve(eqJavaTreeTypeContext(expectedContext))).thenReturn(JavaTreeType.Interface)
+    val expectedJavaTreeTypeContext = JavaTreeTypeContext(declType, Modifiers)
+    when(javaTreeTypeResolver.resolve(eqJavaTreeTypeContext(expectedJavaTreeTypeContext))).thenReturn(JavaTreeType.Interface)
   }
 
   private def whenResolveJavaModifiers(declType: Decl.Type) = {
-    val expectedContext = JavaModifiersContext(declType, Modifiers, JavaTreeType.Interface, javaScope)
-    when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedContext)))
+    val expectedJavaModifiersContext = JavaModifiersContext(declType, Modifiers, JavaTreeType.Interface, javaScope)
+    when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedJavaModifiersContext)))
   }
 
 }

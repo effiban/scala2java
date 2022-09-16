@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.JavaModifiersContext
+import effiban.scala2java.contexts.{JavaModifiersContext, StatContext}
 import effiban.scala2java.entities.JavaTreeType.{Interface, Method}
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
@@ -55,7 +55,7 @@ class DeclVarTraverserImplTest extends UnitTestSuite {
     doWrite("int").when(typeTraverser).traverse(eqTree(IntType))
     doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
 
-    declVarTraverser.traverse(declVar)
+    declVarTraverser.traverse(declVar, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """@MyAnnotation
@@ -81,7 +81,7 @@ class DeclVarTraverserImplTest extends UnitTestSuite {
     doWrite("int").when(typeTraverser).traverse(eqTree(IntType))
     doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
 
-    declVarTraverser.traverse(declVar)
+    declVarTraverser.traverse(declVar, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """@MyAnnotation
@@ -107,7 +107,7 @@ class DeclVarTraverserImplTest extends UnitTestSuite {
     doWrite("int").when(typeTraverser).traverse(eqTree(IntType))
     doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
 
-    declVarTraverser.traverse(declVar)
+    declVarTraverser.traverse(declVar, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """@MyAnnotation
@@ -115,7 +115,7 @@ class DeclVarTraverserImplTest extends UnitTestSuite {
   }
 
   private def whenResolveJavaModifiers(declVar: Decl.Var, modifiers: List[Mod]) = {
-    val expectedContext = JavaModifiersContext(declVar, modifiers, JavaTreeType.Variable, javaScope)
-    when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedContext)))
+    val expectedJavaModifiersContext = JavaModifiersContext(declVar, modifiers, JavaTreeType.Variable, javaScope)
+    when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedJavaModifiersContext)))
   }
 }

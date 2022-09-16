@@ -95,12 +95,12 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
   }
 
   private def whenResolveJavaTreeTypeThenReturnInterface(defnType: Defn.Type): Unit = {
-    val expectedContext = JavaTreeTypeContext(defnType, Modifiers)
-    when(javaTreeTypeResolver.resolve(eqJavaTreeTypeContext(expectedContext))).thenReturn(JavaTreeType.Interface)
+    val expectedJavaTreeTypeContext = JavaTreeTypeContext(defnType, Modifiers)
+    when(javaTreeTypeResolver.resolve(eqJavaTreeTypeContext(expectedJavaTreeTypeContext))).thenReturn(JavaTreeType.Interface)
   }
 
   private def whenResolveJavaModifiersThenReturnPrivate(defnType: Defn.Type): Unit = {
-    val expectedContext = JavaModifiersContext(defnType, Modifiers, JavaTreeType.Interface, javaScope)
-    when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedContext))).thenReturn(List(JavaModifier.Private))
+    val expectedJavModifiersContext = JavaModifiersContext(defnType, Modifiers, JavaTreeType.Interface, javaScope)
+    when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedJavModifiersContext))).thenReturn(List(JavaModifier.Private))
   }
 }

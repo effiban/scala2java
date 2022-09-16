@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext}
+import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, StatContext}
 import effiban.scala2java.entities.JavaTreeType.JavaTreeType
 import effiban.scala2java.entities.JavaTreeTypeToKeywordMapping
 import effiban.scala2java.entities.TraversalContext.javaScope
@@ -9,7 +9,9 @@ import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Decl
 
-trait DeclTypeTraverser extends ScalaTreeTraverser[Decl.Type]
+trait DeclTypeTraverser {
+  def traverse(typeDecl: Decl.Type, context: StatContext = StatContext()): Unit
+}
 
 private[traversers] class DeclTypeTraverserImpl(typeParamListTraverser: => TypeParamListTraverser,
                                                 javaModifiersResolver: JavaModifiersResolver,
@@ -19,7 +21,7 @@ private[traversers] class DeclTypeTraverserImpl(typeParamListTraverser: => TypeP
   import javaWriter._
 
   // Scala type declaration : Closest thing in Java is an empty interface with same params
-  override def traverse(typeDecl: Decl.Type): Unit = {
+  override def traverse(typeDecl: Decl.Type, context: StatContext = StatContext()): Unit = {
     writeLine()
     //TODO handle annotations
     val javaTreeType = javaTreeTypeResolver.resolve(JavaTreeTypeContext(typeDecl, typeDecl.mods))
@@ -33,12 +35,12 @@ private[traversers] class DeclTypeTraverserImpl(typeParamListTraverser: => TypeP
   }
 
   private def resolveJavaModifiers(typeDecl: Decl.Type, javaTreeType: JavaTreeType) = {
-    val context = JavaModifiersContext(
+    val javaModifiersContext = JavaModifiersContext(
       scalaTree = typeDecl,
       scalaMods = typeDecl.mods,
       javaTreeType = javaTreeType,
       javaScope = javaScope
     )
-    javaModifiersResolver.resolve(context)
+    javaModifiersResolver.resolve(javaModifiersContext)
   }
 }

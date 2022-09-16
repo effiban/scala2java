@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.JavaModifiersContext
+import effiban.scala2java.contexts.{JavaModifiersContext, StatContext}
 import effiban.scala2java.entities.JavaTreeType.Interface
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
@@ -86,7 +86,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
       onSameLine = ArgumentMatchers.eq(false)
     )
 
-    declDefTraverser.traverse(declDef)
+    declDefTraverser.traverse(declDef, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """
@@ -118,7 +118,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
       onSameLine = ArgumentMatchers.eq(false)
     )
 
-    declDefTraverser.traverse(declDef)
+    declDefTraverser.traverse(declDef, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """
@@ -149,7 +149,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
       onSameLine = ArgumentMatchers.eq(false)
     )
 
-    declDefTraverser.traverse(declDef)
+    declDefTraverser.traverse(declDef, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """
@@ -180,7 +180,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
       onSameLine = ArgumentMatchers.eq(false)
     )
 
-    declDefTraverser.traverse(declDef)
+    declDefTraverser.traverse(declDef, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """
@@ -193,7 +193,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
   }
 
   private def whenResolveJavaModifiers(declDef: Decl.Def) = {
-    val expectedContext = JavaModifiersContext(declDef, Modifiers, JavaTreeType.Method, javaScope)
-    when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedContext)))
+    val expectedJavaModifiersContext = JavaModifiersContext(declDef, Modifiers, JavaTreeType.Method, javaScope)
+    when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedJavaModifiersContext)))
   }
 }

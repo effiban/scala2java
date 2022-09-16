@@ -2,8 +2,10 @@ package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.StatContext
 import effiban.scala2java.entities.JavaTreeType
+import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
+import org.mockito.ArgumentMatchers
 
 import scala.meta.Type.Bounds
 import scala.meta.{Decl, Pat, Term, Type}
@@ -33,7 +35,7 @@ class DeclTraverserImplTest extends UnitTestSuite {
 
     declTraverser.traverse(declVal, TheStatContext)
 
-    verify(declValTraverser).traverse(declVal)
+    verify(declValTraverser).traverse(eqTree(declVal), ArgumentMatchers.eq(TheStatContext))
   }
 
   test("traverse() a Decl.Var") {
@@ -46,7 +48,7 @@ class DeclTraverserImplTest extends UnitTestSuite {
 
     declTraverser.traverse(declVar, TheStatContext)
 
-    verify(declVarTraverser).traverse(declVar)
+    verify(declVarTraverser).traverse(eqTree(declVar), ArgumentMatchers.eq(TheStatContext))
   }
 
   test("traverse() a Decl.Def") {
@@ -61,7 +63,7 @@ class DeclTraverserImplTest extends UnitTestSuite {
 
     declTraverser.traverse(declDef, TheStatContext)
 
-    verify(declDefTraverser).traverse(declDef)
+    verify(declDefTraverser).traverse(eqTree(declDef), ArgumentMatchers.eq(TheStatContext))
   }
 
   test("traverse() a Decl.Type") {
@@ -75,6 +77,6 @@ class DeclTraverserImplTest extends UnitTestSuite {
 
     declTraverser.traverse(declType, TheStatContext)
 
-    verify(declTypeTraverser).traverse(declType)
+    verify(declTypeTraverser).traverse(eqTree(declType), ArgumentMatchers.eq(TheStatContext))
   }
 }
