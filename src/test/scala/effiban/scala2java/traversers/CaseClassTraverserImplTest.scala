@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, TemplateContext}
+import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, StatContext, TemplateContext}
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
@@ -114,7 +114,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(templateTraverser).traverse(eqTree(TheTemplate), eqTemplateContext(TemplateContext(Some(ClassName), None)))
 
-    classTraverser.traverse(cls)
+    classTraverser.traverse(cls, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """
@@ -171,7 +171,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       eqTemplateContext(TemplateContext(Some(ClassName), Some(primaryCtor)))
     )
 
-    classTraverser.traverse(cls)
+    classTraverser.traverse(cls, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """
@@ -218,7 +218,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(templateTraverser).traverse(eqTree(TheTemplate), eqTemplateContext(TemplateContext(Some(ClassName), None)))
 
-    classTraverser.traverse(cls)
+    classTraverser.traverse(cls, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """
@@ -239,8 +239,8 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
   }
 
   private def whenResolveJavaModifiersThenReturnPublic(cls: Defn.Class, modifiers: List[Mod]): Unit = {
-    val expectedContext = JavaModifiersContext(cls, modifiers, JavaTreeType.Class, javaScope)
-    when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedContext))).thenReturn(List(JavaModifier.Public))
+    val expectedJavaModifiersContext = JavaModifiersContext(cls, modifiers, JavaTreeType.Class, javaScope)
+    when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedJavaModifiersContext))).thenReturn(List(JavaModifier.Public))
   }
 
 }

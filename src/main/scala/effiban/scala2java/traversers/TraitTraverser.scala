@@ -26,7 +26,7 @@ private[traversers] class TraitTraverserImpl(annotListTraverser: => AnnotListTra
     writeLine()
     annotListTraverser.traverseMods(traitDef.mods)
     val javaTreeType = javaTreeTypeResolver.resolve(JavaTreeTypeContext(traitDef, traitDef.mods))
-    writeTypeDeclaration(modifiers = resolveJavaModifiers(traitDef, javaTreeType),
+    writeTypeDeclaration(modifiers = resolveJavaModifiers(traitDef, javaTreeType, context),
       typeKeyword = JavaTreeTypeToKeywordMapping(javaTreeType),
       name = traitDef.name.toString)
     typeParamListTraverser.traverse(traitDef.tparams)
@@ -36,12 +36,14 @@ private[traversers] class TraitTraverserImpl(annotListTraverser: => AnnotListTra
     javaScope = outerJavaScope
   }
 
-  private def resolveJavaModifiers(traitDef: Trait, javaTreeType: JavaTreeType) = {
+  private def resolveJavaModifiers(traitDef: Trait,
+                                   javaTreeType: JavaTreeType,
+                                   context: StatContext) = {
     val javaModifiersContext = JavaModifiersContext(
       scalaTree = traitDef,
       scalaMods = traitDef.mods,
       javaTreeType = javaTreeType,
-      javaScope = javaScope
+      javaScope = context.javaScope
     )
     javaModifiersResolver.resolve(javaModifiersContext)
   }

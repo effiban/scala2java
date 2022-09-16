@@ -37,13 +37,13 @@ private[traversers] class ObjectTraverserImpl(annotListTraverser: => AnnotListTr
   }
 
   private def resolveJavaModifiers(objectDef: Defn.Object, javaTreeType: JavaTreeType) = {
-    val context = JavaModifiersContext(
+    val javaModifiersContext = JavaModifiersContext(
       scalaTree = objectDef,
       scalaMods = objectDef.mods,
       javaTreeType = javaTreeType,
       javaScope = javaScope
     )
-    javaModifiersResolver.resolve(context)
+    javaModifiersResolver.resolve(javaModifiersContext)
   }
 }
 
