@@ -1,7 +1,6 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.classifiers.TermApplyInfixClassifier
-import effiban.scala2java.contexts.TermContext
 import effiban.scala2java.entities.ListTraversalOptions
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
@@ -63,12 +62,11 @@ class TermApplyInfixTraverserImplTest extends UnitTestSuite {
       args = List(rhs)
     )
 
-    doWrite("a").when(termTraverser).traverse(eqTree(lhs), ArgumentMatchers.eq(TermContext()))
+    doWrite("a").when(termTraverser).traverse(eqTree(lhs))
     doWrite("+").when(termNameTraverser).traverse(eqTree(op))
     doWrite("b").when(termListTraverser).traverse(
       terms = eqTreeList(List(rhs)),
-      ArgumentMatchers.eq(ListTraversalOptions(onSameLine = true)),
-      ArgumentMatchers.eq(TermContext())
+      ArgumentMatchers.eq(ListTraversalOptions(onSameLine = true))
     )
 
     termApplyInfixTraverser.traverse(applyInfix)

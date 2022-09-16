@@ -1,10 +1,8 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.TermContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
-import org.mockito.ArgumentMatchers
 
 import scala.meta.{Lit, Term}
 
@@ -19,7 +17,7 @@ class AssignTraverserImplTest extends UnitTestSuite {
     val lhs = Term.Name("myVal")
     val rhs = Lit.Int(3)
 
-    doWrite("myVal").when(termTraverser).traverse(eqTree(lhs), ArgumentMatchers.eq(TermContext()))
+    doWrite("myVal").when(termTraverser).traverse(eqTree(lhs))
     doWrite("3").when(rhsTermTraverser).traverse(eqTree(rhs))
 
     assignTraverser.traverse(Term.Assign(lhs = lhs, rhs = rhs))

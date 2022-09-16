@@ -1,10 +1,8 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.TermContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
-import org.mockito.ArgumentMatchers
 
 import scala.meta.Term
 import scala.meta.Term.Eta
@@ -18,7 +16,7 @@ class EtaTraverserImplTest extends UnitTestSuite {
   test("traverse()") {
     val methodName = Term.Name("myMethod")
 
-    doWrite("myMethod").when(termTraverser).traverse(eqTree(methodName), ArgumentMatchers.eq(TermContext()))
+    doWrite("myMethod").when(termTraverser).traverse(eqTree(methodName))
 
     etaTraverser.traverse(Eta(methodName))
 

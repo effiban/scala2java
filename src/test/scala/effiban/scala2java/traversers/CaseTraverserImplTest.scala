@@ -1,10 +1,8 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.TermContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
-import org.mockito.ArgumentMatchers
 
 import scala.meta.{Case, Lit, Pat}
 
@@ -22,7 +20,7 @@ class CaseTraverserImplTest extends UnitTestSuite {
 
   test("traverse() non-default without condition") {
     doWrite(""""value1"""").when(patTraverser).traverse(eqTree(StringPat))
-    doWrite("3").when(termTraverser).traverse(eqTree(Body), ArgumentMatchers.eq(TermContext()))
+    doWrite("3").when(termTraverser).traverse(eqTree(Body))
 
     caseTraverser.traverse(
       Case(pat = StringPat,
@@ -37,7 +35,7 @@ class CaseTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() default case without condition") {
-    doWrite("3").when(termTraverser).traverse(eqTree(Body), ArgumentMatchers.eq(TermContext()))
+    doWrite("3").when(termTraverser).traverse(eqTree(Body))
 
     caseTraverser.traverse(
       Case(pat = Pat.Wildcard(),
@@ -53,8 +51,8 @@ class CaseTraverserImplTest extends UnitTestSuite {
 
   test("traverse() with condition") {
     doWrite(""""value1"""").when(patTraverser).traverse(eqTree(StringPat))
-    doWrite("x > 2").when(termTraverser).traverse(eqTree(Cond), ArgumentMatchers.eq(TermContext()))
-    doWrite("3").when(termTraverser).traverse(eqTree(Body), ArgumentMatchers.eq(TermContext()))
+    doWrite("x > 2").when(termTraverser).traverse(eqTree(Cond))
+    doWrite("3").when(termTraverser).traverse(eqTree(Body))
 
     caseTraverser.traverse(
       Case(pat = StringPat,
