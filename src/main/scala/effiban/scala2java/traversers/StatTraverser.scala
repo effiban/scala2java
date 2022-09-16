@@ -1,10 +1,13 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.StatContext
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.{Decl, Defn, Import, Pkg, Stat, Term}
 
-trait StatTraverser extends ScalaTreeTraverser[Stat]
+trait StatTraverser {
+  def traverse(stat: Stat, statContext: StatContext = StatContext()): Unit
+}
 
 private[traversers] class StatTraverserImpl(termTraverser: => TermTraverser,
                                             importTraverser: => ImportTraverser,
@@ -15,7 +18,7 @@ private[traversers] class StatTraverserImpl(termTraverser: => TermTraverser,
 
   import javaWriter._
 
-  override def traverse(stat: Stat): Unit = stat match {
+  override def traverse(stat: Stat, statContext: StatContext = StatContext()): Unit = stat match {
     case term: Term => termTraverser.traverse(term)
     case `import`: Import => importTraverser.traverse(`import`)
     case pkg: Pkg => pkgTraverser.traverse(pkg)

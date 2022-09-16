@@ -1,5 +1,6 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.StatContext
 import effiban.scala2java.entities.Decision.{Uncertain, Yes}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
@@ -31,7 +32,8 @@ class TermFunctionTraverserImplTest extends UnitTestSuite {
       termParams = ArgumentMatchers.eq(Nil),
       onSameLine = ArgumentMatchers.eq(true)
     )
-    doWrite("doSomething();").when(statTraverser).traverse(eqTree(functionBody))
+    doWrite("doSomething();")
+      .when(statTraverser).traverse(eqTree(functionBody), ArgumentMatchers.eq(StatContext()))
 
     termFunctionTraverser.traverse(Term.Function(params = Nil, body = functionBody))
 
@@ -44,7 +46,8 @@ class TermFunctionTraverserImplTest extends UnitTestSuite {
     val function = Term.Function(params = List(param), body = functionBody)
 
     doWrite("val1").when(termParamTraverser).traverse(eqTree(param))
-    doWrite("doSomething(val1);").when(statTraverser).traverse(eqTree(functionBody))
+    doWrite("doSomething(val1);")
+      .when(statTraverser).traverse(eqTree(functionBody), ArgumentMatchers.eq(StatContext()))
 
     termFunctionTraverser.traverse(function)
 
@@ -57,7 +60,8 @@ class TermFunctionTraverserImplTest extends UnitTestSuite {
     val function = Term.Function(params = List(param), body = Block(List(bodyTerm)))
 
     doWrite("val1").when(termParamTraverser).traverse(eqTree(param))
-    doWrite("doSomething(val1);").when(statTraverser).traverse(eqTree(bodyTerm))
+    doWrite("doSomething(val1);")
+      .when(statTraverser).traverse(eqTree(bodyTerm), ArgumentMatchers.eq(StatContext()))
 
     termFunctionTraverser.traverse(function)
 
@@ -73,7 +77,8 @@ class TermFunctionTraverserImplTest extends UnitTestSuite {
       termParams = eqTreeList(params),
       onSameLine = ArgumentMatchers.eq(true)
     )
-    doWrite("doSomething(val1, val2);").when(statTraverser).traverse(eqTree(functionBody))
+    doWrite("doSomething(val1, val2);")
+      .when(statTraverser).traverse(eqTree(functionBody), ArgumentMatchers.eq(StatContext()))
 
     termFunctionTraverser.traverse(function)
 
