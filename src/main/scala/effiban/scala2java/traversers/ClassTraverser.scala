@@ -13,9 +13,9 @@ private[traversers] class ClassTraverserImpl(caseClassTraverser: => CaseClassTra
 
   def traverse(classDef: Defn.Class, context: StatContext = StatContext()): Unit = {
     if (classDef.mods.exists(_.isInstanceOf[Mod.Case])) {
-      caseClassTraverser.traverse(classDef)
+      caseClassTraverser.traverse(classDef, context)
     } else {
-      regularClassTraverser.traverse(classDef)
+      regularClassTraverser.traverse(classDef, context)
     }
   }
 }

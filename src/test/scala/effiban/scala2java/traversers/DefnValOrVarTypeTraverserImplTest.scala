@@ -1,5 +1,6 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.StatContext
 import effiban.scala2java.entities.JavaTreeType
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.matchers.TreeMatcher.eqTree
@@ -23,7 +24,11 @@ class DefnValOrVarTypeTraverserImplTest extends UnitTestSuite {
   test("traverse when has declared type should traverse it") {
     doWrite("Int").when(typeTraverser).traverse(eqTree(TypeNames.Int))
 
-    defnValOrVarTypeTraverser.traverse(maybeDeclType = Some(TypeNames.Int), maybeRhs = None)
+    defnValOrVarTypeTraverser.traverse(
+      maybeDeclType = Some(TypeNames.Int),
+      maybeRhs = None,
+      context = StatContext(javaScope)
+    )
 
     outputWriter.toString shouldBe "Int"
   }
@@ -32,7 +37,11 @@ class DefnValOrVarTypeTraverserImplTest extends UnitTestSuite {
     when(termTypeInferrer.infer(eqTree(LiteralInt))).thenReturn(Some(TypeNames.Int))
     doWrite("Int").when(typeTraverser).traverse(eqTree(TypeNames.Int))
 
-    defnValOrVarTypeTraverser.traverse(maybeDeclType = None, maybeRhs = Some(LiteralInt))
+    defnValOrVarTypeTraverser.traverse(
+      maybeDeclType = None,
+      maybeRhs = Some(LiteralInt),
+      context = StatContext(javaScope)
+    )
 
     outputWriter.toString shouldBe "Int"
   }
@@ -40,13 +49,21 @@ class DefnValOrVarTypeTraverserImplTest extends UnitTestSuite {
   test("traverse when has no declared type, has RHS, JavaScope is none, and type not inferred - should write 'UnknownType'") {
     when(termTypeInferrer.infer(eqTree(NonInferrableTerm))).thenReturn(None)
 
-    defnValOrVarTypeTraverser.traverse(maybeDeclType = None, maybeRhs = Some(NonInferrableTerm))
+    defnValOrVarTypeTraverser.traverse(
+      maybeDeclType = None,
+      maybeRhs = Some(NonInferrableTerm),
+      context = StatContext(javaScope)
+    )
 
     outputWriter.toString shouldBe "/* UnknownType */"
   }
 
   test("traverse when has no declared type, has no RHS, and JavaScope is none - should write 'UnknownType'") {
-    defnValOrVarTypeTraverser.traverse(maybeDeclType = None, maybeRhs = None)
+    defnValOrVarTypeTraverser.traverse(
+      maybeDeclType = None,
+      maybeRhs = None,
+      context = StatContext(javaScope)
+    )
 
     outputWriter.toString shouldBe "/* UnknownType */"
   }
@@ -54,7 +71,11 @@ class DefnValOrVarTypeTraverserImplTest extends UnitTestSuite {
   test("traverse when has no declared type and JavaScope is Method - should write 'var'") {
     javaScope = JavaTreeType.Method
 
-    defnValOrVarTypeTraverser.traverse(maybeDeclType = None, maybeRhs = None)
+    defnValOrVarTypeTraverser.traverse(
+      maybeDeclType = None,
+      maybeRhs = None,
+      context = StatContext(javaScope)
+    )
 
     outputWriter.toString shouldBe "var"
   }

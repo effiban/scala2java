@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, TemplateContext}
+import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, StatContext, TemplateContext}
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
@@ -132,7 +132,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       eqTemplateContext(TemplateContext(Some(ClassName), Some(primaryCtor)))
     )
 
-    classTraverser.traverse(cls)
+    classTraverser.traverse(cls, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """
@@ -194,7 +194,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       eqTemplateContext(TemplateContext(Some(ClassName), Some(primaryCtor)))
     )
 
-    classTraverser.traverse(cls)
+    classTraverser.traverse(cls, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """

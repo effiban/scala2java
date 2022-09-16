@@ -1,5 +1,6 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.StatContext
 import effiban.scala2java.entities.JavaTreeType.Method
 import effiban.scala2java.entities.TraversalConstants.UnknownType
 import effiban.scala2java.entities.TraversalContext.javaScope
@@ -9,7 +10,9 @@ import effiban.scala2java.writers.JavaWriter
 import scala.meta.{Term, Type}
 
 trait DefnValOrVarTypeTraverser {
-  def traverse(maybeDeclType: Option[Type], rhs: Option[Term]): Unit
+  def traverse(maybeDeclType: Option[Type],
+               rhs: Option[Term],
+               context: StatContext = StatContext()): Unit
 }
 
 private[traversers] class DefnValOrVarTypeTraverserImpl(typeTraverser: => TypeTraverser,
@@ -18,7 +21,9 @@ private[traversers] class DefnValOrVarTypeTraverserImpl(typeTraverser: => TypeTr
 
   import javaWriter._
 
-  override def traverse(maybeDeclType: Option[Type], maybeRhs: Option[Term]): Unit = {
+  override def traverse(maybeDeclType: Option[Type],
+                        maybeRhs: Option[Term],
+                        context: StatContext = StatContext()): Unit = {
     (maybeDeclType, maybeRhs) match {
       case (Some(declType), _) => typeTraverser.traverse(declType)
       case (None, _) if javaScope == Method => write("var")

@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, TemplateContext}
+import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, StatContext, TemplateContext}
 import effiban.scala2java.entities.JavaTreeType.JavaTreeType
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{JavaTreeTypeToKeywordMapping, JavaTreeTypeToScopeMapping}
@@ -9,7 +9,9 @@ import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Defn
 
-trait CaseClassTraverser extends ScalaTreeTraverser[Defn.Class]
+trait CaseClassTraverser {
+  def traverse(classDef: Defn.Class, context: StatContext = StatContext()): Unit
+}
 
 private[traversers] class CaseClassTraverserImpl(annotListTraverser: => AnnotListTraverser,
                                                  typeParamListTraverser: => TypeParamListTraverser,
@@ -21,7 +23,7 @@ private[traversers] class CaseClassTraverserImpl(annotListTraverser: => AnnotLis
 
   import javaWriter._
 
-  def traverse(classDef: Defn.Class): Unit = {
+  override def traverse(classDef: Defn.Class, context: StatContext = StatContext()): Unit = {
     writeLine()
     annotListTraverser.traverseMods(classDef.mods)
     val javaTreeType = javaTreeTypeResolver.resolve(JavaTreeTypeContext(classDef, classDef.mods))
@@ -40,11 +42,11 @@ private[traversers] class CaseClassTraverserImpl(annotListTraverser: => AnnotLis
   }
 
   private def resolveJavaModifiers(classDef: Defn.Class, javaTreeType: JavaTreeType) = {
-    val context = JavaModifiersContext(
+    val javaModifiersContext = JavaModifiersContext(
       scalaTree = classDef,
       scalaMods = classDef.mods,
       javaTreeType = javaTreeType,
       javaScope = javaScope)
-    javaModifiersResolver.resolve(context)
+    javaModifiersResolver.resolve(javaModifiersContext)
   }
 }

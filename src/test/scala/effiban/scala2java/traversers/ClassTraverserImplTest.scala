@@ -2,8 +2,10 @@ package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.StatContext
 import effiban.scala2java.entities.TraversalContext.javaScope
+import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.{PrimaryCtors, Templates}
+import org.mockito.ArgumentMatchers
 
 import scala.meta.{Defn, Mod, Type}
 
@@ -27,7 +29,7 @@ class ClassTraverserImplTest extends UnitTestSuite {
 
     classTraverser.traverse(classDef, StatContext(javaScope))
 
-    verify(caseClassTraverser).traverse(classDef)
+    verify(caseClassTraverser).traverse(eqTree(classDef), ArgumentMatchers.eq(StatContext(javaScope)))
   }
 
   test("traverse when regular class") {
@@ -41,6 +43,6 @@ class ClassTraverserImplTest extends UnitTestSuite {
 
     classTraverser.traverse(classDef, StatContext(javaScope))
 
-    verify(regularClassTraverser).traverse(classDef)
+    verify(regularClassTraverser).traverse(eqTree(classDef), ArgumentMatchers.eq(StatContext(javaScope)))
   }
 }

@@ -57,7 +57,12 @@ class DefnValTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(mods = eqTreeList(modifiers), onSameLine = ArgumentMatchers.eq(false))
     whenResolveJavaModifiers(defnVal, modifiers).thenReturn(JavaPrivateFinalModifiers)
-    doWrite("int").when(defnValOrVarTypeTraverser).traverse(eqSomeTree(IntType), eqSomeTree(Rhs))
+    doWrite("int")
+      .when(defnValOrVarTypeTraverser).traverse(
+      eqSomeTree(IntType),
+      eqSomeTree(Rhs),
+      ArgumentMatchers.eq(StatContext(javaScope))
+    )
     doWrite("myVal").when(patListTraverser).traverse(eqTreeList(List(MyValPat)))
     doWrite("3").when(rhsTermTraverser).traverse(eqTree(Rhs))
 
@@ -85,7 +90,12 @@ class DefnValTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(mods = eqTreeList(modifiers), onSameLine = ArgumentMatchers.eq(false))
     whenResolveJavaModifiers(defnVal, modifiers).thenReturn(JavaPrivateFinalModifiers)
-    doWrite("int").when(defnValOrVarTypeTraverser).traverse(ArgumentMatchers.eq(None), eqSomeTree(Rhs))
+    doWrite("int")
+      .when(defnValOrVarTypeTraverser).traverse(
+      ArgumentMatchers.eq(None),
+      eqSomeTree(Rhs),
+      ArgumentMatchers.eq(StatContext(javaScope))
+    )
     doWrite("myVal").when(patListTraverser).traverse(eqTreeList(List(MyValPat)))
     doWrite("3").when(rhsTermTraverser).traverse(eqTree(Rhs))
 
@@ -113,7 +123,12 @@ class DefnValTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(mods = eqTreeList(modifiers), onSameLine = ArgumentMatchers.eq(false))
     whenResolveJavaModifiers(defnVal, modifiers).thenReturn(Nil)
-    doWrite("int").when(defnValOrVarTypeTraverser).traverse(eqSomeTree(IntType), eqSomeTree(Rhs))
+    doWrite("int")
+      .when(defnValOrVarTypeTraverser).traverse(
+      eqSomeTree(IntType),
+      eqSomeTree(Rhs),
+      ArgumentMatchers.eq(StatContext(javaScope))
+    )
     doWrite("myVal").when(patListTraverser).traverse(eqTreeList(List(MyValPat)))
     doWrite("3").when(rhsTermTraverser).traverse(eqTree(Rhs))
 
@@ -141,7 +156,12 @@ class DefnValTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(mods = eqTreeList(modifiers), onSameLine = ArgumentMatchers.eq(false))
     whenResolveJavaModifiers(defnVal, modifiers).thenReturn(Nil)
-    doWrite("int").when(defnValOrVarTypeTraverser).traverse(ArgumentMatchers.eq(None), eqSomeTree(Rhs))
+    doWrite("int")
+      .when(defnValOrVarTypeTraverser).traverse(
+      ArgumentMatchers.eq(None),
+      eqSomeTree(Rhs),
+      ArgumentMatchers.eq(StatContext(javaScope))
+    )
     doWrite("myVal").when(patListTraverser).traverse(eqTreeList(List(MyValPat)))
     doWrite("3").when(rhsTermTraverser).traverse(eqTree(Rhs))
 

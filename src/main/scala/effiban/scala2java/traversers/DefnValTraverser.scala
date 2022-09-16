@@ -26,7 +26,7 @@ private[traversers] class DefnValTraverserImpl(annotListTraverser: => AnnotListT
   override def traverse(valDef: Defn.Val, context: StatContext = StatContext()): Unit = {
     annotListTraverser.traverseMods(valDef.mods)
     writeModifiers(resolveJavaModifiers(valDef))
-    defnValOrVarTypeTraverser.traverse(valDef.decltpe, Some(valDef.rhs))
+    defnValOrVarTypeTraverser.traverse(valDef.decltpe, Some(valDef.rhs), context)
     write(" ")
     //TODO verify for non-simple case
     patListTraverser.traverse(valDef.pats)
