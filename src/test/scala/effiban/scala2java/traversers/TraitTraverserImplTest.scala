@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, TemplateContext}
+import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, StatContext, TemplateContext}
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
@@ -102,7 +102,7 @@ class TraitTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(templateTraverser).traverse(eqTree(TheTemplate), eqTemplateContext(TemplateContext()))
 
-    traitTraverser.traverse(`trait`)
+    traitTraverser.traverse(`trait`, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """
@@ -114,12 +114,12 @@ class TraitTraverserImplTest extends UnitTestSuite {
   }
 
   private def whenResolveJavaTreeTypeThenReturnInterface(`trait`: Trait): Unit = {
-    val expectedContext = JavaTreeTypeContext(`trait`, Modifiers)
-    when(javaTreeTypeResolver.resolve(eqJavaTreeTypeContext(expectedContext))).thenReturn(JavaTreeType.Interface)
+    val expectedJavaTreeTypeContext = JavaTreeTypeContext(`trait`, Modifiers)
+    when(javaTreeTypeResolver.resolve(eqJavaTreeTypeContext(expectedJavaTreeTypeContext))).thenReturn(JavaTreeType.Interface)
   }
 
   private def whenResolveJavaModifiersThenReturnPublic(`trait`: Trait): Unit = {
-    val expectedContext = JavaModifiersContext(`trait`, Modifiers, JavaTreeType.Interface, javaScope)
-    when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedContext))).thenReturn(List(JavaModifier.Public))
+    val expectedJavaModifiersContext = JavaModifiersContext(`trait`, Modifiers, JavaTreeType.Interface, javaScope)
+    when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedJavaModifiersContext))).thenReturn(List(JavaModifier.Public))
   }
 }

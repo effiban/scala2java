@@ -1,7 +1,8 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.StatContext
+import effiban.scala2java.contexts.{DefnDefContext, StatContext}
 import effiban.scala2java.entities.JavaTreeType
+import effiban.scala2java.matchers.DefnDefContextMatcher.eqDefnDefContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
@@ -43,7 +44,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
 
     defnTraverser.traverse(defnVal, TheStatContext)
 
-    verify(defnValTraverser).traverse(eqTree(defnVal))
+    verify(defnValTraverser).traverse(eqTree(defnVal), ArgumentMatchers.eq(TheStatContext))
   }
 
   test("traverse() for Defn.Var") {
@@ -55,9 +56,9 @@ class DefnTraverserImplTest extends UnitTestSuite {
       rhs = Some(Lit.Int(3))
     )
 
-    defnTraverser.traverse(defnVar)
+    defnTraverser.traverse(defnVar, TheStatContext)
 
-    verify(defnVarTraverser).traverse(eqTree(defnVar))
+    verify(defnVarTraverser).traverse(eqTree(defnVar), ArgumentMatchers.eq(TheStatContext))
   }
 
   test("traverse() for Defn.Def") {
@@ -73,7 +74,10 @@ class DefnTraverserImplTest extends UnitTestSuite {
 
     defnTraverser.traverse(defnDef, TheStatContext)
 
-    verify(defnDefTraverser).traverse(defnDef = eqTree(defnDef), maybeInit = ArgumentMatchers.eq(None))
+    verify(defnDefTraverser).traverse(
+      defnDef = eqTree(defnDef),
+      eqDefnDefContext(DefnDefContext(javaScope = TheStatContext.javaScope))
+    )
   }
 
   test("traverse() for Defn.Type") {
@@ -87,7 +91,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
 
     defnTraverser.traverse(defnType, TheStatContext)
 
-    verify(defnTypeTraverser).traverse(eqTree(defnType))
+    verify(defnTypeTraverser).traverse(eqTree(defnType), ArgumentMatchers.eq(TheStatContext))
   }
 
   test("traverse() for Defn.Class") {
@@ -113,7 +117,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
 
     defnTraverser.traverse(defnClass, TheStatContext)
 
-    verify(classTraverser).traverse(eqTree(defnClass))
+    verify(classTraverser).traverse(eqTree(defnClass), ArgumentMatchers.eq(TheStatContext))
   }
 
   test("traverse() for Trait") {
@@ -143,7 +147,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
 
     defnTraverser.traverse(defnTrait, TheStatContext)
 
-    verify(traitTraverser).traverse(eqTree(defnTrait))
+    verify(traitTraverser).traverse(eqTree(defnTrait), ArgumentMatchers.eq(TheStatContext))
   }
 
   test("traverse() for Object") {
@@ -167,6 +171,8 @@ class DefnTraverserImplTest extends UnitTestSuite {
     )
 
     defnTraverser.traverse(defnObject, TheStatContext)
+
+    verify(objectTraverser).traverse(eqTree(defnObject), ArgumentMatchers.eq(TheStatContext))
   }
 
   private def termParam(name: String, typeName: String) = {

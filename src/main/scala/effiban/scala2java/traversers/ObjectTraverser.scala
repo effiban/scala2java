@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext}
+import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, StatContext}
 import effiban.scala2java.entities.JavaTreeType.JavaTreeType
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{JavaTreeTypeToKeywordMapping, JavaTreeTypeToScopeMapping}
@@ -9,7 +9,9 @@ import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Defn
 
-trait ObjectTraverser extends ScalaTreeTraverser[Defn.Object]
+trait ObjectTraverser {
+  def traverse(objectDef: Defn.Object, context: StatContext = StatContext()): Unit
+}
 
 private[traversers] class ObjectTraverserImpl(annotListTraverser: => AnnotListTraverser,
                                               templateTraverser: => TemplateTraverser,
@@ -19,7 +21,7 @@ private[traversers] class ObjectTraverserImpl(annotListTraverser: => AnnotListTr
 
   import javaWriter._
 
-  override def traverse(objectDef: Defn.Object): Unit = {
+  override def traverse(objectDef: Defn.Object, context: StatContext = StatContext()): Unit = {
     writeLine()
     writeComment("originally a Scala object")
     writeLine()

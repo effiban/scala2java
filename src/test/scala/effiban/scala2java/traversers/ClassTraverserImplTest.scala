@@ -1,5 +1,7 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.StatContext
+import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.{PrimaryCtors, Templates}
 
@@ -23,7 +25,7 @@ class ClassTraverserImplTest extends UnitTestSuite {
       templ = Templates.Empty
     )
 
-    classTraverser.traverse(classDef)
+    classTraverser.traverse(classDef, StatContext(javaScope))
 
     verify(caseClassTraverser).traverse(classDef)
   }
@@ -37,7 +39,7 @@ class ClassTraverserImplTest extends UnitTestSuite {
       templ = Templates.Empty
     )
 
-    classTraverser.traverse(classDef)
+    classTraverser.traverse(classDef, StatContext(javaScope))
 
     verify(regularClassTraverser).traverse(classDef)
   }

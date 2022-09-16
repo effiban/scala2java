@@ -1,6 +1,8 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.DefnDefContext
 import effiban.scala2java.entities.CtorContext
+import effiban.scala2java.entities.JavaTreeType.Unknown
 import effiban.scala2java.transformers.CtorPrimaryTransformer
 
 import scala.meta.Ctor
@@ -14,6 +16,6 @@ private[traversers] class CtorPrimaryTraverserImpl(ctorPrimaryTransformer: CtorP
 
   override def traverse(primaryCtor: Ctor.Primary, ctorContext: CtorContext): Unit = {
     val defnDef = ctorPrimaryTransformer.transform(primaryCtor, ctorContext)
-    defnDefTraverser.traverse(defnDef)
+    defnDefTraverser.traverse(defnDef, DefnDefContext(Unknown))
   }
 }

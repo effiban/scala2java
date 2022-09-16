@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.JavaModifiersContext
+import effiban.scala2java.contexts.{DefnDefContext, JavaModifiersContext}
 import effiban.scala2java.entities.JavaTreeType
 import effiban.scala2java.entities.JavaTreeType.Method
 import effiban.scala2java.entities.TraversalConstants.UnknownType
@@ -12,7 +12,7 @@ import effiban.scala2java.writers.JavaWriter
 import scala.meta.{Defn, Init, Type}
 
 trait DefnDefTraverser {
-  def traverse(defnDef: Defn.Def, maybeInit: Option[Init] = None): Unit
+  def traverse(defnDef: Defn.Def, context: DefnDefContext = DefnDefContext()): Unit
 }
 
 private[traversers] class DefnDefTraverserImpl(annotListTraverser: => AnnotListTraverser,
@@ -27,7 +27,7 @@ private[traversers] class DefnDefTraverserImpl(annotListTraverser: => AnnotListT
 
   import javaWriter._
 
-  override def traverse(defnDef: Defn.Def, maybeInit: Option[Init] = None): Unit = {
+  override def traverse(defnDef: Defn.Def, context: DefnDefContext = DefnDefContext()): Unit = {
     writeLine()
     annotListTraverser.traverseMods(defnDef.mods)
     writeModifiers(resolveJavaModifiers(defnDef))
@@ -37,7 +37,7 @@ private[traversers] class DefnDefTraverserImpl(annotListTraverser: => AnnotListT
 
     val outerJavaScope = javaScope
     javaScope = Method
-    traverseMethodParamsAndBody(defnDef, maybeInit)
+    traverseMethodParamsAndBody(defnDef, context.maybeInit)
     javaScope = outerJavaScope
   }
 
@@ -81,12 +81,12 @@ private[traversers] class DefnDefTraverserImpl(annotListTraverser: => AnnotListT
   }
 
   private def resolveJavaModifiers(defnDef: Defn.Def) = {
-    val context = JavaModifiersContext(
+    val javaModifiersContext = JavaModifiersContext(
       scalaTree = defnDef,
       scalaMods = defnDef.mods,
       javaTreeType = JavaTreeType.Method,
       javaScope = javaScope
     )
-    javaModifiersResolver.resolve(context)
+    javaModifiersResolver.resolve(javaModifiersContext)
   }
 }

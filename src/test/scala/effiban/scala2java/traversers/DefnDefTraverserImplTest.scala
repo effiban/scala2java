@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.JavaModifiersContext
+import effiban.scala2java.contexts.{DefnDefContext, JavaModifiersContext}
 import effiban.scala2java.entities.Decision.{No, Yes}
 import effiban.scala2java.entities.JavaTreeType.Interface
 import effiban.scala2java.entities.TraversalContext.javaScope
@@ -105,7 +105,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       shouldReturnValue = ArgumentMatchers.eq(Yes),
       maybeInit = ArgumentMatchers.eq(None))
 
-    defnDefTraverser.traverse(defnDef)
+    defnDefTraverser.traverse(defnDef, DefnDefContext(javaScope = javaScope))
 
     outputWriter.toString shouldBe
       """
@@ -148,7 +148,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       shouldReturnValue = ArgumentMatchers.eq(No),
       maybeInit = ArgumentMatchers.eq(None))
 
-    defnDefTraverser.traverse(defnDef)
+    defnDefTraverser.traverse(defnDef, DefnDefContext(javaScope = javaScope))
 
     outputWriter.toString shouldBe
       """
@@ -192,7 +192,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       shouldReturnValue = ArgumentMatchers.eq(No),
       maybeInit = ArgumentMatchers.eq(None))
 
-    defnDefTraverser.traverse(defnDef)
+    defnDefTraverser.traverse(defnDef, DefnDefContext(javaScope = javaScope))
 
     outputWriter.toString shouldBe
       """
@@ -241,7 +241,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       shouldReturnValue = ArgumentMatchers.eq(No),
       maybeInit = eqSome(expectedVal = init, valMatcherGenerator = new TreeMatcher[Init](_)))
 
-    defnDefTraverser.traverse(defnDef = defnDef, maybeInit = Some(init))
+    defnDefTraverser.traverse(defnDef = defnDef, DefnDefContext(javaScope = javaScope, maybeInit = Some(init)))
 
     outputWriter.toString shouldBe
       """
@@ -284,7 +284,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       shouldReturnValue = ArgumentMatchers.eq(Yes),
       maybeInit = ArgumentMatchers.eq(None))
 
-    defnDefTraverser.traverse(defnDef)
+    defnDefTraverser.traverse(defnDef, DefnDefContext(javaScope = javaScope))
 
     outputWriter.toString shouldBe
       """
@@ -328,7 +328,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       shouldReturnValue = ArgumentMatchers.eq(Yes),
       maybeInit = ArgumentMatchers.eq(None))
 
-    defnDefTraverser.traverse(defnDef)
+    defnDefTraverser.traverse(defnDef, DefnDefContext(javaScope = javaScope))
 
     outputWriter.toString shouldBe
       """
@@ -373,7 +373,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       shouldReturnValue = ArgumentMatchers.eq(Yes),
       maybeInit = ArgumentMatchers.eq(None))
 
-    defnDefTraverser.traverse(defnDef)
+    defnDefTraverser.traverse(defnDef, DefnDefContext(javaScope = javaScope))
 
     outputWriter.toString shouldBe
       """
@@ -416,7 +416,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       shouldReturnValue = ArgumentMatchers.eq(Yes),
       maybeInit = ArgumentMatchers.eq(None))
 
-    defnDefTraverser.traverse(defnDef)
+    defnDefTraverser.traverse(defnDef, DefnDefContext(javaScope = javaScope))
 
     outputWriter.toString shouldBe
       """
@@ -459,7 +459,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       shouldReturnValue = ArgumentMatchers.eq(Yes),
       maybeInit = ArgumentMatchers.eq(None))
 
-    defnDefTraverser.traverse(defnDef)
+    defnDefTraverser.traverse(defnDef, DefnDefContext(javaScope = javaScope))
 
     outputWriter.toString shouldBe
       """

@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.JavaModifiersContext
+import effiban.scala2java.contexts.{JavaModifiersContext, StatContext}
 import effiban.scala2java.entities.JavaTreeType.{Interface, Method}
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
@@ -60,7 +60,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
     doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
     doWrite("3").when(rhsTermTraverser).traverse(eqTree(Rhs))
 
-    defnVarTraverser.traverse(defnVar)
+    defnVarTraverser.traverse(defnVar, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """@MyAnnotation
@@ -85,7 +85,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
     doWrite("int").when(defnValOrVarTypeTraverser).traverse(eqSomeTree(IntType), ArgumentMatchers.eq(None))
     doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
 
-    defnVarTraverser.traverse(defnVar)
+    defnVarTraverser.traverse(defnVar, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """@MyAnnotation
@@ -111,7 +111,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
     doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
     doWrite("3").when(rhsTermTraverser).traverse(eqTree(Rhs))
 
-    defnVarTraverser.traverse(defnVar)
+    defnVarTraverser.traverse(defnVar, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """@MyAnnotation
@@ -137,7 +137,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
     doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
     doWrite("3").when(rhsTermTraverser).traverse(eqTree(Rhs))
 
-    defnVarTraverser.traverse(defnVar)
+    defnVarTraverser.traverse(defnVar, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """@MyAnnotation
@@ -162,7 +162,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
     doWrite("int").when(defnValOrVarTypeTraverser).traverse(eqSomeTree(IntType), ArgumentMatchers.eq(None))
     doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
 
-    defnVarTraverser.traverse(defnVar)
+    defnVarTraverser.traverse(defnVar, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """@MyAnnotation
@@ -188,7 +188,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
     doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
     doWrite("3").when(rhsTermTraverser).traverse(eqTree(Rhs))
 
-    defnVarTraverser.traverse(defnVar)
+    defnVarTraverser.traverse(defnVar, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """@MyAnnotation
@@ -214,7 +214,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
     doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
     doWrite("3").when(rhsTermTraverser).traverse(eqTree(Rhs))
 
-    defnVarTraverser.traverse(defnVar)
+    defnVarTraverser.traverse(defnVar, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """@MyAnnotation
@@ -239,7 +239,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
     doWrite("int").when(defnValOrVarTypeTraverser).traverse(eqSomeTree(IntType), ArgumentMatchers.eq(None))
     doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
 
-    defnVarTraverser.traverse(defnVar)
+    defnVarTraverser.traverse(defnVar, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """@MyAnnotation
@@ -265,7 +265,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
     doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
     doWrite("3").when(rhsTermTraverser).traverse(eqTree(Rhs))
 
-    defnVarTraverser.traverse(defnVar)
+    defnVarTraverser.traverse(defnVar, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """@MyAnnotation
