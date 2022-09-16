@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext}
+import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, StatContext}
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
@@ -63,7 +63,7 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     doWrite("MyOtherType").when(typeTraverser).traverse(eqTree(MyOtherType))
 
-    defnTypeTraverser.traverse(defnType)
+    defnTypeTraverser.traverse(defnType, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """private interface MyType<T> extends MyOtherType {
@@ -86,7 +86,7 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     doWrite("extends MyOtherType").when(typeBoundsTraverser).traverse(eqTree(bounds))
 
-    defnTypeTraverser.traverse(defnType)
+    defnTypeTraverser.traverse(defnType, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """private interface MyType<T> extends MyOtherType {

@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.JavaModifiersContext
+import effiban.scala2java.contexts.{JavaModifiersContext, StatContext}
 import effiban.scala2java.entities.JavaTreeType.Interface
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
@@ -61,7 +61,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
     doWrite("myVal").when(patListTraverser).traverse(eqTreeList(List(MyValPat)))
     doWrite("3").when(rhsTermTraverser).traverse(eqTree(Rhs))
 
-    defnValTraverser.traverse(defnVal)
+    defnValTraverser.traverse(defnVal, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """@MyAnnotation
@@ -89,7 +89,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
     doWrite("myVal").when(patListTraverser).traverse(eqTreeList(List(MyValPat)))
     doWrite("3").when(rhsTermTraverser).traverse(eqTree(Rhs))
 
-    defnValTraverser.traverse(defnVal)
+    defnValTraverser.traverse(defnVal, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """@MyAnnotation
@@ -117,7 +117,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
     doWrite("myVal").when(patListTraverser).traverse(eqTreeList(List(MyValPat)))
     doWrite("3").when(rhsTermTraverser).traverse(eqTree(Rhs))
 
-    defnValTraverser.traverse(defnVal)
+    defnValTraverser.traverse(defnVal, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """@MyAnnotation
@@ -145,7 +145,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
     doWrite("myVal").when(patListTraverser).traverse(eqTreeList(List(MyValPat)))
     doWrite("3").when(rhsTermTraverser).traverse(eqTree(Rhs))
 
-    defnValTraverser.traverse(defnVal)
+    defnValTraverser.traverse(defnVal, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """@MyAnnotation

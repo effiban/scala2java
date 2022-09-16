@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.JavaModifiersContext
+import effiban.scala2java.contexts.{JavaModifiersContext, StatContext}
 import effiban.scala2java.entities.JavaTreeType
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.resolvers.JavaModifiersResolver
@@ -8,7 +8,9 @@ import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Defn
 
-trait DefnValTraverser extends ScalaTreeTraverser[Defn.Val]
+trait DefnValTraverser {
+  def traverse(valDef: Defn.Val, context: StatContext = StatContext()): Unit
+}
 
 //TODO - if Java owner is an interface, the output should be an accessor method with default impl
 private[traversers] class DefnValTraverserImpl(annotListTraverser: => AnnotListTraverser,
@@ -21,7 +23,7 @@ private[traversers] class DefnValTraverserImpl(annotListTraverser: => AnnotListT
   import javaWriter._
 
   //TODO if it is non-public it will be invalid in a Java interface - replace with method
-  def traverse(valDef: Defn.Val): Unit = {
+  override def traverse(valDef: Defn.Val, context: StatContext = StatContext()): Unit = {
     annotListTraverser.traverseMods(valDef.mods)
     writeModifiers(resolveJavaModifiers(valDef))
     defnValOrVarTypeTraverser.traverse(valDef.decltpe, Some(valDef.rhs))
@@ -33,12 +35,12 @@ private[traversers] class DefnValTraverserImpl(annotListTraverser: => AnnotListT
   }
 
   private def resolveJavaModifiers(valDef: Defn.Val) = {
-    val context = JavaModifiersContext(
+    val javaModifiersContext = JavaModifiersContext(
       scalaTree = valDef,
       scalaMods = valDef.mods,
       javaTreeType = JavaTreeType.Variable,
       javaScope = javaScope
     )
-    javaModifiersResolver.resolve(context)
+    javaModifiersResolver.resolve(javaModifiersContext)
   }
 }
