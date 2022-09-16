@@ -8,6 +8,6 @@ private[traversers] class SourceTraverserImpl(statTraverser: => StatTraverser) e
 
   // source file
   def traverse(source: Source): Unit = {
-    source.stats.foreach(statTraverser.traverse)
+    source.stats.foreach(statTraverser.traverse(_))
   }
 }

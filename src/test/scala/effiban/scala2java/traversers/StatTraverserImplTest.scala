@@ -1,5 +1,8 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.StatContext
+import effiban.scala2java.entities.JavaTreeType
+import effiban.scala2java.entities.JavaTreeType.{Method, Package, Unknown}
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
@@ -31,7 +34,7 @@ class StatTraverserImplTest extends UnitTestSuite {
 
     doWrite("myName").when(termTravserser).traverse(eqTree(termName))
 
-    statTraverser.traverse(termName)
+    statTraverser.traverse(termName, StatContext(JavaTreeType.Class))
 
     outputWriter.toString shouldBe "myName"
   }
@@ -44,7 +47,7 @@ class StatTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(importTraverser).traverse(eqTree(`import`))
 
-    statTraverser.traverse(`import`)
+    statTraverser.traverse(`import`, StatContext(Package))
 
     outputWriter.toString shouldBe
       """import somepackage.SomeClass;
@@ -58,7 +61,7 @@ class StatTraverserImplTest extends UnitTestSuite {
         |*/""".stripMargin
     ).when(pkgTraverser).traverse(eqTree(pkg))
 
-    statTraverser.traverse(pkg)
+    statTraverser.traverse(pkg, StatContext(Unknown))
 
     outputWriter.toString shouldBe
       """/*
@@ -76,7 +79,7 @@ class StatTraverserImplTest extends UnitTestSuite {
 
     doWrite("int myVal = 3").when(defnTraverser).traverse(eqTree(defnVal))
 
-    statTraverser.traverse(defnVal)
+    statTraverser.traverse(defnVal, StatContext(Method))
 
     outputWriter.toString shouldBe "int myVal = 3"
   }
@@ -90,7 +93,7 @@ class StatTraverserImplTest extends UnitTestSuite {
 
     doWrite("int myVal").when(declTraverser).traverse(eqTree(declVal))
 
-    statTraverser.traverse(declVal)
+    statTraverser.traverse(declVal, StatContext(Method))
 
     outputWriter.toString shouldBe "int myVal"
   }

@@ -1,6 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.classifiers.{DefnValClassifier, JavaStatClassifier}
+import effiban.scala2java.contexts.StatContext
 import effiban.scala2java.entities.CtorContext
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.matchers.CtorContextMatcher.eqCtorContext
@@ -123,7 +124,8 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
   test("traverse() for Defn.Val which is not an enum constant list, and requires end delimiter") {
 
     when(defnValClassifier.isEnumConstantList(eqTree(TheDefnVal), ArgumentMatchers.eq(javaScope))).thenReturn(false)
-    doWrite("/* DATA MEMBER DEFINITION */").when(statTraverser).traverse(eqTree(TheDefnVal))
+    doWrite("/* DATA MEMBER DEFINITION */")
+      .when(statTraverser).traverse(eqTree(TheDefnVal), ArgumentMatchers.eq(StatContext()))
     when(javaStatClassifier.requiresEndDelimiter(eqTree(TheDefnVal))).thenReturn(true)
 
     templateChildTraverser.traverse(child = TheDefnVal)
@@ -152,7 +154,7 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
       """{
         |    /* METHOD DEFINITION */
         |}""".stripMargin)
-      .when(statTraverser).traverse(eqTree(TheDefnDef))
+      .when(statTraverser).traverse(eqTree(TheDefnDef), ArgumentMatchers.eq(StatContext()))
     when(javaStatClassifier.requiresEndDelimiter(eqTree(TheDefnDef))).thenReturn(false)
 
     templateChildTraverser.traverse(child = TheDefnDef)

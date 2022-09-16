@@ -1,8 +1,10 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.StatContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
+import org.mockito.ArgumentMatchers
 
 import scala.meta.{Ctor, Defn, Mod, Name, Pkg, Self, Source, Template, Term, Type}
 
@@ -32,7 +34,7 @@ class SourceTraverserImplTest extends UnitTestSuite {
         |*  PACKAGE 1 DEFINITION
         |*/
         |""".stripMargin)
-      .when(statTraverser).traverse(eqTree(pkg1))
+      .when(statTraverser).traverse(eqTree(pkg1), ArgumentMatchers.eq(StatContext()))
 
    doWrite(
      """
@@ -40,7 +42,7 @@ class SourceTraverserImplTest extends UnitTestSuite {
         |*  PACKAGE 2 DEFINITION
         |*/
         |""".stripMargin)
-     .when(statTraverser).traverse(eqTree(pkg2))
+     .when(statTraverser).traverse(eqTree(pkg2), ArgumentMatchers.eq(StatContext()))
 
 
     sourceTraverser.traverse(Source(stats = List(pkg1, pkg2)))

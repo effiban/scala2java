@@ -1,13 +1,18 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.StatContext
+import effiban.scala2java.entities.JavaTreeType.Package
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
+import org.mockito.ArgumentMatchers
 
 import scala.meta.Ctor.Primary
 import scala.meta.{Decl, Defn, Import, Importee, Importer, Name, Pat, Pkg, Self, Template, Term, Type}
 
 class PkgTraverserImplTest extends UnitTestSuite {
+
+  private val PackageStatContext = StatContext(Package)
 
   private val termRefTraverser = mock[TermRefTraverser]
   private val statTraverser = mock[StatTraverser]
@@ -32,19 +37,19 @@ class PkgTraverserImplTest extends UnitTestSuite {
     doWrite("mypkg.myinnerpkg").when(termRefTraverser).traverse(eqTree(pkgRef))
     doWrite(
       """import extpkg.ExtClass;
-        |""".stripMargin).when(statTraverser).traverse(eqTree(`import`))
+        |""".stripMargin).when(statTraverser).traverse(eqTree(`import`), ArgumentMatchers.eq(PackageStatContext))
     doWrite(
       """/*
         |*  TRAIT DEFINITION
         |*/
         |""".stripMargin)
-      .when(statTraverser).traverse(eqTree(traitDefn))
+      .when(statTraverser).traverse(eqTree(traitDefn), ArgumentMatchers.eq(PackageStatContext))
     doWrite(
       """/*
         |*  OBJECT DEFINITION
         |*/
         |""".stripMargin)
-      .when(statTraverser).traverse(eqTree(objectDefn))
+      .when(statTraverser).traverse(eqTree(objectDefn), ArgumentMatchers.eq(PackageStatContext))
 
     pkgTraverser.traverse(
       Pkg(ref = pkgRef,
