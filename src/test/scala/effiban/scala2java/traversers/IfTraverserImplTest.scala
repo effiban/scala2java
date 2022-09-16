@@ -1,5 +1,6 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.TermContext
 import effiban.scala2java.entities.Decision.{No, Yes}
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
@@ -57,7 +58,7 @@ class IfTraverserImplTest extends UnitTestSuite {
       elsep = Lit.Unit()
     )
 
-    doWrite("x < 3").when(termTraverser).traverse(eqTree(Condition))
+    doWrite("x < 3").when(termTraverser).traverse(eqTree(Condition), ArgumentMatchers.eq(TermContext()))
     doWrite(
       """ {
         |  /* BODY */
@@ -84,7 +85,7 @@ class IfTraverserImplTest extends UnitTestSuite {
       elsep = Lit.Unit()
     )
 
-    doWrite("x < 3").when(termTraverser).traverse(eqTree(Condition))
+    doWrite("x < 3").when(termTraverser).traverse(eqTree(Condition), ArgumentMatchers.eq(TermContext()))
     doWrite(
       """ {
         |  /* BODY */
@@ -111,7 +112,7 @@ class IfTraverserImplTest extends UnitTestSuite {
       elsep = Lit.Unit()
     )
 
-    doWrite("x < 3").when(termTraverser).traverse(eqTree(Condition))
+    doWrite("x < 3").when(termTraverser).traverse(eqTree(Condition), ArgumentMatchers.eq(TermContext()))
     doWrite(
       """ {
         |  /* BODY */
@@ -138,7 +139,7 @@ class IfTraverserImplTest extends UnitTestSuite {
       elsep = ElseBlock
     )
 
-    doWrite("x < 3").when(termTraverser).traverse(eqTree(Condition))
+    doWrite("x < 3").when(termTraverser).traverse(eqTree(Condition), ArgumentMatchers.eq(TermContext()))
     doWrite(
       """ {
         |  /* THEN BODY */
@@ -178,7 +179,7 @@ class IfTraverserImplTest extends UnitTestSuite {
       elsep = ElseBlock
     )
 
-    doWrite("x < 3").when(termTraverser).traverse(eqTree(Condition))
+    doWrite("x < 3").when(termTraverser).traverse(eqTree(Condition), ArgumentMatchers.eq(TermContext()))
     doWrite(
       """ {
         |  /* THEN BODY */
@@ -216,7 +217,7 @@ class IfTraverserImplTest extends UnitTestSuite {
       elsep = ElseStatement
     )
 
-    doWrite("x < 3").when(termTraverser).traverse(eqTree(Condition))
+    doWrite("x < 3").when(termTraverser).traverse(eqTree(Condition), ArgumentMatchers.eq(TermContext()))
     doWrite(
       """ {
         |  /* THEN BODY */
@@ -258,9 +259,9 @@ class IfTraverserImplTest extends UnitTestSuite {
       elsep = threeOrMore
     )
 
-    doWrite("x < 3").when(termTraverser).traverse(eqTree(Condition))
-    doWrite(""""LessThanThree"""").when(termTraverser).traverse(eqTree(lessThanThree))
-    doWrite(""""ThreeOrMore"""").when(termTraverser).traverse(eqTree(threeOrMore))
+    doWrite("x < 3").when(termTraverser).traverse(eqTree(Condition), ArgumentMatchers.eq(TermContext()))
+    doWrite(""""LessThanThree"""").when(termTraverser).traverse(eqTree(lessThanThree), ArgumentMatchers.eq(TermContext()))
+    doWrite(""""ThreeOrMore"""").when(termTraverser).traverse(eqTree(threeOrMore), ArgumentMatchers.eq(TermContext()))
 
     ifTraverser.traverseAsTertiaryOp(`if`)
 

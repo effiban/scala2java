@@ -14,7 +14,7 @@ class ArgumentListTraverserImplTest extends UnitTestSuite {
   private val arg2 = Term.Name("arg2")
   private val arg3 = Term.Name("arg3")
 
-  private val argumentTraverser = mock[TermTraverser]
+  private val argumentTraverser = mock[ScalaTreeTraverser[Term]]
 
   private val argumentListTraverser = new ArgumentListTraverserImpl()
 

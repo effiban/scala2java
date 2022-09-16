@@ -1,10 +1,13 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.StatContext
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Decl
 
-trait DeclTraverser extends ScalaTreeTraverser[Decl]
+trait DeclTraverser {
+  def traverse(decl: Decl, context: StatContext = StatContext()): Unit
+}
 
 private[traversers] class DeclTraverserImpl(declValTraverser: => DeclValTraverser,
                                             declVarTraverser: => DeclVarTraverser,
@@ -14,7 +17,7 @@ private[traversers] class DeclTraverserImpl(declValTraverser: => DeclValTraverse
 
   import javaWriter._
 
-  override def traverse(decl: Decl): Unit = decl match {
+  override def traverse(decl: Decl, context: StatContext = StatContext()): Unit = decl match {
     case valDecl: Decl.Val => declValTraverser.traverse(valDecl)
     case varDecl: Decl.Var => declVarTraverser.traverse(varDecl)
     case defDecl: Decl.Def => declDefTraverser.traverse(defDecl)

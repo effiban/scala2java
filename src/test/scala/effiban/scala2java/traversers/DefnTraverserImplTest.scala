@@ -1,5 +1,7 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.StatContext
+import effiban.scala2java.entities.JavaTreeType
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
@@ -10,6 +12,8 @@ import scala.meta.Term.Apply
 import scala.meta.{Decl, Defn, Lit, Name, Pat, Self, Template, Term, Type}
 
 class DefnTraverserImplTest extends UnitTestSuite {
+
+  private val TheStatContext = StatContext(JavaTreeType.Class)
 
   private val defnValTraverser  = mock[DefnValTraverser]
   private val defnVarTraverser  = mock[DefnVarTraverser]
@@ -37,7 +41,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
       rhs = Lit.Int(3)
     )
 
-    defnTraverser.traverse(defnVal)
+    defnTraverser.traverse(defnVal, TheStatContext)
 
     verify(defnValTraverser).traverse(eqTree(defnVal))
   }
@@ -67,7 +71,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
       body = Term.Apply(Term.Name("doSomething"), List())
     )
 
-    defnTraverser.traverse(defnDef)
+    defnTraverser.traverse(defnDef, TheStatContext)
 
     verify(defnDefTraverser).traverse(defnDef = eqTree(defnDef), maybeInit = ArgumentMatchers.eq(None))
   }
@@ -81,7 +85,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
       body = Type.Name("MyOtherType")
     )
 
-    defnTraverser.traverse(defnType)
+    defnTraverser.traverse(defnType, TheStatContext)
 
     verify(defnTypeTraverser).traverse(eqTree(defnType))
   }
@@ -107,7 +111,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
       )
     )
 
-    defnTraverser.traverse(defnClass)
+    defnTraverser.traverse(defnClass, TheStatContext)
 
     verify(classTraverser).traverse(eqTree(defnClass))
   }
@@ -137,7 +141,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
       )
     )
 
-    defnTraverser.traverse(defnTrait)
+    defnTraverser.traverse(defnTrait, TheStatContext)
 
     verify(traitTraverser).traverse(eqTree(defnTrait))
   }
@@ -162,7 +166,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
       )
     )
 
-    defnTraverser.traverse(defnObject)
+    defnTraverser.traverse(defnObject, TheStatContext)
   }
 
   private def termParam(name: String, typeName: String) = {

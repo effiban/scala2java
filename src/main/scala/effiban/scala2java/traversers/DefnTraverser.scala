@@ -1,11 +1,14 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.StatContext
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Defn
 import scala.meta.Defn.Trait
 
-trait DefnTraverser extends ScalaTreeTraverser[Defn]
+trait DefnTraverser {
+  def traverse(defn: Defn, statContext: StatContext = StatContext()): Unit
+}
 
 private[traversers] class DefnTraverserImpl(defnValTraverser: => DefnValTraverser,
                                             defnVarTraverser: => DefnVarTraverser,
@@ -18,7 +21,7 @@ private[traversers] class DefnTraverserImpl(defnValTraverser: => DefnValTraverse
 
   import javaWriter._
 
-  override def traverse(defn: Defn): Unit = defn match {
+  override def traverse(defn: Defn, statContext: StatContext = StatContext()): Unit = defn match {
     case valDef: Defn.Val => defnValTraverser.traverse(valDef)
     case varDef: Defn.Var => defnVarTraverser.traverse(varDef)
     case defDef: Defn.Def => defnDefTraverser.traverse(defDef)

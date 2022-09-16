@@ -1,7 +1,9 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.TermContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.testsuites.UnitTestSuite
+import org.mockito.ArgumentMatchers
 
 import scala.meta.Term
 
@@ -16,6 +18,6 @@ class TermRepeatedTraverserImplTest extends UnitTestSuite {
 
     termRepeatedTraverser.traverse(termRepeated)
 
-    verify(termTraverser).traverse(eqTree(expr))
+    verify(termTraverser).traverse(eqTree(expr), ArgumentMatchers.eq(TermContext()))
   }
 }

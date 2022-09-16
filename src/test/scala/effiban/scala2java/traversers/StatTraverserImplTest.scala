@@ -1,12 +1,13 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.StatContext
+import effiban.scala2java.contexts.{StatContext, TermContext}
 import effiban.scala2java.entities.JavaTreeType
 import effiban.scala2java.entities.JavaTreeType.{Method, Package, Unknown}
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
+import org.mockito.ArgumentMatchers
 
 import scala.meta.Ctor.Primary
 import scala.meta.{Decl, Defn, Import, Importee, Importer, Lit, Name, Pat, Pkg, Self, Template, Term, Type}
@@ -32,7 +33,7 @@ class StatTraverserImplTest extends UnitTestSuite {
   test("traverse Term.Name") {
     val termName = Term.Name("myName")
 
-    doWrite("myName").when(termTravserser).traverse(eqTree(termName))
+    doWrite("myName").when(termTravserser).traverse(eqTree(termName), ArgumentMatchers.eq(TermContext(JavaTreeType.Class)))
 
     statTraverser.traverse(termName, StatContext(JavaTreeType.Class))
 
@@ -77,7 +78,7 @@ class StatTraverserImplTest extends UnitTestSuite {
       rhs = Lit.Int(3)
     )
 
-    doWrite("int myVal = 3").when(defnTraverser).traverse(eqTree(defnVal))
+    doWrite("int myVal = 3").when(defnTraverser).traverse(eqTree(defnVal), ArgumentMatchers.eq(StatContext(Method)))
 
     statTraverser.traverse(defnVal, StatContext(Method))
 
@@ -91,7 +92,7 @@ class StatTraverserImplTest extends UnitTestSuite {
       decltpe = Type.Name("int")
     )
 
-    doWrite("int myVal").when(declTraverser).traverse(eqTree(declVal))
+    doWrite("int myVal").when(declTraverser).traverse(eqTree(declVal), ArgumentMatchers.eq(StatContext(Method)))
 
     statTraverser.traverse(declVal, StatContext(Method))
 

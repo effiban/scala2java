@@ -1,11 +1,14 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.TermContext
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term.{AnonymousFunction, ApplyType, Ascribe, Assign, Block, Do, Eta, For, ForYield, If, New, NewAnonymous, Return, Throw, Try, TryWithHandler, While}
 import scala.meta.{Lit, Term}
 
-trait TermTraverser extends ScalaTreeTraverser[Term]
+trait TermTraverser {
+  def traverse(term: Term, termContext: TermContext = TermContext()): Unit
+}
 
 private[traversers] class TermTraverserImpl(termRefTraverser: => TermRefTraverser,
                                             termApplyTraverser: => TermApplyTraverser,
@@ -40,7 +43,7 @@ private[traversers] class TermTraverserImpl(termRefTraverser: => TermRefTraverse
 
   import javaWriter._
 
-  override def traverse(term: Term): Unit = term match {
+  override def traverse(term: Term, termContext: TermContext = TermContext()): Unit = term match {
     case termRef: Term.Ref => termRefTraverser.traverse(termRef)
     case apply: Term.Apply => termApplyTraverser.traverse(apply)
     case applyType: ApplyType => applyTypeTraverser.traverse(applyType)

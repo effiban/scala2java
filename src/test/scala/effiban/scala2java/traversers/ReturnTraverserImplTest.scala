@@ -1,8 +1,10 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.TermContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
+import org.mockito.ArgumentMatchers
 
 import scala.meta.Term
 import scala.meta.Term.Return
@@ -16,7 +18,7 @@ class ReturnTraverserImplTest extends UnitTestSuite {
   test("traverse()") {
     val x = Term.Name("x")
 
-    doWrite("x").when(termTraverser).traverse(eqTree(x))
+    doWrite("x").when(termTraverser).traverse(eqTree(x), ArgumentMatchers.eq(TermContext()))
 
     returnTraverser.traverse(Return(x))
 

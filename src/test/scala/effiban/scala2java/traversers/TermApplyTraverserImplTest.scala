@@ -1,5 +1,6 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.TermContext
 import effiban.scala2java.entities.EnclosingDelimiter.Parentheses
 import effiban.scala2java.entities.ListTraversalOptions
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
@@ -34,10 +35,11 @@ class TermApplyTraverserImplTest extends UnitTestSuite {
 
     when(scalaToJavaTermApplyTransformer.transform(eqTree(scalaTermApply))).thenReturn(javaTermApply)
 
-    doWrite("myJavaMethod").when(termTraverser).traverse(eqTree(javaTermApply.fun))
+    doWrite("myJavaMethod").when(termTraverser).traverse(eqTree(javaTermApply.fun), ArgumentMatchers.eq(TermContext()))
     doWrite("(arg1, arg2)").when(termListTraverser).traverse(
       terms = eqTreeList(javaTermApply.args),
-      ArgumentMatchers.eq(ListTraversalOptions(maybeEnclosingDelimiter = Some(Parentheses), traverseEmpty = true))
+      ArgumentMatchers.eq(ListTraversalOptions(maybeEnclosingDelimiter = Some(Parentheses), traverseEmpty = true)),
+      ArgumentMatchers.eq(TermContext())
     )
 
     termApplyTraverser.traverse(scalaTermApply)
