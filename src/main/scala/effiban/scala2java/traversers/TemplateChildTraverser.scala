@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.classifiers.{DefnValClassifier, JavaStatClassifier}
-import effiban.scala2java.contexts.{CtorContext, TemplateChildContext}
+import effiban.scala2java.contexts.{CtorContext, StatContext, TemplateChildContext}
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.writers.JavaWriter
 
@@ -27,7 +27,7 @@ private[traversers] class TemplateChildTraverserImpl(ctorPrimaryTraverser: => Ct
     case defnVal: Defn.Val if defnValClassifier.isEnumConstantList(defnVal, javaScope) =>
       enumConstantListTraverser.traverse(defnVal)
       writeStatementEnd()
-    case stat: Stat => traverseNonConstructorStat(stat)
+    case stat: Stat => traverseNonConstructorStat(stat, context)
     case unexpected: Tree => throw new IllegalStateException(s"Unexpected template child: $unexpected")
   }
 
@@ -46,8 +46,8 @@ private[traversers] class TemplateChildTraverserImpl(ctorPrimaryTraverser: => Ct
     }
   }
 
-  private def traverseNonConstructorStat(stat: Stat): Unit = {
-    statTraverser.traverse(stat)
+  private def traverseNonConstructorStat(stat: Stat, context: TemplateChildContext): Unit = {
+    statTraverser.traverse(stat, StatContext(context.javaScope))
     if (javaStatClassifier.requiresEndDelimiter(stat)) {
       writeStatementEnd()
     }
