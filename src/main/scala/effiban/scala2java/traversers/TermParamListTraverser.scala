@@ -26,7 +26,7 @@ private[traversers] class TermParamListTraverserImpl(argumentListTraverser: => A
 
     argumentListTraverser.traverse(
       args = termParams,
-      argTraverser = termParamTraverser,
+      argTraverser = (termParam: Term.Param) => termParamTraverser.traverse(termParam, context),
       options = options
     )
   }
