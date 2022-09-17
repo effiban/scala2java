@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{JavaModifiersContext, StatContext}
-import effiban.scala2java.entities.JavaTreeType.Interface
+import effiban.scala2java.entities.JavaTreeType.{Interface, Method}
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
@@ -83,6 +83,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1),
+      context = ArgumentMatchers.eq(StatContext(Method)),
       onSameLine = ArgumentMatchers.eq(false)
     )
 
@@ -115,6 +116,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1),
+      context = ArgumentMatchers.eq(StatContext(Method)),
       onSameLine = ArgumentMatchers.eq(false)
     )
 
@@ -146,6 +148,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1),
+      context = ArgumentMatchers.eq(StatContext(Method)),
       onSameLine = ArgumentMatchers.eq(false)
     )
 
@@ -177,6 +180,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
     doWrite("(int param1, int param2, int param3, int param4)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1 ++ MethodParams2),
+      context = ArgumentMatchers.eq(StatContext(Method)),
       onSameLine = ArgumentMatchers.eq(false)
     )
 

@@ -2,6 +2,7 @@ package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{BlockContext, StatContext}
 import effiban.scala2java.entities.Decision.{Uncertain, Yes}
+import effiban.scala2java.entities.JavaTreeType.Lambda
 import effiban.scala2java.matchers.BlockContextMatcher.eqBlockContext
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
@@ -31,6 +32,7 @@ class TermFunctionTraverserImplTest extends UnitTestSuite {
 
     doWrite("()").when(termParamListTraverser).traverse(
       termParams = ArgumentMatchers.eq(Nil),
+      context = ArgumentMatchers.eq(StatContext(Lambda)),
       onSameLine = ArgumentMatchers.eq(true)
     )
     doWrite("doSomething();")
@@ -76,6 +78,7 @@ class TermFunctionTraverserImplTest extends UnitTestSuite {
 
     doWrite("(val1, val2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(params),
+      context = ArgumentMatchers.eq(StatContext(Lambda)),
       onSameLine = ArgumentMatchers.eq(true)
     )
     doWrite("doSomething(val1, val2);")

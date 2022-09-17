@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.{BlockContext, DefnDefContext, JavaModifiersContext}
+import effiban.scala2java.contexts.{BlockContext, DefnDefContext, JavaModifiersContext, StatContext}
 import effiban.scala2java.entities.JavaTreeType
 import effiban.scala2java.entities.JavaTreeType.Method
 import effiban.scala2java.entities.TraversalConstants.UnknownType
@@ -42,7 +42,7 @@ private[traversers] class DefnDefTraverserImpl(annotListTraverser: => AnnotListT
   }
 
   private def traverseMethodParamsAndBody(defDef: Defn.Def, maybeInit: Option[Init] = None): Unit = {
-    termParamListTraverser.traverse(defDef.paramss.flatten)
+    termParamListTraverser.traverse(termParams = defDef.paramss.flatten, context = StatContext(Method))
     val withReturnValue = defDef.decltpe match {
       case Some(Type.Name("Unit")) => false
       case Some(Type.AnonymousName()) => false

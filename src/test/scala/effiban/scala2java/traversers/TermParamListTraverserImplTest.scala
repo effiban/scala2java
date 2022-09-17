@@ -1,6 +1,8 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.StatContext
 import effiban.scala2java.entities.EnclosingDelimiter.Parentheses
+import effiban.scala2java.entities.JavaTreeType.Method
 import effiban.scala2java.entities.ListTraversalOptions
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.testsuites.UnitTestSuite
@@ -28,7 +30,7 @@ class TermParamListTraverserImplTest extends UnitTestSuite {
 
 
   test("traverse() when no params") {
-    termParamListTraverser.traverse(Nil)
+    termParamListTraverser.traverse(termParams = Nil, context = StatContext(Method))
 
     verify(argumentListTraverser).traverse(
       args = ArgumentMatchers.eq(Nil),
@@ -40,7 +42,7 @@ class TermParamListTraverserImplTest extends UnitTestSuite {
   test("traverse() when one param and multi-line") {
     val param = termParam("x")
 
-    termParamListTraverser.traverse(termParams = List(param))
+    termParamListTraverser.traverse(termParams = List(param), context = StatContext(Method))
 
     verify(argumentListTraverser).traverse(
       args = eqTreeList(List(param)),
@@ -52,7 +54,7 @@ class TermParamListTraverserImplTest extends UnitTestSuite {
   test("traverse() when one param and same line") {
     val param = termParam("x")
 
-    termParamListTraverser.traverse(termParams = List(param), onSameLine = true)
+    termParamListTraverser.traverse(termParams = List(param), context = StatContext(Method), onSameLine = true)
 
     verify(argumentListTraverser).traverse(
       args = eqTreeList(List(param)),
@@ -65,7 +67,7 @@ class TermParamListTraverserImplTest extends UnitTestSuite {
     val param1 = termParam("x")
     val param2 = termParam("y")
 
-    termParamListTraverser.traverse(termParams = List(param1, param2))
+    termParamListTraverser.traverse(termParams = List(param1, param2), context = StatContext(Method))
 
     verify(argumentListTraverser).traverse(
       args = eqTreeList(List(param1, param2)),
@@ -78,7 +80,7 @@ class TermParamListTraverserImplTest extends UnitTestSuite {
     val param1 = termParam("x")
     val param2 = termParam("y")
 
-    termParamListTraverser.traverse(termParams = List(param1, param2), onSameLine = true)
+    termParamListTraverser.traverse(termParams = List(param1, param2), context = StatContext(Method), onSameLine = true)
 
     verify(argumentListTraverser).traverse(
       args = eqTreeList(List(param1, param2)),

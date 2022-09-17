@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.BlockContext
+import effiban.scala2java.contexts.{BlockContext, StatContext}
 import effiban.scala2java.matchers.BlockContextMatcher.eqBlockContext
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
@@ -23,7 +23,11 @@ class CatchHandlerTraverserImplTest extends UnitTestSuite {
 
   test("traverse() when shouldReturnValue=No") {
     doWrite("(RuntimeException e)")
-      .when(termParamListTraverser).traverse(eqTreeList(List(Param)), onSameLine = ArgumentMatchers.eq(true))
+      .when(termParamListTraverser).traverse(
+      eqTreeList(List(Param)),
+      context = ArgumentMatchers.eq(StatContext()),
+      onSameLine = ArgumentMatchers.eq(true)
+    )
 
     doWrite(
       """ {
@@ -46,7 +50,11 @@ class CatchHandlerTraverserImplTest extends UnitTestSuite {
 
   test("traverse() when shouldReturnValue=Yes") {
     doWrite("(RuntimeException e)")
-      .when(termParamListTraverser).traverse(eqTreeList(List(Param)), onSameLine = ArgumentMatchers.eq(true))
+      .when(termParamListTraverser).traverse(
+      eqTreeList(List(Param)),
+      context = ArgumentMatchers.eq(StatContext()),
+      onSameLine = ArgumentMatchers.eq(true)
+    )
 
     doWrite(
       """ {
