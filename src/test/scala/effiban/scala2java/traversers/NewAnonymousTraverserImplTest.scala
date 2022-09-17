@@ -1,6 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.TemplateContext
+import effiban.scala2java.entities.JavaTreeType
 import effiban.scala2java.matchers.TemplateContextMatcher.eqTemplateContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
@@ -31,7 +32,8 @@ class NewAnonymousTraverserImplTest extends UnitTestSuite {
 
     val newAnonymous = NewAnonymous(template)
 
-    doWrite("/* TEMPLATE BODY */").when(templateTraverser).traverse(eqTree(template), eqTemplateContext(TemplateContext()))
+    doWrite("/* TEMPLATE BODY */")
+      .when(templateTraverser).traverse(eqTree(template), eqTemplateContext(TemplateContext(javaScope = JavaTreeType.Class)))
 
     newAnonymousTraverser.traverse(newAnonymous)
 
