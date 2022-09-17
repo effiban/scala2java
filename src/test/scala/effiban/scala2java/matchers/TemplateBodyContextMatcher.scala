@@ -9,7 +9,8 @@ import scala.meta.{Ctor, Init, Type}
 class TemplateBodyContextMatcher(expectedContext: TemplateBodyContext) extends ArgumentMatcher[TemplateBodyContext] {
 
   override def matches(actualContext: TemplateBodyContext): Boolean = {
-    classNameMatches(actualContext) &&
+    actualContext.javaScope == expectedContext.javaScope &&
+      classNameMatches(actualContext) &&
       explicitPrimaryCtorMatches(actualContext) &&
       initsMatch(actualContext)
   }

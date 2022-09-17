@@ -79,7 +79,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     expectWriteSelf()
     expectTraverseBody(stats = Nil)
 
-    templateTraverser.traverse(Templates.Empty)
+    templateTraverser.traverse(template = Templates.Empty, context = TemplateContext(javaScope = JavaTreeType.Class))
 
     outputWriter.toString shouldBe
       """ {
@@ -100,11 +100,11 @@ class TemplateTraverserImplTest extends UnitTestSuite {
 
     expectWriteSelf()
     expectWriteInits(JavaTreeType.Class)
-    expectTraverseBody(stats = Nil, context = TemplateBodyContext(inits = TheNonSkippedInits))
+    expectTraverseBody(stats = Nil, context = TemplateBodyContext(javaScope = JavaTreeType.Class, inits = TheNonSkippedInits))
 
     javaScope = JavaTreeType.Class
 
-    templateTraverser.traverse(template)
+    templateTraverser.traverse(template, context = TemplateContext(javaScope = JavaTreeType.Class))
 
     outputWriter.toString shouldBe
       """ implements Parent1, Parent2 {
@@ -123,11 +123,11 @@ class TemplateTraverserImplTest extends UnitTestSuite {
 
     expectWriteSelf()
     expectWriteInits(JavaTreeType.Class)
-    expectTraverseBody(stats = Nil, context = TemplateBodyContext(inits = TheNonSkippedInits))
+    expectTraverseBody(stats = Nil, context = TemplateBodyContext(javaScope = JavaTreeType.Class, inits = TheNonSkippedInits))
 
     javaScope = JavaTreeType.Class
 
-    templateTraverser.traverse(template)
+    templateTraverser.traverse(template, context = TemplateContext(javaScope = JavaTreeType.Class))
 
     outputWriter.toString shouldBe
       """ implements Parent1, Parent2 {
@@ -147,7 +147,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     expectWriteSelf(NonEmptySelf)
     expectTraverseBody(stats = Nil)
 
-    templateTraverser.traverse(template)
+    templateTraverser.traverse(template, context = TemplateContext(javaScope = JavaTreeType.Class))
 
     outputWriter.toString shouldBe
       """/* extends SelfName: SelfType */ {
@@ -159,10 +159,15 @@ class TemplateTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse when has primary ctor only") {
-    val context = TemplateContext(maybeClassName = Some(ClassName), maybePrimaryCtor = Some(PrimaryCtor))
+    val context = TemplateContext(
+      javaScope = JavaTreeType.Class,
+      maybeClassName = Some(ClassName),
+      maybePrimaryCtor = Some(PrimaryCtor)
+    )
 
     expectWriteSelf()
     expectTraverseBody(stats = Nil, context = TemplateBodyContext(
+      javaScope = JavaTreeType.Class,
       maybeClassName = context.maybeClassName,
       maybePrimaryCtor = context.maybePrimaryCtor)
     )
@@ -195,7 +200,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     expectWriteSelf()
     expectTraverseBody(stats = stats)
 
-    templateTraverser.traverse(template = template)
+    templateTraverser.traverse(template = template, context = TemplateContext(javaScope = JavaTreeType.Class))
 
     outputWriter.toString shouldBe
       """ {
@@ -219,11 +224,16 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       stats = stats
     )
 
-    val context = TemplateContext(maybeClassName = Some(ClassName), maybePrimaryCtor = Some(PrimaryCtor))
+    val context = TemplateContext(
+      javaScope = JavaTreeType.Class,
+      maybeClassName = Some(ClassName),
+      maybePrimaryCtor = Some(PrimaryCtor)
+    )
 
     expectWriteInits(JavaTreeType.Class)
     expectWriteSelf(NonEmptySelf)
     expectTraverseBody(stats = stats, context = TemplateBodyContext(
+      javaScope = JavaTreeType.Class,
       maybeClassName = Some(ClassName),
       maybePrimaryCtor = Some(PrimaryCtor),
       inits = TheNonSkippedInits)
@@ -257,7 +267,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     doWrite(selfStr).when(selfTraverser).traverse(eqTree(self))
   }
 
-  private def expectTraverseBody(stats: List[Stat], context: TemplateBodyContext = TemplateBodyContext()): Unit = {
+  private def expectTraverseBody(stats: List[Stat], context: TemplateBodyContext = TemplateBodyContext(javaScope = JavaTreeType.Class)): Unit = {
     doWrite(
       """ {
         |  /* BODY */

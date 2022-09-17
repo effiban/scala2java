@@ -9,8 +9,7 @@ import scala.meta.{Init, Template, Type}
 
 trait TemplateTraverser {
 
-  def traverse(template: Template,
-               context: TemplateContext = TemplateContext()): Unit
+  def traverse(template: Template, context: TemplateContext): Unit
 }
 
 private[traversers] class TemplateTraverserImpl(initListTraverser: => InitListTraverser,
@@ -27,12 +26,12 @@ private[traversers] class TemplateTraverserImpl(initListTraverser: => InitListTr
     Type.Name("Enumeration")
   )
 
-  def traverse(template: Template,
-               context: TemplateContext = TemplateContext()): Unit = {
+  def traverse(template: Template, context: TemplateContext): Unit = {
     val relevantInits = template.inits.filterNot(init => shouldSkipParent(init.tpe))
     traverseTemplateInits(relevantInits)
     selfTraverser.traverse(template.self)
     val bodyContext = TemplateBodyContext(
+      javaScope = context.javaScope,
       maybeClassName = context.maybeClassName,
       maybePrimaryCtor = context.maybePrimaryCtor,
       inits = relevantInits
