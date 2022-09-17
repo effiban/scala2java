@@ -3,7 +3,6 @@ package effiban.scala2java.traversers
 import effiban.scala2java.contexts.StatContext
 import effiban.scala2java.entities.JavaTreeType.Block
 import effiban.scala2java.entities.TraversalConstants.UnknownType
-import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.typeinference.TermTypeInferrer
 import effiban.scala2java.writers.JavaWriter
 
@@ -26,7 +25,7 @@ private[traversers] class DefnValOrVarTypeTraverserImpl(typeTraverser: => TypeTr
                         context: StatContext = StatContext()): Unit = {
     (maybeDeclType, maybeRhs) match {
       case (Some(declType), _) => typeTraverser.traverse(declType)
-      case (None, _) if javaScope == Block => write("var")
+      case (None, _) if context.javaScope == Block => write("var")
       case (None, Some(rhs)) => inferTypeIfPossible(rhs)
       case _ => handleUnknownType()
     }

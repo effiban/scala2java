@@ -65,7 +65,7 @@ class JavaAllowedModifiersResolverTest extends UnitTestSuite {
   private final val ExpectedParameterAllowedModifiers = Set[JavaModifier](JavaModifier.Final)
 
 
-  private val AllowedModifiersScenarios = Table(
+  private val AllowedModifiersScenarios = Table[JavaTreeType, JavaTreeType, Set[JavaModifier]](
     ("JavaTreeType", "JavaScope", "ExpectedAllowedModifiers"),
     (JavaTreeType.Class, JavaTreeType.Package, ExpectedOuterClassAllowedModifiers),
     (JavaTreeType.Class, JavaTreeType.Class, ExpectedInnerClassOfClassAllowedModifiers),

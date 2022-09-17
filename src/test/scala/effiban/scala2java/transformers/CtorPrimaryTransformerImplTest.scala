@@ -2,7 +2,6 @@ package effiban.scala2java.transformers
 
 import effiban.scala2java.contexts.CtorContext
 import effiban.scala2java.entities.JavaTreeType
-import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
 import org.mockito.ArgumentMatchers.any
@@ -34,8 +33,6 @@ class CtorPrimaryTransformerImplTest extends UnitTestSuite {
   private val ctorPrimaryTransformer = new CtorPrimaryTransformerImpl(ctorInitsToSuperCallTransformer)
 
   test("traverse() when has no params, no super call, no terms") {
-    javaScope = JavaTreeType.Class
-
     val primaryCtor = Ctor.Primary(
       mods = Modifiers,
       name = Name.Anonymous(),
@@ -61,8 +58,6 @@ class CtorPrimaryTransformerImplTest extends UnitTestSuite {
   }
 
   test("traverse() when has no params, no super call, but has terms") {
-    javaScope = JavaTreeType.Class
-
     val primaryCtor = Ctor.Primary(
       mods = Modifiers,
       name = Name.Anonymous(),
@@ -97,20 +92,11 @@ class CtorPrimaryTransformerImplTest extends UnitTestSuite {
   }
 
   test("traverse() when has no params and has super call") {
-    javaScope = JavaTreeType.Class
-
     val primaryCtor = Ctor.Primary(
       mods = Modifiers,
       name = Name.Anonymous(),
       paramss = Nil
     )
-
-    val inputInit =
-      Init(
-        tpe = Type.Name("MySuperClass"),
-        name = Name.Anonymous(),
-        argss = InitArgss
-      )
 
     val expectedSuperCall = Term.Apply(fun = Term.Name("super"), args = InitArgss.flatten)
 
@@ -136,8 +122,6 @@ class CtorPrimaryTransformerImplTest extends UnitTestSuite {
   }
 
   test("traverse() when has params and no super call") {
-    javaScope = JavaTreeType.Class
-
     val primaryCtor = Ctor.Primary(
       mods = Modifiers,
       name = Name.Anonymous(),
@@ -168,8 +152,6 @@ class CtorPrimaryTransformerImplTest extends UnitTestSuite {
   }
 
   test("traverse() when has params and super call") {
-    javaScope = JavaTreeType.Class
-
     val primaryCtor = Ctor.Primary(
       mods = Modifiers,
       name = Name.Anonymous(),

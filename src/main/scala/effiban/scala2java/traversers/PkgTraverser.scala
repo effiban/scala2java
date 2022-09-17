@@ -2,7 +2,6 @@ package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.StatContext
 import effiban.scala2java.entities.JavaTreeType
-import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Pkg
@@ -21,10 +20,7 @@ private[traversers] class PkgTraverserImpl(termRefTraverser: => TermRefTraverser
     writeStatementEnd()
     writeLine()
 
-    val outerJavaScope = javaScope
-    javaScope = JavaTreeType.Package
     // TODO handle specific scenarios  of multiple top-level definitions which are illegal in Java (such as 2 public classes in the same file)
-    pkg.stats.foreach(stat => statTraverser.traverse(stat, StatContext(javaScope)))
-    javaScope = outerJavaScope
+    pkg.stats.foreach(stat => statTraverser.traverse(stat, StatContext(JavaTreeType.Package)))
   }
 }

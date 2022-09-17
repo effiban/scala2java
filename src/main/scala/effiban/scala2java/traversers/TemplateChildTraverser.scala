@@ -2,7 +2,6 @@ package effiban.scala2java.traversers
 
 import effiban.scala2java.classifiers.{DefnValClassifier, JavaStatClassifier}
 import effiban.scala2java.contexts.{CtorContext, StatContext, TemplateChildContext}
-import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.{Ctor, Defn, Stat, Tree, Type}
@@ -24,7 +23,7 @@ private[traversers] class TemplateChildTraverserImpl(ctorPrimaryTraverser: => Ct
   override def traverse(child: Tree, context: TemplateChildContext): Unit = child match {
     case primaryCtor: Ctor.Primary => traversePrimaryCtor(primaryCtor, context)
     case secondaryCtor: Ctor.Secondary => traverseSecondaryCtor(secondaryCtor, context)
-    case defnVal: Defn.Val if defnValClassifier.isEnumConstantList(defnVal, javaScope) =>
+    case defnVal: Defn.Val if defnValClassifier.isEnumConstantList(defnVal, context.javaScope) =>
       enumConstantListTraverser.traverse(defnVal)
       writeStatementEnd()
     case stat: Stat => traverseNonConstructorStat(stat, context)

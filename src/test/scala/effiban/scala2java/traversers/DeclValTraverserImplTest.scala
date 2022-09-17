@@ -1,8 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{JavaModifiersContext, StatContext}
-import effiban.scala2java.entities.JavaTreeType.Interface
-import effiban.scala2java.entities.TraversalContext.javaScope
+import effiban.scala2java.entities.JavaTreeType.{Interface, JavaTreeType}
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
@@ -38,7 +37,7 @@ class DeclValTraverserImplTest extends UnitTestSuite {
 
 
   test("traverse() when it is a class member") {
-    javaScope = JavaTreeType.Class
+    val javaScope = JavaTreeType.Class
 
     val modifiers = List(TheAnnot)
 
@@ -52,7 +51,7 @@ class DeclValTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(mods = eqTreeList(modifiers), onSameLine = ArgumentMatchers.eq(false))
-    whenResolveJavaModifiers(declVal, modifiers).thenReturn(JavaPrivateFinalModifiers)
+    whenResolveJavaModifiers(declVal, modifiers, javaScope).thenReturn(JavaPrivateFinalModifiers)
     doWrite("int").when(typeTraverser).traverse(eqTree(IntType))
     doWrite("myVal").when(patListTraverser).traverse(eqTreeList(List(MyValPat)))
 
@@ -64,7 +63,7 @@ class DeclValTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() when it is an interface member") {
-    javaScope = Interface
+    val javaScope = Interface
 
     val modifiers = List(TheAnnot)
 
@@ -78,7 +77,7 @@ class DeclValTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(mods = eqTreeList(modifiers), onSameLine = ArgumentMatchers.eq(false))
-    whenResolveJavaModifiers(declVal, modifiers).thenReturn(List.empty)
+    whenResolveJavaModifiers(declVal, modifiers, javaScope).thenReturn(List.empty)
     doWrite("int").when(typeTraverser).traverse(eqTree(IntType))
     doWrite("myVal").when(patListTraverser).traverse(eqTreeList(List(MyValPat)))
 
@@ -89,7 +88,7 @@ class DeclValTraverserImplTest extends UnitTestSuite {
         |int myVal""".stripMargin
   }
 
-  private def whenResolveJavaModifiers(declVal: Decl.Val, modifiers: List[Mod]) = {
+  private def whenResolveJavaModifiers(declVal: Decl.Val, modifiers: List[Mod], javaScope: JavaTreeType) = {
     val expectedJavaModifiersContext = JavaModifiersContext(declVal, modifiers, JavaTreeType.Variable, javaScope)
     when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedJavaModifiersContext)))
   }

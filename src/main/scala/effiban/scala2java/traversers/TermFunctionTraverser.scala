@@ -3,7 +3,6 @@ package effiban.scala2java.traversers
 import effiban.scala2java.contexts.{BlockContext, StatContext}
 import effiban.scala2java.entities.Decision.{Decision, Uncertain}
 import effiban.scala2java.entities.JavaTreeType.Lambda
-import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term
@@ -23,8 +22,6 @@ private[traversers] class TermFunctionTraverserImpl(termParamTraverser: => TermP
 
   // lambda definition
   override def traverse(function: Term.Function, shouldBodyReturnValue: Decision = Uncertain): Unit = {
-    val outerJavaScope = javaScope
-    javaScope = Lambda
     val context = StatContext(Lambda)
     function.params match {
       case param :: Nil => termParamTraverser.traverse(termParam = param, context = context)
@@ -38,6 +35,5 @@ private[traversers] class TermFunctionTraverserImpl(termParamTraverser: => TermP
       case Block(stat :: Nil) => statTraverser.traverse(stat)
       case stat => statTraverser.traverse(stat)
     }
-    javaScope = outerJavaScope
   }
 }

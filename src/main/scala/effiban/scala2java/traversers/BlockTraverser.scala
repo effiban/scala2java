@@ -2,8 +2,6 @@ package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.BlockContext
 import effiban.scala2java.entities.Decision.Decision
-import effiban.scala2java.entities.JavaTreeType
-import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Stat
@@ -33,9 +31,6 @@ private[traversers] class BlockTraverserImpl(initTraverser: => InitTraverser,
   private def traverseBlock(block: Block, context: BlockContext): Unit = {
     import context._
 
-    val origJavaScope = javaScope
-    javaScope = JavaTreeType.Block
-
     writeBlockStart()
     maybeInit.foreach(init => {
       initTraverser.traverse(init)
@@ -43,8 +38,6 @@ private[traversers] class BlockTraverserImpl(initTraverser: => InitTraverser,
     })
     traverseContents(block, shouldReturnValue)
     writeBlockEnd()
-
-    javaScope = origJavaScope
   }
 
   private def traverseContents(block: Block, shouldReturnValue: Decision): Unit = {

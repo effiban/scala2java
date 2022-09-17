@@ -2,7 +2,6 @@ package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{TemplateBodyContext, TemplateContext}
 import effiban.scala2java.entities.JavaTreeType.JavaTreeType
-import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{JavaKeyword, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.TemplateBodyContextMatcher.eqTemplateBodyContext
@@ -102,8 +101,6 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     expectWriteInits(JavaTreeType.Class)
     expectTraverseBody(stats = Nil, context = TemplateBodyContext(javaScope = JavaTreeType.Class, inits = TheNonSkippedInits))
 
-    javaScope = JavaTreeType.Class
-
     templateTraverser.traverse(template, context = TemplateContext(javaScope = JavaTreeType.Class))
 
     outputWriter.toString shouldBe
@@ -124,8 +121,6 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     expectWriteSelf()
     expectWriteInits(JavaTreeType.Class)
     expectTraverseBody(stats = Nil, context = TemplateBodyContext(javaScope = JavaTreeType.Class, inits = TheNonSkippedInits))
-
-    javaScope = JavaTreeType.Class
 
     templateTraverser.traverse(template, context = TemplateContext(javaScope = JavaTreeType.Class))
 
@@ -238,8 +233,6 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       maybePrimaryCtor = Some(PrimaryCtor),
       inits = TheNonSkippedInits)
     )
-
-    javaScope = JavaTreeType.Class
 
     templateTraverser.traverse(template = template, context = context)
 

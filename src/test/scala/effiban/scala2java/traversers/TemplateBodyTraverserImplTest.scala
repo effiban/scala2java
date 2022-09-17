@@ -3,7 +3,6 @@ package effiban.scala2java.traversers
 import effiban.scala2java.classifiers.DefnTypeClassifier
 import effiban.scala2java.contexts.{TemplateBodyContext, TemplateChildContext}
 import effiban.scala2java.entities.JavaTreeType
-import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.matchers.TemplateChildContextMatcher.eqTemplateChildContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.orderings.JavaTemplateChildOrdering
@@ -185,7 +184,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
     expectWriteDataMemberDecl()
     expectWriteDataMemberDefn()
     expectWriteMethodDefn()
-    when(defnTypeClassifier.isEnumTypeDef(eqTree(TypeDefn), ArgumentMatchers.eq(javaScope))).thenReturn(false)
+    when(defnTypeClassifier.isEnumTypeDef(eqTree(TypeDefn), ArgumentMatchers.eq(JavaTreeType.Class))).thenReturn(false)
     expectWriteTypeDefn()
 
     expectChildOrdering()
@@ -217,7 +216,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
     expectWriteDataMemberDecl()
     expectWriteDataMemberDefn()
     expectWriteMethodDefn()
-    when(defnTypeClassifier.isEnumTypeDef(eqTree(TypeDefn), ArgumentMatchers.eq(javaScope))).thenReturn(true)
+    when(defnTypeClassifier.isEnumTypeDef(eqTree(TypeDefn), ArgumentMatchers.eq(JavaTreeType.Class))).thenReturn(true)
 
     expectChildOrdering()
 
@@ -256,8 +255,6 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
     expectWriteMethodDefn(ChildContextWithClassNameAndNoCtorTerms)
 
     expectChildOrdering()
-
-    javaScope = JavaTreeType.Class
 
     templateBodyTraverser.traverse(stats = stats, context = context)
 
@@ -309,8 +306,6 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
     expectWriteMethodDefn(expectedChildContext)
 
     expectChildOrdering()
-
-    javaScope = JavaTreeType.Class
 
     templateBodyTraverser.traverse(stats = stats, context = context)
 

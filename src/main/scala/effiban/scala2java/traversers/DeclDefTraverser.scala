@@ -2,8 +2,7 @@ package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{JavaModifiersContext, StatContext}
 import effiban.scala2java.entities.JavaTreeType
-import effiban.scala2java.entities.JavaTreeType.Method
-import effiban.scala2java.entities.TraversalContext.javaScope
+import effiban.scala2java.entities.JavaTreeType.{JavaTreeType, Method}
 import effiban.scala2java.resolvers.JavaModifiersResolver
 import effiban.scala2java.writers.JavaWriter
 
@@ -26,24 +25,21 @@ private[traversers] class DeclDefTraverserImpl(annotListTraverser: => AnnotListT
   override def traverse(defDecl: Decl.Def, context: StatContext = StatContext()): Unit = {
     writeLine()
     annotListTraverser.traverseMods(defDecl.mods)
-    writeModifiers(resolveJavaModifiers(defDecl))
+    writeModifiers(resolveJavaModifiers(defDecl, context.javaScope))
     traverseTypeParams(defDecl.tparams)
     typeTraverser.traverse(defDecl.decltpe)
     write(" ")
     termNameTraverser.traverse(defDecl.name)
 
-    val outerJavaScope = javaScope
-    javaScope = Method
     termParamListTraverser.traverse(termParams = defDecl.paramss.flatten, context = StatContext(Method))
-    javaScope = outerJavaScope
   }
 
-  private def resolveJavaModifiers(defDecl: Decl.Def) = {
+  private def resolveJavaModifiers(defDecl: Decl.Def, parentJavaScope: JavaTreeType) = {
     val javaModifiersContext = JavaModifiersContext(
       scalaTree = defDecl,
       scalaMods = defDecl.mods,
       javaTreeType = JavaTreeType.Method,
-      javaScope = javaScope
+      javaScope = parentJavaScope
     )
     javaModifiersResolver.resolve(javaModifiersContext)
   }

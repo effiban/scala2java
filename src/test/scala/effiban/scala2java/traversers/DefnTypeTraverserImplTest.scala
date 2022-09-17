@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, StatContext}
-import effiban.scala2java.entities.TraversalContext.javaScope
+import effiban.scala2java.entities.JavaTreeType.JavaTreeType
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
@@ -51,6 +51,8 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
 
 
   test("traverse() when has body and no bounds") {
+    val javaScope = JavaTreeType.Class
+
     val defnType = Defn.Type(
       mods = Modifiers,
       name = MyType,
@@ -59,7 +61,7 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
     )
 
     whenResolveJavaTreeTypeThenReturnInterface(defnType)
-    whenResolveJavaModifiersThenReturnPrivate(defnType)
+    whenResolveJavaModifiersThenReturnPrivate(defnType, javaScope)
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     doWrite("MyOtherType").when(typeTraverser).traverse(eqTree(MyOtherType))
 
@@ -72,6 +74,8 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() when has no body and has upper bound") {
+    val javaScope = JavaTreeType.Class
+
     val bounds = Bounds(lo = None, hi = Some(MyOtherType))
     val defnType = Defn.Type(
       mods = Modifiers,
@@ -82,7 +86,7 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
     )
 
     whenResolveJavaTreeTypeThenReturnInterface(defnType)
-    whenResolveJavaModifiersThenReturnPrivate(defnType)
+    whenResolveJavaModifiersThenReturnPrivate(defnType, javaScope)
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     doWrite("extends MyOtherType").when(typeBoundsTraverser).traverse(eqTree(bounds))
 
@@ -99,7 +103,7 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
     when(javaTreeTypeResolver.resolve(eqJavaTreeTypeContext(expectedJavaTreeTypeContext))).thenReturn(JavaTreeType.Interface)
   }
 
-  private def whenResolveJavaModifiersThenReturnPrivate(defnType: Defn.Type): Unit = {
+  private def whenResolveJavaModifiersThenReturnPrivate(defnType: Defn.Type, javaScope: JavaTreeType): Unit = {
     val expectedJavModifiersContext = JavaModifiersContext(defnType, Modifiers, JavaTreeType.Interface, javaScope)
     when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedJavModifiersContext))).thenReturn(List(JavaModifier.Private))
   }

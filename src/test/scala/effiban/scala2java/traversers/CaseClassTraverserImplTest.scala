@@ -1,7 +1,6 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, StatContext, TemplateContext}
-import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
@@ -117,7 +116,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       eqTree(TheTemplate),
       eqTemplateContext(TemplateContext(javaScope = JavaTreeType.Class, maybeClassName = Some(ClassName))))
 
-    classTraverser.traverse(cls, StatContext(javaScope))
+    classTraverser.traverse(cls, StatContext(JavaTreeType.Package))
 
     outputWriter.toString shouldBe
       """
@@ -175,7 +174,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       eqTemplateContext(TemplateContext(javaScope = JavaTreeType.Class, maybeClassName = Some(ClassName), maybePrimaryCtor = Some(primaryCtor)))
     )
 
-    classTraverser.traverse(cls, StatContext(javaScope))
+    classTraverser.traverse(cls, StatContext(JavaTreeType.Package))
 
     outputWriter.toString shouldBe
       """
@@ -225,7 +224,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       eqTree(TheTemplate),
       eqTemplateContext(TemplateContext(javaScope = JavaTreeType.Class, maybeClassName = Some(ClassName))))
 
-    classTraverser.traverse(cls, StatContext(javaScope))
+    classTraverser.traverse(cls, StatContext(JavaTreeType.Package))
 
     outputWriter.toString shouldBe
       """
@@ -246,7 +245,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
   }
 
   private def whenResolveJavaModifiersThenReturnPublic(cls: Defn.Class, modifiers: List[Mod]): Unit = {
-    val expectedJavaModifiersContext = JavaModifiersContext(cls, modifiers, JavaTreeType.Class, javaScope)
+    val expectedJavaModifiersContext = JavaModifiersContext(cls, modifiers, JavaTreeType.Class, JavaTreeType.Package)
     when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedJavaModifiersContext))).thenReturn(List(JavaModifier.Public))
   }
 
