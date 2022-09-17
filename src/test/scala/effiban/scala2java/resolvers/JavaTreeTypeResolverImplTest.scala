@@ -9,7 +9,7 @@ import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.{PrimaryCtors, Selfs, Templates, TypeNames}
 import org.mockito.ArgumentMatchers.any
 
-import scala.meta.Term.Apply
+import scala.meta.Term.{Apply, Block}
 import scala.meta.Type.Bounds
 import scala.meta.{Decl, Defn, Import, Importee, Importer, Lit, Mod, Name, Pat, Pkg, Template, Term, Tree, Type}
 
@@ -32,6 +32,7 @@ class JavaTreeTypeResolverImplTest extends UnitTestSuite {
   private val TheDeclType = Decl.Type(Nil, Type.Name("MyType"), Nil, Bounds(None, None))
   private val TheDefnType = Defn.Type(Nil, Type.Name("MyType"), Nil, Type.Name("MyOtherType"))
   private val TheTermFunction = Term.Function(List(Term.Param(Nil, Term.Name("x"), None, None)), Apply(Term.Name("foo"), Nil))
+  private val TheBlock = Block(List(Term.Apply(Term.Name("foo"), Nil)))
   private val TheTermParam = Term.Param(Nil, Term.Name("x"), Some(TypeNames.Int), None)
 
   private val RegularResolverScenarios = Table(
@@ -46,6 +47,7 @@ class JavaTreeTypeResolverImplTest extends UnitTestSuite {
     ("Decl.Def", TheDeclDef, Nil, JavaTreeType.Method),
     ("Defn.Def", TheDefnDef, Nil, JavaTreeType.Method),
     ("Term.Function", TheTermFunction, Nil, JavaTreeType.Lambda),
+    ("Block", TheBlock, Nil, JavaTreeType.Block),
     ("Decl.Val", TheDeclVal, Nil, JavaTreeType.Variable),
     ("Defn.Val", TheDefnVal, Nil, JavaTreeType.Variable),
     ("Decl.Var", TheDeclVar, Nil, JavaTreeType.Variable),

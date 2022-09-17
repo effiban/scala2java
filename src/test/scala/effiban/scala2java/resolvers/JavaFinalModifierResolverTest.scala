@@ -13,28 +13,30 @@ class JavaFinalModifierResolverTest extends UnitTestSuite {
   private val TheDeclVal = Decl.Val(Nil, List(Pat.Var(Term.Name("x"))), TypeNames.Int)
   private val TheDefnVal = Defn.Val(Nil, List(Pat.Var(Term.Name("x"))), None, Lit.Int(3))
   private val TheDeclVar = Decl.Var(Nil, List(Pat.Var(Term.Name("x"))), TypeNames.Int)
+  private val TheDefnVar = Defn.Var(Nil, List(Pat.Var(Term.Name("x"))), Some(TypeNames.Int), Some(Lit.Int(3)))
   private val TheTermParam = Term.Param(Nil, Term.Name("myParam"), Some(TypeNames.Int), None)
 
 
   private val DeclValDesc = "Decl.Val"
   private val DefnValDesc = "Defn.Val"
   private val DeclVarDesc = "Decl.Var"
+  private val DefnVarDesc = "Defn.Var"
   private val TermParamDesc = "Term.Param"
 
   private val RequiresFinalScenarios = Table(
     ("ScalaTree", "ScalaTreeDesc", "JavaScope", "ExpectedResult"),
     (TheDeclVal, DeclValDesc, JavaTreeType.Class, true),
     (TheDeclVal, DeclValDesc, JavaTreeType.Interface, false),
-    (TheDeclVal, DeclValDesc, JavaTreeType.Method, true),
-    (TheDeclVal, DeclValDesc, JavaTreeType.Lambda, true),
+    (TheDeclVal, DeclValDesc, JavaTreeType.Block, true),
     (TheDefnVal, DefnValDesc, JavaTreeType.Class, true),
     (TheDefnVal, DefnValDesc, JavaTreeType.Interface, false),
-    (TheDefnVal, DefnValDesc, JavaTreeType.Method, true),
-    (TheDefnVal, DefnValDesc, JavaTreeType.Lambda, true),
+    (TheDefnVal, DefnValDesc, JavaTreeType.Block, true),
     (TheDeclVar, DeclVarDesc, JavaTreeType.Class, false),
     (TheDeclVar, DeclVarDesc, JavaTreeType.Interface, false),
-    (TheDeclVar, DeclVarDesc, JavaTreeType.Method, false),
-    (TheDeclVar, DeclVarDesc, JavaTreeType.Lambda, false),
+    (TheDeclVar, DeclVarDesc, JavaTreeType.Block, false),
+    (TheDefnVar, DefnVarDesc, JavaTreeType.Class, false),
+    (TheDefnVar, DefnVarDesc, JavaTreeType.Interface, false),
+    (TheDefnVar, DefnVarDesc, JavaTreeType.Block, false),
     (TheTermParam, TermParamDesc, JavaTreeType.Class, true),
     (TheTermParam, TermParamDesc, JavaTreeType.Method, true),
     (TheTermParam, TermParamDesc, JavaTreeType.Lambda, false),
