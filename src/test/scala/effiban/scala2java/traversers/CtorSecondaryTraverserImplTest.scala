@@ -1,6 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{CtorContext, DefnDefContext}
+import effiban.scala2java.entities.JavaTreeType
 import effiban.scala2java.entities.JavaTreeType.Unknown
 import effiban.scala2java.matchers.CtorContextMatcher.eqCtorContext
 import effiban.scala2java.matchers.DefnDefContextMatcher.eqDefnDefContext
@@ -20,7 +21,11 @@ class CtorSecondaryTraverserImplTest extends UnitTestSuite {
     Init(tpe = Type.Name("Parent2"), name = Name.Anonymous(), argss = List())
   )
 
-  private val TheCtorContext = CtorContext(className = ClassName, inits = TheInits)
+  private val TheCtorContext = CtorContext(
+    javaScope = JavaTreeType.Class,
+    className = ClassName,
+    inits = TheInits
+  )
 
   private val CtorArgs = List(
     termParam("arg1", "Int"),

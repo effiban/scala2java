@@ -51,9 +51,11 @@ class CtorPrimaryTransformerImplTest extends UnitTestSuite {
       body = Block(Nil)
     )
 
+    val context = CtorContext(javaScope = JavaTreeType.Class, className = Type.Name(ClassName))
+
     when(ctorInitsToSuperCallTransformer.transform(any())).thenReturn(None)
 
-    val actualDefnDef = ctorPrimaryTransformer.transform(primaryCtor, CtorContext(Type.Name(ClassName)))
+    val actualDefnDef = ctorPrimaryTransformer.transform(primaryCtor, context)
 
     actualDefnDef.structure shouldBe expectedDefnDef.structure
   }
@@ -81,9 +83,15 @@ class CtorPrimaryTransformerImplTest extends UnitTestSuite {
       body = Block(terms)
     )
 
+    val context = CtorContext(
+      javaScope = JavaTreeType.Class,
+      className = Type.Name(ClassName),
+      terms = terms
+    )
+
     when(ctorInitsToSuperCallTransformer.transform(any())).thenReturn(None)
 
-    val actualDefnDef = ctorPrimaryTransformer.transform(primaryCtor, CtorContext(className = Type.Name(ClassName), terms = terms))
+    val actualDefnDef = ctorPrimaryTransformer.transform(primaryCtor, context)
 
     actualDefnDef.structure shouldBe expectedDefnDef.structure
   }
@@ -115,9 +123,14 @@ class CtorPrimaryTransformerImplTest extends UnitTestSuite {
       body = Block(List(expectedSuperCall))
     )
 
+    val context = CtorContext(
+      javaScope = JavaTreeType.Class,
+      className = Type.Name(ClassName)
+    )
+
     when(ctorInitsToSuperCallTransformer.transform(any())).thenReturn(Some(expectedSuperCall))
 
-    val actualDefnDef = ctorPrimaryTransformer.transform(primaryCtor, CtorContext(Type.Name(ClassName), List(inputInit)))
+    val actualDefnDef = ctorPrimaryTransformer.transform(primaryCtor, context)
 
     actualDefnDef.structure shouldBe expectedDefnDef.structure
   }
@@ -145,9 +158,11 @@ class CtorPrimaryTransformerImplTest extends UnitTestSuite {
       body = Block(expectedAssignments)
     )
 
+    val context = CtorContext(javaScope = JavaTreeType.Class, className = Type.Name(ClassName))
+
     when(ctorInitsToSuperCallTransformer.transform(any())).thenReturn(None)
 
-    val actualDefnDef = CtorPrimaryTransformer.transform(primaryCtor, CtorContext(Type.Name(ClassName)))
+    val actualDefnDef = CtorPrimaryTransformer.transform(primaryCtor, context)
 
     actualDefnDef.structure shouldBe expectedDefnDef.structure
   }
@@ -184,9 +199,15 @@ class CtorPrimaryTransformerImplTest extends UnitTestSuite {
       body = Block(expectedSuperCall :: expectedAssignments)
     )
 
+    val context = CtorContext(
+      javaScope = JavaTreeType.Class,
+      className = Type.Name(ClassName),
+      inits = List(inputInit)
+    )
+
     when(ctorInitsToSuperCallTransformer.transform(any())).thenReturn(Some(expectedSuperCall))
 
-    val actualDefnDef = CtorPrimaryTransformer.transform(primaryCtor, CtorContext(Type.Name(ClassName), List(inputInit)))
+    val actualDefnDef = CtorPrimaryTransformer.transform(primaryCtor, context)
 
     actualDefnDef.structure shouldBe expectedDefnDef.structure
   }

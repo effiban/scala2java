@@ -12,11 +12,11 @@ trait CtorSecondaryTransformer {
 
 object CtorSecondaryTransformer extends CtorSecondaryTransformer {
 
-  def transform(secondaryCtor: Secondary, ctorContext: CtorContext): Defn.Def = {
+  def transform(secondaryCtor: Secondary, context: CtorContext): Defn.Def = {
 
     Defn.Def(
       mods = secondaryCtor.mods,
-      name = Term.Name(ctorContext.className.value),
+      name = Term.Name(context.className.value),
       tparams = Nil,
       paramss = secondaryCtor.paramss,
       decltpe = Some(Type.AnonymousName()),

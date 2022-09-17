@@ -22,7 +22,15 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
     Init(tpe = Type.Name("Parent2"), name = Name.Anonymous(), argss = List())
   )
 
-  private val TheCtorContext = CtorContext(className = ClassName, inits = TheInits)
+  private val CtorContextWithClassName = CtorContext(
+    javaScope = JavaTreeType.Class,
+    className = ClassName,
+    inits = TheInits)
+
+  private val ChildContextWithClassName = TemplateChildContext(
+    javaScope = JavaTreeType.Class,
+    maybeClassName = Some(ClassName),
+    inits = TheInits)
 
   private val PrimaryCtorArgs = List(
     termParam("arg1", "Int"),
@@ -79,17 +87,14 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
     javaStatClassifier
   )
 
-  test("traverse() for primary ctor. with ctor. context") {
+  test("traverse() for primary ctor. when class name provided") {
     doWrite(
       """{
         |   /* PRIMARY CTOR */
         |}""".stripMargin)
-      .when(ctorPrimaryTraverser).traverse(primaryCtor = eqTree(PrimaryCtor), ctorContext = eqCtorContext(TheCtorContext))
+      .when(ctorPrimaryTraverser).traverse(primaryCtor = eqTree(PrimaryCtor), ctorContext = eqCtorContext(CtorContextWithClassName))
 
-    templateChildTraverser.traverse(
-      child = PrimaryCtor,
-      context = TemplateChildContext(javaScope = JavaTreeType.Class, maybeCtorContext = Some(TheCtorContext))
-    )
+    templateChildTraverser.traverse(child = PrimaryCtor, context = ChildContextWithClassName)
 
     outputWriter.toString shouldBe
       """{
@@ -97,23 +102,20 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
         |}""".stripMargin
   }
 
-  test("traverse() for primary ctor. without ctor. context should throw exception") {
+  test("traverse() for primary ctor. when class name not provided should throw exception") {
     intercept[IllegalStateException] {
       templateChildTraverser.traverse(child = PrimaryCtor, context = TemplateChildContext(javaScope = JavaTreeType.Class))
     }
   }
 
-  test("traverse() for secondary ctor. with ctor. context") {
+  test("traverse() for secondary ctor. when class name provided") {
     doWrite(
       """{
         |   /* SECONDARY CTOR */
         |}""".stripMargin)
-      .when(ctorSecondaryTraverser).traverse(secondaryCtor = eqTree(SecondaryCtor), ctorContext = eqCtorContext(TheCtorContext))
+      .when(ctorSecondaryTraverser).traverse(secondaryCtor = eqTree(SecondaryCtor), ctorContext = eqCtorContext(CtorContextWithClassName))
 
-    templateChildTraverser.traverse(
-      child = SecondaryCtor,
-      context = TemplateChildContext(javaScope = JavaTreeType.Class, maybeCtorContext = Some(TheCtorContext))
-    )
+    templateChildTraverser.traverse(child = SecondaryCtor, context = ChildContextWithClassName)
 
     outputWriter.toString shouldBe
       """{
