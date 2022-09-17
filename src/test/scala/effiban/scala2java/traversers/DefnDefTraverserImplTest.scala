@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{BlockContext, DefnDefContext, JavaModifiersContext, StatContext}
-import effiban.scala2java.entities.Decision.Yes
+import effiban.scala2java.entities.Decision.{Uncertain, Yes}
 import effiban.scala2java.entities.JavaTreeType.{Interface, JavaTreeType, Method}
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 import effiban.scala2java.matchers.BlockContextMatcher.eqBlockContext
@@ -282,7 +282,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin)
       .when(blockTraverser).traverse(stat = eqTree(Statement1),
-      context = eqBlockContext(BlockContext(shouldReturnValue = Yes))
+      context = eqBlockContext(BlockContext(shouldReturnValue = Uncertain))
     )
 
     defnDefTraverser.traverse(defnDef, DefnDefContext(javaScope = javaScope))

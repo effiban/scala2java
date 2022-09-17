@@ -7,6 +7,6 @@ public class Sample {
     }
 
     public /* UnknownType */ foo() {
-        return doSomething();
+        /* return? */doSomething();
     }
 }

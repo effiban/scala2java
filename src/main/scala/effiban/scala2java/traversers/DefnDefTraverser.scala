@@ -1,6 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{BlockContext, DefnDefContext, JavaModifiersContext, StatContext}
+import effiban.scala2java.entities.Decision.{No, Uncertain, Yes}
 import effiban.scala2java.entities.JavaTreeType
 import effiban.scala2java.entities.JavaTreeType.{JavaTreeType, Method}
 import effiban.scala2java.entities.TraversalConstants.UnknownType
@@ -31,23 +32,21 @@ private[traversers] class DefnDefTraverserImpl(annotListTraverser: => AnnotListT
     annotListTraverser.traverseMods(defnDef.mods)
     writeModifiers(resolveJavaModifiers(defnDef, context.javaScope))
     traverseTypeParams(defnDef.tparams)
-    traverseMethodType(defnDef)
+    val maybeMethodType = resolveMethodType(defnDef)
+    traverseMethodType(maybeMethodType)
     termNameTraverser.traverse(defnDef.name)
 
-    traverseMethodParamsAndBody(defnDef, context.maybeInit)
+    traverseMethodParamsAndBody(defnDef, maybeMethodType, context.maybeInit)
   }
 
-  private def traverseMethodParamsAndBody(defDef: Defn.Def, maybeInit: Option[Init] = None): Unit = {
+  private def traverseMethodParamsAndBody(defDef: Defn.Def, maybeMethodType: Option[Type], maybeInit: Option[Init] = None): Unit = {
     termParamListTraverser.traverse(termParams = defDef.paramss.flatten, context = StatContext(Method))
-    val withReturnValue = defDef.decltpe match {
-      case Some(Type.Name("Unit")) => false
-      case Some(Type.AnonymousName()) => false
-      case Some(_) => true
-      // Taking a "reasonable" chance here - if the Scala method has no declared type and inferred type is void,
-      // there will be an incorrect 'return' (as opposed to the opposite case when it would be missing)
-      case None => true
+    val shouldReturnValue = maybeMethodType match {
+      case Some(Type.Name("Unit") | Type.AnonymousName()) => No
+      case Some(_) => Yes
+      case None => Uncertain
     }
-    val blockContext = BlockContext(shouldReturnValue = withReturnValue, maybeInit = maybeInit)
+    val blockContext = BlockContext(shouldReturnValue = shouldReturnValue, maybeInit = maybeInit)
     blockTraverser.traverse(stat = defDef.body, context = blockContext)
   }
 
@@ -60,17 +59,21 @@ private[traversers] class DefnDefTraverserImpl(annotListTraverser: => AnnotListT
     }
   }
 
-  private def traverseMethodType(defnDef: Defn.Def): Unit = {
+  private def resolveMethodType(defnDef: Defn.Def) = {
     defnDef.decltpe match {
+      case Some(tpe) => Some(tpe)
+      case None => termTypeInferrer.infer(defnDef.body)
+    }
+  }
+
+  private def traverseMethodType(maybeType: Option[Type]): Unit = {
+    maybeType match {
       case Some(Type.AnonymousName()) =>
       case Some(tpe) =>
         typeTraverser.traverse(tpe)
         write(" ")
       case None =>
-        termTypeInferrer.infer(defnDef.body) match {
-          case Some(tpe) => typeTraverser.traverse(tpe)
-          case None => writeComment(UnknownType)
-        }
+        writeComment(UnknownType)
         write(" ")
     }
   }
