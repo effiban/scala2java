@@ -1,6 +1,6 @@
 package effiban.scala2java.resolvers
 
-import effiban.scala2java.entities.JavaTreeType.{Interface, JavaTreeType, Lambda, Method, Package, Parameter, Record, Variable}
+import effiban.scala2java.entities.JavaTreeType.{Block, Interface, JavaTreeType, Method, Package, Parameter, Record, Variable}
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 
 trait JavaAllowedModifiersResolver {
@@ -80,7 +80,7 @@ object JavaAllowedModifiersResolver extends JavaAllowedModifiersResolver {
       case (Method, theScope) if isClassLikeScope(theScope) => ClassMethodAllowedModifiers
       case (Method, Interface) => InterfaceMethodAllowedModifiers
       case (Variable, theScope) if isClassLikeScope(theScope) => ClassVariableAllowedModifiers
-      case (Variable, Method | Lambda) => LocalVariableAllowedModifiers
+      case (Variable, Block) => LocalVariableAllowedModifiers
       case (Parameter, _) => ParameterAllowedModifiers
       case _ => Set.empty
     }

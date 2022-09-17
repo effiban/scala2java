@@ -85,8 +85,7 @@ class JavaAllowedModifiersResolverTest extends UnitTestSuite {
     (JavaTreeType.Method, JavaTreeType.Interface, ExpectedInterfaceMethodAllowedModifiers),
     (JavaTreeType.Variable, JavaTreeType.Class, ExpectedClassVariableAllowedModifiers),
     (JavaTreeType.Variable, JavaTreeType.Interface, Set.empty),
-    (JavaTreeType.Variable, JavaTreeType.Method, ExpectedLocalVariableAllowedModifiers),
-    (JavaTreeType.Variable, JavaTreeType.Lambda, ExpectedLocalVariableAllowedModifiers),
+    (JavaTreeType.Variable, JavaTreeType.Block, ExpectedLocalVariableAllowedModifiers),
     (JavaTreeType.Parameter, JavaTreeType.Class, ExpectedParameterAllowedModifiers),
     (JavaTreeType.Parameter, JavaTreeType.Method, ExpectedParameterAllowedModifiers),
     (JavaTreeType.Parameter, JavaTreeType.Lambda, ExpectedParameterAllowedModifiers)

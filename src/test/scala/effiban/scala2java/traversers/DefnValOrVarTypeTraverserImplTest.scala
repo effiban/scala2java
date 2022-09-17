@@ -68,8 +68,8 @@ class DefnValOrVarTypeTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe "/* UnknownType */"
   }
 
-  test("traverse when has no declared type and JavaScope is Method - should write 'var'") {
-    javaScope = JavaTreeType.Method
+  test("traverse when has no declared type and JavaScope is Block - should write 'var'") {
+    javaScope = JavaTreeType.Block
 
     defnValOrVarTypeTraverser.traverse(
       maybeDeclType = None,
