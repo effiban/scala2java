@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.JavaModifiersContext
+import effiban.scala2java.contexts.{JavaModifiersContext, StatContext}
 import effiban.scala2java.entities.JavaTreeType.Method
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
@@ -16,6 +16,8 @@ import org.mockito.ArgumentMatchers
 import scala.meta.{Init, Mod, Name, Term, Type}
 
 class TermParamTraverserImplTest extends UnitTestSuite {
+
+  private val TheStatContext = StatContext(Method)
 
   private val TheAnnot = Mod.Annot(
     Init(tpe = Type.Name("MyAnnotation"), name = Name.Anonymous(), argss = List())
@@ -52,7 +54,7 @@ class TermParamTraverserImplTest extends UnitTestSuite {
     doWrite("int").when(typeTraverser).traverse(eqTree(TypeNames.Int))
     doWrite("myParam").when(nameTraverser).traverse(eqTree(ParamName))
 
-    termParamTraverser.traverse(termParam)
+    termParamTraverser.traverse(termParam, TheStatContext)
 
     outputWriter.toString shouldBe "@MyAnnotation final int myParam"
   }
@@ -74,7 +76,7 @@ class TermParamTraverserImplTest extends UnitTestSuite {
     whenResolveJavaModifiers(termParam, mods).thenReturn(Nil)
     doWrite("myParam").when(nameTraverser).traverse(eqTree(ParamName))
 
-    termParamTraverser.traverse(termParam)
+    termParamTraverser.traverse(termParam, TheStatContext)
 
     outputWriter.toString shouldBe "@MyAnnotation myParam"
   }

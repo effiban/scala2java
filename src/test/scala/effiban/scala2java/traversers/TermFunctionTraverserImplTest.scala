@@ -14,6 +14,9 @@ import scala.meta.Term.Block
 import scala.meta.{Lit, Name, Term}
 
 class TermFunctionTraverserImplTest extends UnitTestSuite {
+
+  private val LambdaStatContext = StatContext(Lambda)
+
   private val termParamTraverser = mock[TermParamTraverser]
   private val termParamListTraverser = mock[TermParamListTraverser]
   private val statTraverser = mock[StatTraverser]
@@ -32,7 +35,7 @@ class TermFunctionTraverserImplTest extends UnitTestSuite {
 
     doWrite("()").when(termParamListTraverser).traverse(
       termParams = ArgumentMatchers.eq(Nil),
-      context = ArgumentMatchers.eq(StatContext(Lambda)),
+      context = ArgumentMatchers.eq(LambdaStatContext),
       onSameLine = ArgumentMatchers.eq(true)
     )
     doWrite("doSomething();")
@@ -48,7 +51,8 @@ class TermFunctionTraverserImplTest extends UnitTestSuite {
     val functionBody = Term.Apply(Term.Name("doSomething"), List(Term.Name("val1")))
     val function = Term.Function(params = List(param), body = functionBody)
 
-    doWrite("val1").when(termParamTraverser).traverse(eqTree(param))
+    doWrite("val1")
+      .when(termParamTraverser).traverse(termParam = eqTree(param), context = ArgumentMatchers.eq(LambdaStatContext))
     doWrite("doSomething(val1);")
       .when(statTraverser).traverse(eqTree(functionBody), ArgumentMatchers.eq(StatContext()))
 
@@ -62,7 +66,8 @@ class TermFunctionTraverserImplTest extends UnitTestSuite {
     val bodyTerm = Term.Apply(Term.Name("doSomething"), List(Term.Name("val1")))
     val function = Term.Function(params = List(param), body = Block(List(bodyTerm)))
 
-    doWrite("val1").when(termParamTraverser).traverse(eqTree(param))
+    doWrite("val1")
+      .when(termParamTraverser).traverse(termParam = eqTree(param), context = ArgumentMatchers.eq(LambdaStatContext))
     doWrite("doSomething(val1);")
       .when(statTraverser).traverse(eqTree(bodyTerm), ArgumentMatchers.eq(StatContext()))
 
@@ -99,7 +104,8 @@ class TermFunctionTraverserImplTest extends UnitTestSuite {
     )
     val function = Term.Function(params = List(param), body = functionBody)
 
-    doWrite("val1").when(termParamTraverser).traverse(eqTree(param))
+    doWrite("val1")
+      .when(termParamTraverser).traverse(termParam = eqTree(param), context = ArgumentMatchers.eq(LambdaStatContext))
     doWrite(
       """ {
         |  /* BODY */
@@ -126,7 +132,8 @@ class TermFunctionTraverserImplTest extends UnitTestSuite {
     )
     val function = Term.Function(params = List(param), body = functionBody)
 
-    doWrite("val1").when(termParamTraverser).traverse(eqTree(param))
+    doWrite("val1")
+      .when(termParamTraverser).traverse(termParam = eqTree(param), context = ArgumentMatchers.eq(LambdaStatContext))
     doWrite(
       """ {
         |  /* BODY */
