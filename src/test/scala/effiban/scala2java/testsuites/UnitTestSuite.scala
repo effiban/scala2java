@@ -1,7 +1,5 @@
 package effiban.scala2java.testsuites
 
-import effiban.scala2java.entities.JavaTreeType.Unknown
-import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.testwriters.TestJavaWriter
 import effiban.scala2java.writers.JavaWriter
 import org.mockito.MockitoSugar
@@ -22,9 +20,4 @@ class UnitTestSuite extends AnyFunSuite
 
   implicit protected val outputWriter: StringWriter = new StringWriter()
   implicit protected val javaWriter: JavaWriter = new TestJavaWriter(outputWriter)
-
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    javaScope = Unknown
-  }
 }

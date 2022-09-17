@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, StatContext, TemplateContext}
-import effiban.scala2java.entities.TraversalContext.javaScope
+import effiban.scala2java.entities.JavaTreeType.JavaTreeType
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
@@ -92,6 +92,8 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
 
 
   test("traverse() for one list of ctor args") {
+    val parentJavaScope = JavaTreeType.Package
+
     val primaryCtor = Ctor.Primary(
       mods = Nil,
       name = Name.Anonymous(),
@@ -114,7 +116,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
     whenResolveJavaTreeTypeThenReturnClass(cls)
-    whenResolveJavaModifiersThenReturnPublic(cls)
+    whenResolveJavaModifiersThenReturnPublic(cls, parentJavaScope)
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
 
     when(paramToDeclValTransformer.transform(any[Term.Param])).thenAnswer( (ctorArg: Term.Param) => ctorArg match {
@@ -132,7 +134,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       eqTemplateContext(TemplateContext(javaScope = JavaTreeType.Class, maybeClassName = Some(ClassName), maybePrimaryCtor = Some(primaryCtor)))
     )
 
-    classTraverser.traverse(cls, StatContext(javaScope))
+    classTraverser.traverse(cls, StatContext(parentJavaScope))
 
     outputWriter.toString shouldBe
       """
@@ -144,6 +146,8 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for two lists of ctor args") {
+    val parentJavaScope = JavaTreeType.Package
+
     val primaryCtor = Ctor.Primary(
       mods = Nil,
       name = Name.Anonymous(),
@@ -174,7 +178,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
     whenResolveJavaTreeTypeThenReturnClass(cls)
-    whenResolveJavaModifiersThenReturnPublic(cls)
+    whenResolveJavaModifiersThenReturnPublic(cls, parentJavaScope)
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
 
     when(paramToDeclValTransformer.transform(any[Term.Param])).thenAnswer( (ctorArg: Term.Param) => ctorArg match {
@@ -194,7 +198,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       eqTemplateContext(TemplateContext(javaScope = JavaTreeType.Class, maybeClassName = Some(ClassName), maybePrimaryCtor = Some(primaryCtor)))
     )
 
-    classTraverser.traverse(cls, StatContext(javaScope))
+    classTraverser.traverse(cls, StatContext(parentJavaScope))
 
     outputWriter.toString shouldBe
       """
@@ -227,8 +231,8 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
     when(javaTreeTypeResolver.resolve(eqJavaTreeTypeContext(expectedContext))).thenReturn(JavaTreeType.Class)
   }
 
-  private def whenResolveJavaModifiersThenReturnPublic(cls: Defn.Class): Unit = {
-    val expectedContext = JavaModifiersContext(cls, Modifiers, JavaTreeType.Class, javaScope)
+  private def whenResolveJavaModifiersThenReturnPublic(cls: Defn.Class, parentJavaScope: JavaTreeType): Unit = {
+    val expectedContext = JavaModifiersContext(cls, Modifiers, JavaTreeType.Class, parentJavaScope)
     when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedContext))).thenReturn(List(JavaModifier.Public))
   }
 }

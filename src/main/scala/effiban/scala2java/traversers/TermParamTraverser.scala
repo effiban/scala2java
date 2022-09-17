@@ -2,7 +2,7 @@ package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{JavaModifiersContext, StatContext}
 import effiban.scala2java.entities.JavaTreeType
-import effiban.scala2java.entities.TraversalContext.javaScope
+import effiban.scala2java.entities.JavaTreeType.JavaTreeType
 import effiban.scala2java.resolvers.JavaModifiersResolver
 import effiban.scala2java.writers.JavaWriter
 
@@ -25,7 +25,7 @@ private[traversers] class TermParamTraverserImpl(annotListTraverser: => AnnotLis
   // but that aspect will be handled by one of the parent traversers before this one is called
   override def traverse(termParam: Term.Param, context: StatContext): Unit = {
     annotListTraverser.traverseMods(termParam.mods, onSameLine = true)
-    writeModifiers(resolveJavaModifiers(termParam))
+    writeModifiers(resolveJavaModifiers(termParam, context.javaScope))
     termParam.decltpe.foreach(declType => {
       typeTraverser.traverse(declType)
       write(" ")
@@ -34,12 +34,12 @@ private[traversers] class TermParamTraverserImpl(annotListTraverser: => AnnotLis
     // TODO handle 'default'
   }
 
-  private def resolveJavaModifiers(termParam: Term.Param) = {
+  private def resolveJavaModifiers(termParam: Term.Param, parentJavaScope: JavaTreeType) = {
     val context = JavaModifiersContext(
       scalaTree = termParam,
       scalaMods = termParam.mods,
       javaTreeType = JavaTreeType.Parameter,
-      javaScope = javaScope
+      javaScope = parentJavaScope
     )
     javaModifiersResolver.resolve(context)
   }

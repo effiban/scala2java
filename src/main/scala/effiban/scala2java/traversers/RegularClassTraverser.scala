@@ -2,7 +2,6 @@ package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, StatContext, TemplateContext}
 import effiban.scala2java.entities.JavaTreeType.JavaTreeType
-import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{JavaTreeTypeToKeywordMapping, JavaTreeTypeToScopeMapping}
 import effiban.scala2java.resolvers.{JavaModifiersResolver, JavaTreeTypeResolver}
 import effiban.scala2java.transformers.ParamToDeclValTransformer
@@ -27,12 +26,10 @@ private[traversers] class RegularClassTraverserImpl(annotListTraverser: => Annot
     writeLine()
     annotListTraverser.traverseMods(classDef.mods)
     val javaTreeType = javaTreeTypeResolver.resolve(JavaTreeTypeContext(classDef, classDef.mods))
-    writeTypeDeclaration(modifiers = resolveJavaModifiers(classDef, javaTreeType),
+    writeTypeDeclaration(modifiers = resolveJavaModifiers(classDef, javaTreeType, context.javaScope),
       typeKeyword = JavaTreeTypeToKeywordMapping(javaTreeType),
       name = classDef.name.value)
     typeParamListTraverser.traverse(classDef.tparams)
-    val outerJavaScope = javaScope
-    javaScope = JavaTreeTypeToScopeMapping(javaTreeType)
     val explicitMemberDecls = classDef.ctor.paramss.flatten.map(x =>
       paramToDeclValTransformer.transform(x)
     )
@@ -45,15 +42,16 @@ private[traversers] class RegularClassTraverserImpl(annotListTraverser: => Annot
       maybePrimaryCtor = Some(classDef.ctor)
     )
     templateTraverser.traverse(template = enrichedTemplate, context = templateContext)
-    javaScope = outerJavaScope
   }
 
-  private def resolveJavaModifiers(classDef: Defn.Class, javaTreeType: JavaTreeType) = {
+  private def resolveJavaModifiers(classDef: Defn.Class,
+                                   javaTreeType: JavaTreeType,
+                                   parentJavaScope: JavaTreeType) = {
     val javaModifiersContext = JavaModifiersContext(
       scalaTree = classDef,
       scalaMods = classDef.mods,
       javaTreeType = javaTreeType,
-      javaScope = javaScope
+      javaScope = parentJavaScope
     )
     javaModifiersResolver.resolve(javaModifiersContext)
   }

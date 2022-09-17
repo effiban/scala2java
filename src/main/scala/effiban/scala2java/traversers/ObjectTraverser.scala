@@ -2,7 +2,6 @@ package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, StatContext, TemplateContext}
 import effiban.scala2java.entities.JavaTreeType.JavaTreeType
-import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{JavaTreeTypeToKeywordMapping, JavaTreeTypeToScopeMapping}
 import effiban.scala2java.resolvers.{JavaModifiersResolver, JavaTreeTypeResolver}
 import effiban.scala2java.writers.JavaWriter
@@ -27,21 +26,20 @@ private[traversers] class ObjectTraverserImpl(annotListTraverser: => AnnotListTr
     writeLine()
     annotListTraverser.traverseMods(objectDef.mods)
     val javaTreeType = javaTreeTypeResolver.resolve(JavaTreeTypeContext(objectDef, objectDef.mods))
-    writeTypeDeclaration(modifiers = resolveJavaModifiers(objectDef, javaTreeType),
+    writeTypeDeclaration(modifiers = resolveJavaModifiers(objectDef, javaTreeType, context.javaScope),
       typeKeyword = JavaTreeTypeToKeywordMapping(javaTreeType),
       name = s"${objectDef.name.toString}")
-    val outerJavaScope = javaScope
-    javaScope = JavaTreeTypeToScopeMapping(javaTreeType)
     templateTraverser.traverse(objectDef.templ, TemplateContext(javaScope = JavaTreeTypeToScopeMapping(javaTreeType)))
-    javaScope = outerJavaScope
   }
 
-  private def resolveJavaModifiers(objectDef: Defn.Object, javaTreeType: JavaTreeType) = {
+  private def resolveJavaModifiers(objectDef: Defn.Object,
+                                   javaTreeType: JavaTreeType,
+                                   parentJavaScope: JavaTreeType) = {
     val javaModifiersContext = JavaModifiersContext(
       scalaTree = objectDef,
       scalaMods = objectDef.mods,
       javaTreeType = javaTreeType,
-      javaScope = javaScope
+      javaScope = parentJavaScope
     )
     javaModifiersResolver.resolve(javaModifiersContext)
   }

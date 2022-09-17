@@ -3,7 +3,6 @@ package effiban.scala2java.traversers
 import effiban.scala2java.classifiers.{DefnValClassifier, JavaStatClassifier}
 import effiban.scala2java.contexts.{CtorContext, StatContext, TemplateChildContext}
 import effiban.scala2java.entities.JavaTreeType
-import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.matchers.CtorContextMatcher.eqCtorContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
@@ -131,7 +130,7 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
 
   test("traverse() for Defn.Val which is not an enum constant list, and requires end delimiter") {
 
-    when(defnValClassifier.isEnumConstantList(eqTree(TheDefnVal), ArgumentMatchers.eq(javaScope))).thenReturn(false)
+    when(defnValClassifier.isEnumConstantList(eqTree(TheDefnVal), ArgumentMatchers.eq(JavaTreeType.Class))).thenReturn(false)
     doWrite("/* DATA MEMBER DEFINITION */")
       .when(statTraverser).traverse(eqTree(TheDefnVal), ArgumentMatchers.eq(StatContext(JavaTreeType.Class)))
     when(javaStatClassifier.requiresEndDelimiter(eqTree(TheDefnVal))).thenReturn(true)
@@ -145,7 +144,7 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
 
   test("traverse() for Defn.Val which is an enum constant list") {
 
-    when(defnValClassifier.isEnumConstantList(eqTree(TheDefnVal), ArgumentMatchers.eq(javaScope))).thenReturn(true)
+    when(defnValClassifier.isEnumConstantList(eqTree(TheDefnVal), ArgumentMatchers.eq(JavaTreeType.Class))).thenReturn(true)
     doWrite("/* ENUM CONSTANTS */".stripMargin).when(enumConstantListTraverser).traverse(eqTree(TheDefnVal))
     when(javaStatClassifier.requiresEndDelimiter(eqTree(TheDefnVal))).thenReturn(true)
 

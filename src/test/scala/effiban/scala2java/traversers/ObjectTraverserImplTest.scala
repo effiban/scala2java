@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, StatContext, TemplateContext}
-import effiban.scala2java.entities.TraversalContext.javaScope
+import effiban.scala2java.entities.JavaTreeType.JavaTreeType
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
@@ -35,6 +35,8 @@ class ObjectTraverserImplTest extends UnitTestSuite {
 
 
   test("traverse()") {
+    val parentJavaScope = JavaTreeType.Package
+
     val modifiers: List[Mod] = List(
       Mod.Annot(
         Init(tpe = Type.Name(AnnotationName), name = Name.Anonymous(), argss = List())
@@ -68,7 +70,7 @@ class ObjectTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(mods = eqTreeList(modifiers), onSameLine = ArgumentMatchers.eq(false))
     whenResolveJavaTreeTypeThenReturnClass(objectDef, modifiers)
-    whenResolveJavaModifiersThenReturnPublic(objectDef, modifiers)
+    whenResolveJavaModifiersThenReturnPublic(objectDef, modifiers, parentJavaScope)
     doWrite(
       """ {
         |  /* BODY */
@@ -76,7 +78,7 @@ class ObjectTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(templateTraverser).traverse(eqTree(template), eqTemplateContext(TemplateContext(javaScope = JavaTreeType.Class)))
 
-    objectTraverser.traverse(objectDef, StatContext(javaScope))
+    objectTraverser.traverse(objectDef, StatContext(parentJavaScope))
 
     outputWriter.toString shouldBe
       """
@@ -97,8 +99,8 @@ class ObjectTraverserImplTest extends UnitTestSuite {
     when(javaTreeTypeResolver.resolve(eqJavaTreeTypeContext(expectedJavaTreeTypeContext))).thenReturn(JavaTreeType.Class)
   }
 
-  private def whenResolveJavaModifiersThenReturnPublic(obj: Defn.Object, modifiers: List[Mod]): Unit = {
-    val expectedJavaModifiersContext = JavaModifiersContext(obj, modifiers, JavaTreeType.Class, javaScope)
+  private def whenResolveJavaModifiersThenReturnPublic(obj: Defn.Object, modifiers: List[Mod], parentJavaScope: JavaTreeType): Unit = {
+    val expectedJavaModifiersContext = JavaModifiersContext(obj, modifiers, JavaTreeType.Class, parentJavaScope)
     when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedJavaModifiersContext))).thenReturn(List(JavaModifier.Public))
   }
 }
