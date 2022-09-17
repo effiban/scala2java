@@ -129,7 +129,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(templateTraverser).traverse(
       eqTree(expectedAdjustedTemplate),
-      eqTemplateContext(TemplateContext(Some(ClassName), Some(primaryCtor)))
+      eqTemplateContext(TemplateContext(javaScope = JavaTreeType.Class, maybeClassName = Some(ClassName), maybePrimaryCtor = Some(primaryCtor)))
     )
 
     classTraverser.traverse(cls, StatContext(javaScope))
@@ -191,7 +191,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(templateTraverser).traverse(
       eqTree(expectedAdjustedTemplate),
-      eqTemplateContext(TemplateContext(Some(ClassName), Some(primaryCtor)))
+      eqTemplateContext(TemplateContext(javaScope = JavaTreeType.Class, maybeClassName = Some(ClassName), maybePrimaryCtor = Some(primaryCtor)))
     )
 
     classTraverser.traverse(cls, StatContext(javaScope))

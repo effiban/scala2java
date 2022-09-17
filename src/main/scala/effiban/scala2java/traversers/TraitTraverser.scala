@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, StatContext}
+import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, StatContext, TemplateContext}
 import effiban.scala2java.entities.JavaTreeType.JavaTreeType
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{JavaTreeTypeToKeywordMapping, JavaTreeTypeToScopeMapping}
@@ -32,7 +32,7 @@ private[traversers] class TraitTraverserImpl(annotListTraverser: => AnnotListTra
     typeParamListTraverser.traverse(traitDef.tparams)
     val outerJavaScope = javaScope
     javaScope = JavaTreeTypeToScopeMapping(javaTreeType)
-    templateTraverser.traverse(traitDef.templ)
+    templateTraverser.traverse(traitDef.templ, TemplateContext(javaScope = JavaTreeTypeToScopeMapping(javaTreeType)))
     javaScope = outerJavaScope
   }
 

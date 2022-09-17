@@ -39,8 +39,12 @@ private[traversers] class RegularClassTraverserImpl(annotListTraverser: => Annot
     // TODO if the ctor. params have 'ValParam' or 'VarParam' modifiers, need to generate accessors/mutators for them as well
     val enrichedStats = explicitMemberDecls ++ classDef.templ.stats
     val enrichedTemplate = classDef.templ.copy(stats = enrichedStats)
-    templateTraverser.traverse(template = enrichedTemplate,
-      context = TemplateContext(maybeClassName = Some(classDef.name), maybePrimaryCtor = Some(classDef.ctor)))
+    val templateContext = TemplateContext(
+      javaScope = JavaTreeTypeToScopeMapping(javaTreeType),
+      maybeClassName = Some(classDef.name),
+      maybePrimaryCtor = Some(classDef.ctor)
+    )
+    templateTraverser.traverse(template = enrichedTemplate, context = templateContext)
     javaScope = outerJavaScope
   }
 

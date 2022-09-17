@@ -74,7 +74,7 @@ class ObjectTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}
         |""".stripMargin)
-      .when(templateTraverser).traverse(eqTree(template), eqTemplateContext(TemplateContext()))
+      .when(templateTraverser).traverse(eqTree(template), eqTemplateContext(TemplateContext(javaScope = JavaTreeType.Class)))
 
     objectTraverser.traverse(objectDef, StatContext(javaScope))
 

@@ -112,7 +112,9 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
         | /* BODY */
         |}
         |""".stripMargin)
-      .when(templateTraverser).traverse(eqTree(TheTemplate), eqTemplateContext(TemplateContext(Some(ClassName), None)))
+      .when(templateTraverser).traverse(
+      eqTree(TheTemplate),
+      eqTemplateContext(TemplateContext(javaScope = JavaTreeType.Class, maybeClassName = Some(ClassName))))
 
     classTraverser.traverse(cls, StatContext(javaScope))
 
@@ -168,7 +170,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(templateTraverser).traverse(
       eqTree(TheTemplate),
-      eqTemplateContext(TemplateContext(Some(ClassName), Some(primaryCtor)))
+      eqTemplateContext(TemplateContext(javaScope = JavaTreeType.Class, maybeClassName = Some(ClassName), maybePrimaryCtor = Some(primaryCtor)))
     )
 
     classTraverser.traverse(cls, StatContext(javaScope))
@@ -216,7 +218,9 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
         | /* BODY */
         |}
         |""".stripMargin)
-      .when(templateTraverser).traverse(eqTree(TheTemplate), eqTemplateContext(TemplateContext(Some(ClassName), None)))
+      .when(templateTraverser).traverse(
+      eqTree(TheTemplate),
+      eqTemplateContext(TemplateContext(javaScope = JavaTreeType.Class, maybeClassName = Some(ClassName))))
 
     classTraverser.traverse(cls, StatContext(javaScope))
 
