@@ -133,7 +133,7 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
 
     when(defnValClassifier.isEnumConstantList(eqTree(TheDefnVal), ArgumentMatchers.eq(javaScope))).thenReturn(false)
     doWrite("/* DATA MEMBER DEFINITION */")
-      .when(statTraverser).traverse(eqTree(TheDefnVal), ArgumentMatchers.eq(StatContext()))
+      .when(statTraverser).traverse(eqTree(TheDefnVal), ArgumentMatchers.eq(StatContext(JavaTreeType.Class)))
     when(javaStatClassifier.requiresEndDelimiter(eqTree(TheDefnVal))).thenReturn(true)
 
     templateChildTraverser.traverse(child = TheDefnVal, context = TemplateChildContext(javaScope = JavaTreeType.Class))
@@ -162,7 +162,7 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
       """{
         |    /* METHOD DEFINITION */
         |}""".stripMargin)
-      .when(statTraverser).traverse(eqTree(TheDefnDef), ArgumentMatchers.eq(StatContext()))
+      .when(statTraverser).traverse(eqTree(TheDefnDef), ArgumentMatchers.eq(StatContext(JavaTreeType.Class)))
     when(javaStatClassifier.requiresEndDelimiter(eqTree(TheDefnDef))).thenReturn(false)
 
     templateChildTraverser.traverse(child = TheDefnDef, context = TemplateChildContext(javaScope = JavaTreeType.Class))

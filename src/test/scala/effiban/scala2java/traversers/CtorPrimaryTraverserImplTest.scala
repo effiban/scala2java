@@ -2,7 +2,6 @@ package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{CtorContext, DefnDefContext}
 import effiban.scala2java.entities.JavaTreeType
-import effiban.scala2java.entities.JavaTreeType.Unknown
 import effiban.scala2java.matchers.CtorContextMatcher.eqCtorContext
 import effiban.scala2java.matchers.DefnDefContextMatcher.eqDefnDefContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
@@ -59,7 +58,7 @@ class CtorPrimaryTraverserImplTest extends UnitTestSuite {
 
     ctorPrimaryTraverser.traverse(PrimaryCtor, TheCtorContext)
 
-    verify(defnDefTraverser).traverse(eqTree(ExpectedDefnDef), eqDefnDefContext(DefnDefContext(javaScope = Unknown)))
+    verify(defnDefTraverser).traverse(eqTree(ExpectedDefnDef), eqDefnDefContext(DefnDefContext(javaScope = JavaTreeType.Class)))
   }
 
   private def termParam(name: String, typeName: String) = {
