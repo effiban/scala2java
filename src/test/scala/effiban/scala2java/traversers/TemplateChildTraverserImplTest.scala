@@ -1,8 +1,8 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.classifiers.{DefnValClassifier, JavaStatClassifier}
-import effiban.scala2java.contexts.StatContext
-import effiban.scala2java.entities.CtorContext
+import effiban.scala2java.contexts.{CtorContext, StatContext, TemplateChildContext}
+import effiban.scala2java.entities.JavaTreeType
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.matchers.CtorContextMatcher.eqCtorContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
@@ -79,14 +79,17 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
     javaStatClassifier
   )
 
-  test("traverse() for primary ctor. with context") {
+  test("traverse() for primary ctor. with ctor. context") {
     doWrite(
       """{
         |   /* PRIMARY CTOR */
         |}""".stripMargin)
       .when(ctorPrimaryTraverser).traverse(primaryCtor = eqTree(PrimaryCtor), ctorContext = eqCtorContext(TheCtorContext))
 
-    templateChildTraverser.traverse(child = PrimaryCtor, maybeCtorContext = Some(TheCtorContext))
+    templateChildTraverser.traverse(
+      child = PrimaryCtor,
+      context = TemplateChildContext(javaScope = JavaTreeType.Class, maybeCtorContext = Some(TheCtorContext))
+    )
 
     outputWriter.toString shouldBe
       """{
@@ -94,20 +97,23 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
         |}""".stripMargin
   }
 
-  test("traverse() for primary ctor. without context should throw exception") {
+  test("traverse() for primary ctor. without ctor. context should throw exception") {
     intercept[IllegalStateException] {
-      templateChildTraverser.traverse(child = PrimaryCtor)
+      templateChildTraverser.traverse(child = PrimaryCtor, context = TemplateChildContext(javaScope = JavaTreeType.Class))
     }
   }
 
-  test("traverse() for secondary ctor. with context") {
+  test("traverse() for secondary ctor. with ctor. context") {
     doWrite(
       """{
         |   /* SECONDARY CTOR */
         |}""".stripMargin)
       .when(ctorSecondaryTraverser).traverse(secondaryCtor = eqTree(SecondaryCtor), ctorContext = eqCtorContext(TheCtorContext))
 
-    templateChildTraverser.traverse(child = SecondaryCtor, maybeCtorContext = Some(TheCtorContext))
+    templateChildTraverser.traverse(
+      child = SecondaryCtor,
+      context = TemplateChildContext(javaScope = JavaTreeType.Class, maybeCtorContext = Some(TheCtorContext))
+    )
 
     outputWriter.toString shouldBe
       """{
@@ -115,9 +121,9 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
         |}""".stripMargin
   }
 
-  test("traverse() for secondary ctor. without context should throw exception") {
+  test("traverse() for secondary ctor. without ctor. context should throw exception") {
     intercept[IllegalStateException] {
-      templateChildTraverser.traverse(child = SecondaryCtor)
+      templateChildTraverser.traverse(child = SecondaryCtor, context = TemplateChildContext(javaScope = JavaTreeType.Class))
     }
   }
 
@@ -128,7 +134,7 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
       .when(statTraverser).traverse(eqTree(TheDefnVal), ArgumentMatchers.eq(StatContext()))
     when(javaStatClassifier.requiresEndDelimiter(eqTree(TheDefnVal))).thenReturn(true)
 
-    templateChildTraverser.traverse(child = TheDefnVal)
+    templateChildTraverser.traverse(child = TheDefnVal, context = TemplateChildContext(javaScope = JavaTreeType.Class))
 
     outputWriter.toString shouldBe
       """/* DATA MEMBER DEFINITION */;
@@ -141,7 +147,7 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
     doWrite("/* ENUM CONSTANTS */".stripMargin).when(enumConstantListTraverser).traverse(eqTree(TheDefnVal))
     when(javaStatClassifier.requiresEndDelimiter(eqTree(TheDefnVal))).thenReturn(true)
 
-    templateChildTraverser.traverse(child = TheDefnVal)
+    templateChildTraverser.traverse(child = TheDefnVal, context = TemplateChildContext(javaScope = JavaTreeType.Class))
 
     outputWriter.toString shouldBe
       """/* ENUM CONSTANTS */;
@@ -157,7 +163,7 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
       .when(statTraverser).traverse(eqTree(TheDefnDef), ArgumentMatchers.eq(StatContext()))
     when(javaStatClassifier.requiresEndDelimiter(eqTree(TheDefnDef))).thenReturn(false)
 
-    templateChildTraverser.traverse(child = TheDefnDef)
+    templateChildTraverser.traverse(child = TheDefnDef, context = TemplateChildContext(javaScope = JavaTreeType.Class))
 
     outputWriter.toString shouldBe
       """{
@@ -167,7 +173,7 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
 
   test("traverse() for non-stat should throw exception") {
     intercept[IllegalStateException] {
-      templateChildTraverser.traverse(child = Name("blabla"))
+      templateChildTraverser.traverse(child = Name("blabla"), context = TemplateChildContext(javaScope = JavaTreeType.Class))
     }
   }
 

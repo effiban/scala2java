@@ -1,10 +1,10 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.classifiers.DefnTypeClassifier
-import effiban.scala2java.contexts.TemplateBodyContext
+import effiban.scala2java.contexts.{CtorContext, TemplateBodyContext, TemplateChildContext}
+import effiban.scala2java.entities.JavaTreeType
 import effiban.scala2java.entities.TraversalContext.javaScope
-import effiban.scala2java.entities.{CtorContext, JavaTreeType}
-import effiban.scala2java.matchers.CombinedMatchers.eqOptionCtorContext
+import effiban.scala2java.matchers.TemplateChildContextMatcher.eqTemplateChildContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.orderings.JavaTemplateChildOrdering
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
@@ -329,14 +329,18 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
     doWrite(
       """/* DATA MEMBER DECL */;
         |""".stripMargin)
-      .when(templateChildTraverser).traverse(eqTree(DataMemberDecl), eqOptionCtorContext(maybeCtorContext))
+      .when(templateChildTraverser).traverse(
+      eqTree(DataMemberDecl),
+      eqTemplateChildContext(TemplateChildContext(javaScope = JavaTreeType.Class, maybeCtorContext = maybeCtorContext)))
   }
 
   private def expectWriteDataMemberDefn(maybeCtorContext: Option[CtorContext] = None): Unit = {
     doWrite(
     """/* DATA MEMBER DEFINITION */;
         |""".stripMargin)
-      .when(templateChildTraverser).traverse(eqTree(DataMemberDefn), eqOptionCtorContext(maybeCtorContext))
+      .when(templateChildTraverser).traverse(
+      eqTree(DataMemberDefn),
+      eqTemplateChildContext(TemplateChildContext(javaScope = JavaTreeType.Class, maybeCtorContext = maybeCtorContext)))
   }
 
   private def expectWritePrimaryCtor(maybeCtorContext: Option[CtorContext] = None): Unit = {
@@ -345,7 +349,9 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
         |*  PRIMARY CTOR
         |*/
         |""".stripMargin)
-      .when(templateChildTraverser).traverse(eqTree(PrimaryCtor), eqOptionCtorContext(maybeCtorContext))
+      .when(templateChildTraverser).traverse(
+      eqTree(PrimaryCtor),
+      eqTemplateChildContext(TemplateChildContext(javaScope = JavaTreeType.Class, maybeCtorContext = maybeCtorContext)))
   }
 
   private def expectWriteSecondaryCtor(maybeCtorContext: Option[CtorContext] = None): Unit = {
@@ -354,7 +360,9 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
         |*  SECONDARY CTOR
         |*/
         |""".stripMargin)
-      .when(templateChildTraverser).traverse(eqTree(SecondaryCtor), eqOptionCtorContext(maybeCtorContext))
+      .when(templateChildTraverser).traverse(
+      eqTree(SecondaryCtor),
+      eqTemplateChildContext(TemplateChildContext(javaScope = JavaTreeType.Class, maybeCtorContext = maybeCtorContext)))
   }
 
   private def expectWriteMethodDefn(maybeCtorContext: Option[CtorContext] = None): Unit = {
@@ -363,7 +371,9 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
         |*  METHOD DEFINITION
         |*/
         |""".stripMargin)
-      .when(templateChildTraverser).traverse(eqTree(MethodDefn), eqOptionCtorContext(maybeCtorContext))
+      .when(templateChildTraverser).traverse(
+      eqTree(MethodDefn),
+      eqTemplateChildContext(TemplateChildContext(javaScope = JavaTreeType.Class, maybeCtorContext = maybeCtorContext)))
   }
 
   private def expectWriteTypeDefn(maybeCtorContext: Option[CtorContext] = None): Unit = {
@@ -372,7 +382,9 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
         |*  TYPE DEFINITION
         |*/
         |""".stripMargin)
-      .when(templateChildTraverser).traverse(eqTree(TypeDefn), eqOptionCtorContext(maybeCtorContext))
+      .when(templateChildTraverser).traverse(
+      eqTree(TypeDefn),
+      eqTemplateChildContext(TemplateChildContext(javaScope = JavaTreeType.Class, maybeCtorContext = maybeCtorContext)))
   }
 
   private def expectChildOrdering() = {

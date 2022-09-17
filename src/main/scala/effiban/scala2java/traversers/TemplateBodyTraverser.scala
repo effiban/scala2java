@@ -1,8 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.classifiers.DefnTypeClassifier
-import effiban.scala2java.contexts.TemplateBodyContext
-import effiban.scala2java.entities.CtorContext
+import effiban.scala2java.contexts.{CtorContext, TemplateBodyContext, TemplateChildContext}
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.orderings.JavaTemplateChildOrdering
 import effiban.scala2java.writers.JavaWriter
@@ -34,7 +33,7 @@ private[traversers] class TemplateBodyTraverserImpl(templateChildTraverser: => T
 
     writeBlockStart()
     children.sorted(javaTemplateChildOrdering).foreach(child =>
-      templateChildTraverser.traverse(child, maybeCtorContext)
+      templateChildTraverser.traverse(child, TemplateChildContext(javaScope = context.javaScope, maybeCtorContext = maybeCtorContext))
     )
     writeBlockEnd()
   }

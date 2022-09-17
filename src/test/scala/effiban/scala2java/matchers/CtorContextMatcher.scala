@@ -1,6 +1,6 @@
 package effiban.scala2java.matchers
 
-import effiban.scala2java.entities.CtorContext
+import effiban.scala2java.contexts.CtorContext
 import org.mockito.ArgumentMatcher
 import org.mockito.ArgumentMatchers.argThat
 

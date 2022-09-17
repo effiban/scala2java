@@ -1,7 +1,8 @@
 package effiban.scala2java.transformers
 
+import effiban.scala2java.contexts.CtorContext
+import effiban.scala2java.entities.JavaTreeType
 import effiban.scala2java.entities.TraversalContext.javaScope
-import effiban.scala2java.entities.{CtorContext, JavaTreeType}
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
 import org.mockito.ArgumentMatchers.any
