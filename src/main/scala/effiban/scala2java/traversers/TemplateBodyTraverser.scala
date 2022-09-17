@@ -11,7 +11,7 @@ import scala.meta.{Defn, Stat, Term, Tree}
 
 trait TemplateBodyTraverser {
 
-  def traverse(statements: List[Stat], context: TemplateBodyContext = TemplateBodyContext()): Unit
+  def traverse(statements: List[Stat], context: TemplateBodyContext): Unit
 }
 
 private[traversers] class TemplateBodyTraverserImpl(templateChildTraverser: => TemplateChildTraverser,
@@ -21,7 +21,7 @@ private[traversers] class TemplateBodyTraverserImpl(templateChildTraverser: => T
 
   import javaWriter._
 
-  def traverse(stats: List[Stat], context: TemplateBodyContext = TemplateBodyContext()): Unit = {
+  def traverse(stats: List[Stat], context: TemplateBodyContext): Unit = {
     val terms = stats.collect { case term: Term => term }
     val nonTerms = stats.filterNot(terms.contains(_))
 

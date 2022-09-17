@@ -103,7 +103,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
 
   test("traverse when empty") {
 
-    templateBodyTraverser.traverse(stats = Nil)
+    templateBodyTraverser.traverse(stats = Nil, context = TemplateBodyContext(javaScope = JavaTreeType.Class))
 
     outputWriter.toString shouldBe
       """ {
@@ -112,7 +112,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse when has inits only") {
-    templateBodyTraverser.traverse(stats = Nil, context = TemplateBodyContext(inits = TheInits))
+    templateBodyTraverser.traverse(stats = Nil, context = TemplateBodyContext(javaScope = JavaTreeType.Class, inits = TheInits))
 
     outputWriter.toString shouldBe
       """ {
@@ -121,7 +121,11 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse when has primary ctor. only") {
-    val context = TemplateBodyContext(maybeClassName = Some(ClassName), maybePrimaryCtor = Some(PrimaryCtor))
+    val context = TemplateBodyContext(
+      javaScope = JavaTreeType.Class,
+      maybeClassName = Some(ClassName),
+      maybePrimaryCtor = Some(PrimaryCtor)
+    )
 
     expectWritePrimaryCtor(Some(CtorContext(className = ClassName, inits = Nil)))
 
@@ -152,7 +156,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
 
     expectChildOrdering()
 
-    templateBodyTraverser.traverse(stats = stats)
+    templateBodyTraverser.traverse(stats = stats, context = TemplateBodyContext(javaScope = JavaTreeType.Class))
 
     outputWriter.toString shouldBe
       """ {
@@ -181,7 +185,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
 
     expectChildOrdering()
 
-    templateBodyTraverser.traverse(stats = stats)
+    templateBodyTraverser.traverse(stats = stats, context = TemplateBodyContext(javaScope = JavaTreeType.Class))
 
     outputWriter.toString shouldBe
       """ {
@@ -212,7 +216,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
 
     expectChildOrdering()
 
-    templateBodyTraverser.traverse(stats = stats)
+    templateBodyTraverser.traverse(stats = stats, context = TemplateBodyContext(javaScope = JavaTreeType.Class))
 
     outputWriter.toString shouldBe
       """ {
@@ -227,6 +231,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
 
   test("traverse when has everything except loose terms") {
     val context = TemplateBodyContext(
+      javaScope = JavaTreeType.Class,
       maybeClassName = Some(ClassName),
       maybePrimaryCtor = Some(PrimaryCtor),
       inits = TheInits
@@ -270,6 +275,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
 
   test("traverse when has everything including loose terms") {
     val context = TemplateBodyContext(
+      javaScope = JavaTreeType.Class,
       maybeClassName = Some(ClassName),
       maybePrimaryCtor = Some(PrimaryCtor),
       inits = TheInits
