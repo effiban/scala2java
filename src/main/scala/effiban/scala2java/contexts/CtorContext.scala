@@ -1,4 +1,4 @@
-package effiban.scala2java.entities
+package effiban.scala2java.contexts
 
 import scala.meta.{Init, Term, Type}
 

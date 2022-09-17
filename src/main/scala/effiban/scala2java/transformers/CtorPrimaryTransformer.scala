@@ -1,6 +1,6 @@
 package effiban.scala2java.transformers
 
-import effiban.scala2java.entities.CtorContext
+import effiban.scala2java.contexts.CtorContext
 
 import scala.meta.Term.{Assign, Block, Select, This}
 import scala.meta.{Ctor, Defn, Name, Term, Type}

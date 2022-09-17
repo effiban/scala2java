@@ -1,7 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.DefnDefContext
-import effiban.scala2java.entities.CtorContext
+import effiban.scala2java.contexts.{CtorContext, DefnDefContext}
 import effiban.scala2java.entities.JavaTreeType.Unknown
 import effiban.scala2java.transformers.CtorPrimaryTransformer
 
