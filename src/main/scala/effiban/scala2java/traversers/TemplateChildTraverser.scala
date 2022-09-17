@@ -5,7 +5,7 @@ import effiban.scala2java.contexts.{CtorContext, TemplateChildContext}
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.writers.JavaWriter
 
-import scala.meta.{Ctor, Defn, Stat, Tree}
+import scala.meta.{Ctor, Defn, Stat, Tree, Type}
 
 trait TemplateChildTraverser {
   def traverse(child: Tree, context: TemplateChildContext): Unit
@@ -22,8 +22,8 @@ private[traversers] class TemplateChildTraverserImpl(ctorPrimaryTraverser: => Ct
   import javaWriter._
 
   override def traverse(child: Tree, context: TemplateChildContext): Unit = child match {
-    case primaryCtor: Ctor.Primary => traversePrimaryCtor(primaryCtor, context.maybeCtorContext)
-    case secondaryCtor: Ctor.Secondary => traverseSecondaryCtor(secondaryCtor, context.maybeCtorContext)
+    case primaryCtor: Ctor.Primary => traversePrimaryCtor(primaryCtor, context)
+    case secondaryCtor: Ctor.Secondary => traverseSecondaryCtor(secondaryCtor, context)
     case defnVal: Defn.Val if defnValClassifier.isEnumConstantList(defnVal, javaScope) =>
       enumConstantListTraverser.traverse(defnVal)
       writeStatementEnd()
@@ -31,17 +31,17 @@ private[traversers] class TemplateChildTraverserImpl(ctorPrimaryTraverser: => Ct
     case unexpected: Tree => throw new IllegalStateException(s"Unexpected template child: $unexpected")
   }
 
-  private def traversePrimaryCtor(primaryCtor: Ctor.Primary, maybeCtorContext: Option[CtorContext]): Unit = {
-    maybeCtorContext match {
+  private def traversePrimaryCtor(primaryCtor: Ctor.Primary, context: TemplateChildContext): Unit = {
+    context.maybeClassName match {
       // TODO skip traversal if the ctor. is public+default+empty, and there are no secondaries
-      case Some(ctorContext) => ctorPrimaryTraverser.traverse(primaryCtor, ctorContext)
+      case Some(className) => ctorPrimaryTraverser.traverse(primaryCtor, toCtorContext(context, className))
       case None => throw new IllegalStateException("Primary Ctor. exists but no context could be constructed for it")
     }
   }
 
-  private def traverseSecondaryCtor(secondaryCtor: Ctor.Secondary, maybeCtorContext: Option[CtorContext]): Unit = {
-    maybeCtorContext match {
-      case Some(ctorContext) => ctorSecondaryTraverser.traverse(secondaryCtor, ctorContext)
+  private def traverseSecondaryCtor(secondaryCtor: Ctor.Secondary, context: TemplateChildContext): Unit = {
+    context.maybeClassName match {
+      case Some(className) => ctorSecondaryTraverser.traverse(secondaryCtor, toCtorContext(context, className))
       case None => throw new IllegalStateException("Secondary Ctor. exists but no context could be constructed for it")
     }
   }
@@ -51,5 +51,14 @@ private[traversers] class TemplateChildTraverserImpl(ctorPrimaryTraverser: => Ct
     if (javaStatClassifier.requiresEndDelimiter(stat)) {
       writeStatementEnd()
     }
+  }
+
+  private def toCtorContext(childContext: TemplateChildContext, className: Type.Name) = {
+    CtorContext(
+      javaScope = childContext.javaScope,
+      className = className,
+      inits = childContext.inits,
+      terms = childContext.ctorTerms
+    )
   }
 }

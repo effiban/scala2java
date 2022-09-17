@@ -6,28 +6,31 @@ import org.mockito.ArgumentMatchers.argThat
 
 import scala.meta.{Init, Term}
 
-class CtorContextMatcher(expectedCtorContext: CtorContext) extends ArgumentMatcher[CtorContext] {
+class CtorContextMatcher(expectedContext: CtorContext) extends ArgumentMatcher[CtorContext] {
 
-  override def matches(actualCtorContext: CtorContext): Boolean = {
-    classNameMatches(actualCtorContext) && initsMatch(actualCtorContext) && termsMatch(actualCtorContext)
+  override def matches(actualContext: CtorContext): Boolean = {
+    actualContext.javaScope == expectedContext.javaScope &&
+      classNameMatches(actualContext) &&
+      initsMatch(actualContext) &&
+      termsMatch(actualContext)
   }
 
-  private def classNameMatches(actualClassInfo: CtorContext) = {
-    new TreeMatcher(expectedCtorContext.className).matches(actualClassInfo.className)
+  private def classNameMatches(actualContext: CtorContext) = {
+    new TreeMatcher(expectedContext.className).matches(actualContext.className)
   }
 
-  private def initsMatch(actualCtorContext: CtorContext) = {
-   new ListMatcher(expectedCtorContext.inits, new TreeMatcher[Init](_)).matches(actualCtorContext.inits)
+  private def initsMatch(actualContext: CtorContext) = {
+    new ListMatcher(expectedContext.inits, new TreeMatcher[Init](_)).matches(actualContext.inits)
   }
 
-  private def termsMatch(actualCtorContext: CtorContext) = {
-    new ListMatcher(expectedCtorContext.terms, new TreeMatcher[Term](_)).matches(actualCtorContext.terms)
+  private def termsMatch(actualContext: CtorContext) = {
+    new ListMatcher(expectedContext.terms, new TreeMatcher[Term](_)).matches(actualContext.terms)
   }
 
-  override def toString: String = s"Matcher for: $expectedCtorContext"
+  override def toString: String = s"Matcher for: $expectedContext"
 }
 
 object CtorContextMatcher {
-  def eqCtorContext(expectedCtorContext: CtorContext): CtorContext = argThat(new CtorContextMatcher(expectedCtorContext))
+  def eqCtorContext(expectedContext: CtorContext): CtorContext = argThat(new CtorContextMatcher(expectedContext))
 }
 
