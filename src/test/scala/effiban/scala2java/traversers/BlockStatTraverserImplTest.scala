@@ -3,6 +3,7 @@ package effiban.scala2java.traversers
 import effiban.scala2java.classifiers.JavaStatClassifier
 import effiban.scala2java.contexts.{StatContext, TryContext}
 import effiban.scala2java.entities.Decision.{No, Uncertain, Yes}
+import effiban.scala2java.entities.JavaTreeType
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.resolvers.ShouldReturnValueResolver
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
@@ -59,6 +60,8 @@ class BlockStatTraverserImplTest extends UnitTestSuite {
       |}
       |""".stripMargin
 
+  private val BlockStatContext = StatContext(JavaTreeType.Block)
+
 
   private val ifTraverser = mock[IfTraverser]
   private val tryTraverser = mock[TryTraverser]
@@ -77,7 +80,7 @@ class BlockStatTraverserImplTest extends UnitTestSuite {
 
 
   test("traverse() when statement end required") {
-    doWrite(TheTermApplyStr).when(statTraverser).traverse(TheTermApply)
+    doWrite(TheTermApplyStr).when(statTraverser).traverse(eqTree(TheTermApply), ArgumentMatchers.eq(BlockStatContext))
     when(javaTermClassifier.requiresEndDelimiter(TheTermApply)).thenReturn(true)
 
     blockStatTraverser.traverse(TheTermApply)
@@ -88,7 +91,7 @@ class BlockStatTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() when statement end not required") {
-    doWrite(TheTermApplyStr).when(statTraverser).traverse(TheTermApply)
+    doWrite(TheTermApplyStr).when(statTraverser).traverse(eqTree(TheTermApply), ArgumentMatchers.eq(BlockStatContext))
     when(javaTermClassifier.requiresEndDelimiter(TheTermApply)).thenReturn(false)
 
     blockStatTraverser.traverse(TheTermApply)
@@ -131,7 +134,7 @@ class BlockStatTraverserImplTest extends UnitTestSuite {
   test("traverseLast() for a 'Term.Apply' when shouldReturnValue=Yes, shouldTermReturnValue=Yes and statementEndRequired=true") {
     when(shouldReturnValueResolver.resolve(eqTree(TheTermApply), ArgumentMatchers.eq(Yes))).thenReturn(Yes)
     doWrite(s"return $TheTermApplyStr")
-      .when(statTraverser).traverse(eqTree(Return(TheTermApply)), ArgumentMatchers.eq(StatContext()))
+      .when(statTraverser).traverse(eqTree(Return(TheTermApply)), ArgumentMatchers.eq(BlockStatContext))
     when(javaTermClassifier.requiresEndDelimiter(eqTree(Return(TheTermApply)))).thenReturn(true)
 
     blockStatTraverser.traverseLast(TheTermApply, shouldReturnValue = Yes)
@@ -144,7 +147,7 @@ class BlockStatTraverserImplTest extends UnitTestSuite {
   test("traverseLast() for a 'Term.Apply' when shouldReturnValue=Yes, shouldTermReturnValue=No and statementEndRequired=true") {
     when(shouldReturnValueResolver.resolve(eqTree(TheTermApply), ArgumentMatchers.eq(Yes))).thenReturn(No)
     doWrite(TheTermApplyStr)
-      .when(statTraverser).traverse(eqTree(TheTermApply), ArgumentMatchers.eq(StatContext()))
+      .when(statTraverser).traverse(eqTree(TheTermApply), ArgumentMatchers.eq(BlockStatContext))
     when(javaTermClassifier.requiresEndDelimiter(eqTree(TheTermApply))).thenReturn(true)
 
     blockStatTraverser.traverseLast(TheTermApply, shouldReturnValue = Yes)
@@ -157,7 +160,7 @@ class BlockStatTraverserImplTest extends UnitTestSuite {
   test("traverseLast() for a 'Term.Apply' when shouldReturnValue=Uncertain, shouldTermReturnValue=Uncertain and statementEndRequired=true") {
     when(shouldReturnValueResolver.resolve(eqTree(TheTermApply), ArgumentMatchers.eq(Uncertain))).thenReturn(Uncertain)
     doWrite(TheTermApplyStr)
-      .when(statTraverser).traverse(eqTree(TheTermApply), ArgumentMatchers.eq(StatContext()))
+      .when(statTraverser).traverse(eqTree(TheTermApply), ArgumentMatchers.eq(BlockStatContext))
     when(javaTermClassifier.requiresEndDelimiter(eqTree(TheTermApply))).thenReturn(true)
 
     blockStatTraverser.traverseLast(TheTermApply, shouldReturnValue = Uncertain)
@@ -170,7 +173,7 @@ class BlockStatTraverserImplTest extends UnitTestSuite {
   test("traverseLast() for a 'Term.Apply' when shouldReturnValue=No, shouldTermReturnValue=No and statementEndRequired=false") {
     when(shouldReturnValueResolver.resolve(eqTree(TheTermApply), ArgumentMatchers.eq(No))).thenReturn(No)
     doWrite(TheTermApplyStr)
-      .when(statTraverser).traverse(eqTree(TheTermApply), ArgumentMatchers.eq(StatContext()))
+      .when(statTraverser).traverse(eqTree(TheTermApply), ArgumentMatchers.eq(BlockStatContext))
     when(javaTermClassifier.requiresEndDelimiter(eqTree(TheTermApply))).thenReturn(false)
 
     blockStatTraverser.traverseLast(TheTermApply, shouldReturnValue = No)
@@ -180,7 +183,7 @@ class BlockStatTraverserImplTest extends UnitTestSuite {
 
   test("traverseLast() for a 'Defn.Def' when statementEndRequired=false") {
     doWrite(TheDefnDefStr)
-      .when(statTraverser).traverse(eqTree(TheDefnDef), ArgumentMatchers.eq(StatContext()))
+      .when(statTraverser).traverse(eqTree(TheDefnDef), ArgumentMatchers.eq(BlockStatContext))
     when(javaTermClassifier.requiresEndDelimiter(eqTree(TheDefnDef))).thenReturn(false)
 
     blockStatTraverser.traverseLast(TheDefnDef)
