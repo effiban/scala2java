@@ -34,7 +34,7 @@ private[traversers] class DeclDefTraverserImpl(annotListTraverser: => AnnotListT
 
     val outerJavaScope = javaScope
     javaScope = Method
-    termParamListTraverser.traverse(defDecl.paramss.flatten)
+    termParamListTraverser.traverse(termParams = defDecl.paramss.flatten, context = StatContext(Method))
     javaScope = outerJavaScope
   }
 

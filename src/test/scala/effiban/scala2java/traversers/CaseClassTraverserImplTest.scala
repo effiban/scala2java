@@ -105,6 +105,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     doWrite("(int arg1, int arg2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(CtorArgs1),
+      context = ArgumentMatchers.eq(StatContext(JavaTreeType.Class)),
       onSameLine = ArgumentMatchers.eq(false)
     )
     doWrite(
@@ -161,6 +162,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     doWrite("(int arg1, int arg2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(CtorArgs1),
+      context = ArgumentMatchers.eq(StatContext(JavaTreeType.Class)),
       onSameLine = ArgumentMatchers.eq(false)
     )
     doWrite(
@@ -211,6 +213,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     doWrite("(int arg1, int arg2, int arg3, int arg4)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(CtorArgs1 ++ CtorArgs2),
+      context = ArgumentMatchers.eq(StatContext(JavaTreeType.Class)),
       onSameLine = ArgumentMatchers.eq(false)
     )
     doWrite(

@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.BlockContext
+import effiban.scala2java.contexts.{BlockContext, StatContext}
 import effiban.scala2java.entities.Decision.{Decision, Uncertain}
 import effiban.scala2java.entities.JavaTreeType.Lambda
 import effiban.scala2java.entities.TraversalContext.javaScope
@@ -27,7 +27,7 @@ private[traversers] class TermFunctionTraverserImpl(termParamTraverser: => TermP
     javaScope = Lambda
     function.params match {
       case param :: Nil => termParamTraverser.traverse(param)
-      case _ => termParamListTraverser.traverse(termParams = function.params, onSameLine = true)
+      case _ => termParamListTraverser.traverse(termParams = function.params, context = StatContext(Lambda), onSameLine = true)
     }
     writeArrow()
     function.body match {

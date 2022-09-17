@@ -1,8 +1,8 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.{BlockContext, DefnDefContext, JavaModifiersContext}
+import effiban.scala2java.contexts.{BlockContext, DefnDefContext, JavaModifiersContext, StatContext}
 import effiban.scala2java.entities.Decision.Yes
-import effiban.scala2java.entities.JavaTreeType.Interface
+import effiban.scala2java.entities.JavaTreeType.{Interface, Method}
 import effiban.scala2java.entities.TraversalContext.javaScope
 import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
 import effiban.scala2java.matchers.BlockContextMatcher.eqBlockContext
@@ -93,6 +93,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1),
+      context = ArgumentMatchers.eq(StatContext(Method)),
       onSameLine = ArgumentMatchers.eq(false)
     )
     doWrite(
@@ -136,6 +137,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1),
+      context = ArgumentMatchers.eq(StatContext(Method)),
       onSameLine = ArgumentMatchers.eq(false)
     )
     doWrite(
@@ -179,6 +181,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1),
+      context = ArgumentMatchers.eq(StatContext(Method)),
       onSameLine = ArgumentMatchers.eq(false)
     )
     doWrite(
@@ -227,6 +230,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     doWrite("MyClass").when(termNameTraverser).traverse(eqTree(ClassName))
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1),
+      context = ArgumentMatchers.eq(StatContext(Method)),
       onSameLine = ArgumentMatchers.eq(false)
     )
     doWrite(
@@ -270,6 +274,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1),
+      context = ArgumentMatchers.eq(StatContext(Method)),
       onSameLine = ArgumentMatchers.eq(false)
     )
     doWrite(
@@ -314,6 +319,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1),
+      context = ArgumentMatchers.eq(StatContext(Method)),
       onSameLine = ArgumentMatchers.eq(false)
     )
     doWrite(
@@ -359,6 +365,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1),
+      context = ArgumentMatchers.eq(StatContext(Method)),
       onSameLine = ArgumentMatchers.eq(false)
     )
     doWrite(
@@ -402,6 +409,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1),
+      context = ArgumentMatchers.eq(StatContext(Method)),
       onSameLine = ArgumentMatchers.eq(false)
     )
     doWrite(
@@ -445,6 +453,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
     doWrite("(int param1, int param2, int param3, int param4)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1 ++ MethodParams2),
+      context = ArgumentMatchers.eq(StatContext(Method)),
       onSameLine = ArgumentMatchers.eq(false)
     )
     doWrite(
