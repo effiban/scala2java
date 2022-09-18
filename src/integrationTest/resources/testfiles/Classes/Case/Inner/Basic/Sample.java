@@ -5,5 +5,4 @@ public record Sample() {
 
     public record InnerSample() {
     }
-    ;
 }

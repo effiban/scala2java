@@ -23,7 +23,10 @@ object JavaStatClassifier extends JavaStatClassifier {
            _: Term.PartialFunction |
            _: Ctor.Secondary |
            _: Defn.Def |
-           _: Defn.Type => false
+           _: Defn.Type |
+           _: Defn.Class |
+           _: Defn.Trait |
+           _: Defn.Object => false
       case Term.Function(_, body) if hasMultipleStatements(body) => false
       case Term.AnonymousFunction(body) if hasMultipleStatements(body) => false
       case _ => true

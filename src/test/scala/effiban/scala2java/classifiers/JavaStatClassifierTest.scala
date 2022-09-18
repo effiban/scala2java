@@ -2,7 +2,7 @@ package effiban.scala2java.classifiers
 
 import effiban.scala2java.classifiers.JavaStatClassifier.requiresEndDelimiter
 import effiban.scala2java.testsuites.UnitTestSuite
-import effiban.scala2java.testtrees.{Selfs, TypeNames}
+import effiban.scala2java.testtrees.{PrimaryCtors, Selfs, Templates, TypeNames}
 
 import scala.meta.Enumerator.Generator
 import scala.meta.Mod.Annot
@@ -54,6 +54,9 @@ class JavaStatClassifierTest extends UnitTestSuite {
   private val TheDefnVar = Defn.Var(Nil, List(Pat.Var(Term.Name("x"))), None, Some(Lit.Int(3)))
   private val TheDeclDef = Decl.Def(Nil, Term.Name("foo"), Nil, List(Nil), TypeNames.Int)
   private val TheDefnDef = Defn.Def(Nil, Term.Name("foo"), Nil, List(Nil), Some(TypeNames.Int), Term.Apply(Term.Name("bar"), Nil))
+  private val TheDefnClass = Defn.Class(Nil, Type.Name("A"), Nil, PrimaryCtors.Empty, Templates.Empty)
+  private val TheDefnTrait = Defn.Trait(Nil, Type.Name("A"), Nil, PrimaryCtors.Empty, Templates.Empty)
+  private val TheDefnObject = Defn.Object(Nil, Term.Name("A"), Templates.Empty)
 
 
   private val RequiresEndDelimiterScenarios = Table(
@@ -100,7 +103,10 @@ class JavaStatClassifierTest extends UnitTestSuite {
     ("DeclVar", TheDeclVar, true),
     ("DefnVar", TheDefnVar, true),
     ("DeclDef", TheDeclDef, true),
-    ("DefnDef", TheDefnDef, false)
+    ("DefnDef", TheDefnDef, false),
+    ("Class", TheDefnClass, false),
+    ("Trait", TheDefnTrait, false),
+    ("Object", TheDefnObject, false)
   )
 
 

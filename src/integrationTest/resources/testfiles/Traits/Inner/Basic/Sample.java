@@ -5,5 +5,4 @@ public interface Sample {
 
     interface InnerSample {
     }
-    ;
 }
