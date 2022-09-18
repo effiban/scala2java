@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.StatContext
-import effiban.scala2java.entities.JavaTreeType
+import effiban.scala2java.entities.JavaScope
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
@@ -21,7 +21,7 @@ class DefnValOrVarTypeTraverserImplTest extends UnitTestSuite {
   private val defnValOrVarTypeTraverser = new DefnValOrVarTypeTraverserImpl(typeTraverser, termTypeInferrer)
 
   test("traverse when has declared type should traverse it") {
-    val javaScope = JavaTreeType.Class
+    val javaScope = JavaScope.Class
 
     doWrite("Int").when(typeTraverser).traverse(eqTree(TypeNames.Int))
 
@@ -35,7 +35,7 @@ class DefnValOrVarTypeTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse when has no declared type, has RHS, JavaScope is none, and type is inferred - should traverse it") {
-    val javaScope = JavaTreeType.Class
+    val javaScope = JavaScope.Class
 
     when(termTypeInferrer.infer(eqTree(LiteralInt))).thenReturn(Some(TypeNames.Int))
     doWrite("Int").when(typeTraverser).traverse(eqTree(TypeNames.Int))
@@ -50,7 +50,7 @@ class DefnValOrVarTypeTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse when has no declared type, has RHS, JavaScope is none, and type not inferred - should write 'UnknownType'") {
-    val javaScope = JavaTreeType.Class
+    val javaScope = JavaScope.Class
 
     when(termTypeInferrer.infer(eqTree(NonInferrableTerm))).thenReturn(None)
 
@@ -64,7 +64,7 @@ class DefnValOrVarTypeTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse when has no declared type, has no RHS, and JavaScope is none - should write 'UnknownType'") {
-    val javaScope = JavaTreeType.Class
+    val javaScope = JavaScope.Class
 
     defnValOrVarTypeTraverser.traverse(
       maybeDeclType = None,
@@ -76,7 +76,7 @@ class DefnValOrVarTypeTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse when has no declared type and JavaScope is Block - should write 'var'") {
-    val javaScope = JavaTreeType.Block
+    val javaScope = JavaScope.Block
 
     defnValOrVarTypeTraverser.traverse(
       maybeDeclType = None,

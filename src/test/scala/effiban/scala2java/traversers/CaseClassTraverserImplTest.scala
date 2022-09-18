@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, StatContext, TemplateContext}
-import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
+import effiban.scala2java.entities.{JavaModifier, JavaScope, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
 import effiban.scala2java.matchers.JavaTreeTypeContextMatcher.eqJavaTreeTypeContext
@@ -104,7 +104,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     doWrite("(int arg1, int arg2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(CtorArgs1),
-      context = ArgumentMatchers.eq(StatContext(JavaTreeType.Class)),
+      context = ArgumentMatchers.eq(StatContext(JavaScope.Class)),
       onSameLine = ArgumentMatchers.eq(false)
     )
     doWrite(
@@ -114,9 +114,9 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(templateTraverser).traverse(
       eqTree(TheTemplate),
-      eqTemplateContext(TemplateContext(javaScope = JavaTreeType.Class, maybeClassName = Some(ClassName))))
+      eqTemplateContext(TemplateContext(javaScope = JavaScope.Class, maybeClassName = Some(ClassName))))
 
-    classTraverser.traverse(cls, StatContext(JavaTreeType.Package))
+    classTraverser.traverse(cls, StatContext(JavaScope.Package))
 
     outputWriter.toString shouldBe
       """
@@ -161,7 +161,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     doWrite("(int arg1, int arg2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(CtorArgs1),
-      context = ArgumentMatchers.eq(StatContext(JavaTreeType.Class)),
+      context = ArgumentMatchers.eq(StatContext(JavaScope.Class)),
       onSameLine = ArgumentMatchers.eq(false)
     )
     doWrite(
@@ -171,10 +171,10 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(templateTraverser).traverse(
       eqTree(TheTemplate),
-      eqTemplateContext(TemplateContext(javaScope = JavaTreeType.Class, maybeClassName = Some(ClassName), maybePrimaryCtor = Some(primaryCtor)))
+      eqTemplateContext(TemplateContext(javaScope = JavaScope.Class, maybeClassName = Some(ClassName), maybePrimaryCtor = Some(primaryCtor)))
     )
 
-    classTraverser.traverse(cls, StatContext(JavaTreeType.Package))
+    classTraverser.traverse(cls, StatContext(JavaScope.Package))
 
     outputWriter.toString shouldBe
       """
@@ -212,7 +212,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     doWrite("(int arg1, int arg2, int arg3, int arg4)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(CtorArgs1 ++ CtorArgs2),
-      context = ArgumentMatchers.eq(StatContext(JavaTreeType.Class)),
+      context = ArgumentMatchers.eq(StatContext(JavaScope.Class)),
       onSameLine = ArgumentMatchers.eq(false)
     )
     doWrite(
@@ -222,9 +222,9 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(templateTraverser).traverse(
       eqTree(TheTemplate),
-      eqTemplateContext(TemplateContext(javaScope = JavaTreeType.Class, maybeClassName = Some(ClassName))))
+      eqTemplateContext(TemplateContext(javaScope = JavaScope.Class, maybeClassName = Some(ClassName))))
 
-    classTraverser.traverse(cls, StatContext(JavaTreeType.Package))
+    classTraverser.traverse(cls, StatContext(JavaScope.Package))
 
     outputWriter.toString shouldBe
       """
@@ -245,7 +245,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
   }
 
   private def whenResolveJavaModifiersThenReturnPublic(cls: Defn.Class, modifiers: List[Mod]): Unit = {
-    val expectedJavaModifiersContext = JavaModifiersContext(cls, modifiers, JavaTreeType.Class, JavaTreeType.Package)
+    val expectedJavaModifiersContext = JavaModifiersContext(cls, modifiers, JavaTreeType.Class, JavaScope.Package)
     when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedJavaModifiersContext))).thenReturn(List(JavaModifier.Public))
   }
 

@@ -1,7 +1,7 @@
 package effiban.scala2java.resolvers
 
 import effiban.scala2java.contexts.JavaModifiersContext
-import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
+import effiban.scala2java.entities.{JavaModifier, JavaScope, JavaTreeType}
 import effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
 import effiban.scala2java.testsuites.UnitTestSuite
 
@@ -13,7 +13,7 @@ class JavaAllExtraModifiersResolverImplTest extends UnitTestSuite {
     scalaTree = Lit.Int(3),
     scalaMods = List(Mod.Private(Name.Anonymous())),
     javaTreeType = JavaTreeType.Variable,
-    javaScope = JavaTreeType.Class
+    javaScope = JavaScope.Class
   )
 
   private val singleResolver1 = mock[JavaExtraModifierResolver]

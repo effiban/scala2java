@@ -1,7 +1,8 @@
 package effiban.scala2java.resolvers
 
+import effiban.scala2java.entities.JavaScope.JavaScope
 import effiban.scala2java.entities.JavaTreeType.JavaTreeType
-import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
+import effiban.scala2java.entities.{JavaModifier, JavaScope, JavaTreeType}
 import effiban.scala2java.testsuites.UnitTestSuite
 
 class JavaAllowedModifiersResolverTest extends UnitTestSuite {
@@ -65,33 +66,33 @@ class JavaAllowedModifiersResolverTest extends UnitTestSuite {
   private final val ExpectedParameterAllowedModifiers = Set[JavaModifier](JavaModifier.Final)
 
 
-  private val AllowedModifiersScenarios = Table[JavaTreeType, JavaTreeType, Set[JavaModifier]](
+  private val AllowedModifiersScenarios = Table[JavaTreeType, JavaScope, Set[JavaModifier]](
     ("JavaTreeType", "JavaScope", "ExpectedAllowedModifiers"),
-    (JavaTreeType.Class, JavaTreeType.Package, ExpectedOuterClassAllowedModifiers),
-    (JavaTreeType.Class, JavaTreeType.Class, ExpectedInnerClassOfClassAllowedModifiers),
-    (JavaTreeType.Class, JavaTreeType.Enum, ExpectedInnerClassOfClassAllowedModifiers),
-    (JavaTreeType.Class, JavaTreeType.Interface, ExpectedInnerClassOfInterfaceAllowedModifiers),
-    (JavaTreeType.Record, JavaTreeType.Package, ExpectedOuterClassAllowedModifiers),
-    (JavaTreeType.Record, JavaTreeType.Class, ExpectedInnerClassOfClassAllowedModifiers),
-    (JavaTreeType.Record, JavaTreeType.Enum, ExpectedInnerClassOfClassAllowedModifiers),
-    (JavaTreeType.Record, JavaTreeType.Interface, ExpectedInnerClassOfInterfaceAllowedModifiers),
-    (JavaTreeType.Enum, JavaTreeType.Package, ExpectedOuterClassAllowedModifiers),
-    (JavaTreeType.Enum, JavaTreeType.Class, ExpectedInnerClassOfClassAllowedModifiers),
-    (JavaTreeType.Enum, JavaTreeType.Interface, ExpectedInnerClassOfInterfaceAllowedModifiers),
-    (JavaTreeType.Interface, JavaTreeType.Package, ExpectedOuterInterfaceAllowedModifiers),
-    (JavaTreeType.Interface, JavaTreeType.Class, ExpectedInnerInterfaceOfClassAllowedModifiers),
-    (JavaTreeType.Interface, JavaTreeType.Interface, ExpectedInnerInterfaceOfInterfaceAllowedModifiers),
-    (JavaTreeType.Method, JavaTreeType.Class, ExpectedClassMethodAllowedModifiers),
-    (JavaTreeType.Method, JavaTreeType.Interface, ExpectedInterfaceMethodAllowedModifiers),
-    (JavaTreeType.Variable, JavaTreeType.Class, ExpectedClassVariableAllowedModifiers),
-    (JavaTreeType.Variable, JavaTreeType.Interface, Set.empty),
-    (JavaTreeType.Variable, JavaTreeType.Block, ExpectedLocalVariableAllowedModifiers),
-    (JavaTreeType.Parameter, JavaTreeType.Class, ExpectedParameterAllowedModifiers),
-    (JavaTreeType.Parameter, JavaTreeType.Method, ExpectedParameterAllowedModifiers),
-    (JavaTreeType.Parameter, JavaTreeType.Lambda, ExpectedParameterAllowedModifiers)
+    (JavaTreeType.Class, JavaScope.Package, ExpectedOuterClassAllowedModifiers),
+    (JavaTreeType.Class, JavaScope.Class, ExpectedInnerClassOfClassAllowedModifiers),
+    (JavaTreeType.Class, JavaScope.Enum, ExpectedInnerClassOfClassAllowedModifiers),
+    (JavaTreeType.Class, JavaScope.Interface, ExpectedInnerClassOfInterfaceAllowedModifiers),
+    (JavaTreeType.Record, JavaScope.Package, ExpectedOuterClassAllowedModifiers),
+    (JavaTreeType.Record, JavaScope.Class, ExpectedInnerClassOfClassAllowedModifiers),
+    (JavaTreeType.Record, JavaScope.Enum, ExpectedInnerClassOfClassAllowedModifiers),
+    (JavaTreeType.Record, JavaScope.Interface, ExpectedInnerClassOfInterfaceAllowedModifiers),
+    (JavaTreeType.Enum, JavaScope.Package, ExpectedOuterClassAllowedModifiers),
+    (JavaTreeType.Enum, JavaScope.Class, ExpectedInnerClassOfClassAllowedModifiers),
+    (JavaTreeType.Enum, JavaScope.Interface, ExpectedInnerClassOfInterfaceAllowedModifiers),
+    (JavaTreeType.Interface, JavaScope.Package, ExpectedOuterInterfaceAllowedModifiers),
+    (JavaTreeType.Interface, JavaScope.Class, ExpectedInnerInterfaceOfClassAllowedModifiers),
+    (JavaTreeType.Interface, JavaScope.Interface, ExpectedInnerInterfaceOfInterfaceAllowedModifiers),
+    (JavaTreeType.Method, JavaScope.Class, ExpectedClassMethodAllowedModifiers),
+    (JavaTreeType.Method, JavaScope.Interface, ExpectedInterfaceMethodAllowedModifiers),
+    (JavaTreeType.Variable, JavaScope.Class, ExpectedClassVariableAllowedModifiers),
+    (JavaTreeType.Variable, JavaScope.Interface, Set.empty),
+    (JavaTreeType.Variable, JavaScope.Block, ExpectedLocalVariableAllowedModifiers),
+    (JavaTreeType.Parameter, JavaScope.Class, ExpectedParameterAllowedModifiers),
+    (JavaTreeType.Parameter, JavaScope.MethodSignature, ExpectedParameterAllowedModifiers),
+    (JavaTreeType.Parameter, JavaScope.LambdaSignature, ExpectedParameterAllowedModifiers)
   )
 
-  forAll(AllowedModifiersScenarios) { case (treeType: JavaTreeType, scope: JavaTreeType, expectedAllowedModifiers: Set[JavaModifier]) =>
+  forAll(AllowedModifiersScenarios) { case (treeType: JavaTreeType, scope: JavaScope, expectedAllowedModifiers: Set[JavaModifier]) =>
     test(s"Java '$treeType' in scope '$scope' should allow: $expectedAllowedModifiers") {
       JavaAllowedModifiersResolver.resolve(treeType, scope) shouldBe expectedAllowedModifiers
     }

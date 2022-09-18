@@ -3,7 +3,7 @@ package effiban.scala2java.traversers
 import effiban.scala2java.classifiers.JavaStatClassifier
 import effiban.scala2java.contexts.{StatContext, TryContext}
 import effiban.scala2java.entities.Decision.{Decision, No, Uncertain, Yes}
-import effiban.scala2java.entities.JavaTreeType
+import effiban.scala2java.entities.JavaScope
 import effiban.scala2java.entities.TraversalConstants.UncertainReturn
 import effiban.scala2java.resolvers.ShouldReturnValueResolver
 import effiban.scala2java.writers.JavaWriter
@@ -29,7 +29,7 @@ private[traversers] class BlockStatTraverserImpl(ifTraverser: => IfTraverser,
   import javaWriter._
 
   override def traverse(stat: Stat): Unit = {
-    statTraverser.traverse(stat, StatContext(JavaTreeType.Block))
+    statTraverser.traverse(stat, StatContext(JavaScope.Block))
     writeStatEnd(stat)
   }
 

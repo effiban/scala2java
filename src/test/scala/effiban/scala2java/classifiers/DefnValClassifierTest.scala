@@ -1,6 +1,6 @@
 package effiban.scala2java.classifiers
 
-import effiban.scala2java.entities.JavaTreeType
+import effiban.scala2java.entities.JavaScope
 import effiban.scala2java.testsuites.UnitTestSuite
 
 import scala.meta.{Defn, Pat, Term}
@@ -16,7 +16,7 @@ class DefnValClassifierTest extends UnitTestSuite {
       rhs = Term.Name("Value")
     )
 
-    DefnValClassifier.isEnumConstantList(defnVal, JavaTreeType.Enum) shouldBe true
+    DefnValClassifier.isEnumConstantList(defnVal, JavaScope.Enum) shouldBe true
   }
 
   test("isEnumConstantList() when RHS is 'Value' and scope is 'Class' should return false") {
@@ -27,7 +27,7 @@ class DefnValClassifierTest extends UnitTestSuite {
       rhs = Term.Name("Value")
     )
 
-    DefnValClassifier.isEnumConstantList(defnVal, JavaTreeType.Class) shouldBe false
+    DefnValClassifier.isEnumConstantList(defnVal, JavaScope.Class) shouldBe false
   }
 
   test("isEnumConstantList() when RHS is 'Blabla' and scope is 'Enum' should return false") {
@@ -38,7 +38,7 @@ class DefnValClassifierTest extends UnitTestSuite {
       rhs = Term.Name("Blabla")
     )
 
-    DefnValClassifier.isEnumConstantList(defnVal, JavaTreeType.Class) shouldBe false
+    DefnValClassifier.isEnumConstantList(defnVal, JavaScope.Class) shouldBe false
   }
 
   test("isEnumConstantList() when RHS is 'Blabla' and scope is 'Class' should return false") {
@@ -49,6 +49,6 @@ class DefnValClassifierTest extends UnitTestSuite {
       rhs = Term.Name("Blabla")
     )
 
-    DefnValClassifier.isEnumConstantList(defnVal, JavaTreeType.Class) shouldBe false
+    DefnValClassifier.isEnumConstantList(defnVal, JavaScope.Class) shouldBe false
   }
 }

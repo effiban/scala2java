@@ -1,8 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{JavaModifiersContext, StatContext}
-import effiban.scala2java.entities.JavaTreeType.Method
-import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
+import effiban.scala2java.entities.{JavaModifier, JavaScope, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
@@ -16,7 +15,7 @@ import scala.meta.{Init, Mod, Name, Term, Type}
 
 class TermParamTraverserImplTest extends UnitTestSuite {
 
-  private val TheStatContext = StatContext(Method)
+  private val TheStatContext = StatContext(JavaScope.MethodSignature)
 
   private val TheAnnot = Mod.Annot(
     Init(tpe = Type.Name("MyAnnotation"), name = Name.Anonymous(), argss = List())
@@ -77,7 +76,7 @@ class TermParamTraverserImplTest extends UnitTestSuite {
   }
 
   private def whenResolveJavaModifiers(termParam: Term.Param, modifiers: List[Mod]) = {
-    val expectedContext = JavaModifiersContext(termParam, modifiers, JavaTreeType.Parameter, JavaTreeType.Method)
+    val expectedContext = JavaModifiersContext(termParam, modifiers, JavaTreeType.Parameter, JavaScope.MethodSignature)
     when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedContext)))
   }
 }

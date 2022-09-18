@@ -2,8 +2,8 @@ package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{BlockContext, DefnDefContext, JavaModifiersContext, StatContext}
 import effiban.scala2java.entities.Decision.{Uncertain, Yes}
-import effiban.scala2java.entities.JavaTreeType.{Interface, JavaTreeType, Method}
-import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
+import effiban.scala2java.entities.JavaScope.JavaScope
+import effiban.scala2java.entities.{JavaModifier, JavaScope, JavaTreeType}
 import effiban.scala2java.matchers.BlockContextMatcher.eqBlockContext
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
@@ -72,7 +72,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     javaModifiersResolver)
 
   test("traverse() for class method with one statement returning int") {
-    val javaScope = JavaTreeType.Class
+    val javaScope = JavaScope.Class
 
     val defnDef = Defn.Def(
       mods = Modifiers,
@@ -92,7 +92,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1),
-      context = ArgumentMatchers.eq(StatContext(Method)),
+      context = ArgumentMatchers.eq(StatContext(JavaScope.MethodSignature)),
       onSameLine = ArgumentMatchers.eq(false)
     )
     doWrite(
@@ -116,7 +116,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for class method with one statement returning Unit") {
-    val javaScope = JavaTreeType.Class
+    val javaScope = JavaScope.Class
 
     val defnDef = Defn.Def(
       mods = Modifiers,
@@ -136,7 +136,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1),
-      context = ArgumentMatchers.eq(StatContext(Method)),
+      context = ArgumentMatchers.eq(StatContext(JavaScope.MethodSignature)),
       onSameLine = ArgumentMatchers.eq(false)
     )
     doWrite(
@@ -159,7 +159,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for class method with type params") {
-    val javaScope = JavaTreeType.Class
+    val javaScope = JavaScope.Class
 
     val defnDef = Defn.Def(
       mods = Modifiers,
@@ -180,7 +180,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1),
-      context = ArgumentMatchers.eq(StatContext(Method)),
+      context = ArgumentMatchers.eq(StatContext(JavaScope.MethodSignature)),
       onSameLine = ArgumentMatchers.eq(false)
     )
     doWrite(
@@ -203,7 +203,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for constructor") {
-    val javaScope = JavaTreeType.Class
+    val javaScope = JavaScope.Class
 
     val defnDef = Defn.Def(
       mods = Modifiers,
@@ -229,7 +229,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     doWrite("MyClass").when(termNameTraverser).traverse(eqTree(ClassName))
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1),
-      context = ArgumentMatchers.eq(StatContext(Method)),
+      context = ArgumentMatchers.eq(StatContext(JavaScope.MethodSignature)),
       onSameLine = ArgumentMatchers.eq(false)
     )
     doWrite(
@@ -253,7 +253,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for class method with one statement missing return type when not inferrable") {
-    val javaScope = JavaTreeType.Class
+    val javaScope = JavaScope.Class
 
     val defnDef = Defn.Def(
       mods = Modifiers,
@@ -273,7 +273,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1),
-      context = ArgumentMatchers.eq(StatContext(Method)),
+      context = ArgumentMatchers.eq(StatContext(JavaScope.MethodSignature)),
       onSameLine = ArgumentMatchers.eq(false)
     )
     doWrite(
@@ -297,7 +297,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for class method with one statement missing return type when inferrable") {
-    val javaScope = JavaTreeType.Class
+    val javaScope = JavaScope.Class
 
     val defnDef = Defn.Def(
       mods = Modifiers,
@@ -318,7 +318,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1),
-      context = ArgumentMatchers.eq(StatContext(Method)),
+      context = ArgumentMatchers.eq(StatContext(JavaScope.MethodSignature)),
       onSameLine = ArgumentMatchers.eq(false)
     )
     doWrite(
@@ -342,7 +342,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for class method with block") {
-    val javaScope = JavaTreeType.Class
+    val javaScope = JavaScope.Class
 
     val body = Block(stats = List(Statement1, Statement2))
 
@@ -364,7 +364,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1),
-      context = ArgumentMatchers.eq(StatContext(Method)),
+      context = ArgumentMatchers.eq(StatContext(JavaScope.MethodSignature)),
       onSameLine = ArgumentMatchers.eq(false)
     )
     doWrite(
@@ -388,7 +388,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for interface method with one list of params") {
-    val javaScope = Interface
+    val javaScope = JavaScope.Interface
 
     val defnDef = Defn.Def(
       mods = Modifiers,
@@ -408,7 +408,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1),
-      context = ArgumentMatchers.eq(StatContext(Method)),
+      context = ArgumentMatchers.eq(StatContext(JavaScope.MethodSignature)),
       onSameLine = ArgumentMatchers.eq(false)
     )
     doWrite(
@@ -432,7 +432,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for interface method with two lists of params") {
-    val javaScope = Interface
+    val javaScope = JavaScope.Interface
 
     val defnDef = Defn.Def(
       mods = Modifiers,
@@ -452,7 +452,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
     doWrite("(int param1, int param2, int param3, int param4)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1 ++ MethodParams2),
-      context = ArgumentMatchers.eq(StatContext(Method)),
+      context = ArgumentMatchers.eq(StatContext(JavaScope.MethodSignature)),
       onSameLine = ArgumentMatchers.eq(false)
     )
     doWrite(
@@ -479,7 +479,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     Term.Param(mods = List(), name = Term.Name(name), decltpe = Some(TypeNames.Int), default = None)
   }
 
-  private def whenResolveJavaModifiers(defnDef: Defn.Def, javaScope: JavaTreeType) = {
+  private def whenResolveJavaModifiers(defnDef: Defn.Def, javaScope: JavaScope) = {
     val expectedJavaModifiersContext = JavaModifiersContext(defnDef, Modifiers, JavaTreeType.Method, javaScope)
     when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedJavaModifiersContext)))
   }

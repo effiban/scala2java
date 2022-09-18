@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.StatContext
-import effiban.scala2java.entities.JavaTreeType.Block
+import effiban.scala2java.entities.JavaScope.Block
 import effiban.scala2java.entities.TraversalConstants.UnknownType
 import effiban.scala2java.typeinference.TermTypeInferrer
 import effiban.scala2java.writers.JavaWriter

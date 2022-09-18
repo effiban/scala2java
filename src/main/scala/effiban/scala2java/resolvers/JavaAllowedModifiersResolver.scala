@@ -1,11 +1,12 @@
 package effiban.scala2java.resolvers
 
-import effiban.scala2java.entities.JavaTreeType.{Block, Interface, JavaTreeType, Method, Package, Parameter, Record, Variable}
-import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
+import effiban.scala2java.entities.JavaScope.JavaScope
+import effiban.scala2java.entities.JavaTreeType.JavaTreeType
+import effiban.scala2java.entities.{JavaModifier, JavaScope, JavaTreeType}
 
 trait JavaAllowedModifiersResolver {
 
-  def resolve(treeType: JavaTreeType, scope: JavaTreeType): Set[JavaModifier]
+  def resolve(treeType: JavaTreeType, scope: JavaScope): Set[JavaModifier]
 }
 
 object JavaAllowedModifiersResolver extends JavaAllowedModifiersResolver {
@@ -68,31 +69,31 @@ object JavaAllowedModifiersResolver extends JavaAllowedModifiersResolver {
 
   private final val ParameterAllowedModifiers = Set[JavaModifier](JavaModifier.Final)
 
-  override def resolve(treeType: JavaTreeType, scope: JavaTreeType): Set[JavaModifier] = {
+  override def resolve(treeType: JavaTreeType, scope: JavaScope): Set[JavaModifier] = {
 
     (treeType, scope) match {
-      case (treeTpe, Package) if isClassLikeTree(treeTpe) => OuterClassAllowedModifiers
+      case (treeTpe, JavaScope.Package) if isClassLikeTree(treeTpe) => OuterClassAllowedModifiers
       case (treeTpe, theScope) if isClassLikeTree(treeTpe) && isClassLikeScope(theScope) => InnerClassOfClassAllowedModifiers
-      case (treeTpe, Interface) if isClassLikeTree(treeTpe) => InnerClassOfInterfaceAllowedModifiers
-      case (Interface, Package) => OuterInterfaceAllowedModifiers
-      case (Interface, theScope) if isClassLikeScope(theScope) => InnerInterfaceOfClassAllowedModifiers
-      case (Interface, Interface) => InnerInterfaceOfInterfaceAllowedModifiers
-      case (Method, theScope) if isClassLikeScope(theScope) => ClassMethodAllowedModifiers
-      case (Method, Interface) => InterfaceMethodAllowedModifiers
-      case (Variable, theScope) if isClassLikeScope(theScope) => ClassVariableAllowedModifiers
-      case (Variable, Block) => LocalVariableAllowedModifiers
-      case (Parameter, _) => ParameterAllowedModifiers
+      case (treeTpe, JavaScope.Interface) if isClassLikeTree(treeTpe) => InnerClassOfInterfaceAllowedModifiers
+      case (JavaTreeType.Interface, JavaScope.Package) => OuterInterfaceAllowedModifiers
+      case (JavaTreeType.Interface, theScope) if isClassLikeScope(theScope) => InnerInterfaceOfClassAllowedModifiers
+      case (JavaTreeType.Interface, JavaScope.Interface) => InnerInterfaceOfInterfaceAllowedModifiers
+      case (JavaTreeType.Method, theScope) if isClassLikeScope(theScope) => ClassMethodAllowedModifiers
+      case (JavaTreeType.Method, JavaScope.Interface) => InterfaceMethodAllowedModifiers
+      case (JavaTreeType.Variable, theScope) if isClassLikeScope(theScope) => ClassVariableAllowedModifiers
+      case (JavaTreeType.Variable, JavaScope.Block) => LocalVariableAllowedModifiers
+      case (JavaTreeType.Parameter, _) => ParameterAllowedModifiers
       case _ => Set.empty
     }
   }
 
   private def isClassLikeTree(treeType: JavaTreeType) = treeType match {
-    case JavaTreeType.Class | Record | JavaTreeType.Enum => true
+    case JavaTreeType.Class | JavaTreeType.Record | JavaTreeType.Enum => true
     case _ => false
   }
 
-  private def isClassLikeScope(treeType: JavaTreeType) = treeType match {
-    case JavaTreeType.Class | JavaTreeType.Enum => true
+  private def isClassLikeScope(scope: JavaScope) = scope match {
+    case JavaScope.Class | JavaScope.Enum => true
     case _ => false
   }
 }

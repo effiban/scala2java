@@ -2,8 +2,7 @@ package effiban.scala2java.resolvers
 
 import effiban.scala2java.classifiers.ModsClassifier
 import effiban.scala2java.contexts.JavaModifiersContext
-import effiban.scala2java.entities.JavaTreeType.{Enum, Interface, Method, Package, Parameter}
-import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
+import effiban.scala2java.entities.{JavaModifier, JavaScope, JavaTreeType}
 
 import scala.meta.Defn
 
@@ -17,10 +16,10 @@ private[resolvers] class JavaPublicModifierResolver(modsClassifier: ModsClassifi
     import context._
 
     (scalaTree, javaTreeType, javaScope) match {
-      case (_: Defn.Def, Method, Interface) => Some(JavaModifier.Default)
+      case (_: Defn.Def, JavaTreeType.Method, JavaScope.Interface) => Some(JavaModifier.Default)
       // A class (ctor.) param is a member in Scala and can be 'public', but for Java we will transfer the 'public' to a generated member
-      case (_, Parameter, JavaTreeType.Class) => None
-      case (_, _, Package | JavaTreeType.Class | Enum) => Some(JavaModifier.Public)
+      case (_, JavaTreeType.Parameter, JavaScope.Class) => None
+      case (_, _, JavaScope.Package | JavaScope.Class | JavaScope.Enum) => Some(JavaModifier.Public)
       case _ => None
     }
   }

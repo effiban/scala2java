@@ -3,7 +3,7 @@ package effiban.scala2java.traversers
 import effiban.scala2java.classifiers.JavaStatClassifier
 import effiban.scala2java.contexts.{StatContext, TryContext}
 import effiban.scala2java.entities.Decision.{No, Uncertain, Yes}
-import effiban.scala2java.entities.JavaTreeType
+import effiban.scala2java.entities.JavaScope
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.resolvers.ShouldReturnValueResolver
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
@@ -60,7 +60,7 @@ class BlockStatTraverserImplTest extends UnitTestSuite {
       |}
       |""".stripMargin
 
-  private val BlockStatContext = StatContext(JavaTreeType.Block)
+  private val BlockStatContext = StatContext(JavaScope.Block)
 
 
   private val ifTraverser = mock[IfTraverser]

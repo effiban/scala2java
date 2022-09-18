@@ -1,8 +1,8 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, StatContext, TemplateContext}
-import effiban.scala2java.entities.JavaTreeType.JavaTreeType
-import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
+import effiban.scala2java.entities.JavaScope.JavaScope
+import effiban.scala2java.entities.{JavaModifier, JavaScope, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
 import effiban.scala2java.matchers.JavaTreeTypeContextMatcher.eqJavaTreeTypeContext
@@ -92,7 +92,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
 
 
   test("traverse() for one list of ctor args") {
-    val parentJavaScope = JavaTreeType.Package
+    val parentJavaScope = JavaScope.Package
 
     val primaryCtor = Ctor.Primary(
       mods = Nil,
@@ -131,7 +131,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(templateTraverser).traverse(
       eqTree(expectedAdjustedTemplate),
-      eqTemplateContext(TemplateContext(javaScope = JavaTreeType.Class, maybeClassName = Some(ClassName), maybePrimaryCtor = Some(primaryCtor)))
+      eqTemplateContext(TemplateContext(javaScope = JavaScope.Class, maybeClassName = Some(ClassName), maybePrimaryCtor = Some(primaryCtor)))
     )
 
     classTraverser.traverse(cls, StatContext(parentJavaScope))
@@ -146,7 +146,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for two lists of ctor args") {
-    val parentJavaScope = JavaTreeType.Package
+    val parentJavaScope = JavaScope.Package
 
     val primaryCtor = Ctor.Primary(
       mods = Nil,
@@ -195,7 +195,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(templateTraverser).traverse(
       eqTree(expectedAdjustedTemplate),
-      eqTemplateContext(TemplateContext(javaScope = JavaTreeType.Class, maybeClassName = Some(ClassName), maybePrimaryCtor = Some(primaryCtor)))
+      eqTemplateContext(TemplateContext(javaScope = JavaScope.Class, maybeClassName = Some(ClassName), maybePrimaryCtor = Some(primaryCtor)))
     )
 
     classTraverser.traverse(cls, StatContext(parentJavaScope))
@@ -231,7 +231,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
     when(javaTreeTypeResolver.resolve(eqJavaTreeTypeContext(expectedContext))).thenReturn(JavaTreeType.Class)
   }
 
-  private def whenResolveJavaModifiersThenReturnPublic(cls: Defn.Class, parentJavaScope: JavaTreeType): Unit = {
+  private def whenResolveJavaModifiersThenReturnPublic(cls: Defn.Class, parentJavaScope: JavaScope): Unit = {
     val expectedContext = JavaModifiersContext(cls, Modifiers, JavaTreeType.Class, parentJavaScope)
     when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedContext))).thenReturn(List(JavaModifier.Public))
   }

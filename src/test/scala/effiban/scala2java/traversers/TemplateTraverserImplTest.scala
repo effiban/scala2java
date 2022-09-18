@@ -1,8 +1,8 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{TemplateBodyContext, TemplateContext}
-import effiban.scala2java.entities.JavaTreeType.JavaTreeType
-import effiban.scala2java.entities.{JavaKeyword, JavaTreeType}
+import effiban.scala2java.entities.JavaScope.JavaScope
+import effiban.scala2java.entities.{JavaKeyword, JavaScope}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.TemplateBodyContextMatcher.eqTemplateBodyContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
@@ -78,7 +78,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     expectWriteSelf()
     expectTraverseBody(stats = Nil)
 
-    templateTraverser.traverse(template = Templates.Empty, context = TemplateContext(javaScope = JavaTreeType.Class))
+    templateTraverser.traverse(template = Templates.Empty, context = TemplateContext(javaScope = JavaScope.Class))
 
     outputWriter.toString shouldBe
       """ {
@@ -98,10 +98,10 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     )
 
     expectWriteSelf()
-    expectWriteInits(JavaTreeType.Class)
-    expectTraverseBody(stats = Nil, context = TemplateBodyContext(javaScope = JavaTreeType.Class, inits = TheNonSkippedInits))
+    expectWriteInits(JavaScope.Class)
+    expectTraverseBody(stats = Nil, context = TemplateBodyContext(javaScope = JavaScope.Class, inits = TheNonSkippedInits))
 
-    templateTraverser.traverse(template, context = TemplateContext(javaScope = JavaTreeType.Class))
+    templateTraverser.traverse(template, context = TemplateContext(javaScope = JavaScope.Class))
 
     outputWriter.toString shouldBe
       """ implements Parent1, Parent2 {
@@ -119,10 +119,10 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     )
 
     expectWriteSelf()
-    expectWriteInits(JavaTreeType.Class)
-    expectTraverseBody(stats = Nil, context = TemplateBodyContext(javaScope = JavaTreeType.Class, inits = TheNonSkippedInits))
+    expectWriteInits(JavaScope.Class)
+    expectTraverseBody(stats = Nil, context = TemplateBodyContext(javaScope = JavaScope.Class, inits = TheNonSkippedInits))
 
-    templateTraverser.traverse(template, context = TemplateContext(javaScope = JavaTreeType.Class))
+    templateTraverser.traverse(template, context = TemplateContext(javaScope = JavaScope.Class))
 
     outputWriter.toString shouldBe
       """ implements Parent1, Parent2 {
@@ -142,7 +142,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     expectWriteSelf(NonEmptySelf)
     expectTraverseBody(stats = Nil)
 
-    templateTraverser.traverse(template, context = TemplateContext(javaScope = JavaTreeType.Class))
+    templateTraverser.traverse(template, context = TemplateContext(javaScope = JavaScope.Class))
 
     outputWriter.toString shouldBe
       """/* extends SelfName: SelfType */ {
@@ -155,14 +155,14 @@ class TemplateTraverserImplTest extends UnitTestSuite {
 
   test("traverse when has primary ctor only") {
     val context = TemplateContext(
-      javaScope = JavaTreeType.Class,
+      javaScope = JavaScope.Class,
       maybeClassName = Some(ClassName),
       maybePrimaryCtor = Some(PrimaryCtor)
     )
 
     expectWriteSelf()
     expectTraverseBody(stats = Nil, context = TemplateBodyContext(
-      javaScope = JavaTreeType.Class,
+      javaScope = JavaScope.Class,
       maybeClassName = context.maybeClassName,
       maybePrimaryCtor = context.maybePrimaryCtor)
     )
@@ -195,7 +195,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     expectWriteSelf()
     expectTraverseBody(stats = stats)
 
-    templateTraverser.traverse(template = template, context = TemplateContext(javaScope = JavaTreeType.Class))
+    templateTraverser.traverse(template = template, context = TemplateContext(javaScope = JavaScope.Class))
 
     outputWriter.toString shouldBe
       """ {
@@ -220,15 +220,15 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     )
 
     val context = TemplateContext(
-      javaScope = JavaTreeType.Class,
+      javaScope = JavaScope.Class,
       maybeClassName = Some(ClassName),
       maybePrimaryCtor = Some(PrimaryCtor)
     )
 
-    expectWriteInits(JavaTreeType.Class)
+    expectWriteInits(JavaScope.Class)
     expectWriteSelf(NonEmptySelf)
     expectTraverseBody(stats = stats, context = TemplateBodyContext(
-      javaScope = JavaTreeType.Class,
+      javaScope = JavaScope.Class,
       maybeClassName = Some(ClassName),
       maybePrimaryCtor = Some(PrimaryCtor),
       inits = TheNonSkippedInits)
@@ -247,7 +247,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     Term.Param(mods = List(), name = Term.Name(name), decltpe = Some(Type.Name(typeName)), default = None)
   }
 
-  private def expectWriteInits(javaScope: JavaTreeType): Unit = {
+  private def expectWriteInits(javaScope: JavaScope): Unit = {
     when(javaInheritanceKeywordResolver.resolve(ArgumentMatchers.eq(javaScope), eqTreeList(TheNonSkippedInits))).thenReturn(JavaKeyword.Implements)
     doWrite("Parent1, Parent2").when(initListTraverser).traverse(eqTreeList(TheNonSkippedInits), ArgumentMatchers.eq(true))
   }
@@ -260,7 +260,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     doWrite(selfStr).when(selfTraverser).traverse(eqTree(self))
   }
 
-  private def expectTraverseBody(stats: List[Stat], context: TemplateBodyContext = TemplateBodyContext(javaScope = JavaTreeType.Class)): Unit = {
+  private def expectTraverseBody(stats: List[Stat], context: TemplateBodyContext = TemplateBodyContext(javaScope = JavaScope.Class)): Unit = {
     doWrite(
       """ {
         |  /* BODY */

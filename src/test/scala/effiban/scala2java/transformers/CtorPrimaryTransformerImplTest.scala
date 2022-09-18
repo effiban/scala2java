@@ -1,7 +1,7 @@
 package effiban.scala2java.transformers
 
 import effiban.scala2java.contexts.CtorContext
-import effiban.scala2java.entities.JavaTreeType
+import effiban.scala2java.entities.JavaScope
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
 import org.mockito.ArgumentMatchers.any
@@ -48,7 +48,7 @@ class CtorPrimaryTransformerImplTest extends UnitTestSuite {
       body = Block(Nil)
     )
 
-    val context = CtorContext(javaScope = JavaTreeType.Class, className = Type.Name(ClassName))
+    val context = CtorContext(javaScope = JavaScope.Class, className = Type.Name(ClassName))
 
     when(ctorInitsToSuperCallTransformer.transform(any())).thenReturn(None)
 
@@ -79,7 +79,7 @@ class CtorPrimaryTransformerImplTest extends UnitTestSuite {
     )
 
     val context = CtorContext(
-      javaScope = JavaTreeType.Class,
+      javaScope = JavaScope.Class,
       className = Type.Name(ClassName),
       terms = terms
     )
@@ -110,7 +110,7 @@ class CtorPrimaryTransformerImplTest extends UnitTestSuite {
     )
 
     val context = CtorContext(
-      javaScope = JavaTreeType.Class,
+      javaScope = JavaScope.Class,
       className = Type.Name(ClassName)
     )
 
@@ -142,7 +142,7 @@ class CtorPrimaryTransformerImplTest extends UnitTestSuite {
       body = Block(expectedAssignments)
     )
 
-    val context = CtorContext(javaScope = JavaTreeType.Class, className = Type.Name(ClassName))
+    val context = CtorContext(javaScope = JavaScope.Class, className = Type.Name(ClassName))
 
     when(ctorInitsToSuperCallTransformer.transform(any())).thenReturn(None)
 
@@ -182,7 +182,7 @@ class CtorPrimaryTransformerImplTest extends UnitTestSuite {
     )
 
     val context = CtorContext(
-      javaScope = JavaTreeType.Class,
+      javaScope = JavaScope.Class,
       className = Type.Name(ClassName),
       inits = List(inputInit)
     )

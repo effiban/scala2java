@@ -1,7 +1,7 @@
 package effiban.scala2java.transformers
 
 import effiban.scala2java.contexts.CtorContext
-import effiban.scala2java.entities.JavaTreeType
+import effiban.scala2java.entities.JavaScope
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
 
@@ -51,7 +51,7 @@ class CtorSecondaryTransformerTest extends UnitTestSuite {
       body = Block(Nil)
     )
 
-    val context = CtorContext(javaScope = JavaTreeType.Class, className = Type.Name(ClassName))
+    val context = CtorContext(javaScope = JavaScope.Class, className = Type.Name(ClassName))
 
     val actualDefnDef = CtorSecondaryTransformer.transform(secondaryCtor = secondaryCtor, context = context)
 
@@ -76,7 +76,7 @@ class CtorSecondaryTransformerTest extends UnitTestSuite {
       body = Block(Nil)
     )
 
-    val context = CtorContext(javaScope = JavaTreeType.Class, className = Type.Name(ClassName))
+    val context = CtorContext(javaScope = JavaScope.Class, className = Type.Name(ClassName))
 
     val actualDefnDef = CtorSecondaryTransformer.transform(secondaryCtor = secondaryCtor, context = context)
 
@@ -106,7 +106,7 @@ class CtorSecondaryTransformerTest extends UnitTestSuite {
       body = Block(stats)
     )
 
-    val context = CtorContext(javaScope = JavaTreeType.Class, className = Type.Name(ClassName))
+    val context = CtorContext(javaScope = JavaScope.Class, className = Type.Name(ClassName))
 
     val actualDefnDef = CtorSecondaryTransformer.transform(secondaryCtor = secondaryCtor, context = context)
 
@@ -136,7 +136,7 @@ class CtorSecondaryTransformerTest extends UnitTestSuite {
       body = Block(stats)
     )
 
-    val context = CtorContext(javaScope = JavaTreeType.Class, className = Type.Name(ClassName))
+    val context = CtorContext(javaScope = JavaScope.Class, className = Type.Name(ClassName))
 
     val actualDefnDef = CtorSecondaryTransformer.transform(secondaryCtor = secondaryCtor, context = context)
 

@@ -1,16 +1,17 @@
 package effiban.scala2java.entities
 
+import effiban.scala2java.entities.JavaScope.JavaScope
 import effiban.scala2java.entities.JavaTreeType.JavaTreeType
 
 object JavaTreeTypeToScopeMapping {
 
-  private final val map: Map[JavaTreeType, JavaTreeType] = Map(
-    JavaTreeType.Package -> JavaTreeType.Package,
-    JavaTreeType.Class -> JavaTreeType.Class,
-    JavaTreeType.Record -> JavaTreeType.Class,
-    JavaTreeType.Enum -> JavaTreeType.Enum,
-    JavaTreeType.Interface -> JavaTreeType.Interface
+  private final val map: Map[JavaTreeType, JavaScope] = Map(
+    JavaTreeType.Package -> JavaScope.Package,
+    JavaTreeType.Class -> JavaScope.Class,
+    JavaTreeType.Record -> JavaScope.Class,
+    JavaTreeType.Enum -> JavaScope.Enum,
+    JavaTreeType.Interface -> JavaScope.Interface
   )
 
-  def apply(javaTreeType: JavaTreeType): JavaTreeType = map.getOrElse(javaTreeType, JavaTreeType.Unknown)
+  def apply(javaTreeType: JavaTreeType): JavaScope = map.getOrElse(javaTreeType, JavaScope.Unknown)
 }

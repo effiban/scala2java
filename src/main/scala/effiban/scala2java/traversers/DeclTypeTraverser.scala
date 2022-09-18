@@ -1,6 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, StatContext}
+import effiban.scala2java.entities.JavaScope.JavaScope
 import effiban.scala2java.entities.JavaTreeType.JavaTreeType
 import effiban.scala2java.entities.JavaTreeTypeToKeywordMapping
 import effiban.scala2java.resolvers.{JavaModifiersResolver, JavaTreeTypeResolver}
@@ -35,7 +36,7 @@ private[traversers] class DeclTypeTraverserImpl(typeParamListTraverser: => TypeP
 
   private def resolveJavaModifiers(typeDecl: Decl.Type,
                                    javaTreeType: JavaTreeType,
-                                   parentJavaScope: JavaTreeType) = {
+                                   parentJavaScope: JavaScope) = {
     val javaModifiersContext = JavaModifiersContext(
       scalaTree = typeDecl,
       scalaMods = typeDecl.mods,

@@ -25,7 +25,6 @@ class JavaTreeTypeResolverImpl(templateClassifier: TemplateClassifier) extends J
       case (_: Defn.Trait, _) | (_: Decl.Type, _) | (_: Defn.Type, _) => JavaTreeType.Interface
       case (_: Decl.Def, _) | (_: Defn.Def, _) => JavaTreeType.Method
       case (_: Term.Function, _) => JavaTreeType.Lambda
-      case (_: Term.Block, _) => JavaTreeType.Block
       case (_: Decl.Val, _) | (_: Defn.Val, _) | (_: Decl.Var, _) | (_: Defn.Var, _) => JavaTreeType.Variable
       case (_: Term.Param, _) => JavaTreeType.Parameter
       case _ => JavaTreeType.Unknown

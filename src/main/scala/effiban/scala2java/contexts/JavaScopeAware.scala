@@ -1,7 +1,7 @@
 package effiban.scala2java.contexts
 
-import effiban.scala2java.entities.JavaTreeType.JavaTreeType
+import effiban.scala2java.entities.JavaScope.JavaScope
 
 trait JavaScopeAware {
-  val javaScope: JavaTreeType
+  val javaScope: JavaScope
 }

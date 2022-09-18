@@ -1,8 +1,8 @@
 package effiban.scala2java.resolvers
 
 import effiban.scala2java.contexts.JavaModifiersContext
-import effiban.scala2java.entities.JavaTreeType.JavaTreeType
-import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
+import effiban.scala2java.entities.JavaScope.JavaScope
+import effiban.scala2java.entities.{JavaModifier, JavaScope, JavaTreeType}
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
 
@@ -25,28 +25,28 @@ class JavaFinalModifierResolverTest extends UnitTestSuite {
 
   private val RequiresFinalScenarios = Table(
     ("ScalaTree", "ScalaTreeDesc", "JavaScope", "ExpectedResult"),
-    (TheDeclVal, DeclValDesc, JavaTreeType.Class, true),
-    (TheDeclVal, DeclValDesc, JavaTreeType.Interface, false),
-    (TheDeclVal, DeclValDesc, JavaTreeType.Block, true),
-    (TheDefnVal, DefnValDesc, JavaTreeType.Class, true),
-    (TheDefnVal, DefnValDesc, JavaTreeType.Interface, false),
-    (TheDefnVal, DefnValDesc, JavaTreeType.Block, true),
-    (TheDeclVar, DeclVarDesc, JavaTreeType.Class, false),
-    (TheDeclVar, DeclVarDesc, JavaTreeType.Interface, false),
-    (TheDeclVar, DeclVarDesc, JavaTreeType.Block, false),
-    (TheDefnVar, DefnVarDesc, JavaTreeType.Class, false),
-    (TheDefnVar, DefnVarDesc, JavaTreeType.Interface, false),
-    (TheDefnVar, DefnVarDesc, JavaTreeType.Block, false),
-    (TheTermParam, TermParamDesc, JavaTreeType.Class, true),
-    (TheTermParam, TermParamDesc, JavaTreeType.Method, true),
-    (TheTermParam, TermParamDesc, JavaTreeType.Lambda, false),
+    (TheDeclVal, DeclValDesc, JavaScope.Class, true),
+    (TheDeclVal, DeclValDesc, JavaScope.Interface, false),
+    (TheDeclVal, DeclValDesc, JavaScope.Block, true),
+    (TheDefnVal, DefnValDesc, JavaScope.Class, true),
+    (TheDefnVal, DefnValDesc, JavaScope.Interface, false),
+    (TheDefnVal, DefnValDesc, JavaScope.Block, true),
+    (TheDeclVar, DeclVarDesc, JavaScope.Class, false),
+    (TheDeclVar, DeclVarDesc, JavaScope.Interface, false),
+    (TheDeclVar, DeclVarDesc, JavaScope.Block, false),
+    (TheDefnVar, DefnVarDesc, JavaScope.Class, false),
+    (TheDefnVar, DefnVarDesc, JavaScope.Interface, false),
+    (TheDefnVar, DefnVarDesc, JavaScope.Block, false),
+    (TheTermParam, TermParamDesc, JavaScope.Class, true),
+    (TheTermParam, TermParamDesc, JavaScope.MethodSignature, true),
+    (TheTermParam, TermParamDesc, JavaScope.LambdaSignature, false),
   )
 
   forAll(RequiresFinalScenarios) {
     case (
       scalaTree: Tree,
       scalaTreeDesc: String,
-      javaScope: JavaTreeType,
+      javaScope: JavaScope,
       expectedResult: Boolean) =>
 
       test(s"A '$scalaTreeDesc' in the scope '$javaScope' should ${if (expectedResult) "" else "not"} require 'final'") {
@@ -54,7 +54,7 @@ class JavaFinalModifierResolverTest extends UnitTestSuite {
       }
   }
 
-  private def resolve(scalaTree: Tree, javaScope: JavaTreeType) = {
+  private def resolve(scalaTree: Tree, javaScope: JavaScope) = {
     JavaFinalModifierResolver.resolve(
       JavaModifiersContext(
         scalaTree = scalaTree,

@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.StatContext
-import effiban.scala2java.entities.JavaTreeType.Package
+import effiban.scala2java.entities.JavaScope
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
@@ -12,7 +12,7 @@ import scala.meta.{Decl, Defn, Import, Importee, Importer, Name, Pat, Pkg, Self,
 
 class PkgTraverserImplTest extends UnitTestSuite {
 
-  private val PackageStatContext = StatContext(Package)
+  private val PackageStatContext = StatContext(JavaScope.Package)
 
   private val termRefTraverser = mock[TermRefTraverser]
   private val statTraverser = mock[StatTraverser]

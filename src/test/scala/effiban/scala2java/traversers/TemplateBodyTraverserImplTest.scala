@@ -2,7 +2,7 @@ package effiban.scala2java.traversers
 
 import effiban.scala2java.classifiers.DefnTypeClassifier
 import effiban.scala2java.contexts.{TemplateBodyContext, TemplateChildContext}
-import effiban.scala2java.entities.JavaTreeType
+import effiban.scala2java.entities.JavaScope
 import effiban.scala2java.matchers.TemplateChildContextMatcher.eqTemplateChildContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.orderings.JavaTemplateChildOrdering
@@ -24,7 +24,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
   )
 
   private val ChildContextWithClassNameAndNoCtorTerms = TemplateChildContext(
-    javaScope = JavaTreeType.Class,
+    javaScope = JavaScope.Class,
     maybeClassName = Some(ClassName),
     inits = TheInits
   )
@@ -106,7 +106,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
 
   test("traverse when empty") {
 
-    templateBodyTraverser.traverse(stats = Nil, context = TemplateBodyContext(javaScope = JavaTreeType.Class))
+    templateBodyTraverser.traverse(stats = Nil, context = TemplateBodyContext(javaScope = JavaScope.Class))
 
     outputWriter.toString shouldBe
       """ {
@@ -115,7 +115,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse when has inits only") {
-    templateBodyTraverser.traverse(stats = Nil, context = TemplateBodyContext(javaScope = JavaTreeType.Class, inits = TheInits))
+    templateBodyTraverser.traverse(stats = Nil, context = TemplateBodyContext(javaScope = JavaScope.Class, inits = TheInits))
 
     outputWriter.toString shouldBe
       """ {
@@ -125,12 +125,12 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
 
   test("traverse when has primary ctor. only") {
     val context = TemplateBodyContext(
-      javaScope = JavaTreeType.Class,
+      javaScope = JavaScope.Class,
       maybeClassName = Some(ClassName),
       maybePrimaryCtor = Some(PrimaryCtor)
     )
 
-    val expectedChildContext = TemplateChildContext(javaScope = JavaTreeType.Class, maybeClassName = Some(ClassName))
+    val expectedChildContext = TemplateChildContext(javaScope = JavaScope.Class, maybeClassName = Some(ClassName))
     expectWritePrimaryCtor(expectedChildContext)
 
     expectChildOrdering()
@@ -160,7 +160,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
 
     expectChildOrdering()
 
-    templateBodyTraverser.traverse(stats = stats, context = TemplateBodyContext(javaScope = JavaTreeType.Class))
+    templateBodyTraverser.traverse(stats = stats, context = TemplateBodyContext(javaScope = JavaScope.Class))
 
     outputWriter.toString shouldBe
       """ {
@@ -184,12 +184,12 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
     expectWriteDataMemberDecl()
     expectWriteDataMemberDefn()
     expectWriteMethodDefn()
-    when(defnTypeClassifier.isEnumTypeDef(eqTree(TypeDefn), ArgumentMatchers.eq(JavaTreeType.Class))).thenReturn(false)
+    when(defnTypeClassifier.isEnumTypeDef(eqTree(TypeDefn), ArgumentMatchers.eq(JavaScope.Class))).thenReturn(false)
     expectWriteTypeDefn()
 
     expectChildOrdering()
 
-    templateBodyTraverser.traverse(stats = stats, context = TemplateBodyContext(javaScope = JavaTreeType.Class))
+    templateBodyTraverser.traverse(stats = stats, context = TemplateBodyContext(javaScope = JavaScope.Class))
 
     outputWriter.toString shouldBe
       """ {
@@ -216,11 +216,11 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
     expectWriteDataMemberDecl()
     expectWriteDataMemberDefn()
     expectWriteMethodDefn()
-    when(defnTypeClassifier.isEnumTypeDef(eqTree(TypeDefn), ArgumentMatchers.eq(JavaTreeType.Class))).thenReturn(true)
+    when(defnTypeClassifier.isEnumTypeDef(eqTree(TypeDefn), ArgumentMatchers.eq(JavaScope.Class))).thenReturn(true)
 
     expectChildOrdering()
 
-    templateBodyTraverser.traverse(stats = stats, context = TemplateBodyContext(javaScope = JavaTreeType.Class))
+    templateBodyTraverser.traverse(stats = stats, context = TemplateBodyContext(javaScope = JavaScope.Class))
 
     outputWriter.toString shouldBe
       """ {
@@ -235,7 +235,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
 
   test("traverse when has everything except loose terms") {
     val context = TemplateBodyContext(
-      javaScope = JavaTreeType.Class,
+      javaScope = JavaScope.Class,
       maybeClassName = Some(ClassName),
       maybePrimaryCtor = Some(PrimaryCtor),
       inits = TheInits
@@ -277,7 +277,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
 
   test("traverse when has everything including loose terms") {
     val context = TemplateBodyContext(
-      javaScope = JavaTreeType.Class,
+      javaScope = JavaScope.Class,
       maybeClassName = Some(ClassName),
       maybePrimaryCtor = Some(PrimaryCtor),
       inits = TheInits
@@ -293,7 +293,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
     )
 
     val expectedChildContext = TemplateChildContext(
-      javaScope = JavaTreeType.Class,
+      javaScope = JavaScope.Class,
       maybeClassName = Some(ClassName),
       inits = TheInits,
       ctorTerms = List(TermApply1, TermApply2)
@@ -330,14 +330,14 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
     Term.Param(mods = List(), name = Term.Name(name), decltpe = Some(Type.Name(typeName)), default = None)
   }
 
-  private def expectWriteDataMemberDecl(expectedChildContext: TemplateChildContext = TemplateChildContext(javaScope = JavaTreeType.Class)): Unit = {
+  private def expectWriteDataMemberDecl(expectedChildContext: TemplateChildContext = TemplateChildContext(javaScope = JavaScope.Class)): Unit = {
     doWrite(
       """/* DATA MEMBER DECL */;
         |""".stripMargin)
       .when(templateChildTraverser).traverse(eqTree(DataMemberDecl), eqTemplateChildContext(expectedChildContext))
   }
 
-  private def expectWriteDataMemberDefn(expectedChildContext: TemplateChildContext = TemplateChildContext(javaScope = JavaTreeType.Class)): Unit = {
+  private def expectWriteDataMemberDefn(expectedChildContext: TemplateChildContext = TemplateChildContext(javaScope = JavaScope.Class)): Unit = {
     doWrite(
     """/* DATA MEMBER DEFINITION */;
         |""".stripMargin)
@@ -362,7 +362,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
       .when(templateChildTraverser).traverse(eqTree(SecondaryCtor), eqTemplateChildContext(expectedChildContext))
   }
 
-  private def expectWriteMethodDefn(expectedChildContext: TemplateChildContext = TemplateChildContext(javaScope = JavaTreeType.Class)): Unit = {
+  private def expectWriteMethodDefn(expectedChildContext: TemplateChildContext = TemplateChildContext(javaScope = JavaScope.Class)): Unit = {
     doWrite(
       """/*
         |*  METHOD DEFINITION
@@ -371,7 +371,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
       .when(templateChildTraverser).traverse(eqTree(MethodDefn), eqTemplateChildContext(expectedChildContext))
   }
 
-  private def expectWriteTypeDefn(expectedChildContext: TemplateChildContext = TemplateChildContext(javaScope = JavaTreeType.Class)): Unit = {
+  private def expectWriteTypeDefn(expectedChildContext: TemplateChildContext = TemplateChildContext(javaScope = JavaScope.Class)): Unit = {
     doWrite(
       """/*
         |*  TYPE DEFINITION
