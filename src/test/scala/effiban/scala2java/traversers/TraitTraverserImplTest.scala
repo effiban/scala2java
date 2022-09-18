@@ -2,7 +2,7 @@ package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, StatContext, TemplateContext}
 import effiban.scala2java.entities.JavaTreeType.Interface
-import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
+import effiban.scala2java.entities.{JavaModifier, JavaScope}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
 import effiban.scala2java.matchers.JavaTreeTypeContextMatcher.eqJavaTreeTypeContext
@@ -100,9 +100,9 @@ class TraitTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}
         |""".stripMargin)
-      .when(templateTraverser).traverse(eqTree(TheTemplate), eqTemplateContext(TemplateContext(javaScope = Interface)))
+      .when(templateTraverser).traverse(eqTree(TheTemplate), eqTemplateContext(TemplateContext(javaScope = JavaScope.Interface)))
 
-    traitTraverser.traverse(`trait`, StatContext(JavaTreeType.Package))
+    traitTraverser.traverse(`trait`, StatContext(JavaScope.Package))
 
     outputWriter.toString shouldBe
       """
@@ -119,7 +119,7 @@ class TraitTraverserImplTest extends UnitTestSuite {
   }
 
   private def whenResolveJavaModifiersThenReturnPublic(`trait`: Trait): Unit = {
-    val expectedJavaModifiersContext = JavaModifiersContext(`trait`, Modifiers, Interface, JavaTreeType.Package)
+    val expectedJavaModifiersContext = JavaModifiersContext(`trait`, Modifiers, Interface, JavaScope.Package)
     when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedJavaModifiersContext))).thenReturn(List(JavaModifier.Public))
   }
 }

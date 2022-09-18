@@ -1,8 +1,8 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{JavaModifiersContext, StatContext}
-import effiban.scala2java.entities.JavaTreeType.{Interface, JavaTreeType}
-import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
+import effiban.scala2java.entities.JavaScope.JavaScope
+import effiban.scala2java.entities.{JavaModifier, JavaScope, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.{eqSomeTree, eqTreeList}
 import effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
@@ -40,7 +40,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
 
 
   test("traverse() when it is a class member - typed") {
-    val javaScope = JavaTreeType.Class
+    val javaScope = JavaScope.Class
 
     val modifiers = List(TheAnnot)
 
@@ -73,7 +73,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() when it is a class member - untyped") {
-    val javaScope = JavaTreeType.Class
+    val javaScope = JavaScope.Class
 
     val modifiers = List(TheAnnot)
 
@@ -106,7 +106,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() when it is an interface member - typed") {
-    val javaScope = Interface
+    val javaScope = JavaScope.Interface
 
     val modifiers = List(TheAnnot)
 
@@ -139,7 +139,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() when it is an interface member - untyped") {
-    val javaScope = Interface
+    val javaScope = JavaScope.Interface
 
     val modifiers = List(TheAnnot)
 
@@ -171,7 +171,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
         |int myVal = 3""".stripMargin
   }
 
-  private def whenResolveJavaModifiers(defnVal: Defn.Val, modifiers: List[Mod], javaScope: JavaTreeType) = {
+  private def whenResolveJavaModifiers(defnVal: Defn.Val, modifiers: List[Mod], javaScope: JavaScope) = {
     val expectedContext = JavaModifiersContext(defnVal, modifiers, JavaTreeType.Variable, javaScope)
     when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedContext)))
   }

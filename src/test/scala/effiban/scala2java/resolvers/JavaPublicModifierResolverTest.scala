@@ -2,8 +2,9 @@ package effiban.scala2java.resolvers
 
 import effiban.scala2java.classifiers.ModsClassifier
 import effiban.scala2java.contexts.JavaModifiersContext
+import effiban.scala2java.entities.JavaScope.JavaScope
 import effiban.scala2java.entities.JavaTreeType.JavaTreeType
-import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
+import effiban.scala2java.entities.{JavaModifier, JavaScope, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.{PrimaryCtors, Templates, TypeNames}
@@ -59,32 +60,32 @@ class JavaPublicModifierResolverTest extends UnitTestSuite {
 
   private val ScenariosWhenScalaModsPublic = Table(
     ("Desc", "ScalaTree", "JavaTreeType", "JavaScope", "ExpectedMaybeModifier"),
-    ("outer class", TheClass, JavaTreeType.Class, JavaTreeType.Package, Some(JavaModifier.Public)),
-    ("inner class of class", TheClass, JavaTreeType.Class, JavaTreeType.Class, Some(JavaModifier.Public)),
-    ("inner class of interface", TheClass, JavaTreeType.Class, JavaTreeType.Interface, None),
-    ("outer enum", TheClass, JavaTreeType.Enum, JavaTreeType.Package, Some(JavaModifier.Public)),
-    ("outer interface", TheTrait, JavaTreeType.Interface, JavaTreeType.Package, Some(JavaModifier.Public)),
-    ("inner interface of class", TheTrait, JavaTreeType.Interface, JavaTreeType.Class, Some(JavaModifier.Public)),
-    ("inner interface of interface", TheTrait, JavaTreeType.Interface, JavaTreeType.Interface, None),
-    ("class method", TheDefnDef, JavaTreeType.Method, JavaTreeType.Class, Some(JavaModifier.Public)),
-    ("enum method", TheDefnDef, JavaTreeType.Method, JavaTreeType.Enum, Some(JavaModifier.Public)),
-    ("interface method definition", TheDefnDef, JavaTreeType.Method, JavaTreeType.Interface, Some(JavaModifier.Default)),
-    ("interface method declaration", TheDeclDef, JavaTreeType.Method, JavaTreeType.Interface, None),
-    ("class variable", TheVal, JavaTreeType.Variable, JavaTreeType.Class, Some(JavaModifier.Public)),
-    ("enum variable", TheVal, JavaTreeType.Variable, JavaTreeType.Enum, Some(JavaModifier.Public)),
-    ("interface variable", TheVal, JavaTreeType.Variable, JavaTreeType.Interface, None),
-    ("method variable", TheVal, JavaTreeType.Variable, JavaTreeType.Method, None),
-    ("lambda variable", TheVal, JavaTreeType.Variable, JavaTreeType.Lambda, None),
-    ("class (ctor.) parameter", TheVal, JavaTreeType.Parameter, JavaTreeType.Class, None),
-    ("method parameter", TheVal, JavaTreeType.Parameter, JavaTreeType.Method, None),
-    ("lambda parameter", TheVal, JavaTreeType.Parameter, JavaTreeType.Lambda, None)
+    ("outer class", TheClass, JavaTreeType.Class, JavaScope.Package, Some(JavaModifier.Public)),
+    ("inner class of class", TheClass, JavaTreeType.Class, JavaScope.Class, Some(JavaModifier.Public)),
+    ("inner class of interface", TheClass, JavaTreeType.Class, JavaScope.Interface, None),
+    ("outer enum", TheClass, JavaTreeType.Enum, JavaScope.Package, Some(JavaModifier.Public)),
+    ("outer interface", TheTrait, JavaTreeType.Interface, JavaScope.Package, Some(JavaModifier.Public)),
+    ("inner interface of class", TheTrait, JavaTreeType.Interface, JavaScope.Class, Some(JavaModifier.Public)),
+    ("inner interface of interface", TheTrait, JavaTreeType.Interface, JavaScope.Interface, None),
+    ("class method", TheDefnDef, JavaTreeType.Method, JavaScope.Class, Some(JavaModifier.Public)),
+    ("enum method", TheDefnDef, JavaTreeType.Method, JavaScope.Enum, Some(JavaModifier.Public)),
+    ("interface method definition", TheDefnDef, JavaTreeType.Method, JavaScope.Interface, Some(JavaModifier.Default)),
+    ("interface method declaration", TheDeclDef, JavaTreeType.Method, JavaScope.Interface, None),
+    ("class variable", TheVal, JavaTreeType.Variable, JavaScope.Class, Some(JavaModifier.Public)),
+    ("enum variable", TheVal, JavaTreeType.Variable, JavaScope.Enum, Some(JavaModifier.Public)),
+    ("interface variable", TheVal, JavaTreeType.Variable, JavaScope.Interface, None),
+    ("method variable", TheVal, JavaTreeType.Variable, JavaScope.MethodSignature, None),
+    ("lambda variable", TheVal, JavaTreeType.Variable, JavaScope.LambdaSignature, None),
+    ("class (ctor.) parameter", TheVal, JavaTreeType.Parameter, JavaScope.Class, None),
+    ("method parameter", TheVal, JavaTreeType.Parameter, JavaScope.MethodSignature, None),
+    ("lambda parameter", TheVal, JavaTreeType.Parameter, JavaScope.LambdaSignature, None)
   )
 
   forAll(ScenariosWhenScalaModsPublic) { case (
     desc: String,
     scalaTree: Tree,
     javaTreeType: JavaTreeType,
-    javaScope: JavaTreeType,
+    javaScope: JavaScope,
     expectedMaybeModifier: Option[JavaModifier]) =>
     test(s"Public modifier generated for $desc should be: '$expectedMaybeModifier'") {
       when(scalaModsClassifier.arePublic(eqTreeList(ScalaModsPublic))).thenReturn(true)
@@ -94,13 +95,13 @@ class JavaPublicModifierResolverTest extends UnitTestSuite {
 
   test("No public modifier generated when scala mods are not public") {
     when(scalaModsClassifier.arePublic(eqTreeList(ScalaModsNonPublic))).thenReturn(false)
-    resolve(TheVal, ScalaModsPublic, JavaTreeType.Parameter, JavaTreeType.Method) shouldBe None
+    resolve(TheVal, ScalaModsPublic, JavaTreeType.Parameter, JavaScope.MethodSignature) shouldBe None
   }
 
   private def resolve(scalaTree: Tree,
                       scalaMods: List[Mod],
                       javaTreeType: JavaTreeType,
-                      javaScope: JavaTreeType): Option[JavaModifier] = {
+                      javaScope: JavaScope): Option[JavaModifier] = {
     JavaPublicModifierResolver.resolve(
       JavaModifiersContext(
         scalaTree = scalaTree,

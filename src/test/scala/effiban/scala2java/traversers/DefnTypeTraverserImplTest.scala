@@ -1,8 +1,8 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, StatContext}
-import effiban.scala2java.entities.JavaTreeType.JavaTreeType
-import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
+import effiban.scala2java.entities.JavaScope.JavaScope
+import effiban.scala2java.entities.{JavaModifier, JavaScope, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
 import effiban.scala2java.matchers.JavaTreeTypeContextMatcher.eqJavaTreeTypeContext
@@ -51,7 +51,7 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
 
 
   test("traverse() when has body and no bounds") {
-    val javaScope = JavaTreeType.Class
+    val javaScope = JavaScope.Class
 
     val defnType = Defn.Type(
       mods = Modifiers,
@@ -74,7 +74,7 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() when has no body and has upper bound") {
-    val javaScope = JavaTreeType.Class
+    val javaScope = JavaScope.Class
 
     val bounds = Bounds(lo = None, hi = Some(MyOtherType))
     val defnType = Defn.Type(
@@ -103,7 +103,7 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
     when(javaTreeTypeResolver.resolve(eqJavaTreeTypeContext(expectedJavaTreeTypeContext))).thenReturn(JavaTreeType.Interface)
   }
 
-  private def whenResolveJavaModifiersThenReturnPrivate(defnType: Defn.Type, javaScope: JavaTreeType): Unit = {
+  private def whenResolveJavaModifiersThenReturnPrivate(defnType: Defn.Type, javaScope: JavaScope): Unit = {
     val expectedJavModifiersContext = JavaModifiersContext(defnType, Modifiers, JavaTreeType.Interface, javaScope)
     when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedJavModifiersContext))).thenReturn(List(JavaModifier.Private))
   }

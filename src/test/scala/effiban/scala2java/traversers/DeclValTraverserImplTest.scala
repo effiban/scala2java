@@ -1,8 +1,8 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{JavaModifiersContext, StatContext}
-import effiban.scala2java.entities.JavaTreeType.{Interface, JavaTreeType}
-import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
+import effiban.scala2java.entities.JavaScope.JavaScope
+import effiban.scala2java.entities.{JavaModifier, JavaScope, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
@@ -37,7 +37,7 @@ class DeclValTraverserImplTest extends UnitTestSuite {
 
 
   test("traverse() when it is a class member") {
-    val javaScope = JavaTreeType.Class
+    val javaScope = JavaScope.Class
 
     val modifiers = List(TheAnnot)
 
@@ -63,7 +63,7 @@ class DeclValTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() when it is an interface member") {
-    val javaScope = Interface
+    val javaScope = JavaScope.Interface
 
     val modifiers = List(TheAnnot)
 
@@ -88,7 +88,7 @@ class DeclValTraverserImplTest extends UnitTestSuite {
         |int myVal""".stripMargin
   }
 
-  private def whenResolveJavaModifiers(declVal: Decl.Val, modifiers: List[Mod], javaScope: JavaTreeType) = {
+  private def whenResolveJavaModifiers(declVal: Decl.Val, modifiers: List[Mod], javaScope: JavaScope) = {
     val expectedJavaModifiersContext = JavaModifiersContext(declVal, modifiers, JavaTreeType.Variable, javaScope)
     when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedJavaModifiersContext)))
   }

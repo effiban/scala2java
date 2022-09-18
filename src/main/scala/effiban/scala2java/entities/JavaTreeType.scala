@@ -10,7 +10,6 @@ object JavaTreeType extends Enumeration {
   Interface,
   Method,
   Lambda,
-  Block,
   Variable,
   Parameter,
   Unknown = Value

@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{TemplateBodyContext, TemplateContext}
-import effiban.scala2java.entities.JavaTreeType.JavaTreeType
+import effiban.scala2java.entities.JavaScope.JavaScope
 import effiban.scala2java.resolvers.JavaInheritanceKeywordResolver
 import effiban.scala2java.writers.JavaWriter
 
@@ -39,7 +39,7 @@ private[traversers] class TemplateTraverserImpl(initListTraverser: => InitListTr
     templateBodyTraverser.traverse(statements = template.stats, context = bodyContext)
   }
 
-  private def traverseTemplateInits(inits: List[Init], javaScope: JavaTreeType): Unit = {
+  private def traverseTemplateInits(inits: List[Init], javaScope: JavaScope): Unit = {
     if (inits.nonEmpty) {
       val inheritanceKeyword = javaInheritanceKeywordResolver.resolve(javaScope, inits)
       write(" ")

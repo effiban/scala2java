@@ -2,8 +2,7 @@ package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.StatContext
 import effiban.scala2java.entities.EnclosingDelimiter.Parentheses
-import effiban.scala2java.entities.JavaTreeType.Method
-import effiban.scala2java.entities.ListTraversalOptions
+import effiban.scala2java.entities.{JavaScope, ListTraversalOptions}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.testsuites.UnitTestSuite
@@ -13,7 +12,7 @@ import scala.meta.{Name, Term}
 
 class TermParamListTraverserImplTest extends UnitTestSuite {
 
-  private val TheStatContext = StatContext(Method)
+  private val TheStatContext = StatContext(JavaScope.MethodSignature)
 
   private val ExpectedOptionsForMultiLine = ListTraversalOptions(
     maybeEnclosingDelimiter = Some(Parentheses),

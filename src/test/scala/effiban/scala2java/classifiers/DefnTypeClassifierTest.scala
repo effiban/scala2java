@@ -1,6 +1,6 @@
 package effiban.scala2java.classifiers
 
-import effiban.scala2java.entities.JavaTreeType
+import effiban.scala2java.entities.JavaScope
 import effiban.scala2java.testsuites.UnitTestSuite
 
 import scala.meta.{Defn, Type}
@@ -16,7 +16,7 @@ class DefnTypeClassifierTest extends UnitTestSuite {
       body = Type.Name("Value")
     )
 
-    DefnTypeClassifier.isEnumTypeDef(defnType, JavaTreeType.Enum) shouldBe true
+    DefnTypeClassifier.isEnumTypeDef(defnType, JavaScope.Enum) shouldBe true
   }
 
   test("isEnumTypeDef() when body is 'Value' and scope is 'Class' should return false") {
@@ -27,7 +27,7 @@ class DefnTypeClassifierTest extends UnitTestSuite {
       body = Type.Name("Value")
     )
 
-    DefnTypeClassifier.isEnumTypeDef(defnType, JavaTreeType.Class) shouldBe false
+    DefnTypeClassifier.isEnumTypeDef(defnType, JavaScope.Class) shouldBe false
   }
 
   test("isEnumTypeDef() when body is 'Blabla' and scope is 'Enum' should return false") {
@@ -38,7 +38,7 @@ class DefnTypeClassifierTest extends UnitTestSuite {
       body = Type.Name("Blabla")
     )
 
-    DefnTypeClassifier.isEnumTypeDef(defnType, JavaTreeType.Class) shouldBe false
+    DefnTypeClassifier.isEnumTypeDef(defnType, JavaScope.Class) shouldBe false
   }
 
   test("isEnumTypeDef() when body is 'Blabla' and scope is 'Class' should return false") {
@@ -49,6 +49,6 @@ class DefnTypeClassifierTest extends UnitTestSuite {
       body = Type.Name("Blabla")
     )
 
-    DefnTypeClassifier.isEnumTypeDef(defnType, JavaTreeType.Class) shouldBe false
+    DefnTypeClassifier.isEnumTypeDef(defnType, JavaScope.Class) shouldBe false
   }
 }

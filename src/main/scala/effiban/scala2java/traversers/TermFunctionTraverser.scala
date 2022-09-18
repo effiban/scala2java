@@ -2,7 +2,7 @@ package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{BlockContext, StatContext}
 import effiban.scala2java.entities.Decision.{Decision, Uncertain}
-import effiban.scala2java.entities.JavaTreeType.Lambda
+import effiban.scala2java.entities.JavaScope
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term
@@ -22,10 +22,10 @@ private[traversers] class TermFunctionTraverserImpl(termParamTraverser: => TermP
 
   // lambda definition
   override def traverse(function: Term.Function, shouldBodyReturnValue: Decision = Uncertain): Unit = {
-    val context = StatContext(Lambda)
+    val paramContext = StatContext(JavaScope.LambdaSignature)
     function.params match {
-      case param :: Nil => termParamTraverser.traverse(termParam = param, context = context)
-      case _ => termParamListTraverser.traverse(termParams = function.params, context = context, onSameLine = true)
+      case param :: Nil => termParamTraverser.traverse(termParam = param, context = paramContext)
+      case _ => termParamListTraverser.traverse(termParams = function.params, context = paramContext, onSameLine = true)
     }
     writeArrow()
     function.body match {

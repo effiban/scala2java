@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{DefnDefContext, StatContext}
-import effiban.scala2java.entities.JavaTreeType
+import effiban.scala2java.entities.JavaScope
 import effiban.scala2java.matchers.DefnDefContextMatcher.eqDefnDefContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.testsuites.UnitTestSuite
@@ -14,7 +14,7 @@ import scala.meta.{Decl, Defn, Lit, Name, Pat, Self, Template, Term, Type}
 
 class DefnTraverserImplTest extends UnitTestSuite {
 
-  private val TheStatContext = StatContext(JavaTreeType.Class)
+  private val TheStatContext = StatContext(JavaScope.Class)
 
   private val defnValTraverser  = mock[DefnValTraverser]
   private val defnVarTraverser  = mock[DefnVarTraverser]

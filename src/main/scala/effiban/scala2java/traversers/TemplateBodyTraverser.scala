@@ -2,7 +2,7 @@ package effiban.scala2java.traversers
 
 import effiban.scala2java.classifiers.DefnTypeClassifier
 import effiban.scala2java.contexts.{TemplateBodyContext, TemplateChildContext}
-import effiban.scala2java.entities.JavaTreeType.JavaTreeType
+import effiban.scala2java.entities.JavaScope.JavaScope
 import effiban.scala2java.orderings.JavaTemplateChildOrdering
 import effiban.scala2java.writers.JavaWriter
 
@@ -48,7 +48,7 @@ private[traversers] class TemplateBodyTraverserImpl(templateChildTraverser: => T
     writeBlockEnd()
   }
 
-  private def isEnumTypeDef(tree: Tree, javaScope: JavaTreeType): Boolean = tree match {
+  private def isEnumTypeDef(tree: Tree, javaScope: JavaScope): Boolean = tree match {
     // The particular Scala typedef required for an enumeration is redundant in Java
     case defnType: Defn.Type if defnTypeClassifier.isEnumTypeDef(defnType, javaScope) => true
     case _ => false

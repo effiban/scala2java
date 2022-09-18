@@ -1,8 +1,8 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{JavaModifiersContext, StatContext}
-import effiban.scala2java.entities.JavaTreeType.{Interface, JavaTreeType, Method}
-import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
+import effiban.scala2java.entities.JavaScope.JavaScope
+import effiban.scala2java.entities.{JavaModifier, JavaScope, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
@@ -63,7 +63,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
 
 
   test("traverse() for class method when has one list of params") {
-    val javaScope = JavaTreeType.Class
+    val javaScope = JavaScope.Class
 
     val declDef = Decl.Def(
       mods = Modifiers,
@@ -82,7 +82,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1),
-      context = ArgumentMatchers.eq(StatContext(Method)),
+      context = ArgumentMatchers.eq(StatContext(JavaScope.MethodSignature)),
       onSameLine = ArgumentMatchers.eq(false)
     )
 
@@ -95,7 +95,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for class method when has type params") {
-    val javaScope = JavaTreeType.Class
+    val javaScope = JavaScope.Class
 
     val declDef = Decl.Def(
       mods = Modifiers,
@@ -115,7 +115,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1),
-      context = ArgumentMatchers.eq(StatContext(Method)),
+      context = ArgumentMatchers.eq(StatContext(JavaScope.MethodSignature)),
       onSameLine = ArgumentMatchers.eq(false)
     )
 
@@ -128,7 +128,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for interface method when has one list of params") {
-    val javaScope = Interface
+    val javaScope = JavaScope.Interface
 
     val declDef = Decl.Def(
       mods = Modifiers,
@@ -147,7 +147,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1),
-      context = ArgumentMatchers.eq(StatContext(Method)),
+      context = ArgumentMatchers.eq(StatContext(JavaScope.MethodSignature)),
       onSameLine = ArgumentMatchers.eq(false)
     )
 
@@ -160,7 +160,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for interface method when has two lists of params") {
-    val javaScope = Interface
+    val javaScope = JavaScope.Interface
 
     val declDef = Decl.Def(
       mods = Modifiers,
@@ -179,7 +179,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
     doWrite("(int param1, int param2, int param3, int param4)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1 ++ MethodParams2),
-      context = ArgumentMatchers.eq(StatContext(Method)),
+      context = ArgumentMatchers.eq(StatContext(JavaScope.MethodSignature)),
       onSameLine = ArgumentMatchers.eq(false)
     )
 
@@ -195,7 +195,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     Term.Param(mods = List(), name = Term.Name(name), decltpe = Some(TypeNames.Int), default = None)
   }
 
-  private def whenResolveJavaModifiers(declDef: Decl.Def, javaScope: JavaTreeType) = {
+  private def whenResolveJavaModifiers(declDef: Decl.Def, javaScope: JavaScope) = {
     val expectedJavaModifiersContext = JavaModifiersContext(declDef, Modifiers, JavaTreeType.Method, javaScope)
     when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedJavaModifiersContext)))
   }

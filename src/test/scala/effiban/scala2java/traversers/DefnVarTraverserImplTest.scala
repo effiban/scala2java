@@ -1,8 +1,8 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{JavaModifiersContext, StatContext}
-import effiban.scala2java.entities.JavaTreeType.{Interface, JavaTreeType, Method}
-import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
+import effiban.scala2java.entities.JavaScope.JavaScope
+import effiban.scala2java.entities.{JavaModifier, JavaScope, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.{eqSomeTree, eqTreeList}
 import effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
@@ -41,7 +41,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
 
 
   test("traverse() when it is a class member - typed with value") {
-    val javaScope = JavaTreeType.Class
+    val javaScope = JavaScope.Class
 
     val defnVar = Defn.Var(
       mods = Modifiers,
@@ -72,7 +72,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() when it is a class member - typed without value") {
-    val javaScope = JavaTreeType.Class
+    val javaScope = JavaScope.Class
 
     val defnVar = Defn.Var(
       mods = Modifiers,
@@ -102,7 +102,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() when it is a class member - untyped with value") {
-    val javaScope = JavaTreeType.Class
+    val javaScope = JavaScope.Class
 
     val defnVar = Defn.Var(
       mods = Modifiers,
@@ -133,7 +133,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() when it is an interface member - typed with value") {
-    val javaScope = Interface
+    val javaScope = JavaScope.Interface
 
     val defnVar = Defn.Var(
       mods = Modifiers,
@@ -164,7 +164,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() when it is an interface member - typed without value") {
-    val javaScope = Interface
+    val javaScope = JavaScope.Interface
 
     val defnVar = Defn.Var(
       mods = Modifiers,
@@ -194,7 +194,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() when it is an interface member - untyped with value") {
-    val javaScope = Interface
+    val javaScope = JavaScope.Interface
 
     val defnVar = Defn.Var(
       mods = Modifiers,
@@ -225,7 +225,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() when it is a local variable - typed with value") {
-    val javaScope = Method
+    val javaScope = JavaScope.Block
 
     val defnVar = Defn.Var(
       mods = Modifiers,
@@ -256,7 +256,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() when it is a local variable - typed without value") {
-    val javaScope = Method
+    val javaScope = JavaScope.Block
 
     val defnVar = Defn.Var(
       mods = Modifiers,
@@ -286,7 +286,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() when it is a local variable - untyped with value") {
-    val javaScope = Method
+    val javaScope = JavaScope.Block
 
     val defnVar = Defn.Var(
       mods = Modifiers,
@@ -316,7 +316,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
         |var myVar = 3""".stripMargin
   }
 
-  private def whenResolveJavaModifiers(defnVar: Defn.Var, javaScope: JavaTreeType) = {
+  private def whenResolveJavaModifiers(defnVar: Defn.Var, javaScope: JavaScope) = {
     val expectedJavaModifiersContext = JavaModifiersContext(defnVar, Modifiers, JavaTreeType.Variable, javaScope)
     when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedJavaModifiersContext)))
   }

@@ -1,8 +1,8 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, StatContext, TemplateContext}
-import effiban.scala2java.entities.JavaTreeType.JavaTreeType
-import effiban.scala2java.entities.{JavaModifier, JavaTreeType}
+import effiban.scala2java.entities.JavaScope.JavaScope
+import effiban.scala2java.entities.{JavaModifier, JavaScope, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
 import effiban.scala2java.matchers.JavaTreeTypeContextMatcher.eqJavaTreeTypeContext
@@ -35,7 +35,7 @@ class ObjectTraverserImplTest extends UnitTestSuite {
 
 
   test("traverse()") {
-    val parentJavaScope = JavaTreeType.Package
+    val parentJavaScope = JavaScope.Package
 
     val modifiers: List[Mod] = List(
       Mod.Annot(
@@ -76,7 +76,7 @@ class ObjectTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}
         |""".stripMargin)
-      .when(templateTraverser).traverse(eqTree(template), eqTemplateContext(TemplateContext(javaScope = JavaTreeType.Class)))
+      .when(templateTraverser).traverse(eqTree(template), eqTemplateContext(TemplateContext(javaScope = JavaScope.Class)))
 
     objectTraverser.traverse(objectDef, StatContext(parentJavaScope))
 
@@ -98,7 +98,7 @@ class ObjectTraverserImplTest extends UnitTestSuite {
     when(javaTreeTypeResolver.resolve(eqJavaTreeTypeContext(expectedJavaTreeTypeContext))).thenReturn(JavaTreeType.Class)
   }
 
-  private def whenResolveJavaModifiersThenReturnPublic(obj: Defn.Object, modifiers: List[Mod], parentJavaScope: JavaTreeType): Unit = {
+  private def whenResolveJavaModifiersThenReturnPublic(obj: Defn.Object, modifiers: List[Mod], parentJavaScope: JavaScope): Unit = {
     val expectedJavaModifiersContext = JavaModifiersContext(obj, modifiers, JavaTreeType.Class, parentJavaScope)
     when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedJavaModifiersContext))).thenReturn(List(JavaModifier.Public))
   }

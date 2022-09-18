@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{CtorContext, DefnDefContext}
-import effiban.scala2java.entities.JavaTreeType
+import effiban.scala2java.entities.JavaScope
 import effiban.scala2java.matchers.CtorContextMatcher.eqCtorContext
 import effiban.scala2java.matchers.DefnDefContextMatcher.eqDefnDefContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
@@ -21,7 +21,7 @@ class CtorSecondaryTraverserImplTest extends UnitTestSuite {
   )
 
   private val TheCtorContext = CtorContext(
-    javaScope = JavaTreeType.Class,
+    javaScope = JavaScope.Class,
     className = ClassName,
     inits = TheInits
   )
@@ -62,7 +62,7 @@ class CtorSecondaryTraverserImplTest extends UnitTestSuite {
 
     verify(defnDefTraverser).traverse(
       eqTree(ExpectedDefnDef),
-      eqDefnDefContext(DefnDefContext(javaScope = JavaTreeType.Class, maybeInit = Some(SecondaryCtor.init)))
+      eqDefnDefContext(DefnDefContext(javaScope = JavaScope.Class, maybeInit = Some(SecondaryCtor.init)))
     )
   }
 

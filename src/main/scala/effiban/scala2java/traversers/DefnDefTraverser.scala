@@ -2,9 +2,9 @@ package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.{BlockContext, DefnDefContext, JavaModifiersContext, StatContext}
 import effiban.scala2java.entities.Decision.{No, Uncertain, Yes}
-import effiban.scala2java.entities.JavaTreeType
-import effiban.scala2java.entities.JavaTreeType.{JavaTreeType, Method}
+import effiban.scala2java.entities.JavaScope.JavaScope
 import effiban.scala2java.entities.TraversalConstants.UnknownType
+import effiban.scala2java.entities.{JavaScope, JavaTreeType}
 import effiban.scala2java.resolvers.JavaModifiersResolver
 import effiban.scala2java.typeinference.TermTypeInferrer
 import effiban.scala2java.writers.JavaWriter
@@ -40,7 +40,7 @@ private[traversers] class DefnDefTraverserImpl(annotListTraverser: => AnnotListT
   }
 
   private def traverseMethodParamsAndBody(defDef: Defn.Def, maybeMethodType: Option[Type], maybeInit: Option[Init] = None): Unit = {
-    termParamListTraverser.traverse(termParams = defDef.paramss.flatten, context = StatContext(Method))
+    termParamListTraverser.traverse(termParams = defDef.paramss.flatten, context = StatContext(JavaScope.MethodSignature))
     val shouldReturnValue = maybeMethodType match {
       case Some(Type.Name("Unit") | Type.AnonymousName()) => No
       case Some(_) => Yes
@@ -78,7 +78,7 @@ private[traversers] class DefnDefTraverserImpl(annotListTraverser: => AnnotListT
     }
   }
 
-  private def resolveJavaModifiers(defnDef: Defn.Def, parentJavaScope: JavaTreeType) = {
+  private def resolveJavaModifiers(defnDef: Defn.Def, parentJavaScope: JavaScope) = {
     val javaModifiersContext = JavaModifiersContext(
       scalaTree = defnDef,
       scalaMods = defnDef.mods,

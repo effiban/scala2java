@@ -1,8 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.StatContext
-import effiban.scala2java.entities.JavaTreeType
-import effiban.scala2java.entities.JavaTreeType.{Method, Package, Unknown}
+import effiban.scala2java.entities.JavaScope
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
@@ -35,7 +34,7 @@ class StatTraverserImplTest extends UnitTestSuite {
 
     doWrite("myName").when(termTravserser).traverse(eqTree(termName))
 
-    statTraverser.traverse(termName, StatContext(JavaTreeType.Class))
+    statTraverser.traverse(termName, StatContext(JavaScope.Class))
 
     outputWriter.toString shouldBe "myName"
   }
@@ -52,9 +51,9 @@ class StatTraverserImplTest extends UnitTestSuite {
     doWrite(
       """import somepackage.SomeClass;
         |""".stripMargin)
-      .when(importTraverser).traverse(eqTree(`import`), ArgumentMatchers.eq(StatContext(Package)))
+      .when(importTraverser).traverse(eqTree(`import`), ArgumentMatchers.eq(StatContext(JavaScope.Package)))
 
-    statTraverser.traverse(`import`, StatContext(Package))
+    statTraverser.traverse(`import`, StatContext(JavaScope.Package))
 
     outputWriter.toString shouldBe
       """import somepackage.SomeClass;
@@ -68,7 +67,7 @@ class StatTraverserImplTest extends UnitTestSuite {
         |*/""".stripMargin
     ).when(pkgTraverser).traverse(eqTree(pkg))
 
-    statTraverser.traverse(pkg, StatContext(Unknown))
+    statTraverser.traverse(pkg, StatContext(JavaScope.Unknown))
 
     outputWriter.toString shouldBe
       """/*
@@ -84,9 +83,9 @@ class StatTraverserImplTest extends UnitTestSuite {
       rhs = Lit.Int(3)
     )
 
-    doWrite("int myVal = 3").when(defnTraverser).traverse(eqTree(defnVal), ArgumentMatchers.eq(StatContext(Method)))
+    doWrite("int myVal = 3").when(defnTraverser).traverse(eqTree(defnVal), ArgumentMatchers.eq(StatContext(JavaScope.Block)))
 
-    statTraverser.traverse(defnVal, StatContext(Method))
+    statTraverser.traverse(defnVal, StatContext(JavaScope.Block))
 
     outputWriter.toString shouldBe "int myVal = 3"
   }
@@ -98,9 +97,9 @@ class StatTraverserImplTest extends UnitTestSuite {
       decltpe = Type.Name("int")
     )
 
-    doWrite("int myVal").when(declTraverser).traverse(eqTree(declVal), ArgumentMatchers.eq(StatContext(Method)))
+    doWrite("int myVal").when(declTraverser).traverse(eqTree(declVal), ArgumentMatchers.eq(StatContext(JavaScope.Block)))
 
-    statTraverser.traverse(declVal, StatContext(Method))
+    statTraverser.traverse(declVal, StatContext(JavaScope.Block))
 
     outputWriter.toString shouldBe "int myVal"
   }
