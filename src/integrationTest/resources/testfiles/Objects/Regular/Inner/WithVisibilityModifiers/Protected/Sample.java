@@ -7,5 +7,4 @@ public class Sample {
     /* originally a Scala object */
     protected class InnerSample {
     }
-    ;
 }
