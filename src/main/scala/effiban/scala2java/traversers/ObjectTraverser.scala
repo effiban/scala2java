@@ -22,8 +22,6 @@ private[traversers] class ObjectTraverserImpl(annotListTraverser: => AnnotListTr
 
   override def traverse(objectDef: Defn.Object, context: StatContext = StatContext()): Unit = {
     writeLine()
-    writeComment("originally a Scala object")
-    writeLine()
     annotListTraverser.traverseMods(objectDef.mods)
     val javaTreeType = javaTreeTypeResolver.resolve(JavaTreeTypeContext(objectDef, objectDef.mods))
     writeTypeDeclaration(modifiers = resolveJavaModifiers(objectDef, javaTreeType, context.javaScope),
