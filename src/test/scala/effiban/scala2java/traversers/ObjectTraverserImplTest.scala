@@ -82,7 +82,6 @@ class ObjectTraverserImplTest extends UnitTestSuite {
 
     outputWriter.toString shouldBe
       """
-        |/* originally a Scala object */
         |@MyAnnotation
         |public class MyObject {
         |  /* BODY */
