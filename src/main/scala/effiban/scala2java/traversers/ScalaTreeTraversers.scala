@@ -3,7 +3,7 @@ package effiban.scala2java.traversers
 import effiban.scala2java.classifiers._
 import effiban.scala2java.orderings.JavaTemplateChildOrdering
 import effiban.scala2java.resolvers.Resolvers.shouldReturnValueResolver
-import effiban.scala2java.resolvers.{JavaInheritanceKeywordResolver, JavaModifiersResolver, JavaTreeTypeResolver}
+import effiban.scala2java.resolvers.{JavaChildScopeResolver, JavaInheritanceKeywordResolver, JavaModifiersResolver, JavaTreeTypeResolver}
 import effiban.scala2java.transformers._
 import effiban.scala2java.typeinference.TypeInferrers.termTypeInferrer
 import effiban.scala2java.writers.JavaWriter
@@ -50,7 +50,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
     termParamListTraverser,
     templateTraverser,
     JavaModifiersResolver,
-    JavaTreeTypeResolver
+    JavaTreeTypeResolver,
+    JavaChildScopeResolver
   )
 
   private lazy val caseTraverser: CaseTraverser = new CaseTraverserImpl(patTraverser, termTraverser)
@@ -190,7 +191,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
     annotListTraverser,
     templateTraverser,
     JavaModifiersResolver,
-    JavaTreeTypeResolver)
+    JavaTreeTypeResolver,
+    JavaChildScopeResolver)
 
   private lazy val partialFunctionTraverser: PartialFunctionTraverser = new PartialFunctionTraverserImpl(termFunctionTraverser)
 
@@ -235,7 +237,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
     templateTraverser,
     ParamToDeclValTransformer,
     JavaModifiersResolver,
-    JavaTreeTypeResolver
+    JavaTreeTypeResolver,
+    JavaChildScopeResolver
   )
 
   private lazy val returnTraverser: ReturnTraverser = new ReturnTraverserImpl(termTraverser)
@@ -380,7 +383,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
     typeParamListTraverser,
     templateTraverser,
     JavaModifiersResolver,
-    JavaTreeTypeResolver
+    JavaTreeTypeResolver,
+    JavaChildScopeResolver
   )
 
   private lazy val tryTraverser: TryTraverser = new TryTraverserImpl(

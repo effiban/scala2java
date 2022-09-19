@@ -1,10 +1,10 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, StatContext, TemplateContext}
+import effiban.scala2java.contexts._
 import effiban.scala2java.entities.JavaScope.JavaScope
 import effiban.scala2java.entities.JavaTreeType.JavaTreeType
-import effiban.scala2java.entities.{JavaTreeTypeToKeywordMapping, JavaTreeTypeToScopeMapping}
-import effiban.scala2java.resolvers.{JavaModifiersResolver, JavaTreeTypeResolver}
+import effiban.scala2java.entities.JavaTreeTypeToKeywordMapping
+import effiban.scala2java.resolvers.{JavaChildScopeResolver, JavaModifiersResolver, JavaTreeTypeResolver}
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Defn
@@ -18,7 +18,8 @@ private[traversers] class CaseClassTraverserImpl(annotListTraverser: => AnnotLis
                                                  termParamListTraverser: => TermParamListTraverser,
                                                  templateTraverser: => TemplateTraverser,
                                                  javaModifiersResolver: JavaModifiersResolver,
-                                                 javaTreeTypeResolver: JavaTreeTypeResolver)
+                                                 javaTreeTypeResolver: JavaTreeTypeResolver,
+                                                 javaChildScopeResolver: JavaChildScopeResolver)
                                                 (implicit javaWriter: JavaWriter) extends CaseClassTraverser {
 
   import javaWriter._
@@ -31,12 +32,12 @@ private[traversers] class CaseClassTraverserImpl(annotListTraverser: => AnnotLis
       typeKeyword = JavaTreeTypeToKeywordMapping(javaTreeType),
       name = classDef.name.value)
     typeParamListTraverser.traverse(classDef.tparams)
-    val javaScope = JavaTreeTypeToScopeMapping(javaTreeType)
-    termParamListTraverser.traverse(classDef.ctor.paramss.flatten, StatContext(javaScope))
+    val javaChildScope = javaChildScopeResolver.resolve(JavaChildScopeContext(classDef, javaTreeType))
+    termParamListTraverser.traverse(classDef.ctor.paramss.flatten, StatContext(javaChildScope))
     // Even though the Java type is a Record, the constructor must still be explicitly declared if it has modifiers (annotations, visibility, etc.)
     val maybePrimaryCtor = if (classDef.ctor.mods.nonEmpty) Some(classDef.ctor) else None
     val templateContext = TemplateContext(
-      javaScope = javaScope,
+      javaScope = javaChildScope,
       maybeClassName = Some(classDef.name),
       maybePrimaryCtor = maybePrimaryCtor
     )
@@ -45,12 +46,12 @@ private[traversers] class CaseClassTraverserImpl(annotListTraverser: => AnnotLis
 
   private def resolveJavaModifiers(classDef: Defn.Class,
                                    javaTreeType: JavaTreeType,
-                                   parentJavaScope: JavaScope) = {
+                                   javaScope: JavaScope) = {
     val javaModifiersContext = JavaModifiersContext(
       scalaTree = classDef,
       scalaMods = classDef.mods,
       javaTreeType = javaTreeType,
-      javaScope = parentJavaScope)
+      javaScope = javaScope)
     javaModifiersResolver.resolve(javaModifiersContext)
   }
 }

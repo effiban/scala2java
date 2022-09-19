@@ -93,7 +93,7 @@ object JavaAllowedModifiersResolver extends JavaAllowedModifiersResolver {
   }
 
   private def isClassLikeScope(scope: JavaScope) = scope match {
-    case JavaScope.Class | JavaScope.Enum => true
+    case JavaScope.Class | JavaScope.UtilityClass | JavaScope.Enum => true
     case _ => false
   }
 }

@@ -14,10 +14,9 @@ object JavaInheritanceKeywordResolver extends JavaInheritanceKeywordResolver {
 
   override def resolve(scope: JavaScope, inits: List[Init]): JavaKeyword = {
     val haveArgs = doInitsHaveArgs(inits)
-    // The wildcard covers scenarios of both explicit and anonymous classes
     (scope, haveArgs) match {
       case (JavaScope.Interface, _) => JavaKeyword.Extends
-      case (JavaScope.Class, true) => JavaKeyword.Extends
+      case (JavaScope.UtilityClass, _) => throw new IllegalStateException("A Java utility class cannot have a parent")
       case (JavaScope.Enum, true) => throw new IllegalStateException("A Java enum cannot extend a class")
       case (JavaScope.Enum, false) => JavaKeyword.Implements
       case (_, true) => JavaKeyword.Extends

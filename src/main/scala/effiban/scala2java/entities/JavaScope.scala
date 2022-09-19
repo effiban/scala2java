@@ -5,6 +5,7 @@ object JavaScope extends Enumeration {
 
   val Package,
   Class,
+  UtilityClass,
   Enum,
   Interface,
   MethodSignature,

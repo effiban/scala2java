@@ -1,10 +1,10 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, StatContext, TemplateContext}
+import effiban.scala2java.contexts._
 import effiban.scala2java.entities.JavaScope.JavaScope
 import effiban.scala2java.entities.JavaTreeType.JavaTreeType
-import effiban.scala2java.entities.{JavaTreeTypeToKeywordMapping, JavaTreeTypeToScopeMapping}
-import effiban.scala2java.resolvers.{JavaModifiersResolver, JavaTreeTypeResolver}
+import effiban.scala2java.entities.JavaTreeTypeToKeywordMapping
+import effiban.scala2java.resolvers.{JavaChildScopeResolver, JavaModifiersResolver, JavaTreeTypeResolver}
 import effiban.scala2java.transformers.ParamToDeclValTransformer
 import effiban.scala2java.writers.JavaWriter
 
@@ -19,7 +19,9 @@ private[traversers] class RegularClassTraverserImpl(annotListTraverser: => Annot
                                                     templateTraverser: => TemplateTraverser,
                                                     paramToDeclValTransformer: ParamToDeclValTransformer,
                                                     javaModifiersResolver: JavaModifiersResolver,
-                                                    javaTreeTypeResolver: JavaTreeTypeResolver)(implicit javaWriter: JavaWriter) extends RegularClassTraverser {
+                                                    javaTreeTypeResolver: JavaTreeTypeResolver,
+                                                    javaChildScopeResolver: JavaChildScopeResolver)
+                                                   (implicit javaWriter: JavaWriter) extends RegularClassTraverser {
 
   import javaWriter._
 
@@ -37,8 +39,9 @@ private[traversers] class RegularClassTraverserImpl(annotListTraverser: => Annot
     // TODO if the ctor. params have 'ValParam' or 'VarParam' modifiers, need to generate accessors/mutators for them as well
     val enrichedStats = explicitMemberDecls ++ classDef.templ.stats
     val enrichedTemplate = classDef.templ.copy(stats = enrichedStats)
+    val javaChildScope = javaChildScopeResolver.resolve(JavaChildScopeContext(classDef, javaTreeType))
     val templateContext = TemplateContext(
-      javaScope = JavaTreeTypeToScopeMapping(javaTreeType),
+      javaScope = javaChildScope,
       maybeClassName = Some(classDef.name),
       maybePrimaryCtor = Some(classDef.ctor)
     )
@@ -47,12 +50,12 @@ private[traversers] class RegularClassTraverserImpl(annotListTraverser: => Annot
 
   private def resolveJavaModifiers(classDef: Defn.Class,
                                    javaTreeType: JavaTreeType,
-                                   parentJavaScope: JavaScope) = {
+                                   javaScope: JavaScope) = {
     val javaModifiersContext = JavaModifiersContext(
       scalaTree = classDef,
       scalaMods = classDef.mods,
       javaTreeType = javaTreeType,
-      javaScope = parentJavaScope
+      javaScope = javaScope
     )
     javaModifiersResolver.resolve(javaModifiersContext)
   }
