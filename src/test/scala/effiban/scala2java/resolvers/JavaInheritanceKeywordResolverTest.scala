@@ -21,6 +21,12 @@ class JavaInheritanceKeywordResolverTest extends UnitTestSuite {
     JavaInheritanceKeywordResolver.resolve(JavaScope.Class, inits) shouldBe JavaKeyword.Implements
   }
 
+  test("resolve for utility class should throw exception") {
+    intercept[IllegalStateException] {
+      JavaInheritanceKeywordResolver.resolve(JavaScope.UtilityClass, Nil)
+    }
+  }
+
   test("resolve for enum with parent args should throw exception") {
     val inits = List(
       Init(tpe = Type.Name("Parent"), name = Name.Anonymous(), argss = List(List(Lit.Int(3))))

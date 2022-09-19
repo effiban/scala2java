@@ -1,14 +1,15 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, StatContext, TemplateContext}
+import effiban.scala2java.contexts._
 import effiban.scala2java.entities.JavaScope.JavaScope
 import effiban.scala2java.entities.{JavaModifier, JavaScope, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
+import effiban.scala2java.matchers.JavaChildScopeContextMatcher.eqJavaChildScopeContext
 import effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
 import effiban.scala2java.matchers.JavaTreeTypeContextMatcher.eqJavaTreeTypeContext
 import effiban.scala2java.matchers.TemplateContextMatcher.eqTemplateContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
-import effiban.scala2java.resolvers.{JavaModifiersResolver, JavaTreeTypeResolver}
+import effiban.scala2java.resolvers.{JavaChildScopeResolver, JavaModifiersResolver, JavaTreeTypeResolver}
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.transformers.ParamToDeclValTransformer
@@ -81,6 +82,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
   private val paramToDeclValTransformer = mock[ParamToDeclValTransformer]
   private val javaModifiersResolver = mock[JavaModifiersResolver]
   private val javaTreeTypeResolver = mock[JavaTreeTypeResolver]
+  private val javaChildScopeResolver = mock[JavaChildScopeResolver]
 
   private val classTraverser = new RegularClassTraverserImpl(
     annotListTraverser,
@@ -88,7 +90,9 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
     templateTraverser,
     paramToDeclValTransformer,
     javaModifiersResolver,
-    javaTreeTypeResolver)
+    javaTreeTypeResolver,
+    javaChildScopeResolver
+  )
 
 
   test("traverse() for one list of ctor args") {
@@ -110,6 +114,8 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
 
     val expectedMemberDecls = List(ExpectedMemberDecl1, ExpectedMemberDecl2)
     val expectedAdjustedTemplate = InitialTemplate.copy(stats = expectedMemberDecls ++ InitialTemplate.stats)
+
+    when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Class)))).thenReturn(JavaScope.Class)
 
     doWrite(
       """@MyAnnotation
@@ -172,6 +178,8 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       ExpectedMemberDecl4
     )
     val expectedAdjustedTemplate = InitialTemplate.copy(stats = expectedMemberDecls ++ InitialTemplate.stats)
+
+    when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Class)))).thenReturn(JavaScope.Class)
 
     doWrite(
       """@MyAnnotation

@@ -20,6 +20,7 @@ private[resolvers] class JavaAllExtraModifiersResolverImpl(resolvers: Iterable[_
 object JavaAllExtraModifiersResolver extends JavaAllExtraModifiersResolverImpl(
   List(
     JavaPublicModifierResolver,
+    JavaStaticModifierResolver,
     JavaFinalModifierResolver
   )
 )

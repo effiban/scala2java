@@ -1,13 +1,14 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, StatContext, TemplateContext}
+import effiban.scala2java.contexts._
 import effiban.scala2java.entities.{JavaModifier, JavaScope, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
+import effiban.scala2java.matchers.JavaChildScopeContextMatcher.eqJavaChildScopeContext
 import effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
 import effiban.scala2java.matchers.JavaTreeTypeContextMatcher.eqJavaTreeTypeContext
 import effiban.scala2java.matchers.TemplateContextMatcher.eqTemplateContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
-import effiban.scala2java.resolvers.{JavaModifiersResolver, JavaTreeTypeResolver}
+import effiban.scala2java.resolvers.{JavaChildScopeResolver, JavaModifiersResolver, JavaTreeTypeResolver}
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
@@ -65,6 +66,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
   private val templateTraverser = mock[TemplateTraverser]
   private val javaModifiersResolver = mock[JavaModifiersResolver]
   private val javaTreeTypeResolver = mock[JavaTreeTypeResolver]
+  private val javaChildScopeResolver = mock[JavaChildScopeResolver]
 
 
 
@@ -74,8 +76,12 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     termParamListTraverser,
     templateTraverser,
     javaModifiersResolver,
-    javaTreeTypeResolver)
+    javaTreeTypeResolver,
+    javaChildScopeResolver)
 
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+  }
 
   test("traverse() for one list of ctor args") {
     val modifiers: List[Mod] = List(
@@ -94,6 +100,8 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       ctor = primaryCtor,
       templ = TheTemplate
     )
+
+    when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Record)))).thenReturn(JavaScope.Class)
 
     doWrite(
       """@MyAnnotation
@@ -152,6 +160,8 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       templ = TheTemplate
     )
 
+    when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Record)))).thenReturn(JavaScope.Class)
+
     doWrite(
       """@MyAnnotation
         |""".stripMargin)
@@ -202,6 +212,8 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       ctor = primaryCtor,
       templ = TheTemplate
     )
+
+    when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Record)))).thenReturn(JavaScope.Class)
 
     doWrite(
       """@MyAnnotation

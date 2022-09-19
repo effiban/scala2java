@@ -1,14 +1,15 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, StatContext, TemplateContext}
+import effiban.scala2java.contexts._
 import effiban.scala2java.entities.JavaTreeType.Interface
-import effiban.scala2java.entities.{JavaModifier, JavaScope}
+import effiban.scala2java.entities.{JavaModifier, JavaScope, JavaTreeType}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
+import effiban.scala2java.matchers.JavaChildScopeContextMatcher.eqJavaChildScopeContext
 import effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
 import effiban.scala2java.matchers.JavaTreeTypeContextMatcher.eqJavaTreeTypeContext
 import effiban.scala2java.matchers.TemplateContextMatcher.eqTemplateContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
-import effiban.scala2java.resolvers.{JavaModifiersResolver, JavaTreeTypeResolver}
+import effiban.scala2java.resolvers.{JavaChildScopeResolver, JavaModifiersResolver, JavaTreeTypeResolver}
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.{PrimaryCtors, TypeNames}
@@ -67,6 +68,7 @@ class TraitTraverserImplTest extends UnitTestSuite {
   private val templateTraverser = mock[TemplateTraverser]
   private val javaModifiersResolver = mock[JavaModifiersResolver]
   private val javaTreeTypeResolver = mock[JavaTreeTypeResolver]
+  private val javaChildScopeResolver = mock[JavaChildScopeResolver]
 
 
   private val traitTraverser = new TraitTraverserImpl(
@@ -74,7 +76,8 @@ class TraitTraverserImplTest extends UnitTestSuite {
     typeParamListTraverser,
     templateTraverser,
     javaModifiersResolver,
-    javaTreeTypeResolver
+    javaTreeTypeResolver,
+    javaChildScopeResolver
   )
 
 
@@ -101,6 +104,8 @@ class TraitTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin)
       .when(templateTraverser).traverse(eqTree(TheTemplate), eqTemplateContext(TemplateContext(javaScope = JavaScope.Interface)))
+
+    when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(`trait`, JavaTreeType.Interface)))).thenReturn(JavaScope.Interface)
 
     traitTraverser.traverse(`trait`, StatContext(JavaScope.Package))
 
