@@ -151,8 +151,72 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
         |""".stripMargin
   }
 
+  test("traverse() for one list of ctor args with permitted sub-type names") {
+    val javaScope = JavaScope.Package
+
+    val primaryCtor = Ctor.Primary(
+      mods = Nil,
+      name = Name.Anonymous(),
+      paramss = List(List(CtorArg1, CtorArg2))
+    )
+
+    val cls = Defn.Class(
+      mods = Modifiers,
+      name = ClassName,
+      tparams = TypeParams,
+      ctor = primaryCtor,
+      templ = InitialTemplate
+    )
+
+    val expectedMemberDecls = List(ExpectedMemberDecl1, ExpectedMemberDecl2)
+    val expectedAdjustedTemplate = InitialTemplate.copy(stats = expectedMemberDecls ++ InitialTemplate.stats)
+
+    val permittedSubTypeNames = List("A", "B")
+
+    when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Class)))).thenReturn(JavaScope.Class)
+
+    doWrite(
+      """@MyAnnotation
+        |""".stripMargin)
+      .when(annotListTraverser).traverseMods(eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
+    whenResolveJavaTreeTypeThenReturnClass(cls)
+    whenResolveJavaModifiersThenReturnPublic(cls, javaScope)
+    doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
+
+    when(paramToDeclValTransformer.transform(any[Term.Param])).thenAnswer((ctorArg: Term.Param) => ctorArg match {
+      case arg1 if arg1.structure == CtorArg1.structure => ExpectedMemberDecl1
+      case arg2 if arg2.structure == CtorArg2.structure => ExpectedMemberDecl2
+    })
+
+    doWrite(
+      """ {
+        |  /* BODY */
+        |}
+        |""".stripMargin)
+      .when(templateTraverser).traverse(
+      eqTree(expectedAdjustedTemplate),
+      eqTemplateContext(TemplateContext(
+        javaScope = JavaScope.Class,
+        maybeClassName = Some(ClassName),
+        maybePrimaryCtor = Some(primaryCtor),
+        javaPermittedSubTypeNames = permittedSubTypeNames)
+      )
+    )
+
+    val context = ClassOrTraitContext(javaScope = javaScope, javaPermittedSubTypeNames = permittedSubTypeNames)
+    classTraverser.traverse(cls, context)
+
+    outputWriter.toString shouldBe
+      """
+        |@MyAnnotation
+        |public class MyClass<T> {
+        |  /* BODY */
+        |}
+        |""".stripMargin
+  }
+
   test("traverse() for two lists of ctor args") {
-    val parentJavaScope = JavaScope.Package
+    val javaScope = JavaScope.Package
 
     val primaryCtor = Ctor.Primary(
       mods = Nil,
@@ -186,7 +250,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
     whenResolveJavaTreeTypeThenReturnClass(cls)
-    whenResolveJavaModifiersThenReturnPublic(cls, parentJavaScope)
+    whenResolveJavaModifiersThenReturnPublic(cls, javaScope)
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
 
     when(paramToDeclValTransformer.transform(any[Term.Param])).thenAnswer( (ctorArg: Term.Param) => ctorArg match {
@@ -206,7 +270,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       eqTemplateContext(TemplateContext(javaScope = JavaScope.Class, maybeClassName = Some(ClassName), maybePrimaryCtor = Some(primaryCtor)))
     )
 
-    classTraverser.traverse(cls, ClassOrTraitContext(parentJavaScope))
+    classTraverser.traverse(cls, ClassOrTraitContext(javaScope))
 
     outputWriter.toString shouldBe
       """
