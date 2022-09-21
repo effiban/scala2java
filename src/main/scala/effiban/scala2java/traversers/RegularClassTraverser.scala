@@ -11,7 +11,7 @@ import effiban.scala2java.writers.JavaWriter
 import scala.meta.Defn
 
 trait RegularClassTraverser {
-  def traverse(classDef: Defn.Class, context: StatContext = StatContext()): Unit
+  def traverse(classDef: Defn.Class, context: ClassOrTraitContext = ClassOrTraitContext()): Unit
 }
 
 private[traversers] class RegularClassTraverserImpl(annotListTraverser: => AnnotListTraverser,
@@ -25,7 +25,7 @@ private[traversers] class RegularClassTraverserImpl(annotListTraverser: => Annot
 
   import javaWriter._
 
-  def traverse(classDef: Defn.Class, context: StatContext = StatContext()): Unit = {
+  def traverse(classDef: Defn.Class, context: ClassOrTraitContext = ClassOrTraitContext()): Unit = {
     writeLine()
     annotListTraverser.traverseMods(classDef.mods)
     val javaTreeType = javaTreeTypeResolver.resolve(JavaTreeTypeContext(classDef, classDef.mods))

@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.{DefnDefContext, StatContext}
+import effiban.scala2java.contexts.{ClassOrTraitContext, DefnDefContext, StatContext}
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Defn
@@ -26,8 +26,8 @@ private[traversers] class DefnTraverserImpl(defnValTraverser: => DefnValTraverse
     case varDef: Defn.Var => defnVarTraverser.traverse(varDef, context)
     case defDef: Defn.Def => defnDefTraverser.traverse(defDef, DefnDefContext(javaScope = context.javaScope))
     case typeDef: Defn.Type => defnTypeTraverser.traverse(typeDef, context)
-    case classDef: Defn.Class => classTraverser.traverse(classDef, context)
-    case traitDef: Trait => traitTraverser.traverse(traitDef, context)
+    case classDef: Defn.Class => classTraverser.traverse(classDef, ClassOrTraitContext(context.javaScope))
+    case traitDef: Trait => traitTraverser.traverse(traitDef, ClassOrTraitContext(context.javaScope))
     case objectDef: Defn.Object => objectTraverser.traverse(objectDef, context)
     case _ => writeComment(s"UNSUPPORTED: $defn")
   }
