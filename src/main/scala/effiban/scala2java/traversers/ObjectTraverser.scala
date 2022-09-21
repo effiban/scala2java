@@ -30,7 +30,7 @@ private[traversers] class ObjectTraverserImpl(annotListTraverser: => AnnotListTr
       typeKeyword = JavaTreeTypeToKeywordMapping(javaTreeType),
       name = s"${objectDef.name.toString}")
     val javaChildScope = javaChildScopeResolver.resolve(JavaChildScopeContext(objectDef, javaTreeType))
-    // TODO iof child scope is utility class, add private ctor.
+    // TODO if child scope is utility class, add private ctor.
     templateTraverser.traverse(objectDef.templ, TemplateContext(javaScope = javaChildScope))
   }
 
