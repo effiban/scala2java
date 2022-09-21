@@ -6,7 +6,9 @@ trait ModsClassifier {
 
   def arePublic(mods: List[Mod]): Boolean
 
-  def areSealed(mods: List[Mod]): Boolean
+  def includeSealed(mods: List[Mod]): Boolean
+
+  def includeFinal(mods: List[Mod]): Boolean
 }
 
 object ModsClassifier extends ModsClassifier {
@@ -18,7 +20,11 @@ object ModsClassifier extends ModsClassifier {
     }.isEmpty
   }
 
-  override def areSealed(mods: List[Mod]): Boolean = {
+  override def includeSealed(mods: List[Mod]): Boolean = {
     mods.collect { case m: Mod.Sealed => m}.nonEmpty
+  }
+
+  override def includeFinal(mods: List[Mod]): Boolean = {
+    mods.collect { case m: Mod.Final => m }.nonEmpty
   }
 }
