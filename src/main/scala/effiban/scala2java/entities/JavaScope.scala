@@ -4,6 +4,7 @@ object JavaScope extends Enumeration {
   type JavaScope = Value
 
   val Package,
+  Sealed,
   Class,
   UtilityClass,
   Enum,

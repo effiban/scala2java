@@ -72,10 +72,10 @@ object JavaAllowedModifiersResolver extends JavaAllowedModifiersResolver {
   override def resolve(treeType: JavaTreeType, scope: JavaScope): Set[JavaModifier] = {
 
     (treeType, scope) match {
-      case (treeTpe, JavaScope.Package) if isClassLikeTree(treeTpe) => OuterClassAllowedModifiers
+      case (treeTpe, theScope) if isClassLikeTree(treeTpe) && isPackageLikeScope(theScope) => OuterClassAllowedModifiers
       case (treeTpe, theScope) if isClassLikeTree(treeTpe) && isClassLikeScope(theScope) => InnerClassOfClassAllowedModifiers
       case (treeTpe, JavaScope.Interface) if isClassLikeTree(treeTpe) => InnerClassOfInterfaceAllowedModifiers
-      case (JavaTreeType.Interface, JavaScope.Package) => OuterInterfaceAllowedModifiers
+      case (JavaTreeType.Interface, theScope) if isPackageLikeScope(theScope) => OuterInterfaceAllowedModifiers
       case (JavaTreeType.Interface, theScope) if isClassLikeScope(theScope) => InnerInterfaceOfClassAllowedModifiers
       case (JavaTreeType.Interface, JavaScope.Interface) => InnerInterfaceOfInterfaceAllowedModifiers
       case (JavaTreeType.Method, theScope) if isClassLikeScope(theScope) => ClassMethodAllowedModifiers
@@ -85,6 +85,11 @@ object JavaAllowedModifiersResolver extends JavaAllowedModifiersResolver {
       case (JavaTreeType.Parameter, _) => ParameterAllowedModifiers
       case _ => Set.empty
     }
+  }
+
+  private def isPackageLikeScope(scope: JavaScope) = scope match {
+    case JavaScope.Package | JavaScope.Sealed => true
+    case _ => false
   }
 
   private def isClassLikeTree(treeType: JavaTreeType) = treeType match {
