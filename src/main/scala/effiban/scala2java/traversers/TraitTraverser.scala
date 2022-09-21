@@ -10,7 +10,7 @@ import effiban.scala2java.writers.JavaWriter
 import scala.meta.Defn.Trait
 
 trait TraitTraverser {
-  def traverse(traitDef: Trait, context: StatContext = StatContext()): Unit
+  def traverse(traitDef: Trait, context: ClassOrTraitContext = ClassOrTraitContext()): Unit
 }
 
 private[traversers] class TraitTraverserImpl(annotListTraverser: => AnnotListTraverser,
@@ -23,7 +23,7 @@ private[traversers] class TraitTraverserImpl(annotListTraverser: => AnnotListTra
 
   import javaWriter._
 
-  override def traverse(traitDef: Trait, context: StatContext = StatContext()): Unit = {
+  override def traverse(traitDef: Trait, context: ClassOrTraitContext = ClassOrTraitContext()): Unit = {
     writeLine()
     annotListTraverser.traverseMods(traitDef.mods)
     val javaTreeType = javaTreeTypeResolver.resolve(JavaTreeTypeContext(traitDef, traitDef.mods))

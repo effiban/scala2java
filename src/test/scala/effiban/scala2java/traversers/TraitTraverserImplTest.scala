@@ -107,7 +107,7 @@ class TraitTraverserImplTest extends UnitTestSuite {
 
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(`trait`, JavaTreeType.Interface)))).thenReturn(JavaScope.Interface)
 
-    traitTraverser.traverse(`trait`, StatContext(JavaScope.Package))
+    traitTraverser.traverse(`trait`, ClassOrTraitContext(JavaScope.Package))
 
     outputWriter.toString shouldBe
       """

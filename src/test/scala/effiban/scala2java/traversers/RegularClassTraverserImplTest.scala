@@ -140,7 +140,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       eqTemplateContext(TemplateContext(javaScope = JavaScope.Class, maybeClassName = Some(ClassName), maybePrimaryCtor = Some(primaryCtor)))
     )
 
-    classTraverser.traverse(cls, StatContext(parentJavaScope))
+    classTraverser.traverse(cls, ClassOrTraitContext(parentJavaScope))
 
     outputWriter.toString shouldBe
       """
@@ -206,7 +206,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       eqTemplateContext(TemplateContext(javaScope = JavaScope.Class, maybeClassName = Some(ClassName), maybePrimaryCtor = Some(primaryCtor)))
     )
 
-    classTraverser.traverse(cls, StatContext(parentJavaScope))
+    classTraverser.traverse(cls, ClassOrTraitContext(parentJavaScope))
 
     outputWriter.toString shouldBe
       """

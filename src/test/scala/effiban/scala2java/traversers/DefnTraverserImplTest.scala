@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.{DefnDefContext, StatContext}
+import effiban.scala2java.contexts.{ClassOrTraitContext, DefnDefContext, StatContext}
 import effiban.scala2java.entities.JavaScope
 import effiban.scala2java.matchers.DefnDefContextMatcher.eqDefnDefContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
@@ -15,6 +15,7 @@ import scala.meta.{Decl, Defn, Lit, Name, Pat, Self, Template, Term, Type}
 class DefnTraverserImplTest extends UnitTestSuite {
 
   private val TheStatContext = StatContext(JavaScope.Class)
+  private val TheClassOrTraitContext = ClassOrTraitContext(JavaScope.Class)
 
   private val defnValTraverser  = mock[DefnValTraverser]
   private val defnVarTraverser  = mock[DefnVarTraverser]
@@ -117,7 +118,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
 
     defnTraverser.traverse(defnClass, TheStatContext)
 
-    verify(classTraverser).traverse(eqTree(defnClass), ArgumentMatchers.eq(TheStatContext))
+    verify(classTraverser).traverse(eqTree(defnClass), ArgumentMatchers.eq(TheClassOrTraitContext))
   }
 
   test("traverse() for Trait") {
@@ -147,7 +148,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
 
     defnTraverser.traverse(defnTrait, TheStatContext)
 
-    verify(traitTraverser).traverse(eqTree(defnTrait), ArgumentMatchers.eq(TheStatContext))
+    verify(traitTraverser).traverse(eqTree(defnTrait), ArgumentMatchers.eq(TheClassOrTraitContext))
   }
 
   test("traverse() for Object") {
