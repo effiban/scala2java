@@ -12,7 +12,8 @@ class JavaModifierOrderingTest extends UnitTestSuite {
     (JavaModifier.Public, JavaModifier.Default, 0),
     (JavaModifier.Default, JavaModifier.Static, -1),
     (JavaModifier.Static, JavaModifier.Sealed, -1),
-    (JavaModifier.Sealed, JavaModifier.Abstract, -1),
+    (JavaModifier.Sealed, JavaModifier.NonSealed, 0),
+    (JavaModifier.NonSealed, JavaModifier.Abstract, -1),
     (JavaModifier.Abstract, JavaModifier.Final, -1)
   )
 

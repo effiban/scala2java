@@ -13,6 +13,7 @@ object JavaModifierOrdering extends JavaModifierOrdering {
     JavaModifier.Default -> 0,
     JavaModifier.Static -> 1,
     JavaModifier.Sealed -> 2,
+    JavaModifier.NonSealed -> 2,
     JavaModifier.Abstract -> 3,
     JavaModifier.Final -> 4
   )
