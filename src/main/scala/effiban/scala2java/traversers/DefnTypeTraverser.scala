@@ -50,12 +50,12 @@ private[traversers] class DefnTypeTraverserImpl(typeParamListTraverser: => TypeP
 
   private def resolveJavaModifiers(typeDef: Defn.Type,
                                    javaTreeType: JavaTreeType,
-                                   parentJavaScope: JavaScope) = {
+                                   javaScope: JavaScope) = {
     val javaModifiersContext = JavaModifiersContext(
       scalaTree = typeDef,
       scalaMods = typeDef.mods,
       javaTreeType = javaTreeType,
-      javaScope = parentJavaScope
+      javaScope = javaScope
     )
     javaModifiersResolver.resolve(javaModifiersContext)
   }

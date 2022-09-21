@@ -31,12 +31,12 @@ private[traversers] class DeclValTraverserImpl(annotListTraverser: => AnnotListT
     patListTraverser.traverse(valDecl.pats)
   }
 
-  private def resolveJavaModifiers(valDecl: Decl.Val, parentJavaScope: JavaScope) = {
+  private def resolveJavaModifiers(valDecl: Decl.Val, javaScope: JavaScope) = {
     val context = JavaModifiersContext(
       scalaTree = valDecl,
       scalaMods = valDecl.mods,
       javaTreeType = JavaTreeType.Variable,
-      javaScope = parentJavaScope
+      javaScope = javaScope
     )
     javaModifiersResolver.resolve(context)
   }

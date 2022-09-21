@@ -78,12 +78,12 @@ private[traversers] class DefnDefTraverserImpl(annotListTraverser: => AnnotListT
     }
   }
 
-  private def resolveJavaModifiers(defnDef: Defn.Def, parentJavaScope: JavaScope) = {
+  private def resolveJavaModifiers(defnDef: Defn.Def, javaScope: JavaScope) = {
     val javaModifiersContext = JavaModifiersContext(
       scalaTree = defnDef,
       scalaMods = defnDef.mods,
       javaTreeType = JavaTreeType.Method,
-      javaScope = parentJavaScope
+      javaScope = javaScope
     )
     javaModifiersResolver.resolve(javaModifiersContext)
   }
