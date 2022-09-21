@@ -32,6 +32,10 @@ private[traversers] class CaseClassTraverserImpl(annotListTraverser: => AnnotLis
       typeKeyword = JavaTreeTypeToKeywordMapping(javaTreeType),
       name = classDef.name.value)
     typeParamListTraverser.traverse(classDef.tparams)
+    traverseCtorAndTemplate(classDef, javaTreeType, context)
+  }
+
+  private def traverseCtorAndTemplate(classDef: Defn.Class, javaTreeType: JavaTreeType, context: ClassOrTraitContext): Unit = {
     val javaChildScope = javaChildScopeResolver.resolve(JavaChildScopeContext(classDef, javaTreeType))
     termParamListTraverser.traverse(classDef.ctor.paramss.flatten, StatContext(javaChildScope))
     // Even though the Java type is a Record, the constructor must still be explicitly declared if it has modifiers (annotations, visibility, etc.)
@@ -39,7 +43,8 @@ private[traversers] class CaseClassTraverserImpl(annotListTraverser: => AnnotLis
     val templateContext = TemplateContext(
       javaScope = javaChildScope,
       maybeClassName = Some(classDef.name),
-      maybePrimaryCtor = maybePrimaryCtor
+      maybePrimaryCtor = maybePrimaryCtor,
+      javaPermittedSubTypeNames = context.javaPermittedSubTypeNames
     )
     templateTraverser.traverse(template = classDef.templ, context = templateContext)
   }

@@ -90,6 +90,8 @@ class TraitTraverserImplTest extends UnitTestSuite {
       templ = TheTemplate
     )
 
+    val permittedSubTypeNames = List("A", "B")
+
     doWrite(
       """@MyAnnotation
         |""".stripMargin)
@@ -103,11 +105,14 @@ class TraitTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}
         |""".stripMargin)
-      .when(templateTraverser).traverse(eqTree(TheTemplate), eqTemplateContext(TemplateContext(javaScope = JavaScope.Interface)))
+      .when(templateTraverser).traverse(
+      eqTree(TheTemplate),
+      eqTemplateContext(TemplateContext(javaScope = JavaScope.Interface, javaPermittedSubTypeNames = permittedSubTypeNames)))
 
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(`trait`, JavaTreeType.Interface)))).thenReturn(JavaScope.Interface)
 
-    traitTraverser.traverse(`trait`, ClassOrTraitContext(JavaScope.Package))
+    val context = ClassOrTraitContext(javaScope = JavaScope.Package, javaPermittedSubTypeNames = permittedSubTypeNames)
+    traitTraverser.traverse(`trait`, context)
 
     outputWriter.toString shouldBe
       """

@@ -33,6 +33,10 @@ private[traversers] class RegularClassTraverserImpl(annotListTraverser: => Annot
       typeKeyword = JavaTreeTypeToKeywordMapping(javaTreeType),
       name = classDef.name.value)
     typeParamListTraverser.traverse(classDef.tparams)
+    traverseCtorAndTemplate(classDef, javaTreeType, context)
+  }
+
+  private def traverseCtorAndTemplate(classDef: Defn.Class, javaTreeType: JavaTreeType, context: ClassOrTraitContext): Unit = {
     val explicitMemberDecls = classDef.ctor.paramss.flatten.map(x =>
       paramToDeclValTransformer.transform(x)
     )
@@ -43,7 +47,8 @@ private[traversers] class RegularClassTraverserImpl(annotListTraverser: => Annot
     val templateContext = TemplateContext(
       javaScope = javaChildScope,
       maybeClassName = Some(classDef.name),
-      maybePrimaryCtor = Some(classDef.ctor)
+      maybePrimaryCtor = Some(classDef.ctor),
+      javaPermittedSubTypeNames = context.javaPermittedSubTypeNames
     )
     templateTraverser.traverse(template = enrichedTemplate, context = templateContext)
   }

@@ -6,4 +6,6 @@ import scala.meta.{Ctor, Type}
 
 case class TemplateContext(override val javaScope: JavaScope,
                            maybeClassName: Option[Type.Name] = None,
-                           maybePrimaryCtor: Option[Ctor.Primary] = None) extends JavaScopeAware
+                           maybePrimaryCtor: Option[Ctor.Primary] = None,
+                           override val javaPermittedSubTypeNames: List[String] = Nil)
+  extends JavaScopeAware with PermittedSubTypeNamesHolder

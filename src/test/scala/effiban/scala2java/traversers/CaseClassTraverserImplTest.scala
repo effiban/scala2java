@@ -195,6 +195,69 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
         |""".stripMargin
   }
 
+  test("traverse() for one list of ctor args with permitted sub-type names") {
+    val modifiers: List[Mod] = List(
+      Mod.Annot(
+        Init(tpe = Type.Name(AnnotationName), name = Name.Anonymous(), argss = List())
+      ),
+      Mod.Case()
+    )
+
+    val primaryCtor = Ctor.Primary(mods = List(), name = Name.Anonymous(), paramss = List(CtorArgs1))
+
+    val cls = Defn.Class(
+      mods = modifiers,
+      name = ClassName,
+      tparams = TypeParams,
+      ctor = primaryCtor,
+      templ = TheTemplate
+    )
+
+    val permittedSubTypeNames = List("A", "B")
+
+    when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Record)))).thenReturn(JavaScope.Class)
+
+    doWrite(
+      """@MyAnnotation
+        |""".stripMargin)
+      .when(annotListTraverser).traverseMods(eqTreeList(modifiers), onSameLine = ArgumentMatchers.eq(false))
+    whenResolveJavaTreeTypeThenReturnRecord(cls, modifiers)
+    whenResolveJavaModifiersThenReturnPublic(cls, modifiers)
+    doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
+    doWrite("(int arg1, int arg2)").when(termParamListTraverser).traverse(
+      termParams = eqTreeList(CtorArgs1),
+      context = ArgumentMatchers.eq(StatContext(JavaScope.Class)),
+      onSameLine = ArgumentMatchers.eq(false)
+    )
+    doWrite(
+      """ {
+        | /* BODY */
+        |}
+        |""".stripMargin)
+      .when(templateTraverser).traverse(
+      eqTree(TheTemplate),
+      eqTemplateContext(TemplateContext(
+        javaScope = JavaScope.Class,
+        maybeClassName = Some(ClassName),
+        javaPermittedSubTypeNames = permittedSubTypeNames)
+      )
+    )
+
+    val context = ClassOrTraitContext(
+      javaScope = JavaScope.Package,
+      javaPermittedSubTypeNames = permittedSubTypeNames
+    )
+    classTraverser.traverse(cls, context)
+
+    outputWriter.toString shouldBe
+      """
+        |@MyAnnotation
+        |public record MyRecord<T>(int arg1, int arg2) {
+        | /* BODY */
+        |}
+        |""".stripMargin
+  }
+
   test("traverse() for two lists of ctor args") {
     val modifiers: List[Mod] = List(
       Mod.Annot(
