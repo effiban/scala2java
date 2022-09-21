@@ -61,11 +61,13 @@ class JavaPublicModifierResolverTest extends UnitTestSuite {
   private val ScenariosWhenScalaModsPublic = Table(
     ("Desc", "ScalaTree", "JavaTreeType", "JavaScope", "ExpectedMaybeModifier"),
     ("outer class", TheClass, JavaTreeType.Class, JavaScope.Package, Some(JavaModifier.Public)),
+    ("outer class in sealed hierarchy", TheClass, JavaTreeType.Class, JavaScope.Sealed, Some(JavaModifier.Public)),
     ("inner class of class", TheClass, JavaTreeType.Class, JavaScope.Class, Some(JavaModifier.Public)),
     ("inner class of utility class", TheClass, JavaTreeType.Class, JavaScope.UtilityClass, Some(JavaModifier.Public)),
     ("inner class of interface", TheClass, JavaTreeType.Class, JavaScope.Interface, None),
     ("outer enum", TheClass, JavaTreeType.Enum, JavaScope.Package, Some(JavaModifier.Public)),
     ("outer interface", TheTrait, JavaTreeType.Interface, JavaScope.Package, Some(JavaModifier.Public)),
+    ("outer interface in sealed hierarchy", TheTrait, JavaTreeType.Interface, JavaScope.Sealed, Some(JavaModifier.Public)),
     ("inner interface of class", TheTrait, JavaTreeType.Interface, JavaScope.Class, Some(JavaModifier.Public)),
     ("inner interface of utility class", TheTrait, JavaTreeType.Interface, JavaScope.UtilityClass, Some(JavaModifier.Public)),
     ("inner interface of interface", TheTrait, JavaTreeType.Interface, JavaScope.Interface, None),
