@@ -171,7 +171,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
     val expectedMemberDecls = List(ExpectedMemberDecl1, ExpectedMemberDecl2)
     val expectedAdjustedTemplate = InitialTemplate.copy(stats = expectedMemberDecls ++ InitialTemplate.stats)
 
-    val permittedSubTypeNames = List("A", "B")
+    val permittedSubTypeNames = List(Type.Name("A"), Term.Name("B"))
 
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Class)))).thenReturn(JavaScope.Class)
 
@@ -199,11 +199,11 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
         javaScope = JavaScope.Class,
         maybeClassName = Some(ClassName),
         maybePrimaryCtor = Some(primaryCtor),
-        javaPermittedSubTypeNames = permittedSubTypeNames)
+        permittedSubTypeNames = permittedSubTypeNames)
       )
     )
 
-    val context = ClassOrTraitContext(javaScope = javaScope, javaPermittedSubTypeNames = permittedSubTypeNames)
+    val context = ClassOrTraitContext(javaScope = javaScope, permittedSubTypeNames = permittedSubTypeNames)
     classTraverser.traverse(cls, context)
 
     outputWriter.toString shouldBe

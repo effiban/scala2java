@@ -48,7 +48,7 @@ private[traversers] class RegularClassTraverserImpl(annotListTraverser: => Annot
       javaScope = javaChildScope,
       maybeClassName = Some(classDef.name),
       maybePrimaryCtor = Some(classDef.ctor),
-      javaPermittedSubTypeNames = context.javaPermittedSubTypeNames
+      permittedSubTypeNames = context.permittedSubTypeNames
     )
     templateTraverser.traverse(template = enrichedTemplate, context = templateContext)
   }

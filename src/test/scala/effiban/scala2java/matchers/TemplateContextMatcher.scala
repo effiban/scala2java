@@ -12,7 +12,7 @@ class TemplateContextMatcher(expectedTemplateContext: TemplateContext) extends A
     actualTemplateContext.javaScope == expectedTemplateContext.javaScope &&
       classNameMatches(actualTemplateContext) &&
       explicitPrimaryCtorMatches(actualTemplateContext) &&
-      actualTemplateContext.javaPermittedSubTypeNames == expectedTemplateContext.javaPermittedSubTypeNames
+      actualTemplateContext.permittedSubTypeNames == expectedTemplateContext.permittedSubTypeNames
   }
 
   private def classNameMatches(actualTemplateContext: TemplateContext) = {

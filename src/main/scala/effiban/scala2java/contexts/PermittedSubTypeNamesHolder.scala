@@ -1,5 +1,7 @@
 package effiban.scala2java.contexts
 
+import scala.meta.Name
+
 trait PermittedSubTypeNamesHolder {
-  val javaPermittedSubTypeNames: List[String]
+  val permittedSubTypeNames: List[Name]
 }

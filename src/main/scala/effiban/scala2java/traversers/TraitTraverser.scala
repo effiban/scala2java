@@ -32,7 +32,7 @@ private[traversers] class TraitTraverserImpl(annotListTraverser: => AnnotListTra
       name = traitDef.name.toString)
     typeParamListTraverser.traverse(traitDef.tparams)
     val javaChildScope = javaChildScopeResolver.resolve(JavaChildScopeContext(traitDef, javaTreeType))
-    val templateContext = TemplateContext(javaScope = javaChildScope, javaPermittedSubTypeNames = context.javaPermittedSubTypeNames)
+    val templateContext = TemplateContext(javaScope = javaChildScope, permittedSubTypeNames = context.permittedSubTypeNames)
     templateTraverser.traverse(traitDef.templ, templateContext)
   }
 
