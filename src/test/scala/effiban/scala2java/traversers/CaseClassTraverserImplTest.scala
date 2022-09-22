@@ -213,7 +213,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       templ = TheTemplate
     )
 
-    val permittedSubTypeNames = List("A", "B")
+    val permittedSubTypeNames = List(Type.Name("A"), Term.Name("B"))
 
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Record)))).thenReturn(JavaScope.Class)
 
@@ -239,13 +239,13 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       eqTemplateContext(TemplateContext(
         javaScope = JavaScope.Class,
         maybeClassName = Some(ClassName),
-        javaPermittedSubTypeNames = permittedSubTypeNames)
+        permittedSubTypeNames = permittedSubTypeNames)
       )
     )
 
     val context = ClassOrTraitContext(
       javaScope = JavaScope.Package,
-      javaPermittedSubTypeNames = permittedSubTypeNames
+      permittedSubTypeNames = permittedSubTypeNames
     )
     classTraverser.traverse(cls, context)
 

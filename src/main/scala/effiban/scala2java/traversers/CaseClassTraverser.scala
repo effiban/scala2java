@@ -44,7 +44,7 @@ private[traversers] class CaseClassTraverserImpl(annotListTraverser: => AnnotLis
       javaScope = javaChildScope,
       maybeClassName = Some(classDef.name),
       maybePrimaryCtor = maybePrimaryCtor,
-      javaPermittedSubTypeNames = context.javaPermittedSubTypeNames
+      permittedSubTypeNames = context.permittedSubTypeNames
     )
     templateTraverser.traverse(template = classDef.templ, context = templateContext)
   }
