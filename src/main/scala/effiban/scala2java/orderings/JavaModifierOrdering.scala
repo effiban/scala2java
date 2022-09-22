@@ -12,10 +12,10 @@ object JavaModifierOrdering extends JavaModifierOrdering {
     JavaModifier.Public -> 0,
     JavaModifier.Default -> 0,
     JavaModifier.Static -> 1,
-    JavaModifier.Sealed -> 2,
-    JavaModifier.NonSealed -> 2,
-    JavaModifier.Abstract -> 3,
-    JavaModifier.Final -> 4
+    JavaModifier.Abstract -> 2,
+    JavaModifier.Sealed -> 3,
+    JavaModifier.NonSealed -> 3,
+    JavaModifier.Final -> 3
   )
 
   override def compare(modifier1: JavaModifier, modifier2: JavaModifier): Int = positionOf(modifier1) - positionOf(modifier2)
