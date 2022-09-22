@@ -21,6 +21,7 @@ object JavaAllExtraModifiersResolver extends JavaAllExtraModifiersResolverImpl(
   List(
     JavaPublicModifierResolver,
     JavaStaticModifierResolver,
+    JavaNonSealedModifierResolver,
     JavaFinalModifierResolver
   )
 )
