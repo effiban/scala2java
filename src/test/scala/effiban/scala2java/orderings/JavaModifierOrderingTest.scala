@@ -11,10 +11,10 @@ class JavaModifierOrderingTest extends UnitTestSuite {
     (JavaModifier.Protected, JavaModifier.Public, 0),
     (JavaModifier.Public, JavaModifier.Default, 0),
     (JavaModifier.Default, JavaModifier.Static, -1),
-    (JavaModifier.Static, JavaModifier.Sealed, -1),
+    (JavaModifier.Static, JavaModifier.Abstract, -1),
+    (JavaModifier.Abstract, JavaModifier.Sealed, -1),
     (JavaModifier.Sealed, JavaModifier.NonSealed, 0),
-    (JavaModifier.NonSealed, JavaModifier.Abstract, -1),
-    (JavaModifier.Abstract, JavaModifier.Final, -1)
+    (JavaModifier.NonSealed, JavaModifier.Final, 0),
   )
 
   forAll(ModifierOrderingScenarios) { case (modifier1: JavaModifier, modifier2: JavaModifier, expectedResult: Int) =>
