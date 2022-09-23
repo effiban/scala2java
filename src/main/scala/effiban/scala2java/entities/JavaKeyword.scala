@@ -10,6 +10,7 @@ object JavaKeyword {
   case object Implements extends JavaKeyword("implements")
   case object Interface extends JavaKeyword("interface")
   case object Package extends JavaKeyword("package")
+  case object Permits extends JavaKeyword("permits")
   case object Record extends JavaKeyword("record")
 
   case object NoKeyword extends JavaKeyword("")

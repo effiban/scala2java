@@ -15,6 +15,7 @@ trait TemplateTraverser {
 private[traversers] class TemplateTraverserImpl(initListTraverser: => InitListTraverser,
                                                 selfTraverser: => SelfTraverser,
                                                 templateBodyTraverser: => TemplateBodyTraverser,
+                                                permittedSubTypeNameListTraverser: PermittedSubTypeNameListTraverser,
                                                 javaInheritanceKeywordResolver: JavaInheritanceKeywordResolver)
                                                (implicit javaWriter: JavaWriter) extends TemplateTraverser {
 
@@ -30,6 +31,10 @@ private[traversers] class TemplateTraverserImpl(initListTraverser: => InitListTr
     val relevantInits = template.inits.filterNot(init => shouldSkipParent(init.tpe))
     traverseTemplateInits(relevantInits, context.javaScope)
     selfTraverser.traverse(template.self)
+    if (context.permittedSubTypeNames.nonEmpty) {
+      write(" ")
+      permittedSubTypeNameListTraverser.traverse(context.permittedSubTypeNames)
+    }
     val bodyContext = TemplateBodyContext(
       javaScope = context.javaScope,
       maybeClassName = context.maybeClassName,

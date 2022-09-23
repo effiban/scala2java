@@ -229,6 +229,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
 
   private lazy val patWildcardTraverser: PatWildcardTraverser = new PatWildcardTraverserImpl()
 
+  private lazy val permittedSubTypeNameListTraverser = new PermittedSubTypeNameListTraverserImpl(argumentListTraverser)
+
   private lazy val pkgTraverser: PkgTraverser = new PkgTraverserImpl(termRefTraverser, statTraverser)
 
   private lazy val regularClassTraverser: RegularClassTraverser = new RegularClassTraverserImpl(
@@ -278,6 +280,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
     initListTraverser,
     selfTraverser,
     templateBodyTraverser,
+    permittedSubTypeNameListTraverser,
     JavaInheritanceKeywordResolver
   )
 
