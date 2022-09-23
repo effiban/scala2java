@@ -2,6 +2,7 @@ package effiban.scala2java.traversers
 
 import effiban.scala2java.classifiers.ImporterClassifier
 import effiban.scala2java.contexts.StatContext
+import effiban.scala2java.entities.JavaScope
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Import
@@ -17,6 +18,15 @@ private[traversers] class ImportTraverserImpl(importerTraverser: => ImporterTrav
   import javaWriter._
 
   override def traverse(`import`: Import, context: StatContext = StatContext()): Unit = {
+    context.javaScope match {
+      case JavaScope.Package => traverseInner(`import`)
+      case _ =>
+        // Java doesn't support imports below package scope
+        writeComment(s"${`import`.toString()}")
+    }
+  }
+
+  private def traverseInner(`import`: Import): Unit = {
     `import`.importers match {
       case List() => writeComment("Invalid import with no inner importers")
       // TODO instead of filtering out all scala imports, some can be converted to Java equivalents

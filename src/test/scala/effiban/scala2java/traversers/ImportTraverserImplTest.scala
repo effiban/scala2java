@@ -13,14 +13,14 @@ import scala.meta.{Import, Importee, Importer, Name, Term}
 
 class ImportTraverserImplTest extends UnitTestSuite {
 
-  private val TheStatContext = StatContext(JavaScope.Package)
+  private val PackageStatContext = StatContext(JavaScope.Package)
 
   private val importerTraverser = mock[ImporterTraverser]
   private val importerClassifier = mock[ImporterClassifier]
 
   private val importTraverser = new ImportTraverserImpl(importerTraverser, importerClassifier)
 
-  test("traverse() when there are no scala importers") {
+  test("traverse() in package scope when there are no scala importers") {
     val importer1 = Importer(
       ref = Term.Name("mypackage1"),
       importees = List(Importee.Name(Name.Indeterminate("myclass1")))
@@ -37,7 +37,7 @@ class ImportTraverserImplTest extends UnitTestSuite {
               |""".stripMargin)
       .when(importerTraverser).traverse(eqTree(importer2))
 
-    importTraverser.traverse(`import` = Import(List(importer1, importer2)), context = TheStatContext)
+    importTraverser.traverse(`import` = Import(List(importer1, importer2)), context = PackageStatContext)
 
     outputWriter.toString shouldBe
       """import mypackage1.myclass1;
@@ -45,7 +45,7 @@ class ImportTraverserImplTest extends UnitTestSuite {
         |""".stripMargin
   }
 
-  test("traverse() when there are scala importers should skip them") {
+  test("traverse() in package scope when there are scala importers should skip them") {
     val scalaImporter1 = Importer(
       ref = ScalaTermName,
       importees = List(Importee.Name(Name.Indeterminate("myclass1")))
@@ -79,12 +79,23 @@ class ImportTraverserImplTest extends UnitTestSuite {
 
     importTraverser.traverse(
       `import` = Import(List(scalaImporter1, nonScalaImporter1, scalaImporter2, nonScalaImporter2)),
-      context = TheStatContext
+      context = PackageStatContext
     )
 
     outputWriter.toString shouldBe
       """import mypackage1.myclass1;
         |import mypackage2.myclass2;
         |""".stripMargin
+  }
+
+  test("traverse() in class scope should write a comment") {
+    val importer = Importer(
+      ref = Term.Name("mypackage1"),
+      importees = List(Importee.Name(Name.Indeterminate("myclass1")))
+    )
+
+    importTraverser.traverse(`import` = Import(List(importer)), context = StatContext(JavaScope.Class))
+
+    outputWriter.toString shouldBe "/* import mypackage1.myclass1 */"
   }
 }

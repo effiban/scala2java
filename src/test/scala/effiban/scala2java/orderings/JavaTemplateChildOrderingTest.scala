@@ -3,13 +3,15 @@ package effiban.scala2java.orderings
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.{PrimaryCtors, TypeBounds, TypeNames}
 
-import scala.meta.{Ctor, Decl, Defn, Init, Lit, Name, Pat, Term, Tree, Type}
+import scala.meta.{Ctor, Decl, Defn, Import, Importee, Importer, Init, Lit, Name, Pat, Term, Tree, Type}
 
 class JavaTemplateChildOrderingTest extends UnitTestSuite {
 
   private val x = Term.Name("x")
   private val myMethod = Term.Name("myMethod")
   private val myType = Type.Name("MyType")
+
+  private val `import` = Import(List(Importer(Term.Name("mypackage1"), List(Importee.Name(Name.Indeterminate("myclass1"))))))
 
   private val defnVal = Defn.Val(
     mods = Nil,
@@ -86,6 +88,7 @@ class JavaTemplateChildOrderingTest extends UnitTestSuite {
 
   private val ChildTypeComparisons = Table(
     ("ChildType1", "ChildType2"),
+    (`import`, defnVal),
     (defnVal, defnVar),
     (defnVar, declVal),
     (declVal, declVar),
