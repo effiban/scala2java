@@ -3,7 +3,7 @@ package effiban.scala2java.resolvers
 import effiban.scala2java.classifiers.ModsClassifier
 import effiban.scala2java.entities.SealedHierarchies
 
-import scala.meta.{Defn, Member, Stat, Template}
+import scala.meta.{Defn, Member, Name, Stat, Template}
 
 trait SealedHierarchiesResolver {
   def traverse(stats: List[Stat]): SealedHierarchies
@@ -17,19 +17,17 @@ private[resolvers] class SealedHierarchiesResolverImpl(modsClassifier: ModsClass
       case defnTrait: Defn.Trait if modsClassifier.includeSealed(defnTrait.mods) => defnTrait
     }
 
-    val sealedNameToSubTypeNames = stats.collect(templateAndNameOf(_))
+    val sealedNameToSubTypeNames = stats.collect(templateAndName())
       .map { case (template, name) => (sealedParentNameOf(sealedTypes, template), name) }
       .collect { case (Some(sealedName), subTypeName) => (sealedName, subTypeName) }
       .groupMap(_._1)(_._2)
     SealedHierarchies(sealedNameToSubTypeNames)
   }
 
-  private def templateAndNameOf(stat: Stat) = {
-    stat match {
+  private def templateAndName(): PartialFunction[Stat, (Template, Name)] = {
       case defnClass: Defn.Class => (defnClass.templ, defnClass.name)
       case defnTrait: Defn.Trait => (defnTrait.templ, defnTrait.name)
       case defnObject: Defn.Object => (defnObject.templ, defnObject.name)
-    }
   }
 
   private def sealedParentNameOf(sealedTypes: List[Member.Type], template: Template) = {
