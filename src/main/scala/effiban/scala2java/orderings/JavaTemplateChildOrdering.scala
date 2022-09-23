@@ -1,11 +1,12 @@
 package effiban.scala2java.orderings
 
-import scala.meta.{Ctor, Decl, Defn, Tree}
+import scala.meta.{Ctor, Decl, Defn, Import, Tree}
 
 trait JavaTemplateChildOrdering extends Ordering[Tree]
 
 object JavaTemplateChildOrdering extends JavaTemplateChildOrdering {
   private val ChildOrder: List[Class[_ <: Tree]] = List[Class[_ <: Tree]](
+    classOf[Import],
     classOf[Defn.Val],
     classOf[Defn.Var],
     classOf[Decl.Val],
