@@ -6,7 +6,7 @@ import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.{PrimaryCtors, Selfs}
 
-import scala.meta.{Defn, Init, Mod, Name, Template, Term, Type}
+import scala.meta.{Defn, Import, Importee, Importer, Init, Mod, Name, Template, Term, Type}
 
 class SealedHierarchiesResolverImplTest extends UnitTestSuite {
 
@@ -21,6 +21,16 @@ class SealedHierarchiesResolverImplTest extends UnitTestSuite {
 
     when(modsClassifier.includeSealed(Nil)).thenReturn(false)
     when(modsClassifier.includeSealed(eqTreeList(SealedMods))).thenReturn(true)
+  }
+
+  test("traverse for import and class") {
+    val importDef = Import(List(Importer(Term.Name("A"), List(Importee.Name(Name.Indeterminate("a"))))))
+    val classDef = defnClass(Type.Name("B"))
+    val stats = List(importDef, classDef)
+
+    when(modsClassifier.includeSealed(Nil)).thenReturn(false)
+
+    sealedHierarchiesResolver.traverse(stats) shouldBe SealedHierarchies()
   }
 
   test("traverse for trait and object, no inheritance") {
