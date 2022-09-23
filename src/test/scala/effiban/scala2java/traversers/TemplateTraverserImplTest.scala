@@ -31,6 +31,8 @@ class TemplateTraverserImplTest extends UnitTestSuite {
 
   private val NonEmptySelf = Self(name = Name.Indeterminate("SelfName"), decltpe = Some(Type.Name("SelfType")))
 
+  private val PermittedSubTypeNames = List(Type.Name("Child1"), Term.Name("Child2"))
+
   private val DataMemberDefn = Defn.Val(
     mods = Nil,
     pats = List(Pat.Var(name = Term.Name("y"))),
@@ -65,11 +67,13 @@ class TemplateTraverserImplTest extends UnitTestSuite {
   private val selfTraverser = mock[SelfTraverser]
   private val javaInheritanceKeywordResolver = mock[JavaInheritanceKeywordResolver]
   private val templateBodyTraverser = mock[TemplateBodyTraverser]
+  private val permittedSubTypeNameListTraverser = mock[PermittedSubTypeNameListTraverser]
 
   private val templateTraverser = new TemplateTraverserImpl(
     initListTraverser,
     selfTraverser,
     templateBodyTraverser,
+    permittedSubTypeNameListTraverser,
     javaInheritanceKeywordResolver
   )
 
@@ -153,6 +157,28 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     verifyZeroInteractions(initListTraverser)
   }
 
+  test("traverse when has permitted subtypes only") {
+    val template = Template(
+      early = Nil,
+      inits = Nil,
+      self = Selfs.Empty,
+      stats = Nil
+    )
+
+    expectTraversePermittedSubTypeNames()
+    expectTraverseBody(stats = Nil)
+
+    templateTraverser.traverse(template, context = TemplateContext(javaScope = JavaScope.Class, permittedSubTypeNames = PermittedSubTypeNames))
+
+    outputWriter.toString shouldBe
+      """ permits Child1, Child2 {
+        |  /* BODY */
+        |}
+        |""".stripMargin
+
+    verifyZeroInteractions(initListTraverser)
+  }
+
   test("traverse when has primary ctor only") {
     val context = TemplateContext(
       javaScope = JavaScope.Class,
@@ -222,11 +248,13 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     val context = TemplateContext(
       javaScope = JavaScope.Class,
       maybeClassName = Some(ClassName),
-      maybePrimaryCtor = Some(PrimaryCtor)
+      maybePrimaryCtor = Some(PrimaryCtor),
+      permittedSubTypeNames = PermittedSubTypeNames
     )
 
     expectWriteInits(JavaScope.Class)
     expectWriteSelf(NonEmptySelf)
+    expectTraversePermittedSubTypeNames()
     expectTraverseBody(stats = stats, context = TemplateBodyContext(
       javaScope = JavaScope.Class,
       maybeClassName = Some(ClassName),
@@ -237,7 +265,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     templateTraverser.traverse(template = template, context = context)
 
     outputWriter.toString shouldBe
-      """ implements Parent1, Parent2/* extends SelfName: SelfType */ {
+      """ implements Parent1, Parent2/* extends SelfName: SelfType */ permits Child1, Child2 {
         |  /* BODY */
         |}
         |""".stripMargin
@@ -258,6 +286,11 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       case _ => "/* extends SelfName: SelfType */"
     }
     doWrite(selfStr).when(selfTraverser).traverse(eqTree(self))
+  }
+
+  private def expectTraversePermittedSubTypeNames(): Unit = {
+    doWrite("permits Child1, Child2")
+      .when(permittedSubTypeNameListTraverser).traverse(eqTreeList(PermittedSubTypeNames))
   }
 
   private def expectTraverseBody(stats: List[Stat], context: TemplateBodyContext = TemplateBodyContext(javaScope = JavaScope.Class)): Unit = {
