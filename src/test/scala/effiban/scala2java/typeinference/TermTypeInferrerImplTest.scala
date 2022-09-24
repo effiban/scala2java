@@ -36,17 +36,16 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
   )
   private val MatchCases = List(MatchCase1, MatchCase2)
 
+  private val applyTypeTypeInferrer = mock[ApplyTypeTypeInferrer]
+  private val caseListTypeInferrer = mock[CaseListTypeInferrer]
   private val ifTypeInferrer = mock[IfTypeInferrer]
   private val blockTypeInferrer = mock[BlockTypeInferrer]
   private val litTypeInferrer = mock[LitTypeInferrer]
-
   private val tryTypeInferrer = mock[TryTypeInferrer]
-
   private val tryWithHandlerTypeInferrer = mock[TryWithHandlerTypeInferrer]
 
-  private val caseListTypeInferrer = mock[CaseListTypeInferrer]
-
   private val termTypeInferrer = new TermTypeInferrerImpl(
+    applyTypeTypeInferrer,
     blockTypeInferrer,
     caseListTypeInferrer,
     ifTypeInferrer,

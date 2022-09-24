@@ -2,6 +2,8 @@ package effiban.scala2java.typeinference
 
 object TypeInferrers {
 
+  private[typeinference] lazy val applyTypeTypeInferrer = new ApplyTypeTypeInferrerImpl(termTypeInferrer)
+
   private[typeinference] lazy val blockTypeInferrer = new BlockTypeInferrerImpl(termTypeInferrer)
 
   private[typeinference] lazy val caseListTypeInferrer = new CaseListTypeInferrerImpl(caseTypeInferrer, CollectiveTypeInferrer)
@@ -19,6 +21,7 @@ object TypeInferrers {
   private[typeinference] lazy val tryWithHandlerTypeInferrer = new TryWithHandlerTypeInferrerImpl(termTypeInferrer, CollectiveTypeInferrer)
 
   lazy val termTypeInferrer: TermTypeInferrer = new TermTypeInferrerImpl(
+    applyTypeTypeInferrer,
     blockTypeInferrer,
     caseListTypeInferrer,
     ifTypeInferrer,

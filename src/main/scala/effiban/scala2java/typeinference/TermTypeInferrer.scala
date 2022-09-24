@@ -1,11 +1,12 @@
 package effiban.scala2java.typeinference
 
-import scala.meta.Term.{Annotate, Ascribe, Assign, Block, Do, For, ForYield, If, New, Return, Throw, Try, TryWithHandler, While}
+import scala.meta.Term.{Annotate, ApplyType, Ascribe, Assign, Block, Do, For, ForYield, If, New, Return, Throw, Try, TryWithHandler, While}
 import scala.meta.{Lit, Term, Type}
 
 trait TermTypeInferrer extends TypeInferrer[Term]
 
-private[typeinference] class TermTypeInferrerImpl(blockTypeInferrer: => BlockTypeInferrer,
+private[typeinference] class TermTypeInferrerImpl(applyTypeTypeInferrer: ApplyTypeTypeInferrer,
+                                                  blockTypeInferrer: => BlockTypeInferrer,
                                                   caseListTypeInferrer: => CaseListTypeInferrer,
                                                   ifTypeInferrer: => IfTypeInferrer,
                                                   litTypeInferrer: LitTypeInferrer,
@@ -15,6 +16,7 @@ private[typeinference] class TermTypeInferrerImpl(blockTypeInferrer: => BlockTyp
   override def infer(term: Term): Option[Type] = {
     term match {
       case _: Annotate => Some(Type.AnonymousName())
+      case applyType: ApplyType => applyTypeTypeInferrer.infer(applyType)
       case ascribe: Ascribe => Some(ascribe.tpe)
       case assign: Assign => infer(assign.rhs)
       case block: Block => blockTypeInferrer.infer(block)
