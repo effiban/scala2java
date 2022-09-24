@@ -5,33 +5,33 @@ import scala.meta.{Lit, Term, Type}
 
 trait TermTypeInferrer extends TypeInferrer[Term]
 
-private[typeinference] class TermTypeInferrerImpl(ifTypeInferrer: => IfTypeInferrer,
-                                                  blockTypeInferrer: => BlockTypeInferrer,
+private[typeinference] class TermTypeInferrerImpl(blockTypeInferrer: => BlockTypeInferrer,
+                                                  caseListTypeInferrer: => CaseListTypeInferrer,
+                                                  ifTypeInferrer: => IfTypeInferrer,
                                                   litTypeInferrer: LitTypeInferrer,
                                                   tryTypeInferrer: => TryTypeInferrer,
-                                                  tryWithHandlerTypeInferrer: => TryWithHandlerTypeInferrer,
-                                                  caseListTypeInferrer: => CaseListTypeInferrer) extends TermTypeInferrer {
+                                                  tryWithHandlerTypeInferrer: => TryWithHandlerTypeInferrer) extends TermTypeInferrer {
 
   override def infer(term: Term): Option[Type] = {
     term match {
-      case `if`: If => ifTypeInferrer.infer(`if`)
+      case _: Annotate => Some(Type.AnonymousName())
+      case ascribe: Ascribe => Some(ascribe.tpe)
+      case assign: Assign => infer(assign.rhs)
       case block: Block => blockTypeInferrer.infer(block)
+      case _: Do => Some(Type.AnonymousName())
+      case _: For => Some(Type.AnonymousName())
+      case forYield: ForYield => infer(forYield.body)
+      case `if`: If => ifTypeInferrer.infer(`if`)
+      case _: Term.Interpolate => Some(Type.Name("String"))
       case lit: Lit => litTypeInferrer.infer(lit)
+      case `new`: New => Some(`new`.init.tpe)
+      case repeated: Term.Repeated => inferRepeated(repeated)
+      case `return`: Return => infer(`return`.expr)
+      case termMatch: Term.Match => caseListTypeInferrer.infer(termMatch.cases)
+      case _: Throw => Some(Type.AnonymousName())
       case `try`: Try => tryTypeInferrer.infer(`try`)
       case tryWithHandler: TryWithHandler => tryWithHandlerTypeInferrer.infer(tryWithHandler)
-      case termMatch: Term.Match => caseListTypeInferrer.infer(termMatch.cases)
-      case repeated: Term.Repeated => inferRepeated(repeated)
-      case forYield: ForYield => infer(forYield.body)
-      case `return`: Return => infer(`return`.expr)
-      case assign: Assign => infer(assign.rhs)
-      case ascribe: Ascribe => Some(ascribe.tpe)
-      case `new`: New => Some(`new`.init.tpe)
-      case _: Term.Interpolate => Some(Type.Name("String"))
-      case _: For => Some(Type.AnonymousName())
-      case _: Annotate => Some(Type.AnonymousName())
-      case _: Do => Some(Type.AnonymousName())
       case _: While => Some(Type.AnonymousName())
-      case _: Throw => Some(Type.AnonymousName())
       // TODO - support Tuple, NewAnonymous, Function, PartialFunction
       case _ => None
     }
