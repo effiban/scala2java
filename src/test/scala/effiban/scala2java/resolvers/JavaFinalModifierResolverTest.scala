@@ -1,10 +1,9 @@
 package effiban.scala2java.resolvers
 
-import effiban.scala2java.classifiers.ObjectClassifier
 import effiban.scala2java.contexts.JavaModifiersContext
 import effiban.scala2java.entities.JavaScope.JavaScope
+import effiban.scala2java.entities.JavaTreeType.JavaTreeType
 import effiban.scala2java.entities.{JavaModifier, JavaScope, JavaTreeType}
-import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.{Templates, TypeNames}
 
@@ -20,67 +19,57 @@ class JavaFinalModifierResolverTest extends UnitTestSuite {
   private val TheTermParam = Term.Param(Nil, Term.Name("myParam"), Some(TypeNames.Int), None)
 
 
+  private val DefnObjectDesc = "Defn.Object"
   private val DeclValDesc = "Decl.Val"
   private val DefnValDesc = "Defn.Val"
   private val DeclVarDesc = "Decl.Var"
   private val DefnVarDesc = "Defn.Var"
   private val TermParamDesc = "Term.Param"
 
-  private val objectClassifier = mock[ObjectClassifier]
-
-  private val javaFinalModifierResolver = new JavaFinalModifierResolver(objectClassifier)
-
-  private val RegularScenarios = Table(
-    ("ScalaTree", "ScalaTreeDesc", "JavaScope", "ExpectedResult"),
-    (TheDeclVal, DeclValDesc, JavaScope.Class, true),
-    (TheDeclVal, DeclValDesc, JavaScope.UtilityClass, true),
-    (TheDeclVal, DeclValDesc, JavaScope.Interface, false),
-    (TheDeclVal, DeclValDesc, JavaScope.Block, true),
-    (TheDefnVal, DefnValDesc, JavaScope.Class, true),
-    (TheDefnVal, DefnValDesc, JavaScope.UtilityClass, true),
-    (TheDefnVal, DefnValDesc, JavaScope.Interface, false),
-    (TheDefnVal, DefnValDesc, JavaScope.Block, true),
-    (TheDeclVar, DeclVarDesc, JavaScope.Class, false),
-    (TheDeclVar, DeclVarDesc, JavaScope.UtilityClass, false),
-    (TheDeclVar, DeclVarDesc, JavaScope.Interface, false),
-    (TheDeclVar, DeclVarDesc, JavaScope.Block, false),
-    (TheDefnVar, DefnVarDesc, JavaScope.Class, false),
-    (TheDefnVar, DefnVarDesc, JavaScope.UtilityClass, false),
-    (TheDefnVar, DefnVarDesc, JavaScope.Interface, false),
-    (TheDefnVar, DefnVarDesc, JavaScope.Block, false),
-    (TheTermParam, TermParamDesc, JavaScope.Class, true),
-    (TheTermParam, TermParamDesc, JavaScope.MethodSignature, true),
-    (TheTermParam, TermParamDesc, JavaScope.LambdaSignature, false),
+  private val Scenarios = Table(
+    ("ScalaTree", "ScalaTreeDesc", "JavaTreeType", "JavaScope", "ExpectedResult"),
+    (TheDefnObject, DefnObjectDesc, JavaTreeType.Class, JavaScope.Package, true),
+    (TheDefnObject, DefnObjectDesc, JavaTreeType.Enum, JavaScope.Package, false),
+    (TheDeclVal, DeclValDesc, JavaTreeType.Variable, JavaScope.Class, true),
+    (TheDeclVal, DeclValDesc, JavaTreeType.Variable, JavaScope.UtilityClass, true),
+    (TheDeclVal, DeclValDesc, JavaTreeType.Variable, JavaScope.Interface, false),
+    (TheDeclVal, DeclValDesc, JavaTreeType.Variable, JavaScope.Block, true),
+    (TheDefnVal, DefnValDesc, JavaTreeType.Variable, JavaScope.Class, true),
+    (TheDefnVal, DefnValDesc, JavaTreeType.Variable, JavaScope.UtilityClass, true),
+    (TheDefnVal, DefnValDesc, JavaTreeType.Variable, JavaScope.Interface, false),
+    (TheDefnVal, DefnValDesc, JavaTreeType.Variable, JavaScope.Block, true),
+    (TheDeclVar, DeclVarDesc, JavaTreeType.Variable, JavaScope.Class, false),
+    (TheDeclVar, DeclVarDesc, JavaTreeType.Variable, JavaScope.UtilityClass, false),
+    (TheDeclVar, DeclVarDesc, JavaTreeType.Variable, JavaScope.Interface, false),
+    (TheDeclVar, DeclVarDesc, JavaTreeType.Variable, JavaScope.Block, false),
+    (TheDefnVar, DefnVarDesc, JavaTreeType.Variable, JavaScope.Class, false),
+    (TheDefnVar, DefnVarDesc, JavaTreeType.Variable, JavaScope.UtilityClass, false),
+    (TheDefnVar, DefnVarDesc, JavaTreeType.Variable, JavaScope.Interface, false),
+    (TheDefnVar, DefnVarDesc, JavaTreeType.Variable, JavaScope.Block, false),
+    (TheTermParam, TermParamDesc, JavaTreeType.Parameter, JavaScope.Class, true),
+    (TheTermParam, TermParamDesc, JavaTreeType.Parameter, JavaScope.MethodSignature, true),
+    (TheTermParam, TermParamDesc, JavaTreeType.Parameter, JavaScope.LambdaSignature, false),
   )
 
-  forAll(RegularScenarios) {
+  forAll(Scenarios) {
     case (
       scalaTree: Tree,
       scalaTreeDesc: String,
+      javaTreeType: JavaTreeType,
       javaScope: JavaScope,
       expectedResult: Boolean) =>
 
-      test(s"A '$scalaTreeDesc' in the scope '$javaScope' should ${if (expectedResult) "" else "not"} require 'final'") {
-        resolve(scalaTree, javaScope) shouldBe (if (expectedResult) Some(JavaModifier.Final) else None)
+      test(s"A '$scalaTreeDesc' with java type '$javaTreeType' in scope '$javaScope' should ${if (expectedResult) "" else "not"} require 'final'") {
+        resolve(scalaTree, javaTreeType, javaScope) shouldBe (if (expectedResult) Some(JavaModifier.Final) else None)
       }
   }
 
-  test("A Defn.Object should require 'final' when classified as 'standalone'") {
-    when(objectClassifier.isStandalone(eqTree(TheDefnObject))).thenReturn(true)
-    resolve(TheDefnObject, JavaScope.Package).value shouldBe JavaModifier.Final
-  }
-
-  test("A Defn.Object should not require 'final' when not classified as 'standalone'") {
-    when(objectClassifier.isStandalone(eqTree(TheDefnObject))).thenReturn(false)
-    resolve(TheDefnObject, JavaScope.Package) shouldBe None
-  }
-
-  private def resolve(scalaTree: Tree, javaScope: JavaScope) = {
-    javaFinalModifierResolver.resolve(
+  private def resolve(scalaTree: Tree, javaTreeType: JavaTreeType, javaScope: JavaScope) = {
+    JavaFinalModifierResolver.resolve(
       JavaModifiersContext(
         scalaTree = scalaTree,
         scalaMods = Nil,
-        javaTreeType = JavaTreeType.Unknown,
+        javaTreeType = javaTreeType,
         javaScope = javaScope
       ))
   }

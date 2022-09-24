@@ -5,7 +5,6 @@ import effiban.scala2java.contexts.JavaModifiersContext
 import effiban.scala2java.entities.JavaScope.JavaScope
 import effiban.scala2java.entities.JavaTreeType.Unknown
 import effiban.scala2java.entities.{JavaModifier, JavaScope}
-import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.{PrimaryCtors, Templates}
 
@@ -25,17 +24,25 @@ class JavaNonSealedModifierResolverTest extends UnitTestSuite {
 
   private val DummyMods: List[Mod] = List(Mod.Implicit())
 
-  private val NonObjectScenarios = Table(
+  private val DefnClassDesc = "Defn.Class"
+  private val DefnTraitDesc = "Defn.Trait"
+  private val DefnObjectDesc = "Defn.Object"
+  private val DefnValDesc = "Defn.Val"
+
+  private val Scenarios = Table(
     ("ScalaTreeDesc", "ScalaTree", "ScalaModsIncludeSealed", "ScalaModsIncludeFinal", "JavaScope", "ExpectedNonSealed"),
-    ("Defn.Class", TheDefnClass, ModsDontIncludeSealed, ModsDontIncludeFinal, JavaScope.Sealed, true),
-    ("Defn.Class", TheDefnClass, ModsIncludeSealed, ModsDontIncludeFinal, JavaScope.Sealed, false),
-    ("Defn.Class", TheDefnClass, ModsDontIncludeSealed, ModsIncludeFinal, JavaScope.Sealed, false),
-    ("Defn.Class", TheDefnClass, ModsIncludeSealed, ModsIncludeFinal, JavaScope.Sealed, false),
-    ("Defn.Class", TheDefnClass, ModsDontIncludeSealed, ModsDontIncludeFinal, JavaScope.Package, false),
-    ("Defn.Trait", TheDefnTrait, ModsDontIncludeSealed, ModsDontIncludeFinal, JavaScope.Sealed, true),
-    ("Defn.Trait", TheDefnTrait, ModsIncludeSealed, ModsDontIncludeFinal, JavaScope.Sealed, false),
-    ("Defn.Trait", TheDefnTrait, ModsDontIncludeSealed, ModsDontIncludeFinal, JavaScope.Package, false),
-    ("Defn.Val", TheDefnVal, ModsDontIncludeSealed, ModsDontIncludeFinal, JavaScope.Class, false)
+    (DefnClassDesc, TheDefnClass, ModsDontIncludeSealed, ModsDontIncludeFinal, JavaScope.Sealed, true),
+    (DefnClassDesc, TheDefnClass, ModsIncludeSealed, ModsDontIncludeFinal, JavaScope.Sealed, false),
+    (DefnClassDesc, TheDefnClass, ModsDontIncludeSealed, ModsIncludeFinal, JavaScope.Sealed, false),
+    (DefnClassDesc, TheDefnClass, ModsIncludeSealed, ModsIncludeFinal, JavaScope.Sealed, false),
+    (DefnClassDesc, TheDefnClass, ModsDontIncludeSealed, ModsDontIncludeFinal, JavaScope.Package, false),
+    (DefnTraitDesc, TheDefnTrait, ModsDontIncludeSealed, ModsDontIncludeFinal, JavaScope.Sealed, true),
+    (DefnTraitDesc, TheDefnTrait, ModsIncludeSealed, ModsDontIncludeFinal, JavaScope.Sealed, false),
+    (DefnTraitDesc, TheDefnTrait, ModsDontIncludeSealed, ModsDontIncludeFinal, JavaScope.Package, false),
+    (DefnObjectDesc, TheDefnObject, ModsDontIncludeSealed, ModsDontIncludeFinal, JavaScope.Sealed, false),
+    (DefnObjectDesc, TheDefnObject, ModsIncludeSealed, ModsDontIncludeFinal, JavaScope.Sealed, false),
+    (DefnObjectDesc, TheDefnObject, ModsDontIncludeSealed, ModsDontIncludeFinal, JavaScope.Package, false),
+    (DefnValDesc, TheDefnVal, ModsDontIncludeSealed, ModsDontIncludeFinal, JavaScope.Class, false)
   )
 
   private val modsClassifier = mock[ModsClassifier]
@@ -43,7 +50,7 @@ class JavaNonSealedModifierResolverTest extends UnitTestSuite {
 
   private val javaNonSealedModifierResolver = new JavaNonSealedModifierResolver(modsClassifier, objectClassifier)
 
-  forAll(NonObjectScenarios) { case (
+  forAll(Scenarios) { case (
     scalaTreeDesc: String,
     scalaTree: Tree,
     scalaModsIncludeSealed: Boolean,
@@ -68,61 +75,5 @@ class JavaNonSealedModifierResolverTest extends UnitTestSuite {
 
       javaNonSealedModifierResolver.resolve(context) shouldBe (if (expectedNonSealed) Some(JavaModifier.NonSealed) else None)
     }
-  }
-
-  test("A Defn.Object that is standalone in Java scope Sealed should NOT require the Java modifier 'non-sealed'") {
-    val context = JavaModifiersContext(
-      scalaTree = TheDefnObject,
-      scalaMods = DummyMods,
-      javaTreeType = Unknown,
-      javaScope = JavaScope.Sealed
-    )
-
-    when(objectClassifier.isStandalone(eqTree(TheDefnObject))).thenReturn(true)
-
-    javaNonSealedModifierResolver.resolve(context) shouldBe None
-  }
-
-  test("A Defn.Object that is NOT standalone, in Java scope Sealed with no other mods should require the Java modifier 'non-sealed'") {
-    val context = JavaModifiersContext(
-      scalaTree = TheDefnObject,
-      scalaMods = DummyMods,
-      javaTreeType = Unknown,
-      javaScope = JavaScope.Sealed
-    )
-
-    when(objectClassifier.isStandalone(eqTree(TheDefnObject))).thenReturn(false)
-    when(modsClassifier.includeSealed(DummyMods)).thenReturn(false)
-    when(modsClassifier.includeFinal(DummyMods)).thenReturn(false)
-
-    javaNonSealedModifierResolver.resolve(context) shouldBe Some(JavaModifier.NonSealed)
-  }
-
-  test("A Defn.Object that is NOT standalone, is Java scope Sealed and has mod Sealed should NOT require the Java modifier 'non-sealed'") {
-    val context = JavaModifiersContext(
-      scalaTree = TheDefnObject,
-      scalaMods = DummyMods,
-      javaTreeType = Unknown,
-      javaScope = JavaScope.Sealed
-    )
-
-    when(objectClassifier.isStandalone(eqTree(TheDefnObject))).thenReturn(false)
-    when(modsClassifier.includeSealed(DummyMods)).thenReturn(true)
-    when(modsClassifier.includeFinal(DummyMods)).thenReturn(false)
-
-    javaNonSealedModifierResolver.resolve(context) shouldBe None
-  }
-
-  test("A Defn.Object that is NOT standalone, and not in Java scope Sealed should NOT require the Java modifier 'non-sealed'") {
-    val context = JavaModifiersContext(
-      scalaTree = TheDefnObject,
-      scalaMods = DummyMods,
-      javaTreeType = Unknown,
-      javaScope = JavaScope.Package
-    )
-
-    when(objectClassifier.isStandalone(eqTree(TheDefnObject))).thenReturn(false)
-
-    javaNonSealedModifierResolver.resolve(context) shouldBe None
   }
 }
