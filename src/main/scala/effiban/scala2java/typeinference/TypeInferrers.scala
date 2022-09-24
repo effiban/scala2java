@@ -26,6 +26,7 @@ object TypeInferrers {
     caseListTypeInferrer,
     ifTypeInferrer,
     LitTypeInferrer,
+    NameTypeInferrer,
     tryTypeInferrer,
     tryWithHandlerTypeInferrer
   )

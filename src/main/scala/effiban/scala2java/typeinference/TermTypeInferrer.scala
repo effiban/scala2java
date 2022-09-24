@@ -10,6 +10,7 @@ private[typeinference] class TermTypeInferrerImpl(applyTypeTypeInferrer: ApplyTy
                                                   caseListTypeInferrer: => CaseListTypeInferrer,
                                                   ifTypeInferrer: => IfTypeInferrer,
                                                   litTypeInferrer: LitTypeInferrer,
+                                                  nameTypeInferrer: NameTypeInferrer,
                                                   tryTypeInferrer: => TryTypeInferrer,
                                                   tryWithHandlerTypeInferrer: => TryWithHandlerTypeInferrer) extends TermTypeInferrer {
 
@@ -26,6 +27,7 @@ private[typeinference] class TermTypeInferrerImpl(applyTypeTypeInferrer: ApplyTy
       case `if`: If => ifTypeInferrer.infer(`if`)
       case _: Term.Interpolate => Some(Type.Name("String"))
       case lit: Lit => litTypeInferrer.infer(lit)
+      case name: Term.Name => nameTypeInferrer.infer(name)
       case `new`: New => Some(`new`.init.tpe)
       case repeated: Term.Repeated => inferRepeated(repeated)
       case `return`: Return => infer(`return`.expr)
