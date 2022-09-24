@@ -11,6 +11,8 @@ import scala.meta.{Case, Init, Lit, Name, Pat, Term, Type}
 
 class TermTypeInferrerImplTest extends UnitTestSuite {
 
+  private val TheApplyType = Term.ApplyType(Term.Name("foo"), List(TypeNames.Int))
+
   private val Condition = Term.ApplyInfix(
     lhs = Term.Name("x"),
     op = Term.Name("<"),
@@ -41,6 +43,7 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
   private val ifTypeInferrer = mock[IfTypeInferrer]
   private val blockTypeInferrer = mock[BlockTypeInferrer]
   private val litTypeInferrer = mock[LitTypeInferrer]
+  private val nameTypeInferrer = mock[NameTypeInferrer]
   private val tryTypeInferrer = mock[TryTypeInferrer]
   private val tryWithHandlerTypeInferrer = mock[TryWithHandlerTypeInferrer]
 
@@ -50,12 +53,23 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
     caseListTypeInferrer,
     ifTypeInferrer,
     litTypeInferrer,
+    nameTypeInferrer,
     tryTypeInferrer,
     tryWithHandlerTypeInferrer
   )
 
   test("infer 'Apply' should return None") {
     termTypeInferrer.infer(Term.Apply(Term.Name("myMethod"), Nil)) shouldBe None
+  }
+
+  test("infer 'ApplyType' when 'ApplyTypeTypeInferrer' returns a result, should return it") {
+    when(applyTypeTypeInferrer.infer(eqTree(TheApplyType))).thenReturn(Some(TypeNames.Int))
+    termTypeInferrer.infer(TheApplyType).value.structure shouldBe TypeNames.Int.structure
+  }
+
+  test("infer 'ApplyType' when 'ApplyTypeTypeInferrer' returns None should return None") {
+    when(applyTypeTypeInferrer.infer(eqTree(TheApplyType))).thenReturn(None)
+    termTypeInferrer.infer(TheApplyType) shouldBe None
   }
 
   test("infer 'Ascribe' should return its type") {
@@ -137,6 +151,16 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
     when(caseListTypeInferrer.infer(eqTreeList(MatchCases))).thenReturn(Some(TypeNames.Int))
 
     termTypeInferrer.infer(`match`).value.structure shouldBe TypeNames.Int.structure
+  }
+
+  test("infer 'Name' when 'NameTypeInferrer' returns a result, should return it") {
+    when(nameTypeInferrer.infer(eqTree(Term.Name("List")))).thenReturn(Some(TypeNames.List))
+    termTypeInferrer.infer(Term.Name("List")).value.structure shouldBe TypeNames.List.structure
+  }
+
+  test("infer 'Name' when 'NameTypeInferrer' returns None should return None") {
+    when(nameTypeInferrer.infer(eqTree(Term.Name("foo")))).thenReturn(None)
+    termTypeInferrer.infer(Term.Name("foo")) shouldBe None
   }
 
   test("infer 'New' should return type of its 'Init'") {
