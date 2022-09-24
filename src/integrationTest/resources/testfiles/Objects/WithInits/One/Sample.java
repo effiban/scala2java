@@ -1,5 +1,5 @@
 package dummy;
 
 
-public class Sample implements Parent {
+public final class Sample implements Parent {
 }

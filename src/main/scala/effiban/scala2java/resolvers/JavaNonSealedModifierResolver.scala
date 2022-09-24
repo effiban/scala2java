@@ -13,7 +13,7 @@ class JavaNonSealedModifierResolver(modsClassifier: ModsClassifier,
     import context._
 
     (scalaTree, scalaMods, javaScope) match {
-      case (objectDef: Defn.Object, _, _) if objectClassifier.isStandalone(objectDef) => None
+      case (_: Defn.Object, _, _) => None
       case (_, scMods, JavaScope.Sealed) if !(modsClassifier.includeSealed(scMods) || modsClassifier.includeFinal(scMods)) => Some(JavaModifier.NonSealed)
       case _ => None
     }
