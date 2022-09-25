@@ -12,14 +12,6 @@ object TypeInferrers {
 
   private[typeinference] lazy val ifTypeInferrer = new IfTypeInferrerImpl(termTypeInferrer)
 
-  private[typeinference] lazy val tryTypeInferrer = new TryTypeInferrerImpl(
-    termTypeInferrer,
-    caseListTypeInferrer,
-    CollectiveTypeInferrer
-  )
-
-  private[typeinference] lazy val tryWithHandlerTypeInferrer = new TryWithHandlerTypeInferrerImpl(termTypeInferrer, CollectiveTypeInferrer)
-
   lazy val termTypeInferrer: TermTypeInferrer = new TermTypeInferrerImpl(
     applyTypeTypeInferrer,
     blockTypeInferrer,
@@ -28,6 +20,17 @@ object TypeInferrers {
     LitTypeInferrer,
     NameTypeInferrer,
     tryTypeInferrer,
-    tryWithHandlerTypeInferrer
+    tryWithHandlerTypeInferrer,
+    tupleTypeInferrer
   )
+
+  private[typeinference] lazy val tryTypeInferrer = new TryTypeInferrerImpl(
+    termTypeInferrer,
+    caseListTypeInferrer,
+    CollectiveTypeInferrer
+  )
+
+  private[typeinference] lazy val tryWithHandlerTypeInferrer = new TryWithHandlerTypeInferrerImpl(termTypeInferrer, CollectiveTypeInferrer)
+
+  private[typeinference] lazy val tupleTypeInferrer = new TupleTypeInferrerImpl(termTypeInferrer)
 }
