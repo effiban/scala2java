@@ -16,6 +16,6 @@ private[typeinference] class TryTypeInferrerImpl(termTypeInferrer: => TermTypeIn
       case Some(finallyp) => termTypeInferrer.infer(finallyp)
       case None => Some(Type.AnonymousName())
     }
-    collectiveTypeInferrer.infer(List(maybeExprType, maybeCatchType, maybeFinallyType))
+    collectiveTypeInferrer.inferScalar(List(maybeExprType, maybeCatchType, maybeFinallyType))
   }
 }

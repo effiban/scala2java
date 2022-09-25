@@ -52,7 +52,7 @@ class TryTypeInferrerImplTest extends UnitTestSuite {
 
     when(termTypeInferrer.infer(eqTree(TryStatement))).thenReturn(Some(TypeNames.String))
     when(caseListTypeInferrer.infer(Nil)).thenReturn(Some(Type.AnonymousName()))
-    when(collectiveTypeInferrer.infer(eqOptionTreeList(List(Some(TypeNames.String), Some(Type.AnonymousName()), Some(Type.AnonymousName())))))
+    when(collectiveTypeInferrer.inferScalar(eqOptionTreeList(List(Some(TypeNames.String), Some(Type.AnonymousName()), Some(Type.AnonymousName())))))
       .thenReturn(Some(TypeNames.String))
 
     tryTypeInferrer.infer(`try`).value.structure shouldBe TypeNames.String.structure
@@ -67,7 +67,7 @@ class TryTypeInferrerImplTest extends UnitTestSuite {
 
     when(termTypeInferrer.infer(eqTree(TryStatement))).thenReturn(Some(TypeNames.String))
     when(caseListTypeInferrer.infer(eqTreeList(CatchCases))).thenReturn(Some(TypeNames.String))
-    when(collectiveTypeInferrer.infer(eqOptionTreeList(List(Some(TypeNames.String), Some(TypeNames.String), Some(Type.AnonymousName())))))
+    when(collectiveTypeInferrer.inferScalar(eqOptionTreeList(List(Some(TypeNames.String), Some(TypeNames.String), Some(Type.AnonymousName())))))
       .thenReturn(Some(TypeNames.String))
 
     tryTypeInferrer.infer(`try`).value.structure shouldBe TypeNames.String.structure
@@ -89,7 +89,7 @@ class TryTypeInferrerImplTest extends UnitTestSuite {
       }
     })
     when(caseListTypeInferrer.infer(Nil)).thenReturn(Some(Type.AnonymousName()))
-    when(collectiveTypeInferrer.infer(eqOptionTreeList(List(Some(TypeNames.String), Some(Type.AnonymousName()), Some(TypeNames.Int)))))
+    when(collectiveTypeInferrer.inferScalar(eqOptionTreeList(List(Some(TypeNames.String), Some(Type.AnonymousName()), Some(TypeNames.Int)))))
       .thenReturn(Some(collectiveType))
 
     tryTypeInferrer.infer(`try`).value.structure shouldBe collectiveType.structure
@@ -111,7 +111,7 @@ class TryTypeInferrerImplTest extends UnitTestSuite {
       }
     })
     when(caseListTypeInferrer.infer(eqTreeList(CatchCases))).thenReturn(Some(TypeNames.String))
-    when(collectiveTypeInferrer.infer(eqOptionTreeList(List(Some(TypeNames.String), Some(TypeNames.String), Some(TypeNames.Int)))))
+    when(collectiveTypeInferrer.inferScalar(eqOptionTreeList(List(Some(TypeNames.String), Some(TypeNames.String), Some(TypeNames.Int)))))
       .thenReturn(Some(collectiveType))
 
     tryTypeInferrer.infer(`try`).value.structure shouldBe collectiveType.structure
