@@ -46,6 +46,7 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
   private val nameTypeInferrer = mock[NameTypeInferrer]
   private val tryTypeInferrer = mock[TryTypeInferrer]
   private val tryWithHandlerTypeInferrer = mock[TryWithHandlerTypeInferrer]
+  private val tupleTypeInferrer = mock[TupleTypeInferrer]
 
   private val termTypeInferrer = new TermTypeInferrerImpl(
     applyTypeTypeInferrer,
@@ -55,7 +56,8 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
     litTypeInferrer,
     nameTypeInferrer,
     tryTypeInferrer,
-    tryWithHandlerTypeInferrer
+    tryWithHandlerTypeInferrer,
+    tupleTypeInferrer
   )
 
   test("infer 'Apply' should return None") {
@@ -190,5 +192,14 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
     termTypeInferrer.infer(Term.Return(expr)).value.structure shouldBe TypeNames.String.structure
   }
 
+  test("infer 'Tuple' should return result of 'TupleTypeInferrer'") {
+    val termTuple = Term.Tuple(List(Lit.String("a"), Lit.Int(1)))
+
+    val expectedTypeTuple = Type.Tuple(List(TypeNames.String, TypeNames.Int))
+
+    when(tupleTypeInferrer.infer(eqTree(termTuple))).thenReturn(expectedTypeTuple)
+
+    termTypeInferrer.infer(termTuple).value.structure shouldBe expectedTypeTuple.structure
+  }
   // TODO complete the coverage
 }

@@ -15,4 +15,5 @@ object TypeNames {
   val Set: Type.Name = Type.Name("Set")
   val Map: Type.Name = Type.Name("Map")
 
+  val Any: Type.Name = Type.Name("Any")
 }

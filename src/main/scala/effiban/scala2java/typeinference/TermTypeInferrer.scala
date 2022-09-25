@@ -12,7 +12,8 @@ private[typeinference] class TermTypeInferrerImpl(applyTypeTypeInferrer: ApplyTy
                                                   litTypeInferrer: LitTypeInferrer,
                                                   nameTypeInferrer: NameTypeInferrer,
                                                   tryTypeInferrer: => TryTypeInferrer,
-                                                  tryWithHandlerTypeInferrer: => TryWithHandlerTypeInferrer) extends TermTypeInferrer {
+                                                  tryWithHandlerTypeInferrer: => TryWithHandlerTypeInferrer,
+                                                  tupleTypeInferrer: => TupleTypeInferrer) extends TermTypeInferrer {
 
   override def infer(term: Term): Option[Type] = {
     term match {
@@ -35,8 +36,9 @@ private[typeinference] class TermTypeInferrerImpl(applyTypeTypeInferrer: ApplyTy
       case _: Throw => Some(Type.AnonymousName())
       case `try`: Try => tryTypeInferrer.infer(`try`)
       case tryWithHandler: TryWithHandler => tryWithHandlerTypeInferrer.infer(tryWithHandler)
+      case tuple: Term.Tuple => Some(tupleTypeInferrer.infer(tuple))
       case _: While => Some(Type.AnonymousName())
-      // TODO - support Tuple, NewAnonymous, Function, PartialFunction
+      // TODO - support NewAnonymous, Function, PartialFunction
       case _ => None
     }
   }
