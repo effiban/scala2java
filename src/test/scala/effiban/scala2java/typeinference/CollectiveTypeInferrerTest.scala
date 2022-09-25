@@ -2,44 +2,61 @@ package effiban.scala2java.typeinference
 
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
+import effiban.scala2java.typeinference.CollectiveTypeInferrer.{inferScalar, inferTuple}
 
 import scala.meta.Type
 
 class CollectiveTypeInferrerTest extends UnitTestSuite {
 
-  test("infer for two defined identical types should return the type") {
-    CollectiveTypeInferrer.inferScalar(List(Some(TypeNames.Int), Some(TypeNames.Int))).value.structure shouldBe TypeNames.Int.structure
+  private val ScalarScenarios = Table(
+    ("MaybeScalarTypesDesc", "ExpectedMaybeTypeDesc", "MaybeScalarTypes", "ExpectedMaybeType"),
+    ("two defined identical types", "same type", List(Some(TypeNames.Int), Some(TypeNames.Int)), Some(TypeNames.Int)),
+    ("two defined and equal (non-identical) types", "the type", List(Some(TypeNames.Int), Some(Type.Name("Int"))), Some(TypeNames.Int)),
+    ("two defined and different types", "None", List(Some(TypeNames.Int), Some(TypeNames.String)), None),
+    ("two anonymous types", "the anonymous type",
+      List(Some(Type.AnonymousName()), Some(Type.AnonymousName())), Some(Type.AnonymousName())),
+    ("two None elements", "None", List(None, None), None),
+    ("two defined identical types and an anonymous type", "the defined type",
+      List(Some(TypeNames.String), Some(TypeNames.String), Some(Type.AnonymousName())), Some(TypeNames.String)),
+    ("two defined identical types and a None", "None", List(Some(TypeNames.String), Some(TypeNames.String), None), None),
+    ("empty", "the anonymous type", Nil, Some(Type.AnonymousName()))
+  )
+
+  private val TypeTupleStrIntA = Type.Tuple(List(TypeNames.String, TypeNames.Int))
+  private val TypeTupleStrIntB = Type.Tuple(List(TypeNames.String, TypeNames.Int))
+  private val TypeTupleStrLong = Type.Tuple(List(TypeNames.String, TypeNames.Long))
+  private val TypeTupleDoubleLong = Type.Tuple(List(TypeNames.Double, TypeNames.Long))
+  private val TypeTupleStrAny = Type.Tuple(List(TypeNames.String, TypeNames.Any))
+  private val TypeTupleAnyAny = Type.Tuple(List(TypeNames.Any, TypeNames.Any))
+
+  private val TupleValidScenarios = Table(
+    ("TupleTypesDesc", "ExpectedTupleTypeDesc", "TupleTypes", "ExpectedTupleType"),
+    ("one tuple", "the same tuple", List(TypeTupleStrIntA), TypeTupleStrIntA),
+    ("two identical tuples", "the same tuple", List(TypeTupleStrIntA, TypeTupleStrIntA), TypeTupleStrIntA),
+    ("two tuples with equal types", "the same tuple", List(TypeTupleStrIntA, TypeTupleStrIntB), TypeTupleStrIntA),
+    ("two tuples with completely different types", "A tuple with all types 'Any'",
+      List(TypeTupleStrIntA, TypeTupleDoubleLong), TypeTupleAnyAny),
+    ("two tuples with some matching types", "A tuple with matching types and others 'Any'",
+      List(TypeTupleStrIntA, TypeTupleStrLong), TypeTupleStrAny)
+  )
+
+  forAll(ScalarScenarios) {
+    case (maybeScalarTypesDesc: String, expectedMaybeTypeDesc: String, maybeScalarTypes: List[Option[Type]], expectedMaybeType: Option[Type]) =>
+      test(s"infer for $maybeScalarTypesDesc should return $expectedMaybeTypeDesc") {
+        inferScalar(maybeScalarTypes).structure shouldBe expectedMaybeType.structure
+      }
   }
 
-  test("infer for two defined and equal (non-identical) types should return the type") {
-    CollectiveTypeInferrer.inferScalar(List(Some(TypeNames.Int), Some(Type.Name("Int")))).value.structure shouldBe TypeNames.Int.structure
+  forAll(TupleValidScenarios) {
+    case (tupleTypesDesc: String, expectedTupleTypeDesc: String, tupleTypes: List[Type.Tuple], expectedTupleType: Type.Tuple) =>
+      test(s"infer for $tupleTypesDesc should return $expectedTupleTypeDesc") {
+        inferTuple(tupleTypes).structure shouldBe expectedTupleType.structure
+      }
   }
 
-  test("infer for two defined and different types should return None") {
-    CollectiveTypeInferrer.inferScalar(List(Some(TypeNames.Int), Some(TypeNames.String))) shouldBe None
-  }
-
-  test("infer for two anonymous types should return the anonymous type") {
-    CollectiveTypeInferrer.inferScalar(List(Some(Type.AnonymousName()), Some(Type.AnonymousName()))).value.structure shouldBe Type.AnonymousName().structure
-  }
-
-  test("infer for two None elements should return None") {
-    CollectiveTypeInferrer.inferScalar(List(None, None)) shouldBe None
-  }
-
-  test("infer for two defined identical types and an anonymous type should return the defined type") {
-    val maybeTypes = List(Some(TypeNames.String), Some(TypeNames.String), Some(Type.AnonymousName()))
-
-    CollectiveTypeInferrer.inferScalar(maybeTypes).value.structure shouldBe TypeNames.String.structure
-  }
-
-  test("infer for two defined identical types and a None should return None") {
-    val maybeTypes = List(Some(TypeNames.String), Some(TypeNames.String), None)
-
-    CollectiveTypeInferrer.inferScalar(maybeTypes) shouldBe None
-  }
-
-  test("infer when empty should return the anonymous type") {
-    CollectiveTypeInferrer.inferScalar(Nil).value.structure shouldBe Type.AnonymousName().structure
+  test("inferTuple when tuples have different sizes should throw exception") {
+    intercept[IllegalStateException] {
+      inferTuple(List(Type.Tuple(List(TypeNames.String)), Type.Tuple(List(TypeNames.String, TypeNames.Int))))
+    }
   }
 }
