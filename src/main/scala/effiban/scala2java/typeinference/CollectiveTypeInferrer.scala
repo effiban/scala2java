@@ -2,11 +2,14 @@ package effiban.scala2java.typeinference
 
 import scala.meta.Type
 
-trait CollectiveTypeInferrer extends TypeInferrer[List[Option[Type]]]
+trait CollectiveTypeInferrer {
+
+  def inferScalar(maybeTypes: List[Option[Type]]): Option[Type]
+}
 
 private[typeinference] object CollectiveTypeInferrer extends CollectiveTypeInferrer {
 
-  override def infer(maybeTypes: List[Option[Type]]): Option[Type] = {
+  override def inferScalar(maybeTypes: List[Option[Type]]): Option[Type] = {
     val filteredMaybeTypes = maybeTypes
       .filterNot(_.exists(_.structure == Type.AnonymousName().structure))
 

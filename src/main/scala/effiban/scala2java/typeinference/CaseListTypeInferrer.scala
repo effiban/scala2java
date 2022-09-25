@@ -9,6 +9,6 @@ private[typeinference] class CaseListTypeInferrerImpl(caseTypeInferrer: => CaseT
 
   override def infer(cases: List[Case]): Option[Type] = {
     val maybeCaseTypes = cases.map(caseTypeInferrer.infer)
-    collectiveTypeInferrer.infer(maybeCaseTypes)
+    collectiveTypeInferrer.inferScalar(maybeCaseTypes)
   }
 }

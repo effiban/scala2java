@@ -29,7 +29,7 @@ class TryWithHandlerTypeInferrerImplTest extends UnitTestSuite {
     )
 
     when(termTypeInferrer.infer(eqTree(TryStatement))).thenReturn(Some(TypeNames.String))
-    when(collectiveTypeInferrer.infer(eqOptionTreeList(List(Some(TypeNames.String), Some(Type.AnonymousName()), Some(Type.AnonymousName())))))
+    when(collectiveTypeInferrer.inferScalar(eqOptionTreeList(List(Some(TypeNames.String), Some(Type.AnonymousName()), Some(Type.AnonymousName())))))
       .thenReturn(Some(TypeNames.String))
 
     tryWithHandlerTypeInferrer.infer(tryWithHandler).value.structure shouldBe TypeNames.String.structure
@@ -43,7 +43,7 @@ class TryWithHandlerTypeInferrerImplTest extends UnitTestSuite {
     )
 
     when(termTypeInferrer.infer(eqTree(TryStatement))).thenReturn(Some(TypeNames.String))
-    when(collectiveTypeInferrer.infer(eqOptionTreeList(List(Some(TypeNames.String), None, Some(Type.AnonymousName())))))
+    when(collectiveTypeInferrer.inferScalar(eqOptionTreeList(List(Some(TypeNames.String), None, Some(Type.AnonymousName())))))
       .thenReturn(None)
 
     tryWithHandlerTypeInferrer.infer(tryWithHandler) shouldBe None
@@ -64,7 +64,7 @@ class TryWithHandlerTypeInferrerImplTest extends UnitTestSuite {
         case t if t.structure == FinallyStatement.structure => Some(TypeNames.Int)
       }
     })
-    when(collectiveTypeInferrer.infer(eqOptionTreeList(List(Some(TypeNames.String), Some(Type.AnonymousName()), Some(TypeNames.Int)))))
+    when(collectiveTypeInferrer.inferScalar(eqOptionTreeList(List(Some(TypeNames.String), Some(Type.AnonymousName()), Some(TypeNames.Int)))))
       .thenReturn(Some(collectiveType))
 
     tryWithHandlerTypeInferrer.infer(tryWithHandler).value.structure shouldBe collectiveType.structure
@@ -83,7 +83,7 @@ class TryWithHandlerTypeInferrerImplTest extends UnitTestSuite {
         case t if t.structure == FinallyStatement.structure => Some(TypeNames.Int)
       }
     })
-    when(collectiveTypeInferrer.infer(eqOptionTreeList(List(Some(TypeNames.String), None, Some(TypeNames.Int)))))
+    when(collectiveTypeInferrer.inferScalar(eqOptionTreeList(List(Some(TypeNames.String), None, Some(TypeNames.Int)))))
       .thenReturn(None)
 
     tryWithHandlerTypeInferrer.infer(tryWithHandler) shouldBe None

@@ -26,7 +26,7 @@ class CaseListTypeInferrerTest extends UnitTestSuite {
     val case2 = Case(pat = Lit.String("two"), cond = None, body = int2)
 
     when(caseTypeInferrer.infer(any[Case])).thenReturn(Some(TypeNames.Int))
-    when(collectiveTypeInferrer.infer(eqOptionTreeList(List(Some(TypeNames.Int), Some(TypeNames.Int)))))
+    when(collectiveTypeInferrer.inferScalar(eqOptionTreeList(List(Some(TypeNames.Int), Some(TypeNames.Int)))))
       .thenReturn(Some(TypeNames.Int))
 
     caseListTypeInferrer.infer(List(case1, case2)).value.structure shouldBe TypeNames.Int.structure
@@ -47,7 +47,7 @@ class CaseListTypeInferrerTest extends UnitTestSuite {
         case aCase if aCase.body.structure == int.structure => Some(TypeNames.Int)
         case aCase if aCase.body.structure == throwException.structure => Some(Type.AnonymousName())
       })
-    when(collectiveTypeInferrer.infer(eqOptionTreeList(List(Some(TypeNames.Int), Some(Type.AnonymousName())))))
+    when(collectiveTypeInferrer.inferScalar(eqOptionTreeList(List(Some(TypeNames.Int), Some(Type.AnonymousName())))))
       .thenReturn(Some(TypeNames.Int))
 
     caseListTypeInferrer.infer(List(case1, case2)).value.structure shouldBe TypeNames.Int.structure
@@ -65,13 +65,13 @@ class CaseListTypeInferrerTest extends UnitTestSuite {
         case aCase if aCase.body.structure == int.structure => Some(TypeNames.Int)
         case aCase if aCase.body.structure == termApply.structure => None
       })
-    when(collectiveTypeInferrer.infer(eqOptionTreeList(List(Some(TypeNames.Int), None)))).thenReturn(None)
+    when(collectiveTypeInferrer.inferScalar(eqOptionTreeList(List(Some(TypeNames.Int), None)))).thenReturn(None)
 
     caseListTypeInferrer.infer(List(case1, case2)) shouldBe None
   }
 
   test("infer when empty should return the collective result for an empty list") {
-    when(collectiveTypeInferrer.infer(Nil)).thenReturn(Some(Type.AnonymousName()))
+    when(collectiveTypeInferrer.inferScalar(Nil)).thenReturn(Some(Type.AnonymousName()))
 
     caseListTypeInferrer.infer(Nil).value.structure shouldBe Type.AnonymousName().structure
   }
