@@ -17,14 +17,18 @@ class InitTraverserImplTest extends UnitTestSuite {
   private val ArgList1 = List(Term.Name("arg1"), Term.Name("arg2"))
   private val ArgList2 = List(Term.Name("arg3"), Term.Name("arg4"))
 
-  private val ExpectedTraversalOptions = ListTraversalOptions(maybeEnclosingDelimiter = Some(Parentheses))
+  private val ExpectedTraversalOptionsSkipEmpty = ListTraversalOptions(maybeEnclosingDelimiter = Some(Parentheses))
+  private val ExpectedTraversalOptionsHandleEmpty = ListTraversalOptions(
+    maybeEnclosingDelimiter = Some(Parentheses),
+    traverseEmpty = true
+  )
 
   private val typeTraverser = mock[TypeTraverser]
   private val termListTraverser = mock[TermListTraverser]
 
   private val initTraverser = new InitTraverserImpl(typeTraverser, termListTraverser)
 
-  test("traverse() with no arguments and not ignored") {
+  test("traverse() with no arguments, not ignored, and traverseEmpty = false") {
     val init = Init(tpe = TypeName, name = Name.Anonymous(), argss = Nil)
 
     doWrite("MyType").when(typeTraverser).traverse(eqTree(TypeName))
@@ -35,7 +39,22 @@ class InitTraverserImplTest extends UnitTestSuite {
 
     verify(termListTraverser).traverse(
       ArgumentMatchers.eq(Nil),
-      ArgumentMatchers.eq(ExpectedTraversalOptions)
+      ArgumentMatchers.eq(ExpectedTraversalOptionsSkipEmpty)
+    )
+  }
+
+  test("traverse() with no arguments, not ignored, and traverseEmpty = true") {
+    val init = Init(tpe = TypeName, name = Name.Anonymous(), argss = Nil)
+
+    doWrite("MyType()").when(typeTraverser).traverse(eqTree(TypeName))
+
+    initTraverser.traverse(init, InitContext(traverseEmpty = true))
+
+    outputWriter.toString shouldBe "MyType()"
+
+    verify(termListTraverser).traverse(
+      ArgumentMatchers.eq(Nil),
+      ArgumentMatchers.eq(ExpectedTraversalOptionsHandleEmpty)
     )
   }
 
@@ -60,7 +79,7 @@ class InitTraverserImplTest extends UnitTestSuite {
         |arg2)""".stripMargin)
       .when(termListTraverser).traverse(
       eqTreeList(ArgList1),
-      ArgumentMatchers.eq(ExpectedTraversalOptions)
+      ArgumentMatchers.eq(ExpectedTraversalOptionsSkipEmpty)
     )
 
     initTraverser.traverse(init)
@@ -98,7 +117,7 @@ class InitTraverserImplTest extends UnitTestSuite {
         |arg4)""".stripMargin)
       .when(termListTraverser).traverse(
       eqTreeList(ArgList1 ++ ArgList2),
-      ArgumentMatchers.eq(ExpectedTraversalOptions)
+      ArgumentMatchers.eq(ExpectedTraversalOptionsSkipEmpty)
     )
 
     initTraverser.traverse(init)
