@@ -1,5 +1,6 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.InitContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
@@ -23,7 +24,8 @@ class NewTraverserImplTest extends UnitTestSuite {
 
     val `new` = New(init)
 
-    doWrite("MyClass(val1, val2)").when(initTraverser).traverse(eqTree(init), ArgumentMatchers.eq(false))
+    doWrite("MyClass(val1, val2)")
+      .when(initTraverser).traverse(eqTree(init), ArgumentMatchers.eq(InitContext(traverseEmpty = true)))
 
     newTraverser.traverse(`new`)
 

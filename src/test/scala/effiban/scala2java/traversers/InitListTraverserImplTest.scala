@@ -1,5 +1,6 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.InitContext
 import effiban.scala2java.entities.ListTraversalOptions
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
@@ -41,13 +42,14 @@ class InitListTraverserImplTest extends UnitTestSuite {
     )
 
     initTraverserCaptor.getValue.traverse(init)
-    verify(initTraverser).traverse(eqTree(init), ArgumentMatchers.eq(false))
+    verify(initTraverser).traverse(eqTree(init), ArgumentMatchers.eq(InitContext()))
   }
 
   test("traverse() when one init and args ignored") {
     val init = Init(tpe = Type.Name("MyType"), name = Name.Anonymous(), argss = List(List(Term.Name("arg1"), Term.Name("arg2"))))
+    val context = InitContext(ignoreArgs = true)
 
-    initListTraverser.traverse(List(init), ignoreArgs = true)
+    initListTraverser.traverse(List(init), context)
 
     verify(argumentListTraverser).traverse(
       args = eqTreeList(List(init)),
@@ -56,7 +58,7 @@ class InitListTraverserImplTest extends UnitTestSuite {
     )
 
     initTraverserCaptor.getValue.traverse(init)
-    verify(initTraverser).traverse(eqTree(init), ArgumentMatchers.eq(true))
+    verify(initTraverser).traverse(eqTree(init), ArgumentMatchers.eq(context))
   }
 
   test("traverse() when two inits") {
@@ -72,6 +74,6 @@ class InitListTraverserImplTest extends UnitTestSuite {
     )
 
     initTraverserCaptor.getValue.traverse(init1)
-    verify(initTraverser).traverse(eqTree(init1), ArgumentMatchers.eq(false))
+    verify(initTraverser).traverse(eqTree(init1), ArgumentMatchers.eq(InitContext()))
   }
 }

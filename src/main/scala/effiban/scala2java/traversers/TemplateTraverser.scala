@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.{TemplateBodyContext, TemplateContext}
+import effiban.scala2java.contexts.{InitContext, TemplateBodyContext, TemplateContext}
 import effiban.scala2java.entities.JavaScope.JavaScope
 import effiban.scala2java.resolvers.JavaInheritanceKeywordResolver
 import effiban.scala2java.writers.JavaWriter
@@ -50,7 +50,7 @@ private[traversers] class TemplateTraverserImpl(initListTraverser: => InitListTr
       write(" ")
       writeKeyword(inheritanceKeyword)
       write(" ")
-      initListTraverser.traverse(inits, ignoreArgs = true)
+      initListTraverser.traverse(inits, InitContext(ignoreArgs = true))
     }
   }
 

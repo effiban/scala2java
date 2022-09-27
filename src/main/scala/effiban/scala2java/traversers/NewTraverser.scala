@@ -1,5 +1,6 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.InitContext
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term.New
@@ -13,6 +14,6 @@ private[traversers] class NewTraverserImpl(initTraverser: => InitTraverser)
 
   override def traverse(`new`: New): Unit = {
     write("new ")
-    initTraverser.traverse(`new`.init)
+    initTraverser.traverse(`new`.init, InitContext(traverseEmpty = true))
   }
 }

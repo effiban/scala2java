@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.BlockContext
+import effiban.scala2java.contexts.{BlockContext, InitContext}
 import effiban.scala2java.entities.Decision.{No, Yes}
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
@@ -136,7 +136,7 @@ class BlockTraverserImplTest extends UnitTestSuite {
     )
     val initVal = "this(dummy)"
 
-    doWrite(initVal).when(initTraverser).traverse(eqTree(init), ArgumentMatchers.eq(false))
+    doWrite(initVal).when(initTraverser).traverse(eqTree(init), ArgumentMatchers.eq(InitContext()))
     doWrite(
       s"""$SimpleStatement1Val;
          |""".stripMargin)
