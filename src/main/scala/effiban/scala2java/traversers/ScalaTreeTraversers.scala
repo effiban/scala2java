@@ -387,7 +387,10 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
     litTraverser
   )
 
-  private lazy val termTupleTraverser: TermTupleTraverser = new TermTupleTraverserImpl(termListTraverser)
+  private lazy val termTupleTraverser: TermTupleTraverser = new TermTupleTraverserImpl(
+    termApplyTraverser,
+    TermTupleToTermApplyTransformer
+  )
 
   private lazy val thisTraverser: ThisTraverser = new ThisTraverserImpl(nameTraverser)
 
