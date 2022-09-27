@@ -6,8 +6,9 @@ import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
-import effiban.scala2java.testtrees.TermNames.{PlusTermName, ScalaRangeTermName, ScalaToTermName}
-import effiban.scala2java.transformers.TermApplyInfixToRangeTransformer
+import effiban.scala2java.testtrees.TermNames
+import effiban.scala2java.testtrees.TermNames.{Association, PlusTermName, ScalaRangeTermName, ScalaToTermName}
+import effiban.scala2java.transformers.{TermApplyInfixToMapEntryTransformer, TermApplyInfixToRangeTransformer}
 import org.mockito.ArgumentMatchers
 
 import scala.meta.Term
@@ -20,6 +21,7 @@ class TermApplyInfixTraverserImplTest extends UnitTestSuite {
   private val termListTraverser = mock[TermListTraverser]
   private val termApplyInfixClassifier = mock[TermApplyInfixClassifier]
   private val termApplyInfixToRangeTransformer = mock[TermApplyInfixToRangeTransformer]
+  private val termApplyInfixToMapEntryTransformer = mock[TermApplyInfixToMapEntryTransformer]
 
   private val termApplyInfixTraverser = new TermApplyInfixTraverserImpl(
     termTraverser,
@@ -27,7 +29,8 @@ class TermApplyInfixTraverserImplTest extends UnitTestSuite {
     termNameTraverser,
     termListTraverser,
     termApplyInfixClassifier,
-    termApplyInfixToRangeTransformer)
+    termApplyInfixToRangeTransformer,
+    termApplyInfixToMapEntryTransformer)
 
   test("traverse() when has range operator") {
     val lhs = Term.Name("a")
@@ -48,6 +51,28 @@ class TermApplyInfixTraverserImplTest extends UnitTestSuite {
     termApplyInfixTraverser.traverse(applyInfix)
 
     verify(termApplyTraverser).traverse(eqTree(expectedRangeTermApply))
+  }
+
+  test("traverse() when has association operator") {
+    val lhs = Term.Name("a")
+    val rhs = Term.Name("b")
+
+    val applyInfix = Term.ApplyInfix(
+      lhs = lhs,
+      op = Association,
+      targs = Nil,
+      args = List(rhs)
+    )
+
+    val expectedMapEntryTermApply = Term.Apply(Term.Select(TermNames.Map, TermNames.JavaEntryMethod), args = List(lhs, rhs))
+
+    when(termApplyInfixClassifier.isAssociation(eqTree(applyInfix))).thenReturn(true)
+
+    when(termApplyInfixToMapEntryTransformer.transform(eqTree(applyInfix))).thenReturn(expectedMapEntryTermApply)
+
+    termApplyInfixTraverser.traverse(applyInfix)
+
+    verify(termApplyTraverser).traverse(eqTree(expectedMapEntryTermApply))
   }
 
   test("traverse() when has arithmetic operator") {
