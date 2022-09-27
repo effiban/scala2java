@@ -1,13 +1,15 @@
 package effiban.scala2java.typeinference
 
+import effiban.scala2java.classifiers.Classifiers.termTypeClassifier
 import effiban.scala2java.classifiers.TypeNameClassifier
+import effiban.scala2java.transformers.TermToTupleCaster
 
 object TypeInferrers {
 
   private[typeinference] lazy val applyTypeInferrer = new ApplyTypeInferrerImpl(
     applyTypeTypeInferrer,
     termTypeInferrer,
-    termArgsToTypeArgsInferrer,
+    compositeArgListTypesInferrer,
     TypeNameClassifier)
 
   private[typeinference] lazy val applyTypeTypeInferrer = new ApplyTypeTypeInferrerImpl(termTypeInferrer)
@@ -18,11 +20,17 @@ object TypeInferrers {
 
   private[typeinference] lazy val caseTypeInferrer = new CaseTypeInferrerImpl(termTypeInferrer)
 
+  private[typeinference] lazy val compositeArgListTypesInferrer = new CompositeArgListTypesInferrerImpl(
+    scalarArgListTypeInferrer,
+    tupleArgListTypesInferrer,
+    termTypeClassifier,
+    TermToTupleCaster
+  )
+
   private[typeinference] lazy val ifTypeInferrer = new IfTypeInferrerImpl(termTypeInferrer)
 
-  private[typeinference] lazy val termArgsToTypeArgsInferrer = new TermArgsToTypeArgsInferrerImpl(
+  private[typeinference] lazy val scalarArgListTypeInferrer = new ScalarArgListTypeInferrerImpl(
     termTypeInferrer,
-    tupleTypeInferrer,
     CollectiveTypeInferrer
   )
 
@@ -46,6 +54,11 @@ object TypeInferrers {
   )
 
   private[typeinference] lazy val tryWithHandlerTypeInferrer = new TryWithHandlerTypeInferrerImpl(termTypeInferrer, CollectiveTypeInferrer)
+
+  private[typeinference] lazy val tupleArgListTypesInferrer = new TupleArgListTypesInferrerImpl(
+    tupleTypeInferrer,
+    CollectiveTypeInferrer
+  )
 
   private[typeinference] lazy val tupleTypeInferrer = new TupleTypeInferrerImpl(termTypeInferrer)
 }
