@@ -304,7 +304,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
     termNameTraverser,
     termListTraverser,
     TermApplyInfixClassifier,
-    TermApplyInfixToRangeTransformer
+    TermApplyInfixToRangeTransformer,
+    TermApplyInfixToMapEntryTransformer
   )
 
   private lazy val termApplyTraverser: TermApplyTraverser = new TermApplyTraverserImpl(

@@ -22,7 +22,11 @@ object TermNames {
   val Set: Term.Name = Term.Name("Set")
   val Map: Term.Name = Term.Name("Map")
 
+  val JavaEntryMethod: Term.Name = Term.Name("entry")
+
   val String: Term.Name = Term.Name("String")
 
   val PlusTermName: Term.Name = Term.Name("+")
+
+  val Association: Term.Name = Term.Name("->")
 }
