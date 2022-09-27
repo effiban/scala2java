@@ -11,6 +11,8 @@ import scala.meta.{Case, Init, Lit, Name, Pat, Term, Type}
 
 class TermTypeInferrerImplTest extends UnitTestSuite {
 
+  private val TheApply = Term.Apply(Term.Name("myMethod"), Nil)
+
   private val TheApplyType = Term.ApplyType(Term.Name("foo"), List(TypeNames.Int))
 
   private val Condition = Term.ApplyInfix(
@@ -38,6 +40,7 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
   )
   private val MatchCases = List(MatchCase1, MatchCase2)
 
+  private val applyTypeInferrer = mock[ApplyTypeInferrer]
   private val applyTypeTypeInferrer = mock[ApplyTypeTypeInferrer]
   private val caseListTypeInferrer = mock[CaseListTypeInferrer]
   private val ifTypeInferrer = mock[IfTypeInferrer]
@@ -49,6 +52,7 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
   private val tupleTypeInferrer = mock[TupleTypeInferrer]
 
   private val termTypeInferrer = new TermTypeInferrerImpl(
+    applyTypeInferrer,
     applyTypeTypeInferrer,
     blockTypeInferrer,
     caseListTypeInferrer,
@@ -60,8 +64,14 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
     tupleTypeInferrer
   )
 
-  test("infer 'Apply' should return None") {
-    termTypeInferrer.infer(Term.Apply(Term.Name("myMethod"), Nil)) shouldBe None
+  test("infer 'Apply' when 'ApplyTypeInferrer returns a result, should return it") {
+    when(applyTypeInferrer.infer(eqTree(TheApply))).thenReturn(Some(TypeNames.Int))
+    termTypeInferrer.infer(TheApply).value.structure shouldBe TypeNames.Int.structure
+  }
+
+  test("infer 'Apply' when 'ApplyTypeInferrer returns None should return None") {
+    when(applyTypeInferrer.infer(eqTree(TheApply))).thenReturn(None)
+    termTypeInferrer.infer(TheApply) shouldBe None
   }
 
   test("infer 'ApplyType' when 'ApplyTypeTypeInferrer' returns a result, should return it") {

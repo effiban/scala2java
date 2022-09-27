@@ -13,7 +13,7 @@ class TermArgsToTypeArgsInferrerImplTest extends UnitTestSuite {
   private val tupleTypeInferrer = mock[TupleTypeInferrer]
   private val collectiveTypeInferrer = mock[CollectiveTypeInferrer]
 
-  private val termArgsToTypeArgsInferrer = new TermsToTypeArgsInferrerImpl(
+  private val termArgsToTypeArgsInferrer = new TermArgsToTypeArgsInferrerImpl(
     termTypeInferrer,
     tupleTypeInferrer,
     collectiveTypeInferrer

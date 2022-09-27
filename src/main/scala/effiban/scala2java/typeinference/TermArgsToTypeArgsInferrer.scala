@@ -6,9 +6,9 @@ trait TermArgsToTypeArgsInferrer {
   def infer(terms: List[Term]): List[Type]
 }
 
-private[typeinference] class TermsToTypeArgsInferrerImpl(termTypeInferrer: => TermTypeInferrer,
-                                                         tupleTypeInferrer: => TupleTypeInferrer,
-                                                         collectiveTypeInferrer: CollectiveTypeInferrer)
+private[typeinference] class TermArgsToTypeArgsInferrerImpl(termTypeInferrer: => TermTypeInferrer,
+                                                            tupleTypeInferrer: => TupleTypeInferrer,
+                                                            collectiveTypeInferrer: CollectiveTypeInferrer)
   extends TermArgsToTypeArgsInferrer {
 
   override def infer(termArgs: List[Term]): List[Type] = {
