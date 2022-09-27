@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.{TemplateBodyContext, TemplateContext}
+import effiban.scala2java.contexts.{InitContext, TemplateBodyContext, TemplateContext}
 import effiban.scala2java.entities.JavaScope.JavaScope
 import effiban.scala2java.entities.{JavaKeyword, JavaScope}
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
@@ -277,7 +277,9 @@ class TemplateTraverserImplTest extends UnitTestSuite {
 
   private def expectWriteInits(javaScope: JavaScope): Unit = {
     when(javaInheritanceKeywordResolver.resolve(ArgumentMatchers.eq(javaScope), eqTreeList(TheNonSkippedInits))).thenReturn(JavaKeyword.Implements)
-    doWrite("Parent1, Parent2").when(initListTraverser).traverse(eqTreeList(TheNonSkippedInits), ArgumentMatchers.eq(true))
+    doWrite("Parent1, Parent2")
+      .when(initListTraverser).traverse(
+      eqTreeList(TheNonSkippedInits), ArgumentMatchers.eq(InitContext(ignoreArgs = true)))
   }
 
   private def expectWriteSelf(self: Self = Selfs.Empty): Unit = {

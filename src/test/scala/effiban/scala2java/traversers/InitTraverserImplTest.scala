@@ -1,5 +1,6 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.InitContext
 import effiban.scala2java.entities.EnclosingDelimiter.Parentheses
 import effiban.scala2java.entities.ListTraversalOptions
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
@@ -43,7 +44,7 @@ class InitTraverserImplTest extends UnitTestSuite {
 
     doWrite("MyType").when(typeTraverser).traverse(eqTree(TypeName))
 
-    initTraverser.traverse(init, ignoreArgs = true)
+    initTraverser.traverse(init, InitContext(ignoreArgs = true))
 
     outputWriter.toString shouldBe "MyType"
 
@@ -74,7 +75,7 @@ class InitTraverserImplTest extends UnitTestSuite {
 
     doWrite("MyType").when(typeTraverser).traverse(eqTree(TypeName))
 
-    initTraverser.traverse(init, ignoreArgs = true)
+    initTraverser.traverse(init, InitContext(ignoreArgs = true))
 
     outputWriter.toString shouldBe "MyType"
 
