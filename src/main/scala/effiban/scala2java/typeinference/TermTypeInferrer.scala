@@ -5,7 +5,8 @@ import scala.meta.{Lit, Term, Type}
 
 trait TermTypeInferrer extends TypeInferrer[Term]
 
-private[typeinference] class TermTypeInferrerImpl(applyTypeTypeInferrer: ApplyTypeTypeInferrer,
+private[typeinference] class TermTypeInferrerImpl(applyTypeInferrer: => ApplyTypeInferrer,
+                                                  applyTypeTypeInferrer: => ApplyTypeTypeInferrer,
                                                   blockTypeInferrer: => BlockTypeInferrer,
                                                   caseListTypeInferrer: => CaseListTypeInferrer,
                                                   ifTypeInferrer: => IfTypeInferrer,
@@ -18,6 +19,7 @@ private[typeinference] class TermTypeInferrerImpl(applyTypeTypeInferrer: ApplyTy
   override def infer(term: Term): Option[Type] = {
     term match {
       case _: Annotate => Some(Type.AnonymousName())
+      case apply: Term.Apply => applyTypeInferrer.infer(apply)
       case applyType: ApplyType => applyTypeTypeInferrer.infer(applyType)
       case ascribe: Ascribe => Some(ascribe.tpe)
       case assign: Assign => infer(assign.rhs)
@@ -38,7 +40,7 @@ private[typeinference] class TermTypeInferrerImpl(applyTypeTypeInferrer: ApplyTy
       case tryWithHandler: TryWithHandler => tryWithHandlerTypeInferrer.infer(tryWithHandler)
       case tuple: Term.Tuple => Some(tupleTypeInferrer.infer(tuple))
       case _: While => Some(Type.AnonymousName())
-      // TODO - support NewAnonymous, Function, PartialFunction
+      // TODO - support Select, NewAnonymous, Function, PartialFunction
       case _ => None
     }
   }

@@ -1,6 +1,14 @@
 package effiban.scala2java.typeinference
 
+import effiban.scala2java.classifiers.TypeNameClassifier
+
 object TypeInferrers {
+
+  private[typeinference] lazy val applyTypeInferrer = new ApplyTypeInferrerImpl(
+    applyTypeTypeInferrer,
+    termTypeInferrer,
+    termArgsToTypeArgsInferrer,
+    TypeNameClassifier)
 
   private[typeinference] lazy val applyTypeTypeInferrer = new ApplyTypeTypeInferrerImpl(termTypeInferrer)
 
@@ -12,7 +20,14 @@ object TypeInferrers {
 
   private[typeinference] lazy val ifTypeInferrer = new IfTypeInferrerImpl(termTypeInferrer)
 
+  private[typeinference] lazy val termArgsToTypeArgsInferrer = new TermArgsToTypeArgsInferrerImpl(
+    termTypeInferrer,
+    tupleTypeInferrer,
+    CollectiveTypeInferrer
+  )
+
   lazy val termTypeInferrer: TermTypeInferrer = new TermTypeInferrerImpl(
+    applyTypeInferrer,
     applyTypeTypeInferrer,
     blockTypeInferrer,
     caseListTypeInferrer,
