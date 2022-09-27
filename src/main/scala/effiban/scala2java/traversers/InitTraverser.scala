@@ -18,7 +18,10 @@ private[traversers] class InitTraverserImpl(typeTraverser: => TypeTraverser,
     typeTraverser.traverse(init.tpe)
 
     if (!context.ignoreArgs) {
-      val options = ListTraversalOptions(maybeEnclosingDelimiter = Some(Parentheses))
+      val options = ListTraversalOptions(
+        maybeEnclosingDelimiter = Some(Parentheses),
+        traverseEmpty = context.traverseEmpty
+      )
       termListTraverser.traverse(init.argss.flatten, options)
     }
   }
