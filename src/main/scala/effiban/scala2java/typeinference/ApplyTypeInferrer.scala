@@ -8,7 +8,7 @@ trait ApplyTypeInferrer extends TypeInferrer[Term.Apply]
 
 private[typeinference] class ApplyTypeInferrerImpl(applyTypeTypeInferrer: => ApplyTypeTypeInferrer,
                                                    termTypeInferrer: => TermTypeInferrer,
-                                                   termArgsToTypeArgsInferrer: => TermArgsToTypeArgsInferrer,
+                                                   compositeArgListTypesInferrer: => CompositeArgListTypesInferrer,
                                                    typeNameClassifier: TypeNameClassifier) extends ApplyTypeInferrer {
 
   override def infer(termApply: Term.Apply): Option[Type] = {
@@ -16,7 +16,7 @@ private[typeinference] class ApplyTypeInferrerImpl(applyTypeTypeInferrer: => App
       case Term.Apply(applyType: Term.ApplyType, _) => applyTypeTypeInferrer.infer(applyType)
       case Term.Apply(fun, args) => termTypeInferrer.infer(fun).map {
         case typeName: Type.Name if typeNameClassifier.isParameterizedType(typeName) =>
-          Type.Apply(typeName, termArgsToTypeArgsInferrer.infer(args))
+          Type.Apply(typeName, compositeArgListTypesInferrer.infer(args))
         case tpe => tpe
       }
     }

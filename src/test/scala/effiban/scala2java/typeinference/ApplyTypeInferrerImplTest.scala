@@ -12,13 +12,13 @@ class ApplyTypeInferrerImplTest extends UnitTestSuite {
 
   private val applyTypeTypeInferrer = mock[ApplyTypeTypeInferrer]
   private val termTypeInferrer = mock[TermTypeInferrer]
-  private val termArgsToTypeArgsInferrer = mock[TermArgsToTypeArgsInferrer]
+  private val compositeArgListTypesInferrer = mock[CompositeArgListTypesInferrer]
   private val typeNameClassifier = mock[TypeNameClassifier]
 
   private val applyTypeInferrer = new ApplyTypeInferrerImpl(
     applyTypeTypeInferrer,
     termTypeInferrer,
-    termArgsToTypeArgsInferrer,
+    compositeArgListTypesInferrer,
     typeNameClassifier
   )
 
@@ -47,7 +47,7 @@ class ApplyTypeInferrerImplTest extends UnitTestSuite {
 
     when(termTypeInferrer.infer(eqTree(TermNames.Map))).thenReturn(Some(TypeNames.Map))
     when(typeNameClassifier.isParameterizedType(eqTree(TypeNames.Map))).thenReturn(true)
-    when(termArgsToTypeArgsInferrer.infer(eqTreeList(mapElements))).thenReturn(List(TypeNames.String, TypeNames.Int))
+    when(compositeArgListTypesInferrer.infer(eqTreeList(mapElements))).thenReturn(List(TypeNames.String, TypeNames.Int))
 
     applyTypeInferrer.infer(mapInitializer).value.structure shouldBe expectedTypeApply.structure
   }
