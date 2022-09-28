@@ -18,7 +18,11 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
 
   private lazy val anonymousFunctionTraverser: AnonymousFunctionTraverser = new AnonymousFunctionTraverserImpl(termFunctionTraverser)
 
-  private lazy val applyTypeTraverser: ApplyTypeTraverser = new ApplyTypeTraverserImpl(typeTraverser, termTraverser, typeListTraverser)
+  private lazy val applyTypeTraverser: ApplyTypeTraverser = new ApplyTypeTraverserImpl(
+    typeTraverser,
+    termSelectTraverser,
+    termTraverser
+  )
 
   private lazy val applyUnaryTraverser: ApplyUnaryTraverser = new ApplyUnaryTraverserImpl(termNameTraverser, termTraverser)
 
@@ -353,6 +357,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
   private lazy val termSelectTraverser: TermSelectTraverser = new TermSelectTraverserImpl(
     termTraverser,
     termNameTraverser,
+    typeListTraverser,
     ScalaToJavaTermSelectTransformer
   )
 

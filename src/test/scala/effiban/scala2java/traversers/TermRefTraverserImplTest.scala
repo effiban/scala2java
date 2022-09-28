@@ -1,5 +1,7 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.TermSelectContext
+import effiban.scala2java.matchers.TermSelectContextMatcher.eqTermSelectContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.testsuites.UnitTestSuite
 
@@ -51,7 +53,7 @@ class TermRefTraverserImplTest extends UnitTestSuite {
 
     termRefTraverser.traverse(termSelect)
 
-    verify(termSelectTraverser).traverse(eqTree(termSelect))
+    verify(termSelectTraverser).traverse(eqTree(termSelect), eqTermSelectContext(TermSelectContext()))
   }
 
   test("traverse applyUnary") {

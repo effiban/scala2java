@@ -7,6 +7,6 @@ public class Sample {
     }
 
     public void foo() {
-        Set.<int>.of(1, 2);
+        Set.<int>of(1, 2);
     }
 }

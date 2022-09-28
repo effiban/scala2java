@@ -7,6 +7,6 @@ public class Sample {
     }
 
     public void foo() {
-        doSomething.<String>();
+        myObj.<int, String>doSomething();
     }
 }
