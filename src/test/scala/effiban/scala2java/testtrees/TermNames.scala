@@ -16,6 +16,7 @@ object TermNames {
   val JavaRangeClosedTermName: Term.Name = Term.Name("rangeClosed")
 
   val Array: Term.Name = Term.Name("Array")
+  val Stream: Term.Name = Term.Name("Stream")
   val List: Term.Name = Term.Name("List")
   val Vector: Term.Name = Term.Name("Vector")
   val Seq: Term.Name = Term.Name("Seq")

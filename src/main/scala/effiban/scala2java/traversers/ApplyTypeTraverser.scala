@@ -1,5 +1,6 @@
 package effiban.scala2java.traversers
 
+import effiban.scala2java.contexts.TermSelectContext
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term
@@ -8,8 +9,8 @@ import scala.meta.Term.ApplyType
 trait ApplyTypeTraverser extends ScalaTreeTraverser[ApplyType]
 
 private[traversers] class ApplyTypeTraverserImpl(typeTraverser: => TypeTraverser,
-                                                 termTraverser: => TermTraverser,
-                                                 typeListTraverser: => TypeListTraverser)
+                                                 termSelectTraverser: => TermSelectTraverser,
+                                                 termTraverser: => TermTraverser)
                                                 (implicit javaWriter: JavaWriter) extends ApplyTypeTraverser {
 
   import javaWriter._
@@ -24,12 +25,11 @@ private[traversers] class ApplyTypeTraverserImpl(typeTraverser: => TypeTraverser
             write(".class")
           case _ => write(s"UNPARSEABLE class type: $termApplyType")
         }
-      case fun =>
-        termTraverser.traverse(fun)
-        if (termApplyType.targs.nonEmpty) {
-          write(".")
-        }
-        typeListTraverser.traverse(termApplyType.targs)
+      case termSelect: Term.Select => termSelectTraverser.traverse(termSelect, TermSelectContext(termApplyType.targs))
+      case term =>
+        // In Java a type can only be applied to a qualified name, so the best we can do here is write a comment
+        writeComment(termApplyType.targs.toString())
+        termTraverser.traverse(term)
     }
   }
 }
