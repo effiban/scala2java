@@ -48,6 +48,13 @@ class TermApplyNameTransformerImplTest extends UnitTestSuite {
     termApplyNameTransformer.transform(scalaTermName).structure shouldBe expectedJavaTerm.structure
   }
 
+  test("transform 'Future' should return 'CompletableFuture.supplyAsync'") {
+    val scalaTermName = TermNames.Future
+    val expectedJavaTerm = Term.Select(TermNames.JavaCompletableFuture, TermNames.JavaSupplyAsync)
+
+    termApplyNameTransformer.transform(scalaTermName).structure shouldBe expectedJavaTerm.structure
+  }
+
   test("transform 'Stream' should return 'Stream.of'") {
     val scalaTermName = TermNames.Stream
     val expectedJavaTerm = Term.Select(TermNames.Stream, TermNames.JavaOf)

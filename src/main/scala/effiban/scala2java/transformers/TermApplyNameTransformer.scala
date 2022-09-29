@@ -20,6 +20,7 @@ private[transformers] class TermApplyNameTransformerImpl(termNameClassifier: Ter
     // The next two transform to the VAVR framework syntax of 'Either' - only one I found in Java
     case Term.Name("Right") => Term.Select(Term.Name("Either"), Term.Name("right"))
     case Term.Name("Left") => Term.Select(Term.Name("Either"), Term.Name("left"))
+    case Term.Name("Future") => Term.Select(Term.Name("CompletableFuture"), Term.Name("supplyAsync"))
     case nm if isJavaStreamLike(nm) => Term.Select(Term.Name("Stream"), Term.Name("of"))
     case nm if isJavaListLike(nm) => Term.Select(Term.Name("List"), Term.Name("of"))
     case nm if isJavaSetLike(nm) => Term.Select(Term.Name("Set"), Term.Name("of"))

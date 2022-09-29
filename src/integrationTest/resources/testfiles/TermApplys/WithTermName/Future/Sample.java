@@ -7,6 +7,6 @@ public class Sample {
     }
 
     public void foo() {
-        doSomething(1, 2);
+        CompletableFuture.supplyAsync(1);
     }
 }
