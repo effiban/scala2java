@@ -7,7 +7,7 @@ import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TermNames
-import effiban.scala2java.testtrees.TermNames.{Association, PlusTermName, ScalaRangeTermName, ScalaToTermName}
+import effiban.scala2java.testtrees.TermNames.{Plus, ScalaAssociation, ScalaRange, ScalaTo}
 import effiban.scala2java.transformers.{TermApplyInfixToMapEntryTransformer, TermApplyInfixToRangeTransformer}
 import org.mockito.ArgumentMatchers
 
@@ -38,12 +38,12 @@ class TermApplyInfixTraverserImplTest extends UnitTestSuite {
 
     val applyInfix = Term.ApplyInfix(
       lhs = lhs,
-      op = ScalaToTermName,
+      op = ScalaTo,
       targs = Nil,
       args = List(rhs)
     )
 
-    val expectedRangeTermApply = Term.Apply(fun = ScalaRangeTermName, args = List(lhs, rhs))
+    val expectedRangeTermApply = Term.Apply(fun = ScalaRange, args = List(lhs, rhs))
 
     when(termApplyInfixClassifier.isRange(eqTree(applyInfix))).thenReturn(true)
     when(termApplyInfixToRangeTransformer.transform(eqTree(applyInfix))).thenReturn(expectedRangeTermApply)
@@ -59,7 +59,7 @@ class TermApplyInfixTraverserImplTest extends UnitTestSuite {
 
     val applyInfix = Term.ApplyInfix(
       lhs = lhs,
-      op = Association,
+      op = ScalaAssociation,
       targs = Nil,
       args = List(rhs)
     )
@@ -77,7 +77,7 @@ class TermApplyInfixTraverserImplTest extends UnitTestSuite {
 
   test("traverse() when has arithmetic operator") {
     val lhs = Term.Name("a")
-    val op = PlusTermName
+    val op = Plus
     val rhs = Term.Name("b")
 
     val applyInfix = Term.ApplyInfix(

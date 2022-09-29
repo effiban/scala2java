@@ -66,7 +66,7 @@ class TermTypeClassifierImplTest extends UnitTestSuite {
     val associationInfix = Term.ApplyInfix(
       lhs = Term.Name("a"),
       targs = Nil,
-      op = TermNames.PlusTermName,
+      op = TermNames.Plus,
       args = List(Lit.Int(1))
     )
 
