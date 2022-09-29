@@ -2,7 +2,7 @@ package dummy;
 
 
 public class Sample {
-    public final Optional<String> x = /* List(String) */Option("abc");
+    public final Optional<String> x = Optional.<String>ofNullable("abc");
 
     public Sample() {
     }

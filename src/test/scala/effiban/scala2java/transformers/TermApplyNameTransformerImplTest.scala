@@ -20,6 +20,20 @@ class TermApplyNameTransformerImplTest extends UnitTestSuite {
     termApplyNameTransformer.transform(scalaTermName).structure shouldBe expectedJavaTerm.structure
   }
 
+  test("transform 'Option' should return 'Optional.ofNullable'") {
+    val scalaTermName = TermNames.ScalaOption
+    val expectedJavaTerm = Term.Select(TermNames.JavaOptional, TermNames.JavaOfNullable)
+
+    termApplyNameTransformer.transform(scalaTermName).structure shouldBe expectedJavaTerm.structure
+  }
+
+  test("transform 'Some' should return 'Optional.of'") {
+    val scalaTermName = TermNames.ScalaSome
+    val expectedJavaTerm = Term.Select(TermNames.JavaOptional, TermNames.JavaOf)
+
+    termApplyNameTransformer.transform(scalaTermName).structure shouldBe expectedJavaTerm.structure
+  }
+
   test("transform 'Stream' should return 'Stream.of'") {
     val scalaTermName = TermNames.Stream
     val expectedJavaTerm = Term.Select(TermNames.Stream, TermNames.JavaOf)
