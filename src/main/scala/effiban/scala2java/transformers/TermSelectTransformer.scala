@@ -2,11 +2,11 @@ package effiban.scala2java.transformers
 
 import scala.meta.Term
 
-trait ScalaToJavaTermSelectTransformer {
+trait TermSelectTransformer {
   def transform(termSelect: Term.Select): Term.Select
 }
 
-object ScalaToJavaTermSelectTransformer extends ScalaToJavaTermSelectTransformer {
+object TermSelectTransformer extends TermSelectTransformer {
 
   private final val ScalaRange = "Range"
   private final val IntStream = "IntStream"

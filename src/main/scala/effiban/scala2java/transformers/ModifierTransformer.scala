@@ -2,15 +2,15 @@ package effiban.scala2java.transformers
 
 import effiban.scala2java.entities.JavaModifier
 
-import scala.meta.{Mod, Name}
 import scala.meta.Mod.{Abstract, Final, Private, Protected, Sealed}
+import scala.meta.{Mod, Name}
 
-trait ScalaToJavaModifierTransformer {
+trait ModifierTransformer {
 
   def transform(scalaMod: Mod): Option[JavaModifier]
 }
 
-object ScalaToJavaModifierTransformer extends ScalaToJavaModifierTransformer {
+object ModifierTransformer extends ModifierTransformer {
 
   override def transform(scalaMod: Mod): Option[JavaModifier] = {
     scalaMod match {

@@ -3,7 +3,7 @@ package effiban.scala2java.resolvers
 import effiban.scala2java.contexts.JavaModifiersContext
 import effiban.scala2java.entities.JavaModifier
 import effiban.scala2java.orderings.JavaModifierOrdering
-import effiban.scala2java.transformers.ScalaToJavaModifierTransformer
+import effiban.scala2java.transformers.ModifierTransformer
 
 import scala.meta.Mod
 
@@ -34,7 +34,7 @@ class JavaModifiersResolverImpl(javaAllowedModifiersResolver: JavaAllowedModifie
 
   private def transform(inputScalaMods: List[Mod], allowedJavaModifiers: Set[JavaModifier]): List[JavaModifier] = {
     inputScalaMods
-      .map(ScalaToJavaModifierTransformer.transform)
+      .map(ModifierTransformer.transform)
       .collect { case Some(javaModifier) => javaModifier }
       .distinct
       .filter(allowedJavaModifiers.contains)

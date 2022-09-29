@@ -8,7 +8,7 @@ import effiban.scala2java.testtrees.TermNames.{JavaIntStreamTermName, JavaRangeT
 
 import scala.meta.{Lit, Term}
 
-class ScalaToJavaTermApplyTransformerTest extends UnitTestSuite {
+class TermApplyTransformerImplTest extends UnitTestSuite {
 
   private val fun = Term.Name("foo")
   private val arg1 = Term.Name("arg1")
@@ -19,9 +19,9 @@ class ScalaToJavaTermApplyTransformerTest extends UnitTestSuite {
   private val arg6 = Term.Name("arg6")
 
   private val termApplyClassifier = mock[TermApplyClassifier]
-  private val collectionInitializerTransformer = mock[ScalaToJavaCollectionInitializerTransformer]
+  private val collectionInitializerTransformer = mock[CollectionInitializerTransformer]
 
-  private val termApplyTransformer = new ScalaToJavaTermApplyTransformerImpl(termApplyClassifier, collectionInitializerTransformer)
+  private val termApplyTransformer = new TermApplyTransformerImpl(termApplyClassifier, collectionInitializerTransformer)
 
   test("transform() of Range(...) should return IntStream.range(...)") {
     val scalaTermApply = Term.Apply(ScalaRangeTermName, List(Lit.Int(0), Lit.Int(10)))
@@ -70,6 +70,6 @@ class ScalaToJavaTermApplyTransformerTest extends UnitTestSuite {
       )
     val expectedJavaStyleTermApply = Term.Apply(fun, List(arg1, arg2, arg3, arg4, arg5, arg6))
 
-    ScalaToJavaTermApplyTransformer.transform(scalaStyleTermApply).structure shouldBe expectedJavaStyleTermApply.structure
+    termApplyTransformer.transform(scalaStyleTermApply).structure shouldBe expectedJavaStyleTermApply.structure
   }
 }

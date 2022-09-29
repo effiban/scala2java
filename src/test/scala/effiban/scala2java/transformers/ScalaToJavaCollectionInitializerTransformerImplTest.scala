@@ -20,7 +20,7 @@ class ScalaToJavaCollectionInitializerTransformerImplTest extends UnitTestSuite 
 
   private val termNameClassifier = mock[TermNameClassifier]
 
-  private val collectionInitializerTransformer = new ScalaToJavaCollectionInitializerTransformerImpl(termNameClassifier)
+  private val collectionInitializerTransformer = new CollectionInitializerTransformerImpl(termNameClassifier)
 
   test("transform Stream(1, 2) should return Stream.of(1, 2)") {
     val scalaInitializer = Term.Apply(TermNames.Stream, ScalarArgs)

@@ -6,7 +6,7 @@ import effiban.scala2java.testsuites.UnitTestSuite
 import scala.meta.Mod.{Abstract, Final, Implicit, Lazy, Private, Protected, Sealed}
 import scala.meta.{Mod, Name}
 
-class ScalaToJavaModifierTransformerTest extends UnitTestSuite {
+class ModifierTransformerTest extends UnitTestSuite {
 
   private val TypeMappings = Table(
     ("ScalaModifier", "ExpectedMaybeJavaModifier"),
@@ -23,7 +23,7 @@ class ScalaToJavaModifierTransformerTest extends UnitTestSuite {
 
   forAll(TypeMappings) { (scalaModifier: Mod, expectedMaybeJavaModifier: Option[JavaModifier]) =>
     test(s"transform $scalaModifier should return $expectedMaybeJavaModifier") {
-      ScalaToJavaModifierTransformer.transform(scalaModifier) shouldBe expectedMaybeJavaModifier
+      ModifierTransformer.transform(scalaModifier) shouldBe expectedMaybeJavaModifier
     }
   }
 }

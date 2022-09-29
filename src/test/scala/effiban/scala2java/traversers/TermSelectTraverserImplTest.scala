@@ -6,7 +6,7 @@ import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
-import effiban.scala2java.transformers.ScalaToJavaTermSelectTransformer
+import effiban.scala2java.transformers.TermSelectTransformer
 
 import scala.meta.Term
 
@@ -22,19 +22,19 @@ class TermSelectTraverserImplTest extends UnitTestSuite {
   private val termTraverser = mock[TermTraverser]
   private val termNameTraverser = mock[TermNameTraverser]
   private val typeListTraverser = mock[TypeListTraverser]
-  private val scalaToJavaTermSelectTransformer = mock[ScalaToJavaTermSelectTransformer]
+  private val termSelectTransformer = mock[TermSelectTransformer]
 
   private val termSelectTraverser = new TermSelectTraverserImpl(
     termTraverser,
     termNameTraverser,
     typeListTraverser,
-    scalaToJavaTermSelectTransformer
+    termSelectTransformer
   )
 
   test("traverse() with type args") {
     val typeArgs = List(TypeNames.Int)
 
-    when(scalaToJavaTermSelectTransformer.transform(eqTree(ScalaSelect))).thenReturn(JavaSelect)
+    when(termSelectTransformer.transform(eqTree(ScalaSelect))).thenReturn(JavaSelect)
 
     doWrite("MyJavaClass").when(termTraverser).traverse(eqTree(MyJavaClass))
     doWrite("myJavaMethod").when(termNameTraverser).traverse(eqTree(MyJavaMethod))
@@ -46,7 +46,7 @@ class TermSelectTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() without type args") {
-    when(scalaToJavaTermSelectTransformer.transform(eqTree(ScalaSelect))).thenReturn(JavaSelect)
+    when(termSelectTransformer.transform(eqTree(ScalaSelect))).thenReturn(JavaSelect)
 
     doWrite("MyJavaClass").when(termTraverser).traverse(eqTree(MyJavaClass))
     doWrite("myJavaMethod").when(termNameTraverser).traverse(eqTree(MyJavaMethod))

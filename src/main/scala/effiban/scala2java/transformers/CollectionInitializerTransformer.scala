@@ -4,12 +4,12 @@ import effiban.scala2java.classifiers.TermNameClassifier
 
 import scala.meta.Term.{Apply, ApplyType, Name, Select}
 
-trait ScalaToJavaCollectionInitializerTransformer {
+trait CollectionInitializerTransformer {
   def transform(termApply: Apply): Apply
 }
 
-private[transformers] class ScalaToJavaCollectionInitializerTransformerImpl(termNameClassifier: TermNameClassifier)
-  extends ScalaToJavaCollectionInitializerTransformer {
+private[transformers] class CollectionInitializerTransformerImpl(termNameClassifier: TermNameClassifier)
+  extends CollectionInitializerTransformer {
 
   import termNameClassifier._
 
@@ -33,4 +33,4 @@ private[transformers] class ScalaToJavaCollectionInitializerTransformerImpl(term
   }
 }
 
-object ScalaToJavaCollectionInitializerTransformer extends ScalaToJavaCollectionInitializerTransformerImpl(TermNameClassifier)
+object CollectionInitializerTransformer extends CollectionInitializerTransformerImpl(TermNameClassifier)
