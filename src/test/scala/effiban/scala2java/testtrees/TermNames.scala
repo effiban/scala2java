@@ -5,6 +5,9 @@ import scala.meta.Term
 object TermNames {
 
   val String: Term.Name = Term.Name("String")
+  val Either: Term.Name = Term.Name("Either")
+  val LowercaseRight: Term.Name = Term.Name("right")
+  val LowercaseLeft: Term.Name = Term.Name("left")
   val Array: Term.Name = Term.Name("Array")
   val Stream: Term.Name = Term.Name("Stream")
   val List: Term.Name = Term.Name("List")
@@ -23,6 +26,8 @@ object TermNames {
   val ScalaAssociation: Term.Name = Term.Name("->")
   val ScalaOption: Term.Name = Term.Name("Option")
   val ScalaSome: Term.Name = Term.Name("Some")
+  val ScalaRight: Term.Name = Term.Name("Right")
+  val ScalaLeft: Term.Name = Term.Name("Left")
 
   val JavaIntStream: Term.Name = Term.Name("IntStream")
   val JavaRange: Term.Name = Term.Name("range")
