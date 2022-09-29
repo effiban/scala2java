@@ -12,6 +12,7 @@ private[typeinference] class TermTypeInferrerImpl(applyTypeInferrer: => ApplyTyp
                                                   ifTypeInferrer: => IfTypeInferrer,
                                                   litTypeInferrer: LitTypeInferrer,
                                                   nameTypeInferrer: NameTypeInferrer,
+                                                  selectTypeInferrer: SelectTypeInferrer,
                                                   tryTypeInferrer: => TryTypeInferrer,
                                                   tryWithHandlerTypeInferrer: => TryWithHandlerTypeInferrer,
                                                   tupleTypeInferrer: => TupleTypeInferrer) extends TermTypeInferrer {
@@ -34,13 +35,14 @@ private[typeinference] class TermTypeInferrerImpl(applyTypeInferrer: => ApplyTyp
       case `new`: New => Some(`new`.init.tpe)
       case repeated: Term.Repeated => inferRepeated(repeated)
       case `return`: Return => infer(`return`.expr)
+      case select: Term.Select => selectTypeInferrer.infer(select)
       case termMatch: Term.Match => caseListTypeInferrer.infer(termMatch.cases)
       case _: Throw => Some(Type.AnonymousName())
       case `try`: Try => tryTypeInferrer.infer(`try`)
       case tryWithHandler: TryWithHandler => tryWithHandlerTypeInferrer.infer(tryWithHandler)
       case tuple: Term.Tuple => Some(tupleTypeInferrer.infer(tuple))
       case _: While => Some(Type.AnonymousName())
-      // TODO - support Select, NewAnonymous, Function, PartialFunction
+      // TODO - support NewAnonymous, Function, PartialFunction
       case _ => None
     }
   }

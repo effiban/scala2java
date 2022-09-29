@@ -7,21 +7,35 @@ import scala.meta.Term
 
 class TermSelectTransformerTest extends UnitTestSuite {
 
-  test("transform Range.inclusive() should return IntStream.rangeClosed()") {
+  test("transform Range.inclusive should return IntStream.rangeClosed") {
     val scalaTermSelect = Term.Select(ScalaRange, ScalaInclusive)
     val expectedJavaTermSelect = Term.Select(JavaIntStream, JavaRangeClosed)
 
     TermSelectTransformer.transform(scalaTermSelect).structure shouldBe expectedJavaTermSelect.structure
   }
 
-  test("transform Range.apply() should return IntStream.range()") {
+  test("transform Range.apply should return IntStream.range") {
     val scalaTermSelect = Term.Select(ScalaRange, Term.Name("apply"))
     val expectedJavaTermSelect = Term.Select(JavaIntStream, JavaRange)
 
     TermSelectTransformer.transform(scalaTermSelect).structure shouldBe expectedJavaTermSelect.structure
   }
 
-  test("transform Dummy.dummy() should return the same") {
+  test("transform Future.successful should return CompletableFuture.completedFuture") {
+    val scalaTermSelect = Term.Select(Future, ScalaSuccessful)
+    val expectedJavaTermSelect = Term.Select(JavaCompletableFuture, JavaCompletedFuture)
+
+    TermSelectTransformer.transform(scalaTermSelect).structure shouldBe expectedJavaTermSelect.structure
+  }
+
+  test("transform Future.failed should return CompletableFuture.failedFuture") {
+    val scalaTermSelect = Term.Select(Future, ScalaFailed)
+    val expectedJavaTermSelect = Term.Select(JavaCompletableFuture, JavaFailedFuture)
+
+    TermSelectTransformer.transform(scalaTermSelect).structure shouldBe expectedJavaTermSelect.structure
+  }
+
+  test("transform Dummy.dummy should return the same") {
     val termSelect = Term.Select(Term.Name("Dummy"), Term.Name("dummy"))
 
     TermSelectTransformer.transform(termSelect).structure shouldBe termSelect.structure
