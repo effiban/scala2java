@@ -8,6 +8,7 @@ object TermNames {
   val Either: Term.Name = Term.Name("Either")
   val LowercaseRight: Term.Name = Term.Name("right")
   val LowercaseLeft: Term.Name = Term.Name("left")
+  val Future: Term.Name = Term.Name("Future")
   val Array: Term.Name = Term.Name("Array")
   val Stream: Term.Name = Term.Name("Stream")
   val List: Term.Name = Term.Name("List")
@@ -37,4 +38,6 @@ object TermNames {
   val JavaOf: Term.Name = Term.Name("of")
   val JavaOfNullable: Term.Name = Term.Name("ofNullable")
   val JavaOfEntries: Term.Name = Term.Name("ofEntries")
+  val JavaCompletableFuture: Term.Name = Term.Name("CompletableFuture")
+  val JavaSupplyAsync: Term.Name = Term.Name("supplyAsync")
 }
