@@ -42,6 +42,7 @@ object TypeInferrers {
     ifTypeInferrer,
     LitTypeInferrer,
     NameTypeInferrer,
+    SelectTypeInferrer,
     tryTypeInferrer,
     tryWithHandlerTypeInferrer,
     tupleTypeInferrer

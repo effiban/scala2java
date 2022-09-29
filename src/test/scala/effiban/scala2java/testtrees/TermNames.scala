@@ -29,6 +29,8 @@ object TermNames {
   val ScalaSome: Term.Name = Term.Name("Some")
   val ScalaRight: Term.Name = Term.Name("Right")
   val ScalaLeft: Term.Name = Term.Name("Left")
+  val ScalaSuccessful: Term.Name = Term.Name("successful")
+  val ScalaFailed: Term.Name = Term.Name("failed")
 
   val JavaIntStream: Term.Name = Term.Name("IntStream")
   val JavaRange: Term.Name = Term.Name("range")
@@ -40,4 +42,6 @@ object TermNames {
   val JavaOfEntries: Term.Name = Term.Name("ofEntries")
   val JavaCompletableFuture: Term.Name = Term.Name("CompletableFuture")
   val JavaSupplyAsync: Term.Name = Term.Name("supplyAsync")
+  val JavaCompletedFuture: Term.Name = Term.Name("completedFuture")
+  val JavaFailedFuture: Term.Name = Term.Name("failedFuture")
 }
