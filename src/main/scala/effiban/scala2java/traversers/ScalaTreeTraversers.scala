@@ -315,7 +315,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
   private lazy val termApplyTraverser: TermApplyTraverser = new TermApplyTraverserImpl(
     termTraverser,
     termListTraverser,
-    ScalaToJavaTermApplyTransformer
+    TermApplyTransformer
   )
 
   private lazy val termFunctionTraverser: TermFunctionTraverser = new TermFunctionTraverserImpl(
@@ -358,7 +358,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
     termTraverser,
     termNameTraverser,
     typeListTraverser,
-    ScalaToJavaTermSelectTransformer
+    TermSelectTransformer
   )
 
   private lazy val termTraverser: TermTraverser = new TermTraverserImpl(
@@ -432,13 +432,13 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
 
   private lazy val typeExistentialTraverser: TypeExistentialTraverser = new TypeExistentialTraverserImpl(typeTraverser)
 
-  private lazy val typeFunctionTraverser: TypeFunctionTraverser = new TypeFunctionTraverserImpl(typeApplyTraverser, ScalaToJavaFunctionTypeTransformer)
+  private lazy val typeFunctionTraverser: TypeFunctionTraverser = new TypeFunctionTraverserImpl(typeApplyTraverser, FunctionTypeTransformer)
 
   private lazy val typeLambdaTraverser: TypeLambdaTraverser = new TypeLambdaTraverserImpl
 
   private lazy val typeListTraverser: TypeListTraverser = new TypeListTraverserImpl(argumentListTraverser, typeTraverser)
 
-  private lazy val typeNameTraverser: TypeNameTraverser = new TypeNameTraverserImpl(ScalaToJavaTypeNameTransformer)
+  private lazy val typeNameTraverser: TypeNameTraverser = new TypeNameTraverserImpl(TypeNameTransformer)
 
   private lazy val typeParamListTraverser: TypeParamListTraverser = new TypeParamListTraverserImpl(argumentListTraverser, typeParamTraverser)
 

@@ -2,11 +2,11 @@ package effiban.scala2java.transformers
 
 import scala.meta.Type
 
-trait ScalaToJavaTypeNameTransformer {
+trait TypeNameTransformer {
   def transform(scalaName: Type.Name): String
 }
 
-object ScalaToJavaTypeNameTransformer extends ScalaToJavaTypeNameTransformer {
+object TypeNameTransformer extends TypeNameTransformer {
 
   private final val ScalaTypeNameToJavaTypeName = Map(
     "Any" -> "Object",

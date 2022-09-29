@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.transformers.ScalaToJavaFunctionTypeTransformer
+import effiban.scala2java.transformers.FunctionTypeTransformer
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Type
@@ -8,7 +8,7 @@ import scala.meta.Type
 trait TypeFunctionTraverser extends ScalaTreeTraverser[Type.Function]
 
 private[traversers] class TypeFunctionTraverserImpl(typeApplyTraverser: => TypeApplyTraverser,
-                                                    scalaToJavaFunctionTypeTransformer: ScalaToJavaFunctionTypeTransformer)
+                                                    functionTypeTransformer: FunctionTypeTransformer)
                                                    (implicit javaWriter: JavaWriter)
   extends TypeFunctionTraverser {
 
@@ -18,7 +18,7 @@ private[traversers] class TypeFunctionTraverserImpl(typeApplyTraverser: => TypeA
 
   // function type, e.g.: Int => String
   override def traverse(functionType: Type.Function): Unit = {
-    val javaFunctionType = scalaToJavaFunctionTypeTransformer.transform(functionType)
+    val javaFunctionType = functionTypeTransformer.transform(functionType)
     javaFunctionType.tpe match {
       case tpe@Type.Name(name) if JoolFunctionTypeRegex.matches(name) =>
         // TODO add this to README, and maybe add import automatically once we can

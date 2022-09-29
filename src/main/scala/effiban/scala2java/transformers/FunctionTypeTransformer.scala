@@ -2,11 +2,11 @@ package effiban.scala2java.transformers
 
 import scala.meta.Type
 
-trait ScalaToJavaFunctionTypeTransformer {
+trait FunctionTypeTransformer {
   def transform(functionType: Type.Function): Type.Apply
 }
 
-object ScalaToJavaFunctionTypeTransformer extends ScalaToJavaFunctionTypeTransformer {
+object FunctionTypeTransformer extends FunctionTypeTransformer {
 
   // Transform a Scala function type (e.g.: Int => String) into a Java function type (e.g. Function<Int, String>)
   override def transform(functionType: Type.Function): Type.Apply = {

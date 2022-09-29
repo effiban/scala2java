@@ -5,13 +5,13 @@ import effiban.scala2java.classifiers.TermApplyClassifier
 import scala.annotation.tailrec
 import scala.meta.Term
 
-trait ScalaToJavaTermApplyTransformer {
+trait TermApplyTransformer {
   def transform(termApply: Term.Apply): Term.Apply
 }
 
-class ScalaToJavaTermApplyTransformerImpl(termApplyClassifier: TermApplyClassifier,
-                                          collectionInitializerTransformer: ScalaToJavaCollectionInitializerTransformer)
-  extends ScalaToJavaTermApplyTransformer {
+class TermApplyTransformerImpl(termApplyClassifier: TermApplyClassifier,
+                               collectionInitializerTransformer: CollectionInitializerTransformer)
+  extends TermApplyTransformer {
 
   // Transform any method invocations which have a Scala-specific naming or style into Java equivalents
   @tailrec
@@ -26,7 +26,7 @@ class ScalaToJavaTermApplyTransformerImpl(termApplyClassifier: TermApplyClassifi
   }
 }
 
-object ScalaToJavaTermApplyTransformer extends ScalaToJavaTermApplyTransformerImpl(
+object TermApplyTransformer extends TermApplyTransformerImpl(
   TermApplyClassifier,
-  ScalaToJavaCollectionInitializerTransformer
+  CollectionInitializerTransformer
 )

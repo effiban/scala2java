@@ -6,7 +6,7 @@ import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
-import effiban.scala2java.transformers.ScalaToJavaTermApplyTransformer
+import effiban.scala2java.transformers.TermApplyTransformer
 import org.mockito.ArgumentMatchers
 
 import scala.meta.Term
@@ -14,12 +14,12 @@ import scala.meta.Term
 class TermApplyTraverserImplTest extends UnitTestSuite {
   private val termTraverser = mock[TermTraverser]
   private val termListTraverser = mock[TermListTraverser]
-  private val scalaToJavaTermApplyTransformer = mock[ScalaToJavaTermApplyTransformer]
+  private val termApplyTransformer = mock[TermApplyTransformer]
 
   private val termApplyTraverser = new TermApplyTraverserImpl(
     termTraverser,
     termListTraverser,
-    scalaToJavaTermApplyTransformer
+    termApplyTransformer
   )
 
   test("traverse") {
@@ -32,7 +32,7 @@ class TermApplyTraverserImplTest extends UnitTestSuite {
       args = List(Term.Name("arg1"), Term.Name("arg2"))
     )
 
-    when(scalaToJavaTermApplyTransformer.transform(eqTree(scalaTermApply))).thenReturn(javaTermApply)
+    when(termApplyTransformer.transform(eqTree(scalaTermApply))).thenReturn(javaTermApply)
 
     doWrite("myJavaMethod").when(termTraverser).traverse(eqTree(javaTermApply.fun))
     doWrite("(arg1, arg2)").when(termListTraverser).traverse(

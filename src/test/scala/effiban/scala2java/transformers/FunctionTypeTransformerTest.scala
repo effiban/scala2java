@@ -5,7 +5,7 @@ import effiban.scala2java.testsuites.UnitTestSuite
 
 import scala.meta.Type
 
-class ScalaToJavaFunctionTypeTransformerTest extends UnitTestSuite {
+class FunctionTypeTransformerTest extends UnitTestSuite {
 
   test("transform for zero input types should return a Supplier") {
     val typeT = Type.Name("T")
@@ -14,7 +14,7 @@ class ScalaToJavaFunctionTypeTransformerTest extends UnitTestSuite {
 
     val expectedJavaFunctionType = Type.Apply(tpe = Type.Name("Supplier"), args = List(typeT))
 
-    val actualJavaFunctionType = ScalaToJavaFunctionTypeTransformer.transform(scalaFunctionType)
+    val actualJavaFunctionType = FunctionTypeTransformer.transform(scalaFunctionType)
 
     actualJavaFunctionType.structure shouldBe expectedJavaFunctionType.structure
   }
@@ -27,7 +27,7 @@ class ScalaToJavaFunctionTypeTransformerTest extends UnitTestSuite {
 
     val expectedJavaFunctionType = Type.Apply(tpe = Type.Name("Function"), args = List(typeT, typeU))
 
-    val actualJavaFunctionType = ScalaToJavaFunctionTypeTransformer.transform(scalaFunctionType)
+    val actualJavaFunctionType = FunctionTypeTransformer.transform(scalaFunctionType)
 
     actualJavaFunctionType.structure shouldBe expectedJavaFunctionType.structure
   }
@@ -41,7 +41,7 @@ class ScalaToJavaFunctionTypeTransformerTest extends UnitTestSuite {
 
     val expectedJavaFunctionType = Type.Apply(tpe = Type.Name("BiFunction"), args = List(typeT1, typeT2, typeU))
 
-    val actualJavaFunctionType = ScalaToJavaFunctionTypeTransformer.transform(scalaFunctionType)
+    val actualJavaFunctionType = FunctionTypeTransformer.transform(scalaFunctionType)
 
     actualJavaFunctionType.structure shouldBe expectedJavaFunctionType.structure
   }
@@ -56,7 +56,7 @@ class ScalaToJavaFunctionTypeTransformerTest extends UnitTestSuite {
 
     val expectedJavaFunctionType = Type.Apply(tpe = Type.Name("Function3"), args = List(typeT1, typeT2, typeT3, typeU))
 
-    val actualMaybeJavaFunctionType = ScalaToJavaFunctionTypeTransformer.transform(scalaFunctionType)
+    val actualMaybeJavaFunctionType = FunctionTypeTransformer.transform(scalaFunctionType)
 
     actualMaybeJavaFunctionType.structure shouldBe expectedJavaFunctionType.structure
   }

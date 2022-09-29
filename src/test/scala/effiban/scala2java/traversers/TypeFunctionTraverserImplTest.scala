@@ -4,16 +4,16 @@ import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
-import effiban.scala2java.transformers.ScalaToJavaFunctionTypeTransformer
+import effiban.scala2java.transformers.FunctionTypeTransformer
 
 import scala.meta.Type
 
 class TypeFunctionTraverserImplTest extends UnitTestSuite {
 
   private val typeApplyTraverser = mock[TypeApplyTraverser]
-  private val scalaToJavaFunctionTypeTransformer = mock[ScalaToJavaFunctionTypeTransformer]
+  private val functionTypeTransformer = mock[FunctionTypeTransformer]
 
-  private val typeFunctionTraverser = new TypeFunctionTraverserImpl(typeApplyTraverser, scalaToJavaFunctionTypeTransformer)
+  private val typeFunctionTraverser = new TypeFunctionTraverserImpl(typeApplyTraverser, functionTypeTransformer)
 
   test("traverse() when corresponding function type is a native Java type") {
     val inputType = TypeNames.Int
@@ -22,7 +22,7 @@ class TypeFunctionTraverserImplTest extends UnitTestSuite {
     val scalaFunctionType = Type.Function(params = List(inputType), res = resultType)
     val expectedJavaFunctionType = Type.Apply(Type.Name("Function"), List(inputType, resultType))
 
-    when(scalaToJavaFunctionTypeTransformer.transform(eqTree(scalaFunctionType))).thenReturn(expectedJavaFunctionType)
+    when(functionTypeTransformer.transform(eqTree(scalaFunctionType))).thenReturn(expectedJavaFunctionType)
 
     doWrite("Function<Int, String>").when(typeApplyTraverser).traverse(eqTree(expectedJavaFunctionType))
 
@@ -41,7 +41,7 @@ class TypeFunctionTraverserImplTest extends UnitTestSuite {
     val scalaFunctionType = Type.Function(params = inParams, res = resultType)
     val expectedJavaFunctionType = Type.Apply(Type.Name("Function3"), inParams :+ resultType)
 
-    when(scalaToJavaFunctionTypeTransformer.transform(eqTree(scalaFunctionType))).thenReturn(expectedJavaFunctionType)
+    when(functionTypeTransformer.transform(eqTree(scalaFunctionType))).thenReturn(expectedJavaFunctionType)
 
     doWrite("Function3<T1, T2, T3, String>").when(typeApplyTraverser).traverse(eqTree(expectedJavaFunctionType))
 
