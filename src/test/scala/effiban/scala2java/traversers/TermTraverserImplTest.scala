@@ -5,7 +5,7 @@ import effiban.scala2java.entities.Decision.{No, Uncertain}
 import effiban.scala2java.matchers.BlockContextMatcher.eqBlockContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.testsuites.UnitTestSuite
-import effiban.scala2java.testtrees.TermNames.PlusTermName
+import effiban.scala2java.testtrees.TermNames.Plus
 import effiban.scala2java.testtrees.TypeNames
 import org.mockito.ArgumentMatchers
 
@@ -100,7 +100,7 @@ class TermTraverserImplTest extends UnitTestSuite {
   test("traverse() for Term.ApplyInfix") {
     val applyInfix = Term.ApplyInfix(
       lhs = Term.Name("x"),
-      op = PlusTermName,
+      op = Plus,
       targs = Nil,
       args = List(Term.Name("y"))
     )

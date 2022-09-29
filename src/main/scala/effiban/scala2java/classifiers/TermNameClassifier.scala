@@ -3,25 +3,23 @@ package effiban.scala2java.classifiers
 import scala.meta.Term
 
 trait TermNameClassifier {
-  def isLazySeqLike(termName: Term.Name): Boolean
+  def isJavaStreamLike(termName: Term.Name): Boolean
 
-  def isEagerSeqLike(termName: Term.Name): Boolean
+  def isJavaListLike(termName: Term.Name): Boolean
 
-  def isSetLike(termName: Term.Name): Boolean
+  def isJavaSetLike(termName: Term.Name): Boolean
 
-  def isMapLike(termName: Term.Name): Boolean
-
-  def isCollection(termName: Term.Name): Boolean
+  def isJavaMapLike(termName: Term.Name): Boolean
 }
 
 object TermNameClassifier extends TermNameClassifier {
 
-  final val LazySeqLike: Set[String] = Set(
+  final val JavaStreamLike: Set[String] = Set(
     "LazyList",
     "Stream",
   )
 
-  final val EagerSeqLike: Set[String] = Set(
+  final val JavaListLike: Set[String] = Set(
     "Seq",
     "LinearSeq",
     "IndexedSeq",
@@ -30,33 +28,21 @@ object TermNameClassifier extends TermNameClassifier {
     "Vector"
   )
 
-  final val SetLike: Set[String] = Set(
+  final val JavaSetLike: Set[String] = Set(
     "Set",
-    "HashSet",
-    "SortedSet",
-    "TreeSet",
-    "ListSet"
+    "HashSet"
   )
 
-  final val MapLike: Set[String] = Set(
+  final val JavaMapLike: Set[String] = Set(
     "Map",
-    "HashMap",
-    "VectorMap",
-    "ListMap",
-    "SortedMap",
-    "TreeMap",
-    "TreeSeqMap"
+    "HashMap"
   )
 
-  final val All: Set[String] = LazySeqLike ++ EagerSeqLike ++ SetLike ++ MapLike
+  override def isJavaStreamLike(termName: Term.Name): Boolean = JavaStreamLike.contains(termName.value)
 
-  override def isLazySeqLike(termName: Term.Name): Boolean = LazySeqLike.contains(termName.value)
+  override def isJavaListLike(termName: Term.Name): Boolean = JavaListLike.contains(termName.value)
 
-  override def isEagerSeqLike(termName: Term.Name): Boolean = EagerSeqLike.contains(termName.value)
+  override def isJavaSetLike(termName: Term.Name): Boolean = JavaSetLike.contains(termName.value)
 
-  override def isSetLike(termName: Term.Name): Boolean = SetLike.contains(termName.value)
-
-  override def isMapLike(termName: Term.Name): Boolean = MapLike.contains(termName.value)
-
-  override def isCollection(termName: Term.Name): Boolean = All.contains(termName.value)
+  override def isJavaMapLike(termName: Term.Name): Boolean = JavaMapLike.contains(termName.value)
 }

@@ -8,15 +8,15 @@ import scala.meta.Term
 class TermSelectTransformerTest extends UnitTestSuite {
 
   test("transform Range.inclusive() should return IntStream.rangeClosed()") {
-    val scalaTermSelect = Term.Select(ScalaRangeTermName, ScalaInclusiveTermName)
-    val expectedJavaTermSelect = Term.Select(JavaIntStreamTermName, JavaRangeClosedTermName)
+    val scalaTermSelect = Term.Select(ScalaRange, ScalaInclusive)
+    val expectedJavaTermSelect = Term.Select(JavaIntStream, JavaRangeClosed)
 
     TermSelectTransformer.transform(scalaTermSelect).structure shouldBe expectedJavaTermSelect.structure
   }
 
   test("transform Range.apply() should return IntStream.range()") {
-    val scalaTermSelect = Term.Select(ScalaRangeTermName, Term.Name("apply"))
-    val expectedJavaTermSelect = Term.Select(JavaIntStreamTermName, JavaRangeTermName)
+    val scalaTermSelect = Term.Select(ScalaRange, Term.Name("apply"))
+    val expectedJavaTermSelect = Term.Select(JavaIntStream, JavaRange)
 
     TermSelectTransformer.transform(scalaTermSelect).structure shouldBe expectedJavaTermSelect.structure
   }

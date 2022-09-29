@@ -6,7 +6,7 @@ import effiban.scala2java.entities.JavaScope
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
-import effiban.scala2java.testtrees.TermNames.ScalaTermName
+import effiban.scala2java.testtrees.TermNames.Scala
 import org.mockito.ArgumentMatchers.any
 
 import scala.meta.{Import, Importee, Importer, Name, Term}
@@ -47,7 +47,7 @@ class ImportTraverserImplTest extends UnitTestSuite {
 
   test("traverse() in package scope when there are scala importers should skip them") {
     val scalaImporter1 = Importer(
-      ref = ScalaTermName,
+      ref = Scala,
       importees = List(Importee.Name(Name.Indeterminate("myclass1")))
     )
     val nonScalaImporter1 = Importer(
@@ -55,7 +55,7 @@ class ImportTraverserImplTest extends UnitTestSuite {
       importees = List(Importee.Name(Name.Indeterminate("myclass1")))
     )
     val scalaImporter2 = Importer(
-      ref = ScalaTermName,
+      ref = Scala,
       importees = List(Importee.Name(Name.Indeterminate("myclass2")))
     )
     val nonScalaImporter2 = Importer(

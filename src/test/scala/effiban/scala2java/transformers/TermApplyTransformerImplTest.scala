@@ -1,10 +1,8 @@
 package effiban.scala2java.transformers
 
-import effiban.scala2java.classifiers.TermApplyClassifier
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.testsuites.UnitTestSuite
-import effiban.scala2java.testtrees.TermNames
-import effiban.scala2java.testtrees.TermNames.{JavaIntStreamTermName, JavaRangeTermName, ScalaRangeTermName}
+import effiban.scala2java.testtrees.TypeNames
 
 import scala.meta.{Lit, Term}
 
@@ -18,36 +16,36 @@ class TermApplyTransformerImplTest extends UnitTestSuite {
   private val arg5 = Term.Name("arg5")
   private val arg6 = Term.Name("arg6")
 
-  private val termApplyClassifier = mock[TermApplyClassifier]
-  private val collectionInitializerTransformer = mock[CollectionInitializerTransformer]
+  private val termApplyNameTransformer = mock[TermApplyNameTransformer]
 
-  private val termApplyTransformer = new TermApplyTransformerImpl(termApplyClassifier, collectionInitializerTransformer)
+  private val termApplyTransformer = new TermApplyTransformerImpl(termApplyNameTransformer)
 
-  test("transform() of Range(...) should return IntStream.range(...)") {
-    val scalaTermApply = Term.Apply(ScalaRangeTermName, List(Lit.Int(0), Lit.Int(10)))
-    val expectedRangeTermApply = Term.Apply(Term.Select(JavaIntStreamTermName, JavaRangeTermName), List(Lit.Int(0), Lit.Int(10)))
+  test("transform() of a Term.Apply(Term.Name, _) should return same object with the name transformed") {
+    val initialTermApply = Term.Apply(Term.Name("input"), List(Lit.Int(1)))
+    val expectedTermApply = Term.Apply(Term.Name("output"), List(Lit.Int(1)))
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedRangeTermApply.structure
+    when(termApplyNameTransformer.transform(eqTree(Term.Name("input")))).thenReturn(Term.Name("output"))
+
+    termApplyTransformer.transform(initialTermApply).structure shouldBe expectedTermApply.structure
   }
 
-  test("transform() of a collection initializer should invoke the appropriate transformer") {
-    val args = List(Lit.Int(1), Lit.Int(2))
-    val scalaCollectionInitializer = Term.Apply(TermNames.List, args)
-    val expectedJavaCollectionInitializer = Term.Apply(Term.Select(TermNames.List, Term.Name("of")), args)
+  test("transform() of a Term.Apply(Term.ApplyType(Term.Name, _), _) should return same object with the name transformed") {
+    val initialTermApply = Term.Apply(Term.ApplyType(Term.Name("input"), List(TypeNames.Int)), List(Lit.Int(1)))
+    val expectedTermApply = Term.Apply(Term.ApplyType(Term.Name("output"), List(TypeNames.Int)), List(Lit.Int(1)))
 
-    when(termApplyClassifier.isCollectionInitializer(eqTree(scalaCollectionInitializer))).thenReturn(true)
-    when(collectionInitializerTransformer.transform(scalaCollectionInitializer)).thenReturn(expectedJavaCollectionInitializer)
+    when(termApplyNameTransformer.transform(eqTree(Term.Name("input")))).thenReturn(Term.Name("output"))
 
-    termApplyTransformer.transform(scalaCollectionInitializer).structure shouldBe expectedJavaCollectionInitializer.structure
+    termApplyTransformer.transform(initialTermApply).structure shouldBe expectedTermApply.structure
   }
 
-  test("transform() of dummy(...) should return the same") {
-    val termApply = Term.Apply(Term.Name("dummy"), List(Lit.Int(1)))
+  test("transform() of a Term.Apply(Term.Select(_, _), _) should return same object") {
+    val termApply = Term.Apply(Term.Select(Term.Name("a"), Term.Name("b")), List(Lit.Int(1)))
 
     termApplyTransformer.transform(termApply).structure shouldBe termApply.structure
+
   }
 
-  // foo(arg1, arg2)(arg3, arg4) ---> foo(arg1, arg2, arg3, arg4)
+    // foo(arg1, arg2)(arg3, arg4) ---> foo(arg1, arg2, arg3, arg4)
   test("transform() of a 2-level nested Apply should return a single Apply with concatenated args") {
     val scalaStyleTermApply =
       Term.Apply(
@@ -55,6 +53,8 @@ class TermApplyTransformerImplTest extends UnitTestSuite {
         List(arg3, arg4)
     )
     val expectedJavaStyleTermApply = Term.Apply(fun, List(arg1, arg2, arg3, arg4))
+
+    when(termApplyNameTransformer.transform(eqTree(fun))).thenReturn(fun)
 
     termApplyTransformer.transform(scalaStyleTermApply).structure shouldBe expectedJavaStyleTermApply.structure
   }
@@ -69,6 +69,8 @@ class TermApplyTransformerImplTest extends UnitTestSuite {
         List(arg5, arg6)
       )
     val expectedJavaStyleTermApply = Term.Apply(fun, List(arg1, arg2, arg3, arg4, arg5, arg6))
+
+    when(termApplyNameTransformer.transform(eqTree(fun))).thenReturn(fun)
 
     termApplyTransformer.transform(scalaStyleTermApply).structure shouldBe expectedJavaStyleTermApply.structure
   }
