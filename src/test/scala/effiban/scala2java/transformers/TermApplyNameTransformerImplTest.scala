@@ -34,6 +34,20 @@ class TermApplyNameTransformerImplTest extends UnitTestSuite {
     termApplyNameTransformer.transform(scalaTermName).structure shouldBe expectedJavaTerm.structure
   }
 
+  test("transform 'Right' should return 'Either.right'") {
+    val scalaTermName = TermNames.ScalaRight
+    val expectedJavaTerm = Term.Select(TermNames.Either, TermNames.LowercaseRight)
+
+    termApplyNameTransformer.transform(scalaTermName).structure shouldBe expectedJavaTerm.structure
+  }
+
+  test("transform 'Left' should return 'Either.left'") {
+    val scalaTermName = TermNames.ScalaLeft
+    val expectedJavaTerm = Term.Select(TermNames.Either, TermNames.LowercaseLeft)
+
+    termApplyNameTransformer.transform(scalaTermName).structure shouldBe expectedJavaTerm.structure
+  }
+
   test("transform 'Stream' should return 'Stream.of'") {
     val scalaTermName = TermNames.Stream
     val expectedJavaTerm = Term.Select(TermNames.Stream, TermNames.JavaOf)
