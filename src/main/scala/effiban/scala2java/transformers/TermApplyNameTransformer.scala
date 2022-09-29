@@ -15,6 +15,8 @@ private[transformers] class TermApplyNameTransformerImpl(termNameClassifier: Ter
 
   override def transform(termName: Term.Name): Term = termName match {
     case Term.Name("Range") => Term.Select(Term.Name("IntStream"), Term.Name("range"))
+    case Term.Name("Option") => Term.Select(Term.Name("Optional"), Term.Name("ofNullable"))
+    case Term.Name("Some") => Term.Select(Term.Name("Optional"), Term.Name("of"))
     case nm if isJavaStreamLike(nm) => Term.Select(Term.Name("Stream"), Term.Name("of"))
     case nm if isJavaListLike(nm) => Term.Select(Term.Name("List"), Term.Name("of"))
     case nm if isJavaSetLike(nm) => Term.Select(Term.Name("Set"), Term.Name("of"))

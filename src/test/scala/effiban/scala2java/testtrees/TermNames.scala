@@ -21,11 +21,15 @@ object TermNames {
   val ScalaUntil: Term.Name = Term.Name("until")
   val ScalaInclusive: Term.Name = Term.Name("inclusive")
   val ScalaAssociation: Term.Name = Term.Name("->")
+  val ScalaOption: Term.Name = Term.Name("Option")
+  val ScalaSome: Term.Name = Term.Name("Some")
 
   val JavaIntStream: Term.Name = Term.Name("IntStream")
   val JavaRange: Term.Name = Term.Name("range")
   val JavaRangeClosed: Term.Name = Term.Name("rangeClosed")
   val JavaEntryMethod: Term.Name = Term.Name("entry")
+  val JavaOptional: Term.Name = Term.Name("Optional")
   val JavaOf: Term.Name = Term.Name("of")
+  val JavaOfNullable: Term.Name = Term.Name("ofNullable")
   val JavaOfEntries: Term.Name = Term.Name("ofEntries")
 }
