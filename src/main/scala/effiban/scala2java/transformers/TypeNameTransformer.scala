@@ -22,6 +22,7 @@ object TypeNameTransformer extends TypeNameTransformer {
     "Seq" -> "List",
     "Vector" -> "List",
     "Option" -> "Optional",
+    "Future" -> "CompletableFuture"
   )
 
   override def transform(scalaName: Type.Name): String = {

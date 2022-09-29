@@ -20,7 +20,8 @@ class TypeNameTransformerTest extends UnitTestSuite {
     ("Unit", "void"),
     ("Seq", "List"),
     ("Vector", "List"),
-    ("Option", "Optional")
+    ("Option", "Optional"),
+    ("Future", "CompletableFuture")
   )
 
   forAll(TypeMappings) { (scalaType: String, expectedJavaType: String) =>
