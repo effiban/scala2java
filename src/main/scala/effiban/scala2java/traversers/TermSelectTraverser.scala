@@ -1,6 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.TermSelectContext
+import effiban.scala2java.entities.EnclosingDelimiter.Parentheses
 import effiban.scala2java.transformers.TermSelectTransformer
 import effiban.scala2java.writers.JavaWriter
 
@@ -21,9 +22,19 @@ private[traversers] class TermSelectTraverserImpl(termTraverser: => TermTraverse
   // qualified name
   override def traverse(select: Term.Select, context: TermSelectContext = TermSelectContext()): Unit = {
     val javaSelect = termSelectTransformer.transform(select)
-    termTraverser.traverse(javaSelect.qual)
+    traverseQualifier(javaSelect.qual)
     write(".")
     typeListTraverser.traverse(context.appliedTypeArgs)
     termNameTraverser.traverse(javaSelect.name)
+  }
+
+  private def traverseQualifier(qualifier: Term): Unit = {
+    qualifier match {
+      case termFunction: Term.Function =>
+        writeArgumentsStart(Parentheses)
+        termTraverser.traverse(termFunction)
+        writeArgumentsEnd(Parentheses)
+      case qual => termTraverser.traverse(qual)
+    }
   }
 }
