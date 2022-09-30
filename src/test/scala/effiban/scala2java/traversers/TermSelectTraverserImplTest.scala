@@ -8,7 +8,7 @@ import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
 import effiban.scala2java.transformers.TermSelectTransformer
 
-import scala.meta.Term
+import scala.meta.{Lit, Term}
 
 class TermSelectTraverserImplTest extends UnitTestSuite {
 
@@ -16,8 +16,8 @@ class TermSelectTraverserImplTest extends UnitTestSuite {
   private val MyMethod = Term.Name("myMethod")
   private val MyJavaClass = Term.Name("MyJavaClass")
   private val MyJavaMethod = Term.Name("myJavaMethod")
-  private val ScalaSelect = Term.Select(qual = MyClass, name = MyMethod)
-  private val JavaSelect = Term.Select(qual = MyJavaClass, name = MyJavaMethod)
+  private val ScalaSelectWithTermName = Term.Select(qual = MyClass, name = MyMethod)
+  private val JavaSelectWithTermName = Term.Select(qual = MyJavaClass, name = MyJavaMethod)
 
   private val termTraverser = mock[TermTraverser]
   private val termNameTraverser = mock[TermNameTraverser]
@@ -31,28 +31,43 @@ class TermSelectTraverserImplTest extends UnitTestSuite {
     termSelectTransformer
   )
 
-  test("traverse() with type args") {
+  test("traverse() when qualifier is a Term.Name and has type args") {
     val typeArgs = List(TypeNames.Int)
 
-    when(termSelectTransformer.transform(eqTree(ScalaSelect))).thenReturn(JavaSelect)
+    when(termSelectTransformer.transform(eqTree(ScalaSelectWithTermName))).thenReturn(JavaSelectWithTermName)
 
     doWrite("MyJavaClass").when(termTraverser).traverse(eqTree(MyJavaClass))
     doWrite("myJavaMethod").when(termNameTraverser).traverse(eqTree(MyJavaMethod))
     doWrite("<Integer>").when(typeListTraverser).traverse(eqTreeList(typeArgs))
 
-    termSelectTraverser.traverse(ScalaSelect, TermSelectContext(appliedTypeArgs = typeArgs))
+    termSelectTraverser.traverse(ScalaSelectWithTermName, TermSelectContext(appliedTypeArgs = typeArgs))
 
     outputWriter.toString shouldBe "MyJavaClass.<Integer>myJavaMethod"
   }
 
-  test("traverse() without type args") {
-    when(termSelectTransformer.transform(eqTree(ScalaSelect))).thenReturn(JavaSelect)
+  test("traverse() when qualifier is a Term.Name and has no type args") {
+    when(termSelectTransformer.transform(eqTree(ScalaSelectWithTermName))).thenReturn(JavaSelectWithTermName)
 
     doWrite("MyJavaClass").when(termTraverser).traverse(eqTree(MyJavaClass))
     doWrite("myJavaMethod").when(termNameTraverser).traverse(eqTree(MyJavaMethod))
 
-    termSelectTraverser.traverse(ScalaSelect)
+    termSelectTraverser.traverse(ScalaSelectWithTermName)
 
     outputWriter.toString shouldBe "MyJavaClass.myJavaMethod"
+  }
+
+  test("traverse() when qualifier is a Term.Function should wrap in parentheses") {
+    val termFunction = Term.Function(Nil, Lit.Int(1))
+    val scalaSelect = Term.Select(termFunction, MyMethod)
+    val javaSelect = Term.Select(termFunction, MyJavaMethod)
+
+    when(termSelectTransformer.transform(eqTree(scalaSelect))).thenReturn(javaSelect)
+
+    doWrite("() -> 1").when(termTraverser).traverse(eqTree(termFunction))
+    doWrite("get").when(termNameTraverser).traverse(eqTree(MyJavaMethod))
+
+    termSelectTraverser.traverse(scalaSelect)
+
+    outputWriter.toString shouldBe "(() -> 1).get"
   }
 }
