@@ -1,5 +1,7 @@
 package effiban.scala2java.classifiers
 
+import effiban.scala2java.entities.TermNameValues
+
 import scala.meta.Term
 
 trait TermNameClassifier {
@@ -12,41 +14,51 @@ trait TermNameClassifier {
   def isJavaMapLike(termName: Term.Name): Boolean
 
   def isScalaObject(termName: Term.Name): Boolean
+
+  def isInstantiatedByName(termName: Term.Name): Boolean
 }
 
 object TermNameClassifier extends TermNameClassifier {
 
   final val JavaStreamLike: Set[String] = Set(
     "LazyList",
-    "Stream",
+    TermNameValues.Stream,
   )
 
   final val JavaListLike: Set[String] = Set(
-    "Seq",
+    TermNameValues.Seq,
     "LinearSeq",
     "IndexedSeq",
     "ArraySeq",
-    "List",
-    "Vector"
+    TermNameValues.List,
+    TermNameValues.ScalaVector
   )
 
   final val JavaSetLike: Set[String] = Set(
-    "Set",
+    TermNameValues.Set,
     "HashSet"
   )
 
   final val JavaMapLike: Set[String] = Set(
-    "Map",
+    TermNameValues.Map,
     "HashMap"
+  )
+
+  final val InstantiatedByName: Set[String] = Set(
+    TermNameValues.Try,
+    TermNameValues.Future
   )
 
   final val ScalaObjects = Set(
     "Range",
-    "Option",
-    "Some",
-    "Right",
-    "Left",
-    "Future"
+    TermNameValues.ScalaOption,
+    TermNameValues.ScalaSome,
+    TermNameValues.ScalaRight,
+    TermNameValues.ScalaLeft,
+    TermNameValues.Try,
+    TermNameValues.ScalaSuccess,
+    TermNameValues.ScalaFailure,
+    TermNameValues.Future
   ) ++ JavaStreamLike ++ JavaListLike ++ JavaSetLike ++ JavaMapLike
 
   override def isJavaStreamLike(termName: Term.Name): Boolean = JavaStreamLike.contains(termName.value)
@@ -58,4 +70,6 @@ object TermNameClassifier extends TermNameClassifier {
   override def isJavaMapLike(termName: Term.Name): Boolean = JavaMapLike.contains(termName.value)
 
   override def isScalaObject(termName: Term.Name): Boolean = ScalaObjects.contains(termName.value)
+
+  override def isInstantiatedByName(termName: Term.Name): Boolean = InstantiatedByName.contains(termName.value)
 }

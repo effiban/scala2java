@@ -1,32 +1,35 @@
 package effiban.scala2java.typeinference
 
+import effiban.scala2java.entities.{TermNameValues, TypeNameValues}
+
 import scala.meta.{Term, Type}
 
 trait NameTypeInferrer extends TypeInferrer[Term.Name]
 
 object NameTypeInferrer extends NameTypeInferrer {
 
-  private val OptionTypeName = Type.Name("Option")
-  private val EitherTypeName = Type.Name("Either")
-
   override def infer(termName: Term.Name): Option[Type] = {
     termName match {
-      case Term.Name("Option") => Some(OptionTypeName)
-      case Term.Name("Some") => Some(OptionTypeName)
-      case Term.Name("None") => Some(OptionTypeName)
+      case Term.Name(TermNameValues.ScalaOption) => Some(Type.Name(TypeNameValues.ScalaOption))
+      case Term.Name(TermNameValues.ScalaSome) => Some(Type.Name(TypeNameValues.ScalaOption))
+      case Term.Name(TermNameValues.ScalaNone) => Some(Type.Name(TypeNameValues.ScalaOption))
 
-      case Term.Name("Right") => Some(EitherTypeName)
-      case Term.Name("Left") => Some(EitherTypeName)
+      case Term.Name(TermNameValues.ScalaRight) => Some(Type.Name(TypeNameValues.Either))
+      case Term.Name(TermNameValues.ScalaLeft) => Some(Type.Name(TypeNameValues.Either))
 
-      case Term.Name("Future") => Some(Type.Name("Future"))
+      case Term.Name(TermNameValues.Try) => Some(Type.Name(TypeNameValues.Try))
+      case Term.Name(TermNameValues.ScalaSuccess) => Some(Type.Name(TypeNameValues.Try))
+      case Term.Name(TermNameValues.ScalaFailure) => Some(Type.Name(TypeNameValues.Try))
 
-      case Term.Name("Stream") => Some(Type.Name("Stream"))
-      case Term.Name("Array") => Some(Type.Name("Array"))
-      case Term.Name("List") => Some(Type.Name("List"))
-      case Term.Name("Vector") => Some(Type.Name("Vector"))
-      case Term.Name("Seq") => Some(Type.Name("Seq"))
-      case Term.Name("Set") => Some(Type.Name("Set"))
-      case Term.Name("Map") => Some(Type.Name("Map"))
+      case Term.Name(TermNameValues.Future) => Some(Type.Name(TypeNameValues.Future))
+
+      case Term.Name(TermNameValues.Stream) => Some(Type.Name(TypeNameValues.Stream))
+      case Term.Name(TermNameValues.ScalaArray) => Some(Type.Name(TypeNameValues.ScalaArray))
+      case Term.Name(TermNameValues.List) => Some(Type.Name(TypeNameValues.List))
+      case Term.Name(TermNameValues.ScalaVector) => Some(Type.Name(TypeNameValues.ScalaVector))
+      case Term.Name(TermNameValues.Seq) => Some(Type.Name(TypeNameValues.Seq))
+      case Term.Name(TermNameValues.Set) => Some(Type.Name(TypeNameValues.Set))
+      case Term.Name(TermNameValues.Map) => Some(Type.Name(TypeNameValues.Map))
 
       case _ => None
     }

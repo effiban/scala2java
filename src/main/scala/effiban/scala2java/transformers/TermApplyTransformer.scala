@@ -29,8 +29,8 @@ class TermApplyTransformerImpl(termNameClassifier: TermNameClassifier) extends T
   }
 
   private def transformArgs(name: Term.Name, args: List[Term]): List[Term] = (name, args) match {
-    // The Scala Future(...) invocation expects a parameter by-name, so we need to transform it to a supplier lambda for Java
-    case (Term.Name("Future"), List(arg)) => List(Term.Function(Nil, arg))
+    // For objects that are instantiated with a single argument by-name, transform the argument to a supplier lambda for Java
+    case (nm, List(arg)) if termNameClassifier.isInstantiatedByName(nm) => List(Term.Function(Nil, arg))
     case _ => args
   }
 }

@@ -26,8 +26,8 @@ class CollectiveTypeInferrerTest extends UnitTestSuite {
   private val TypeTupleStrIntB = Type.Tuple(List(TypeNames.String, TypeNames.Int))
   private val TypeTupleStrLong = Type.Tuple(List(TypeNames.String, TypeNames.Long))
   private val TypeTupleDoubleLong = Type.Tuple(List(TypeNames.Double, TypeNames.Long))
-  private val TypeTupleStrAny = Type.Tuple(List(TypeNames.String, TypeNames.Any))
-  private val TypeTupleAnyAny = Type.Tuple(List(TypeNames.Any, TypeNames.Any))
+  private val TypeTupleStrAny = Type.Tuple(List(TypeNames.String, TypeNames.ScalaAny))
+  private val TypeTupleAnyAny = Type.Tuple(List(TypeNames.ScalaAny, TypeNames.ScalaAny))
 
   private val TupleValidScenarios = Table(
     ("TupleTypesDesc", "ExpectedTupleTypeDesc", "TupleTypes", "ExpectedTupleType"),

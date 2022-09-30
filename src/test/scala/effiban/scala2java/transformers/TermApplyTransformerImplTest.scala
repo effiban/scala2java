@@ -21,28 +21,7 @@ class TermApplyTransformerImplTest extends UnitTestSuite {
 
   private val termApplyTransformer = new TermApplyTransformerImpl(termNameClassifier)
 
-  test("transform() of a 'Future' invocation should return an invocation with 'apply' added and arg wrapped by a lambda") {
-    val initialTermApply = Term.Apply(TermNames.Future, List(Lit.Int(1)))
-    val expectedTermApply = Term.Apply(Term.Select(TermNames.Future, TermNames.Apply), List(Term.Function(Nil, Lit.Int(1))))
-
-    when(termNameClassifier.isScalaObject(eqTree(TermNames.Future))).thenReturn(true)
-
-    termApplyTransformer.transform(initialTermApply).structure shouldBe expectedTermApply.structure
-  }
-
-  test("transform() of a typed 'Future' invocation should return an invocation with 'apply' added and arg wrapped by a lambda") {
-    val initialTermApply = Term.Apply(Term.ApplyType(TermNames.Future, List(TypeNames.Int)), List(Lit.Int(1)))
-    val expectedTermApply = Term.Apply(
-      Term.ApplyType(Term.Select(TermNames.Future, TermNames.Apply), List(TypeNames.Int)),
-      List(Term.Function(Nil, Lit.Int(1)))
-    )
-
-    when(termNameClassifier.isScalaObject(eqTree(TermNames.Future))).thenReturn(true)
-
-    termApplyTransformer.transform(initialTermApply).structure shouldBe expectedTermApply.structure
-  }
-
-  test("transform() of a untyped Scala object invocation should return an invocation with 'apply' added") {
+  test("transform() of a untyped Scala object initializer, arg by-value, should return same with added 'apply'") {
     val initialTermApply = Term.Apply(Term.Name("ScalaObject"), List(Lit.Int(1)))
     val expectedTermApply = Term.Apply(Term.Select(Term.Name("ScalaObject"), TermNames.Apply), List(Lit.Int(1)))
 
@@ -51,7 +30,7 @@ class TermApplyTransformerImplTest extends UnitTestSuite {
     termApplyTransformer.transform(initialTermApply).structure shouldBe expectedTermApply.structure
   }
 
-  test("transform() of a typed Scala object invocation should return an invocation with 'apply' added") {
+  test("transform() of a typed Scala object initializer, arg by-value, should return same with added 'apply'") {
     val initialTermApply = Term.Apply(Term.ApplyType(Term.Name("ScalaObject"), List(TypeNames.Int)), List(Lit.Int(1)))
     val expectedTermApply = Term.Apply(Term.ApplyType(Term.Select(Term.Name("ScalaObject"), TermNames.Apply), List(TypeNames.Int)), List(Lit.Int(1)))
 
@@ -60,7 +39,30 @@ class TermApplyTransformerImplTest extends UnitTestSuite {
     termApplyTransformer.transform(initialTermApply).structure shouldBe expectedTermApply.structure
   }
 
-  test("transform() of an unqualified non-Scala object invocation should return the same invocation") {
+  test("transform() of a untyped Scala object initializer, arg by-name, should return same with added 'apply' and arg wrapped by lambda") {
+    val initialTermApply = Term.Apply(TermNames.Future, List(Lit.Int(1)))
+    val expectedTermApply = Term.Apply(Term.Select(TermNames.Future, TermNames.Apply), List(Term.Function(Nil, Lit.Int(1))))
+
+    when(termNameClassifier.isScalaObject(eqTree(TermNames.Future))).thenReturn(true)
+    when(termNameClassifier.isInstantiatedByName(eqTree(TermNames.Future))).thenReturn(true)
+
+    termApplyTransformer.transform(initialTermApply).structure shouldBe expectedTermApply.structure
+  }
+
+  test("transform() of a typed Scala object initializer, arg by-name, should return same with added 'apply' and arg wrapped by lambda") {
+    val initialTermApply = Term.Apply(Term.ApplyType(TermNames.Future, List(TypeNames.Int)), List(Lit.Int(1)))
+    val expectedTermApply = Term.Apply(
+      Term.ApplyType(Term.Select(TermNames.Future, TermNames.Apply), List(TypeNames.Int)),
+      List(Term.Function(Nil, Lit.Int(1)))
+    )
+
+    when(termNameClassifier.isScalaObject(eqTree(TermNames.Future))).thenReturn(true)
+    when(termNameClassifier.isInstantiatedByName(eqTree(TermNames.Future))).thenReturn(true)
+
+    termApplyTransformer.transform(initialTermApply).structure shouldBe expectedTermApply.structure
+  }
+
+  test("transform() of a regular method invocation with an unqualified name, should return  same invocation") {
     val termApply = Term.Apply(Term.Name("Foo"), List(Lit.Int(1)))
 
     when(termNameClassifier.isScalaObject(eqTree(Term.Name("Foo")))).thenReturn(false)
@@ -69,7 +71,7 @@ class TermApplyTransformerImplTest extends UnitTestSuite {
   }
 
 
-  test("transform() of a qualified-name invocation should return same invocation") {
+  test("transform() of a regular method invocation with a qualified name, should return same invocation") {
     val termApply = Term.Apply(Term.Select(Term.Name("a"), Term.Name("b")), List(Lit.Int(1)))
 
     termApplyTransformer.transform(termApply).structure shouldBe termApply.structure

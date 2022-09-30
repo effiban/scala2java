@@ -1,5 +1,7 @@
 package effiban.scala2java.classifiers
 
+import effiban.scala2java.entities.TypeNameValues
+
 import scala.meta.Type
 
 trait TypeNameClassifier {
@@ -10,16 +12,17 @@ trait TypeNameClassifier {
 object TypeNameClassifier extends TypeNameClassifier {
 
   private val ParameterizedTypeNames = Set(
-    "Option",
-    "Either",
-    "Future",
-    "Stream",
-    "Array",
-    "List",
-    "Vector",
-    "Seq",
-    "Set",
-    "Map"
+    TypeNameValues.ScalaOption,
+    TypeNameValues.Either,
+    TypeNameValues.Try,
+    TypeNameValues.Future,
+    TypeNameValues.Stream,
+    TypeNameValues.ScalaArray,
+    TypeNameValues.List,
+    TypeNameValues.ScalaVector,
+    TypeNameValues.Seq,
+    TypeNameValues.Set,
+    TypeNameValues.Map
   )
 
   override def isParameterizedType(typeName: Type.Name): Boolean = ParameterizedTypeNames.contains(typeName.value)
