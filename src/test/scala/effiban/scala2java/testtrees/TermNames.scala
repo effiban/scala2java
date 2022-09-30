@@ -19,6 +19,8 @@ object TermNames {
 
   val Plus: Term.Name = Term.Name("+")
 
+  val Apply: Term.Name = Term.Name("apply")
+
   val Scala: Term.Name = Term.Name("scala")
   val ScalaRange: Term.Name = Term.Name("Range")
   val ScalaTo: Term.Name = Term.Name("to")

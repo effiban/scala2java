@@ -10,6 +10,8 @@ trait TermNameClassifier {
   def isJavaSetLike(termName: Term.Name): Boolean
 
   def isJavaMapLike(termName: Term.Name): Boolean
+
+  def isScalaObject(termName: Term.Name): Boolean
 }
 
 object TermNameClassifier extends TermNameClassifier {
@@ -38,6 +40,15 @@ object TermNameClassifier extends TermNameClassifier {
     "HashMap"
   )
 
+  final val ScalaObjects = Set(
+    "Range",
+    "Option",
+    "Some",
+    "Right",
+    "Left",
+    "Future"
+  ) ++ JavaStreamLike ++ JavaListLike ++ JavaSetLike ++ JavaMapLike
+
   override def isJavaStreamLike(termName: Term.Name): Boolean = JavaStreamLike.contains(termName.value)
 
   override def isJavaListLike(termName: Term.Name): Boolean = JavaListLike.contains(termName.value)
@@ -45,4 +56,6 @@ object TermNameClassifier extends TermNameClassifier {
   override def isJavaSetLike(termName: Term.Name): Boolean = JavaSetLike.contains(termName.value)
 
   override def isJavaMapLike(termName: Term.Name): Boolean = JavaMapLike.contains(termName.value)
+
+  override def isScalaObject(termName: Term.Name): Boolean = ScalaObjects.contains(termName.value)
 }
