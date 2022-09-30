@@ -50,6 +50,6 @@ class ScalarArgListTypeInferrerImplTest extends UnitTestSuite {
 
     val inferredTypes = scalarArgListTypeInferrer.infer(List(term1, term2))
 
-    inferredTypes.structure shouldBe TypeNames.Any.structure
+    inferredTypes.structure shouldBe TypeNames.ScalaAny.structure
   }
 }

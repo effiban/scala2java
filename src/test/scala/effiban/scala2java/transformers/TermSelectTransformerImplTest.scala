@@ -15,7 +15,7 @@ class TermSelectTransformerImplTest extends UnitTestSuite {
   private val termSelectTransformer = new TermSelectTransformerImpl(termNameClassifier)
 
   test("transform 'Range.apply' should return 'IntStream.range'") {
-    val scalaTermSelect = Term.Select(ScalaRange, TermNames.Apply)
+    val scalaTermSelect = Term.Select(ScalaRange, Apply)
     val expectedJavaTermSelect = Term.Select(JavaIntStream, JavaRange)
 
     termSelectTransformer.transform(scalaTermSelect).structure shouldBe expectedJavaTermSelect.structure
@@ -29,35 +29,56 @@ class TermSelectTransformerImplTest extends UnitTestSuite {
   }
 
   test("transform 'Option.apply' should return 'Optional.ofNullable'") {
-    val scalaTermSelect = Term.Select(ScalaOption, TermNames.Apply)
+    val scalaTermSelect = Term.Select(ScalaOption, Apply)
     val expectedJavaTermSelect = Term.Select(JavaOptional, JavaOfNullable)
 
     termSelectTransformer.transform(scalaTermSelect).structure shouldBe expectedJavaTermSelect.structure
   }
 
   test("transform 'Some.apply' should return 'Optional.of'") {
-    val scalaTermSelect = Term.Select(ScalaSome, TermNames.Apply)
+    val scalaTermSelect = Term.Select(ScalaSome, Apply)
     val expectedJavaTermSelect = Term.Select(JavaOptional, JavaOf)
 
     termSelectTransformer.transform(scalaTermSelect).structure shouldBe expectedJavaTermSelect.structure
   }
 
   test("transform 'Right.apply' should return 'Either.right'") {
-    val scalaTermSelect = Term.Select(ScalaRight, TermNames.Apply)
+    val scalaTermSelect = Term.Select(ScalaRight, Apply)
     val expectedJavaTermSelect = Term.Select(TermNames.Either, LowercaseRight)
 
     termSelectTransformer.transform(scalaTermSelect).structure shouldBe expectedJavaTermSelect.structure
   }
 
   test("transform 'Left.apply' should return 'Either.left'") {
-    val scalaTermSelect = Term.Select(ScalaLeft, TermNames.Apply)
+    val scalaTermSelect = Term.Select(ScalaLeft, Apply)
     val expectedJavaTermSelect = Term.Select(TermNames.Either, LowercaseLeft)
 
     termSelectTransformer.transform(scalaTermSelect).structure shouldBe expectedJavaTermSelect.structure
   }
 
+  test("transform 'Try.apply' should return 'Try.ofSupplier'") {
+    val scalaTermSelect = Term.Select(Try, Apply)
+    val expectedJavaTermSelect = Term.Select(Try, JavaOfSupplier)
+
+    termSelectTransformer.transform(scalaTermSelect).structure shouldBe expectedJavaTermSelect.structure
+  }
+
+  test("transform 'Success.apply' should return 'Try.success'") {
+    val scalaTermSelect = Term.Select(ScalaSuccess, Apply)
+    val expectedJavaTermSelect = Term.Select(Try, JavaSuccess)
+
+    termSelectTransformer.transform(scalaTermSelect).structure shouldBe expectedJavaTermSelect.structure
+  }
+
+  test("transform 'Failure.apply' should return 'Try.failure'") {
+    val scalaTermSelect = Term.Select(ScalaFailure, Apply)
+    val expectedJavaTermSelect = Term.Select(Try, JavaFailure)
+
+    termSelectTransformer.transform(scalaTermSelect).structure shouldBe expectedJavaTermSelect.structure
+  }
+
   test("transform 'Future.apply' should return 'CompletableFuture.supplyAsync'") {
-    val scalaTermSelect = Term.Select(TermNames.Future, TermNames.Apply)
+    val scalaTermSelect = Term.Select(TermNames.Future, Apply)
     val expectedJavaTermSelect = Term.Select(JavaCompletableFuture, JavaSupplyAsync)
 
     termSelectTransformer.transform(scalaTermSelect).structure shouldBe expectedJavaTermSelect.structure
@@ -78,7 +99,7 @@ class TermSelectTransformerImplTest extends UnitTestSuite {
   }
 
   test("transform 'Stream.apply' should return 'Stream.of'") {
-    val scalaTermSelect = Term.Select(TermNames.Stream, TermNames.Apply)
+    val scalaTermSelect = Term.Select(TermNames.Stream, Apply)
     val expectedJavaTermSelect = Term.Select(TermNames.Stream, JavaOf)
 
     when(termNameClassifier.isJavaStreamLike(eqTree(TermNames.Stream))).thenReturn(true)
@@ -87,7 +108,7 @@ class TermSelectTransformerImplTest extends UnitTestSuite {
   }
 
   test("transform 'Seq.apply' should return 'List.of'") {
-    val scalaTermSelect = Term.Select(TermNames.Seq, TermNames.Apply)
+    val scalaTermSelect = Term.Select(TermNames.Seq, Apply)
     val expectedJavaTermSelect = Term.Select(TermNames.List, JavaOf)
 
     when(termNameClassifier.isJavaListLike(eqTree(TermNames.Seq))).thenReturn(true)
@@ -96,7 +117,7 @@ class TermSelectTransformerImplTest extends UnitTestSuite {
   }
 
   test("transform 'Set.apply' should return 'Set.of'") {
-    val scalaTermSelect = Term.Select(TermNames.Set, TermNames.Apply)
+    val scalaTermSelect = Term.Select(TermNames.Set, Apply)
     val expectedJavaTermSelect = Term.Select(TermNames.Set, JavaOf)
 
     when(termNameClassifier.isJavaSetLike(eqTree(TermNames.Set))).thenReturn(true)
@@ -105,7 +126,7 @@ class TermSelectTransformerImplTest extends UnitTestSuite {
   }
 
   test("transform 'Map.apply' should return 'Map.ofEntries'") {
-    val scalaTermSelect = Term.Select(TermNames.Map, TermNames.Apply)
+    val scalaTermSelect = Term.Select(TermNames.Map, Apply)
     val expectedJavaTermSelect = Term.Select(TermNames.Map, TermNames.JavaOfEntries)
 
     when(termNameClassifier.isJavaMapLike(eqTree(TermNames.Map))).thenReturn(true)

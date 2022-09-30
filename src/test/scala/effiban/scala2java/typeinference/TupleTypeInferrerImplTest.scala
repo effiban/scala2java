@@ -32,6 +32,6 @@ class TupleTypeInferrerImplTest extends UnitTestSuite {
       case _ => None
     })
 
-    tupleTypeInferrer.infer(termTuple).structure shouldBe Type.Tuple(List(TypeNames.Any, TypeNames.Int)).structure
+    tupleTypeInferrer.infer(termTuple).structure shouldBe Type.Tuple(List(TypeNames.ScalaAny, TypeNames.Int)).structure
   }
 }
