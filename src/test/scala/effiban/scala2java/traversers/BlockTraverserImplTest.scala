@@ -136,7 +136,8 @@ class BlockTraverserImplTest extends UnitTestSuite {
     )
     val initVal = "this(dummy)"
 
-    doWrite(initVal).when(initTraverser).traverse(eqTree(init), ArgumentMatchers.eq(InitContext()))
+    doWrite(initVal)
+      .when(initTraverser).traverse(eqTree(init), ArgumentMatchers.eq(InitContext(argNameAsComment = true)))
     doWrite(
       s"""$SimpleStatement1Val;
          |""".stripMargin)

@@ -174,7 +174,14 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
 
   private lazy val initListTraverser: InitListTraverser = new InitListTraverserImpl(argumentListTraverser, initTraverser)
 
-  private lazy val initTraverser: InitTraverser = new InitTraverserImpl(typeTraverser, termListTraverser)
+  private lazy val initTraverser: InitTraverser = new InitTraverserImpl(typeTraverser, invocationArgListTraverser)
+
+  private lazy val invocationArgListTraverser: InvocationArgListTraverser = new InvocationArgListTraverserImpl(
+    argumentListTraverser,
+    invocationArgTraverser
+  )
+
+  private lazy val invocationArgTraverser: InvocationArgTraverser = new InvocationArgTraverserImpl(assignTraverser, termTraverser)
 
   private lazy val litTraverser: LitTraverser = new LitTraverserImpl()
 
@@ -306,7 +313,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
     termTraverser,
     termApplyTraverser,
     termNameTraverser,
-    termListTraverser,
+    invocationArgListTraverser,
     TermApplyInfixClassifier,
     TermApplyInfixToRangeTransformer,
     TermApplyInfixToMapEntryTransformer
@@ -314,7 +321,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
 
   private lazy val termApplyTraverser: TermApplyTraverser = new TermApplyTraverserImpl(
     termTraverser,
-    termListTraverser,
+    invocationArgListTraverser,
     TermApplyTransformer
   )
 
@@ -326,8 +333,6 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
   )
 
   private lazy val termInterpolateTraverser: TermInterpolateTraverser = new TermInterpolateTraverserImpl(TermInterpolateTransformer, termApplyTraverser)
-
-  private lazy val termListTraverser: TermListTraverser = new TermListTraverserImpl(argumentListTraverser, termTraverser)
 
   private lazy val termMatchTraverser: TermMatchTraverser = new TermMatchTraverserImpl(termTraverser, caseTraverser)
 

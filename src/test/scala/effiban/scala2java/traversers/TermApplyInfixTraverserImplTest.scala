@@ -1,15 +1,12 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.classifiers.TermApplyInfixClassifier
-import effiban.scala2java.entities.ListTraversalOptions
-import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TermNames
 import effiban.scala2java.testtrees.TermNames.{Plus, ScalaAssociation, ScalaRange, ScalaTo}
 import effiban.scala2java.transformers.{TermApplyInfixToMapEntryTransformer, TermApplyInfixToRangeTransformer}
-import org.mockito.ArgumentMatchers
 
 import scala.meta.Term
 
@@ -18,7 +15,7 @@ class TermApplyInfixTraverserImplTest extends UnitTestSuite {
   private val termTraverser = mock[TermTraverser]
   private val termApplyTraverser = mock[TermApplyTraverser]
   private val termNameTraverser = mock[TermNameTraverser]
-  private val termListTraverser = mock[TermListTraverser]
+  private val invocationArgListTraverser = mock[InvocationArgListTraverser]
   private val termApplyInfixClassifier = mock[TermApplyInfixClassifier]
   private val termApplyInfixToRangeTransformer = mock[TermApplyInfixToRangeTransformer]
   private val termApplyInfixToMapEntryTransformer = mock[TermApplyInfixToMapEntryTransformer]
@@ -27,7 +24,7 @@ class TermApplyInfixTraverserImplTest extends UnitTestSuite {
     termTraverser,
     termApplyTraverser,
     termNameTraverser,
-    termListTraverser,
+    invocationArgListTraverser,
     termApplyInfixClassifier,
     termApplyInfixToRangeTransformer,
     termApplyInfixToMapEntryTransformer)
@@ -89,10 +86,7 @@ class TermApplyInfixTraverserImplTest extends UnitTestSuite {
 
     doWrite("a").when(termTraverser).traverse(eqTree(lhs))
     doWrite("+").when(termNameTraverser).traverse(eqTree(op))
-    doWrite("b").when(termListTraverser).traverse(
-      terms = eqTreeList(List(rhs)),
-      ArgumentMatchers.eq(ListTraversalOptions(onSameLine = true))
-    )
+    doWrite("b").when(termTraverser).traverse(eqTree(rhs))
 
     termApplyInfixTraverser.traverse(applyInfix)
 

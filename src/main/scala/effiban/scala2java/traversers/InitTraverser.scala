@@ -1,8 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.InitContext
-import effiban.scala2java.entities.EnclosingDelimiter.Parentheses
-import effiban.scala2java.entities.ListTraversalOptions
+import effiban.scala2java.contexts.{InitContext, InvocationArgListContext}
 
 import scala.meta.Init
 
@@ -11,18 +9,18 @@ trait InitTraverser {
 }
 
 private[traversers] class InitTraverserImpl(typeTraverser: => TypeTraverser,
-                                            termListTraverser: => TermListTraverser) extends InitTraverser {
+                                            invocationArgListTraverser: => InvocationArgListTraverser) extends InitTraverser {
 
   // An 'Init' is an instantiated type, such as with `new` or as a parent in a type definition
   override def traverse(init: Init, context: InitContext = InitContext()): Unit = {
     typeTraverser.traverse(init.tpe)
 
     if (!context.ignoreArgs) {
-      val options = ListTraversalOptions(
-        maybeEnclosingDelimiter = Some(Parentheses),
-        traverseEmpty = context.traverseEmpty
+      val invocationArgListContext = InvocationArgListContext(
+        traverseEmpty = context.traverseEmpty,
+        argNameAsComment = context.argNameAsComment
       )
-      termListTraverser.traverse(init.argss.flatten, options)
+      invocationArgListTraverser.traverse(init.argss.flatten, invocationArgListContext)
     }
   }
 }

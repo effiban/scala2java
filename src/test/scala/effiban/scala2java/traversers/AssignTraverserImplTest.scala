@@ -13,15 +13,26 @@ class AssignTraverserImplTest extends UnitTestSuite {
 
   private val assignTraverser = new AssignTraverserImpl(termTraverser, rhsTermTraverser)
 
-  test("traverse") {
+  test("traverse when LHS should be traversed normally") {
     val lhs = Term.Name("myVal")
     val rhs = Lit.Int(3)
 
     doWrite("myVal").when(termTraverser).traverse(eqTree(lhs))
     doWrite("3").when(rhsTermTraverser).traverse(eqTree(rhs))
 
-    assignTraverser.traverse(Term.Assign(lhs = lhs, rhs = rhs))
+    assignTraverser.traverse(assign = Term.Assign(lhs = lhs, rhs = rhs))
 
     outputWriter.toString shouldBe "myVal = 3"
+  }
+
+  test("traverse when LHS shuld be written as a comment") {
+    val lhs = Term.Name("myVal")
+    val rhs = Lit.Int(3)
+
+    doWrite("3").when(rhsTermTraverser).traverse(eqTree(rhs))
+
+    assignTraverser.traverse(assign = Term.Assign(lhs = lhs, rhs = rhs), lhsAsComment = true)
+
+    outputWriter.toString shouldBe "/* myVal = */3"
   }
 }

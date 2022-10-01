@@ -25,7 +25,7 @@ class NewTraverserImplTest extends UnitTestSuite {
     val `new` = New(init)
 
     doWrite("MyClass(val1, val2)")
-      .when(initTraverser).traverse(eqTree(init), ArgumentMatchers.eq(InitContext(traverseEmpty = true)))
+      .when(initTraverser).traverse(eqTree(init), ArgumentMatchers.eq(InitContext(traverseEmpty = true, argNameAsComment = true)))
 
     newTraverser.traverse(`new`)
 

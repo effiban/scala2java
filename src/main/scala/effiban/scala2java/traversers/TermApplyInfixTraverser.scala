@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.classifiers.TermApplyInfixClassifier
-import effiban.scala2java.entities.ListTraversalOptions
+import effiban.scala2java.contexts.InvocationArgListContext
 import effiban.scala2java.transformers.{TermApplyInfixToMapEntryTransformer, TermApplyInfixToRangeTransformer}
 import effiban.scala2java.writers.JavaWriter
 
@@ -12,7 +12,7 @@ trait TermApplyInfixTraverser extends ScalaTreeTraverser[Term.ApplyInfix]
 private[traversers] class TermApplyInfixTraverserImpl(termTraverser: => TermTraverser,
                                                       termApplyTraverser: => TermApplyTraverser,
                                                       termNameTraverser: => TermNameTraverser,
-                                                      termListTraverser: => TermListTraverser,
+                                                      invocationArgListTraverser: => InvocationArgListTraverser,
                                                       termApplyInfixClassifier: TermApplyInfixClassifier,
                                                       termApplyInfixToRangeTransformer: TermApplyInfixToRangeTransformer,
                                                       termApplyInfixToMapEntryTransformer: TermApplyInfixToMapEntryTransformer)
@@ -44,7 +44,13 @@ private[traversers] class TermApplyInfixTraverserImpl(termTraverser: => TermTrav
     termNameTraverser.traverse(termApplyInfix.op)
     write(" ")
     //TODO handle type args
-    //TODO - verify implementation for multiple RHS args
-    termListTraverser.traverse(termApplyInfix.args, ListTraversalOptions(onSameLine = true))
+    termApplyInfix.args match {
+      case Nil => throw new IllegalStateException("An Term.ApplyInfix must have at least one RHS arg")
+      case arg :: Nil => termTraverser.traverse(arg)
+      case args =>
+        //TODO - fix (should transform to Term.Apply, cannot use infix notation in Java with multiple RHS args)
+        val invocationArgListContext = InvocationArgListContext(onSameLine = true, argNameAsComment = true)
+        invocationArgListTraverser.traverse(args, invocationArgListContext)
+    }
   }
 }
