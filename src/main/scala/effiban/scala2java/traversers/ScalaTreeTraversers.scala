@@ -21,6 +21,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
   private lazy val applyTypeTraverser: ApplyTypeTraverser = new ApplyTypeTraverserImpl(
     typeTraverser,
     termSelectTraverser,
+    typeListTraverser,
     termTraverser
   )
 

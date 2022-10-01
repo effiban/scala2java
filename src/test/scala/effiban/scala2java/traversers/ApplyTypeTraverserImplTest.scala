@@ -1,6 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.TermSelectContext
+import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.TermSelectContextMatcher.eqTermSelectContext
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
@@ -12,11 +13,13 @@ class ApplyTypeTraverserImplTest extends UnitTestSuite {
 
   private val typeTraverser = mock[TypeTraverser]
   private val termSelectTraverser = mock[TermSelectTraverser]
+  private val typeListTraverser = mock[TypeListTraverser]
   private val termTraverser = mock[TermTraverser]
 
   private val applyTypeTraverser = new ApplyTypeTraverserImpl(
     typeTraverser,
     termSelectTraverser,
+    typeListTraverser,
     termTraverser)
 
   test("traverse() when function is 'classOf' should convert to the Java equivalent") {
@@ -49,10 +52,11 @@ class ApplyTypeTraverserImplTest extends UnitTestSuite {
     val typeArgs = List(Type.Name("T1"), Type.Name("T2"))
 
     doWrite("myFunc").when(termTraverser).traverse(eqTree(fun))
+    doWrite("<T1, T2>").when(typeListTraverser).traverse(eqTreeList(typeArgs))
 
     applyTypeTraverser.traverse(Term.ApplyType(fun = fun, targs = typeArgs))
 
-    outputWriter.toString shouldBe "/* List(T1, T2) */myFunc"
+    outputWriter.toString shouldBe "/* this? */.<T1, T2>myFunc"
 
     verifyNoMoreInteractions(typeTraverser, termSelectTraverser)
   }
