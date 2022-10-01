@@ -31,7 +31,7 @@ private[traversers] class TermParamTraverserImpl(annotListTraverser: => AnnotLis
       write(" ")
     })
     nameTraverser.traverse(termParam.name)
-    // TODO handle 'default'
+    termParam.default.foreach(default => writeComment(s"= ${default.toString()}"))
   }
 
   private def resolveJavaModifiers(termParam: Term.Param, parentJavaScope: JavaScope) = {
