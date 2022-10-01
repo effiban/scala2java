@@ -18,6 +18,7 @@ class TypeNameTransformerTest extends UnitTestSuite {
     ("Float", "float"),
     ("Double", "double"),
     ("Unit", "void"),
+    ("Array", "Object[]"),
     ("Seq", "List"),
     ("Vector", "List"),
     ("Option", "Optional"),
