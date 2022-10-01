@@ -11,6 +11,8 @@ trait TermSelectTransformer {
 
 class TermSelectTransformerImpl(termNameClassifier: TermNameClassifier) extends TermSelectTransformer {
 
+  private final val TupleElementRegex = "_(\\d)".r
+
   // Transform a Scala-specific qualified name into an equivalent in Java
   // Either and Try use the syntax of the VAVR framework (Maven: io.vavr:vavr)
   override def transform(termSelect: Term.Select): Term.Select = {
@@ -31,6 +33,8 @@ class TermSelectTransformerImpl(termNameClassifier: TermNameClassifier) extends 
       case (Term.Name(Future), Term.Name(Apply)) => Term.Select(Term.Name(JavaCompletableFuture), Term.Name(JavaSupplyAsync))
       case (Term.Name(Future), Term.Name(ScalaSuccessful)) => Term.Select(Term.Name(JavaCompletableFuture), Term.Name(JavaCompletedFuture))
       case (Term.Name(Future), Term.Name(ScalaFailed)) => Term.Select(Term.Name(JavaCompletableFuture), Term.Name(JavaFailedFuture))
+
+      case(qual, Term.Name(TupleElementRegex(index))) => Term.Select(qual, Term.Name(s"v$index"))
 
       case (nm: Term.Name, Term.Name(Apply)) if termNameClassifier.isJavaStreamLike(nm) => Term.Select(Term.Name(Stream), Term.Name(JavaOf))
       case (nm: Term.Name, Term.Name(Apply)) if termNameClassifier.isJavaListLike(nm) => Term.Select(Term.Name(List), Term.Name(JavaOf))

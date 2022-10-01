@@ -47,7 +47,6 @@ class TypeFunctionTraverserImplTest extends UnitTestSuite {
 
     typeFunctionTraverser.traverse(scalaFunctionType)
 
-    outputWriter.toString shouldBe
-      "/* Requires JOOL (import org.jooq.lambda.function.Function3) */Function3<T1, T2, T3, String>"
+    outputWriter.toString shouldBe "Function3<T1, T2, T3, String>"
   }
 }

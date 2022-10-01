@@ -98,6 +98,13 @@ class TermSelectTransformerImplTest extends UnitTestSuite {
     termSelectTransformer.transform(scalaTermSelect).structure shouldBe expectedJavaTermSelect.structure
   }
 
+  test("transform 'myTuple._1' should return 'myTuple.v1'") {
+    val scalaTermSelect = Term.Select(Term.Name("myTuple"), Term.Name("_1"))
+    val expectedJavaTermSelect = Term.Select(Term.Name("myTuple"), Term.Name("v1"))
+
+    termSelectTransformer.transform(scalaTermSelect).structure shouldBe expectedJavaTermSelect.structure
+  }
+
   test("transform 'Stream.apply' should return 'Stream.of'") {
     val scalaTermSelect = Term.Select(TermNames.Stream, Apply)
     val expectedJavaTermSelect = Term.Select(TermNames.Stream, JavaOf)
