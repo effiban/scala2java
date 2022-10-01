@@ -10,6 +10,7 @@ trait ApplyTypeTraverser extends ScalaTreeTraverser[ApplyType]
 
 private[traversers] class ApplyTypeTraverserImpl(typeTraverser: => TypeTraverser,
                                                  termSelectTraverser: => TermSelectTraverser,
+                                                 typeListTraverser: => TypeListTraverser,
                                                  termTraverser: => TermTraverser)
                                                 (implicit javaWriter: JavaWriter) extends ApplyTypeTraverser {
 
@@ -27,8 +28,10 @@ private[traversers] class ApplyTypeTraverserImpl(typeTraverser: => TypeTraverser
         }
       case termSelect: Term.Select => termSelectTraverser.traverse(termSelect, TermSelectContext(termApplyType.targs))
       case term =>
-        // In Java a type can only be applied to a qualified name, so the best we can do here is write a comment
-        writeComment(termApplyType.targs.toString())
+        // In Java a type can only be applied to a qualified name, so the best we can do is guess the qualifier in a comment
+        writeComment("this?")
+        write(".")
+        typeListTraverser.traverse(termApplyType.targs)
         termTraverser.traverse(term)
     }
   }

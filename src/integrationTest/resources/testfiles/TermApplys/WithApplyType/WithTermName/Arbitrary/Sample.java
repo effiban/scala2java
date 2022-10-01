@@ -7,6 +7,6 @@ public class Sample {
     }
 
     public void foo() {
-        /* List(String) */doSomething();
+        /* this? */.<String>doSomething();
     }
 }
