@@ -1,5 +1,5 @@
 package dummy
 
 class Sample {
-  def foo(): Unit = new Array(5)
+    val x: Array[Object] = new Array(5)
 }
