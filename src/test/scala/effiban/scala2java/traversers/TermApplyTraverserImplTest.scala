@@ -1,27 +1,34 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.InvocationArgListContext
+import effiban.scala2java.contexts.{ArrayInitializerValuesContext, InvocationArgListContext}
+import effiban.scala2java.matchers.ArrayInitializerValuesContextMockitoMatcher.eqArrayInitializerValuesContext
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
+import effiban.scala2java.resolvers.ArrayInitializerContextResolver
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import effiban.scala2java.testsuites.UnitTestSuite
+import effiban.scala2java.testtrees.{TermNames, TypeNames}
 import effiban.scala2java.transformers.TermApplyTransformer
 import org.mockito.ArgumentMatchers
 
-import scala.meta.Term
+import scala.meta.{Lit, Term}
 
 class TermApplyTraverserImplTest extends UnitTestSuite {
   private val termTraverser = mock[TermTraverser]
+  private val arrayInitializerTraverser = mock[ArrayInitializerTraverser]
   private val invocationArgListTraverser = mock[InvocationArgListTraverser]
+  private val arrayInitializerContextResolver = mock[ArrayInitializerContextResolver]
   private val termApplyTransformer = mock[TermApplyTransformer]
 
   private val termApplyTraverser = new TermApplyTraverserImpl(
     termTraverser,
+    arrayInitializerTraverser,
     invocationArgListTraverser,
+    arrayInitializerContextResolver,
     termApplyTransformer
   )
 
-  test("traverse") {
+  test("traverse() an arbitrary method invocation") {
     val scalaTermApply = Term.Apply(
       fun = Term.Name("myMethod"),
       args = List(Term.Name("arg1"), Term.Name("arg2"))
@@ -31,6 +38,7 @@ class TermApplyTraverserImplTest extends UnitTestSuite {
       args = List(Term.Name("arg1"), Term.Name("arg2"))
     )
 
+    when(arrayInitializerContextResolver.tryResolve(eqTree(scalaTermApply))).thenReturn(None)
     when(termApplyTransformer.transform(eqTree(scalaTermApply))).thenReturn(javaTermApply)
 
     doWrite("myJavaMethod").when(termTraverser).traverse(eqTree(javaTermApply.fun))
@@ -45,4 +53,19 @@ class TermApplyTraverserImplTest extends UnitTestSuite {
 
   }
 
+  test("traverse() an Array initializer") {
+    val values = List(Lit.String("a"), Lit.String("b"))
+    val termApply = Term.Apply(
+      fun = Term.ApplyType(TermNames.ScalaArray, List(TypeNames.String)),
+      args = values
+    )
+
+    val expectedContext = ArrayInitializerValuesContext(maybeType = Some(TypeNames.String), values = values)
+
+    when(arrayInitializerContextResolver.tryResolve(eqTree(termApply))).thenReturn(Some(expectedContext))
+
+    termApplyTraverser.traverse(termApply)
+
+    verify(arrayInitializerTraverser).traverseWithValues(eqArrayInitializerValuesContext(expectedContext))
+  }
 }

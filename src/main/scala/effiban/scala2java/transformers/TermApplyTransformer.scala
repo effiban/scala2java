@@ -24,7 +24,7 @@ class TermApplyTransformerImpl(termNameClassifier: TermNameClassifier) extends T
   }
 
   private def transformName(name: Term.Name): Term = name match {
-    case nm if termNameClassifier.isScalaObject(nm) => Term.Select(nm, Term.Name("apply"))
+    case nm if termNameClassifier.isPreDefScalaObject(nm) => Term.Select(nm, Term.Name("apply"))
     case _ => name
   }
 

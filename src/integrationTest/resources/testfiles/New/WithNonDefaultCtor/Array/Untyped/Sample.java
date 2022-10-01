@@ -2,8 +2,11 @@ package dummy;
 
 
 public class Sample {
-    public final String[] x = new String[] {"abc", "def"};
 
     public Sample() {
+    }
+
+    public void foo() {
+        new Object[5];
     }
 }

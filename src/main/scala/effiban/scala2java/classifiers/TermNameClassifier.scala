@@ -13,7 +13,7 @@ trait TermNameClassifier {
 
   def isJavaMapLike(termName: Term.Name): Boolean
 
-  def isScalaObject(termName: Term.Name): Boolean
+  def isPreDefScalaObject(termName: Term.Name): Boolean
 
   def isInstantiatedByName(termName: Term.Name): Boolean
 }
@@ -49,8 +49,8 @@ object TermNameClassifier extends TermNameClassifier {
     TermNameValues.Future
   )
 
-  final val ScalaObjects = Set(
-    "Range",
+  final val PreDefScalaObjects = Set(
+    TermNameValues.ScalaRange,
     TermNameValues.ScalaOption,
     TermNameValues.ScalaSome,
     TermNameValues.ScalaRight,
@@ -69,7 +69,7 @@ object TermNameClassifier extends TermNameClassifier {
 
   override def isJavaMapLike(termName: Term.Name): Boolean = JavaMapLike.contains(termName.value)
 
-  override def isScalaObject(termName: Term.Name): Boolean = ScalaObjects.contains(termName.value)
+  override def isPreDefScalaObject(termName: Term.Name): Boolean = PreDefScalaObjects.contains(termName.value)
 
   override def isInstantiatedByName(termName: Term.Name): Boolean = InstantiatedByName.contains(termName.value)
 }

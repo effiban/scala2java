@@ -15,7 +15,9 @@ object TypeNameValues {
   final val ScalaOption = "Option"
   final val ScalaArray = "Array"
   final val ScalaVector = "Vector"
+  final val ScalaAny = "Any"
 
   final val JavaCompletableFuture = "CompletableFuture"
   final val JavaOptional = "Optional"
+
 }

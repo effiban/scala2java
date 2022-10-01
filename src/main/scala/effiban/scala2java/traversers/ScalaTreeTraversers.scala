@@ -5,7 +5,7 @@ import effiban.scala2java.orderings.JavaTemplateChildOrdering
 import effiban.scala2java.resolvers.Resolvers.shouldReturnValueResolver
 import effiban.scala2java.resolvers._
 import effiban.scala2java.transformers._
-import effiban.scala2java.typeinference.TypeInferrers.termTypeInferrer
+import effiban.scala2java.typeinference.TypeInferrers.{scalarArgListTypeInferrer, termTypeInferrer}
 import effiban.scala2java.writers.JavaWriter
 
 class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
@@ -27,6 +27,13 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
   private lazy val applyUnaryTraverser: ApplyUnaryTraverser = new ApplyUnaryTraverserImpl(termNameTraverser, termTraverser)
 
   private lazy val argumentListTraverser: ArgumentListTraverser = new ArgumentListTraverserImpl
+
+  private lazy val arrayInitializerTraverser: ArrayInitializerTraverser = new ArrayInitializerTraverserImpl(
+    typeTraverser,
+    termTraverser,
+    argumentListTraverser,
+    scalarArgListTypeInferrer
+  )
 
   private lazy val ascribeTraverser: AscribeTraverser = new AscribeTraverserImpl(typeTraverser, termTraverser)
 
@@ -196,7 +203,11 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
 
   private lazy val newAnonymousTraverser: NewAnonymousTraverser = new NewAnonymousTraverserImpl(templateTraverser)
 
-  private lazy val newTraverser: NewTraverser = new NewTraverserImpl(initTraverser)
+  private lazy val newTraverser: NewTraverser = new NewTraverserImpl(
+    initTraverser,
+    arrayInitializerTraverser,
+    ArrayInitializerContextResolver
+  )
 
   private lazy val objectTraverser: ObjectTraverser = new ObjectTraverserImpl(
     annotListTraverser,
@@ -321,7 +332,9 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
 
   private lazy val termApplyTraverser: TermApplyTraverser = new TermApplyTraverserImpl(
     termTraverser,
+    arrayInitializerTraverser,
     invocationArgListTraverser,
+    ArrayInitializerContextResolver,
     TermApplyTransformer
   )
 

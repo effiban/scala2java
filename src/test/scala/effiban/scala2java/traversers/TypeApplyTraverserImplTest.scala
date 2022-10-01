@@ -15,8 +15,8 @@ class TypeApplyTraverserImplTest extends UnitTestSuite {
 
   private val typeApplyTraverser = new TypeApplyTraverserImpl(typeTraverser, typeListTraverser)
 
-  test("traverse") {
-    val tpe = Type.Name("Map")
+  test("traverse() a 'Map'") {
+    val tpe = TypeNames.Map
     val args = List(TypeNames.Int, TypeNames.String)
 
     val typeApply = Type.Apply(tpe = tpe, args = args)
@@ -29,4 +29,27 @@ class TypeApplyTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe "Map<Integer, String>"
   }
 
+  test("traverse() a valid 'Array'") {
+    val tpe = TypeNames.ScalaArray
+    val args = List(TypeNames.String)
+
+    val typeApply = Type.Apply(tpe = tpe, args = args)
+
+    doWrite("String").when(typeTraverser).traverse(eqTree(TypeNames.String))
+
+    typeApplyTraverser.traverse(typeApply)
+
+    outputWriter.toString shouldBe "String[]"
+  }
+
+  test("traverse() an 'Array' with 2 type args should throw an exception") {
+    val tpe = TypeNames.ScalaArray
+    val args = List(TypeNames.String, TypeNames.Int)
+
+    val typeApply = Type.Apply(tpe = tpe, args = args)
+
+    intercept[IllegalStateException] {
+      typeApplyTraverser.traverse(typeApply)
+    }
+  }
 }
