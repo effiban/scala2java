@@ -29,7 +29,7 @@ object TypeInferrers {
 
   private[typeinference] lazy val ifTypeInferrer = new IfTypeInferrerImpl(termTypeInferrer)
 
-  private[typeinference] lazy val scalarArgListTypeInferrer = new ScalarArgListTypeInferrerImpl(
+  lazy val scalarArgListTypeInferrer = new ScalarArgListTypeInferrerImpl(
     termTypeInferrer,
     CollectiveTypeInferrer
   )

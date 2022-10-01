@@ -1,7 +1,7 @@
 package effiban.scala2java.traversers
 
 import effiban.scala2java.contexts.TemplateContext
-import effiban.scala2java.entities.JavaScope
+import effiban.scala2java.entities.{JavaKeyword, JavaScope}
 import effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Term.NewAnonymous
@@ -14,7 +14,8 @@ private[traversers] class NewAnonymousTraverserImpl(templateTraverser: => Templa
   import javaWriter._
 
   override def traverse(newAnonymous: NewAnonymous): Unit = {
-    write("new ")
+    writeKeyword(JavaKeyword.New)
+    write(" ")
     templateTraverser.traverse(newAnonymous.templ, TemplateContext(javaScope = JavaScope.Class))
   }
 }
