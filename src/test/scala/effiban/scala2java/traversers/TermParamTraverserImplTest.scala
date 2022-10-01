@@ -11,7 +11,7 @@ import effiban.scala2java.testsuites.UnitTestSuite
 import effiban.scala2java.testtrees.TypeNames
 import org.mockito.ArgumentMatchers
 
-import scala.meta.{Init, Mod, Name, Term, Type}
+import scala.meta.{Init, Lit, Mod, Name, Term, Type}
 
 class TermParamTraverserImplTest extends UnitTestSuite {
 
@@ -34,14 +34,14 @@ class TermParamTraverserImplTest extends UnitTestSuite {
     javaModifiersResolver
   )
 
-  test("traverse with type") {
+  test("traverse with type and default") {
     val mods = List(TheAnnot)
 
     val termParam = Term.Param(
       mods = List(TheAnnot),
       name = ParamName,
       decltpe = Some(TypeNames.Int),
-      default = None
+      default = Some(Lit.Int(3))
     )
 
     doWrite("@MyAnnotation ")
@@ -52,10 +52,10 @@ class TermParamTraverserImplTest extends UnitTestSuite {
 
     termParamTraverser.traverse(termParam, TheStatContext)
 
-    outputWriter.toString shouldBe "@MyAnnotation final int myParam"
+    outputWriter.toString shouldBe "@MyAnnotation final int myParam/* = 3 */"
   }
 
-  test("traverse without type") {
+  test("traverse without type and without default") {
     val mods = List(TheAnnot)
 
     val termParam = Term.Param(
