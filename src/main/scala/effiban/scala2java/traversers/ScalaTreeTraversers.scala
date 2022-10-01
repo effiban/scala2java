@@ -188,7 +188,11 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
     invocationArgTraverser
   )
 
-  private lazy val invocationArgTraverser: InvocationArgTraverser = new InvocationArgTraverserImpl(assignTraverser, termTraverser)
+  private lazy val invocationArgTraverser: InvocationArgTraverser = new InvocationArgTraverserImpl(
+    assignTraverser,
+    termFunctionTraverser,
+    termTraverser
+  )
 
   private lazy val litTraverser: LitTraverser = new LitTraverserImpl()
 
