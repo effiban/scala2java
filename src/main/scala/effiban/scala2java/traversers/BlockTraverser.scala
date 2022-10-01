@@ -1,6 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.contexts.BlockContext
+import effiban.scala2java.contexts.{BlockContext, InitContext}
 import effiban.scala2java.entities.Decision.Decision
 import effiban.scala2java.writers.JavaWriter
 
@@ -33,7 +33,7 @@ private[traversers] class BlockTraverserImpl(initTraverser: => InitTraverser,
 
     writeBlockStart()
     maybeInit.foreach(init => {
-      initTraverser.traverse(init)
+      initTraverser.traverse(init, InitContext(argNameAsComment = true))
       writeStatementEnd()
     })
     traverseContents(block, shouldReturnValue)

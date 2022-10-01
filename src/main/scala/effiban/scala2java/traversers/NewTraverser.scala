@@ -14,6 +14,6 @@ private[traversers] class NewTraverserImpl(initTraverser: => InitTraverser)
 
   override def traverse(`new`: New): Unit = {
     write("new ")
-    initTraverser.traverse(`new`.init, InitContext(traverseEmpty = true))
+    initTraverser.traverse(`new`.init, InitContext(traverseEmpty = true, argNameAsComment = true))
   }
 }

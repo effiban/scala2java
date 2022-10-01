@@ -111,7 +111,7 @@ class TermTraverserImplTest extends UnitTestSuite {
   test("traverse() for Assign") {
     val assign = Term.Assign(lhs = Term.Name("x"), rhs = Lit.Int(3))
     termTraverser.traverse(assign)
-    verify(assignTraverser).traverse(eqTree(assign))
+    verify(assignTraverser).traverse(eqTree(assign), lhsAsComment = ArgumentMatchers.eq(false))
   }
 
   test("traverse() for Return") {

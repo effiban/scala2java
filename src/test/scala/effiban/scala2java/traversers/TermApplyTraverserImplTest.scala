@@ -1,7 +1,6 @@
 package effiban.scala2java.traversers
 
-import effiban.scala2java.entities.EnclosingDelimiter.Parentheses
-import effiban.scala2java.entities.ListTraversalOptions
+import effiban.scala2java.contexts.InvocationArgListContext
 import effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import effiban.scala2java.matchers.TreeMatcher.eqTree
 import effiban.scala2java.stubbers.OutputWriterStubber.doWrite
@@ -13,12 +12,12 @@ import scala.meta.Term
 
 class TermApplyTraverserImplTest extends UnitTestSuite {
   private val termTraverser = mock[TermTraverser]
-  private val termListTraverser = mock[TermListTraverser]
+  private val invocationArgListTraverser = mock[InvocationArgListTraverser]
   private val termApplyTransformer = mock[TermApplyTransformer]
 
   private val termApplyTraverser = new TermApplyTraverserImpl(
     termTraverser,
-    termListTraverser,
+    invocationArgListTraverser,
     termApplyTransformer
   )
 
@@ -35,9 +34,9 @@ class TermApplyTraverserImplTest extends UnitTestSuite {
     when(termApplyTransformer.transform(eqTree(scalaTermApply))).thenReturn(javaTermApply)
 
     doWrite("myJavaMethod").when(termTraverser).traverse(eqTree(javaTermApply.fun))
-    doWrite("(arg1, arg2)").when(termListTraverser).traverse(
-      terms = eqTreeList(javaTermApply.args),
-      ArgumentMatchers.eq(ListTraversalOptions(maybeEnclosingDelimiter = Some(Parentheses), traverseEmpty = true))
+    doWrite("(arg1, arg2)").when(invocationArgListTraverser).traverse(
+      args = eqTreeList(javaTermApply.args),
+      ArgumentMatchers.eq(InvocationArgListContext(traverseEmpty = true, argNameAsComment = true))
     )
 
     termApplyTraverser.traverse(scalaTermApply)
