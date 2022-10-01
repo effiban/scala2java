@@ -1,5 +1,5 @@
 package dummy
 
 class Sample {
-  def foo(): Unit = new MyType
+  val x: MyType = new MyType
 }

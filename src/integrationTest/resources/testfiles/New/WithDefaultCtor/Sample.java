@@ -2,11 +2,8 @@ package dummy;
 
 
 public class Sample {
+    public final MyType x = new MyType();
 
     public Sample() {
-    }
-
-    public void foo() {
-        new MyType();
     }
 }
