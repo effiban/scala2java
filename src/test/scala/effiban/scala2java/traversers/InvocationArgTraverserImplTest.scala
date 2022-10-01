@@ -10,9 +10,14 @@ import scala.meta.{Lit, Term}
 class InvocationArgTraverserImplTest extends UnitTestSuite {
 
   private val assignTraverser = mock[AssignTraverser]
+  private val termFunctionTraverser = mock[TermFunctionTraverser]
   private val termTraverser = mock[TermTraverser]
 
-  private val invocationArgTraverser = new InvocationArgTraverserImpl(assignTraverser, termTraverser)
+  private val invocationArgTraverser = new InvocationArgTraverserImpl(
+    assignTraverser,
+    termFunctionTraverser,
+    termTraverser
+  )
 
   test("traverse when arg is a Lit") {
     val arg = Lit.Int(1)
