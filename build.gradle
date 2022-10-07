@@ -2,6 +2,7 @@ plugins {
     id 'java-library'
     id 'scala'
     id "com.github.maiflai.scalatest" version "0.32"
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
 java {
@@ -63,4 +64,10 @@ configurations {
 
 tasks.named('check') {
     dependsOn(testing.suites.integrationTest)
+}
+
+shadowJar {
+    manifest {
+        attributes 'Main-Class': 'effiban.scala2java.Scala2JavaRunner'
+    }
 }
