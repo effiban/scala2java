@@ -24,15 +24,16 @@ The tool receives one or more Scala source files and translates them one by one 
 The output can either be printed to the console or save to a given directory.  
 In the second case, each Scala file will be translated into a corresponding file with the same name and **.java** suffix
 
-There are two options for running the tool:
+There are currently two options for running the tool, as a CLI and as an SDK. 
+In the future I plan to add an IntelliJ plugin as well.  
 
 **Option 1 - CLI tool** 
 
 1. Download the executable jar [scala2Java-1.0.0-all.jar](TBD) 
 1. To generate output to the console:  
-   ```java -jar scala2Java-1.0.0-all.jar MyClass1.scala MyClass2.scala```  
+   ```java -jar scala2java-1.0.0-all.jar MyClass1.scala MyClass2.scala```  
 1. To generate output to a directory:  
-   ```java -jar scala2Java-1.0.0-all.jar --outDir=myDir  MyClass.scala MyClass2.scala```
+   ```java -jar scala2java-1.0.0-all.jar --outDir=myDir  MyClass.scala MyClass2.scala```
 
 
 
@@ -95,10 +96,11 @@ precise and comprehensive translation into Java code.
 **Java**: The generated files are in Java 17. In the future (if needed) other versions can be supported.
 
 ### Supported Features
-Scala2Java is able to translate all of the basic Scala syntax into equivalent Java. Here is a partial list: 
-- class/method/variable definitions
-- control structures (if / while)
-- visibility modifiers (which can have different rules and names in Java)
+Scala2Java is able to translate all the basic Scala syntax into equivalent Java. Here is a partial list: 
+- Class/method/variable definitions
+- Method invocations
+- Control structures (if / while / do / try)
+- Visibility modifiers (which can have different rules and names in Java)
 - Generic types 
 - Annotations  
   
@@ -111,17 +113,18 @@ It is also able to rewrite some language constructs which are supported differen
 
 ### Limitations 
 - **Scala advanced features**  
-Scala has some advanced features that have no parallel in Java, and they either cannot be translated to Java based on syntax alone, 
-or else they require a full rewrite that is quite complex. These features are not supported by the tool and it will generate a comment as a hint 
-for the manual translation that will have to been done by the developer, for example:
+Scala has some advanced features that have no analogue in Java. Either these features cannot be translated to Java based on syntax alone, 
+or else they require a major rewrite that is quite complex.  
+Therefore these features are not supported by the tool, and instead it will generate comments in the generated code accordingly.    
+Examples:
   - Implicit definitions
-  - imports inside a class/method
-  - named parameters and method arguments
+  - Imports inside a class/method
+  - Named parameters and method arguments
   - Advanced pattern matching (Java 17 'switch' cases still have very limited capabilities)  
 
 - **Scala built-in types**    
 Scala has many built-in types and methods that need to be translated into the Java equivalent such as `Option`, `Future`, collection types, etc.  
-At this time the tool provides only basic support for these, and the rest will simply be written in the Java code as-is.  
+At this time the tool provides basic support for some of these, while others will be written in the Java code as-is.  
 Improvements in this area are planned for the future.  
 
 - **Semantic Data**   
