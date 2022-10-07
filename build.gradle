@@ -19,7 +19,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.scalameta:scalameta_2.13:4.5.4'
+    implementation 'org.scalameta:scalameta_2.13:4.6.0'
 }
 
 testing {
