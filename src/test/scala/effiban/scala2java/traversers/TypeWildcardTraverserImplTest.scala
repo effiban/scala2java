@@ -6,18 +6,18 @@ import effiban.scala2java.testsuites.UnitTestSuite
 
 import scala.meta.Type
 
-class TypePlaceholderTraverserImplTest extends UnitTestSuite {
+class TypeWildcardTraverserImplTest extends UnitTestSuite {
 
   private val typeBoundsTraverser = mock[TypeBoundsTraverser]
 
-  private val typePlaceholderTraverser = new TypePlaceholderTraverserImpl(typeBoundsTraverser)
+  private val typeAnonymousParamTraverser = new TypeWildcardTraverserImpl(typeBoundsTraverser)
 
   test("traverse") {
     val bounds = Type.Bounds(lo = None, hi = Some(Type.Name("T")))
 
     doWrite(" extends T").when(typeBoundsTraverser).traverse(eqTree(bounds))
 
-    typePlaceholderTraverser.traverse(Type.Placeholder(bounds))
+    typeAnonymousParamTraverser.traverse(Type.Wildcard(bounds))
 
     outputWriter.toString shouldBe "? extends T"
   }

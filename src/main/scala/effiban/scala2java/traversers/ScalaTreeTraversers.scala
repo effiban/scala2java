@@ -445,6 +445,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
 
   private lazy val typeAnnotateTraverser: TypeAnnotateTraverser = new TypeAnnotateTraverserImpl(annotListTraverser, typeTraverser)
 
+  private lazy val typeAnonymousParamTraverser: TypeAnonymousParamTraverser = new TypeAnonymousParamTraverserImpl
+
   private lazy val typeApplyInfixTraverser: TypeApplyInfixTraverser = new TypeApplyInfixTraverserImpl
 
   private lazy val typeApplyTraverser: TypeApplyTraverser = new TypeApplyTraverserImpl(typeTraverser, typeListTraverser)
@@ -470,8 +472,6 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
     typeParamListTraverser,
     typeBoundsTraverser
   )
-
-  private lazy val typePlaceholderTraverser: TypePlaceholderTraverser = new TypePlaceholderTraverserImpl(typeBoundsTraverser)
 
   private lazy val typeProjectTraverser: TypeProjectTraverser = new TypeProjectTraverserImpl(typeTraverser, typeNameTraverser)
 
@@ -501,7 +501,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
     typeExistentialTraverser,
     typeAnnotateTraverser,
     typeLambdaTraverser,
-    typePlaceholderTraverser,
+    typeAnonymousParamTraverser,
+    typeWildcardTraverser,
     typeByNameTraverser,
     typeRepeatedTraverser,
     typeVarTraverser
@@ -513,6 +514,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
   )
 
   private lazy val typeVarTraverser: TypeVarTraverser = new TypeVarTraverserImpl
+
+  private lazy val typeWildcardTraverser: TypeWildcardTraverser = new TypeWildcardTraverserImpl(typeBoundsTraverser)
 
   private lazy val typeWithTraverser: TypeWithTraverser = new TypeWithTraverserImpl(typeTraverser)
 
