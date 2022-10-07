@@ -4,8 +4,8 @@
 Scala is an advanced language built on top of the JVM, offering concise syntax and extensive support 
 for functional programming.
 Unfortunately, although Scala has been around for quite a while (and is my personal favorite) - it hasn't gained
-the popularity that some expected, and is used today by only a small percentage of developers and applications (this is true  
-for both the industry in general, as well as the JVM-based languages).  
+the popularity that some expected, and is used today by only a small percentage of developers and applications (this is true for
+both the industry in general, as well as the JVM-based languages).  
 At my company, we started out many years ago with a purely-Java codebase, and about 6-7 years ago began to introduce Scala. 
 Over the years we accumulated a significant amount of Scala code in our microservices.  
 Recently, due to a lack of Scala expertise in the company and difficulty recruiting Scala developers, management
@@ -16,6 +16,7 @@ Using a decompiler will of course produce equivalent Java code, but it is unread
 Therefore, I decided to develop this tool - which is aimed at translating (transpiling) Scala code into _readable_ and _maintainable_ Java code,
 while adhering to the original style of the code (with certain limitations). Even though the generated code is not complete, I still believe 
 it will save at least 80% of the manual work that would otherwise be needed to carry out the translation.  
+I also hope it may prove useful to other companies/individuals as well.  
 
 ### Usage Guide
 
@@ -52,7 +53,7 @@ Maven:
 Gradle:
 
 ```groovy
-implementation 'effiban:scaal2java:1.0.0'
+implementation 'effiban:scala2java:1.0.0'
 ```
 
 2. To generate output to the console (Scala example)
@@ -100,9 +101,11 @@ Scala2Java is able to translate all of the basic Scala syntax into equivalent Ja
 - visibility modifiers (which can have different rules and names in Java)
 - Generic types 
 - Annotations  
-It is also able to rewrite some language constructs which are supported differently or completely unsupported in Java such as:
-- Primary constructors (explicit methods in Java)
-- 'for comprehension'
+  
+It is also able to rewrite some language constructs which are supported differently or completely unsupported in Java such as:  
+- Primary constructors
+- Adding the 'return' keyword
+- 'for' comprehension
 - string interpolation
 - by-name parameters
 
