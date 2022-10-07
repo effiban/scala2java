@@ -6,7 +6,7 @@ import effiban.scala2java.testtrees.{TypeBounds, TypeNames}
 
 import scala.meta.Mod.Annot
 import scala.meta.Type.Bounds
-import scala.meta.{Decl, Init, Name, Pat, Term, Type}
+import scala.meta.{Decl, Init, Mod, Name, Pat, Term, Type}
 
 class TypeTraverserImplTest extends UnitTestSuite {
 
@@ -20,7 +20,8 @@ class TypeTraverserImplTest extends UnitTestSuite {
   private val typeExistentialTraverser = mock[TypeExistentialTraverser]
   private val typeAnnotateTraverser = mock[TypeAnnotateTraverser]
   private val typeLambdaTraverser = mock[TypeLambdaTraverser]
-  private val typePlaceholderTraverser = mock[TypePlaceholderTraverser]
+  private val typeAnonymousParamTraverser = mock[TypeAnonymousParamTraverser]
+  private val typeWildcardTraverser = mock[TypeWildcardTraverser]
   private val typeByNameTraverser = mock[TypeByNameTraverser]
   private val typeRepeatedTraverser = mock[TypeRepeatedTraverser]
   private val typeVarTraverser = mock[TypeVarTraverser]
@@ -36,7 +37,8 @@ class TypeTraverserImplTest extends UnitTestSuite {
     typeExistentialTraverser,
     typeAnnotateTraverser,
     typeLambdaTraverser,
-    typePlaceholderTraverser,
+    typeAnonymousParamTraverser,
+    typeWildcardTraverser,
     typeByNameTraverser,
     typeRepeatedTraverser,
     typeVarTraverser
@@ -126,10 +128,16 @@ class TypeTraverserImplTest extends UnitTestSuite {
     verify(typeLambdaTraverser).traverse(eqTree(typeLambda))
   }
 
-  test("traverse Type.Placeholder") {
-    val typePlaceholder = Type.Placeholder(TypeBounds.Empty)
-    typeTraverser.traverse(typePlaceholder)
-    verify(typePlaceholderTraverser).traverse(eqTree(typePlaceholder))
+  test("traverse Type.AnonymousParam") {
+    val typeAnonymousParam = Type.AnonymousParam(Some(Mod.Contravariant()))
+    typeTraverser.traverse(typeAnonymousParam)
+    verify(typeAnonymousParamTraverser).traverse(eqTree(typeAnonymousParam))
+  }
+
+  test("traverse Type.Wildcard") {
+    val typeWildcard = Type.Wildcard(TypeBounds.Empty)
+    typeTraverser.traverse(typeWildcard)
+    verify(typeWildcardTraverser).traverse(eqTree(typeWildcard))
   }
 
   test("traverse Type.ByName") {

@@ -10,7 +10,7 @@ private[traversers] class TypeParamTraverserImpl(nameTraverser: => NameTraverser
 
   // Type param declaration, e.g.: `T` in trait MyTrait[T]
   override def traverse(typeParam: Type.Param): Unit = {
-    //TODO handle mods
+    //TODO handle mods (such as variance mods)
     nameTraverser.traverse(typeParam.name)
     typeParamListTraverser.traverse(typeParam.tparams)
     typeBoundsTraverser.traverse(typeParam.tbounds)
