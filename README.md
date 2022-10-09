@@ -59,7 +59,7 @@ implementation 'effiban:scala2java:1.0.0'
 
 2. To generate output to the console (Scala example)
    ```scala
-   import effiban.scala2java.Scala2JavaTranslator.translate
+   import io.github.effiban.scala2java.Scala2JavaTranslator.translate
    import java.nio.file.Path
 
    class Translator {
@@ -71,7 +71,7 @@ implementation 'effiban:scala2java:1.0.0'
    ```
 3. To generate output to a directory (Scala example)
    ```scala
-   import effiban.scala2java.Scala2JavaTranslator.translate
+   import io.github.effiban.scala2java.Scala2JavaTranslator.translate
    import java.nio.file.Path
 
    class Translator {
