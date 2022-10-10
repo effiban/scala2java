@@ -18,6 +18,11 @@ while adhering to the original style of the code (with certain limitations). Eve
 it will save at least 80% of the manual work, that would otherwise be needed to carry out the translation.  
 I also hope it may prove useful to other companies/individuals as well.  
 
+### Supported Language Versions
+**Tool**: The tool itself is built with Scala 2.13 and Java 17. 
+**Scala Input**: The tool was tested with sources in Scala 2.13, and will probably work with earlier versions. There is no support for Scala 3.    
+**Java Output**: The generated files are in Java 17. In the future (if needed) other versions may be supported.
+
 ### Usage Guide
 
 The tool receives one or more Scala source files and translates them one by one to Java.  
@@ -29,7 +34,7 @@ In the future I plan to add an IntelliJ plugin as well.
 
 **Option 1 - CLI tool** 
 
-1. Download the executable jar [scala2Java-1.0.1-all.jar](https://repo1.maven.org/maven2/io/github/effiban/scala2java/1.0.1/scala2java-1.0.1-all.jar) 
+1. Download the executable jar [scala2java-1.0.1-all.jar](https://repo1.maven.org/maven2/io/github/effiban/scala2java_2.13/1.0.1/scala2java-1.0.1-all.jar) 
 1. To generate output to the console:  
    ```java -jar scala2java-1.0.1-all.jar MyClass1.scala MyClass2.scala```  
 1. To generate output to a directory:  
@@ -46,7 +51,7 @@ Maven:
 ```xml
 <dependency>
   <groupId>io.github.effiban</groupId>
-  <artifactId>scala2java</artifactId>
+  <artifactId>scala2java_2.13</artifactId>
   <version>1.0.1</version>
 </dependency>
 ```
@@ -54,7 +59,7 @@ Maven:
 Gradle:
 
 ```groovy
-implementation 'io.github.effiban:scala2java:1.0.1'
+implementation 'io.github.effiban:scala2java_2.13:1.0.1'
 ```
 
 2. To generate output to the console (Scala example)
@@ -90,10 +95,6 @@ At this point, the tool supports _syntactic_ translation only - so each file in 
 and the tool will not be able to utilize or infer _semantic_ information such as method definitions from other files.    
 In the future I plan to utilize Scalameta's [SemanticDB](https://scalameta.org/docs/semanticdb/guide.html) feature, which should generate a more
 precise and comprehensive translation into Java code.
-
-### Supported Language Versions
-**Scala**: The tool was tested with Scala 2.13, and will probably work with earlier versions. There is no support for Scala 3.    
-**Java**: The generated files are in Java 17. In the future (if needed) other versions can be supported.
 
 ### Supported Features
 Scala2Java is able to translate all the basic Scala syntax into equivalent Java. Here is a partial list: 
