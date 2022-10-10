@@ -82,7 +82,7 @@ jar {
 
 shadowJar {
     manifest {
-        attributes 'Main-Class': 'effiban.scala2java.Scala2JavaRunner'
+        attributes 'Main-Class': 'io.github.effiban.scala2java.Scala2JavaRunner'
     }
 }
 
