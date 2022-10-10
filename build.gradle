@@ -25,6 +25,11 @@ repositories {
 
 dependencies {
     implementation 'org.scalameta:scalameta_2.13:4.6.0'
+    constraints {
+        implementation('com.google.protobuf:protobuf-java:3.19.6') {
+            because 'previous versions have a security vulnerability'
+        }
+    }
 }
 
 testing {
