@@ -19,7 +19,7 @@ it will save at least 80% of the manual work, that would otherwise be needed to 
 I also hope it may prove useful to other companies/individuals as well.  
 
 ### Supported Language Versions
-**Tool**: The tool itself is built with Scala 2.13 and Java 17. 
+**Tool**: The tool itself is built with Scala 2.13 and Java 17.   
 **Scala Input**: The tool was tested with sources in Scala 2.13, and will probably work with earlier versions. There is no support for Scala 3.    
 **Java Output**: The generated files are in Java 17. In the future (if needed) other versions may be supported.
 
