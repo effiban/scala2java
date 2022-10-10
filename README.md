@@ -34,11 +34,11 @@ In the future I plan to add an IntelliJ plugin as well.
 
 **Option 1 - CLI tool** 
 
-1. Download the executable jar [scala2java-1.0.2-all.jar](https://repo1.maven.org/maven2/io/github/effiban/scala2java_2.13/1.0.2/scala2java-1.0.2-all.jar) 
+1. Download the executable jar [scala2java_2.13-1.0.2-all.jar](https://repo1.maven.org/maven2/io/github/effiban/scala2java_2.13/1.0.2/scala2java_2.13-1.0.2-all.jar) 
 1. To generate output to the console:  
-   ```java -jar scala2java-1.0.2-all.jar MyClass1.scala MyClass2.scala```  
+   ```java -jar scala2java_2.13-1.0.2-all.jar MyClass1.scala MyClass2.scala```  
 1. To generate output to a directory:  
-   ```java -jar scala2java-1.0.2-all.jar --outDir=myDir  MyClass.scala MyClass2.scala```
+   ```java -jar scala2java_2.13-1.0.2-all.jar --outDir=myDir  MyClass.scala MyClass2.scala```
 
 
 
