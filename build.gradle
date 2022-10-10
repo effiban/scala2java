@@ -7,6 +7,8 @@ plugins {
     id 'signing'
 }
 
+def scalaMajorVersion = "2.13"
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
@@ -24,7 +26,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.scalameta:scalameta_2.13:4.6.0'
+    implementation "org.scalameta:scalameta_$scalaMajorVersion:4.6.0"
     constraints {
         implementation('com.google.protobuf:protobuf-java:3.19.6') {
             because 'previous versions have a security vulnerability'
@@ -36,8 +38,8 @@ testing {
     suites {
         test {
             dependencies {
-                implementation 'org.scalatest:scalatest_2.13:3.2.12'
-                implementation 'org.mockito:mockito-scala_2.13:1.17.5'
+                implementation "org.scalatest:scalatest_$scalaMajorVersion:3.2.12"
+                implementation "org.mockito:mockito-scala_$scalaMajorVersion:1.17.5"
                 runtimeOnly 'com.vladsch.flexmark:flexmark-all:0.64.0'
             }
             targets {
@@ -89,6 +91,7 @@ shadowJar {
 publishing {
     publications {
         scala2java(MavenPublication) {
+            artifactId = "${project.name}_$scalaMajorVersion"
             from components.java
 
             pom {
