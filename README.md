@@ -29,11 +29,11 @@ In the future I plan to add an IntelliJ plugin as well.
 
 **Option 1 - CLI tool** 
 
-1. Download the executable jar [scala2Java-1.0.0-all.jar](TBD) 
+1. Download the executable jar [scala2Java-1.0.1-all.jar](https://repo1.maven.org/maven2/io/github/effiban/scala2java/1.0.1/scala2java-1.0.1-all.jar) 
 1. To generate output to the console:  
-   ```java -jar scala2java-1.0.0-all.jar MyClass1.scala MyClass2.scala```  
+   ```java -jar scala2java-1.0.1-all.jar MyClass1.scala MyClass2.scala```  
 1. To generate output to a directory:  
-   ```java -jar scala2java-1.0.0-all.jar --outDir=myDir  MyClass.scala MyClass2.scala```
+   ```java -jar scala2java-1.0.1-all.jar --outDir=myDir  MyClass.scala MyClass2.scala```
 
 
 
@@ -47,14 +47,14 @@ Maven:
 <dependency>
   <groupId>io.github.effiban</groupId>
   <artifactId>scala2java</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
 </dependency>
 ```
 
 Gradle:
 
 ```groovy
-implementation 'io.github.effiban:scala2java:1.0.0'
+implementation 'io.github.effiban:scala2java:1.0.1'
 ```
 
 2. To generate output to the console (Scala example)
