@@ -13,6 +13,7 @@ object TermNameValues {
   final val Map = "Map"
   final val Try = "Try"
   final val Apply = "apply"
+  final val Empty = "empty"
 
   final val ScalaRange = "Range"
   final val ScalaInclusive = "inclusive"
@@ -27,6 +28,7 @@ object TermNameValues {
   final val ScalaFailed = "failed"
   final val ScalaArray = "Array"
   final val ScalaVector = "Vector"
+  final val ScalaNil = "Nil"
 
   final val JavaIntStream = "IntStream"
   final val JavaRange = "range"
@@ -36,6 +38,7 @@ object TermNameValues {
   final val JavaCompletedFuture = "completedFuture"
   final val JavaFailedFuture = "failedFuture"
   final val JavaOptional = "Optional"
+  final val JavaAbsent = "absent"
   final val JavaOf = "of"
   final val JavaOfNullable = "ofNullable"
   final val JavaOfEntries = "ofEntries"

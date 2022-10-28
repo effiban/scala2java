@@ -26,6 +26,7 @@ object NameTypeInferrer extends NameTypeInferrer {
       case Term.Name(TermNameValues.Stream) => Some(Type.Name(TypeNameValues.Stream))
       case Term.Name(TermNameValues.ScalaArray) => Some(Type.Name(TypeNameValues.ScalaArray))
       case Term.Name(TermNameValues.List) => Some(Type.Name(TypeNameValues.List))
+      case Term.Name(TermNameValues.ScalaNil) => Some(Type.Name(TypeNameValues.List))
       case Term.Name(TermNameValues.ScalaVector) => Some(Type.Name(TypeNameValues.ScalaVector))
       case Term.Name(TermNameValues.Seq) => Some(Type.Name(TypeNameValues.Seq))
       case Term.Name(TermNameValues.Set) => Some(Type.Name(TypeNameValues.Set))

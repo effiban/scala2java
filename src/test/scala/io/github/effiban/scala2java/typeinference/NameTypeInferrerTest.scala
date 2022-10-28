@@ -21,6 +21,7 @@ class NameTypeInferrerTest extends UnitTestSuite {
     (TermNames.Stream, Some(TypeNames.Stream)),
     (TermNames.ScalaArray, Some(TypeNames.ScalaArray)),
     (TermNames.List, Some(TypeNames.List)),
+    (TermNames.ScalaNil, Some(TypeNames.List)),
     (TermNames.Vector, Some(TypeNames.ScalaVector)),
     (TermNames.Seq, Some(TypeNames.Seq)),
     (TermNames.Set, Some(TypeNames.Set)),

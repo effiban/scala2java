@@ -354,7 +354,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
 
   private lazy val termMatchTraverser: TermMatchTraverser = new TermMatchTraverserImpl(termTraverser, caseTraverser)
 
-  private lazy val termNameTraverser: TermNameTraverser = new TermNameTraverserImpl
+  private lazy val termNameTraverser: TermNameTraverser = new TermNameTraverserImpl(termTraverser, TermNameTransformer)
 
   private lazy val termParamListTraverser: TermParamListTraverser = new TermParamListTraverserImpl(argumentListTraverser, termParamTraverser)
 
