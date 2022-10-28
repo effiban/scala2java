@@ -21,6 +21,7 @@ class TermSelectTransformerImpl(termNameClassifier: TermNameClassifier) extends 
       case (Term.Name(ScalaRange), Term.Name(ScalaInclusive)) => Term.Select(Term.Name(JavaIntStream), Term.Name(JavaRangeClosed))
 
       case (Term.Name(ScalaOption), Term.Name(Apply)) => Term.Select(Term.Name(JavaOptional), Term.Name(JavaOfNullable))
+      case (Term.Name(ScalaOption), Term.Name(Empty)) => Term.Select(Term.Name(JavaOptional), Term.Name(JavaAbsent))
       case (Term.Name(ScalaSome), Term.Name(Apply)) => Term.Select(Term.Name(JavaOptional), Term.Name(JavaOf))
 
       case (Term.Name(ScalaRight), Term.Name(Apply)) => Term.Select(Term.Name(Either), Term.Name(LowercaseRight))
@@ -37,9 +38,10 @@ class TermSelectTransformerImpl(termNameClassifier: TermNameClassifier) extends 
       case(qual, Term.Name(TupleElementRegex(index))) => Term.Select(qual, Term.Name(s"v$index"))
 
       case (nm: Term.Name, Term.Name(Apply)) if termNameClassifier.isJavaStreamLike(nm) => Term.Select(Term.Name(Stream), Term.Name(JavaOf))
-      case (nm: Term.Name, Term.Name(Apply)) if termNameClassifier.isJavaListLike(nm) => Term.Select(Term.Name(List), Term.Name(JavaOf))
-      case (nm: Term.Name, Term.Name(Apply)) if termNameClassifier.isJavaSetLike(nm) => Term.Select(Term.Name(Set), Term.Name(JavaOf))
+      case (nm: Term.Name, Term.Name(Apply) | Term.Name(Empty)) if termNameClassifier.isJavaListLike(nm) => Term.Select(Term.Name(List), Term.Name(JavaOf))
+      case (nm: Term.Name, Term.Name(Apply) | Term.Name(Empty)) if termNameClassifier.isJavaSetLike(nm) => Term.Select(Term.Name(Set), Term.Name(JavaOf))
       case (nm: Term.Name, Term.Name(Apply)) if termNameClassifier.isJavaMapLike(nm) => Term.Select(Term.Name(Map), Term.Name(JavaOfEntries))
+      case (nm: Term.Name, Term.Name(Empty)) if termNameClassifier.isJavaMapLike(nm) => Term.Select(Term.Name(Map), Term.Name(JavaOf))
 
       case _ => termSelect
     }

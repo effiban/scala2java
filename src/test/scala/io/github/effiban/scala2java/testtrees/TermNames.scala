@@ -20,6 +20,7 @@ object TermNames {
   val Plus: Term.Name = Term.Name("+")
 
   val Apply: Term.Name = Term.Name("apply")
+  val Empty: Term.Name = Term.Name("empty")
 
   val Scala: Term.Name = Term.Name("scala")
   val ScalaRange: Term.Name = Term.Name("Range")
@@ -37,6 +38,7 @@ object TermNames {
   val ScalaFailure: Term.Name = Term.Name("Failure")
   val ScalaSuccessful: Term.Name = Term.Name("successful")
   val ScalaFailed: Term.Name = Term.Name("failed")
+  val ScalaNil: Term.Name = Term.Name("Nil")
 
   val JavaIntStream: Term.Name = Term.Name("IntStream")
   val JavaRange: Term.Name = Term.Name("range")
@@ -45,6 +47,7 @@ object TermNames {
   val JavaOptional: Term.Name = Term.Name("Optional")
   val JavaOf: Term.Name = Term.Name("of")
   val JavaOfNullable: Term.Name = Term.Name("ofNullable")
+  val JavaAbsent: Term.Name = Term.Name("absent")
   val JavaOfEntries: Term.Name = Term.Name("ofEntries")
   val JavaOfSupplier: Term.Name = Term.Name("ofSupplier")
   val JavaCompletableFuture: Term.Name = Term.Name("CompletableFuture")
