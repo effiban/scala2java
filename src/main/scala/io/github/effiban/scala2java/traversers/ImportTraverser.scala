@@ -1,8 +1,8 @@
 package io.github.effiban.scala2java.traversers
 
-import io.github.effiban.scala2java.classifiers.ImporterClassifier
 import io.github.effiban.scala2java.contexts.StatContext
 import io.github.effiban.scala2java.entities.JavaScope
+import io.github.effiban.scala2java.predicates.ImporterIncludedPredicate
 import io.github.effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Import
@@ -12,7 +12,7 @@ trait ImportTraverser {
 }
 
 private[traversers] class ImportTraverserImpl(importerTraverser: => ImporterTraverser,
-                                              importerClassifier: ImporterClassifier)
+                                              importerIncludedPredicate: ImporterIncludedPredicate)
                                              (implicit javaWriter: JavaWriter) extends ImportTraverser {
 
   import javaWriter._
@@ -28,9 +28,8 @@ private[traversers] class ImportTraverserImpl(importerTraverser: => ImporterTrav
 
   private def traverseInner(`import`: Import): Unit = {
     `import`.importers match {
-      case List() => writeComment("Invalid import with no inner importers")
-      // TODO instead of filtering out all scala imports, some can be converted to Java equivalents
-      case importers => importers.filterNot(importerClassifier.isScala).foreach(importerTraverser.traverse)
+      case Nil => throw new IllegalStateException("Invalid import with no inner importers")
+      case importers => importers.filter(importerIncludedPredicate).foreach(importerTraverser.traverse)
     }
   }
 }
