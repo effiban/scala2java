@@ -2,10 +2,11 @@ package io.github.effiban.scala2java.traversers
 
 import io.github.effiban.scala2java.contexts.{InitContext, TemplateBodyContext, TemplateContext}
 import io.github.effiban.scala2java.entities.JavaScope.JavaScope
+import io.github.effiban.scala2java.predicates.TemplateInitIncludedPredicate
 import io.github.effiban.scala2java.resolvers.JavaInheritanceKeywordResolver
 import io.github.effiban.scala2java.writers.JavaWriter
 
-import scala.meta.{Init, Template, Type}
+import scala.meta.{Init, Template}
 
 trait TemplateTraverser {
 
@@ -16,20 +17,15 @@ private[traversers] class TemplateTraverserImpl(initListTraverser: => InitListTr
                                                 selfTraverser: => SelfTraverser,
                                                 templateBodyTraverser: => TemplateBodyTraverser,
                                                 permittedSubTypeNameListTraverser: PermittedSubTypeNameListTraverser,
-                                                javaInheritanceKeywordResolver: JavaInheritanceKeywordResolver)
+                                                javaInheritanceKeywordResolver: JavaInheritanceKeywordResolver,
+                                                templateInitIncludedPredicate: TemplateInitIncludedPredicate)
                                                (implicit javaWriter: JavaWriter) extends TemplateTraverser {
 
   import javaWriter._
 
-  private val ParentsToSkip = Set(
-    Type.Name("Product"),
-    Type.Name("Serializable"),
-    Type.Name("Enumeration")
-  )
-
   def traverse(template: Template, context: TemplateContext): Unit = {
-    val relevantInits = template.inits.filterNot(init => shouldSkipParent(init.tpe))
-    traverseTemplateInits(relevantInits, context.javaScope)
+    val includedInits = template.inits.filter(templateInitIncludedPredicate)
+    traverseTemplateInits(includedInits, context.javaScope)
     selfTraverser.traverse(template.self)
     if (context.permittedSubTypeNames.nonEmpty) {
       write(" ")
@@ -39,7 +35,7 @@ private[traversers] class TemplateTraverserImpl(initListTraverser: => InitListTr
       javaScope = context.javaScope,
       maybeClassName = context.maybeClassName,
       maybePrimaryCtor = context.maybePrimaryCtor,
-      inits = relevantInits
+      inits = includedInits
     )
     templateBodyTraverser.traverse(statements = template.stats, context = bodyContext)
   }
@@ -52,9 +48,5 @@ private[traversers] class TemplateTraverserImpl(initListTraverser: => InitListTr
       write(" ")
       initListTraverser.traverse(inits, InitContext(ignoreArgs = true))
     }
-  }
-
-  private def shouldSkipParent(parent: Type): Boolean = {
-    ParentsToSkip.exists(parentToSkip => parentToSkip.structure == parent.structure)
   }
 }

@@ -2,6 +2,7 @@ package io.github.effiban.scala2java.traversers
 
 import io.github.effiban.scala2java.classifiers._
 import io.github.effiban.scala2java.orderings.JavaTemplateChildOrdering
+import io.github.effiban.scala2java.predicates.TemplateInitIncludedPredicate
 import io.github.effiban.scala2java.resolvers.Resolvers.shouldReturnValueResolver
 import io.github.effiban.scala2java.resolvers._
 import io.github.effiban.scala2java.transformers._
@@ -320,7 +321,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
     selfTraverser,
     templateBodyTraverser,
     permittedSubTypeNameListTraverser,
-    JavaInheritanceKeywordResolver
+    JavaInheritanceKeywordResolver,
+    TemplateInitIncludedPredicate
   )
 
   private lazy val termAnnotateTraverser: TermAnnotateTraverser = new TermAnnotateTraverserImpl(annotListTraverser, termTraverser)
