@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.traversers
 
 import io.github.effiban.scala2java.classifiers._
 import io.github.effiban.scala2java.orderings.JavaTemplateChildOrdering
-import io.github.effiban.scala2java.predicates.TemplateInitIncludedPredicate
+import io.github.effiban.scala2java.predicates.{ImporterIncludedPredicate, TemplateInitIncludedPredicate}
 import io.github.effiban.scala2java.resolvers.Resolvers.shouldReturnValueResolver
 import io.github.effiban.scala2java.resolvers._
 import io.github.effiban.scala2java.transformers._
@@ -179,7 +179,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
 
   private lazy val importerTraverser: ImporterTraverser = new ImporterTraverserImpl(termRefTraverser, importeeTraverser)
 
-  private lazy val importTraverser: ImportTraverser = new ImportTraverserImpl(importerTraverser, ImporterClassifier)
+  private lazy val importTraverser: ImportTraverser = new ImportTraverserImpl(importerTraverser, ImporterIncludedPredicate)
 
   private lazy val initListTraverser: InitListTraverser = new InitListTraverserImpl(argumentListTraverser, initTraverser)
 
