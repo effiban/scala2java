@@ -16,7 +16,7 @@ private[traversers] class TypeSelectTraverserImpl(termRefTraverser: => TermRefTr
   // I think it's supported in Java, but will produce a warning that a 'static member is being accessed from a non-static context'.
   override def traverse(typeSelect: Type.Select): Unit = {
     termRefTraverser.traverse(typeSelect.qual)
-    write(".")
+    writeQualifierSeparator()
     typeNameTraverser.traverse(typeSelect.name)
   }
 }

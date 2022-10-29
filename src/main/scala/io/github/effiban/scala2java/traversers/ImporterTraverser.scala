@@ -17,7 +17,7 @@ private[traversers] class ImporterTraverserImpl(termRefTraverser: => TermRefTrav
     importer.importees.foreach(importee => {
       write("import ")
       termRefTraverser.traverse(importer.ref)
-      write(".")
+      writeQualifierSeparator()
       importeeTraverser.traverse(importee)
       writeStatementEnd()
     })

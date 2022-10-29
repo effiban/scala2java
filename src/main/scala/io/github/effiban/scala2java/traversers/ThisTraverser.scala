@@ -17,7 +17,7 @@ private[traversers] class ThisTraverserImpl(nameTraverser: => NameTraverser)
       case Name.Anonymous() =>
       case name =>
         nameTraverser.traverse(name)
-        write(".")
+        writeQualifierSeparator()
     }
     write("this")
   }

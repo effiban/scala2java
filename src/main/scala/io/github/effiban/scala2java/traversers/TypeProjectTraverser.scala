@@ -16,7 +16,7 @@ private[traversers] class TypeProjectTraverserImpl(typeTraverser: => TypeTravers
   // In Java it would be 'A.B'
   override def traverse(typeProject: Type.Project): Unit = {
     typeTraverser.traverse(typeProject.qual)
-    write(".")
+    writeQualifierSeparator()
     typeNameTraverser.traverse(typeProject.name)
   }
 }

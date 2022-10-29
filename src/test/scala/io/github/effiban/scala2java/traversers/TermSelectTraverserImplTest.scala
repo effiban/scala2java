@@ -14,8 +14,10 @@ class TermSelectTraverserImplTest extends UnitTestSuite {
 
   private val MyClass = Term.Name("MyClass")
   private val MyMethod = Term.Name("myMethod")
+  private val MyMethod2 = Term.Name("myMethod2")
   private val MyJavaClass = Term.Name("MyJavaClass")
   private val MyJavaMethod = Term.Name("myJavaMethod")
+  private val MyJavaMethod2 = Term.Name("myJavaMethod2")
   private val ScalaSelectWithTermName = Term.Select(qual = MyClass, name = MyMethod)
   private val JavaSelectWithTermName = Term.Select(qual = MyJavaClass, name = MyJavaMethod)
 
@@ -69,5 +71,26 @@ class TermSelectTraverserImplTest extends UnitTestSuite {
     termSelectTraverser.traverse(scalaSelect)
 
     outputWriter.toString shouldBe "(() -> 1).get"
+  }
+
+  test("traverse() when qualifier is a Term.Apply should break the line") {
+    val arg = List(Term.Name("arg1"))
+
+    val scalaQual = Term.Apply(ScalaSelectWithTermName, arg)
+    val scalaSelect = Term.Select(scalaQual, MyMethod2)
+
+    val javaQual = Term.Apply(JavaSelectWithTermName, arg)
+    val javaSelect = Term.Select(javaQual, MyJavaMethod2)
+
+    when(termSelectTransformer.transform(eqTree(scalaSelect))).thenReturn(javaSelect)
+
+    doWrite("MyJavaClass.myJavaMethod(arg1)").when(termTraverser).traverse(eqTree(javaQual))
+    doWrite("myJavaMethod2").when(termNameTraverser).traverse(eqTree(MyJavaMethod2))
+
+    termSelectTraverser.traverse(scalaSelect)
+
+    outputWriter.toString shouldBe
+    """MyJavaClass.myJavaMethod(arg1)
+        |.myJavaMethod2""".stripMargin
   }
 }

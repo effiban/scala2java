@@ -27,6 +27,8 @@ trait JavaWriter {
 
   def writeListSeparator(): Unit
 
+  def writeQualifierSeparator(): Unit
+
   def writeComment(comment: String): Unit
 
   def writeLine(str: String = ""): Unit
@@ -97,6 +99,10 @@ class JavaWriterImpl(writer: Writer) extends JavaWriter {
 
   override def writeListSeparator(): Unit = {
     write(",")
+  }
+
+  override def writeQualifierSeparator(): Unit = {
+    write(".")
   }
 
   override def writeComment(comment: String): Unit = {

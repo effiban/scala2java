@@ -55,6 +55,10 @@ class TestJavaWriter(sw: StringWriter) extends JavaWriter {
     write(",")
   }
 
+  override def writeQualifierSeparator(): Unit = {
+    write(".")
+  }
+
   override def writeComment(comment: String): Unit = {
     if (comment.contains("\n")) {
       val commentLines = comment.split("\n")

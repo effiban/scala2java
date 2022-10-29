@@ -17,7 +17,7 @@ private[traversers] class SuperTraverserImpl(nameTraverser: => NameTraverser)
       case Name.Anonymous() =>
       case name =>
         nameTraverser.traverse(name)
-        write(".")
+        writeQualifierSeparator()
     }
     write("super")
     `super`.superp match {

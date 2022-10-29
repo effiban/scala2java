@@ -30,7 +30,7 @@ private[traversers] class ApplyTypeTraverserImpl(typeTraverser: => TypeTraverser
       case term =>
         // In Java a type can only be applied to a qualified name, so the best we can do is guess the qualifier in a comment
         writeComment("this?")
-        write(".")
+        writeQualifierSeparator()
         typeListTraverser.traverse(termApplyType.targs)
         termTraverser.traverse(term)
     }

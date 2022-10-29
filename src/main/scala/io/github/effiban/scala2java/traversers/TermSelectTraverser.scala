@@ -23,7 +23,7 @@ private[traversers] class TermSelectTraverserImpl(termTraverser: => TermTraverse
   override def traverse(select: Term.Select, context: TermSelectContext = TermSelectContext()): Unit = {
     val javaSelect = termSelectTransformer.transform(select)
     traverseQualifier(javaSelect.qual)
-    write(".")
+    writeQualifierSeparator(javaSelect.qual)
     typeListTraverser.traverse(context.appliedTypeArgs)
     termNameTraverser.traverse(javaSelect.name)
   }
@@ -36,5 +36,13 @@ private[traversers] class TermSelectTraverserImpl(termTraverser: => TermTraverse
         writeArgumentsEnd(Parentheses)
       case qual => termTraverser.traverse(qual)
     }
+  }
+
+  private def writeQualifierSeparator(qualifier: Term): Unit = {
+    qualifier match {
+      case _ : Term.Apply => writeLine()
+      case _ =>
+    }
+    javaWriter.writeQualifierSeparator()
   }
 }
