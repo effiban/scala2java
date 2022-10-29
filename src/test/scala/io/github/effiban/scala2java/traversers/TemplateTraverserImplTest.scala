@@ -6,11 +6,13 @@ import io.github.effiban.scala2java.entities.{JavaKeyword, JavaScope}
 import io.github.effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.matchers.TemplateBodyContextMatcher.eqTemplateBodyContext
 import io.github.effiban.scala2java.matchers.TreeMatcher.eqTree
+import io.github.effiban.scala2java.predicates.TemplateInitIncludedPredicate
 import io.github.effiban.scala2java.resolvers.JavaInheritanceKeywordResolver
 import io.github.effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.testtrees.{Selfs, Templates, TypeNames}
 import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchers.any
 
 import scala.meta.{Ctor, Defn, Init, Lit, Name, Pat, Self, Stat, Template, Term, Type}
 
@@ -18,12 +20,12 @@ class TemplateTraverserImplTest extends UnitTestSuite {
 
   private val ClassName = Type.Name("MyClass")
 
-  private val TheNonSkippedInits = List(
+  private val IncludedInits = List(
     Init(tpe = Type.Name("Parent1"), name = Name.Anonymous(), argss = List()),
     Init(tpe = Type.Name("Parent2"), name = Name.Anonymous(), argss = List())
   )
 
-  private val TheSkippedInits = List(
+  private val ExcludedInits = List(
     Init(tpe = Type.Name("Product"), name = Name.Anonymous(), argss = List()),
     Init(tpe = Type.Name("Serializable"), name = Name.Anonymous(), argss = List()),
     Init(tpe = Type.Name("Enumeration"), name = Name.Anonymous(), argss = List())
@@ -68,13 +70,15 @@ class TemplateTraverserImplTest extends UnitTestSuite {
   private val javaInheritanceKeywordResolver = mock[JavaInheritanceKeywordResolver]
   private val templateBodyTraverser = mock[TemplateBodyTraverser]
   private val permittedSubTypeNameListTraverser = mock[PermittedSubTypeNameListTraverser]
+  private val templateInitIncludedPredicate = mock[TemplateInitIncludedPredicate]
 
   private val templateTraverser = new TemplateTraverserImpl(
     initListTraverser,
     selfTraverser,
     templateBodyTraverser,
     permittedSubTypeNameListTraverser,
-    javaInheritanceKeywordResolver
+    javaInheritanceKeywordResolver,
+    templateInitIncludedPredicate
   )
 
   test("traverse when empty") {
@@ -96,14 +100,15 @@ class TemplateTraverserImplTest extends UnitTestSuite {
   test("traverse when has inits only, nothing to skip") {
     val template = Template(
       early = Nil,
-      inits = TheNonSkippedInits,
+      inits = IncludedInits,
       self = Selfs.Empty,
       stats = Nil
     )
 
-    expectWriteSelf()
+    expectFilterInits()
     expectWriteInits(JavaScope.Class)
-    expectTraverseBody(stats = Nil, context = TemplateBodyContext(javaScope = JavaScope.Class, inits = TheNonSkippedInits))
+    expectWriteSelf()
+    expectTraverseBody(stats = Nil, context = TemplateBodyContext(javaScope = JavaScope.Class, inits = IncludedInits))
 
     templateTraverser.traverse(template, context = TemplateContext(javaScope = JavaScope.Class))
 
@@ -117,14 +122,15 @@ class TemplateTraverserImplTest extends UnitTestSuite {
   test("traverse when has inits only and some should be skipped") {
     val template = Template(
       early = Nil,
-      inits = TheNonSkippedInits ++ TheSkippedInits,
+      inits = IncludedInits ++ ExcludedInits,
       self = Selfs.Empty,
       stats = Nil
     )
 
+    expectFilterInits()
     expectWriteSelf()
     expectWriteInits(JavaScope.Class)
-    expectTraverseBody(stats = Nil, context = TemplateBodyContext(javaScope = JavaScope.Class, inits = TheNonSkippedInits))
+    expectTraverseBody(stats = Nil, context = TemplateBodyContext(javaScope = JavaScope.Class, inits = IncludedInits))
 
     templateTraverser.traverse(template, context = TemplateContext(javaScope = JavaScope.Class))
 
@@ -240,7 +246,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
 
     val template = Template(
       early = Nil,
-      inits = TheNonSkippedInits,
+      inits = IncludedInits,
       self = NonEmptySelf,
       stats = stats
     )
@@ -252,6 +258,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       permittedSubTypeNames = PermittedSubTypeNames
     )
 
+    expectFilterInits()
     expectWriteInits(JavaScope.Class)
     expectWriteSelf(NonEmptySelf)
     expectTraversePermittedSubTypeNames()
@@ -259,7 +266,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       javaScope = JavaScope.Class,
       maybeClassName = Some(ClassName),
       maybePrimaryCtor = Some(PrimaryCtor),
-      inits = TheNonSkippedInits)
+      inits = IncludedInits)
     )
 
     templateTraverser.traverse(template = template, context = context)
@@ -275,11 +282,17 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     Term.Param(mods = List(), name = Term.Name(name), decltpe = Some(Type.Name(typeName)), default = None)
   }
 
+  private def expectFilterInits(): Unit = {
+      when(templateInitIncludedPredicate.apply(any[Init])).thenAnswer(
+        (actualInit: Init) => IncludedInits.exists(_.structure == actualInit.structure)
+      )
+  }
+
   private def expectWriteInits(javaScope: JavaScope): Unit = {
-    when(javaInheritanceKeywordResolver.resolve(ArgumentMatchers.eq(javaScope), eqTreeList(TheNonSkippedInits))).thenReturn(JavaKeyword.Implements)
+    when(javaInheritanceKeywordResolver.resolve(ArgumentMatchers.eq(javaScope), eqTreeList(IncludedInits))).thenReturn(JavaKeyword.Implements)
     doWrite("Parent1, Parent2")
       .when(initListTraverser).traverse(
-      eqTreeList(TheNonSkippedInits), ArgumentMatchers.eq(InitContext(ignoreArgs = true)))
+      eqTreeList(IncludedInits), ArgumentMatchers.eq(InitContext(ignoreArgs = true)))
   }
 
   private def expectWriteSelf(self: Self = Selfs.Empty): Unit = {
