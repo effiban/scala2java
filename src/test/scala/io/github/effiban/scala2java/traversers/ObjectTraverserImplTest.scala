@@ -1,15 +1,13 @@
 package io.github.effiban.scala2java.traversers
 
 import io.github.effiban.scala2java.contexts._
-import io.github.effiban.scala2java.entities.JavaScope.JavaScope
-import io.github.effiban.scala2java.entities.{JavaModifier, JavaScope, JavaTreeType}
-import io.github.effiban.scala2java.matchers.CombinedMatchers.eqTreeList
+import io.github.effiban.scala2java.entities.{JavaScope, JavaTreeType}
 import io.github.effiban.scala2java.matchers.JavaChildScopeContextMatcher.eqJavaChildScopeContext
 import io.github.effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
 import io.github.effiban.scala2java.matchers.JavaTreeTypeContextMatcher.eqJavaTreeTypeContext
 import io.github.effiban.scala2java.matchers.TemplateContextMatcher.eqTemplateContext
 import io.github.effiban.scala2java.matchers.TreeMatcher.eqTree
-import io.github.effiban.scala2java.resolvers.{JavaChildScopeResolver, JavaModifiersResolver, JavaTreeTypeResolver}
+import io.github.effiban.scala2java.resolvers.{JavaChildScopeResolver, JavaTreeTypeResolver}
 import io.github.effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.testtrees.TypeNames
@@ -37,16 +35,14 @@ class ObjectTraverserImplTest extends UnitTestSuite {
     body = Block(List())
   )
 
-  private val annotListTraverser = mock[AnnotListTraverser]
+  private val modListTraverser = mock[ModListTraverser]
   private val templateTraverser = mock[TemplateTraverser]
-  private val javaModifiersResolver = mock[JavaModifiersResolver]
   private val javaTreeTypeResolver = mock[JavaTreeTypeResolver]
   private val javaChildScopeResolver = mock[JavaChildScopeResolver]
 
   private val objectTraverser = new ObjectTraverserImpl(
-    annotListTraverser,
+    modListTraverser,
     templateTraverser,
-    javaModifiersResolver,
     javaTreeTypeResolver,
     javaChildScopeResolver)
 
@@ -69,15 +65,12 @@ class ObjectTraverserImplTest extends UnitTestSuite {
 
     val expectedTemplateContext = TemplateContext(javaScope = JavaScope.Class)
 
-    when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(objectDef, JavaTreeType.Class)))).thenReturn(JavaScope.Class)
-
-    doWrite(
-      """@MyAnnotation
-        |""".stripMargin)
-      .when(annotListTraverser).traverseMods(mods = eqTreeList(TheMods), onSameLine = ArgumentMatchers.eq(false))
     whenResolveJavaTreeTypeThenReturnClass(objectDef, TheMods)
-    whenResolveJavaModifiersThenReturnPublic(objectDef, TheMods, javaScope)
-
+    doWrite(
+    """@MyAnnotation
+        |public """.stripMargin)
+      .when(modListTraverser).traverse(eqExpectedModifiers(objectDef), annotsOnSameLine = ArgumentMatchers.eq(false))
+    when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(objectDef, JavaTreeType.Class)))).thenReturn(JavaScope.Class)
     doWrite(
       """ {
         |  /* BODY */
@@ -120,10 +113,9 @@ class ObjectTraverserImplTest extends UnitTestSuite {
 
     doWrite(
       """@MyAnnotation
-        |""".stripMargin)
-      .when(annotListTraverser).traverseMods(mods = eqTreeList(TheMods), onSameLine = ArgumentMatchers.eq(false))
+        |public """.stripMargin)
+      .when(modListTraverser).traverse(eqExpectedModifiers(objectDef), annotsOnSameLine = ArgumentMatchers.eq(false))
     whenResolveJavaTreeTypeThenReturnClass(objectDef, TheMods)
-    whenResolveJavaModifiersThenReturnPublic(objectDef, TheMods, javaScope)
     doWrite(
       """ {
         |  /* BODY */
@@ -151,8 +143,8 @@ class ObjectTraverserImplTest extends UnitTestSuite {
     when(javaTreeTypeResolver.resolve(eqJavaTreeTypeContext(expectedJavaTreeTypeContext))).thenReturn(JavaTreeType.Class)
   }
 
-  private def whenResolveJavaModifiersThenReturnPublic(obj: Defn.Object, modifiers: List[Mod], javaScope: JavaScope): Unit = {
-    val expectedJavaModifiersContext = JavaModifiersContext(obj, modifiers, JavaTreeType.Class, javaScope)
-    when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedJavaModifiersContext))).thenReturn(List(JavaModifier.Public))
+  private def eqExpectedModifiers(obj: Defn.Object) = {
+    val expectedJavaModifiersContext = JavaModifiersContext(obj, TheMods, JavaTreeType.Class, JavaScope.Package)
+    eqJavaModifiersContext(expectedJavaModifiersContext)
   }
 }

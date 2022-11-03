@@ -2,11 +2,10 @@ package io.github.effiban.scala2java.traversers
 
 import io.github.effiban.scala2java.contexts.{JavaModifiersContext, StatContext}
 import io.github.effiban.scala2java.entities.JavaScope.JavaScope
-import io.github.effiban.scala2java.entities.{JavaModifier, JavaScope, JavaTreeType}
+import io.github.effiban.scala2java.entities.{JavaScope, JavaTreeType}
 import io.github.effiban.scala2java.matchers.CombinedMatchers.{eqSomeTree, eqTreeList}
 import io.github.effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
 import io.github.effiban.scala2java.matchers.TreeMatcher.eqTree
-import io.github.effiban.scala2java.resolvers.JavaModifiersResolver
 import io.github.effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.testtrees.TypeNames
@@ -16,7 +15,6 @@ import scala.meta.{Defn, Init, Lit, Mod, Name, Pat, Term, Type}
 
 class DefnValTraverserImplTest extends UnitTestSuite {
 
-  private val JavaPrivateFinalModifiers = List(JavaModifier.Private, JavaModifier.Final)
   private val IntType = TypeNames.Int
   private val MyValPat = Pat.Var(Term.Name("myVal"))
   private val Rhs = Lit.Int(3)
@@ -24,28 +22,25 @@ class DefnValTraverserImplTest extends UnitTestSuite {
   private val TheAnnot = Mod.Annot(
     Init(tpe = Type.Name("MyAnnotation"), name = Name.Anonymous(), argss = List())
   )
+  private val Modifiers = List(TheAnnot)
 
-  private val annotListTraverser = mock[AnnotListTraverser]
+  private val modListTraverser = mock[ModListTraverser]
   private val defnValOrVarTypeTraverser = mock[DefnValOrVarTypeTraverser]
   private val patListTraverser = mock[PatListTraverser]
   private val rhsTermTraverser = mock[RhsTermTraverser]
-  private val javaModifiersResolver = mock[JavaModifiersResolver]
 
   private val defnValTraverser = new DefnValTraverserImpl(
-    annotListTraverser,
+    modListTraverser,
     defnValOrVarTypeTraverser,
     patListTraverser,
-    rhsTermTraverser,
-    javaModifiersResolver)
+    rhsTermTraverser)
 
 
   test("traverse() when it is a class member - typed") {
     val javaScope = JavaScope.Class
 
-    val modifiers = List(TheAnnot)
-
     val defnVal = Defn.Val(
-      mods = modifiers,
+      mods = Modifiers,
       pats = List(MyValPat),
       decltpe = Some(TypeNames.Int),
       rhs = Rhs
@@ -53,9 +48,8 @@ class DefnValTraverserImplTest extends UnitTestSuite {
 
     doWrite(
       """@MyAnnotation
-        |""".stripMargin)
-      .when(annotListTraverser).traverseMods(mods = eqTreeList(modifiers), onSameLine = ArgumentMatchers.eq(false))
-    whenResolveJavaModifiers(defnVal, modifiers, javaScope).thenReturn(JavaPrivateFinalModifiers)
+        |private final """.stripMargin)
+      .when(modListTraverser).traverse(eqExpectedModifiers(defnVal, javaScope), annotsOnSameLine = ArgumentMatchers.eq(false))
     doWrite("int")
       .when(defnValOrVarTypeTraverser).traverse(
       eqSomeTree(IntType),
@@ -75,10 +69,8 @@ class DefnValTraverserImplTest extends UnitTestSuite {
   test("traverse() when it is a class member - untyped") {
     val javaScope = JavaScope.Class
 
-    val modifiers = List(TheAnnot)
-
     val defnVal = Defn.Val(
-      mods = modifiers,
+      mods = Modifiers,
       pats = List(MyValPat),
       decltpe = None,
       rhs = Rhs
@@ -86,9 +78,8 @@ class DefnValTraverserImplTest extends UnitTestSuite {
 
     doWrite(
       """@MyAnnotation
-        |""".stripMargin)
-      .when(annotListTraverser).traverseMods(mods = eqTreeList(modifiers), onSameLine = ArgumentMatchers.eq(false))
-    whenResolveJavaModifiers(defnVal, modifiers, javaScope).thenReturn(JavaPrivateFinalModifiers)
+        |private final """.stripMargin)
+      .when(modListTraverser).traverse(eqExpectedModifiers(defnVal, javaScope), annotsOnSameLine = ArgumentMatchers.eq(false))
     doWrite("int")
       .when(defnValOrVarTypeTraverser).traverse(
       ArgumentMatchers.eq(None),
@@ -108,10 +99,8 @@ class DefnValTraverserImplTest extends UnitTestSuite {
   test("traverse() when it is an interface member - typed") {
     val javaScope = JavaScope.Interface
 
-    val modifiers = List(TheAnnot)
-
     val defnVal = Defn.Val(
-      mods = modifiers,
+      mods = Modifiers,
       pats = List(MyValPat),
       decltpe = Some(TypeNames.Int),
       rhs = Rhs
@@ -120,8 +109,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
     doWrite(
       """@MyAnnotation
         |""".stripMargin)
-      .when(annotListTraverser).traverseMods(mods = eqTreeList(modifiers), onSameLine = ArgumentMatchers.eq(false))
-    whenResolveJavaModifiers(defnVal, modifiers, javaScope).thenReturn(Nil)
+      .when(modListTraverser).traverse(eqExpectedModifiers(defnVal, javaScope), annotsOnSameLine = ArgumentMatchers.eq(false))
     doWrite("int")
       .when(defnValOrVarTypeTraverser).traverse(
       eqSomeTree(IntType),
@@ -141,10 +129,8 @@ class DefnValTraverserImplTest extends UnitTestSuite {
   test("traverse() when it is an interface member - untyped") {
     val javaScope = JavaScope.Interface
 
-    val modifiers = List(TheAnnot)
-
     val defnVal = Defn.Val(
-      mods = modifiers,
+      mods = Modifiers,
       pats = List(MyValPat),
       decltpe = None,
       rhs = Rhs
@@ -153,8 +139,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
     doWrite(
       """@MyAnnotation
         |""".stripMargin)
-      .when(annotListTraverser).traverseMods(mods = eqTreeList(modifiers), onSameLine = ArgumentMatchers.eq(false))
-    whenResolveJavaModifiers(defnVal, modifiers, javaScope).thenReturn(Nil)
+      .when(modListTraverser).traverse(eqExpectedModifiers(defnVal, javaScope), annotsOnSameLine = ArgumentMatchers.eq(false))
     doWrite("int")
       .when(defnValOrVarTypeTraverser).traverse(
       ArgumentMatchers.eq(None),
@@ -171,8 +156,8 @@ class DefnValTraverserImplTest extends UnitTestSuite {
         |int myVal = 3""".stripMargin
   }
 
-  private def whenResolveJavaModifiers(defnVal: Defn.Val, modifiers: List[Mod], javaScope: JavaScope) = {
-    val expectedContext = JavaModifiersContext(defnVal, modifiers, JavaTreeType.Variable, javaScope)
-    when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedContext)))
+  private def eqExpectedModifiers(defnVal: Defn.Val, javaScope: JavaScope) = {
+    val expectedJavaModifiersContext = JavaModifiersContext(defnVal, Modifiers, JavaTreeType.Variable, javaScope)
+    eqJavaModifiersContext(expectedJavaModifiersContext)
   }
 }

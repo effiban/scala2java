@@ -1,15 +1,14 @@
 package io.github.effiban.scala2java.traversers
 
 import io.github.effiban.scala2java.contexts._
-import io.github.effiban.scala2java.entities.JavaScope.JavaScope
-import io.github.effiban.scala2java.entities.{JavaModifier, JavaScope, JavaTreeType}
+import io.github.effiban.scala2java.entities.{JavaScope, JavaTreeType}
 import io.github.effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.matchers.JavaChildScopeContextMatcher.eqJavaChildScopeContext
 import io.github.effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
 import io.github.effiban.scala2java.matchers.JavaTreeTypeContextMatcher.eqJavaTreeTypeContext
 import io.github.effiban.scala2java.matchers.TemplateContextMatcher.eqTemplateContext
 import io.github.effiban.scala2java.matchers.TreeMatcher.eqTree
-import io.github.effiban.scala2java.resolvers.{JavaChildScopeResolver, JavaModifiersResolver, JavaTreeTypeResolver}
+import io.github.effiban.scala2java.resolvers.{JavaChildScopeResolver, JavaTreeTypeResolver}
 import io.github.effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.transformers.ParamToDeclValTransformer
@@ -76,28 +75,24 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       )
     )
 
-  private val annotListTraverser = mock[AnnotListTraverser]
+  private val modListTraverser = mock[ModListTraverser]
   private val typeParamListTraverser = mock[TypeParamListTraverser]
   private val templateTraverser = mock[TemplateTraverser]
   private val paramToDeclValTransformer = mock[ParamToDeclValTransformer]
-  private val javaModifiersResolver = mock[JavaModifiersResolver]
   private val javaTreeTypeResolver = mock[JavaTreeTypeResolver]
   private val javaChildScopeResolver = mock[JavaChildScopeResolver]
 
   private val classTraverser = new RegularClassTraverserImpl(
-    annotListTraverser,
+    modListTraverser,
     typeParamListTraverser,
     templateTraverser,
     paramToDeclValTransformer,
-    javaModifiersResolver,
     javaTreeTypeResolver,
     javaChildScopeResolver
   )
 
 
   test("traverse() for one list of ctor args") {
-    val parentJavaScope = JavaScope.Package
-
     val primaryCtor = Ctor.Primary(
       mods = Nil,
       name = Name.Anonymous(),
@@ -115,15 +110,13 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
     val expectedMemberDecls = List(ExpectedMemberDecl1, ExpectedMemberDecl2)
     val expectedAdjustedTemplate = InitialTemplate.copy(stats = expectedMemberDecls ++ InitialTemplate.stats)
 
-    when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Class)))).thenReturn(JavaScope.Class)
-
-    doWrite(
-      """@MyAnnotation
-        |""".stripMargin)
-      .when(annotListTraverser).traverseMods(eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
     whenResolveJavaTreeTypeThenReturnClass(cls)
-    whenResolveJavaModifiersThenReturnPublic(cls, parentJavaScope)
+    doWrite(
+    """@MyAnnotation
+      |public """.stripMargin)
+      .when(modListTraverser).traverse(eqExpectedModifiers(cls), annotsOnSameLine = ArgumentMatchers.eq(false))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
+    when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Class)))).thenReturn(JavaScope.Class)
 
     when(paramToDeclValTransformer.transform(any[Term.Param])).thenAnswer( (ctorArg: Term.Param) => ctorArg match {
       case arg1 if arg1.structure == CtorArg1.structure => ExpectedMemberDecl1
@@ -140,7 +133,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       eqTemplateContext(TemplateContext(javaScope = JavaScope.Class, maybeClassName = Some(ClassName), maybePrimaryCtor = Some(primaryCtor)))
     )
 
-    classTraverser.traverse(cls, ClassOrTraitContext(parentJavaScope))
+    classTraverser.traverse(cls, ClassOrTraitContext(JavaScope.Package))
 
     outputWriter.toString shouldBe
       """
@@ -152,8 +145,6 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for one list of ctor args with permitted sub-type names") {
-    val javaScope = JavaScope.Package
-
     val primaryCtor = Ctor.Primary(
       mods = Nil,
       name = Name.Anonymous(),
@@ -173,15 +164,13 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
 
     val permittedSubTypeNames = List(Type.Name("A"), Term.Name("B"))
 
-    when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Class)))).thenReturn(JavaScope.Class)
-
-    doWrite(
-      """@MyAnnotation
-        |""".stripMargin)
-      .when(annotListTraverser).traverseMods(eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
     whenResolveJavaTreeTypeThenReturnClass(cls)
-    whenResolveJavaModifiersThenReturnPublic(cls, javaScope)
+    doWrite(
+    """@MyAnnotation
+      |public """.stripMargin)
+      .when(modListTraverser).traverse(eqExpectedModifiers(cls), annotsOnSameLine = ArgumentMatchers.eq(false))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
+    when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Class)))).thenReturn(JavaScope.Class)
 
     when(paramToDeclValTransformer.transform(any[Term.Param])).thenAnswer((ctorArg: Term.Param) => ctorArg match {
       case arg1 if arg1.structure == CtorArg1.structure => ExpectedMemberDecl1
@@ -203,7 +192,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       )
     )
 
-    val context = ClassOrTraitContext(javaScope = javaScope, permittedSubTypeNames = permittedSubTypeNames)
+    val context = ClassOrTraitContext(javaScope = JavaScope.Package, permittedSubTypeNames = permittedSubTypeNames)
     classTraverser.traverse(cls, context)
 
     outputWriter.toString shouldBe
@@ -216,8 +205,6 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for two lists of ctor args") {
-    val javaScope = JavaScope.Package
-
     val primaryCtor = Ctor.Primary(
       mods = Nil,
       name = Name.Anonymous(),
@@ -241,16 +228,16 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       ExpectedMemberDecl3,
       ExpectedMemberDecl4
     )
+
     val expectedAdjustedTemplate = InitialTemplate.copy(stats = expectedMemberDecls ++ InitialTemplate.stats)
 
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Class)))).thenReturn(JavaScope.Class)
 
-    doWrite(
-      """@MyAnnotation
-        |""".stripMargin)
-      .when(annotListTraverser).traverseMods(eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
     whenResolveJavaTreeTypeThenReturnClass(cls)
-    whenResolveJavaModifiersThenReturnPublic(cls, javaScope)
+    doWrite(
+    """@MyAnnotation
+        |public """.stripMargin)
+      .when(modListTraverser).traverse(eqExpectedModifiers(cls), annotsOnSameLine = ArgumentMatchers.eq(false))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
 
     when(paramToDeclValTransformer.transform(any[Term.Param])).thenAnswer( (ctorArg: Term.Param) => ctorArg match {
@@ -270,7 +257,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       eqTemplateContext(TemplateContext(javaScope = JavaScope.Class, maybeClassName = Some(ClassName), maybePrimaryCtor = Some(primaryCtor)))
     )
 
-    classTraverser.traverse(cls, ClassOrTraitContext(javaScope))
+    classTraverser.traverse(cls, ClassOrTraitContext(JavaScope.Package))
 
     outputWriter.toString shouldBe
       """
@@ -303,8 +290,8 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
     when(javaTreeTypeResolver.resolve(eqJavaTreeTypeContext(expectedContext))).thenReturn(JavaTreeType.Class)
   }
 
-  private def whenResolveJavaModifiersThenReturnPublic(cls: Defn.Class, parentJavaScope: JavaScope): Unit = {
-    val expectedContext = JavaModifiersContext(cls, Modifiers, JavaTreeType.Class, parentJavaScope)
-    when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedContext))).thenReturn(List(JavaModifier.Public))
+  private def eqExpectedModifiers(classDef: Defn.Class) = {
+    val expectedJavaModifiersContext = JavaModifiersContext(classDef, Modifiers, JavaTreeType.Class, JavaScope.Package)
+    eqJavaModifiersContext(expectedJavaModifiersContext)
   }
 }

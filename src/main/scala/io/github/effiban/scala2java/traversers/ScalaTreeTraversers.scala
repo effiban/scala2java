@@ -58,11 +58,10 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
   )
 
   private lazy val caseClassTraverser: CaseClassTraverser = new CaseClassTraverserImpl(
-    annotListTraverser,
+    modListTraverser,
     typeParamListTraverser,
     termParamListTraverser,
     templateTraverser,
-    JavaModifiersResolver,
     JavaTreeTypeResolver,
     JavaChildScopeResolver
   )
@@ -78,12 +77,11 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
   private lazy val ctorSecondaryTraverser: CtorSecondaryTraverser = new CtorSecondaryTraverserImpl(CtorSecondaryTransformer, defnDefTraverser)
 
   private lazy val declDefTraverser: DeclDefTraverser = new DeclDefTraverserImpl(
-    annotListTraverser,
+    modListTraverser,
     typeParamListTraverser,
     typeTraverser,
     termNameTraverser,
     termParamListTraverser,
-    JavaModifiersResolver
   )
 
   private lazy val declTraverser: DeclTraverser = new DeclTraverserImpl(
@@ -93,33 +91,30 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
     declTypeTraverser)
 
   private lazy val declTypeTraverser: DeclTypeTraverser = new DeclTypeTraverserImpl(
+    modListTraverser,
     typeParamListTraverser,
-    JavaModifiersResolver,
     JavaTreeTypeResolver)
 
   private lazy val declValTraverser: DeclValTraverser = new DeclValTraverserImpl(
-    annotListTraverser,
+    modListTraverser,
     typeTraverser,
-    patListTraverser,
-    JavaModifiersResolver
+    patListTraverser
   )
 
   private lazy val declVarTraverser: DeclVarTraverser = new DeclVarTraverserImpl(
-    annotListTraverser,
+    modListTraverser,
     typeTraverser,
-    patListTraverser,
-    JavaModifiersResolver
+    patListTraverser
   )
 
   private lazy val defnDefTraverser: DefnDefTraverser = new DefnDefTraverserImpl(
-    annotListTraverser,
+    modListTraverser,
     typeParamListTraverser,
     termNameTraverser,
     typeTraverser,
     termParamListTraverser,
     blockTraverser,
-    termTypeInferrer,
-    JavaModifiersResolver
+    termTypeInferrer
   )
 
   private lazy val defnTraverser: DefnTraverser = new DefnTraverserImpl(
@@ -133,10 +128,10 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
   )
 
   private lazy val defnTypeTraverser: DefnTypeTraverser = new DefnTypeTraverserImpl(
+    modListTraverser,
     typeParamListTraverser,
     typeTraverser,
     typeBoundsTraverser,
-    JavaModifiersResolver,
     JavaTreeTypeResolver
   )
 
@@ -146,19 +141,17 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
   )
 
   private lazy val defnValTraverser: DefnValTraverser = new DefnValTraverserImpl(
-    annotListTraverser,
+    modListTraverser,
     defnValOrVarTypeTraverser,
     patListTraverser,
-    rhsTermTraverser,
-    JavaModifiersResolver
+    rhsTermTraverser
   )
 
   private lazy val defnVarTraverser: DefnVarTraverser = new DefnVarTraverserImpl(
-    annotListTraverser,
+    modListTraverser,
     defnValOrVarTypeTraverser,
     patListTraverser,
-    rhsTermTraverser,
-    JavaModifiersResolver
+    rhsTermTraverser
   )
 
   private lazy val doTraverser: DoTraverser = new DoTraverserImpl(termTraverser, blockTraverser)
@@ -198,6 +191,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
 
   private lazy val litTraverser: LitTraverser = new LitTraverserImpl()
 
+  private lazy val modListTraverser: ModListTraverser = new ModListTraverserImpl(annotListTraverser, JavaModifiersResolver)
+
   private lazy val nameIndeterminateTraverser: NameIndeterminateTraverser = new NameIndeterminateTraverserImpl()
 
   private lazy val nameTraverser: NameTraverser = new NameTraverserImpl(
@@ -216,9 +211,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
   )
 
   private lazy val objectTraverser: ObjectTraverser = new ObjectTraverserImpl(
-    annotListTraverser,
+    modListTraverser,
     templateTraverser,
-    JavaModifiersResolver,
     JavaTreeTypeResolver,
     JavaChildScopeResolver)
 
@@ -274,11 +268,10 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
   private lazy val pkgTraverser: PkgTraverser = new PkgTraverserImpl(termRefTraverser, pkgStatListTraverser)
 
   private lazy val regularClassTraverser: RegularClassTraverser = new RegularClassTraverserImpl(
-    annotListTraverser,
+    modListTraverser,
     typeParamListTraverser,
     templateTraverser,
     ParamToDeclValTransformer,
-    JavaModifiersResolver,
     JavaTreeTypeResolver,
     JavaChildScopeResolver
   )
@@ -361,10 +354,9 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
   private lazy val termParamListTraverser: TermParamListTraverser = new TermParamListTraverserImpl(argumentListTraverser, termParamTraverser)
 
   private lazy val termParamTraverser: TermParamTraverser = new TermParamTraverserImpl(
-    annotListTraverser,
+    modListTraverser,
     typeTraverser,
-    nameTraverser,
-    JavaModifiersResolver
+    nameTraverser
   )
 
   private lazy val termPlaceholderTraverser: TermPlaceholderTraverser = new TermPlaceholderTraverserImpl
@@ -428,10 +420,9 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
   private lazy val throwTraverser: ThrowTraverser = new ThrowTraverserImpl(termTraverser)
 
   private lazy val traitTraverser: TraitTraverser = new TraitTraverserImpl(
-    annotListTraverser,
+    modListTraverser,
     typeParamListTraverser,
     templateTraverser,
-    JavaModifiersResolver,
     JavaTreeTypeResolver,
     JavaChildScopeResolver
   )

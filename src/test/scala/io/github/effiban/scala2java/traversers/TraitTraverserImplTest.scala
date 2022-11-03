@@ -2,14 +2,14 @@ package io.github.effiban.scala2java.traversers
 
 import io.github.effiban.scala2java.contexts._
 import io.github.effiban.scala2java.entities.JavaTreeType.Interface
-import io.github.effiban.scala2java.entities.{JavaModifier, JavaScope, JavaTreeType}
+import io.github.effiban.scala2java.entities.{JavaScope, JavaTreeType}
 import io.github.effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.matchers.JavaChildScopeContextMatcher.eqJavaChildScopeContext
 import io.github.effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
 import io.github.effiban.scala2java.matchers.JavaTreeTypeContextMatcher.eqJavaTreeTypeContext
 import io.github.effiban.scala2java.matchers.TemplateContextMatcher.eqTemplateContext
 import io.github.effiban.scala2java.matchers.TreeMatcher.eqTree
-import io.github.effiban.scala2java.resolvers.{JavaChildScopeResolver, JavaModifiersResolver, JavaTreeTypeResolver}
+import io.github.effiban.scala2java.resolvers.{JavaChildScopeResolver, JavaTreeTypeResolver}
 import io.github.effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.testtrees.{PrimaryCtors, TypeNames}
@@ -63,19 +63,17 @@ class TraitTraverserImplTest extends UnitTestSuite {
       )
     )
 
-  private val annotListTraverser = mock[AnnotListTraverser]
+  private val modListTraverser = mock[ModListTraverser]
   private val typeParamListTraverser = mock[TypeParamListTraverser]
   private val templateTraverser = mock[TemplateTraverser]
-  private val javaModifiersResolver = mock[JavaModifiersResolver]
   private val javaTreeTypeResolver = mock[JavaTreeTypeResolver]
   private val javaChildScopeResolver = mock[JavaChildScopeResolver]
 
 
   private val traitTraverser = new TraitTraverserImpl(
-    annotListTraverser,
+    modListTraverser,
     typeParamListTraverser,
     templateTraverser,
-    javaModifiersResolver,
     javaTreeTypeResolver,
     javaChildScopeResolver
   )
@@ -92,24 +90,22 @@ class TraitTraverserImplTest extends UnitTestSuite {
 
     val permittedSubTypeNames = List(Type.Name("A"), Term.Name("B"))
 
-    doWrite(
-      """@MyAnnotation
-        |""".stripMargin)
-      .when(annotListTraverser).traverseMods(eqTreeList(Modifiers), onSameLine = ArgumentMatchers.eq(false))
     whenResolveJavaTreeTypeThenReturnInterface(`trait`)
-    whenResolveJavaModifiersThenReturnPublic(`trait`)
-    doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
-
     doWrite(
-      """ {
+    """@MyAnnotation
+        |public """.stripMargin)
+      .when(modListTraverser).traverse(eqExpectedModifiers(`trait`), annotsOnSameLine = ArgumentMatchers.eq(false))
+    doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
+    when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(`trait`, JavaTreeType.Interface)))).thenReturn(JavaScope.Interface)
+    doWrite(
+    """ {
         |  /* BODY */
         |}
         |""".stripMargin)
       .when(templateTraverser).traverse(
-      eqTree(TheTemplate),
-      eqTemplateContext(TemplateContext(javaScope = JavaScope.Interface, permittedSubTypeNames = permittedSubTypeNames)))
+        eqTree(TheTemplate),
+        eqTemplateContext(TemplateContext(javaScope = JavaScope.Interface, permittedSubTypeNames = permittedSubTypeNames)))
 
-    when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(`trait`, JavaTreeType.Interface)))).thenReturn(JavaScope.Interface)
 
     val context = ClassOrTraitContext(javaScope = JavaScope.Package, permittedSubTypeNames = permittedSubTypeNames)
     traitTraverser.traverse(`trait`, context)
@@ -128,8 +124,8 @@ class TraitTraverserImplTest extends UnitTestSuite {
     when(javaTreeTypeResolver.resolve(eqJavaTreeTypeContext(expectedJavaTreeTypeContext))).thenReturn(Interface)
   }
 
-  private def whenResolveJavaModifiersThenReturnPublic(`trait`: Trait): Unit = {
-    val expectedJavaModifiersContext = JavaModifiersContext(`trait`, Modifiers, Interface, JavaScope.Package)
-    when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedJavaModifiersContext))).thenReturn(List(JavaModifier.Public))
+  private def eqExpectedModifiers(`trait`: Trait) = {
+    val expectedJavaModifiersContext = JavaModifiersContext(`trait`, Modifiers, JavaTreeType.Interface, JavaScope.Package)
+    eqJavaModifiersContext(expectedJavaModifiersContext)
   }
 }

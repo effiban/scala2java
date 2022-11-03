@@ -11,7 +11,7 @@ class JavaModifiersContextMatcher(expectedContext: JavaModifiersContext) extends
   override def matches(actualContext: JavaModifiersContext): Boolean = {
     scalaTreeMatches(actualContext) &&
       scalaModsMatch(actualContext) &&
-      actualContext.javaTreeType == expectedContext.javaTreeType
+      actualContext.javaTreeType == expectedContext.javaTreeType &&
       actualContext.javaScope == expectedContext.javaScope
   }
 

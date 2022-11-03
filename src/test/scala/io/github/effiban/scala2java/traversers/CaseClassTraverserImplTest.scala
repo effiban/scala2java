@@ -1,14 +1,14 @@
 package io.github.effiban.scala2java.traversers
 
 import io.github.effiban.scala2java.contexts._
-import io.github.effiban.scala2java.entities.{JavaModifier, JavaScope, JavaTreeType}
+import io.github.effiban.scala2java.entities.{JavaScope, JavaTreeType}
 import io.github.effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.matchers.JavaChildScopeContextMatcher.eqJavaChildScopeContext
 import io.github.effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
 import io.github.effiban.scala2java.matchers.JavaTreeTypeContextMatcher.eqJavaTreeTypeContext
 import io.github.effiban.scala2java.matchers.TemplateContextMatcher.eqTemplateContext
 import io.github.effiban.scala2java.matchers.TreeMatcher.eqTree
-import io.github.effiban.scala2java.resolvers.{JavaChildScopeResolver, JavaModifiersResolver, JavaTreeTypeResolver}
+import io.github.effiban.scala2java.resolvers.{JavaChildScopeResolver, JavaTreeTypeResolver}
 import io.github.effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.testtrees.TypeNames
@@ -60,22 +60,20 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     )
   )
 
-  private val annotListTraverser = mock[AnnotListTraverser]
+  private val modListTraverser = mock[ModListTraverser]
   private val typeParamListTraverser = mock[TypeParamListTraverser]
   private val termParamListTraverser = mock[TermParamListTraverser]
   private val templateTraverser = mock[TemplateTraverser]
-  private val javaModifiersResolver = mock[JavaModifiersResolver]
   private val javaTreeTypeResolver = mock[JavaTreeTypeResolver]
   private val javaChildScopeResolver = mock[JavaChildScopeResolver]
 
 
 
   private val classTraverser = new CaseClassTraverserImpl(
-    annotListTraverser,
+    modListTraverser,
     typeParamListTraverser,
     termParamListTraverser,
     templateTraverser,
-    javaModifiersResolver,
     javaTreeTypeResolver,
     javaChildScopeResolver)
 
@@ -101,19 +99,17 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       templ = TheTemplate
     )
 
-    when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Record)))).thenReturn(JavaScope.Class)
-
+    whenResolveJavaTreeTypeThenReturnRecord(cls, modifiers)
     doWrite(
       """@MyAnnotation
-        |""".stripMargin)
-      .when(annotListTraverser).traverseMods(eqTreeList(modifiers), onSameLine = ArgumentMatchers.eq(false))
-    whenResolveJavaTreeTypeThenReturnRecord(cls, modifiers)
-    whenResolveJavaModifiersThenReturnPublic(cls, modifiers)
+        |public """.stripMargin)
+      .when(modListTraverser).traverse(eqExpectedModifiers(cls, modifiers), annotsOnSameLine = ArgumentMatchers.eq(false))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
+    when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Record)))).thenReturn(JavaScope.Class)
     doWrite("(int arg1, int arg2)").when(termParamListTraverser).traverse(
-      termParams = eqTreeList(CtorArgs1),
-      context = ArgumentMatchers.eq(StatContext(JavaScope.Class)),
-      onSameLine = ArgumentMatchers.eq(false)
+        termParams = eqTreeList(CtorArgs1),
+        context = ArgumentMatchers.eq(StatContext(JavaScope.Class)),
+        onSameLine = ArgumentMatchers.eq(false)
     )
     doWrite(
       """ {
@@ -160,15 +156,13 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       templ = TheTemplate
     )
 
-    when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Record)))).thenReturn(JavaScope.Class)
-
+    whenResolveJavaTreeTypeThenReturnRecord(cls, modifiers)
     doWrite(
       """@MyAnnotation
-        |""".stripMargin)
-      .when(annotListTraverser).traverseMods(eqTreeList(modifiers), onSameLine = ArgumentMatchers.eq(false))
-    whenResolveJavaTreeTypeThenReturnRecord(cls, modifiers)
-    whenResolveJavaModifiersThenReturnPublic(cls, modifiers)
+        |public """.stripMargin)
+      .when(modListTraverser).traverse(eqExpectedModifiers(cls, modifiers), annotsOnSameLine = ArgumentMatchers.eq(false))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
+    when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Record)))).thenReturn(JavaScope.Class)
     doWrite("(int arg1, int arg2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(CtorArgs1),
       context = ArgumentMatchers.eq(StatContext(JavaScope.Class)),
@@ -215,15 +209,13 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
 
     val permittedSubTypeNames = List(Type.Name("A"), Term.Name("B"))
 
-    when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Record)))).thenReturn(JavaScope.Class)
-
+    whenResolveJavaTreeTypeThenReturnRecord(cls, modifiers)
     doWrite(
       """@MyAnnotation
-        |""".stripMargin)
-      .when(annotListTraverser).traverseMods(eqTreeList(modifiers), onSameLine = ArgumentMatchers.eq(false))
-    whenResolveJavaTreeTypeThenReturnRecord(cls, modifiers)
-    whenResolveJavaModifiersThenReturnPublic(cls, modifiers)
+        |public """.stripMargin)
+      .when(modListTraverser).traverse(eqExpectedModifiers(cls, modifiers), annotsOnSameLine = ArgumentMatchers.eq(false))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
+    when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Record)))).thenReturn(JavaScope.Class)
     doWrite("(int arg1, int arg2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(CtorArgs1),
       context = ArgumentMatchers.eq(StatContext(JavaScope.Class)),
@@ -276,15 +268,13 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       templ = TheTemplate
     )
 
-    when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Record)))).thenReturn(JavaScope.Class)
-
+    whenResolveJavaTreeTypeThenReturnRecord(cls, modifiers)
     doWrite(
       """@MyAnnotation
-        |""".stripMargin)
-      .when(annotListTraverser).traverseMods(eqTreeList(modifiers), onSameLine = ArgumentMatchers.eq(false))
-    whenResolveJavaTreeTypeThenReturnRecord(cls, modifiers)
-    whenResolveJavaModifiersThenReturnPublic(cls, modifiers)
+        |public """.stripMargin)
+      .when(modListTraverser).traverse(eqExpectedModifiers(cls, modifiers), annotsOnSameLine = ArgumentMatchers.eq(false))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
+    when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Record)))).thenReturn(JavaScope.Class)
     doWrite("(int arg1, int arg2, int arg3, int arg4)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(CtorArgs1 ++ CtorArgs2),
       context = ArgumentMatchers.eq(StatContext(JavaScope.Class)),
@@ -319,9 +309,8 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     when(javaTreeTypeResolver.resolve(eqJavaTreeTypeContext(expectedContext))).thenReturn(JavaTreeType.Record)
   }
 
-  private def whenResolveJavaModifiersThenReturnPublic(cls: Defn.Class, modifiers: List[Mod]): Unit = {
-    val expectedJavaModifiersContext = JavaModifiersContext(cls, modifiers, JavaTreeType.Class, JavaScope.Package)
-    when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedJavaModifiersContext))).thenReturn(List(JavaModifier.Public))
+  private def eqExpectedModifiers(classDef: Defn.Class, modifiers: List[Mod]) = {
+    val expectedJavaModifiersContext = JavaModifiersContext(classDef, modifiers, JavaTreeType.Record, JavaScope.Package)
+    eqJavaModifiersContext(expectedJavaModifiersContext)
   }
-
 }

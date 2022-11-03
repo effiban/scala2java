@@ -1,13 +1,14 @@
 package io.github.effiban.scala2java.traversers
 
 import io.github.effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, StatContext}
-import io.github.effiban.scala2java.entities.{JavaModifier, JavaScope, JavaTreeType}
+import io.github.effiban.scala2java.entities.{JavaScope, JavaTreeType}
 import io.github.effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
 import io.github.effiban.scala2java.matchers.JavaTreeTypeContextMatcher.eqJavaTreeTypeContext
-import io.github.effiban.scala2java.resolvers.{JavaModifiersResolver, JavaTreeTypeResolver}
+import io.github.effiban.scala2java.resolvers.JavaTreeTypeResolver
 import io.github.effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.testsuites.UnitTestSuite
+import org.mockito.ArgumentMatchers
 
 import scala.meta.Type.Bounds
 import scala.meta.{Decl, Init, Mod, Name, Type}
@@ -31,13 +32,13 @@ class DeclTypeTraverserImplTest extends UnitTestSuite {
     )
   )
 
+  private val modListTraverser = mock[ModListTraverser]
   private val typeParamListTraverser = mock[TypeParamListTraverser]
-  private val javaModifiersResolver = mock[JavaModifiersResolver]
   private val javaTreeTypeResolver = mock[JavaTreeTypeResolver]
 
   private val declTypeTraverser = new DeclTypeTraverserImpl(
+    modListTraverser,
     typeParamListTraverser,
-    javaModifiersResolver,
     javaTreeTypeResolver)
 
 
@@ -51,13 +52,17 @@ class DeclTypeTraverserImplTest extends UnitTestSuite {
     )
 
     whenResolveJavaTreeTypeThenReturnInterface(declType)
-    whenResolveJavaModifiers(declType).thenReturn(List(JavaModifier.Private))
+    doWrite(
+      """@MyAnnotation
+        |private """.stripMargin)
+      .when(modListTraverser).traverse(eqExpectedModifiers(declType), annotsOnSameLine = ArgumentMatchers.eq(false))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
 
     declTypeTraverser.traverse(declType, StatContext(JavaScope.Class))
 
     outputWriter.toString shouldBe
       """
+        |@MyAnnotation
         |private interface MyType<T> {
         |}
         |""".stripMargin
@@ -68,9 +73,8 @@ class DeclTypeTraverserImplTest extends UnitTestSuite {
     when(javaTreeTypeResolver.resolve(eqJavaTreeTypeContext(expectedJavaTreeTypeContext))).thenReturn(JavaTreeType.Interface)
   }
 
-  private def whenResolveJavaModifiers(declType: Decl.Type) = {
+  private def eqExpectedModifiers(declType: Decl.Type) = {
     val expectedJavaModifiersContext = JavaModifiersContext(declType, Modifiers, JavaTreeType.Interface, JavaScope.Class)
-    when(javaModifiersResolver.resolve(eqJavaModifiersContext(expectedJavaModifiersContext)))
+    eqJavaModifiersContext(expectedJavaModifiersContext)
   }
-
 }
