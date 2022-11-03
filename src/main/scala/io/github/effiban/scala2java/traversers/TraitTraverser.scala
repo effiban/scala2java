@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.contexts._
 import io.github.effiban.scala2java.entities.JavaScope.JavaScope
 import io.github.effiban.scala2java.entities.JavaTreeType.JavaTreeType
 import io.github.effiban.scala2java.entities.JavaTreeTypeToKeywordMapping
-import io.github.effiban.scala2java.resolvers.{JavaChildScopeResolver, JavaModifiersResolver, JavaTreeTypeResolver}
+import io.github.effiban.scala2java.resolvers.{JavaChildScopeResolver, JavaTreeTypeResolver}
 import io.github.effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Defn.Trait
@@ -13,10 +13,9 @@ trait TraitTraverser {
   def traverse(traitDef: Trait, context: ClassOrTraitContext = ClassOrTraitContext()): Unit
 }
 
-private[traversers] class TraitTraverserImpl(annotListTraverser: => AnnotListTraverser,
+private[traversers] class TraitTraverserImpl(modListTraverser: => ModListTraverser,
                                              typeParamListTraverser: => TypeParamListTraverser,
                                              templateTraverser: => TemplateTraverser,
-                                             javaModifiersResolver: JavaModifiersResolver,
                                              javaTreeTypeResolver: JavaTreeTypeResolver,
                                              javaChildScopeResolver: JavaChildScopeResolver)
                                             (implicit javaWriter: JavaWriter) extends TraitTraverser {
@@ -25,26 +24,23 @@ private[traversers] class TraitTraverserImpl(annotListTraverser: => AnnotListTra
 
   override def traverse(traitDef: Trait, context: ClassOrTraitContext = ClassOrTraitContext()): Unit = {
     writeLine()
-    annotListTraverser.traverseMods(traitDef.mods)
     val javaTreeType = javaTreeTypeResolver.resolve(JavaTreeTypeContext(traitDef, traitDef.mods))
-    writeTypeDeclaration(modifiers = resolveJavaModifiers(traitDef, javaTreeType, context.javaScope),
-      typeKeyword = JavaTreeTypeToKeywordMapping(javaTreeType),
-      name = traitDef.name.toString)
+    modListTraverser.traverse(toJavaModifiersContext(traitDef, javaTreeType, context.javaScope))
+    writeNamedType(JavaTreeTypeToKeywordMapping(javaTreeType), traitDef.name.value)
     typeParamListTraverser.traverse(traitDef.tparams)
     val javaChildScope = javaChildScopeResolver.resolve(JavaChildScopeContext(traitDef, javaTreeType))
     val templateContext = TemplateContext(javaScope = javaChildScope, permittedSubTypeNames = context.permittedSubTypeNames)
     templateTraverser.traverse(traitDef.templ, templateContext)
   }
 
-  private def resolveJavaModifiers(traitDef: Trait,
-                                   javaTreeType: JavaTreeType,
-                                   parentJavaScope: JavaScope) = {
-    val javaModifiersContext = JavaModifiersContext(
+  private def toJavaModifiersContext(traitDef: Trait,
+                                     javaTreeType: JavaTreeType,
+                                     javaScope: JavaScope) = {
+    JavaModifiersContext(
       scalaTree = traitDef,
       scalaMods = traitDef.mods,
       javaTreeType = javaTreeType,
-      javaScope = parentJavaScope
+      javaScope = javaScope
     )
-    javaModifiersResolver.resolve(javaModifiersContext)
   }
 }

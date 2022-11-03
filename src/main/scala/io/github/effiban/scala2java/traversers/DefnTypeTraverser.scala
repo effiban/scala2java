@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeType
 import io.github.effiban.scala2java.entities.JavaScope.JavaScope
 import io.github.effiban.scala2java.entities.JavaTreeType.JavaTreeType
 import io.github.effiban.scala2java.entities.JavaTreeTypeToKeywordMapping
-import io.github.effiban.scala2java.resolvers.{JavaModifiersResolver, JavaTreeTypeResolver}
+import io.github.effiban.scala2java.resolvers.JavaTreeTypeResolver
 import io.github.effiban.scala2java.writers.JavaWriter
 
 import scala.meta.Type.Bounds
@@ -14,10 +14,10 @@ trait DefnTypeTraverser {
   def traverse(typeDef: Defn.Type, context: StatContext = StatContext()): Unit
 }
 
-private[traversers] class DefnTypeTraverserImpl(typeParamListTraverser: => TypeParamListTraverser,
+private[traversers] class DefnTypeTraverserImpl(modListTraverser: => ModListTraverser,
+                                                typeParamListTraverser: => TypeParamListTraverser,
                                                 typeTraverser: => TypeTraverser,
                                                 typeBoundsTraverser: => TypeBoundsTraverser,
-                                                javaModifiersResolver: JavaModifiersResolver,
                                                 javaTreeTypeResolver: JavaTreeTypeResolver)
                                                (implicit javaWriter: JavaWriter) extends DefnTypeTraverser {
 
@@ -25,11 +25,10 @@ private[traversers] class DefnTypeTraverserImpl(typeParamListTraverser: => TypeP
 
   // Scala type definition : Can sometimes be replaced by an empty interface
   override def traverse(typeDef: Defn.Type, context: StatContext = StatContext()): Unit = {
-    //TODO - handle annotations
+    //TODO - transform to Defn.Trait instead of traversing directly (+ the Java tree type is incorrect anyway)
     val javaTreeType = javaTreeTypeResolver.resolve(JavaTreeTypeContext(typeDef, typeDef.mods))
-    writeTypeDeclaration(modifiers = resolveJavaModifiers(typeDef, javaTreeType, context.javaScope),
-      typeKeyword = JavaTreeTypeToKeywordMapping(javaTreeType),
-      name = typeDef.name.toString)
+    modListTraverser.traverse(toJavaModifiersContext(typeDef, javaTreeType, context.javaScope))
+    writeNamedType(JavaTreeTypeToKeywordMapping(javaTreeType), typeDef.name.value)
     typeParamListTraverser.traverse(typeDef.tparams)
     typeDef.bounds match {
       case Bounds(None, None) =>
@@ -48,15 +47,13 @@ private[traversers] class DefnTypeTraverserImpl(typeParamListTraverser: => TypeP
     writeBlockEnd()
   }
 
-  private def resolveJavaModifiers(typeDef: Defn.Type,
-                                   javaTreeType: JavaTreeType,
-                                   javaScope: JavaScope) = {
-    val javaModifiersContext = JavaModifiersContext(
-      scalaTree = typeDef,
-      scalaMods = typeDef.mods,
+  private def toJavaModifiersContext(typeDefn: Defn.Type,
+                                     javaTreeType: JavaTreeType,
+                                     javaScope: JavaScope) =
+    JavaModifiersContext(
+      scalaTree = typeDefn,
+      scalaMods = typeDefn.mods,
       javaTreeType = javaTreeType,
       javaScope = javaScope
     )
-    javaModifiersResolver.resolve(javaModifiersContext)
-  }
 }

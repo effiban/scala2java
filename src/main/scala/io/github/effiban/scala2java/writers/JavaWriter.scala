@@ -9,6 +9,7 @@ trait JavaWriter {
 
   def writeTypeDeclaration(modifiers: List[JavaModifier], typeKeyword: JavaKeyword, name: String): Unit
 
+  def writeNamedType(typeKeyword: JavaKeyword, name: String): Unit
   def writeModifiers(modifiers: List[JavaModifier]): Unit
 
   def writeKeyword(keyword: JavaKeyword): Unit
@@ -51,6 +52,10 @@ class JavaWriterImpl(writer: Writer) extends JavaWriter {
 
   override def writeTypeDeclaration(modifiers: List[JavaModifier], typeKeyword: JavaKeyword, name: String): Unit = {
     writeModifiers(modifiers)
+    writeNamedType(typeKeyword, name)
+  }
+
+  override def writeNamedType(typeKeyword: JavaKeyword, name: String): Unit = {
     write(s"${typeKeyword.name} $name")
   }
 

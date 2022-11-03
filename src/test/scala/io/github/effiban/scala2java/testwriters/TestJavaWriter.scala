@@ -9,6 +9,10 @@ import java.io.StringWriter
 class TestJavaWriter(sw: StringWriter) extends JavaWriter {
   override def writeTypeDeclaration(modifiers: List[JavaModifier], typeKeyword: JavaKeyword, name: String): Unit = {
     writeModifiers(modifiers)
+    writeNamedType(typeKeyword, name)
+  }
+
+  override def writeNamedType(typeKeyword: JavaKeyword, name: String): Unit = {
     write(s"${typeKeyword.name} $name")
   }
 

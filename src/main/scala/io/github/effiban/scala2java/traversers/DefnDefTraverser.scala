@@ -5,7 +5,6 @@ import io.github.effiban.scala2java.entities.Decision.{No, Uncertain, Yes}
 import io.github.effiban.scala2java.entities.JavaScope.JavaScope
 import io.github.effiban.scala2java.entities.TraversalConstants.UnknownType
 import io.github.effiban.scala2java.entities.{JavaScope, JavaTreeType}
-import io.github.effiban.scala2java.resolvers.JavaModifiersResolver
 import io.github.effiban.scala2java.typeinference.TermTypeInferrer
 import io.github.effiban.scala2java.writers.JavaWriter
 
@@ -15,27 +14,24 @@ trait DefnDefTraverser {
   def traverse(defnDef: Defn.Def, context: DefnDefContext = DefnDefContext()): Unit
 }
 
-private[traversers] class DefnDefTraverserImpl(annotListTraverser: => AnnotListTraverser,
+private[traversers] class DefnDefTraverserImpl(modListTraverser: => ModListTraverser,
                                                typeParamListTraverser: => TypeParamListTraverser,
                                                termNameTraverser: => TermNameTraverser,
                                                typeTraverser: => TypeTraverser,
                                                termParamListTraverser: => TermParamListTraverser,
                                                blockTraverser: => BlockTraverser,
-                                               termTypeInferrer: => TermTypeInferrer,
-                                               javaModifiersResolver: JavaModifiersResolver)
+                                               termTypeInferrer: => TermTypeInferrer)
                                               (implicit javaWriter: JavaWriter) extends DefnDefTraverser {
 
   import javaWriter._
 
   override def traverse(defnDef: Defn.Def, context: DefnDefContext = DefnDefContext()): Unit = {
     writeLine()
-    annotListTraverser.traverseMods(defnDef.mods)
-    writeModifiers(resolveJavaModifiers(defnDef, context.javaScope))
+    modListTraverser.traverse(toJavaModifiersContext(defnDef, context.javaScope))
     traverseTypeParams(defnDef.tparams)
     val maybeMethodType = resolveMethodType(defnDef)
     traverseMethodType(maybeMethodType)
     termNameTraverser.traverse(defnDef.name)
-
     traverseMethodParamsAndBody(defnDef, maybeMethodType, context.maybeInit)
   }
 
@@ -78,13 +74,10 @@ private[traversers] class DefnDefTraverserImpl(annotListTraverser: => AnnotListT
     }
   }
 
-  private def resolveJavaModifiers(defnDef: Defn.Def, javaScope: JavaScope) = {
-    val javaModifiersContext = JavaModifiersContext(
+  private def toJavaModifiersContext(defnDef: Defn.Def, javaScope: JavaScope) = JavaModifiersContext(
       scalaTree = defnDef,
       scalaMods = defnDef.mods,
       javaTreeType = JavaTreeType.Method,
       javaScope = javaScope
     )
-    javaModifiersResolver.resolve(javaModifiersContext)
-  }
 }
