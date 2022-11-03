@@ -14,10 +14,10 @@ import scala.meta.{Decl, Mod, Name, Pat, Term}
 
 class ModListTraverserImplTest extends UnitTestSuite {
 
-  private val Mods = List(Mod.Private(Name.Anonymous()))
+  private val PrivateFinalMods = List(Mod.Private(Name.Anonymous()), Mod.Final())
+  private val ImplicitPrivateFinalMods = Mod.Implicit() +: PrivateFinalMods
+
   private val Pats = List(Pat.Var(Term.Name("x")))
-  private val TheDeclVal = Decl.Val(Mods, Pats, TypeNames.Int)
-  private val TheModifiersContext = JavaModifiersContext(TheDeclVal, Mods, JavaTreeType.Variable, JavaScope.Class)
 
   private val annotListTraverser = mock[AnnotListTraverser]
   private val javaModifiersResolver = mock[JavaModifiersResolver]
@@ -25,14 +25,16 @@ class ModListTraverserImplTest extends UnitTestSuite {
   private val modListTraverser = new ModListTraverserImpl(annotListTraverser, javaModifiersResolver)
 
   test("traverse when annotations not on same line") {
+    val modifiersContext = modifiersContextOf(PrivateFinalMods)
+
     doWrite(
       """@MyAnnotation
-      |""".stripMargin)
-      .when(annotListTraverser).traverseMods(eqTreeList(Mods), onSameLine = ArgumentMatchers.eq(false))
-    when(javaModifiersResolver.resolve(eqJavaModifiersContext(TheModifiersContext)))
+        |""".stripMargin)
+      .when(annotListTraverser).traverseMods(eqTreeList(PrivateFinalMods), onSameLine = ArgumentMatchers.eq(false))
+    when(javaModifiersResolver.resolve(eqJavaModifiersContext(modifiersContext)))
       .thenReturn(List(JavaModifier.Private, JavaModifier.Final))
 
-    modListTraverser.traverse(TheModifiersContext)
+    modListTraverser.traverse(modifiersContext)
 
     outputWriter.toString shouldBe
       """@MyAnnotation
@@ -40,13 +42,36 @@ class ModListTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse when annotations on same line") {
+    val modifiersContext = modifiersContextOf(PrivateFinalMods)
+
     doWrite("@MyAnnotation ")
-      .when(annotListTraverser).traverseMods(eqTreeList(Mods), onSameLine = ArgumentMatchers.eq(true))
-    when(javaModifiersResolver.resolve(eqJavaModifiersContext(TheModifiersContext)))
+      .when(annotListTraverser).traverseMods(eqTreeList(PrivateFinalMods), onSameLine = ArgumentMatchers.eq(true))
+    when(javaModifiersResolver.resolve(eqJavaModifiersContext(modifiersContext)))
       .thenReturn(List(JavaModifier.Private, JavaModifier.Final))
 
-    modListTraverser.traverse(TheModifiersContext, annotsOnSameLine = true)
+    modListTraverser.traverse(modifiersContext, annotsOnSameLine = true)
 
     outputWriter.toString shouldBe "@MyAnnotation private final "
   }
+
+  test("traverse when 'implicit'") {
+    val modifiersContext = modifiersContextOf(ImplicitPrivateFinalMods)
+
+    doWrite(
+      """@MyAnnotation
+        |""".stripMargin)
+      .when(annotListTraverser).traverseMods(eqTreeList(ImplicitPrivateFinalMods), onSameLine = ArgumentMatchers.eq(false))
+    when(javaModifiersResolver.resolve(eqJavaModifiersContext(modifiersContext)))
+      .thenReturn(List(JavaModifier.Private, JavaModifier.Final))
+
+    modListTraverser.traverse(modifiersContext)
+
+    outputWriter.toString shouldBe
+      """@MyAnnotation
+        |/* implicit */private final """.stripMargin
+  }
+
+  private def modifiersContextOf(mods: List[Mod]) = JavaModifiersContext(declValWith(mods), mods, JavaTreeType.Variable, JavaScope.Class)
+
+  private def declValWith(mods: List[Mod]) = Decl.Val(mods, Pats, TypeNames.Int)
 }
