@@ -1,2 +1,3 @@
 rootProject.name = 'scala2java'
+include 'scala2java-core'
 
