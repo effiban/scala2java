@@ -1,11 +1,11 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.generators.JavaImportersProvider
 import io.github.effiban.scala2java.core.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.core.matchers.TreeMatcher.eqTree
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{PrimaryCtors, TermNames}
+import io.github.effiban.scala2java.spi.providers.JavaImportersProvider
 
 import scala.meta.{Decl, Defn, Import, Importee, Importer, Name, Pat, Pkg, Self, Template, Term, Type}
 

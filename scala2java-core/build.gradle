@@ -4,12 +4,7 @@ plugins {
 }
 
 dependencies {
-    implementation "org.scalameta:scalameta_$scalaMajorVersion:4.6.0"
-    constraints {
-        implementation('com.google.protobuf:protobuf-java:3.19.6') {
-            because 'previous versions have a security vulnerability'
-        }
-    }
+    implementation project(':scala2java-spi')
 }
 
 jar {

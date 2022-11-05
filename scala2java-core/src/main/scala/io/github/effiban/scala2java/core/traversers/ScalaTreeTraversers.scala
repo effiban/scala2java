@@ -1,16 +1,17 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.classifiers.{DefnTypeClassifier, DefnValClassifier, JavaStatClassifier, TermApplyInfixClassifier}
-import io.github.effiban.scala2java.core.generators.DefaultJavaImportersProvider
+import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
 import io.github.effiban.scala2java.core.orderings.JavaTemplateChildOrdering
 import io.github.effiban.scala2java.core.predicates.{ImporterIncludedPredicate, TemplateInitIncludedPredicate}
+import io.github.effiban.scala2java.core.providers.{CompositeJavaImportersProvider, DefaultJavaImportersProvider}
 import io.github.effiban.scala2java.core.resolvers.Resolvers.shouldReturnValueResolver
 import io.github.effiban.scala2java.core.resolvers._
 import io.github.effiban.scala2java.core.transformers._
 import io.github.effiban.scala2java.core.typeinference.TypeInferrers.{scalarArgListTypeInferrer, termTypeInferrer}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
-class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
+class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: ExtensionRegistry) {
 
   private lazy val alternativeTraverser: AlternativeTraverser = new AlternativeTraverserImpl(patTraverser)
 
@@ -269,7 +270,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
   private lazy val pkgTraverser: PkgTraverser = new PkgTraverserImpl(
     termRefTraverser,
     pkgStatListTraverser,
-    DefaultJavaImportersProvider
+    new CompositeJavaImportersProvider(DefaultJavaImportersProvider, extensionRegistry)
   )
 
   private lazy val regularClassTraverser: RegularClassTraverser = new RegularClassTraverserImpl(
