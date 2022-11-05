@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.traversers
 
-import io.github.effiban.scala2java.contexts.JavaModifiersContext
+import io.github.effiban.scala2java.contexts.ModifiersContext
 import io.github.effiban.scala2java.resolvers.JavaModifiersResolver
 import io.github.effiban.scala2java.writers.JavaWriter
 
@@ -8,7 +8,7 @@ import scala.meta.Mod
 import scala.meta.Mod.Implicit
 
 trait ModListTraverser {
-  def traverse(javaModifiersContext: JavaModifiersContext, annotsOnSameLine: Boolean = false): Unit
+  def traverse(modifiersContext: ModifiersContext, annotsOnSameLine: Boolean = false): Unit
 }
 
 class ModListTraverserImpl(annotListTraverser: => AnnotListTraverser,
@@ -17,10 +17,10 @@ class ModListTraverserImpl(annotListTraverser: => AnnotListTraverser,
 
   import javaWriter._
 
-  override def traverse(javaModifiersContext: JavaModifiersContext, annotsOnSameLine: Boolean = false): Unit = {
-    annotListTraverser.traverseMods(javaModifiersContext.scalaMods, annotsOnSameLine)
-    handleImplicitIfExists(javaModifiersContext.scalaMods)
-    writeModifiers(javaModifiersResolver.resolve(javaModifiersContext))
+  override def traverse(modifiersContext: ModifiersContext, annotsOnSameLine: Boolean = false): Unit = {
+    annotListTraverser.traverseMods(modifiersContext.scalaMods, annotsOnSameLine)
+    handleImplicitIfExists(modifiersContext.scalaMods)
+    writeModifiers(javaModifiersResolver.resolve(modifiersContext))
   }
 
   private def handleImplicitIfExists(scalaMods: List[Mod]): Unit = {

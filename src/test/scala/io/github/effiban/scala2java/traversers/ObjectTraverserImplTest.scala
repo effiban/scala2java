@@ -3,8 +3,8 @@ package io.github.effiban.scala2java.traversers
 import io.github.effiban.scala2java.contexts._
 import io.github.effiban.scala2java.entities.{JavaScope, JavaTreeType}
 import io.github.effiban.scala2java.matchers.JavaChildScopeContextMatcher.eqJavaChildScopeContext
-import io.github.effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
 import io.github.effiban.scala2java.matchers.JavaTreeTypeContextMatcher.eqJavaTreeTypeContext
+import io.github.effiban.scala2java.matchers.ModifiersContextMatcher.eqModifiersContext
 import io.github.effiban.scala2java.matchers.TemplateContextMatcher.eqTemplateContext
 import io.github.effiban.scala2java.matchers.TreeMatcher.eqTree
 import io.github.effiban.scala2java.resolvers.{JavaChildScopeResolver, JavaTreeTypeResolver}
@@ -144,7 +144,7 @@ class ObjectTraverserImplTest extends UnitTestSuite {
   }
 
   private def eqExpectedModifiers(obj: Defn.Object) = {
-    val expectedJavaModifiersContext = JavaModifiersContext(obj, JavaTreeType.Class, JavaScope.Package)
-    eqJavaModifiersContext(expectedJavaModifiersContext)
+    val expectedModifiersContext = ModifiersContext(obj, JavaTreeType.Class, JavaScope.Package)
+    eqModifiersContext(expectedModifiersContext)
   }
 }

@@ -23,7 +23,7 @@ private[traversers] class TraitTraverserImpl(modListTraverser: => ModListTravers
   override def traverse(traitDef: Trait, context: ClassOrTraitContext = ClassOrTraitContext()): Unit = {
     writeLine()
     val javaTreeType = javaTreeTypeResolver.resolve(JavaTreeTypeContext(traitDef, traitDef.mods))
-    modListTraverser.traverse(JavaModifiersContext(traitDef, javaTreeType, context.javaScope))
+    modListTraverser.traverse(ModifiersContext(traitDef, javaTreeType, context.javaScope))
     writeNamedType(JavaTreeTypeToKeywordMapping(javaTreeType), traitDef.name.value)
     typeParamListTraverser.traverse(traitDef.tparams)
     val javaChildScope = javaChildScopeResolver.resolve(JavaChildScopeContext(traitDef, javaTreeType))

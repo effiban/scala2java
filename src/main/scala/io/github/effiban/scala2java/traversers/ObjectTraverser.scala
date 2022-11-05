@@ -22,7 +22,7 @@ private[traversers] class ObjectTraverserImpl(modListTraverser: => ModListTraver
   override def traverse(objectDef: Defn.Object, context: StatContext = StatContext()): Unit = {
     writeLine()
     val javaTreeType = javaTreeTypeResolver.resolve(JavaTreeTypeContext(objectDef, objectDef.mods))
-    modListTraverser.traverse(JavaModifiersContext(objectDef, javaTreeType, context.javaScope))
+    modListTraverser.traverse(ModifiersContext(objectDef, javaTreeType, context.javaScope))
     writeNamedType(JavaTreeTypeToKeywordMapping(javaTreeType), objectDef.name.value)
     val javaChildScope = javaChildScopeResolver.resolve(JavaChildScopeContext(objectDef, javaTreeType))
     // TODO if child scope is utility class, add private ctor.

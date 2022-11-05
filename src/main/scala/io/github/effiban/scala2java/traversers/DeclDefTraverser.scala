@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.traversers
 
-import io.github.effiban.scala2java.contexts.{JavaModifiersContext, StatContext}
+import io.github.effiban.scala2java.contexts.{ModifiersContext, StatContext}
 import io.github.effiban.scala2java.entities.{JavaScope, JavaTreeType}
 import io.github.effiban.scala2java.writers.JavaWriter
 
@@ -21,7 +21,7 @@ private[traversers] class DeclDefTraverserImpl(modListTraverser: => ModListTrave
 
   override def traverse(defDecl: Decl.Def, context: StatContext = StatContext()): Unit = {
     writeLine()
-    modListTraverser.traverse(JavaModifiersContext(defDecl, JavaTreeType.Method, context.javaScope))
+    modListTraverser.traverse(ModifiersContext(defDecl, JavaTreeType.Method, context.javaScope))
     traverseTypeParams(defDecl.tparams)
     typeTraverser.traverse(defDecl.decltpe)
     write(" ")
