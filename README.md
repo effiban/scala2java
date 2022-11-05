@@ -23,6 +23,11 @@ I also hope it may prove useful to other companies/individuals as well.
 **Scala Input**: The tool was tested with sources in Scala 2.13, and will probably work with earlier versions. There is no support for Scala 3.    
 **Java Output**: The generated files are in Java 17. In the future (if needed) other versions may be supported.
 
+### Maven Central Coordinates
+
+group: **io.github.effiban**  
+artifact: **scala2java_2.13**
+
 ### Usage Guide
 
 The tool receives one or more Scala source files and translates them one by one to Java.  
@@ -34,33 +39,15 @@ In the future I plan to add an IntelliJ plugin as well.
 
 **Option 1 - CLI tool** 
 
-1. Download the executable jar [scala2java_2.13-1.0.2-all.jar](https://repo1.maven.org/maven2/io/github/effiban/scala2java_2.13/1.0.2/scala2java_2.13-1.0.2-all.jar) 
+1. Download the executable jar which is the one with the **-all** suffix 
 1. To generate output to the console:  
-   ```java -jar scala2java_2.13-1.0.2-all.jar MyClass1.scala MyClass2.scala```  
+   ```java -jar scala2java_2.13-<version>-all.jar MyClass1.scala MyClass2.scala```  
 1. To generate output to a directory:  
-   ```java -jar scala2java_2.13-1.0.2-all.jar --outDir=myDir  MyClass.scala MyClass2.scala```
-
-
+   ```java -jar scala2java_2.13-<version>-all.jar --outDir=myDir  MyClass.scala MyClass2.scala```
 
 **Option 2 - SDK _(currently supports only one file at a time)_**
 
-1. Add the scala2java dependency to your project as follows:
-
-Maven:
-
-```xml
-<dependency>
-  <groupId>io.github.effiban</groupId>
-  <artifactId>scala2java_2.13</artifactId>
-  <version>1.0.2</version>
-</dependency>
-```
-
-Gradle:
-
-```groovy
-implementation 'io.github.effiban:scala2java_2.13:1.0.2'
-```
+1. Add the scala2java dependency to your project
 
 2. To generate output to the console (Scala example)
    ```scala
