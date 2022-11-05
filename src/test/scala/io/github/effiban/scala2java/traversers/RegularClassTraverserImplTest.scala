@@ -291,7 +291,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
   }
 
   private def eqExpectedModifiers(classDef: Defn.Class) = {
-    val expectedJavaModifiersContext = JavaModifiersContext(classDef, Modifiers, JavaTreeType.Class, JavaScope.Package)
+    val expectedJavaModifiersContext = JavaModifiersContext(classDef, JavaTreeType.Class, JavaScope.Package)
     eqJavaModifiersContext(expectedJavaModifiersContext)
   }
 }

@@ -13,7 +13,6 @@ import scala.meta.{Decl, Defn, Lit, Mod, Name, Pat, Term, Tree, Type}
 
 class JavaPublicModifierResolverTest extends UnitTestSuite {
 
-  private val ScalaModsPublic = List(Mod.Case())
   private val ScalaModsNonPublic = List(Mod.Private(Name.Anonymous()), Mod.Protected(Name.Anonymous()))
 
   private val TheClass = Defn.Class(
@@ -49,7 +48,14 @@ class JavaPublicModifierResolverTest extends UnitTestSuite {
     body = Lit.Int(3)
   )
 
-  private val TheVal = Defn.Val(
+  private val TheValWithoutMods = Defn.Val(
+    mods = Nil,
+    pats = List(Pat.Var(Term.Name("x"))),
+    decltpe = Some(TypeNames.Int),
+    rhs = Lit.Int(3)
+  )
+
+  private val TheValWithNonPublicMods = Defn.Val(
     mods = Nil,
     pats = List(Pat.Var(Term.Name("x"))),
     decltpe = Some(TypeNames.Int),
@@ -75,15 +81,15 @@ class JavaPublicModifierResolverTest extends UnitTestSuite {
     ("enum method", TheDefnDef, JavaTreeType.Method, JavaScope.Enum, Some(JavaModifier.Public)),
     ("interface method definition", TheDefnDef, JavaTreeType.Method, JavaScope.Interface, Some(JavaModifier.Default)),
     ("interface method declaration", TheDeclDef, JavaTreeType.Method, JavaScope.Interface, None),
-    ("class variable", TheVal, JavaTreeType.Variable, JavaScope.Class, Some(JavaModifier.Public)),
-    ("utility class variable", TheVal, JavaTreeType.Variable, JavaScope.UtilityClass, Some(JavaModifier.Public)),
-    ("enum variable", TheVal, JavaTreeType.Variable, JavaScope.Enum, Some(JavaModifier.Public)),
-    ("interface variable", TheVal, JavaTreeType.Variable, JavaScope.Interface, None),
-    ("method variable", TheVal, JavaTreeType.Variable, JavaScope.MethodSignature, None),
-    ("lambda variable", TheVal, JavaTreeType.Variable, JavaScope.LambdaSignature, None),
-    ("class (ctor.) parameter", TheVal, JavaTreeType.Parameter, JavaScope.Class, None),
-    ("method parameter", TheVal, JavaTreeType.Parameter, JavaScope.MethodSignature, None),
-    ("lambda parameter", TheVal, JavaTreeType.Parameter, JavaScope.LambdaSignature, None)
+    ("class variable", TheValWithoutMods, JavaTreeType.Variable, JavaScope.Class, Some(JavaModifier.Public)),
+    ("utility class variable", TheValWithoutMods, JavaTreeType.Variable, JavaScope.UtilityClass, Some(JavaModifier.Public)),
+    ("enum variable", TheValWithoutMods, JavaTreeType.Variable, JavaScope.Enum, Some(JavaModifier.Public)),
+    ("interface variable", TheValWithoutMods, JavaTreeType.Variable, JavaScope.Interface, None),
+    ("method variable", TheValWithoutMods, JavaTreeType.Variable, JavaScope.MethodSignature, None),
+    ("lambda variable", TheValWithoutMods, JavaTreeType.Variable, JavaScope.LambdaSignature, None),
+    ("class (ctor.) parameter", TheValWithoutMods, JavaTreeType.Parameter, JavaScope.Class, None),
+    ("method parameter", TheValWithoutMods, JavaTreeType.Parameter, JavaScope.MethodSignature, None),
+    ("lambda parameter", TheValWithoutMods, JavaTreeType.Parameter, JavaScope.LambdaSignature, None)
   )
 
   forAll(ScenariosWhenScalaModsPublic) { case (
@@ -93,24 +99,22 @@ class JavaPublicModifierResolverTest extends UnitTestSuite {
     javaScope: JavaScope,
     expectedMaybeModifier: Option[JavaModifier]) =>
     test(s"Public modifier generated for $desc should be: '$expectedMaybeModifier'") {
-      when(scalaModsClassifier.arePublic(eqTreeList(ScalaModsPublic))).thenReturn(true)
-      resolve(scalaTree, ScalaModsPublic, javaTreeType, javaScope) shouldBe expectedMaybeModifier
+      when(scalaModsClassifier.arePublic(Nil)).thenReturn(true)
+      resolve(scalaTree, javaTreeType, javaScope) shouldBe expectedMaybeModifier
     }
   }
 
   test("No public modifier generated when scala mods are not public") {
     when(scalaModsClassifier.arePublic(eqTreeList(ScalaModsNonPublic))).thenReturn(false)
-    resolve(TheVal, ScalaModsPublic, JavaTreeType.Parameter, JavaScope.MethodSignature) shouldBe None
+    resolve(TheValWithNonPublicMods, JavaTreeType.Parameter, JavaScope.MethodSignature) shouldBe None
   }
 
   private def resolve(scalaTree: Tree,
-                      scalaMods: List[Mod],
                       javaTreeType: JavaTreeType,
                       javaScope: JavaScope): Option[JavaModifier] = {
     JavaPublicModifierResolver.resolve(
       JavaModifiersContext(
         scalaTree = scalaTree,
-        scalaMods = scalaMods,
         javaTreeType = javaTreeType,
         javaScope = javaScope
       ))

@@ -1,7 +1,6 @@
 package io.github.effiban.scala2java.traversers
 
 import io.github.effiban.scala2java.contexts._
-import io.github.effiban.scala2java.entities.JavaScope.JavaScope
 import io.github.effiban.scala2java.entities.JavaTreeType.JavaTreeType
 import io.github.effiban.scala2java.entities.JavaTreeTypeToKeywordMapping
 import io.github.effiban.scala2java.resolvers.{JavaChildScopeResolver, JavaTreeTypeResolver}
@@ -27,7 +26,7 @@ private[traversers] class RegularClassTraverserImpl(modListTraverser: => ModList
   def traverse(classDef: Defn.Class, context: ClassOrTraitContext = ClassOrTraitContext()): Unit = {
     writeLine()
     val javaTreeType = javaTreeTypeResolver.resolve(JavaTreeTypeContext(classDef, classDef.mods))
-    modListTraverser.traverse(toJavaModifiersContext(classDef, javaTreeType, context.javaScope))
+    modListTraverser.traverse(JavaModifiersContext(classDef, javaTreeType, context.javaScope))
     writeNamedType(JavaTreeTypeToKeywordMapping(javaTreeType), classDef.name.value)
     typeParamListTraverser.traverse(classDef.tparams)
     traverseCtorAndTemplate(classDef, javaTreeType, context)
@@ -49,14 +48,4 @@ private[traversers] class RegularClassTraverserImpl(modListTraverser: => ModList
     )
     templateTraverser.traverse(template = enrichedTemplate, context = templateContext)
   }
-
-  private def toJavaModifiersContext(classDef: Defn.Class,
-                                     javaTreeType: JavaTreeType,
-                                     javaScope: JavaScope) =
-    JavaModifiersContext(
-      scalaTree = classDef,
-      scalaMods = classDef.mods,
-      javaTreeType = javaTreeType,
-      javaScope = javaScope
-    )
 }

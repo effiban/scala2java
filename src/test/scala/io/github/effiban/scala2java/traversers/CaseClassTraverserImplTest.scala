@@ -103,7 +103,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     doWrite(
       """@MyAnnotation
         |public """.stripMargin)
-      .when(modListTraverser).traverse(eqExpectedModifiers(cls, modifiers), annotsOnSameLine = ArgumentMatchers.eq(false))
+      .when(modListTraverser).traverse(eqExpectedModifiers(cls), annotsOnSameLine = ArgumentMatchers.eq(false))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Record)))).thenReturn(JavaScope.Class)
     doWrite("(int arg1, int arg2)").when(termParamListTraverser).traverse(
@@ -160,7 +160,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     doWrite(
       """@MyAnnotation
         |public """.stripMargin)
-      .when(modListTraverser).traverse(eqExpectedModifiers(cls, modifiers), annotsOnSameLine = ArgumentMatchers.eq(false))
+      .when(modListTraverser).traverse(eqExpectedModifiers(cls), annotsOnSameLine = ArgumentMatchers.eq(false))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Record)))).thenReturn(JavaScope.Class)
     doWrite("(int arg1, int arg2)").when(termParamListTraverser).traverse(
@@ -213,7 +213,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     doWrite(
       """@MyAnnotation
         |public """.stripMargin)
-      .when(modListTraverser).traverse(eqExpectedModifiers(cls, modifiers), annotsOnSameLine = ArgumentMatchers.eq(false))
+      .when(modListTraverser).traverse(eqExpectedModifiers(cls), annotsOnSameLine = ArgumentMatchers.eq(false))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Record)))).thenReturn(JavaScope.Class)
     doWrite("(int arg1, int arg2)").when(termParamListTraverser).traverse(
@@ -272,7 +272,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     doWrite(
       """@MyAnnotation
         |public """.stripMargin)
-      .when(modListTraverser).traverse(eqExpectedModifiers(cls, modifiers), annotsOnSameLine = ArgumentMatchers.eq(false))
+      .when(modListTraverser).traverse(eqExpectedModifiers(cls), annotsOnSameLine = ArgumentMatchers.eq(false))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Record)))).thenReturn(JavaScope.Class)
     doWrite("(int arg1, int arg2, int arg3, int arg4)").when(termParamListTraverser).traverse(
@@ -309,8 +309,8 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     when(javaTreeTypeResolver.resolve(eqJavaTreeTypeContext(expectedContext))).thenReturn(JavaTreeType.Record)
   }
 
-  private def eqExpectedModifiers(classDef: Defn.Class, modifiers: List[Mod]) = {
-    val expectedJavaModifiersContext = JavaModifiersContext(classDef, modifiers, JavaTreeType.Record, JavaScope.Package)
+  private def eqExpectedModifiers(classDef: Defn.Class) = {
+    val expectedJavaModifiersContext = JavaModifiersContext(classDef, JavaTreeType.Record, JavaScope.Package)
     eqJavaModifiersContext(expectedJavaModifiersContext)
   }
 }
