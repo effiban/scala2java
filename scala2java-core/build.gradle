@@ -1,0 +1,139 @@
+plugins {
+    id 'java-library'
+    id 'scala'
+    id "com.github.maiflai.scalatest" version "0.32"
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'maven-publish'
+    id 'signing'
+}
+
+def scalaMajorVersion = "2.13"
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+
+    withJavadocJar()
+    withSourcesJar()
+}
+
+group 'io.github.effiban'
+version '1.0.3'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation "org.scalameta:scalameta_$scalaMajorVersion:4.6.0"
+    constraints {
+        implementation('com.google.protobuf:protobuf-java:3.19.6') {
+            because 'previous versions have a security vulnerability'
+        }
+    }
+}
+
+testing {
+    suites {
+        test {
+            dependencies {
+                implementation "org.scalatest:scalatest_$scalaMajorVersion:3.2.12"
+                implementation "org.mockito:mockito-scala_$scalaMajorVersion:1.17.5"
+                runtimeOnly 'com.vladsch.flexmark:flexmark-all:0.64.0'
+            }
+            targets {
+                all {
+                    testTask.configure {
+                        maxParallelForks = 1
+                    }
+                }
+            }
+        }
+        integrationTest(JvmTestSuite) {
+            targets {
+                all {
+                    testTask.configure {
+                        shouldRunAfter(test)
+                    }
+                }
+            }
+        }
+    }
+}
+
+sourceSets {
+    integrationTest {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+
+configurations {
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
+tasks.named('check') {
+    dependsOn(testing.suites.integrationTest)
+}
+
+jar {
+    exclude("**/Scala2JavaRunner*.class")
+}
+
+shadowJar {
+    manifest {
+        attributes 'Main-Class': 'io.github.effiban.scala2java.core.Scala2JavaRunner'
+    }
+}
+
+publishing {
+    publications {
+        scala2javaCore(MavenPublication) {
+            artifactId = "${project.name}_$scalaMajorVersion"
+            from components.java
+
+            pom {
+                name = 'Scala2Java'
+                description = 'Tool for translating Scala source files into Java'
+                url = 'https://github.com/effiban/scala2java'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'effiban'
+                        name = 'Effi Ban'
+                        email = 'effi.ban@skai.io'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/effiban/scala2java.git'
+                    developerConnection = 'scm:git:ssh://github.com/effiban/scala2java.git'
+                    url = 'https://github.com/effiban/scala2java'
+                }
+            }
+        }
+    }
+    repositories {
+
+        def user = project.hasProperty('ossrhUsername') ? "$ossrhUsername" : ''
+        def pass = project.hasProperty('ossrhPassword') ? "$ossrhPassword" : ''
+
+        maven {
+            url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username = user
+                password = pass
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.scala2javaCore
+}
