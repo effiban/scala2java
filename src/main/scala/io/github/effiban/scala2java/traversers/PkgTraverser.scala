@@ -1,13 +1,15 @@
 package io.github.effiban.scala2java.traversers
 
+import io.github.effiban.scala2java.generators.JavaImportersProvider
 import io.github.effiban.scala2java.writers.JavaWriter
 
-import scala.meta.Pkg
+import scala.meta.{Import, Pkg}
 
 trait PkgTraverser extends ScalaTreeTraverser[Pkg]
 
 private[traversers] class PkgTraverserImpl(termRefTraverser: => TermRefTraverser,
-                                           pkgStatListTraverser: => PkgStatListTraverser)
+                                           pkgStatListTraverser: => PkgStatListTraverser,
+                                           javaImportersProvider: JavaImportersProvider)
                                           (implicit javaWriter: JavaWriter) extends PkgTraverser {
 
   import javaWriter._
@@ -18,6 +20,8 @@ private[traversers] class PkgTraverserImpl(termRefTraverser: => TermRefTraverser
     writeStatementEnd()
     writeLine()
 
-    pkgStatListTraverser.traverse(pkg.stats)
+    val enrichedPkgStats = Import(javaImportersProvider.provide()) +: pkg.stats
+
+    pkgStatListTraverser.traverse(enrichedPkgStats)
   }
 }

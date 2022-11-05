@@ -14,6 +14,7 @@ object TermNameValues {
   final val Try = "Try"
   final val Apply = "apply"
   final val Empty = "empty"
+  final val Util = "util"
 
   final val ScalaRange = "Range"
   final val ScalaInclusive = "inclusive"
@@ -30,6 +31,7 @@ object TermNameValues {
   final val ScalaVector = "Vector"
   final val ScalaNil = "Nil"
 
+  final val Java = "java"
   final val JavaIntStream = "IntStream"
   final val JavaRange = "range"
   final val JavaRangeClosed = "rangeClosed"
