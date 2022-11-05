@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.traversers
 
 import io.github.effiban.scala2java.classifiers._
+import io.github.effiban.scala2java.generators.DefaultJavaImportersProvider
 import io.github.effiban.scala2java.orderings.JavaTemplateChildOrdering
 import io.github.effiban.scala2java.predicates.{ImporterIncludedPredicate, TemplateInitIncludedPredicate}
 import io.github.effiban.scala2java.resolvers.Resolvers.shouldReturnValueResolver
@@ -265,7 +266,11 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter) {
     SealedHierarchiesResolver
   )
 
-  private lazy val pkgTraverser: PkgTraverser = new PkgTraverserImpl(termRefTraverser, pkgStatListTraverser)
+  private lazy val pkgTraverser: PkgTraverser = new PkgTraverserImpl(
+    termRefTraverser,
+    pkgStatListTraverser,
+    DefaultJavaImportersProvider
+  )
 
   private lazy val regularClassTraverser: RegularClassTraverser = new RegularClassTraverserImpl(
     modListTraverser,
