@@ -1,8 +1,8 @@
 package io.github.effiban.scala2java.resolvers
 
-import io.github.effiban.scala2java.contexts.JavaModifiersContext
+import io.github.effiban.scala2java.contexts.ModifiersContext
 import io.github.effiban.scala2java.entities.{JavaModifier, JavaScope, JavaTreeType}
-import io.github.effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
+import io.github.effiban.scala2java.matchers.ModifiersContextMatcher.eqModifiersContext
 import io.github.effiban.scala2java.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.testtrees.TypeNames
 
@@ -10,7 +10,7 @@ import scala.meta.{Decl, Mod, Name, Pat, Term}
 
 class JavaAllExtraModifiersResolverImplTest extends UnitTestSuite {
 
-  private val Context = JavaModifiersContext(
+  private val Context = ModifiersContext(
     scalaTree = Decl.Val(List(Mod.Private(Name.Anonymous())), List(Pat.Var(Term.Name("x"))), TypeNames.Int),
     javaTreeType = JavaTreeType.Variable,
     javaScope = JavaScope.Class
@@ -34,9 +34,9 @@ class JavaAllExtraModifiersResolverImplTest extends UnitTestSuite {
 
   forAll(Scenarios) { case (maybeModifier1, maybeModifier2, maybeModifier3, expectedModifiers) =>
     test(s"When the single resolvers return: ($maybeModifier1, $maybeModifier2, $maybeModifier3) the modifiers should be: $expectedModifiers") {
-      when(singleResolver1.resolve(eqJavaModifiersContext(Context))).thenReturn(maybeModifier1)
-      when(singleResolver2.resolve(eqJavaModifiersContext(Context))).thenReturn(maybeModifier2)
-      when(singleResolver3.resolve(eqJavaModifiersContext(Context))).thenReturn(maybeModifier3)
+      when(singleResolver1.resolve(eqModifiersContext(Context))).thenReturn(maybeModifier1)
+      when(singleResolver2.resolve(eqModifiersContext(Context))).thenReturn(maybeModifier2)
+      when(singleResolver3.resolve(eqModifiersContext(Context))).thenReturn(maybeModifier3)
 
       allResolver.resolve(Context) shouldBe expectedModifiers
     }

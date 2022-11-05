@@ -1,9 +1,9 @@
 package io.github.effiban.scala2java.traversers
 
-import io.github.effiban.scala2java.contexts.JavaModifiersContext
+import io.github.effiban.scala2java.contexts.ModifiersContext
 import io.github.effiban.scala2java.entities.{JavaModifier, JavaScope, JavaTreeType}
 import io.github.effiban.scala2java.matchers.CombinedMatchers.eqTreeList
-import io.github.effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
+import io.github.effiban.scala2java.matchers.ModifiersContextMatcher.eqModifiersContext
 import io.github.effiban.scala2java.resolvers.JavaModifiersResolver
 import io.github.effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.testsuites.UnitTestSuite
@@ -31,7 +31,7 @@ class ModListTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(eqTreeList(PrivateFinalMods), onSameLine = ArgumentMatchers.eq(false))
-    when(javaModifiersResolver.resolve(eqJavaModifiersContext(modifiersContext)))
+    when(javaModifiersResolver.resolve(eqModifiersContext(modifiersContext)))
       .thenReturn(List(JavaModifier.Private, JavaModifier.Final))
 
     modListTraverser.traverse(modifiersContext)
@@ -46,7 +46,7 @@ class ModListTraverserImplTest extends UnitTestSuite {
 
     doWrite("@MyAnnotation ")
       .when(annotListTraverser).traverseMods(eqTreeList(PrivateFinalMods), onSameLine = ArgumentMatchers.eq(true))
-    when(javaModifiersResolver.resolve(eqJavaModifiersContext(modifiersContext)))
+    when(javaModifiersResolver.resolve(eqModifiersContext(modifiersContext)))
       .thenReturn(List(JavaModifier.Private, JavaModifier.Final))
 
     modListTraverser.traverse(modifiersContext, annotsOnSameLine = true)
@@ -61,7 +61,7 @@ class ModListTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(annotListTraverser).traverseMods(eqTreeList(ImplicitPrivateFinalMods), onSameLine = ArgumentMatchers.eq(false))
-    when(javaModifiersResolver.resolve(eqJavaModifiersContext(modifiersContext)))
+    when(javaModifiersResolver.resolve(eqModifiersContext(modifiersContext)))
       .thenReturn(List(JavaModifier.Private, JavaModifier.Final))
 
     modListTraverser.traverse(modifiersContext)
@@ -71,7 +71,7 @@ class ModListTraverserImplTest extends UnitTestSuite {
         |/* implicit */private final """.stripMargin
   }
 
-  private def modifiersContextOf(mods: List[Mod]) = JavaModifiersContext(declValWith(mods), JavaTreeType.Variable, JavaScope.Class)
+  private def modifiersContextOf(mods: List[Mod]) = ModifiersContext(declValWith(mods), JavaTreeType.Variable, JavaScope.Class)
 
   private def declValWith(mods: List[Mod]) = Decl.Val(mods, Pats, TypeNames.Int)
 }

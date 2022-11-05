@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.traversers
 
-import io.github.effiban.scala2java.contexts.{JavaModifiersContext, StatContext}
+import io.github.effiban.scala2java.contexts.{ModifiersContext, StatContext}
 import io.github.effiban.scala2java.entities.JavaTreeType
 import io.github.effiban.scala2java.writers.JavaWriter
 
@@ -20,7 +20,7 @@ private[traversers] class DefnValTraverserImpl(modListTraverser: => ModListTrave
 
   //TODO if it is non-public it will be invalid in a Java interface - replace with method
   override def traverse(valDef: Defn.Val, context: StatContext = StatContext()): Unit = {
-    modListTraverser.traverse(JavaModifiersContext(valDef, JavaTreeType.Variable, context.javaScope))
+    modListTraverser.traverse(ModifiersContext(valDef, JavaTreeType.Variable, context.javaScope))
     defnValOrVarTypeTraverser.traverse(valDef.decltpe, Some(valDef.rhs), context)
     write(" ")
     //TODO verify for non-simple case

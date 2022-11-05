@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.resolvers
 
-import io.github.effiban.scala2java.contexts.JavaModifiersContext
+import io.github.effiban.scala2java.contexts.ModifiersContext
 import io.github.effiban.scala2java.entities.JavaScope.JavaScope
 import io.github.effiban.scala2java.entities.JavaTreeType.JavaTreeType
 import io.github.effiban.scala2java.entities.{JavaModifier, JavaScope, JavaTreeType}
@@ -66,7 +66,7 @@ class JavaFinalModifierResolverTest extends UnitTestSuite {
 
   private def resolve(scalaTree: Tree, javaTreeType: JavaTreeType, javaScope: JavaScope) = {
     JavaFinalModifierResolver.resolve(
-      JavaModifiersContext(
+      ModifiersContext(
         scalaTree = scalaTree,
         javaTreeType = javaTreeType,
         javaScope = javaScope

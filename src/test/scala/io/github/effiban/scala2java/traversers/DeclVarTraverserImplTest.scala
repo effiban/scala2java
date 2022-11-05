@@ -1,10 +1,10 @@
 package io.github.effiban.scala2java.traversers
 
-import io.github.effiban.scala2java.contexts.{JavaModifiersContext, StatContext}
+import io.github.effiban.scala2java.contexts.{ModifiersContext, StatContext}
 import io.github.effiban.scala2java.entities.JavaScope.JavaScope
 import io.github.effiban.scala2java.entities.{JavaScope, JavaTreeType}
 import io.github.effiban.scala2java.matchers.CombinedMatchers.eqTreeList
-import io.github.effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
+import io.github.effiban.scala2java.matchers.ModifiersContextMatcher.eqModifiersContext
 import io.github.effiban.scala2java.matchers.TreeMatcher.eqTree
 import io.github.effiban.scala2java.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.testsuites.UnitTestSuite
@@ -107,7 +107,7 @@ class DeclVarTraverserImplTest extends UnitTestSuite {
   }
 
   private def eqExpectedModifiers(declVar: Decl.Var, javaScope: JavaScope) = {
-    val expectedJavaModifiersContext = JavaModifiersContext(declVar, JavaTreeType.Variable, javaScope)
-    eqJavaModifiersContext(expectedJavaModifiersContext)
+    val expectedModifiersContext = ModifiersContext(declVar, JavaTreeType.Variable, javaScope)
+    eqModifiersContext(expectedModifiersContext)
   }
 }

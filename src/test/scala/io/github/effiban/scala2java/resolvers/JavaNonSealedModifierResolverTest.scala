@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.resolvers
 
 import io.github.effiban.scala2java.classifiers.{ModsClassifier, ObjectClassifier}
-import io.github.effiban.scala2java.contexts.JavaModifiersContext
+import io.github.effiban.scala2java.contexts.ModifiersContext
 import io.github.effiban.scala2java.entities.JavaScope.JavaScope
 import io.github.effiban.scala2java.entities.JavaTreeType.Unknown
 import io.github.effiban.scala2java.entities.{JavaModifier, JavaScope}
@@ -61,7 +61,7 @@ class JavaNonSealedModifierResolverTest extends UnitTestSuite {
       s"in scope $javaScope " +
       s"should ${if (expectedNonSealed) "require" else "NOT require"} the Java modifier 'non-sealed'") {
 
-      val context = JavaModifiersContext(
+      val context = ModifiersContext(
         scalaTree = scalaTree,
         javaTreeType = Unknown,
         javaScope = javaScope

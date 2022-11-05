@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.traversers
 
-import io.github.effiban.scala2java.contexts.{BlockContext, DefnDefContext, JavaModifiersContext, StatContext}
+import io.github.effiban.scala2java.contexts.{BlockContext, DefnDefContext, ModifiersContext, StatContext}
 import io.github.effiban.scala2java.entities.Decision.{No, Uncertain, Yes}
 import io.github.effiban.scala2java.entities.TraversalConstants.UnknownType
 import io.github.effiban.scala2java.entities.{JavaScope, JavaTreeType}
@@ -26,7 +26,7 @@ private[traversers] class DefnDefTraverserImpl(modListTraverser: => ModListTrave
 
   override def traverse(defnDef: Defn.Def, context: DefnDefContext = DefnDefContext()): Unit = {
     writeLine()
-    modListTraverser.traverse(JavaModifiersContext(defnDef, JavaTreeType.Method, context.javaScope))
+    modListTraverser.traverse(ModifiersContext(defnDef, JavaTreeType.Method, context.javaScope))
     traverseTypeParams(defnDef.tparams)
     val maybeMethodType = resolveMethodType(defnDef)
     traverseMethodType(maybeMethodType)

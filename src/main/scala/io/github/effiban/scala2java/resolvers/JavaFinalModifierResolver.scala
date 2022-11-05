@@ -1,13 +1,13 @@
 package io.github.effiban.scala2java.resolvers
 
-import io.github.effiban.scala2java.contexts.JavaModifiersContext
+import io.github.effiban.scala2java.contexts.ModifiersContext
 import io.github.effiban.scala2java.entities.{JavaModifier, JavaScope, JavaTreeType}
 
 import scala.meta.{Decl, Defn, Term}
 
 object JavaFinalModifierResolver extends JavaExtraModifierResolver {
 
-  override def resolve(context: JavaModifiersContext): Option[JavaModifier] = {
+  override def resolve(context: ModifiersContext): Option[JavaModifier] = {
     import context._
 
     (scalaTree, javaTreeType, javaScope) match {

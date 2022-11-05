@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.resolvers
 
-import io.github.effiban.scala2java.contexts.JavaModifiersContext
+import io.github.effiban.scala2java.contexts.ModifiersContext
 import io.github.effiban.scala2java.entities.JavaModifier
 import io.github.effiban.scala2java.orderings.JavaModifierOrdering
 import io.github.effiban.scala2java.transformers.ModifierTransformer
@@ -9,13 +9,13 @@ import scala.meta.Mod
 
 trait JavaModifiersResolver {
 
-  def resolve(context: JavaModifiersContext): List[JavaModifier]
+  def resolve(context: ModifiersContext): List[JavaModifier]
 }
 
 class JavaModifiersResolverImpl(javaAllowedModifiersResolver: JavaAllowedModifiersResolver,
                                 javaExtraModifiersResolver: JavaAllExtraModifiersResolver) extends JavaModifiersResolver {
 
-  override def resolve(context: JavaModifiersContext): List[JavaModifier] = {
+  override def resolve(context: ModifiersContext): List[JavaModifier] = {
     import context._
 
     val modifierNamesBuilder = Set.newBuilder[JavaModifier]

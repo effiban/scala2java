@@ -25,7 +25,7 @@ private[traversers] class CaseClassTraverserImpl(modListTraverser: => ModListTra
   override def traverse(classDef: Defn.Class, context: ClassOrTraitContext = ClassOrTraitContext()): Unit = {
     writeLine()
     val javaTreeType = javaTreeTypeResolver.resolve(JavaTreeTypeContext(classDef, classDef.mods))
-    modListTraverser.traverse(JavaModifiersContext(classDef, javaTreeType, context.javaScope))
+    modListTraverser.traverse(ModifiersContext(classDef, javaTreeType, context.javaScope))
     writeNamedType(JavaTreeTypeToKeywordMapping(javaTreeType), classDef.name.value)
     typeParamListTraverser.traverse(classDef.tparams)
     traverseCtorAndTemplate(classDef, javaTreeType, context)

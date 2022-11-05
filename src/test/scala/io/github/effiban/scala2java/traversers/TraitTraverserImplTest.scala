@@ -5,8 +5,8 @@ import io.github.effiban.scala2java.entities.JavaTreeType.Interface
 import io.github.effiban.scala2java.entities.{JavaScope, JavaTreeType}
 import io.github.effiban.scala2java.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.matchers.JavaChildScopeContextMatcher.eqJavaChildScopeContext
-import io.github.effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
 import io.github.effiban.scala2java.matchers.JavaTreeTypeContextMatcher.eqJavaTreeTypeContext
+import io.github.effiban.scala2java.matchers.ModifiersContextMatcher.eqModifiersContext
 import io.github.effiban.scala2java.matchers.TemplateContextMatcher.eqTemplateContext
 import io.github.effiban.scala2java.matchers.TreeMatcher.eqTree
 import io.github.effiban.scala2java.resolvers.{JavaChildScopeResolver, JavaTreeTypeResolver}
@@ -125,7 +125,7 @@ class TraitTraverserImplTest extends UnitTestSuite {
   }
 
   private def eqExpectedModifiers(`trait`: Trait) = {
-    val expectedJavaModifiersContext = JavaModifiersContext(`trait`, JavaTreeType.Interface, JavaScope.Package)
-    eqJavaModifiersContext(expectedJavaModifiersContext)
+    val expectedModifiersContext = ModifiersContext(`trait`, JavaTreeType.Interface, JavaScope.Package)
+    eqModifiersContext(expectedModifiersContext)
   }
 }

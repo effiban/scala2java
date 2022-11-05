@@ -6,9 +6,9 @@ import io.github.effiban.scala2java.entities.JavaTreeType.JavaTreeType
 import scala.meta.Stat.WithMods
 import scala.meta.{Mod, Term, Tree}
 
-case class JavaModifiersContext(scalaTree: Tree,
-                                javaTreeType: JavaTreeType,
-                                javaScope: JavaScope) {
+case class ModifiersContext(scalaTree: Tree,
+                            javaTreeType: JavaTreeType,
+                            javaScope: JavaScope) {
 
   val scalaMods: List[Mod] = scalaTree match {
     case statWithMods: WithMods => statWithMods.mods
