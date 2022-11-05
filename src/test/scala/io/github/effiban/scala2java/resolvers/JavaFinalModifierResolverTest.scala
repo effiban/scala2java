@@ -68,7 +68,6 @@ class JavaFinalModifierResolverTest extends UnitTestSuite {
     JavaFinalModifierResolver.resolve(
       JavaModifiersContext(
         scalaTree = scalaTree,
-        scalaMods = Nil,
         javaTreeType = javaTreeType,
         javaScope = javaScope
       ))

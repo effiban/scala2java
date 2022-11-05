@@ -125,7 +125,7 @@ class TraitTraverserImplTest extends UnitTestSuite {
   }
 
   private def eqExpectedModifiers(`trait`: Trait) = {
-    val expectedJavaModifiersContext = JavaModifiersContext(`trait`, Modifiers, JavaTreeType.Interface, JavaScope.Package)
+    val expectedJavaModifiersContext = JavaModifiersContext(`trait`, JavaTreeType.Interface, JavaScope.Package)
     eqJavaModifiersContext(expectedJavaModifiersContext)
   }
 }

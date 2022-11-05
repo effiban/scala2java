@@ -189,7 +189,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
   }
 
   private def eqExpectedModifiers(declDef: Decl.Def, javaScope: JavaScope) = {
-    val expectedJavaModifiersContext = JavaModifiersContext(declDef, Modifiers, JavaTreeType.Method, javaScope)
+    val expectedJavaModifiersContext = JavaModifiersContext(declDef, JavaTreeType.Method, javaScope)
     eqJavaModifiersContext(expectedJavaModifiersContext)
   }
 }

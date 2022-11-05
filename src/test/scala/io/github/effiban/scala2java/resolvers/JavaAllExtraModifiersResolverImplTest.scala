@@ -4,14 +4,14 @@ import io.github.effiban.scala2java.contexts.JavaModifiersContext
 import io.github.effiban.scala2java.entities.{JavaModifier, JavaScope, JavaTreeType}
 import io.github.effiban.scala2java.matchers.JavaModifiersContextMatcher.eqJavaModifiersContext
 import io.github.effiban.scala2java.testsuites.UnitTestSuite
+import io.github.effiban.scala2java.testtrees.TypeNames
 
-import scala.meta.{Lit, Mod, Name}
+import scala.meta.{Decl, Mod, Name, Pat, Term}
 
 class JavaAllExtraModifiersResolverImplTest extends UnitTestSuite {
 
   private val Context = JavaModifiersContext(
-    scalaTree = Lit.Int(3),
-    scalaMods = List(Mod.Private(Name.Anonymous())),
+    scalaTree = Decl.Val(List(Mod.Private(Name.Anonymous())), List(Pat.Var(Term.Name("x"))), TypeNames.Int),
     javaTreeType = JavaTreeType.Variable,
     javaScope = JavaScope.Class
   )

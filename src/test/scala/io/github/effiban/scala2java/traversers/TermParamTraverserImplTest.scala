@@ -67,7 +67,7 @@ class TermParamTraverserImplTest extends UnitTestSuite {
   }
 
   private def eqExpectedModifiers(termParam: Term.Param) = {
-    val expectedJavaModifiersContext = JavaModifiersContext(termParam, Modifiers, JavaTreeType.Parameter, JavaScope.MethodSignature)
+    val expectedJavaModifiersContext = JavaModifiersContext(termParam, JavaTreeType.Parameter, JavaScope.MethodSignature)
     eqJavaModifiersContext(expectedJavaModifiersContext)
   }
 }

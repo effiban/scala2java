@@ -1,8 +1,6 @@
 package io.github.effiban.scala2java.traversers
 
 import io.github.effiban.scala2java.contexts.{JavaModifiersContext, JavaTreeTypeContext, StatContext}
-import io.github.effiban.scala2java.entities.JavaScope.JavaScope
-import io.github.effiban.scala2java.entities.JavaTreeType.JavaTreeType
 import io.github.effiban.scala2java.entities.JavaTreeTypeToKeywordMapping
 import io.github.effiban.scala2java.resolvers.JavaTreeTypeResolver
 import io.github.effiban.scala2java.writers.JavaWriter
@@ -27,7 +25,7 @@ private[traversers] class DefnTypeTraverserImpl(modListTraverser: => ModListTrav
   override def traverse(typeDef: Defn.Type, context: StatContext = StatContext()): Unit = {
     //TODO - transform to Defn.Trait instead of traversing directly (+ the Java tree type is incorrect anyway)
     val javaTreeType = javaTreeTypeResolver.resolve(JavaTreeTypeContext(typeDef, typeDef.mods))
-    modListTraverser.traverse(toJavaModifiersContext(typeDef, javaTreeType, context.javaScope))
+    modListTraverser.traverse(JavaModifiersContext(typeDef, javaTreeType, context.javaScope))
     writeNamedType(JavaTreeTypeToKeywordMapping(javaTreeType), typeDef.name.value)
     typeParamListTraverser.traverse(typeDef.tparams)
     typeDef.bounds match {
@@ -46,14 +44,4 @@ private[traversers] class DefnTypeTraverserImpl(modListTraverser: => ModListTrav
     writeBlockStart()
     writeBlockEnd()
   }
-
-  private def toJavaModifiersContext(typeDefn: Defn.Type,
-                                     javaTreeType: JavaTreeType,
-                                     javaScope: JavaScope) =
-    JavaModifiersContext(
-      scalaTree = typeDefn,
-      scalaMods = typeDefn.mods,
-      javaTreeType = javaTreeType,
-      javaScope = javaScope
-    )
 }

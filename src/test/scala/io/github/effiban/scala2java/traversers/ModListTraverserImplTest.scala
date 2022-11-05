@@ -71,7 +71,7 @@ class ModListTraverserImplTest extends UnitTestSuite {
         |/* implicit */private final """.stripMargin
   }
 
-  private def modifiersContextOf(mods: List[Mod]) = JavaModifiersContext(declValWith(mods), mods, JavaTreeType.Variable, JavaScope.Class)
+  private def modifiersContextOf(mods: List[Mod]) = JavaModifiersContext(declValWith(mods), JavaTreeType.Variable, JavaScope.Class)
 
   private def declValWith(mods: List[Mod]) = Decl.Val(mods, Pats, TypeNames.Int)
 }

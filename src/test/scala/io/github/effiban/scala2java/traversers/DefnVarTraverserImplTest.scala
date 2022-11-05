@@ -304,7 +304,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
   }
 
   private def eqExpectedModifiers(defnVar: Defn.Var, javaScope: JavaScope) = {
-    val expectedJavaModifiersContext = JavaModifiersContext(defnVar, Modifiers, JavaTreeType.Variable, javaScope)
+    val expectedJavaModifiersContext = JavaModifiersContext(defnVar, JavaTreeType.Variable, javaScope)
     eqJavaModifiersContext(expectedJavaModifiersContext)
   }
 }
