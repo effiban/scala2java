@@ -1,6 +1,7 @@
-package io.github.effiban.scala2java.core.generators
+package io.github.effiban.scala2java.core.providers
 
 import io.github.effiban.scala2java.core.entities.TermNameValues.{Java, Util}
+import io.github.effiban.scala2java.spi.providers.JavaImportersProvider
 
 import scala.meta.Importee.Wildcard
 import scala.meta.Term.Select

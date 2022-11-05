@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core
 
+import io.github.effiban.scala2java.core.extensions.{ExtensionRegistry, ExtensionRegistryBuilder}
 import io.github.effiban.scala2java.core.traversers.ScalaTreeTraversers
 import io.github.effiban.scala2java.core.writers.{ConsoleJavaWriter, JavaWriter, JavaWriterImpl}
 
@@ -20,6 +21,8 @@ object Scala2JavaTranslator {
       case Some(outputJavaBasePath) => createFileJavaWriter(scalaFileName, outputJavaBasePath)
       case None => ConsoleJavaWriter
     }
+    implicit val extensionRegistry: ExtensionRegistry = ExtensionRegistryBuilder.build()
+
     try {
       new ScalaTreeTraversers().sourceTraverser.traverse(sourceTree)
     } finally {

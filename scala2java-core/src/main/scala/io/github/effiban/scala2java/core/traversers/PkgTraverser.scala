@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.generators.JavaImportersProvider
 import io.github.effiban.scala2java.core.writers.JavaWriter
+import io.github.effiban.scala2java.spi.providers.JavaImportersProvider
 
 import scala.meta.{Import, Pkg}
 

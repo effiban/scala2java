@@ -1,0 +1,23 @@
+plugins {
+    id 'scala2java.library-conventions'
+}
+
+dependencies {
+    api "org.scalameta:scalameta_$scalaMajorVersion:4.6.0"
+    constraints {
+        api('com.google.protobuf:protobuf-java:3.19.6') {
+            because 'previous versions have a security vulnerability'
+        }
+    }
+}
+
+publishing {
+    publications {
+        scala2java(MavenPublication) {
+            pom {
+                name = 'Scala2Java SPI'
+                description = 'Plugin Interface for Scala2Java Tool'
+            }
+        }
+    }
+}
