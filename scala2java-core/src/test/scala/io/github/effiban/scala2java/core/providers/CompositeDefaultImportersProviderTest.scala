@@ -28,9 +28,9 @@ class CompositeDefaultImportersProviderTest extends UnitTestSuite {
   private val coreProvider = mock[DefaultImportersProvider]
   private val extraProvider1 = mock[DefaultImportersProvider]
   private val extraProvider2 = mock[DefaultImportersProvider]
-  private val extensionRegistry = mock[ExtensionRegistry]
+  private implicit val extensionRegistry: ExtensionRegistry = mock[ExtensionRegistry]
 
-  private val compositeProvider = new CompositeDefaultImportersProvider(coreProvider, extensionRegistry)
+  private val compositeProvider = new CompositeDefaultImportersProvider(coreProvider)
 
   test("provide") {
     when(extensionRegistry.defaultImportersProviders).thenReturn(List(extraProvider1, extraProvider2))

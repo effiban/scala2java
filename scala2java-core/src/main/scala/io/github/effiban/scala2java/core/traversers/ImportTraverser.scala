@@ -2,8 +2,8 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.StatContext
 import io.github.effiban.scala2java.core.entities.JavaScope
-import io.github.effiban.scala2java.core.predicates.ImporterIncludedPredicate
 import io.github.effiban.scala2java.core.writers.JavaWriter
+import io.github.effiban.scala2java.spi.predicates.ImporterIncludedPredicate
 
 import scala.meta.Import
 
