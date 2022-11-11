@@ -5,7 +5,7 @@ import io.github.effiban.scala2java.core.matchers.TreeMatcher.eqTree
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{PrimaryCtors, TermNames}
-import io.github.effiban.scala2java.spi.providers.JavaImportersProvider
+import io.github.effiban.scala2java.spi.providers.DefaultImportersProvider
 
 import scala.meta.{Decl, Defn, Import, Importee, Importer, Name, Pat, Pkg, Self, Template, Term, Type}
 
@@ -20,7 +20,7 @@ class PkgTraverserImplTest extends UnitTestSuite {
     )
   )
 
-  private val JavaImporters = List(
+  private val CoreImporters = List(
     Importer(ref = Term.Select(TermNames.Java, Term.Name("lang")), importees = List(Importee.Wildcard())),
     Importer(ref = Term.Select(TermNames.Java, Term.Name("util")), importees = List(Importee.Wildcard()))
   )
@@ -42,12 +42,12 @@ class PkgTraverserImplTest extends UnitTestSuite {
 
   private val termRefTraverser = mock[TermRefTraverser]
   private val pkgStatListTraverser = mock[PkgStatListTraverser]
-  private val javaImportersProvider = mock[JavaImportersProvider]
+  private val defaultImportersProvider = mock[DefaultImportersProvider]
 
   private val pkgTraverser = new PkgTraverserImpl(
     termRefTraverser,
     pkgStatListTraverser,
-    javaImportersProvider
+    defaultImportersProvider
   )
 
 
@@ -55,10 +55,10 @@ class PkgTraverserImplTest extends UnitTestSuite {
     val pkgRef = Term.Select(Term.Name("mypkg"), Term.Name("myinnerpkg"))
 
     val stats = List(ArbitraryImport, TheClass)
-    val expectedEnrichedStats = Import(JavaImporters) +: stats
+    val expectedEnrichedStats = Import(CoreImporters) +: stats
 
     doWrite("mypkg.myinnerpkg").when(termRefTraverser).traverse(eqTree(pkgRef))
-    when(javaImportersProvider.provide()).thenReturn(JavaImporters)
+    when(defaultImportersProvider.provide()).thenReturn(CoreImporters)
     doWrite(
       """/*
         |*  IMPORT DEFINITIONS

@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.classifiers.{DefnTypeClassifier, DefnVa
 import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
 import io.github.effiban.scala2java.core.orderings.JavaTemplateChildOrdering
 import io.github.effiban.scala2java.core.predicates.{ImporterIncludedPredicate, TemplateInitIncludedPredicate}
-import io.github.effiban.scala2java.core.providers.{CompositeJavaImportersProvider, DefaultJavaImportersProvider}
+import io.github.effiban.scala2java.core.providers.{CompositeDefaultImportersProvider, CoreDefaultImportersProvider}
 import io.github.effiban.scala2java.core.resolvers.Resolvers.shouldReturnValueResolver
 import io.github.effiban.scala2java.core.resolvers._
 import io.github.effiban.scala2java.core.transformers._
@@ -270,7 +270,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   private lazy val pkgTraverser: PkgTraverser = new PkgTraverserImpl(
     termRefTraverser,
     pkgStatListTraverser,
-    new CompositeJavaImportersProvider(DefaultJavaImportersProvider, extensionRegistry)
+    new CompositeDefaultImportersProvider(CoreDefaultImportersProvider, extensionRegistry)
   )
 
   private lazy val regularClassTraverser: RegularClassTraverser = new RegularClassTraverserImpl(

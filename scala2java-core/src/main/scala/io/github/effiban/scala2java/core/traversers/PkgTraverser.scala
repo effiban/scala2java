@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.writers.JavaWriter
-import io.github.effiban.scala2java.spi.providers.JavaImportersProvider
+import io.github.effiban.scala2java.spi.providers.DefaultImportersProvider
 
 import scala.meta.{Import, Pkg}
 
@@ -9,7 +9,7 @@ trait PkgTraverser extends ScalaTreeTraverser[Pkg]
 
 private[traversers] class PkgTraverserImpl(termRefTraverser: => TermRefTraverser,
                                            pkgStatListTraverser: => PkgStatListTraverser,
-                                           javaImportersProvider: JavaImportersProvider)
+                                           defaultImportersProvider: DefaultImportersProvider)
                                           (implicit javaWriter: JavaWriter) extends PkgTraverser {
 
   import javaWriter._
@@ -20,7 +20,7 @@ private[traversers] class PkgTraverserImpl(termRefTraverser: => TermRefTraverser
     writeStatementEnd()
     writeLine()
 
-    val enrichedPkgStats = Import(javaImportersProvider.provide()) +: pkg.stats
+    val enrichedPkgStats = Import(defaultImportersProvider.provide()) +: pkg.stats
 
     pkgStatListTraverser.traverse(enrichedPkgStats)
   }
