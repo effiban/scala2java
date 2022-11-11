@@ -7,11 +7,11 @@ import io.github.effiban.scala2java.core.testtrees.TermNames.Scala
 
 import scala.meta.{Importee, Importer, Name, Term}
 
-class ImporterIncludedPredicateImplTest extends UnitTestSuite {
+class CoreImporterIncludedPredicateTest extends UnitTestSuite {
 
   private val importerClassifier = mock[ImporterClassifier]
 
-  private val importerIncludedPredicate = new ImporterIncludedPredicateImpl(importerClassifier)
+  private val importerIncludedPredicate = new CoreImporterIncludedPredicate(importerClassifier)
 
   test("apply() when it is not a scala importer") {
     val importer = Importer(

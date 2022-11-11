@@ -3,10 +3,10 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.StatContext
 import io.github.effiban.scala2java.core.entities.JavaScope
 import io.github.effiban.scala2java.core.matchers.TreeMatcher.eqTree
-import io.github.effiban.scala2java.core.predicates.ImporterIncludedPredicate
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TermNames.Scala
+import io.github.effiban.scala2java.spi.predicates.ImporterIncludedPredicate
 import org.mockito.ArgumentMatchers.any
 
 import scala.meta.{Import, Importee, Importer, Name, Term}
