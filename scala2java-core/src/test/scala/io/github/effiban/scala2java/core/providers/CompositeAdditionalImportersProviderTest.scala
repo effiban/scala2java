@@ -3,13 +3,13 @@ package io.github.effiban.scala2java.core.providers
 import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TermNames
-import io.github.effiban.scala2java.spi.providers.DefaultImportersProvider
+import io.github.effiban.scala2java.spi.providers.AdditionalImportersProvider
 
 import scala.meta.Importee.Wildcard
 import scala.meta.Term.Select
 import scala.meta.{Importer, Term}
 
-class CompositeDefaultImportersProviderTest extends UnitTestSuite {
+class CompositeAdditionalImportersProviderTest extends UnitTestSuite {
 
   private val CoreImporter1 = Importer(Select(TermNames.Java, Term.Name("io")), List(Wildcard()))
   private val CoreImporter2 = Importer(Select(TermNames.Java, Term.Name("lang")), List(Wildcard()))
@@ -25,15 +25,15 @@ class CompositeDefaultImportersProviderTest extends UnitTestSuite {
     ExtraImporter2
   )
 
-  private val coreProvider = mock[DefaultImportersProvider]
-  private val extraProvider1 = mock[DefaultImportersProvider]
-  private val extraProvider2 = mock[DefaultImportersProvider]
+  private val coreProvider = mock[AdditionalImportersProvider]
+  private val extraProvider1 = mock[AdditionalImportersProvider]
+  private val extraProvider2 = mock[AdditionalImportersProvider]
   private implicit val extensionRegistry: ExtensionRegistry = mock[ExtensionRegistry]
 
-  private val compositeProvider = new CompositeDefaultImportersProvider(coreProvider)
+  private val compositeProvider = new CompositeAdditionalImportersProvider(coreProvider)
 
   test("provide") {
-    when(extensionRegistry.defaultImportersProviders).thenReturn(List(extraProvider1, extraProvider2))
+    when(extensionRegistry.additionalImportersProviders).thenReturn(List(extraProvider1, extraProvider2))
     when(coreProvider.provide()).thenReturn(List(CoreImporter1, CoreImporter2))
     when(extraProvider1.provide()).thenReturn(List(ExtraImporter1A, ExtraImporter1B))
     when(extraProvider2.provide()).thenReturn(List(ExtraImporter2))

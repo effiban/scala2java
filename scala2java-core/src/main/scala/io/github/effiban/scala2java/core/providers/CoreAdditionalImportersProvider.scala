@@ -1,13 +1,13 @@
 package io.github.effiban.scala2java.core.providers
 
 import io.github.effiban.scala2java.core.entities.TermNameValues.{Java, Util}
-import io.github.effiban.scala2java.spi.providers.DefaultImportersProvider
+import io.github.effiban.scala2java.spi.providers.AdditionalImportersProvider
 
 import scala.meta.Importee.Wildcard
 import scala.meta.Term.Select
 import scala.meta.{Importer, Term}
 
-object CoreDefaultImportersProvider extends DefaultImportersProvider {
+object CoreAdditionalImportersProvider extends AdditionalImportersProvider {
 
   private val importers =
     List(

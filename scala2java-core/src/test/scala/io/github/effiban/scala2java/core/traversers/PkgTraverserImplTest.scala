@@ -5,7 +5,7 @@ import io.github.effiban.scala2java.core.matchers.TreeMatcher.eqTree
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{PrimaryCtors, TermNames}
-import io.github.effiban.scala2java.spi.providers.DefaultImportersProvider
+import io.github.effiban.scala2java.spi.providers.AdditionalImportersProvider
 
 import scala.meta.{Decl, Defn, Import, Importee, Importer, Name, Pat, Pkg, Self, Template, Term, Type}
 
@@ -42,12 +42,12 @@ class PkgTraverserImplTest extends UnitTestSuite {
 
   private val termRefTraverser = mock[TermRefTraverser]
   private val pkgStatListTraverser = mock[PkgStatListTraverser]
-  private val defaultImportersProvider = mock[DefaultImportersProvider]
+  private val additionalImportersProvider = mock[AdditionalImportersProvider]
 
   private val pkgTraverser = new PkgTraverserImpl(
     termRefTraverser,
     pkgStatListTraverser,
-    defaultImportersProvider
+    additionalImportersProvider
   )
 
 
@@ -58,7 +58,7 @@ class PkgTraverserImplTest extends UnitTestSuite {
     val expectedEnrichedStats = Import(CoreImporters) +: stats
 
     doWrite("mypkg.myinnerpkg").when(termRefTraverser).traverse(eqTree(pkgRef))
-    when(defaultImportersProvider.provide()).thenReturn(CoreImporters)
+    when(additionalImportersProvider.provide()).thenReturn(CoreImporters)
     doWrite(
       """/*
         |*  IMPORT DEFINITIONS
