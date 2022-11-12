@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{InitContext, TemplateBodyContext, TemplateContext}
 import io.github.effiban.scala2java.core.entities.JavaScope.JavaScope
-import io.github.effiban.scala2java.core.predicates.TemplateInitIncludedPredicate
+import io.github.effiban.scala2java.core.predicates.TemplateInitExcludedPredicate
 import io.github.effiban.scala2java.core.resolvers.JavaInheritanceKeywordResolver
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
@@ -18,13 +18,13 @@ private[traversers] class TemplateTraverserImpl(initListTraverser: => InitListTr
                                                 templateBodyTraverser: => TemplateBodyTraverser,
                                                 permittedSubTypeNameListTraverser: PermittedSubTypeNameListTraverser,
                                                 javaInheritanceKeywordResolver: JavaInheritanceKeywordResolver,
-                                                templateInitIncludedPredicate: TemplateInitIncludedPredicate)
+                                                templateInitExcludedPredicate: TemplateInitExcludedPredicate)
                                                (implicit javaWriter: JavaWriter) extends TemplateTraverser {
 
   import javaWriter._
 
   def traverse(template: Template, context: TemplateContext): Unit = {
-    val includedInits = template.inits.filter(templateInitIncludedPredicate)
+    val includedInits = template.inits.filterNot(templateInitExcludedPredicate)
     traverseTemplateInits(includedInits, context.javaScope)
     selfTraverser.traverse(template.self)
     if (context.permittedSubTypeNames.nonEmpty) {
