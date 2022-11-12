@@ -7,11 +7,11 @@ import io.github.effiban.scala2java.core.entities.JavaScope.JavaScope
 import io.github.effiban.scala2java.core.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.core.matchers.TemplateBodyContextMatcher.eqTemplateBodyContext
 import io.github.effiban.scala2java.core.matchers.TreeMatcher.eqTree
-import io.github.effiban.scala2java.core.predicates.TemplateInitExcludedPredicate
 import io.github.effiban.scala2java.core.resolvers.JavaInheritanceKeywordResolver
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{Selfs, Templates, TypeNames}
+import io.github.effiban.scala2java.spi.predicates.TemplateInitExcludedPredicate
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 

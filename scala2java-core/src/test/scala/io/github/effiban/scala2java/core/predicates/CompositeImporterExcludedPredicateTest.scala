@@ -20,7 +20,7 @@ class CompositeImporterExcludedPredicateTest extends UnitTestSuite {
   private val ExcludedLibraryImporter1B = Importer(Select(Term.Name("bbb"), Term.Name("e")), List(Wildcard()))
   private val ExcludedLibraryImporter2 = Importer(Select(Term.Name("ccc"), Term.Name("f")), List(Wildcard()))
 
-  private val ImporterIncludedScenarios = Table(
+  private val ImporterExcludedScenarios = Table(
     ("Desc", "Importer", "ExpectedResult"),
     ("IncludedImporter1", IncludedImporter1, true),
     ("IncludedImporter2", IncludedImporter2, true),
@@ -60,8 +60,8 @@ class CompositeImporterExcludedPredicateTest extends UnitTestSuite {
     })
   }
 
-  forAll(ImporterIncludedScenarios) { (desc: String, importer: Importer, expectedResult: Boolean) =>
-    test(s"""The importer '$desc' should be ${if (expectedResult) "included" else "excluded"}""") {
+  forAll(ImporterExcludedScenarios) { (desc: String, importer: Importer, expectedResult: Boolean) =>
+    test(s"""The importer '$desc' should be ${if (expectedResult) "excluded" else "included"}""") {
       compositePredicate.apply(importer) shouldBe expectedResult
     }
   }
