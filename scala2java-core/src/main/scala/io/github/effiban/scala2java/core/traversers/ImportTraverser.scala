@@ -3,7 +3,7 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.StatContext
 import io.github.effiban.scala2java.core.entities.JavaScope
 import io.github.effiban.scala2java.core.writers.JavaWriter
-import io.github.effiban.scala2java.spi.predicates.ImporterIncludedPredicate
+import io.github.effiban.scala2java.spi.predicates.ImporterExcludedPredicate
 
 import scala.meta.Import
 
@@ -12,7 +12,7 @@ trait ImportTraverser {
 }
 
 private[traversers] class ImportTraverserImpl(importerTraverser: => ImporterTraverser,
-                                              importerIncludedPredicate: ImporterIncludedPredicate)
+                                              importerExcludedPredicate: ImporterExcludedPredicate)
                                              (implicit javaWriter: JavaWriter) extends ImportTraverser {
 
   import javaWriter._
@@ -29,7 +29,7 @@ private[traversers] class ImportTraverserImpl(importerTraverser: => ImporterTrav
   private def traverseInner(`import`: Import): Unit = {
     `import`.importers match {
       case Nil => throw new IllegalStateException("Invalid import with no inner importers")
-      case importers => importers.filter(importerIncludedPredicate).foreach(importerTraverser.traverse)
+      case importers => importers.filterNot(importerExcludedPredicate).foreach(importerTraverser.traverse)
     }
   }
 }
