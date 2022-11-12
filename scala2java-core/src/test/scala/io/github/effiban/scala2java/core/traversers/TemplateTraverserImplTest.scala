@@ -7,7 +7,7 @@ import io.github.effiban.scala2java.core.entities.JavaScope.JavaScope
 import io.github.effiban.scala2java.core.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.core.matchers.TemplateBodyContextMatcher.eqTemplateBodyContext
 import io.github.effiban.scala2java.core.matchers.TreeMatcher.eqTree
-import io.github.effiban.scala2java.core.predicates.TemplateInitIncludedPredicate
+import io.github.effiban.scala2java.core.predicates.TemplateInitExcludedPredicate
 import io.github.effiban.scala2java.core.resolvers.JavaInheritanceKeywordResolver
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
@@ -71,7 +71,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
   private val javaInheritanceKeywordResolver = mock[JavaInheritanceKeywordResolver]
   private val templateBodyTraverser = mock[TemplateBodyTraverser]
   private val permittedSubTypeNameListTraverser = mock[PermittedSubTypeNameListTraverser]
-  private val templateInitIncludedPredicate = mock[TemplateInitIncludedPredicate]
+  private val templateInitExcludedPredicate = mock[TemplateInitExcludedPredicate]
 
   private val templateTraverser = new TemplateTraverserImpl(
     initListTraverser,
@@ -79,7 +79,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     templateBodyTraverser,
     permittedSubTypeNameListTraverser,
     javaInheritanceKeywordResolver,
-    templateInitIncludedPredicate
+    templateInitExcludedPredicate
   )
 
   test("traverse when empty") {
@@ -284,8 +284,8 @@ class TemplateTraverserImplTest extends UnitTestSuite {
   }
 
   private def expectFilterInits(): Unit = {
-      when(templateInitIncludedPredicate.apply(any[Init])).thenAnswer(
-        (actualInit: Init) => IncludedInits.exists(_.structure == actualInit.structure)
+      when(templateInitExcludedPredicate.apply(any[Init])).thenAnswer(
+        (actualInit: Init) => ExcludedInits.exists(_.structure == actualInit.structure)
       )
   }
 
