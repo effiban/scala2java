@@ -6,7 +6,7 @@ import io.github.effiban.scala2java.core.matchers.TreeMatcher.eqTree
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TermNames.Scala
-import io.github.effiban.scala2java.spi.predicates.ImporterIncludedPredicate
+import io.github.effiban.scala2java.spi.predicates.ImporterExcludedPredicate
 import org.mockito.ArgumentMatchers.any
 
 import scala.meta.{Import, Importee, Importer, Name, Term}
@@ -16,9 +16,9 @@ class ImportTraverserImplTest extends UnitTestSuite {
   private val PackageStatContext = StatContext(JavaScope.Package)
 
   private val importerTraverser = mock[ImporterTraverser]
-  private val importerIncludedPredicate = mock[ImporterIncludedPredicate]
+  private val importerExcludedPredicate = mock[ImporterExcludedPredicate]
 
-  private val importTraverser = new ImportTraverserImpl(importerTraverser, importerIncludedPredicate)
+  private val importTraverser = new ImportTraverserImpl(importerTraverser, importerExcludedPredicate)
 
   test("traverse() in package scope when all importers should be included") {
     val importer1 = Importer(
@@ -30,9 +30,7 @@ class ImportTraverserImplTest extends UnitTestSuite {
       importees = List(Importee.Name(Name.Indeterminate("myclass2")))
     )
 
-    when(importerIncludedPredicate.apply(any[Importer])).thenAnswer( (importer: Importer) =>
-      Seq(importer1, importer2).exists(_.structure == importer.structure)
-    )
+    when(importerExcludedPredicate.apply(any[Importer])).thenReturn(false)
 
     doWrite("""import mypackage1.myclass1;
            |""".stripMargin)
@@ -47,6 +45,9 @@ class ImportTraverserImplTest extends UnitTestSuite {
       """import mypackage1.myclass1;
         |import mypackage2.myclass2;
         |""".stripMargin
+
+    Seq(importer1, importer2)
+      .foreach(importer => verify(importerExcludedPredicate).apply(eqTree(importer)))
   }
 
   test("traverse() in package scope when some importers should be excluded") {
@@ -67,8 +68,8 @@ class ImportTraverserImplTest extends UnitTestSuite {
       importees = List(Importee.Name(Name.Indeterminate("myclass2")))
     )
 
-    when(importerIncludedPredicate.apply(any[Importer])).thenAnswer((importer: Importer) =>
-      Seq(nonScalaImporter1, nonScalaImporter2).exists(_.structure == importer.structure)
+    when(importerExcludedPredicate.apply(any[Importer])).thenAnswer((importer: Importer) =>
+      Seq(scalaImporter1, scalaImporter2).exists(_.structure == importer.structure)
     )
 
 

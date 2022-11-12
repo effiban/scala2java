@@ -3,14 +3,14 @@ package io.github.effiban.scala2java.core.predicates
 import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TermNames
-import io.github.effiban.scala2java.spi.predicates.ImporterIncludedPredicate
+import io.github.effiban.scala2java.spi.predicates.ImporterExcludedPredicate
 import org.mockito.ArgumentMatchers.any
 
 import scala.meta.Importee.Wildcard
 import scala.meta.Term.Select
 import scala.meta.{Importer, Term}
 
-class CompositeImporterIncludedPredicateTest extends UnitTestSuite {
+class CompositeImporterExcludedPredicateTest extends UnitTestSuite {
 
   private val IncludedImporter1 = Importer(Select(TermNames.Java, Term.Name("io")), List(Wildcard()))
   private val IncludedImporter2 = Importer(Select(TermNames.Java, Term.Name("lang")), List(Wildcard()))
@@ -31,16 +31,16 @@ class CompositeImporterIncludedPredicateTest extends UnitTestSuite {
     ("ExcludedLibraryImporter2", ExcludedLibraryImporter2, false)
   )
 
-  private val corePredicate = mock[ImporterIncludedPredicate]
-  private val extensionPredicate1 = mock[ImporterIncludedPredicate]
-  private val extensionPredicate2 = mock[ImporterIncludedPredicate]
+  private val corePredicate = mock[ImporterExcludedPredicate]
+  private val extensionPredicate1 = mock[ImporterExcludedPredicate]
+  private val extensionPredicate2 = mock[ImporterExcludedPredicate]
 
   private implicit val extensionRegistry: ExtensionRegistry = mock[ExtensionRegistry]
 
-  private val compositePredicate = new CompositeImporterIncludedPredicate(corePredicate)
+  private val compositePredicate = new CompositeImporterExcludedPredicate(corePredicate)
 
   override def beforeEach(): Unit = {
-    when(extensionRegistry.importerIncludedPredicates).thenReturn(List(extensionPredicate1, extensionPredicate2))
+    when(extensionRegistry.importerExcludedPredicates).thenReturn(List(extensionPredicate1, extensionPredicate2))
 
     when(corePredicate.apply(any[Importer])).thenAnswer( (importer: Importer) => importer match {
       case anImporter if anImporter.structure == ExcludedCoreImporter1.structure => false

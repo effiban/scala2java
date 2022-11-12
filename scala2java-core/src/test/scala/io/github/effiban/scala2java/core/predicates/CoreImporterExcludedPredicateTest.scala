@@ -7,11 +7,11 @@ import io.github.effiban.scala2java.core.testtrees.TermNames.Scala
 
 import scala.meta.{Importee, Importer, Name, Term}
 
-class CoreImporterIncludedPredicateTest extends UnitTestSuite {
+class CoreImporterExcludedPredicateTest extends UnitTestSuite {
 
   private val importerClassifier = mock[ImporterClassifier]
 
-  private val importerIncludedPredicate = new CoreImporterIncludedPredicate(importerClassifier)
+  private val importerExcludedPredicate = new CoreImporterExcludedPredicate(importerClassifier)
 
   test("apply() when it is not a scala importer") {
     val importer = Importer(
@@ -21,7 +21,7 @@ class CoreImporterIncludedPredicateTest extends UnitTestSuite {
 
     when(importerClassifier.isScala(eqTree(importer))).thenReturn(false)
 
-    importerIncludedPredicate(importer) shouldBe true
+    importerExcludedPredicate(importer) shouldBe false
   }
 
   test("apply() when it is a scala importer") {
@@ -32,7 +32,7 @@ class CoreImporterIncludedPredicateTest extends UnitTestSuite {
 
     when(importerClassifier.isScala(eqTree(scalaImporter))).thenReturn(true)
 
-    importerIncludedPredicate(scalaImporter) shouldBe false
+    importerExcludedPredicate(scalaImporter) shouldBe true
   }
 
 }
