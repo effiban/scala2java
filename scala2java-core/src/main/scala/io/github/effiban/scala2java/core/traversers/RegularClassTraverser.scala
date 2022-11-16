@@ -6,6 +6,7 @@ import io.github.effiban.scala2java.core.entities.JavaTreeTypeToKeywordMapping
 import io.github.effiban.scala2java.core.resolvers.{JavaChildScopeResolver, JavaTreeTypeResolver}
 import io.github.effiban.scala2java.core.transformers.ParamToDeclValTransformer
 import io.github.effiban.scala2java.core.writers.JavaWriter
+import io.github.effiban.scala2java.spi.transformers.ClassNameTransformer
 
 import scala.meta.Defn
 
@@ -17,6 +18,7 @@ private[traversers] class RegularClassTraverserImpl(modListTraverser: => ModList
                                                     typeParamListTraverser: => TypeParamListTraverser,
                                                     templateTraverser: => TemplateTraverser,
                                                     paramToDeclValTransformer: ParamToDeclValTransformer,
+                                                    classNameTransformer: ClassNameTransformer,
                                                     javaTreeTypeResolver: JavaTreeTypeResolver,
                                                     javaChildScopeResolver: JavaChildScopeResolver)
                                                    (implicit javaWriter: JavaWriter) extends RegularClassTraverser {
@@ -27,7 +29,8 @@ private[traversers] class RegularClassTraverserImpl(modListTraverser: => ModList
     writeLine()
     val javaTreeType = javaTreeTypeResolver.resolve(JavaTreeTypeContext(classDef, classDef.mods))
     modListTraverser.traverse(ModifiersContext(classDef, javaTreeType, context.javaScope))
-    writeNamedType(JavaTreeTypeToKeywordMapping(javaTreeType), classDef.name.value)
+    val transformedName = classNameTransformer.transform(classDef.name)
+    writeNamedType(JavaTreeTypeToKeywordMapping(javaTreeType), transformedName.value)
     typeParamListTraverser.traverse(classDef.tparams)
     traverseCtorAndTemplate(classDef, javaTreeType, context)
   }

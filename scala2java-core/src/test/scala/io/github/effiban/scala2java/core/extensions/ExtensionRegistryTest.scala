@@ -4,6 +4,7 @@ import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.spi.Scala2JavaExtension
 import io.github.effiban.scala2java.spi.predicates.{ImporterExcludedPredicate, TemplateInitExcludedPredicate}
 import io.github.effiban.scala2java.spi.providers.AdditionalImportersProvider
+import io.github.effiban.scala2java.spi.transformers.ClassNameTransformer
 
 class ExtensionRegistryTest extends UnitTestSuite {
 
@@ -48,5 +49,18 @@ class ExtensionRegistryTest extends UnitTestSuite {
     val extensionRegistry = ExtensionRegistry(extensions)
 
     extensionRegistry.templateInitExcludedPredicates shouldBe templateInitExcludedPredicates
+  }
+
+  test("classNameTransformers") {
+    val classNameTransformer1 = mock[ClassNameTransformer]
+    val classNameTransformer2 = mock[ClassNameTransformer]
+    val classNameTransformers = List(classNameTransformer1, classNameTransformer2)
+
+    when(extension1.classNameTransformer()).thenReturn(classNameTransformer1)
+    when(extension2.classNameTransformer()).thenReturn(classNameTransformer2)
+
+    val extensionRegistry = ExtensionRegistry(extensions)
+
+    extensionRegistry.classNameTransformers shouldBe classNameTransformers
   }
 }

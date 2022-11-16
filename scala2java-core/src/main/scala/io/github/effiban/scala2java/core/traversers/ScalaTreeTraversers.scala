@@ -10,8 +10,11 @@ import io.github.effiban.scala2java.core.resolvers._
 import io.github.effiban.scala2java.core.transformers._
 import io.github.effiban.scala2java.core.typeinference.TypeInferrers.{scalarArgListTypeInferrer, termTypeInferrer}
 import io.github.effiban.scala2java.core.writers.JavaWriter
+import io.github.effiban.scala2java.spi.transformers.ClassNameTransformer
 
-class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: ExtensionRegistry) {
+class ScalaTreeTraversers(implicit javaWriter: JavaWriter,
+                          extensionRegistry: ExtensionRegistry,
+                          compositeClassNameTransformer: ClassNameTransformer) {
 
   private lazy val alternativeTraverser: AlternativeTraverser = new AlternativeTraverserImpl(patTraverser)
 
@@ -281,6 +284,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     typeParamListTraverser,
     templateTraverser,
     ParamToDeclValTransformer,
+    compositeClassNameTransformer,
     JavaTreeTypeResolver,
     JavaChildScopeResolver
   )
