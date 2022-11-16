@@ -1,11 +1,14 @@
 package io.github.effiban.scala2java.core
 
 import io.github.effiban.scala2java.core.extensions.{ExtensionRegistry, ExtensionRegistryBuilder}
+import io.github.effiban.scala2java.core.resolvers.JavaFileResolverImpl
+import io.github.effiban.scala2java.core.transformers.CompositeClassNameTransformer
 import io.github.effiban.scala2java.core.traversers.ScalaTreeTraversers
 import io.github.effiban.scala2java.core.writers.{ConsoleJavaWriter, JavaWriter, JavaWriterImpl}
+import io.github.effiban.scala2java.spi.transformers.ClassNameTransformer
 
 import java.io.FileWriter
-import java.nio.file.{Files, Path, Paths}
+import java.nio.file.{Files, Path}
 import scala.meta.Source
 import scala.meta.inputs.Input
 
@@ -17,11 +20,13 @@ object Scala2JavaTranslator {
     val input = Input.VirtualFile(scalaFileName, scalaText)
     val sourceTree = input.parse[Source].get
 
+    implicit val extensionRegistry: ExtensionRegistry = ExtensionRegistryBuilder.build()
+    implicit val compositeClassNameTransformer: ClassNameTransformer = new CompositeClassNameTransformer()
+
     implicit val javaWriter: JavaWriter = maybeOutputJavaBasePath match {
-      case Some(outputJavaBasePath) => createFileJavaWriter(scalaFileName, outputJavaBasePath)
+      case Some(outputJavaBasePath) => createJavaFileWriter(scalaPath, outputJavaBasePath)
       case None => ConsoleJavaWriter
     }
-    implicit val extensionRegistry: ExtensionRegistry = ExtensionRegistryBuilder.build()
 
     try {
       new ScalaTreeTraversers().sourceTraverser.traverse(sourceTree)
@@ -30,10 +35,9 @@ object Scala2JavaTranslator {
     }
   }
 
-  private def createFileJavaWriter(scalaFileName: String, outputJavaBasePath: Path) = {
-    outputJavaBasePath.toFile.mkdirs()
-    val javaFileName = scalaFileName.replace("scala", "java")
-    val javaFile = Paths.get(outputJavaBasePath.toString, javaFileName).toFile
+  private def createJavaFileWriter(scalaPath: Path, outputJavaBasePath: Path)
+                                  (implicit classNameTransformer: ClassNameTransformer) = {
+    val javaFile = new JavaFileResolverImpl().resolve(scalaPath, outputJavaBasePath)
     new JavaWriterImpl(new FileWriter(javaFile))
   }
 }
