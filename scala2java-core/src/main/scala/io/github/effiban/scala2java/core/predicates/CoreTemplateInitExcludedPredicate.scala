@@ -1,10 +1,10 @@
 package io.github.effiban.scala2java.core.predicates
 
+import io.github.effiban.scala2java.spi.predicates.TemplateInitExcludedPredicate
+
 import scala.meta.{Init, Type}
 
-trait TemplateInitExcludedPredicate extends (Init => Boolean)
-
-object TemplateInitExcludedPredicate extends TemplateInitExcludedPredicate {
+object CoreTemplateInitExcludedPredicate extends TemplateInitExcludedPredicate {
 
   private val TypesToExclude = Set[Type](
     Type.Name("Product"),
