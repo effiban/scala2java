@@ -119,7 +119,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter,
     typeTraverser,
     termParamListTraverser,
     blockTraverser,
-    termTypeInferrer
+    termTypeInferrer,
+    new CompositeDefnDefTransformer()
   )
 
   private lazy val defnTraverser: DefnTraverser = new DefnTraverserImpl(
