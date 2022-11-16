@@ -6,6 +6,7 @@ import io.github.effiban.scala2java.core.entities.TraversalConstants.UnknownType
 import io.github.effiban.scala2java.core.entities.{JavaScope, JavaTreeType}
 import io.github.effiban.scala2java.core.typeinference.TermTypeInferrer
 import io.github.effiban.scala2java.core.writers.JavaWriter
+import io.github.effiban.scala2java.spi.transformers.DefnDefTransformer
 
 import scala.meta.{Defn, Init, Type}
 
@@ -19,19 +20,21 @@ private[traversers] class DefnDefTraverserImpl(modListTraverser: => ModListTrave
                                                typeTraverser: => TypeTraverser,
                                                termParamListTraverser: => TermParamListTraverser,
                                                blockTraverser: => BlockTraverser,
-                                               termTypeInferrer: => TermTypeInferrer)
+                                               termTypeInferrer: => TermTypeInferrer,
+                                               defnDefTransformer: DefnDefTransformer)
                                               (implicit javaWriter: JavaWriter) extends DefnDefTraverser {
 
   import javaWriter._
 
   override def traverse(defnDef: Defn.Def, context: DefnDefContext = DefnDefContext()): Unit = {
+    val transformedDefnDef = defnDefTransformer.transform(defnDef)
     writeLine()
-    modListTraverser.traverse(ModifiersContext(defnDef, JavaTreeType.Method, context.javaScope))
-    traverseTypeParams(defnDef.tparams)
-    val maybeMethodType = resolveMethodType(defnDef)
+    modListTraverser.traverse(ModifiersContext(transformedDefnDef, JavaTreeType.Method, context.javaScope))
+    traverseTypeParams(transformedDefnDef.tparams)
+    val maybeMethodType = resolveMethodType(transformedDefnDef)
     traverseMethodType(maybeMethodType)
-    termNameTraverser.traverse(defnDef.name)
-    traverseMethodParamsAndBody(defnDef, maybeMethodType, context.maybeInit)
+    termNameTraverser.traverse(transformedDefnDef.name)
+    traverseMethodParamsAndBody(transformedDefnDef, maybeMethodType, context.maybeInit)
   }
 
   private def traverseMethodParamsAndBody(defDef: Defn.Def, maybeMethodType: Option[Type], maybeInit: Option[Init] = None): Unit = {
