@@ -4,9 +4,9 @@ import scala.meta.Importer
 
 trait AdditionalImportersProvider {
 
-  def provide(): List[Importer] = Nil
+  def provide(): List[Importer]
 }
 
 object AdditionalImportersProvider {
-  val Empty: AdditionalImportersProvider = new AdditionalImportersProvider {}
+  val Empty: AdditionalImportersProvider = () => Nil
 }

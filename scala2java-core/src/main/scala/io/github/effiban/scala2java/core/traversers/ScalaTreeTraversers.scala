@@ -28,7 +28,9 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter,
     typeTraverser,
     termSelectTraverser,
     typeListTraverser,
-    termTraverser
+    termTraverser,
+    termApplyTraverser,
+    new CompositeTermApplyTypeToTermApplyTransformer()
   )
 
   private lazy val applyUnaryTraverser: ApplyUnaryTraverser = new ApplyUnaryTraverserImpl(termNameTraverser, termTraverser)
