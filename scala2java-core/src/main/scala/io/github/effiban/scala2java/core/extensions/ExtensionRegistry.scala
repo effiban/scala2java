@@ -3,7 +3,7 @@ package io.github.effiban.scala2java.core.extensions
 import io.github.effiban.scala2java.spi.Scala2JavaExtension
 import io.github.effiban.scala2java.spi.predicates.{ImporterExcludedPredicate, TemplateInitExcludedPredicate}
 import io.github.effiban.scala2java.spi.providers.AdditionalImportersProvider
-import io.github.effiban.scala2java.spi.transformers.{ClassNameTransformer, DefnDefTransformer}
+import io.github.effiban.scala2java.spi.transformers.{ClassNameTransformer, DefnDefTransformer, TermApplyTypeToTermApplyTransformer}
 
 case class ExtensionRegistry(extensions: List[Scala2JavaExtension]) {
 
@@ -16,4 +16,7 @@ case class ExtensionRegistry(extensions: List[Scala2JavaExtension]) {
   val classNameTransformers: List[ClassNameTransformer] = extensions.map(_.classNameTransformer())
 
   val defnDefTransformers: List[DefnDefTransformer] = extensions.map(_.defnDefTransformer())
+
+  val termApplyTypeToTermApplyTransformers: List[TermApplyTypeToTermApplyTransformer] =
+    extensions.map(_.termApplyTypeToTermApplyTransformer())
 }
