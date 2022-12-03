@@ -2,10 +2,10 @@ package io.github.effiban.scala2java.core
 
 import io.github.effiban.scala2java.core.extensions.{ExtensionRegistry, ExtensionRegistryBuilder}
 import io.github.effiban.scala2java.core.resolvers.JavaFileResolverImpl
-import io.github.effiban.scala2java.core.transformers.CompositeClassNameTransformer
+import io.github.effiban.scala2java.core.transformers.CompositeFileNameTransformer
 import io.github.effiban.scala2java.core.traversers.ScalaTreeTraversers
 import io.github.effiban.scala2java.core.writers.{ConsoleJavaWriter, JavaWriter, JavaWriterImpl}
-import io.github.effiban.scala2java.spi.transformers.ClassNameTransformer
+import io.github.effiban.scala2java.spi.transformers.FileNameTransformer
 
 import java.io.FileWriter
 import java.nio.file.{Files, Path}
@@ -21,7 +21,7 @@ object Scala2JavaTranslator {
     val sourceTree = input.parse[Source].get
 
     implicit val extensionRegistry: ExtensionRegistry = ExtensionRegistryBuilder.build()
-    implicit val compositeClassNameTransformer: ClassNameTransformer = new CompositeClassNameTransformer()
+    implicit val fileNameTransformer: FileNameTransformer = new CompositeFileNameTransformer()
 
     implicit val javaWriter: JavaWriter = maybeOutputJavaBasePath match {
       case Some(outputJavaBasePath) => createJavaFileWriter(scalaPath, outputJavaBasePath)
@@ -36,7 +36,7 @@ object Scala2JavaTranslator {
   }
 
   private def createJavaFileWriter(scalaPath: Path, outputJavaBasePath: Path)
-                                  (implicit classNameTransformer: ClassNameTransformer) = {
+                                  (implicit fileNameTransformer: FileNameTransformer) = {
     val javaFile = new JavaFileResolverImpl().resolve(scalaPath, outputJavaBasePath)
     new JavaWriterImpl(new FileWriter(javaFile))
   }

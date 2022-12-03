@@ -12,7 +12,6 @@ import io.github.effiban.scala2java.core.resolvers.{JavaChildScopeResolver, Java
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.transformers.ParamToDeclValTransformer
-import io.github.effiban.scala2java.spi.transformers.ClassNameTransformer
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 
@@ -24,7 +23,6 @@ import scala.meta.{Ctor, Decl, Defn, Init, Mod, Name, Pat, Self, Template, Term,
 class RegularClassTraverserImplTest extends UnitTestSuite {
 
   private val ClassName = Type.Name("MyClass")
-  private val NewClassName = Type.Name("MyNewClass")
 
   private val Modifiers: List[Mod.Annot] = List(
     Mod.Annot(
@@ -81,7 +79,6 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
   private val typeParamListTraverser = mock[TypeParamListTraverser]
   private val templateTraverser = mock[TemplateTraverser]
   private val paramToDeclValTransformer = mock[ParamToDeclValTransformer]
-  private val classNameTransformer = mock[ClassNameTransformer]
   private val javaTreeTypeResolver = mock[JavaTreeTypeResolver]
   private val javaChildScopeResolver = mock[JavaChildScopeResolver]
 
@@ -90,15 +87,9 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
     typeParamListTraverser,
     templateTraverser,
     paramToDeclValTransformer,
-    classNameTransformer,
     javaTreeTypeResolver,
     javaChildScopeResolver
   )
-
-  override def beforeEach(): Unit = {
-    when(classNameTransformer.transform(eqTree(ClassName))).thenReturn(NewClassName)
-  }
-
 
   test("traverse() for one list of ctor args") {
     val primaryCtor = Ctor.Primary(
@@ -146,7 +137,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """
         |@MyAnnotation
-        |public class MyNewClass<T> {
+        |public class MyClass<T> {
         |  /* BODY */
         |}
         |""".stripMargin
@@ -206,7 +197,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """
         |@MyAnnotation
-        |public class MyNewClass<T> {
+        |public class MyClass<T> {
         |  /* BODY */
         |}
         |""".stripMargin
@@ -270,7 +261,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """
         |@MyAnnotation
-        |public class MyNewClass<T> {
+        |public class MyClass<T> {
         |  /* BODY */
         |}
         |""".stripMargin
