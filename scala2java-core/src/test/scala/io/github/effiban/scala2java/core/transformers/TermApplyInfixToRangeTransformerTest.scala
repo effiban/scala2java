@@ -20,7 +20,7 @@ class TermApplyInfixToRangeTransformerTest extends UnitTestSuite {
       args = List(Lit.Int(1), Lit.Int(10))
     )
 
-    TermApplyInfixToRangeTransformer.transform(termApplyInfix).structure shouldBe expectedTermApply.structure
+    TermApplyInfixToRangeTransformer.transform(termApplyInfix).value.structure shouldBe expectedTermApply.structure
   }
 
   test("transform 'to' with no args should throw an IllegalStateException") {
@@ -32,7 +32,7 @@ class TermApplyInfixToRangeTransformerTest extends UnitTestSuite {
     )
 
     intercept[IllegalStateException] {
-      TermApplyInfixToRangeTransformer.transform(termApplyInfix).structure
+      TermApplyInfixToRangeTransformer.transform(termApplyInfix)
     }
   }
 
@@ -49,7 +49,7 @@ class TermApplyInfixToRangeTransformerTest extends UnitTestSuite {
       args = List(Lit.Int(0), Lit.Int(10))
     )
 
-    TermApplyInfixToRangeTransformer.transform(termApplyInfix).structure shouldBe expectedTermApply.structure
+    TermApplyInfixToRangeTransformer.transform(termApplyInfix).value.structure shouldBe expectedTermApply.structure
   }
 
   test("transform 'until' with two args should throw an IllegalStateException") {

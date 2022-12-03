@@ -1,8 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.classifiers.TermApplyInfixClassifier
 import io.github.effiban.scala2java.core.contexts.InvocationArgListContext
-import io.github.effiban.scala2java.core.transformers.{TermApplyInfixToMapEntryTransformer, TermApplyInfixToRangeTransformer}
+import io.github.effiban.scala2java.core.transformers.TermApplyInfixToTermApplyTransformer
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Term
@@ -13,32 +12,21 @@ private[traversers] class TermApplyInfixTraverserImpl(termTraverser: => TermTrav
                                                       termApplyTraverser: => TermApplyTraverser,
                                                       termNameTraverser: => TermNameTraverser,
                                                       invocationArgListTraverser: => InvocationArgListTraverser,
-                                                      termApplyInfixClassifier: TermApplyInfixClassifier,
-                                                      termApplyInfixToRangeTransformer: TermApplyInfixToRangeTransformer,
-                                                      termApplyInfixToMapEntryTransformer: TermApplyInfixToMapEntryTransformer)
+                                                      termApplyInfixToTermApplyTransformer: TermApplyInfixToTermApplyTransformer)
                                                      (implicit javaWriter: JavaWriter) extends TermApplyInfixTraverser {
 
   import javaWriter._
 
   // Infix method invocation, e.g.: a + b, 0 until 5, a -> 1
+  // Except for Java-style operators, all other invocations must be transformed to a regular method invocation in Java
   override def traverse(termApplyInfix: Term.ApplyInfix): Unit = {
-    termApplyInfix match {
-      case theTermApplyInfix if termApplyInfixClassifier.isRange(theTermApplyInfix) => traverseRange(theTermApplyInfix)
-      case theTermApplyInfix if termApplyInfixClassifier.isAssociation(theTermApplyInfix) => traverseAssociation(theTermApplyInfix)
-      // TODO handle additional non-operator methods which should be transformed into regular (prefix) order in Java
-      case _ => traverseSimple(termApplyInfix)
+    termApplyInfixToTermApplyTransformer.transform(termApplyInfix) match {
+      case Some(termApply) => termApplyTraverser.traverse(termApply)
+      case _ => traverseAsInfix(termApplyInfix)
     }
   }
 
-  private def traverseRange(termApplyInfix: Term.ApplyInfix): Unit = {
-    termApplyTraverser.traverse(termApplyInfixToRangeTransformer.transform(termApplyInfix))
-  }
-
-  private def traverseAssociation(termApplyInfix: Term.ApplyInfix): Unit = {
-    termApplyTraverser.traverse(termApplyInfixToMapEntryTransformer.transform(termApplyInfix))
-  }
-
-  private def traverseSimple(termApplyInfix: Term.ApplyInfix): Unit = {
+  private def traverseAsInfix(termApplyInfix: Term.ApplyInfix): Unit = {
     termTraverser.traverse(termApplyInfix.lhs)
     write(" ")
     termNameTraverser.traverse(termApplyInfix.op)

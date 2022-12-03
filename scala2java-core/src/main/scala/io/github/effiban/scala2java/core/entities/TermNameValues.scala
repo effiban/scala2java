@@ -16,6 +16,26 @@ object TermNameValues {
   final val Empty = "empty"
   final val Util = "util"
 
+  final val Plus = "+"
+  final val Minus = "-"
+  final val Multiply = "*"
+  final val Divide = "/"
+  final val Modulus = "%"
+
+  final val And = "&&"
+  final val Or = "||"
+
+  final val BitwiseAnd = "&"
+  final val BitwiseOr = "|"
+  final val BitwiseXor = "^"
+
+  final val Equals = "=="
+  final val NotEquals = "!="
+  final val GreaterThan = ">"
+  final val GreaterEquals = ">="
+  final val LessThan = "<"
+  final val LessEquals = "<="
+
   final val ScalaRange = "Range"
   final val ScalaInclusive = "inclusive"
   final val ScalaOption = "Option"
@@ -30,6 +50,9 @@ object TermNameValues {
   final val ScalaArray = "Array"
   final val ScalaVector = "Vector"
   final val ScalaNil = "Nil"
+  final val ScalaTo = "to"
+  final val ScalaUntil = "until"
+  final val ScalaAssociate = "->"
 
   final val Java = "java"
   final val JavaIntStream = "IntStream"

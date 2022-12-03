@@ -1,24 +1,21 @@
 package io.github.effiban.scala2java.core.transformers
 
-import io.github.effiban.scala2java.core.entities.ScalaOperatorName.{To, Until}
+import io.github.effiban.scala2java.core.entities.TermNameValues.{ScalaTo, ScalaUntil}
 
 import scala.meta.Term
 import scala.meta.Term.Select
 
-trait TermApplyInfixToRangeTransformer {
-  def transform(termApplyInfix: Term.ApplyInfix): Term.Apply
-}
+object TermApplyInfixToRangeTransformer extends TermApplyInfixToTermApplyTransformer {
 
-object TermApplyInfixToRangeTransformer extends TermApplyInfixToRangeTransformer {
-
-  override def transform(termApplyInfix: Term.ApplyInfix): Term.Apply = {
-    (termApplyInfix.op, termApplyInfix.args) match {
-      case (Term.Name(To), end :: Nil) => inclusiveRangeOf(termApplyInfix.lhs, end)
-      case (Term.Name(To), _) => handleInvalidRHS(termApplyInfix)
-      case (Term.Name(Until), end :: Nil) => exclusiveRangeOf(termApplyInfix.lhs, end)
-      case (Term.Name(Until), _) => handleInvalidRHS(termApplyInfix)
+  override def transform(termApplyInfix: Term.ApplyInfix): Option[Term.Apply] = {
+    val termApply = (termApplyInfix.op, termApplyInfix.args) match {
+      case (Term.Name(ScalaTo), end :: Nil) => inclusiveRangeOf(termApplyInfix.lhs, end)
+      case (Term.Name(ScalaTo), _) => handleInvalidRHS(termApplyInfix)
+      case (Term.Name(ScalaUntil), end :: Nil) => exclusiveRangeOf(termApplyInfix.lhs, end)
+      case (Term.Name(ScalaUntil), _) => handleInvalidRHS(termApplyInfix)
       case _ => handleNonRange(termApplyInfix)
     }
+    Some(termApply)
   }
 
   private def inclusiveRangeOf(start: Term, end: Term) =
