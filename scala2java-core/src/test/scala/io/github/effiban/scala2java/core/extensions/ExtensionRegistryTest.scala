@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.spi.Scala2JavaExtension
 import io.github.effiban.scala2java.spi.predicates.{ImporterExcludedPredicate, TemplateInitExcludedPredicate}
 import io.github.effiban.scala2java.spi.providers.AdditionalImportersProvider
-import io.github.effiban.scala2java.spi.transformers.{ClassNameTransformer, DefnDefTransformer, TermApplyTypeToTermApplyTransformer}
+import io.github.effiban.scala2java.spi.transformers.{ClassNameTransformer, DefnDefTransformer, TermApplyTransformer, TermApplyTypeToTermApplyTransformer}
 
 class ExtensionRegistryTest extends UnitTestSuite {
 
@@ -88,5 +88,18 @@ class ExtensionRegistryTest extends UnitTestSuite {
     val extensionRegistry = ExtensionRegistry(extensions)
 
     extensionRegistry.termApplyTypeToTermApplyTransformers shouldBe termApplyTypeToTermApplyTransformers
+  }
+
+  test("termApplyTransformers") {
+    val termApplyTransformer1 = mock[TermApplyTransformer]
+    val termApplyTransformer2 = mock[TermApplyTransformer]
+    val termApplyTransformers = List(termApplyTransformer1, termApplyTransformer2)
+
+    when(extension1.termApplyTransformer()).thenReturn(termApplyTransformer1)
+    when(extension2.termApplyTransformer()).thenReturn(termApplyTransformer2)
+
+    val extensionRegistry = ExtensionRegistry(extensions)
+
+    extensionRegistry.termApplyTransformers shouldBe termApplyTransformers
   }
 }

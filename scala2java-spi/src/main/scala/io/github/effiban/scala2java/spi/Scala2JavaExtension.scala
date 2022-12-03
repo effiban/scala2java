@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.spi
 
 import io.github.effiban.scala2java.spi.predicates.{ImporterExcludedPredicate, TemplateInitExcludedPredicate}
 import io.github.effiban.scala2java.spi.providers.AdditionalImportersProvider
-import io.github.effiban.scala2java.spi.transformers.{ClassNameTransformer, DefnDefTransformer, TermApplyTypeToTermApplyTransformer}
+import io.github.effiban.scala2java.spi.transformers.{ClassNameTransformer, DefnDefTransformer, TermApplyTransformer, TermApplyTypeToTermApplyTransformer}
 
 trait Scala2JavaExtension {
 
@@ -17,4 +17,6 @@ trait Scala2JavaExtension {
   def defnDefTransformer(): DefnDefTransformer = DefnDefTransformer.Identity
 
   def termApplyTypeToTermApplyTransformer(): TermApplyTypeToTermApplyTransformer = TermApplyTypeToTermApplyTransformer.Empty
+
+  def termApplyTransformer(): TermApplyTransformer = TermApplyTransformer.Identity
 }

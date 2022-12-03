@@ -8,7 +8,7 @@ import io.github.effiban.scala2java.core.resolvers.ArrayInitializerContextResolv
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{TermNames, TypeNames}
-import io.github.effiban.scala2java.core.transformers.TermApplyTransformer
+import io.github.effiban.scala2java.spi.transformers.TermApplyTransformer
 import org.mockito.ArgumentMatchers
 
 import scala.meta.{Lit, Term}

@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.InvocationArgListContext
 import io.github.effiban.scala2java.core.resolvers.ArrayInitializerContextResolver
-import io.github.effiban.scala2java.core.transformers.TermApplyTransformer
+import io.github.effiban.scala2java.spi.transformers.TermApplyTransformer
 
 import scala.meta.Term
 

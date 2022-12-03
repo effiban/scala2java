@@ -7,7 +7,7 @@ import io.github.effiban.scala2java.core.testtrees.{TermNames, TypeNames}
 
 import scala.meta.{Lit, Term}
 
-class TermApplyTransformerImplTest extends UnitTestSuite {
+class CoreTermApplyTransformerTest extends UnitTestSuite {
 
   private val fun = Term.Name("foo")
   private val arg1 = Term.Name("arg1")
@@ -19,7 +19,7 @@ class TermApplyTransformerImplTest extends UnitTestSuite {
 
   private val termNameClassifier = mock[TermNameClassifier]
 
-  private val termApplyTransformer = new TermApplyTransformerImpl(termNameClassifier)
+  private val termApplyTransformer = new CoreTermApplyTransformer(termNameClassifier)
 
   test("transform() of a untyped pre-def object initializer, arg by-value, should return same with added 'apply'") {
     val initialTermApply = Term.Apply(Term.Name("ScalaObject"), List(Lit.Int(1)))
