@@ -1,7 +1,8 @@
 package io.github.effiban.scala2java.core.classifiers
 
 import io.github.effiban.scala2java.core.entities.Decision.{No, Uncertain, Yes}
-import io.github.effiban.scala2java.core.entities.ScalaOperatorName
+import io.github.effiban.scala2java.core.entities.TermApplyInfixKind
+import io.github.effiban.scala2java.core.entities.TermApplyInfixKind.Association
 import io.github.effiban.scala2java.core.matchers.TreeMatcher.eqTree
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{TermNames, TypeNames}
@@ -53,26 +54,26 @@ class TermTypeClassifierImplTest extends UnitTestSuite {
     val associationInfix = Term.ApplyInfix(
       lhs = Term.Name("a"),
       targs = Nil,
-      op = Term.Name(ScalaOperatorName.Associate),
+      op = TermNames.ScalaAssociation,
       args = List(Lit.Int(1))
     )
 
-    when(termApplyInfixClassifier.isAssociation(eqTree(associationInfix))).thenReturn(true)
+    when(termApplyInfixClassifier.classify(eqTree(associationInfix))).thenReturn(Association)
 
     termTypeClassifier.isTupleLike(associationInfix) shouldBe true
   }
 
   test("isTupleLike() when input is a Term.ApplyInfix which is not an association should return false") {
-    val associationInfix = Term.ApplyInfix(
+    val additionInfix = Term.ApplyInfix(
       lhs = Term.Name("a"),
       targs = Nil,
       op = TermNames.Plus,
       args = List(Lit.Int(1))
     )
 
-    when(termApplyInfixClassifier.isAssociation(eqTree(associationInfix))).thenReturn(false)
+    when(termApplyInfixClassifier.classify(eqTree(additionInfix))).thenReturn(TermApplyInfixKind.Range)
 
-    termTypeClassifier.isTupleLike(associationInfix) shouldBe false
+    termTypeClassifier.isTupleLike(additionInfix) shouldBe false
   }
 
   test("isTupleLike() when input is a Lit.Int should return false") {

@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.transformers
 
-import io.github.effiban.scala2java.core.entities.ScalaOperatorName
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
+import io.github.effiban.scala2java.core.testtrees.TermNames
 import io.github.effiban.scala2java.core.transformers.TermApplyInfixToMapEntryTransformer.transform
 
 import scala.meta.{Lit, Term}
@@ -12,7 +12,7 @@ class TermApplyInfixToMapEntryTransformerTest extends UnitTestSuite {
     val applyInfix = Term.ApplyInfix(
       lhs = Lit.String("a"),
       targs = Nil,
-      op = Term.Name(ScalaOperatorName.Associate),
+      op = TermNames.ScalaAssociation,
       args = List(Lit.Int(1))
     )
 
@@ -21,7 +21,7 @@ class TermApplyInfixToMapEntryTransformerTest extends UnitTestSuite {
       args = List(Lit.String("a"), Lit.Int(1))
     )
 
-    transform(applyInfix).structure shouldBe expectedMapEntry.structure
+    transform(applyInfix).value.structure shouldBe expectedMapEntry.structure
   }
 
 }

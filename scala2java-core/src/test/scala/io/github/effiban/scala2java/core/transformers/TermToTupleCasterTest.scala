@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.transformers
 
-import io.github.effiban.scala2java.core.entities.ScalaOperatorName
+import io.github.effiban.scala2java.core.entities.TermNameValues.ScalaAssociate
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 
 import scala.meta.{Lit, Term}
@@ -16,7 +16,7 @@ class TermToTupleCasterTest extends UnitTestSuite {
     val applyInfix = Term.ApplyInfix(
       lhs = Lit.String("a"),
       targs = Nil,
-      op = Term.Name(ScalaOperatorName.Associate),
+      op = Term.Name(ScalaAssociate),
       args = List(Lit.Int(1))
     )
     val expectedTermTuple = Term.Tuple(List(Lit.String("a"), Lit.Int(1)))

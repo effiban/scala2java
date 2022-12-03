@@ -1,22 +1,41 @@
 package io.github.effiban.scala2java.core.classifiers
 
-import io.github.effiban.scala2java.core.entities.ScalaOperatorName
-import io.github.effiban.scala2java.core.entities.ScalaOperatorName.{To, Until}
+import io.github.effiban.scala2java.core.entities.TermApplyInfixKind.{Association, Operator, Range, TermApplyInfixKind, Unclassified}
+import io.github.effiban.scala2java.core.entities.TermNameValues.{And, BitwiseAnd, BitwiseOr, BitwiseXor, Divide, Equals, GreaterEquals, GreaterThan, LessEquals, LessThan, Minus, Modulus, Multiply, NotEquals, Or, Plus, ScalaAssociate, ScalaTo, ScalaUntil}
 
 import scala.meta.Term
 
 trait TermApplyInfixClassifier {
 
-  def isRange(termApplyInfix: Term.ApplyInfix): Boolean
-
-  def isAssociation(termApplyInfix: Term.ApplyInfix): Boolean
-
+  def classify(termApplyInfix: Term.ApplyInfix): TermApplyInfixKind
 }
+
 object TermApplyInfixClassifier extends TermApplyInfixClassifier {
 
-  private final val RangeOperators = List(To, Until)
+  private final val ScalaRangeOperators = List(ScalaTo, ScalaUntil)
+  private final val JavaStyleOperators = List(
+    Plus,
+    Minus,
+    Multiply,
+    Divide,
+    Modulus,
+    And,
+    Or,
+    BitwiseAnd,
+    BitwiseOr,
+    BitwiseXor,
+    Equals,
+    NotEquals,
+    GreaterThan,
+    GreaterEquals,
+    LessThan,
+    LessEquals
+  )
 
-  override def isRange(termApplyInfix: Term.ApplyInfix): Boolean = RangeOperators.contains(termApplyInfix.op.value)
-
-  override def isAssociation(termApplyInfix: Term.ApplyInfix): Boolean = termApplyInfix.op.value == ScalaOperatorName.Associate
+  override def classify(termApplyInfix: Term.ApplyInfix): TermApplyInfixKind = termApplyInfix.op.value match {
+    case ScalaAssociate => Association
+    case operator if ScalaRangeOperators.contains(operator) => Range
+    case operator if JavaStyleOperators.contains(operator) => Operator
+    case _ => Unclassified
+  }
 }

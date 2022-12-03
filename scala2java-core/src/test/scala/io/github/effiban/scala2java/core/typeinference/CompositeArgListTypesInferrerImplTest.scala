@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.typeinference
 
 import io.github.effiban.scala2java.core.classifiers.TermTypeClassifier
-import io.github.effiban.scala2java.core.entities.ScalaOperatorName
+import io.github.effiban.scala2java.core.entities.TermNameValues.ScalaAssociate
 import io.github.effiban.scala2java.core.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
@@ -50,7 +50,7 @@ class CompositeArgListTypesInferrerImplTest extends UnitTestSuite {
     val arg1 = Term.Tuple(List(Lit.String("a"), Lit.Int(1)))
     val arg2 = Term.ApplyInfix(
       lhs = Lit.String("b"),
-      op = Term.Name(ScalaOperatorName.Associate),
+      op = Term.Name(ScalaAssociate),
       targs = Nil,
       args = List(Lit.Int(2))
     )

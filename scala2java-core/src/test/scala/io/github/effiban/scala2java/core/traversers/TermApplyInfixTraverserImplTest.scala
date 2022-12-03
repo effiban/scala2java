@@ -1,12 +1,10 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.classifiers.TermApplyInfixClassifier
 import io.github.effiban.scala2java.core.matchers.TreeMatcher.eqTree
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.testtrees.TermNames
-import io.github.effiban.scala2java.core.testtrees.TermNames.{Plus, ScalaAssociation, ScalaRange, ScalaTo}
-import io.github.effiban.scala2java.core.transformers.{TermApplyInfixToMapEntryTransformer, TermApplyInfixToRangeTransformer}
+import io.github.effiban.scala2java.core.testtrees.TermNames.{Plus, ScalaRange, ScalaTo}
+import io.github.effiban.scala2java.core.transformers.TermApplyInfixToTermApplyTransformer
 
 import scala.meta.Term
 
@@ -16,20 +14,16 @@ class TermApplyInfixTraverserImplTest extends UnitTestSuite {
   private val termApplyTraverser = mock[TermApplyTraverser]
   private val termNameTraverser = mock[TermNameTraverser]
   private val invocationArgListTraverser = mock[InvocationArgListTraverser]
-  private val termApplyInfixClassifier = mock[TermApplyInfixClassifier]
-  private val termApplyInfixToRangeTransformer = mock[TermApplyInfixToRangeTransformer]
-  private val termApplyInfixToMapEntryTransformer = mock[TermApplyInfixToMapEntryTransformer]
+  private val termApplyInfixToTermApplyTransformer = mock[TermApplyInfixToTermApplyTransformer]
 
   private val termApplyInfixTraverser = new TermApplyInfixTraverserImpl(
     termTraverser,
     termApplyTraverser,
     termNameTraverser,
     invocationArgListTraverser,
-    termApplyInfixClassifier,
-    termApplyInfixToRangeTransformer,
-    termApplyInfixToMapEntryTransformer)
+    termApplyInfixToTermApplyTransformer)
 
-  test("traverse() when has range operator") {
+  test("traverse() when transformed to a Term.Apply should call the TermApplyTraverser") {
     val lhs = Term.Name("a")
     val rhs = Term.Name("b")
 
@@ -42,37 +36,14 @@ class TermApplyInfixTraverserImplTest extends UnitTestSuite {
 
     val expectedRangeTermApply = Term.Apply(fun = ScalaRange, args = List(lhs, rhs))
 
-    when(termApplyInfixClassifier.isRange(eqTree(applyInfix))).thenReturn(true)
-    when(termApplyInfixToRangeTransformer.transform(eqTree(applyInfix))).thenReturn(expectedRangeTermApply)
+    when(termApplyInfixToTermApplyTransformer.transform(eqTree(applyInfix))).thenReturn(Some(expectedRangeTermApply))
 
     termApplyInfixTraverser.traverse(applyInfix)
 
     verify(termApplyTraverser).traverse(eqTree(expectedRangeTermApply))
   }
 
-  test("traverse() when has association operator") {
-    val lhs = Term.Name("a")
-    val rhs = Term.Name("b")
-
-    val applyInfix = Term.ApplyInfix(
-      lhs = lhs,
-      op = ScalaAssociation,
-      targs = Nil,
-      args = List(rhs)
-    )
-
-    val expectedMapEntryTermApply = Term.Apply(Term.Select(TermNames.Map, TermNames.JavaEntryMethod), args = List(lhs, rhs))
-
-    when(termApplyInfixClassifier.isAssociation(eqTree(applyInfix))).thenReturn(true)
-
-    when(termApplyInfixToMapEntryTransformer.transform(eqTree(applyInfix))).thenReturn(expectedMapEntryTermApply)
-
-    termApplyInfixTraverser.traverse(applyInfix)
-
-    verify(termApplyTraverser).traverse(eqTree(expectedMapEntryTermApply))
-  }
-
-  test("traverse() when has arithmetic operator") {
+  test("traverse() when not transformed to a Term.Apply should traverse as an infix") {
     val lhs = Term.Name("a")
     val op = Plus
     val rhs = Term.Name("b")
@@ -84,6 +55,7 @@ class TermApplyInfixTraverserImplTest extends UnitTestSuite {
       args = List(rhs)
     )
 
+    when(termApplyInfixToTermApplyTransformer.transform(eqTree(applyInfix))).thenReturn(None)
     doWrite("a").when(termTraverser).traverse(eqTree(lhs))
     doWrite("+").when(termNameTraverser).traverse(eqTree(op))
     doWrite("b").when(termTraverser).traverse(eqTree(rhs))

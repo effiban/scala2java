@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.classifiers
 
 import io.github.effiban.scala2java.core.entities.Decision.{Decision, No, Uncertain, Yes}
+import io.github.effiban.scala2java.core.entities.TermApplyInfixKind.Association
 import io.github.effiban.scala2java.core.typeinference.TermTypeInferrer
 
 import scala.meta.{Term, Type}
@@ -26,7 +27,7 @@ class TermTypeClassifierImpl(termTypeInferrer: => TermTypeInferrer,
   override def isTupleLike(term: Term): Boolean = {
     term match {
       case _ : Term.Tuple => true
-      case termApplyInfix: Term.ApplyInfix if termApplyInfixClassifier.isAssociation(termApplyInfix) => true
+      case termApplyInfix: Term.ApplyInfix if termApplyInfixClassifier.classify(termApplyInfix) == Association => true
       case _ => false
     }
   }

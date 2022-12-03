@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.classifiers.{DefnTypeClassifier, DefnValClassifier, JavaStatClassifier, TermApplyInfixClassifier}
+import io.github.effiban.scala2java.core.classifiers.{DefnTypeClassifier, DefnValClassifier, JavaStatClassifier}
 import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
 import io.github.effiban.scala2java.core.orderings.JavaTemplateChildOrdering
 import io.github.effiban.scala2java.core.predicates.{CompositeImporterExcludedPredicate, CompositeTemplateInitExcludedPredicate, CoreImporterExcludedPredicate, CoreTemplateInitExcludedPredicate}
@@ -341,9 +341,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter,
     termApplyTraverser,
     termNameTraverser,
     invocationArgListTraverser,
-    TermApplyInfixClassifier,
-    TermApplyInfixToRangeTransformer,
-    TermApplyInfixToMapEntryTransformer
+    CompositeTermApplyInfixToTermApplyTransformer
   )
 
   private lazy val termApplyTraverser: TermApplyTraverser = new TermApplyTraverserImpl(
