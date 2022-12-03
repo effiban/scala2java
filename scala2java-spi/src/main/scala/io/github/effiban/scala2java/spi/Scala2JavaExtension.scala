@@ -2,17 +2,19 @@ package io.github.effiban.scala2java.spi
 
 import io.github.effiban.scala2java.spi.predicates.{ImporterExcludedPredicate, TemplateInitExcludedPredicate}
 import io.github.effiban.scala2java.spi.providers.AdditionalImportersProvider
-import io.github.effiban.scala2java.spi.transformers.{ClassNameTransformer, DefnDefTransformer, TermApplyTransformer, TermApplyTypeToTermApplyTransformer}
+import io.github.effiban.scala2java.spi.transformers._
 
 trait Scala2JavaExtension {
+
+  def fileNameTransformer(): FileNameTransformer = FileNameTransformer.Identity
 
   def additionalImportersProvider(): AdditionalImportersProvider = AdditionalImportersProvider.Empty
 
   def importerExcludedPredicate(): ImporterExcludedPredicate = ImporterExcludedPredicate.None
 
-  def templateInitExcludedPredicate(): TemplateInitExcludedPredicate = TemplateInitExcludedPredicate.None
+  def classTransformer(): ClassTransformer = ClassTransformer.Identity
 
-  def classNameTransformer(): ClassNameTransformer = ClassNameTransformer.Identity
+  def templateInitExcludedPredicate(): TemplateInitExcludedPredicate = TemplateInitExcludedPredicate.None
 
   def defnDefTransformer(): DefnDefTransformer = DefnDefTransformer.Identity
 

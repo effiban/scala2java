@@ -1,18 +1,16 @@
 package io.github.effiban.scala2java.core.resolvers
 
-import io.github.effiban.scala2java.core.matchers.TreeMatcher.eqTree
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.spi.transformers.ClassNameTransformer
+import io.github.effiban.scala2java.spi.transformers.FileNameTransformer
 
 import java.nio.file.{Files, Paths}
-import scala.meta.Type
 
 class JavaFileResolverImplTest extends UnitTestSuite {
 
   private val InitialClassName = "MyInitialClass"
   private val FinalClassName = "MyFinalClass"
 
-  private implicit val classNameTransformer: ClassNameTransformer = mock[ClassNameTransformer]
+  private implicit val fileNameTransformer: FileNameTransformer = mock[FileNameTransformer]
 
   test("resolve") {
 
@@ -28,7 +26,7 @@ class JavaFileResolverImplTest extends UnitTestSuite {
 
     val expectedJavaAbsolutePath = Paths.get(outputJavaBaseDir.getAbsolutePath, s"$FinalClassName.java").toFile.getAbsolutePath
 
-    when(classNameTransformer.transform(eqTree(Type.Name(InitialClassName)))).thenReturn(Type.Name(FinalClassName))
+    when(fileNameTransformer.transform(InitialClassName)).thenReturn(FinalClassName)
 
     new JavaFileResolverImpl().resolve(scalaFile.toPath, outputJavaBaseDir.toPath).getAbsolutePath shouldBe expectedJavaAbsolutePath
   }
