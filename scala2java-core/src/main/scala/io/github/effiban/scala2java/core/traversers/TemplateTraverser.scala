@@ -1,9 +1,9 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{InitContext, TemplateBodyContext, TemplateContext}
-import io.github.effiban.scala2java.core.entities.JavaScope.JavaScope
 import io.github.effiban.scala2java.core.resolvers.JavaInheritanceKeywordResolver
 import io.github.effiban.scala2java.core.writers.JavaWriter
+import io.github.effiban.scala2java.spi.entities.JavaScope.JavaScope
 import io.github.effiban.scala2java.spi.predicates.TemplateInitExcludedPredicate
 
 import scala.meta.{Init, Template}

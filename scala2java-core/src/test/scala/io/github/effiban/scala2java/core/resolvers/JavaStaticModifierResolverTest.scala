@@ -2,10 +2,11 @@ package io.github.effiban.scala2java.core.resolvers
 
 import io.github.effiban.scala2java.core.contexts.ModifiersContext
 import io.github.effiban.scala2java.core.entities.JavaModifier.Static
-import io.github.effiban.scala2java.core.entities.JavaScope.JavaScope
+import io.github.effiban.scala2java.core.entities.JavaTreeType
 import io.github.effiban.scala2java.core.entities.JavaTreeType.JavaTreeType
-import io.github.effiban.scala2java.core.entities.{JavaScope, JavaTreeType}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
+import io.github.effiban.scala2java.spi.entities.JavaScope
+import io.github.effiban.scala2java.spi.entities.JavaScope.JavaScope
 
 class JavaStaticModifierResolverTest extends UnitTestSuite {
 

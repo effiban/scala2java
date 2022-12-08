@@ -2,8 +2,7 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{BlockContext, DefnDefContext, ModifiersContext, StatContext}
 import io.github.effiban.scala2java.core.entities.Decision.{Uncertain, Yes}
-import io.github.effiban.scala2java.core.entities.JavaScope.JavaScope
-import io.github.effiban.scala2java.core.entities.{JavaScope, JavaTreeType}
+import io.github.effiban.scala2java.core.entities.JavaTreeType
 import io.github.effiban.scala2java.core.matchers.BlockContextMatcher.eqBlockContext
 import io.github.effiban.scala2java.core.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
@@ -12,6 +11,8 @@ import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.core.typeinference.TermTypeInferrer
+import io.github.effiban.scala2java.spi.entities.JavaScope
+import io.github.effiban.scala2java.spi.entities.JavaScope.JavaScope
 import io.github.effiban.scala2java.spi.transformers.DefnDefTransformer
 import org.mockito.ArgumentMatchers
 

@@ -1,9 +1,9 @@
 package io.github.effiban.scala2java.core.transformers
 
 import io.github.effiban.scala2java.core.contexts.CtorContext
-import io.github.effiban.scala2java.core.entities.JavaScope
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
+import io.github.effiban.scala2java.spi.entities.JavaScope
 
 import scala.meta.Term.Block
 import scala.meta.{Ctor, Defn, Init, Lit, Mod, Name, Term, Type}

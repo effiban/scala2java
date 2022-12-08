@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.classifiers
 
-import io.github.effiban.scala2java.core.entities.JavaScope
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
+import io.github.effiban.scala2java.spi.entities.JavaScope
 
 import scala.meta.{Defn, Type}
 

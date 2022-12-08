@@ -2,12 +2,12 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.classifiers.{DefnValClassifier, JavaStatClassifier}
 import io.github.effiban.scala2java.core.contexts.{CtorContext, StatContext, TemplateChildContext}
-import io.github.effiban.scala2java.core.entities.JavaScope
 import io.github.effiban.scala2java.core.matchers.CtorContextMatcher.eqCtorContext
 import io.github.effiban.scala2java.core.matchers.TreeMatcher.eqTree
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
+import io.github.effiban.scala2java.spi.entities.JavaScope
 import org.mockito.ArgumentMatchers
 
 import scala.meta.{Ctor, Defn, Init, Lit, Name, Pat, Term, Type}

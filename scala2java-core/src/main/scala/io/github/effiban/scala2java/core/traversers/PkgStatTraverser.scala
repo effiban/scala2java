@@ -1,8 +1,9 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{ClassOrTraitContext, StatContext}
-import io.github.effiban.scala2java.core.entities.{JavaScope, SealedHierarchies}
+import io.github.effiban.scala2java.core.entities.SealedHierarchies
 import io.github.effiban.scala2java.core.writers.JavaWriter
+import io.github.effiban.scala2java.spi.entities.JavaScope
 
 import scala.meta.{Defn, Member, Name, Stat}
 

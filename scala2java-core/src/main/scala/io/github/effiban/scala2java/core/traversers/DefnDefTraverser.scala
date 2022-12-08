@@ -2,10 +2,11 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{BlockContext, DefnDefContext, ModifiersContext, StatContext}
 import io.github.effiban.scala2java.core.entities.Decision.{No, Uncertain, Yes}
+import io.github.effiban.scala2java.core.entities.JavaTreeType
 import io.github.effiban.scala2java.core.entities.TraversalConstants.UnknownType
-import io.github.effiban.scala2java.core.entities.{JavaScope, JavaTreeType}
 import io.github.effiban.scala2java.core.typeinference.TermTypeInferrer
 import io.github.effiban.scala2java.core.writers.JavaWriter
+import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.spi.transformers.DefnDefTransformer
 
 import scala.meta.{Defn, Init, Type}

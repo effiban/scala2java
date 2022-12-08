@@ -2,8 +2,8 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.TemplateContext
 import io.github.effiban.scala2java.core.entities.JavaKeyword.New
-import io.github.effiban.scala2java.core.entities.JavaScope
 import io.github.effiban.scala2java.core.writers.JavaWriter
+import io.github.effiban.scala2java.spi.entities.JavaScope
 
 import scala.meta.Term.NewAnonymous
 

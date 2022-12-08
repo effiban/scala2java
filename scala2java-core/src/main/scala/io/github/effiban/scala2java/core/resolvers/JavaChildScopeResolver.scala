@@ -2,8 +2,9 @@ package io.github.effiban.scala2java.core.resolvers
 
 import io.github.effiban.scala2java.core.classifiers.ObjectClassifier
 import io.github.effiban.scala2java.core.contexts.JavaChildScopeContext
-import io.github.effiban.scala2java.core.entities.JavaScope.JavaScope
-import io.github.effiban.scala2java.core.entities.{JavaScope, JavaTreeType}
+import io.github.effiban.scala2java.core.entities.JavaTreeType
+import io.github.effiban.scala2java.spi.entities.JavaScope
+import io.github.effiban.scala2java.spi.entities.JavaScope.JavaScope
 
 import scala.meta.Defn
 

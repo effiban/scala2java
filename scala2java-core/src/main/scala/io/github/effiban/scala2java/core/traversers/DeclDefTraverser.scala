@@ -1,8 +1,9 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{ModifiersContext, StatContext}
-import io.github.effiban.scala2java.core.entities.{JavaScope, JavaTreeType}
+import io.github.effiban.scala2java.core.entities.JavaTreeType
 import io.github.effiban.scala2java.core.writers.JavaWriter
+import io.github.effiban.scala2java.spi.entities.JavaScope
 
 import scala.meta.{Decl, Type}
 
