@@ -1,10 +1,10 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.StatContext
-import io.github.effiban.scala2java.core.entities.JavaScope.Block
 import io.github.effiban.scala2java.core.entities.TraversalConstants.UnknownType
 import io.github.effiban.scala2java.core.typeinference.TermTypeInferrer
 import io.github.effiban.scala2java.core.writers.JavaWriter
+import io.github.effiban.scala2java.spi.entities.JavaScope.Block
 
 import scala.meta.{Term, Type}
 

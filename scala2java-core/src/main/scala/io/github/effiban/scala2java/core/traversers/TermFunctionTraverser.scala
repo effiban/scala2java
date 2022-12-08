@@ -2,8 +2,8 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{BlockContext, StatContext}
 import io.github.effiban.scala2java.core.entities.Decision.{Decision, Uncertain}
-import io.github.effiban.scala2java.core.entities.JavaScope
 import io.github.effiban.scala2java.core.writers.JavaWriter
+import io.github.effiban.scala2java.spi.entities.JavaScope
 
 import scala.meta.Term
 import scala.meta.Term.Block

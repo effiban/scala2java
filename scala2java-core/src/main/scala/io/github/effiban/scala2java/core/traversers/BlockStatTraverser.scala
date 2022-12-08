@@ -3,10 +3,10 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.classifiers.JavaStatClassifier
 import io.github.effiban.scala2java.core.contexts.{StatContext, TryContext}
 import io.github.effiban.scala2java.core.entities.Decision.{Decision, No, Uncertain, Yes}
-import io.github.effiban.scala2java.core.entities.JavaScope
 import io.github.effiban.scala2java.core.entities.TraversalConstants.UncertainReturn
 import io.github.effiban.scala2java.core.resolvers.ShouldReturnValueResolver
 import io.github.effiban.scala2java.core.writers.JavaWriter
+import io.github.effiban.scala2java.spi.entities.JavaScope
 
 import scala.meta.Term.{If, Return, Try, TryWithHandler}
 import scala.meta.{Stat, Term}

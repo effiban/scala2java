@@ -1,4 +1,4 @@
-package io.github.effiban.scala2java.core.entities
+package io.github.effiban.scala2java.spi.entities
 
 object JavaScope extends Enumeration {
   type JavaScope = Value

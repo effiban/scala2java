@@ -2,11 +2,12 @@ package io.github.effiban.scala2java.core.resolvers
 
 import io.github.effiban.scala2java.core.contexts.ModifiersContext
 import io.github.effiban.scala2java.core.entities.JavaModifier.Final
-import io.github.effiban.scala2java.core.entities.JavaScope.JavaScope
+import io.github.effiban.scala2java.core.entities.JavaTreeType
 import io.github.effiban.scala2java.core.entities.JavaTreeType.JavaTreeType
-import io.github.effiban.scala2java.core.entities.{JavaScope, JavaTreeType}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{Templates, TypeNames}
+import io.github.effiban.scala2java.spi.entities.JavaScope
+import io.github.effiban.scala2java.spi.entities.JavaScope.JavaScope
 
 import scala.meta.{Decl, Defn, Lit, Pat, Term, Tree}
 

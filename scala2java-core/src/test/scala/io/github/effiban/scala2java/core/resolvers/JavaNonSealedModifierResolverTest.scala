@@ -3,11 +3,11 @@ package io.github.effiban.scala2java.core.resolvers
 import io.github.effiban.scala2java.core.classifiers.{ModsClassifier, ObjectClassifier}
 import io.github.effiban.scala2java.core.contexts.ModifiersContext
 import io.github.effiban.scala2java.core.entities.JavaModifier.NonSealed
-import io.github.effiban.scala2java.core.entities.JavaScope
-import io.github.effiban.scala2java.core.entities.JavaScope.JavaScope
 import io.github.effiban.scala2java.core.entities.JavaTreeType.Unknown
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{PrimaryCtors, Templates}
+import io.github.effiban.scala2java.spi.entities.JavaScope
+import io.github.effiban.scala2java.spi.entities.JavaScope.JavaScope
 import org.mockito.ArgumentMatchers.any
 
 import scala.meta.Mod.{Final, Sealed}

@@ -3,12 +3,13 @@ package io.github.effiban.scala2java.core.resolvers
 import io.github.effiban.scala2java.core.classifiers.ModsClassifier
 import io.github.effiban.scala2java.core.contexts.ModifiersContext
 import io.github.effiban.scala2java.core.entities.JavaModifier.Public
-import io.github.effiban.scala2java.core.entities.JavaScope.JavaScope
 import io.github.effiban.scala2java.core.entities.JavaTreeType.JavaTreeType
-import io.github.effiban.scala2java.core.entities.{JavaModifier, JavaScope, JavaTreeType}
+import io.github.effiban.scala2java.core.entities.{JavaModifier, JavaTreeType}
 import io.github.effiban.scala2java.core.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{PrimaryCtors, Templates, TypeNames}
+import io.github.effiban.scala2java.spi.entities.JavaScope
+import io.github.effiban.scala2java.spi.entities.JavaScope.JavaScope
 
 import scala.meta.{Decl, Defn, Lit, Mod, Name, Pat, Term, Tree, Type}
 

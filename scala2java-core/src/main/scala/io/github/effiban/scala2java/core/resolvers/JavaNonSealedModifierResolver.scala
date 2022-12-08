@@ -2,7 +2,8 @@ package io.github.effiban.scala2java.core.resolvers
 
 import io.github.effiban.scala2java.core.classifiers.{ModsClassifier, ObjectClassifier}
 import io.github.effiban.scala2java.core.contexts.ModifiersContext
-import io.github.effiban.scala2java.core.entities.{JavaModifier, JavaScope}
+import io.github.effiban.scala2java.core.entities.JavaModifier
+import io.github.effiban.scala2java.spi.entities.JavaScope
 
 import scala.meta.Defn
 
