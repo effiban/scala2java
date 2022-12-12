@@ -5,7 +5,7 @@ import io.github.effiban.scala2java.spi.predicates.{ImporterExcludedPredicate, T
 import io.github.effiban.scala2java.spi.providers.AdditionalImportersProvider
 import io.github.effiban.scala2java.spi.transformers._
 
-case class ExtensionRegistry(extensions: List[Scala2JavaExtension]) {
+case class ExtensionRegistry(extensions: List[Scala2JavaExtension] = Nil) {
 
   val fileNameTransformers: List[FileNameTransformer] = extensions.map(_.fileNameTransformer())
 

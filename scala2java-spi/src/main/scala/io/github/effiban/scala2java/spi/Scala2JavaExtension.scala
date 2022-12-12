@@ -4,7 +4,11 @@ import io.github.effiban.scala2java.spi.predicates.{ImporterExcludedPredicate, T
 import io.github.effiban.scala2java.spi.providers.AdditionalImportersProvider
 import io.github.effiban.scala2java.spi.transformers._
 
+import scala.meta.Source
+
 trait Scala2JavaExtension {
+
+  def shouldBeAppliedTo(source: Source): Boolean
 
   def fileNameTransformer(): FileNameTransformer = FileNameTransformer.Identity
 
