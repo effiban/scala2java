@@ -25,4 +25,6 @@ case class ExtensionRegistry(extensions: List[Scala2JavaExtension]) {
     extensions.map(_.termApplyTypeToTermApplyTransformer())
 
   val termApplyTransformers: List[TermApplyTransformer] = extensions.map(_.termApplyTransformer())
+
+  val termSelectTransformers: List[TermSelectTransformer] = extensions.map(_.termSelectTransformer())
 }

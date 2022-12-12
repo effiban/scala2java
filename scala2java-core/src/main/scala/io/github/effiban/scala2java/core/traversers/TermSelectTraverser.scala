@@ -2,8 +2,8 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.TermSelectContext
 import io.github.effiban.scala2java.core.entities.EnclosingDelimiter.Parentheses
-import io.github.effiban.scala2java.core.transformers.TermSelectTransformer
 import io.github.effiban.scala2java.core.writers.JavaWriter
+import io.github.effiban.scala2java.spi.transformers.TermSelectTransformer
 
 import scala.meta.Term
 

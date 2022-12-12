@@ -8,11 +8,11 @@ import io.github.effiban.scala2java.core.testtrees.TermNames._
 
 import scala.meta.Term
 
-class TermSelectTransformerImplTest extends UnitTestSuite {
+class CoreTermSelectTransformerTest extends UnitTestSuite {
 
   private val termNameClassifier = mock[TermNameClassifier]
 
-  private val termSelectTransformer = new TermSelectTransformerImpl(termNameClassifier)
+  private val termSelectTransformer = new CoreTermSelectTransformer(termNameClassifier)
 
   test("transform 'Range.apply' should return 'IntStream.range'") {
     val scalaTermSelect = Term.Select(ScalaRange, Apply)

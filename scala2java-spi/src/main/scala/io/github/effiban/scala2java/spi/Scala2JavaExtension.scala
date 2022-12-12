@@ -23,4 +23,6 @@ trait Scala2JavaExtension {
   def termApplyTypeToTermApplyTransformer(): TermApplyTypeToTermApplyTransformer = TermApplyTypeToTermApplyTransformer.Empty
 
   def termApplyTransformer(): TermApplyTransformer = TermApplyTransformer.Identity
+
+  def termSelectTransformer(): TermSelectTransformer = TermSelectTransformer.Identity
 }
