@@ -6,7 +6,7 @@ import io.github.effiban.scala2java.core.matchers.TreeMatcher.eqTree
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
-import io.github.effiban.scala2java.core.transformers.TermSelectTransformer
+import io.github.effiban.scala2java.spi.transformers.TermSelectTransformer
 
 import scala.meta.{Lit, Term}
 

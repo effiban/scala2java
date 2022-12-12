@@ -2,14 +2,11 @@ package io.github.effiban.scala2java.core.transformers
 
 import io.github.effiban.scala2java.core.classifiers.TermNameClassifier
 import io.github.effiban.scala2java.core.entities.TermNameValues._
+import io.github.effiban.scala2java.spi.transformers.TermSelectTransformer
 
 import scala.meta.Term
 
-trait TermSelectTransformer {
-  def transform(termSelect: Term.Select): Term.Select
-}
-
-class TermSelectTransformerImpl(termNameClassifier: TermNameClassifier) extends TermSelectTransformer {
+private[transformers] class CoreTermSelectTransformer(termNameClassifier: TermNameClassifier) extends TermSelectTransformer {
 
   private final val TupleElementRegex = "_(\\d)".r
 
@@ -48,4 +45,5 @@ class TermSelectTransformerImpl(termNameClassifier: TermNameClassifier) extends 
   }
 }
 
-object TermSelectTransformer extends TermSelectTransformerImpl(TermNameClassifier)
+object CoreTermSelectTransformer extends CoreTermSelectTransformer(TermNameClassifier)
+

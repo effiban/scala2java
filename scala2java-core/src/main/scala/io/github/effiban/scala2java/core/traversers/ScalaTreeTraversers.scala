@@ -391,7 +391,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     termTraverser,
     termNameTraverser,
     typeListTraverser,
-    TermSelectTransformer
+    new CompositeTermSelectTransformer(CoreTermSelectTransformer)
   )
 
   private lazy val termTraverser: TermTraverser = new TermTraverserImpl(
