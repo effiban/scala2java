@@ -20,7 +20,7 @@ object Scala2JavaTranslator {
     val input = Input.VirtualFile(scalaFileName, scalaText)
     val sourceTree = input.parse[Source].get
 
-    implicit val extensionRegistry: ExtensionRegistry = ExtensionRegistryBuilder.build()
+    implicit val extensionRegistry: ExtensionRegistry = ExtensionRegistryBuilder.buildFor(sourceTree)
     implicit val fileNameTransformer: FileNameTransformer = new CompositeFileNameTransformer()
 
     implicit val javaWriter: JavaWriter = maybeOutputJavaBasePath match {
