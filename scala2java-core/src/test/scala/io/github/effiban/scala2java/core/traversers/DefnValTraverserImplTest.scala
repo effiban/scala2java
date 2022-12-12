@@ -10,10 +10,9 @@ import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.spi.entities.JavaScope.JavaScope
-import io.github.effiban.scala2java.spi.transformers.DefnValToDeclVarTransformer
 import org.mockito.ArgumentMatchers
 
-import scala.meta.{Decl, Defn, Init, Lit, Mod, Name, Pat, Term, Type}
+import scala.meta.{Defn, Init, Lit, Mod, Name, Pat, Term, Type}
 
 class DefnValTraverserImplTest extends UnitTestSuite {
 
@@ -30,20 +29,15 @@ class DefnValTraverserImplTest extends UnitTestSuite {
   private val defnValOrVarTypeTraverser = mock[DefnValOrVarTypeTraverser]
   private val patListTraverser = mock[PatListTraverser]
   private val rhsTermTraverser = mock[RhsTermTraverser]
-  private val declVarTraverser = mock[DeclVarTraverser]
-  private val defnValToDeclVarTransformer = mock[DefnValToDeclVarTransformer]
 
   private val defnValTraverser = new DefnValTraverserImpl(
     modListTraverser,
     defnValOrVarTypeTraverser,
     patListTraverser,
-    rhsTermTraverser,
-    declVarTraverser,
-    defnValToDeclVarTransformer
-  )
+    rhsTermTraverser)
 
 
-  test("traverse() when transformed, should traverse with the DeclVarTraverser") {
+  test("traverse() when it is a class member - typed") {
     val javaScope = JavaScope.Class
 
     val defnVal = Defn.Val(
@@ -53,32 +47,6 @@ class DefnValTraverserImplTest extends UnitTestSuite {
       rhs = Rhs
     )
 
-    val declVar = Decl.Var(
-      mods = Modifiers,
-      pats = List(MyValPat),
-      decltpe = TypeNames.Int
-    )
-
-    val context = StatContext(javaScope)
-
-    when(defnValToDeclVarTransformer.transform(eqTree(defnVal), ArgumentMatchers.eq(javaScope))).thenReturn(Some(declVar))
-
-    defnValTraverser.traverse(defnVal, context)
-
-    verify(declVarTraverser).traverse(eqTree(declVar), ArgumentMatchers.eq(context))
-  }
-
-  test("traverse() when not transformed, and it is a class member - typed") {
-    val javaScope = JavaScope.Class
-
-    val defnVal = Defn.Val(
-      mods = Modifiers,
-      pats = List(MyValPat),
-      decltpe = Some(TypeNames.Int),
-      rhs = Rhs
-    )
-
-    when(defnValToDeclVarTransformer.transform(eqTree(defnVal), ArgumentMatchers.eq(javaScope))).thenReturn(None)
     doWrite(
       """@MyAnnotation
         |private final """.stripMargin)
@@ -99,7 +67,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
         |private final int myVal = 3""".stripMargin
   }
 
-  test("traverse() when not transformed, and it is a class member - untyped") {
+  test("traverse() when it is a class member - untyped") {
     val javaScope = JavaScope.Class
 
     val defnVal = Defn.Val(
@@ -109,7 +77,6 @@ class DefnValTraverserImplTest extends UnitTestSuite {
       rhs = Rhs
     )
 
-    when(defnValToDeclVarTransformer.transform(eqTree(defnVal), ArgumentMatchers.eq(javaScope))).thenReturn(None)
     doWrite(
       """@MyAnnotation
         |private final """.stripMargin)
@@ -130,7 +97,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
         |private final int myVal = 3""".stripMargin
   }
 
-  test("traverse() when not transformed, and it is an interface member - typed") {
+  test("traverse() when it is an interface member - typed") {
     val javaScope = JavaScope.Interface
 
     val defnVal = Defn.Val(
@@ -140,7 +107,6 @@ class DefnValTraverserImplTest extends UnitTestSuite {
       rhs = Rhs
     )
 
-    when(defnValToDeclVarTransformer.transform(eqTree(defnVal), ArgumentMatchers.eq(javaScope))).thenReturn(None)
     doWrite(
       """@MyAnnotation
         |""".stripMargin)
@@ -161,7 +127,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
         |int myVal = 3""".stripMargin
   }
 
-  test("traverse() when not transformed, and it is an interface member - untyped") {
+  test("traverse() when it is an interface member - untyped") {
     val javaScope = JavaScope.Interface
 
     val defnVal = Defn.Val(
@@ -171,7 +137,6 @@ class DefnValTraverserImplTest extends UnitTestSuite {
       rhs = Rhs
     )
 
-    when(defnValToDeclVarTransformer.transform(eqTree(defnVal), ArgumentMatchers.eq(javaScope))).thenReturn(None)
     doWrite(
       """@MyAnnotation
         |""".stripMargin)
