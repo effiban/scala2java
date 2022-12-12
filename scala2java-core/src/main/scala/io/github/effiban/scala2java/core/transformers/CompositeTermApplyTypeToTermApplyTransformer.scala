@@ -15,17 +15,6 @@ class CompositeTermApplyTypeToTermApplyTransformer(implicit extensionRegistry: E
    */
   override def transform(termApplyType: Term.ApplyType): Option[Term.Apply] = {
     extensionRegistry.termApplyTypeToTermApplyTransformers
-      .foldLeft[Option[Term.Apply]](None)(
-        (maybeTermApply, transformer) => firstTransformedOrNone(maybeTermApply, transformer, termApplyType)
-      )
-  }
-
-  private def firstTransformedOrNone(maybeTermApply: Option[Term.Apply],
-                                     transformer: TermApplyTypeToTermApplyTransformer,
-                                     termApplyType: Term.ApplyType) = {
-    maybeTermApply match {
-      case Some(termApply) => Some(termApply)
-      case None => transformer.transform(termApplyType)
-    }
+      .foldLeft[Option[Term.Apply]](None)((maybeTermApply, transformer) => maybeTermApply.orElse(transformer.transform(termApplyType)))
   }
 }

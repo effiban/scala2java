@@ -16,6 +16,8 @@ trait Scala2JavaExtension {
 
   def templateInitExcludedPredicate(): TemplateInitExcludedPredicate = TemplateInitExcludedPredicate.None
 
+  def defnValToDeclVarTransformer(): DefnValToDeclVarTransformer = DefnValToDeclVarTransformer.Empty
+
   def defnDefTransformer(): DefnDefTransformer = DefnDefTransformer.Identity
 
   def termApplyTypeToTermApplyTransformer(): TermApplyTypeToTermApplyTransformer = TermApplyTypeToTermApplyTransformer.Empty
