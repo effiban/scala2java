@@ -3,10 +3,10 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.{BlockContext, TryContext}
 import io.github.effiban.scala2java.core.entities.Decision.{No, Uncertain}
 import io.github.effiban.scala2java.core.matchers.BlockContextMatcher.eqBlockContext
-import io.github.effiban.scala2java.core.matchers.TreeMatcher.eqTree
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TermNames.Plus
 import io.github.effiban.scala2java.core.testtrees.TypeNames
+import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchers
 
 import scala.meta.Enumerator.Generator

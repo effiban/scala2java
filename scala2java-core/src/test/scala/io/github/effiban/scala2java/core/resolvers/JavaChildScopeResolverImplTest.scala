@@ -4,11 +4,11 @@ import io.github.effiban.scala2java.core.classifiers.ObjectClassifier
 import io.github.effiban.scala2java.core.contexts.JavaChildScopeContext
 import io.github.effiban.scala2java.core.entities.JavaTreeType
 import io.github.effiban.scala2java.core.entities.JavaTreeType.JavaTreeType
-import io.github.effiban.scala2java.core.matchers.TreeMatcher.eqTree
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{PrimaryCtors, Templates, TypeNames}
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.spi.entities.JavaScope.JavaScope
+import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.{Decl, Defn, Import, Importee, Importer, Name, Pat, Pkg, Term, Tree, Type}
 

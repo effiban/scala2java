@@ -2,17 +2,17 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.entities.JavaTreeType
-import io.github.effiban.scala2java.core.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.core.matchers.JavaChildScopeContextMatcher.eqJavaChildScopeContext
 import io.github.effiban.scala2java.core.matchers.JavaTreeTypeContextMatcher.eqJavaTreeTypeContext
 import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
 import io.github.effiban.scala2java.core.matchers.TemplateContextMatcher.eqTemplateContext
-import io.github.effiban.scala2java.core.matchers.TreeMatcher.eqTree
 import io.github.effiban.scala2java.core.resolvers.{JavaChildScopeResolver, JavaTreeTypeResolver}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.transformers.ParamToDeclValTransformer
 import io.github.effiban.scala2java.spi.entities.JavaScope
+import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
+import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 

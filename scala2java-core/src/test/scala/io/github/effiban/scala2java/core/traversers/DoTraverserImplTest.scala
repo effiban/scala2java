@@ -2,9 +2,9 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.BlockContext
 import io.github.effiban.scala2java.core.matchers.BlockContextMatcher.eqBlockContext
-import io.github.effiban.scala2java.core.matchers.TreeMatcher.eqTree
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
+import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.Term.{ApplyInfix, Block, Do}
 import scala.meta.{Lit, Term}

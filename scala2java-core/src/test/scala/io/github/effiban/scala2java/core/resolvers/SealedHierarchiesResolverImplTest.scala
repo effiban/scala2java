@@ -2,9 +2,9 @@ package io.github.effiban.scala2java.core.resolvers
 
 import io.github.effiban.scala2java.core.classifiers.ModsClassifier
 import io.github.effiban.scala2java.core.entities.SealedHierarchies
-import io.github.effiban.scala2java.core.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{PrimaryCtors, Selfs}
+import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 
 import scala.meta.{Defn, Import, Importee, Importer, Init, Mod, Name, Template, Term, Type}
 

@@ -3,12 +3,12 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.classifiers.JavaStatClassifier
 import io.github.effiban.scala2java.core.contexts.{StatContext, TryContext}
 import io.github.effiban.scala2java.core.entities.Decision.{No, Uncertain, Yes}
-import io.github.effiban.scala2java.core.matchers.TreeMatcher.eqTree
 import io.github.effiban.scala2java.core.resolvers.ShouldReturnValueResolver
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.spi.entities.JavaScope
+import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchers
 
 import scala.meta.Term.{Return, TryWithHandler}

@@ -1,8 +1,8 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.entities.ListTraversalOptions
-import io.github.effiban.scala2java.core.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
+import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import org.mockito.ArgumentMatchers
 
 import scala.meta.{Pat, Term}

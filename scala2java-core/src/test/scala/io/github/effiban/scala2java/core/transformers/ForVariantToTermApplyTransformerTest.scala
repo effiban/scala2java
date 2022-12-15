@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.transformers
 
-import io.github.effiban.scala2java.core.matchers.TreeMatcher.eqTree
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
+import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 

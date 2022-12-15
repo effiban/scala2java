@@ -4,9 +4,9 @@ import io.github.effiban.scala2java.core.classifiers.TemplateClassifier
 import io.github.effiban.scala2java.core.contexts.JavaTreeTypeContext
 import io.github.effiban.scala2java.core.entities.JavaTreeType
 import io.github.effiban.scala2java.core.entities.JavaTreeType.JavaTreeType
-import io.github.effiban.scala2java.core.matchers.TreeMatcher.eqTree
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{PrimaryCtors, Selfs, Templates, TypeNames}
+import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchers.any
 
 import scala.meta.Term.Apply

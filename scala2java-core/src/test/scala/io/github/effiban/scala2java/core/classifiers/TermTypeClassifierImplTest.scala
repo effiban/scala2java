@@ -3,10 +3,10 @@ package io.github.effiban.scala2java.core.classifiers
 import io.github.effiban.scala2java.core.entities.Decision.{No, Uncertain, Yes}
 import io.github.effiban.scala2java.core.entities.TermApplyInfixKind
 import io.github.effiban.scala2java.core.entities.TermApplyInfixKind.Association
-import io.github.effiban.scala2java.core.matchers.TreeMatcher.eqTree
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{TermNames, TypeNames}
 import io.github.effiban.scala2java.core.typeinference.TermTypeInferrer
+import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.{Lit, Term, Type}
 

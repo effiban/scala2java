@@ -1,4 +1,5 @@
 rootProject.name = 'scala2java'
 include 'scala2java-core'
 include 'scala2java-spi'
+include 'scala2java-test-utils'
 

@@ -1,10 +1,10 @@
 package io.github.effiban.scala2java.core.transformers
 
 import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
-import io.github.effiban.scala2java.core.matchers.TreeMatcher.eqTree
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{PrimaryCtors, Templates}
 import io.github.effiban.scala2java.spi.transformers.ClassTransformer
+import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.{Defn, Type}
 

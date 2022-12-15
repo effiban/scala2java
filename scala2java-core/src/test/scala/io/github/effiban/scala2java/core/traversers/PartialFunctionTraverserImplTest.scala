@@ -1,8 +1,8 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.entities.Decision.{Uncertain, Yes}
-import io.github.effiban.scala2java.core.matchers.TreeMatcher.eqTree
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
+import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchers
 
 import scala.meta.{Case, Pat, Term}

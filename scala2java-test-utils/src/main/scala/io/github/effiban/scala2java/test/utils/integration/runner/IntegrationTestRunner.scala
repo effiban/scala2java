@@ -1,8 +1,8 @@
-package io.github.effiban.scala2java.core.integrationtest
+package io.github.effiban.scala2java.test.utils.integration.runner
 
 import io.github.effiban.scala2java.core.Scala2JavaTranslator.translate
-import io.github.effiban.scala2java.core.integrationtest.matchers.FileMatchers.equalContentsOf
-import org.scalatest.funsuite.AnyFunSuite
+import io.github.effiban.scala2java.test.utils.integration.matchers.FileMatchers.equalContentsOf
+import org.scalatest.funsuite.AnyFunSuiteLike
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{BeforeAndAfterAll, OptionValues}
 
@@ -10,14 +10,19 @@ import java.nio.file.{Files, Path, Paths}
 import scala.jdk.StreamConverters._
 import scala.util.Using
 
-class IntegrationTestRunner extends AnyFunSuite
-  with Matchers
+trait IntegrationTestRunner
+  extends Matchers
   with OptionValues
-  with BeforeAndAfterAll {
+  with BeforeAndAfterAll { this: AnyFunSuiteLike =>
 
-  private val testFilesBasePath = Paths.get(getClass.getClassLoader.getResource("testfiles").toURI)
-  private val selectedTestPath = Option(System.getenv("INTEGRATION_TEST_PATH")).getOrElse("")
+  private val testFilesBasePath: Path = resolveTestFilesBasePath()
+  private val selectedTestPath: String = resolveSelectedTestPath()
+
   private var outputJavaBasePath: Path = _
+
+  protected def resolveTestFilesBasePath(): Path
+
+  protected def resolveSelectedTestPath(): String
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
