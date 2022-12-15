@@ -10,7 +10,7 @@ trait FileMatchers {
   class FileContentsEqualMatcher(expectedPath: Path) extends Matcher[Path] {
 
     override def apply(actualPath: Path): MatchResult = {
-      val maybeFileMismatchMessage = FileMismatchMessageGenerator.generate(actualPath, expectedPath)
+      val maybeFileMismatchMessage = FileMismatchMessageGenerator.generate(expectedPath, actualPath)
 
       MatchResult(matches = maybeFileMismatchMessage.isEmpty,
         rawFailureMessage = maybeFileMismatchMessage.getOrElse(""),
