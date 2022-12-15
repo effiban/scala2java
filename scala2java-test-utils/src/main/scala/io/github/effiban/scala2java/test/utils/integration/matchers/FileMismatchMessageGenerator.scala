@@ -1,4 +1,4 @@
-package io.github.effiban.scala2java.core.integrationtest.matchers
+package io.github.effiban.scala2java.test.utils.integration.matchers
 
 import java.nio.file.{Files, Path}
 import scala.collection.mutable

@@ -1,8 +1,8 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.matchers.TreeMatcher.eqTree
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.transformers.TypeByNameToSupplierTypeTransformer
+import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.Type
 

@@ -3,9 +3,9 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.{BlockContext, TryContext}
 import io.github.effiban.scala2java.core.entities.Decision.Yes
 import io.github.effiban.scala2java.core.matchers.BlockContextMatcher.eqBlockContext
-import io.github.effiban.scala2java.core.matchers.TreeMatcher.eqTree
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
+import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.Term
 import scala.meta.Term.Block

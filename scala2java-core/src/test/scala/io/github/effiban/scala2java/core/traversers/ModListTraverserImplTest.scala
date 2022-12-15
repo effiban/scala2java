@@ -3,13 +3,13 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.ModifiersContext
 import io.github.effiban.scala2java.core.entities.JavaModifier.{Final, Private}
 import io.github.effiban.scala2java.core.entities.{JavaModifier, JavaTreeType}
-import io.github.effiban.scala2java.core.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
 import io.github.effiban.scala2java.core.resolvers.JavaModifiersResolver
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.spi.entities.JavaScope
+import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import org.mockito.ArgumentMatchers
 
 import scala.meta.{Decl, Mod, Name, Pat, Term}

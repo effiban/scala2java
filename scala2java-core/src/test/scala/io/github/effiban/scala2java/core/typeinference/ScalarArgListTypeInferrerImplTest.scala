@@ -1,8 +1,8 @@
 package io.github.effiban.scala2java.core.typeinference
 
-import io.github.effiban.scala2java.core.matchers.CombinedMatchers.eqOptionTreeList
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
+import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqOptionTreeList
 import org.mockito.ArgumentMatchersSugar.any
 
 import scala.meta.{Lit, Term}

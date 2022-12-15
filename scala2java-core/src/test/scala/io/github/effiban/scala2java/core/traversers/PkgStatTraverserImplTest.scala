@@ -3,10 +3,10 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.{ClassOrTraitContext, StatContext}
 import io.github.effiban.scala2java.core.entities.SealedHierarchies
 import io.github.effiban.scala2java.core.matchers.ClassOrTraitContextMatcher.eqClassOrTraitContext
-import io.github.effiban.scala2java.core.matchers.TreeMatcher.eqTree
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.PrimaryCtors
 import io.github.effiban.scala2java.spi.entities.JavaScope
+import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchers
 
 import scala.meta.{Decl, Defn, Import, Importee, Importer, Name, Pat, Self, Template, Term, Type}

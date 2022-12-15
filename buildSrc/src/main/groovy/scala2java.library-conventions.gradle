@@ -26,12 +26,13 @@ repositories {
 
 testing {
     suites {
-        test {
+        configureEach {
             dependencies {
-                implementation "org.scalatest:scalatest_$scalaMajorVersion:3.2.12"
-                implementation "org.mockito:mockito-scala_$scalaMajorVersion:1.17.5"
+                implementation project(':scala2java-test-utils')
                 runtimeOnly 'com.vladsch.flexmark:flexmark-all:0.64.0'
             }
+        }
+        test {
             targets {
                 all {
                     testTask.configure {

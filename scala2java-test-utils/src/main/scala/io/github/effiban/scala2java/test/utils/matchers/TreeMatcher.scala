@@ -1,4 +1,4 @@
-package io.github.effiban.scala2java.core.matchers
+package io.github.effiban.scala2java.test.utils.matchers
 
 import org.mockito.ArgumentMatcher
 import org.mockito.ArgumentMatchers.argThat

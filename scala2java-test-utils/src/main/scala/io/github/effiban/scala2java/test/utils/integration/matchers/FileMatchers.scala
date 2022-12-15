@@ -1,6 +1,6 @@
-package io.github.effiban.scala2java.core.integrationtest.matchers
+package io.github.effiban.scala2java.test.utils.integration.matchers
 
-import io.github.effiban.scala2java.core.integrationtest.matchers.FileMatchers.SameFileContentsMessage
+import io.github.effiban.scala2java.test.utils.integration.matchers.FileMatchers.SameFileContentsMessage
 import org.scalatest.matchers.{MatchResult, Matcher}
 
 import java.nio.file.Path

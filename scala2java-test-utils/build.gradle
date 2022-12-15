@@ -1,0 +1,25 @@
+plugins {
+    id 'scala2java.library-conventions'
+}
+
+project.ext.scalatestVersion = "3.2.12"
+project.ext.mockitoScalaVersion = "1.17.5"
+
+dependencies {
+    implementation project(':scala2java-spi')
+    implementation project(':scala2java-core')
+
+    api "org.scalatest:scalatest_$scalaMajorVersion:$scalatestVersion"
+    api "org.mockito:mockito-scala_$scalaMajorVersion:$mockitoScalaVersion"
+}
+
+publishing {
+    publications {
+        scala2java(MavenPublication) {
+            pom {
+                name = 'Scala2Java Test Utils'
+                description = 'Test Utils for the Scala2Java Tool and its extensions'
+            }
+        }
+    }
+}

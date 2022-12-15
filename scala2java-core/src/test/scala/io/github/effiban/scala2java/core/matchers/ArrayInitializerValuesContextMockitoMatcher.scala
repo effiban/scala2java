@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.matchers
 
 import io.github.effiban.scala2java.core.contexts.ArrayInitializerValuesContext
+import io.github.effiban.scala2java.test.utils.matchers.{ListMatcher, OptionMatcher, TreeMatcher}
 import org.mockito.ArgumentMatcher
 import org.mockito.ArgumentMatchers.argThat
 

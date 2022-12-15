@@ -3,11 +3,11 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.{CtorContext, DefnDefContext}
 import io.github.effiban.scala2java.core.matchers.CtorContextMatcher.eqCtorContext
 import io.github.effiban.scala2java.core.matchers.DefnDefContextMatcher.eqDefnDefContext
-import io.github.effiban.scala2java.core.matchers.TreeMatcher.eqTree
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.core.transformers.CtorPrimaryTransformer
 import io.github.effiban.scala2java.spi.entities.JavaScope
+import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.{Ctor, Defn, Init, Name, Term, Type}
 

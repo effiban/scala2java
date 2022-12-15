@@ -1,9 +1,9 @@
 package io.github.effiban.scala2java.core.predicates
 
 import io.github.effiban.scala2java.core.classifiers.ImporterClassifier
-import io.github.effiban.scala2java.core.matchers.TreeMatcher.eqTree
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TermNames.Scala
+import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.{Importee, Importer, Name, Term}
 
