@@ -4,6 +4,7 @@ import org.mockito.ArgumentMatcher
 import org.mockito.ArgumentMatchers.argThat
 import org.mockito.matchers.EqTo
 
+/** A Mockito [[ArgumentMatcher]] for comparing two `Option`s, using a given nested matcher when the `Option` exists */
 class OptionMatcher[T](expectedOption: Option[T],
                        valMatcher: T => ArgumentMatcher[T] = (value: T) => EqTo[T](value)) extends ArgumentMatcher[Option[T]] {
 
@@ -20,6 +21,7 @@ class OptionMatcher[T](expectedOption: Option[T],
 
 object OptionMatcher {
 
+  /** A convenience reporter method (using `argThat`) for [[OptionMatcher]] */
   def eqOption[T](expectedOption: Option[T],
                   valMatcherGenerator: T => ArgumentMatcher[T] = (value: T) => EqTo[T](value)): Option[T] =
     argThat(new OptionMatcher[T](expectedOption, valMatcherGenerator))
