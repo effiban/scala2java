@@ -25,7 +25,7 @@ I also hope it may prove useful to other companies/individuals as well.
 
 ### Maven Central Coordinates
 Group: **io.github.effiban**  
-Artifact: **scala2java_2.13-core**
+Artifact: **scala2java-core_2.13**
 
 ### Usage Guide and Documentation
 Refer to the [Wiki](https://github.com/effiban/scala2java/wiki/Home)
