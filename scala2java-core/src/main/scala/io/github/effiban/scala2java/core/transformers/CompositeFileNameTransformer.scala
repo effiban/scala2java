@@ -1,17 +1,10 @@
 package io.github.effiban.scala2java.core.transformers
 
 import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
-import io.github.effiban.scala2java.spi.transformers.FileNameTransformer
+import io.github.effiban.scala2java.spi.transformers.{FileNameTransformer, SameTypeTransformer}
 
-class CompositeFileNameTransformer(implicit extensionRegistry: ExtensionRegistry) extends FileNameTransformer {
+class CompositeFileNameTransformer(implicit extensionRegistry: ExtensionRegistry) extends CompositeSameTypeTransformer[String]
+  with FileNameTransformer {
 
-  /**
-   * If several extensions change the name, the transformations will be applied in encounter order (the order in which the extensions are discovered).<br>
-   * Therefore the resulting name might not be deterministic.<br>
-   * It is the responsibility of the user to understand the consequences of applying multiple extensions.
-   */
-  override def transform(fileName: String): String = {
-    extensionRegistry.fileNameTransformers
-      .foldLeft(fileName)((aFileName, transformer) => transformer.transform(aFileName))
-  }
+  override protected val transformers: List[SameTypeTransformer[String]] = extensionRegistry.fileNameTransformers
 }
