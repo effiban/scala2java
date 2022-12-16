@@ -24,103 +24,12 @@ I also hope it may prove useful to other companies/individuals as well.
 **Java Output**: The generated files are in Java 17. In the future (if needed) other versions may be supported.
 
 ### Maven Central Coordinates
+Group: **io.github.effiban**  
+Artifact: **scala2java_2.13-core**
 
-group: **io.github.effiban**  
-artifact: **scala2java_2.13**
+### Usage Guide and Documentation
+Refer to the [Wiki](https://github.com/effiban/scala2java/wiki/Home)
 
-### Usage Guide
-
-The tool receives one or more Scala source files and translates them one by one to Java.  
-The output can either be printed to the console or save to a given directory.  
-In the second case, each Scala file will be translated into a corresponding file with the same name and a **.java** suffix
-
-There are currently two options for running the tool, as a CLI and as an SDK. 
-In the future I plan to add an IntelliJ plugin as well.  
-
-**Option 1 - CLI tool** 
-
-1. Download the executable jar which is the one with the **-all** suffix 
-1. To generate output to the console:  
-   ```java -jar scala2java_2.13-<version>-all.jar MyClass1.scala MyClass2.scala```  
-1. To generate output to a directory:  
-   ```java -jar scala2java_2.13-<version>-all.jar --outDir=myDir  MyClass.scala MyClass2.scala```
-
-**Option 2 - SDK _(currently supports only one file at a time)_**
-
-1. Add the scala2java dependency to your project
-
-2. To generate output to the console (Scala example)
-   ```scala
-   import io.github.effiban.scala2java.Scala2JavaTranslator.translate
-   import java.nio.file.Path
-
-   class Translator {
-       def doTranslate(): Unit = {
-           val scalaPath = Path.of("myRootDir", "mypackage", "MyClass.scala")
-           translate(scalaPath)
-       }
-   }
-   ```
-3. To generate output to a directory (Scala example)
-   ```scala
-   import io.github.effiban.scala2java.Scala2JavaTranslator.translate
-   import java.nio.file.Path
-
-   class Translator {
-       def doTranslate(): Unit = {
-           val scalaPath = Path.of("myScalaRoot", "mypackage", "MyClass.scala")
-           val javaOutputDir = Path.of("myJavaRoot", "mypackage")
-           translate(scalaPath, Some(javaOuptutDir))
-       }
-   }
-   ```
-
-### Technical Details
-Scala2Java is developed on top of the excellent [ScalaMeta](https://scalameta.org/) library, which provides a convenient API for
-parsing Scala programs into an AST. This AST is traversed by the tool and converted into equivalent Java code, as much as possible.  
-At this point, the tool supports _syntactic_ translation only - so each file in a codebase must be translated separately into Java,
-and the tool will not be able to utilize or infer _semantic_ information such as method definitions from other files.    
-In the future I plan to utilize Scalameta's [SemanticDB](https://scalameta.org/docs/semanticdb/guide.html) feature, which should generate a more
-precise and comprehensive translation into Java code.
-
-### Supported Features
-Scala2Java is able to translate all the basic Scala syntax into equivalent Java. Here is a partial list: 
-- Class/method/variable definitions
-- Method invocations
-- Control structures (if / while / do / try)
-- Visibility modifiers (which can have different rules and names in Java)
-- Generic types 
-- Annotations  
-  
-It is also able to rewrite some language constructs which are supported differently or completely unsupported in Java such as:  
-- Primary constructors
-- Adding the 'return' keyword
-- 'for' comprehension
-- string interpolation
-- by-name parameters
-
-### Limitations 
-- **Scala advanced features**  
-Scala has some advanced features that have no analogue in Java. Either these features cannot be translated to Java based on syntax alone, 
-or else they require a major rewrite that is quite complex.  
-Therefore these features are not supported by the tool, and instead it will generate comments in the generated code accordingly.    
-Examples:
-  - Implicit definitions
-  - Imports inside a class/method
-  - Named parameters and method arguments
-  - Advanced pattern matching (Java 17 'switch' cases still have very limited capabilities)  
-
-- **Scala built-in types**    
-Scala has many built-in types and methods that need to be translated into the Java equivalent such as `Option`, `Future`, collection types, etc.  
-At this time the tool provides basic support for some of these, while others will be written in the Java code as-is.  
-Improvements in this area are planned for the future.  
-
-- **Semantic Data**   
-As explained above , the tool currently does not have access to semantic information, so it cannot process more than one file at a time.    
-It will not be able to validate and infer types of symbols created in different files, and even some of the symbols in the same file. 
-For such cases comments will be generated in the Java code with hints regarding the missing values/types.
-
-
-## Licensing
+### Licensing
 
 Scala2Java is licensed under the Apache License, Version 2.0.
