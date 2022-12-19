@@ -6,10 +6,8 @@ import io.github.effiban.scala2java.spi.predicates.TemplateInitExcludedPredicate
 import scala.meta.Init
 
 class CompositeTemplateInitExcludedPredicate(coreTemplateInitExcludedPredicate: TemplateInitExcludedPredicate)
-                                            (implicit extensionRegistry: ExtensionRegistry) extends TemplateInitExcludedPredicate {
+                                            (implicit extensionRegistry: ExtensionRegistry)
+  extends CompositeAtLeastOneTruePredicate[Init] with TemplateInitExcludedPredicate {
 
-  override def apply(init: Init): Boolean = {
-    val predicates = coreTemplateInitExcludedPredicate +: extensionRegistry.templateInitExcludedPredicates
-    predicates.forall(_.apply(init))
-  }
+  override protected val predicates: List[Init => Boolean] = coreTemplateInitExcludedPredicate +: extensionRegistry.templateInitExcludedPredicates
 }
