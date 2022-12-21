@@ -5,7 +5,7 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.spi.predicates.ImporterExcludedPredicate
 
-import scala.meta.Import
+import scala.meta.{Import, Importer}
 
 trait ImportTraverser {
   def traverse(`import`: Import, context: StatContext = StatContext()): Unit
@@ -29,7 +29,14 @@ private[traversers] class ImportTraverserImpl(importerTraverser: => ImporterTrav
   private def traverseInner(`import`: Import): Unit = {
     `import`.importers match {
       case Nil => throw new IllegalStateException("Invalid import with no inner importers")
-      case importers => importers.filterNot(importerExcludedPredicate).foreach(importerTraverser.traverse)
+      case importers => importers.flatMap(flattenImportees)
+        .filterNot(importerExcludedPredicate)
+        .foreach(importerTraverser.traverse)
     }
+  }
+
+  private def flattenImportees(importer: Importer): List[Importer] = {
+    import importer._
+    importees.map(importee => Importer(ref, List(importee)))
   }
 }
