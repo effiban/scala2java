@@ -31,23 +31,24 @@ trait Scala2JavaExtension {
 
   /** Override this method if you need to produce an output Java file with a different name than the input Scala file.
    *
-   * @return if overriden - a transformer which changes the file name
-   *         otherwise - the default which leaves the name unchanged
+   * @return if overriden - a transformer which changes the file name<br>
+   *         otherwise - the default which leaves the name unchanged<br>
    */
   def fileNameTransformer(): FileNameTransformer = FileNameTransformer.Identity
 
   /** Override this method if you need to provide additional [[scala.meta.Importer]]-s (import statements) to the generated Java file.
    *
-   * @return if overriden - a transformer which adds [[scala.meta.Importer]]-s
-   *         otherwise - the default transformer which does not add any
+   * @return if overriden - a transformer which adds [[scala.meta.Importer]]-s<br>
+   *         otherwise - the default transformer which does not add any<br>
    */
   def additionalImportersProvider(): AdditionalImportersProvider = AdditionalImportersProvider.Empty
 
   /** Override this method if you need to exclude [[scala.meta.Importer]]-s (import statements) that exist in the Scala file,
-   * but do not belong in the generated Java file.
+   * but do not belong in the generated Java file.<br>
+   * @see [[ImporterExcludedPredicate]] for more information on how the framework will invoke this predicate.
    *
-   * @return if overriden - a transformer which excludes importers
-   *         otherwise - the default transformer which does not exclude anything
+   * @return if overriden - a transformer which excludes importers<br>
+   *         otherwise - the default transformer which does not exclude anything<br>
    */
   def importerExcludedPredicate(): ImporterExcludedPredicate = ImporterExcludedPredicate.None
 
@@ -55,15 +56,15 @@ trait Scala2JavaExtension {
    * NOTE that this transformer intended for manipulating the class declaration (e.g. name, visibility, annotations).<br>
    * For manipulating the template part (parents, body) - override one of the other transformers instead.
    *
-   * @return if overriden - a transformer which modifies a given class
-   *         otherwise - the default transformer which doesn't change anything
+   * @return if overriden - a transformer which modifies a given class<br>
+   *         otherwise - the default transformer which doesn't change anything<br>
    */
   def classTransformer(): ClassTransformer = ClassTransformer.Identity
 
   /** Override this method if you need to exclude [[scala.meta.Init]]-s (parents) of a class/trait/object in the corresponding Java type.<br>
    *
-   * @return if overriden - a predicate which determines whether to exclude a [[scala.meta.Init]]
-   *         otherwise - the default predicate which doesn't exclude anything
+   * @return if overriden - a predicate which determines whether to exclude a [[scala.meta.Init]]<br>
+   *         otherwise - the default predicate which doesn't exclude anything<br>
    */
   def templateInitExcludedPredicate(): TemplateInitExcludedPredicate = TemplateInitExcludedPredicate.None
 
@@ -71,15 +72,15 @@ trait Scala2JavaExtension {
    * [[scala.meta.Decl.Var]] (`var` declaration).<br>
    * @see [[DefnValToDeclVarTransformer]] for a usage example.
    *
-   * @return if overriden - a transformer which transforms a [[scala.meta.Defn.Val]] into a [[scala.meta.Decl.Var]] where applicable
-   *         otherwise - the default transformer which never transforms (returns `None`)
+   * @return if overriden - a transformer which transforms a [[scala.meta.Defn.Val]] into a [[scala.meta.Decl.Var]] where applicable<br>
+   *         otherwise - the default transformer which never transforms (returns `None`)<br>
    */
   def defnValToDeclVarTransformer(): DefnValToDeclVarTransformer = DefnValToDeclVarTransformer.Empty
 
   /** Override this method if you need to modify a [[scala.meta.Defn.Def]] (method definition)
    *
-   * @return if overriden - a transformer which modifies a given [[scala.meta.Defn.Def]]
-   *         otherwise - the default transformer which doesn't modify anything
+   * @return if overriden - a transformer which modifies a given [[scala.meta.Defn.Def]]<br>
+   *         otherwise - the default transformer which doesn't modify anything<br>
    */
   def defnDefTransformer(): DefnDefTransformer = DefnDefTransformer.Identity
 
@@ -94,8 +95,8 @@ trait Scala2JavaExtension {
 
   /** Override this method if you need to modify a [[scala.meta.Term.Apply]] (method invocation)
    *
-   * @return if overriden - a transformer which modifies a given [[scala.meta.Term.Apply]]
-   *         otherwise - the default transformer which doesn't modify anything
+   * @return if overriden - a transformer which modifies a given [[scala.meta.Term.Apply]]<br>
+   *         otherwise - the default transformer which doesn't modify anything<br>
    */
   def termApplyTransformer(): TermApplyTransformer = TermApplyTransformer.Identity
 
@@ -106,8 +107,8 @@ trait Scala2JavaExtension {
    *   - inner member selections
    *   - others...
    *
-   * @return if overriden - a transformer which modifies a given [[scala.meta.Term.Select]]
-   *         otherwise - the default transformer which doesn't modify anything
+   * @return if overriden - a transformer which modifies a given [[scala.meta.Term.Select]]<br>
+   *         otherwise - the default transformer which doesn't modify anything<br>
    */
   def termSelectTransformer(): TermSelectTransformer = TermSelectTransformer.Identity
 }
