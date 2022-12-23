@@ -155,7 +155,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     patListTraverser,
     rhsTermTraverser,
     declVarTraverser,
-    new CompositeDefnValToDeclVarTransformer
+    new CompositeDefnValToDeclVarTransformer,
+    new CompositeDefnValTransformer
   )
 
   private lazy val defnVarTraverser: DefnVarTraverser = new DefnVarTraverserImpl(
