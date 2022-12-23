@@ -118,4 +118,11 @@ trait Scala2JavaExtension {
    *         otherwise - the default transformer which doesn't modify anything<br>
    */
   def termSelectTransformer(): TermSelectTransformer = TermSelectTransformer.Identity
+
+  /** Override this method if you need to transform a Scala type name into an equivalent Java one
+   *
+   * @return if overriden - a transformer which changes the type name<br>
+   *         otherwise - the default which leaves the type name unchanged<br>
+   */
+  def typeNameTransformer(): TypeNameTransformer = TypeNameTransformer.Identity
 }

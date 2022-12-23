@@ -1,12 +1,10 @@
 package io.github.effiban.scala2java.core.transformers
 
+import io.github.effiban.scala2java.spi.transformers.TypeNameTransformer
+
 import scala.meta.Type
 
-trait TypeNameTransformer {
-  def transform(scalaName: Type.Name): String
-}
-
-object TypeNameTransformer extends TypeNameTransformer {
+object CoreTypeNameTransformer extends TypeNameTransformer {
 
   private final val ScalaTypeNameToJavaTypeName = Map(
     "Any" -> "Object",
@@ -26,7 +24,7 @@ object TypeNameTransformer extends TypeNameTransformer {
     "Future" -> "CompletableFuture"
   )
 
-  override def transform(scalaName: Type.Name): String = {
-    ScalaTypeNameToJavaTypeName.getOrElse(scalaName.value, scalaName.value)
+  override def transform(scalaName: Type.Name): Type.Name = {
+    Type.Name(ScalaTypeNameToJavaTypeName.getOrElse(scalaName.value, scalaName.value))
   }
 }

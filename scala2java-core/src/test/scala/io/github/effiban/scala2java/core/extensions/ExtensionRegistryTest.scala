@@ -167,4 +167,17 @@ class ExtensionRegistryTest extends UnitTestSuite {
 
     extensionRegistry.termSelectTransformers shouldBe termSelectTransformers
   }
+
+  test("typeNameTransformers") {
+    val typeNameTransformer1 = mock[TypeNameTransformer]
+    val typeNameTransformer2 = mock[TypeNameTransformer]
+    val typeNameTransformers = List(typeNameTransformer1, typeNameTransformer2)
+
+    when(extension1.typeNameTransformer()).thenReturn(typeNameTransformer1)
+    when(extension2.typeNameTransformer()).thenReturn(typeNameTransformer2)
+
+    val extensionRegistry = ExtensionRegistry(extensions)
+
+    extensionRegistry.typeNameTransformers shouldBe typeNameTransformers
+  }
 }
