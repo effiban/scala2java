@@ -33,11 +33,13 @@ class CompositeSameTypeTransformerTest extends UnitTestSuite {
   test("transform when there are no transformers") {
     new CompositeTestObjTransformer().transform(InputObj) shouldBe InputObj
   }
+
+
+  private case class TestObj(name: String)
+
+  private sealed trait TestObjTransformer extends SameTypeTransformer[TestObj]
+
+  private class CompositeTestObjTransformer(override protected val transformers: List[SameTypeTransformer[TestObj]] = Nil)
+    extends CompositeSameTypeTransformer[TestObj] with TestObjTransformer
+
 }
-private case class TestObj(name: String)
-
-private sealed trait TestObjTransformer extends SameTypeTransformer[TestObj]
-
-private class CompositeTestObjTransformer(override protected val transformers: List[SameTypeTransformer[TestObj]] = Nil)
-  extends CompositeSameTypeTransformer[TestObj] with TestObjTransformer
-

@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 
 import scala.meta.Type
 
-class TypeNameTransformerTest extends UnitTestSuite {
+class CoreTypeNameTransformerTest extends UnitTestSuite {
 
   private val TypeMappings = Table(
     ("ScalaType", "ExpectedJavaType"),
@@ -27,7 +27,7 @@ class TypeNameTransformerTest extends UnitTestSuite {
 
   forAll(TypeMappings) { (scalaType: String, expectedJavaType: String) =>
     test(s"transform $scalaType should return $expectedJavaType") {
-      TypeNameTransformer.transform(Type.Name(scalaType)) shouldBe expectedJavaType
+      CoreTypeNameTransformer.transform(Type.Name(scalaType)).structure shouldBe Type.Name(expectedJavaType).structure
     }
   }
 }

@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.transformers.TypeNameTransformer
 import io.github.effiban.scala2java.core.writers.JavaWriter
+import io.github.effiban.scala2java.spi.transformers.TypeNameTransformer
 
 import scala.meta.Type
 
@@ -13,6 +13,6 @@ private[traversers] class TypeNameTraverserImpl(typeNameTransformer: TypeNameTra
   import javaWriter._
 
   override def traverse(name: Type.Name): Unit = {
-    write(typeNameTransformer.transform(name))
+    write(typeNameTransformer.transform(name).value)
   }
 }
