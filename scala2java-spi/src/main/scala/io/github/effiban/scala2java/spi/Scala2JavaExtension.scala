@@ -68,6 +68,13 @@ trait Scala2JavaExtension {
    */
   def templateInitExcludedPredicate(): TemplateInitExcludedPredicate = TemplateInitExcludedPredicate.None
 
+  /** Override this method if you need to transform a [[scala.meta.Defn.Val]] (`val`, immutable variable definition).<br>
+   *
+   * @return if overriden - a transformer which transforms a [[scala.meta.Defn.Val]]<br>
+   *         otherwise - the default transformer which doesn't modify anything<br>
+   */
+  def defnValTransformer(): DefnValTransformer = DefnValTransformer.Identity
+
   /** Override this method if you need to transform a [[scala.meta.Defn.Val]] (`val` definition) into a
    * [[scala.meta.Decl.Var]] (`var` declaration).<br>
    * @see [[DefnValToDeclVarTransformer]] for a usage example.

@@ -3,7 +3,7 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.{ModifiersContext, StatContext}
 import io.github.effiban.scala2java.core.entities.JavaTreeType
 import io.github.effiban.scala2java.core.writers.JavaWriter
-import io.github.effiban.scala2java.spi.transformers.DefnValToDeclVarTransformer
+import io.github.effiban.scala2java.spi.transformers.{DefnValToDeclVarTransformer, DefnValTransformer}
 
 import scala.meta.Defn
 
@@ -16,7 +16,8 @@ private[traversers] class DefnValTraverserImpl(modListTraverser: => ModListTrave
                                                patListTraverser: => PatListTraverser,
                                                rhsTermTraverser: => RhsTermTraverser,
                                                declVarTraverser: => DeclVarTraverser,
-                                               defnValToDeclVarTransformer: DefnValToDeclVarTransformer)
+                                               defnValToDeclVarTransformer: DefnValToDeclVarTransformer,
+                                               defnValTransformer: DefnValTransformer)
                                               (implicit javaWriter: JavaWriter) extends DefnValTraverser {
 
   import javaWriter._
@@ -25,11 +26,13 @@ private[traversers] class DefnValTraverserImpl(modListTraverser: => ModListTrave
   override def traverse(valDef: Defn.Val, context: StatContext = StatContext()): Unit = {
     defnValToDeclVarTransformer.transform(valDef, context.javaScope) match {
       case Some(varDecl) => declVarTraverser.traverse(varDecl, context)
-      case None => traverseOriginal(valDef, context)
+      case None =>
+        val transformedValDef = defnValTransformer.transform(valDef, context.javaScope)
+        traverseInner(transformedValDef, context)
     }
   }
 
-  private def traverseOriginal(valDef: Defn.Val, context: StatContext): Unit = {
+  private def traverseInner(valDef: Defn.Val, context: StatContext): Unit = {
     modListTraverser.traverse(ModifiersContext(valDef, JavaTreeType.Variable, context.javaScope))
     defnValOrVarTypeTraverser.traverse(valDef.decltpe, Some(valDef.rhs), context)
     write(" ")

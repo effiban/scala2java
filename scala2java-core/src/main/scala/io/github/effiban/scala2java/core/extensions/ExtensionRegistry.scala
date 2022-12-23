@@ -17,6 +17,8 @@ case class ExtensionRegistry(extensions: List[Scala2JavaExtension] = Nil) {
 
   val classTransformers: List[ClassTransformer] = extensions.map(_.classTransformer())
 
+  val defnValTransformers: List[DefnValTransformer] = extensions.map(_.defnValTransformer())
+
   val defnValToDeclVarTransformers: List[DefnValToDeclVarTransformer] = extensions.map(_.defnValToDeclVarTransformer())
 
   val defnDefTransformers: List[DefnDefTransformer] = extensions.map(_.defnDefTransformer())
