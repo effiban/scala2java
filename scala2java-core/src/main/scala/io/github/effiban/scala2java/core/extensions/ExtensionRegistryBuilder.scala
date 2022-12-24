@@ -9,7 +9,9 @@ import scala.meta.{Source, Term}
 class ExtensionRegistryBuilder {
 
   def buildFor(source: Source): ExtensionRegistry = {
-    val termSelects = source.collect { case termSelect: Term.Select => termSelect }
+    val termSelects = source
+      .collect { case termSelect: Term.Select => termSelect }
+      .distinctBy(_.structure)
 
     val extensions = loadExtensions()
       .map(_.get)
