@@ -4,11 +4,22 @@ import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.spi.Scala2JavaExtension
 
 import java.util.ServiceLoader.Provider
-import scala.meta.{Source, Term}
+import scala.meta.{Import, Importer, Source, Term, XtensionQuasiquoteImportee, XtensionQuasiquoteTerm}
 
 class ExtensionRegistryBuilderTest extends UnitTestSuite {
 
-  private val TheSource = Source(List(Term.Apply(Term.Name("fun"), List(Term.Name("arg")))))
+  private val TheTermSelect1 = q"a.b"
+  private val TheTermSelect2 = q"e.f"
+  private val TheSource = Source(
+    List(
+      Import(
+        List(
+          Importer(TheTermSelect1, List(importee"c")),
+          Importer(TheTermSelect2, List(importee"g"))
+        )
+      )
+    )
+  )
 
   test("build() when there are two extensions and both should be applied, should return a registry with both") {
     val extension1 = extensionThatShouldBeApplied()
@@ -47,6 +58,7 @@ class ExtensionRegistryBuilderTest extends UnitTestSuite {
     override private[extensions] def loadExtensions() = {
       val extensionProviders = extensions.map(extension => new Provider[Scala2JavaExtension] {
         override def `type`(): Class[Scala2JavaExtension] = classOf[Scala2JavaExtension]
+
         override def get(): Scala2JavaExtension = extension
       })
       LazyList.from(extensionProviders)
@@ -54,10 +66,10 @@ class ExtensionRegistryBuilderTest extends UnitTestSuite {
   }
 
   private def extensionThatShouldBeApplied() = new Scala2JavaExtension() {
-    override def shouldBeAppliedTo(source: Source): Boolean = source.structure == TheSource.structure
+    override def shouldBeAppliedIfContains(termSelect: Term.Select): Boolean = termSelect.structure == TheTermSelect1.structure
   }
 
   private def extensionThatShouldNotBeApplied() = new Scala2JavaExtension() {
-    override def shouldBeAppliedTo(source: Source): Boolean = source.structure != TheSource.structure
+    override def shouldBeAppliedIfContains(termSelect: Term.Select): Boolean = !Set(TheTermSelect1, TheTermSelect2).exists(_.structure == termSelect.structure)
   }
 }

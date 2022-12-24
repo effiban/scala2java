@@ -4,14 +4,16 @@ import io.github.effiban.scala2java.spi.Scala2JavaExtension
 
 import java.util.ServiceLoader
 import scala.jdk.StreamConverters._
-import scala.meta.Source
+import scala.meta.{Source, Term}
 
 class ExtensionRegistryBuilder {
 
   def buildFor(source: Source): ExtensionRegistry = {
+    val termSelects = source.collect { case termSelect: Term.Select => termSelect }
+
     val extensions = loadExtensions()
       .map(_.get)
-      .filter(_.shouldBeAppliedTo(source))
+      .filter(extension => shouldBeAppliedForAnyOf(extension, termSelects))
       .toList
     ExtensionRegistry(extensions)
   }
@@ -20,6 +22,8 @@ class ExtensionRegistryBuilder {
   private[extensions] def loadExtensions() = ServiceLoader.load(classOf[Scala2JavaExtension])
     .stream()
     .toScala(LazyList)
+
+  private def shouldBeAppliedForAnyOf(extension: Scala2JavaExtension, termSelects: List[Term.Select]) = termSelects.exists(extension.shouldBeAppliedIfContains)
 }
 
 object ExtensionRegistryBuilder extends ExtensionRegistryBuilder
