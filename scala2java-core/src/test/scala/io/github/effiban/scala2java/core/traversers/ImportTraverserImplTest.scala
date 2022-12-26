@@ -33,11 +33,13 @@ class ImportTraverserImplTest extends UnitTestSuite {
     when(importerExcludedPredicate.apply(any[Importer])).thenReturn(false)
     when(importerTransformer.transform(any[Importer])).thenAnswer((importer: Importer) => importer)
 
-    doWrite("""import mypackage1.myclass1;
-           |""".stripMargin)
+    doWrite(
+      """import mypackage1.myclass1;
+        |""".stripMargin)
       .when(importerTraverser).traverse(eqTree(importer1))
-    doWrite("""import mypackage2.myclass2;
-              |""".stripMargin)
+    doWrite(
+      """import mypackage2.myclass2;
+        |""".stripMargin)
       .when(importerTraverser).traverse(eqTree(importer2))
 
     importTraverser.traverse(`import` = Import(allImporters), context = PackageStatContext)
@@ -196,6 +198,46 @@ class ImportTraverserImplTest extends UnitTestSuite {
       """import package1B.myclass1B;
         |import package2B.myclass2B;
         |""".stripMargin
+  }
+
+  test("traverse() in package scope when some importers are duplicated should remove the duplicates") {
+    val importer1A = importer"package1.myclass1"
+    val importer1B = importer"package1.myclass1"
+    val importer2 = importer"package2.myclass2"
+    val importer3A = importer"package3.myclass3"
+    val importer3B = importer"package3.myclass3"
+    val inputImporters = List(
+      importer1A,
+      importer1B,
+      importer2,
+      importer3A,
+      importer3B
+    )
+
+    when(importerTransformer.transform(any[Importer])).thenAnswer((importer: Importer) => importer)
+
+    doWrite(
+      """import package1.myclass1;
+        |""".stripMargin)
+      .when(importerTraverser).traverse(eqTree(importer1A))
+    doWrite(
+      """import package2.myclass2;
+        |""".stripMargin)
+      .when(importerTraverser).traverse(eqTree(importer2))
+    doWrite(
+      """import package3.myclass3;
+        |""".stripMargin)
+      .when(importerTraverser).traverse(eqTree(importer3A))
+
+    importTraverser.traverse(`import` = Import(inputImporters), context = PackageStatContext)
+
+    outputWriter.toString shouldBe
+      """import package1.myclass1;
+        |import package2.myclass2;
+        |import package3.myclass3;
+        |""".stripMargin
+
+    verify(importerTraverser, times(3)).traverse(any[Importer])
   }
 
   test("traverse() in class scope should write a comment") {

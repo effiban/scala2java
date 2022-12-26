@@ -34,6 +34,7 @@ private[traversers] class ImportTraverserImpl(importerTraverser: => ImporterTrav
       case importers => importers.flatMap(flattenImportees)
         .filterNot(importerExcludedPredicate)
         .map(importerTransformer.transform)
+        .distinctBy(_.structure)
         .foreach(importerTraverser.traverse)
     }
   }
