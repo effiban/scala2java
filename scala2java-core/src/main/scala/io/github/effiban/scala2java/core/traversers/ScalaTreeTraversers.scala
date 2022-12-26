@@ -186,7 +186,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val importTraverser: ImportTraverser = new ImportTraverserImpl(
     importerTraverser,
-    new CompositeImporterExcludedPredicate(CoreImporterExcludedPredicate)
+    new CompositeImporterExcludedPredicate(CoreImporterExcludedPredicate),
+    new CompositeImporterTransformer
   )
 
   private lazy val initListTraverser: InitListTraverser = new InitListTraverserImpl(argumentListTraverser, initTraverser)

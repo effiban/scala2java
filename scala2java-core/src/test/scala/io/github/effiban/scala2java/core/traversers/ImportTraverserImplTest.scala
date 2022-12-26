@@ -5,6 +5,7 @@ import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.spi.predicates.ImporterExcludedPredicate
+import io.github.effiban.scala2java.spi.transformers.ImporterTransformer
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchers.any
 
@@ -16,8 +17,13 @@ class ImportTraverserImplTest extends UnitTestSuite {
 
   private val importerTraverser = mock[ImporterTraverser]
   private val importerExcludedPredicate = mock[ImporterExcludedPredicate]
+  private val importerTransformer = mock[ImporterTransformer]
 
-  private val importTraverser = new ImportTraverserImpl(importerTraverser, importerExcludedPredicate)
+  private val importTraverser = new ImportTraverserImpl(
+    importerTraverser,
+    importerExcludedPredicate,
+    importerTransformer
+  )
 
   test("traverse() in package scope when all should be included") {
     val importer1 = importer"mypackage1.myclass1"
@@ -25,6 +31,7 @@ class ImportTraverserImplTest extends UnitTestSuite {
     val allImporters = List(importer1, importer2)
 
     when(importerExcludedPredicate.apply(any[Importer])).thenReturn(false)
+    when(importerTransformer.transform(any[Importer])).thenAnswer((importer: Importer) => importer)
 
     doWrite("""import mypackage1.myclass1;
            |""".stripMargin)
@@ -56,6 +63,7 @@ class ImportTraverserImplTest extends UnitTestSuite {
     val allFlattenedImporters = List(flattenedImporter1, flattenedImporter2, flattenedImporter3, flattenedImporter4)
 
     when(importerExcludedPredicate.apply(any[Importer])).thenReturn(false)
+    when(importerTransformer.transform(any[Importer])).thenAnswer((importer: Importer) => importer)
 
     doWrite(
       """import mypackage1.myclass1;
@@ -96,6 +104,7 @@ class ImportTraverserImplTest extends UnitTestSuite {
     when(importerExcludedPredicate.apply(any[Importer])).thenAnswer((importer: Importer) =>
       Seq(excludedImporter1, excludedImporter2).exists(_.structure == importer.structure)
     )
+    when(importerTransformer.transform(any[Importer])).thenAnswer((importer: Importer) => importer)
 
 
     doWrite(
@@ -134,6 +143,7 @@ class ImportTraverserImplTest extends UnitTestSuite {
     when(importerExcludedPredicate.apply(any[Importer])).thenAnswer((importer: Importer) =>
       Seq(excludedFlattenedImporter1, excludedFlattenedImporter2).exists(_.structure == importer.structure)
     )
+    when(importerTransformer.transform(any[Importer])).thenAnswer((importer: Importer) => importer)
 
     doWrite(
       """import mypackage1.included1;
@@ -152,6 +162,40 @@ class ImportTraverserImplTest extends UnitTestSuite {
         |""".stripMargin
 
     allFlattenedImporters.foreach(importer => verify(importerExcludedPredicate).apply(eqTree(importer)))
+  }
+
+  test("traverse() in package scope when importers should be transformed") {
+    val importer1A = importer"package1A.myclass1A"
+    val importer1B = importer"package1B.myclass1B"
+    val importer2A = importer"included2A.myclass2A"
+    val importer2B = importer"included2B.myclass2B"
+    val inputImporters = List(
+      importer1A,
+      importer2A
+    )
+
+    when(importerTransformer.transform(any[Importer])).thenAnswer((importer: Importer) =>
+      importer match {
+        case anImporter if anImporter.structure == importer1A.structure => importer1B
+        case anImporter if anImporter.structure == importer2A.structure => importer2B
+      }
+    )
+
+    doWrite(
+      """import package1B.myclass1B;
+        |""".stripMargin)
+      .when(importerTraverser).traverse(eqTree(importer1B))
+    doWrite(
+      """import package2B.myclass2B;
+        |""".stripMargin)
+      .when(importerTraverser).traverse(eqTree(importer2B))
+
+    importTraverser.traverse(`import` = Import(inputImporters), context = PackageStatContext)
+
+    outputWriter.toString shouldBe
+      """import package1B.myclass1B;
+        |import package2B.myclass2B;
+        |""".stripMargin
   }
 
   test("traverse() in class scope should write a comment") {

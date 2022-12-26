@@ -46,12 +46,26 @@ trait Scala2JavaExtension {
 
   /** Override this method if you need to exclude [[scala.meta.Importer]]-s (import statements) that exist in the Scala file,
    * but do not belong in the generated Java file.<br>
-   * @see [[ImporterExcludedPredicate]] for more information on how the framework will invoke this predicate.
+   * '''NOTE regarding precedence''': This predicate will be invoked before [[importerTransformer]]. This means that if
+   * this extension, or any other one, wishes to modify an importer that is excluded by this predicate -
+   * that modification will be ignored.
    *
+   * @see [[ImporterExcludedPredicate]] for more information on how the framework will invoke this predicate.<br>
    * @return if overriden - a transformer which excludes importers<br>
    *         otherwise - the default transformer which does not exclude anything<br>
    */
   def importerExcludedPredicate(): ImporterExcludedPredicate = ImporterExcludedPredicate.None
+
+  /** Override this method if you need to modify an [[scala.meta.Importer]] (import statement).<br>
+   * '''NOTE regarding precedence''': This transformer will be invoked after [[importerTransformer]]. This means that if
+   * this extension, or any other one, excludes an importer that is modified by this transformer -
+   * the modification will be ignored.
+   *
+   * @see [[ImporterTransformer]] for more information on how the framework will invoke this predicate.
+   * @return if overriden - a transformer which modifies importers<br>
+   *         otherwise - the default transformer which doesn't change anything<br>
+   */
+  def importerTransformer(): ImporterTransformer = ImporterTransformer.Identity
 
   /** Override this method if you need to transform a [[scala.meta.Defn.Class]].<br>
    * NOTE that this transformer intended for manipulating the class declaration (e.g. name, visibility, annotations).<br>
