@@ -13,6 +13,8 @@ case class ExtensionRegistry(extensions: List[Scala2JavaExtension] = Nil) {
 
   val importerExcludedPredicates: List[ImporterExcludedPredicate] = extensions.map(_.importerExcludedPredicate())
 
+  val importerTransformers: List[ImporterTransformer] = extensions.map(_.importerTransformer())
+
   val templateInitExcludedPredicates: List[TemplateInitExcludedPredicate] = extensions.map(_.templateInitExcludedPredicate())
 
   val classTransformers: List[ClassTransformer] = extensions.map(_.classTransformer())

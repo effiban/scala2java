@@ -51,6 +51,19 @@ class ExtensionRegistryTest extends UnitTestSuite {
     extensionRegistry.importerExcludedPredicates shouldBe importerExcludedPredicates
   }
 
+  test("importerTransformers") {
+    val importerTransformer1 = mock[ImporterTransformer]
+    val importerTransformer2 = mock[ImporterTransformer]
+    val importerTransformers = List(importerTransformer1, importerTransformer2)
+
+    when(extension1.importerTransformer()).thenReturn(importerTransformer1)
+    when(extension2.importerTransformer()).thenReturn(importerTransformer2)
+
+    val extensionRegistry = ExtensionRegistry(extensions)
+
+    extensionRegistry.importerTransformers shouldBe importerTransformers
+  }
+
   test("classTransformers") {
     val classTransformer1 = mock[ClassTransformer]
     val classTransformer2 = mock[ClassTransformer]
@@ -75,19 +88,6 @@ class ExtensionRegistryTest extends UnitTestSuite {
     val extensionRegistry = ExtensionRegistry(extensions)
 
     extensionRegistry.templateInitExcludedPredicates shouldBe templateInitExcludedPredicates
-  }
-
-  test("classNameTransformers") {
-    val classNameTransformer1 = mock[ClassTransformer]
-    val classNameTransformer2 = mock[ClassTransformer]
-    val classNameTransformers = List(classNameTransformer1, classNameTransformer2)
-
-    when(extension1.classTransformer()).thenReturn(classNameTransformer1)
-    when(extension2.classTransformer()).thenReturn(classNameTransformer2)
-
-    val extensionRegistry = ExtensionRegistry(extensions)
-
-    extensionRegistry.classTransformers shouldBe classNameTransformers
   }
 
   test("defnValTransformers") {
