@@ -9,8 +9,16 @@ import io.github.effiban.scala2java.spi.Scala2JavaExtension
  */
 trait ExtendedTypeInferrers {
 
+  /** Override this method if you need to apply custom logic for inferring the type of a [[scala.meta.Term.Apply]] (method invocation).<br>
+   * If the inferrers of all extensions return `None`, the tool will default to the core logic which is able to infer for Scala standard library methods.
+   *
+   * @return if overriden - an inferrer which attempts to infer the type of a [[scala.meta.Term.Apply]]
+   *         otherwise - the empty inferrer which always returns `None` (could not be inferred)
+   */
+  def applyTypeInferrer(): ApplyTypeInferrer = ApplyTypeInferrer.Empty
+
   /** Override this method if you need to apply custom logic for inferring the type of a [[scala.meta.Term.ApplyType]] (parameterized type application).<br>
-   * If the inferrers of all the extensions return `None`, the tool will default to the core logic as follows:<br>
+   * If the inferrers of all extensions return `None`, the tool will default to the core logic as follows:<br>
    * It first checks the type of the `fun` part, and then (if resolved) appends the type argument.<br>
    * For example, if the input is `foo[T]` and `foo` is of type `Foo`, then the inferred type will be `Foo[T]`
    *

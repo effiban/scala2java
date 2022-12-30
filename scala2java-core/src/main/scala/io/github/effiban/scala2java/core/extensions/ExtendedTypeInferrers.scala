@@ -1,8 +1,10 @@
 package io.github.effiban.scala2java.core.extensions
 
-import io.github.effiban.scala2java.spi.typeinferrers.ApplyTypeTypeInferrer
+import io.github.effiban.scala2java.spi.typeinferrers.{ApplyTypeInferrer, ApplyTypeTypeInferrer}
 
 private[extensions] trait ExtendedTypeInferrers { this: ExtensionContainer =>
+
+  val applyTypeInferrers: List[ApplyTypeInferrer] = extensions.map(_.applyTypeInferrer())
 
   val applyTypeTypeInferrers: List[ApplyTypeTypeInferrer] = extensions.map(_.applyTypeTypeInferrer())
 

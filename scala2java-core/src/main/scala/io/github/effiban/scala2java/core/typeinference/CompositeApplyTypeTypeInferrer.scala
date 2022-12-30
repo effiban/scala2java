@@ -1,16 +1,15 @@
 package io.github.effiban.scala2java.core.typeinference
 
 import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
-import io.github.effiban.scala2java.spi.typeinferrers.ApplyTypeTypeInferrer
+import io.github.effiban.scala2java.spi.typeinferrers.{ApplyTypeTypeInferrer, TypeInferrer}
 
-import scala.meta.{Term, Type}
+import scala.meta.Term
 
-private[typeinference] class CompositeApplyTypeTypeInferrer(coreApplyTypeTypeInferrer: => ApplyTypeTypeInferrer)
-                                                           (implicit extensionRegistry: ExtensionRegistry) extends ApplyTypeTypeInferrer {
+private[typeinference] class CompositeApplyTypeTypeInferrer(theCoreInferrer: => ApplyTypeTypeInferrer)
+                                                           (implicit extensionRegistry: ExtensionRegistry)
+  extends CompositeCoreAndOthersTypeInferrer[Term.ApplyType] with ApplyTypeTypeInferrer {
 
-  private lazy val inferrers: List[ApplyTypeTypeInferrer] = extensionRegistry.applyTypeTypeInferrers :+ coreApplyTypeTypeInferrer
+  override protected def coreInferrer(): TypeInferrer[Term.ApplyType] = theCoreInferrer
 
-  override def infer(termApplyType: Term.ApplyType): Option[Type] = {
-    inferrers.foldLeft[Option[Type]](None)((maybeType, inferrer) => maybeType.orElse(inferrer.infer(termApplyType)))
-  }
+  override protected val otherInferrers: List[TypeInferrer[Term.ApplyType]] = extensionRegistry.applyTypeTypeInferrers
 }
