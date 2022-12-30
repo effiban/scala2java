@@ -1,5 +1,7 @@
 package io.github.effiban.scala2java.core.typeinference
 
+import io.github.effiban.scala2java.spi.typeinferrers.{ApplyTypeTypeInferrer, TypeInferrer}
+
 import scala.meta.Term.{Annotate, ApplyType, Ascribe, Assign, Block, Do, For, ForYield, If, New, Return, Throw, Try, TryWithHandler, While}
 import scala.meta.{Lit, Term, Type}
 

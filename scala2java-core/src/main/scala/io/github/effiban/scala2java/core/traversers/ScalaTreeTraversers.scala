@@ -1,17 +1,24 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.classifiers.{DefnTypeClassifier, DefnValClassifier, JavaStatClassifier}
+import io.github.effiban.scala2java.core.classifiers.{Classifiers, DefnTypeClassifier, DefnValClassifier, JavaStatClassifier}
 import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
 import io.github.effiban.scala2java.core.orderings.JavaTemplateChildOrdering
 import io.github.effiban.scala2java.core.predicates.{CompositeImporterExcludedPredicate, CompositeTemplateInitExcludedPredicate, CoreImporterExcludedPredicate, CoreTemplateInitExcludedPredicate}
 import io.github.effiban.scala2java.core.providers.{CompositeAdditionalImportersProvider, CoreAdditionalImportersProvider}
-import io.github.effiban.scala2java.core.resolvers.Resolvers.shouldReturnValueResolver
 import io.github.effiban.scala2java.core.resolvers._
 import io.github.effiban.scala2java.core.transformers._
-import io.github.effiban.scala2java.core.typeinference.TypeInferrers.{scalarArgListTypeInferrer, termTypeInferrer}
+import io.github.effiban.scala2java.core.typeinference.TypeInferrers
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: ExtensionRegistry) {
+
+  private implicit lazy val typeInferrers: TypeInferrers = new TypeInferrers(classifiers)
+  private implicit lazy val classifiers: Classifiers = new Classifiers(typeInferrers)
+  private lazy val resolvers = new Resolvers()
+
+  import resolvers._
+  import typeInferrers._
+
 
   private lazy val alternativeTraverser: AlternativeTraverser = new AlternativeTraverserImpl(patTraverser)
 

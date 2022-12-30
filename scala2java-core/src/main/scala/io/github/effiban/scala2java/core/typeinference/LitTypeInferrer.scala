@@ -1,5 +1,7 @@
 package io.github.effiban.scala2java.core.typeinference
 
+import io.github.effiban.scala2java.spi.typeinferrers.TypeInferrer
+
 import scala.meta.{Lit, Type}
 
 trait LitTypeInferrer extends TypeInferrer[Lit]

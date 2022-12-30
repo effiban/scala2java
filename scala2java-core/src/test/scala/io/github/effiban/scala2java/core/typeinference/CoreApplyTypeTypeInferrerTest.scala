@@ -7,11 +7,11 @@ import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import scala.meta.Term.ApplyType
 import scala.meta.{Term, Type}
 
-class ApplyTypeTypeInferrerImplTest extends UnitTestSuite {
+class CoreApplyTypeTypeInferrerTest extends UnitTestSuite {
 
   private val termTypeInferrer = mock[TermTypeInferrer]
 
-  private val applyTypeTypeInferrer = new ApplyTypeTypeInferrerImpl(termTypeInferrer)
+  private val applyTypeTypeInferrer = new CoreApplyTypeTypeInferrer(termTypeInferrer)
 
   test("infer when 'fun' can be inferred") {
     val typeArgs = List(TypeNames.String, TypeNames.Int)

@@ -4,6 +4,7 @@ import io.github.effiban.scala2java.spi.Scala2JavaExtension
 import io.github.effiban.scala2java.spi.predicates.{ImporterExcludedPredicate, TemplateInitExcludedPredicate}
 import io.github.effiban.scala2java.spi.providers.AdditionalImportersProvider
 import io.github.effiban.scala2java.spi.transformers._
+import io.github.effiban.scala2java.spi.typeinferrers.ApplyTypeTypeInferrer
 
 case class ExtensionRegistry(extensions: List[Scala2JavaExtension] = Nil) {
 
@@ -24,6 +25,8 @@ case class ExtensionRegistry(extensions: List[Scala2JavaExtension] = Nil) {
   val defnValToDeclVarTransformers: List[DefnValToDeclVarTransformer] = extensions.map(_.defnValToDeclVarTransformer())
 
   val defnDefTransformers: List[DefnDefTransformer] = extensions.map(_.defnDefTransformer())
+
+  val applyTypeTypeInferrers: List[ApplyTypeTypeInferrer] = extensions.map(_.applyTypeTypeInferrer())
 
   val termApplyTypeToTermApplyTransformers: List[TermApplyTypeToTermApplyTransformer] =
     extensions.map(_.termApplyTypeToTermApplyTransformer())

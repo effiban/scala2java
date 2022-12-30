@@ -1,8 +1,9 @@
 package io.github.effiban.scala2java.core.resolvers
 
-import io.github.effiban.scala2java.core.classifiers.Classifiers.termTypeClassifier
+import io.github.effiban.scala2java.core.classifiers.Classifiers
 
-object Resolvers {
+class Resolvers(implicit classifiers: Classifiers) {
+  import classifiers._
 
   lazy val shouldReturnValueResolver: ShouldReturnValueResolver = new ShouldReturnValueResolverImpl(termTypeClassifier)
 }

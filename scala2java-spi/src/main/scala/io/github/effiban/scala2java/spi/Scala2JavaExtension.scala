@@ -3,6 +3,7 @@ package io.github.effiban.scala2java.spi
 import io.github.effiban.scala2java.spi.predicates.{ImporterExcludedPredicate, TemplateInitExcludedPredicate}
 import io.github.effiban.scala2java.spi.providers.AdditionalImportersProvider
 import io.github.effiban.scala2java.spi.transformers._
+import io.github.effiban.scala2java.spi.typeinferrers.ApplyTypeTypeInferrer
 
 import scala.meta.Term
 
@@ -106,8 +107,19 @@ trait Scala2JavaExtension {
    */
   def defnDefTransformer(): DefnDefTransformer = DefnDefTransformer.Identity
 
+  /** Override this method if you need to apply custom logic for inferring the type of a [[scala.meta.Term.ApplyType]] (parameterized type application).<br>
+   * If the inferrers of all the extensions return `None`, the tool will default to the core logic as follows:<br>
+   * It first checks the type of the `fun` part, and then (if resolved) appends the type argument.<br>
+   * For example, if the input is `foo[T]` and `foo` is of type `Foo`, then the inferred type will be `Foo[T]`
+   *
+   *
+   * @return if overriden - an inferrer which attempts to infer the type of a [[scala.meta.Term.ApplyType]]
+   *         otherwise - the empty inferrer which always returns `None` (could not be inferred)
+   */
+  def applyTypeTypeInferrer(): ApplyTypeTypeInferrer = ApplyTypeTypeInferrer.Empty
+
   /** Override this method if you need to transform a [[scala.meta.Term.ApplyType]] (parameterized type application) into a
-   * [[scala.meta.Term.Apply]] (method inovocation).<br>
+   * [[scala.meta.Term.Apply]] (method invocation).<br>
    * @see [[TermApplyTypeToTermApplyTransformer]] for a usage example.
    *
    * @return if overriden - a transformer which transforms a [[scala.meta.Term.ApplyType]] into a [[scala.meta.Term.Apply]] where applicable
