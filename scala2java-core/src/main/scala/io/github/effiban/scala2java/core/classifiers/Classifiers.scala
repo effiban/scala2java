@@ -1,10 +1,10 @@
 package io.github.effiban.scala2java.core.classifiers
 
-import io.github.effiban.scala2java.core.typeinference.TypeInferrers.termTypeInferrer
+import io.github.effiban.scala2java.core.typeinference.TypeInferrers
 
-object Classifiers {
+class Classifiers(typeInferrers: => TypeInferrers) {
 
   lazy val termTypeClassifier: TermTypeClassifier = new TermTypeClassifierImpl(
-    termTypeInferrer,
+    typeInferrers.termTypeInferrer,
     TermApplyInfixClassifier)
 }

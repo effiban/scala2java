@@ -1,10 +1,10 @@
 package io.github.effiban.scala2java.core.typeinference
 
-import io.github.effiban.scala2java.core.classifiers.Classifiers.termTypeClassifier
-import io.github.effiban.scala2java.core.classifiers.TypeNameClassifier
+import io.github.effiban.scala2java.core.classifiers.{Classifiers, TypeNameClassifier}
+import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
 import io.github.effiban.scala2java.core.transformers.TermToTupleCaster
 
-object TypeInferrers {
+class TypeInferrers(classifiers: => Classifiers)(implicit extensionRegistry: ExtensionRegistry) {
 
   private[typeinference] lazy val applyTypeInferrer = new ApplyTypeInferrerImpl(
     applyTypeTypeInferrer,
@@ -12,7 +12,9 @@ object TypeInferrers {
     compositeArgListTypesInferrer,
     TypeNameClassifier)
 
-  private[typeinference] lazy val applyTypeTypeInferrer = new ApplyTypeTypeInferrerImpl(termTypeInferrer)
+  private[typeinference] lazy val applyTypeTypeInferrer = new CompositeApplyTypeTypeInferrer(
+    new CoreApplyTypeTypeInferrer(termTypeInferrer)
+  )
 
   private[typeinference] lazy val blockTypeInferrer = new BlockTypeInferrerImpl(termTypeInferrer)
 
@@ -23,7 +25,7 @@ object TypeInferrers {
   private[typeinference] lazy val compositeArgListTypesInferrer = new CompositeArgListTypesInferrerImpl(
     scalarArgListTypeInferrer,
     tupleArgListTypesInferrer,
-    termTypeClassifier,
+    classifiers.termTypeClassifier,
     TermToTupleCaster
   )
 

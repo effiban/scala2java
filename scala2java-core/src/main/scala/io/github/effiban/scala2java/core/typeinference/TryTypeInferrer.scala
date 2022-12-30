@@ -1,5 +1,7 @@
 package io.github.effiban.scala2java.core.typeinference
 
+import io.github.effiban.scala2java.spi.typeinferrers.TypeInferrer
+
 import scala.meta.Term.Try
 import scala.meta.Type
 
