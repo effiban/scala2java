@@ -9,14 +9,14 @@ import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.{Lit, Term, Type}
 
-class ApplyTypeInferrerImplTest extends UnitTestSuite {
+class CoreApplyTypeInferrerTest extends UnitTestSuite {
 
   private val applyTypeTypeInferrer = mock[ApplyTypeTypeInferrer]
   private val termTypeInferrer = mock[TermTypeInferrer]
   private val compositeArgListTypesInferrer = mock[CompositeArgListTypesInferrer]
   private val typeNameClassifier = mock[TypeNameClassifier]
 
-  private val applyTypeInferrer = new ApplyTypeInferrerImpl(
+  private val coreApplyTypeInferrer = new CoreApplyTypeInferrer(
     applyTypeTypeInferrer,
     termTypeInferrer,
     compositeArgListTypesInferrer,
@@ -32,7 +32,7 @@ class ApplyTypeInferrerImplTest extends UnitTestSuite {
 
     when(applyTypeTypeInferrer.infer(eqTree(stringListApplyType))).thenReturn(Some(expectedTypeApply))
 
-    applyTypeInferrer.infer(stringListInitializer).value.structure shouldBe expectedTypeApply.structure
+    coreApplyTypeInferrer.infer(stringListInitializer).value.structure shouldBe expectedTypeApply.structure
   }
 
   test("infer() when 'fun' is an implicit parameterized type") {
@@ -50,7 +50,7 @@ class ApplyTypeInferrerImplTest extends UnitTestSuite {
     when(typeNameClassifier.isParameterizedType(eqTree(TypeNames.Map))).thenReturn(true)
     when(compositeArgListTypesInferrer.infer(eqTreeList(mapElements))).thenReturn(List(TypeNames.String, TypeNames.Int))
 
-    applyTypeInferrer.infer(mapInitializer).value.structure shouldBe expectedTypeApply.structure
+    coreApplyTypeInferrer.infer(mapInitializer).value.structure shouldBe expectedTypeApply.structure
   }
 
   test("infer() when 'fun' is a non-parametrized type name") {
@@ -60,7 +60,7 @@ class ApplyTypeInferrerImplTest extends UnitTestSuite {
     when(termTypeInferrer.infer(eqTree(TermNames.String))).thenReturn(Some(TypeNames.String))
     when(typeNameClassifier.isParameterizedType(eqTree(TypeNames.Map))).thenReturn(false)
 
-    applyTypeInferrer.infer(stringTermApply).value.structure shouldBe TypeNames.String.structure
+    coreApplyTypeInferrer.infer(stringTermApply).value.structure shouldBe TypeNames.String.structure
   }
 
   test("infer() when 'fun' is a Type.Select") {
@@ -72,7 +72,7 @@ class ApplyTypeInferrerImplTest extends UnitTestSuite {
 
     when(termTypeInferrer.infer(eqTree(termSelect))).thenReturn(Some(expectedTypeSelect))
 
-    applyTypeInferrer.infer(termApply).value.structure shouldBe expectedTypeSelect.structure
+    coreApplyTypeInferrer.infer(termApply).value.structure shouldBe expectedTypeSelect.structure
   }
 
   test("infer() when 'fun' is not inferrable") {
@@ -82,6 +82,6 @@ class ApplyTypeInferrerImplTest extends UnitTestSuite {
 
     when(termTypeInferrer.infer(eqTree(nonInferrableFun))).thenReturn(None)
 
-    applyTypeInferrer.infer(nonInferrableTermApply) shouldBe None
+    coreApplyTypeInferrer.infer(nonInferrableTermApply) shouldBe None
   }
 }

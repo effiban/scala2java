@@ -6,11 +6,7 @@ import io.github.effiban.scala2java.core.transformers.TermToTupleCaster
 
 class TypeInferrers(classifiers: => Classifiers)(implicit extensionRegistry: ExtensionRegistry) {
 
-  private[typeinference] lazy val applyTypeInferrer = new ApplyTypeInferrerImpl(
-    applyTypeTypeInferrer,
-    termTypeInferrer,
-    compositeArgListTypesInferrer,
-    TypeNameClassifier)
+  private[typeinference] lazy val applyTypeInferrer = new CompositeApplyTypeInferrer(coreApplyTypeInferrer)
 
   private[typeinference] lazy val applyTypeTypeInferrer = new CompositeApplyTypeTypeInferrer(
     new CoreApplyTypeTypeInferrer(termTypeInferrer)
@@ -29,6 +25,13 @@ class TypeInferrers(classifiers: => Classifiers)(implicit extensionRegistry: Ext
     TermToTupleCaster
   )
 
+  private[typeinference] lazy val coreApplyTypeInferrer = new CoreApplyTypeInferrer(
+    applyTypeTypeInferrer,
+    termTypeInferrer,
+    compositeArgListTypesInferrer,
+    TypeNameClassifier
+  )
+
   private[typeinference] lazy val ifTypeInferrer = new IfTypeInferrerImpl(termTypeInferrer)
 
   lazy val scalarArgListTypeInferrer = new ScalarArgListTypeInferrerImpl(
@@ -37,7 +40,7 @@ class TypeInferrers(classifiers: => Classifiers)(implicit extensionRegistry: Ext
   )
 
   lazy val termTypeInferrer: TermTypeInferrer = new TermTypeInferrerImpl(
-    applyTypeInferrer,
+    coreApplyTypeInferrer,
     applyTypeTypeInferrer,
     blockTypeInferrer,
     caseListTypeInferrer,

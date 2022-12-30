@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.extensions
 
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.spi.Scala2JavaExtension
-import io.github.effiban.scala2java.spi.typeinferrers.ApplyTypeTypeInferrer
+import io.github.effiban.scala2java.spi.typeinferrers.{ApplyTypeInferrer, ApplyTypeTypeInferrer}
 
 class ExtendedTypeInferrersTest extends UnitTestSuite {
 
@@ -10,6 +10,19 @@ class ExtendedTypeInferrersTest extends UnitTestSuite {
   private val extension2 = mock[Scala2JavaExtension]
   private val extensions = List(extension1, extension2)
 
+
+  test("applyTypeInferrers") {
+    val applyTypeInferrer1 = mock[ApplyTypeInferrer]
+    val applyTypeInferrer2 = mock[ApplyTypeInferrer]
+    val applyTypeInferrers = List(applyTypeInferrer1, applyTypeInferrer2)
+
+    when(extension1.applyTypeInferrer()).thenReturn(applyTypeInferrer1)
+    when(extension2.applyTypeInferrer()).thenReturn(applyTypeInferrer2)
+
+    val extensionRegistry = ExtensionRegistry(extensions)
+
+    extensionRegistry.applyTypeInferrers shouldBe applyTypeInferrers
+  }
 
   test("applyTypeTypeInferrers") {
     val applyTypeTypeInferrer1 = mock[ApplyTypeTypeInferrer]

@@ -1,13 +1,11 @@
 package io.github.effiban.scala2java.core.typeinference
 
 import io.github.effiban.scala2java.core.classifiers.TypeNameClassifier
-import io.github.effiban.scala2java.spi.typeinferrers.{ApplyTypeTypeInferrer, TypeInferrer}
+import io.github.effiban.scala2java.spi.typeinferrers.{ApplyTypeInferrer, ApplyTypeTypeInferrer}
 
 import scala.meta.{Term, Type}
 
-trait ApplyTypeInferrer extends TypeInferrer[Term.Apply]
-
-private[typeinference] class ApplyTypeInferrerImpl(applyTypeTypeInferrer: => ApplyTypeTypeInferrer,
+private[typeinference] class CoreApplyTypeInferrer(applyTypeTypeInferrer: => ApplyTypeTypeInferrer,
                                                    termTypeInferrer: => TermTypeInferrer,
                                                    compositeArgListTypesInferrer: => CompositeArgListTypesInferrer,
                                                    typeNameClassifier: TypeNameClassifier) extends ApplyTypeInferrer {
