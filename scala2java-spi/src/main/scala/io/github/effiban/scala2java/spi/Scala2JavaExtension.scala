@@ -1,9 +1,9 @@
 package io.github.effiban.scala2java.spi
 
-import io.github.effiban.scala2java.spi.predicates.{ImporterExcludedPredicate, TemplateInitExcludedPredicate}
-import io.github.effiban.scala2java.spi.providers.AdditionalImportersProvider
-import io.github.effiban.scala2java.spi.transformers._
-import io.github.effiban.scala2java.spi.typeinferrers.ApplyTypeTypeInferrer
+import io.github.effiban.scala2java.spi.predicates.ExtendedPredicates
+import io.github.effiban.scala2java.spi.providers.ExtendedProviders
+import io.github.effiban.scala2java.spi.transformers.ExtendedTransformers
+import io.github.effiban.scala2java.spi.typeinferrers.ExtendedTypeInferrers
 
 import scala.meta.Term
 
@@ -21,7 +21,11 @@ import scala.meta.Term
  * Extensions are designed to be loaded dynamically by the tool at runtime.
  * To achieve this, an extension '''must''' make itself discoverable by a [[java.util.ServiceLoader]] - see there for details.
  */
-trait Scala2JavaExtension {
+trait Scala2JavaExtension
+  extends ExtendedTypeInferrers
+    with ExtendedPredicates
+    with ExtendedProviders
+    with ExtendedTransformers {
 
   /** Indicates whether this extension should be applied if the given [[scala.meta.Term.Select]] (qualified name) appears in the Scala source file.<br>
    * The tool will invoke this method for every qualified name in the file, and if at least one returns `true` - the extension as a whole will be applied.
@@ -30,126 +34,4 @@ trait Scala2JavaExtension {
    * @return `true` if the extension should be applied, `false` otherwise
    */
   def shouldBeAppliedIfContains(termSelect: Term.Select): Boolean
-
-  /** Override this method if you need to produce an output Java file with a different name than the input Scala file.
-   *
-   * @return if overriden - a transformer which changes the file name<br>
-   *         otherwise - the default which leaves the name unchanged<br>
-   */
-  def fileNameTransformer(): FileNameTransformer = FileNameTransformer.Identity
-
-  /** Override this method if you need to provide additional [[scala.meta.Importer]]-s (import statements) to the generated Java file.
-   *
-   * @return if overriden - a transformer which adds [[scala.meta.Importer]]-s<br>
-   *         otherwise - the default transformer which does not add any<br>
-   */
-  def additionalImportersProvider(): AdditionalImportersProvider = AdditionalImportersProvider.Empty
-
-  /** Override this method if you need to exclude [[scala.meta.Importer]]-s (import statements) that exist in the Scala file,
-   * but do not belong in the generated Java file.<br>
-   * '''NOTE regarding precedence''': This predicate will be invoked before [[importerTransformer]]. This means that if
-   * this extension, or any other one, wishes to modify an importer that is excluded by this predicate -
-   * that modification will be ignored.
-   *
-   * @see [[ImporterExcludedPredicate]] for more information on how the framework will invoke this predicate.<br>
-   * @return if overriden - a transformer which excludes importers<br>
-   *         otherwise - the default transformer which does not exclude anything<br>
-   */
-  def importerExcludedPredicate(): ImporterExcludedPredicate = ImporterExcludedPredicate.None
-
-  /** Override this method if you need to modify an [[scala.meta.Importer]] (import statement).<br>
-   * '''NOTE regarding precedence''': This transformer will be invoked after [[importerTransformer]]. This means that if
-   * this extension, or any other one, excludes an importer that is modified by this transformer -
-   * the modification will be ignored.
-   *
-   * @see [[ImporterTransformer]] for more information on how the framework will invoke this predicate.
-   * @return if overriden - a transformer which modifies importers<br>
-   *         otherwise - the default transformer which doesn't change anything<br>
-   */
-  def importerTransformer(): ImporterTransformer = ImporterTransformer.Identity
-
-  /** Override this method if you need to transform a [[scala.meta.Defn.Class]].<br>
-   * NOTE that this transformer intended for manipulating the class declaration (e.g. name, visibility, annotations).<br>
-   * For manipulating the template part (parents, body) - override one of the other transformers instead.
-   *
-   * @return if overriden - a transformer which modifies a given class<br>
-   *         otherwise - the default transformer which doesn't change anything<br>
-   */
-  def classTransformer(): ClassTransformer = ClassTransformer.Identity
-
-  /** Override this method if you need to exclude [[scala.meta.Init]]-s (parents) of a class/trait/object in the corresponding Java type.<br>
-   *
-   * @return if overriden - a predicate which determines whether to exclude a [[scala.meta.Init]]<br>
-   *         otherwise - the default predicate which doesn't exclude anything<br>
-   */
-  def templateInitExcludedPredicate(): TemplateInitExcludedPredicate = TemplateInitExcludedPredicate.None
-
-  /** Override this method if you need to transform a [[scala.meta.Defn.Val]] (`val`, immutable variable definition).<br>
-   *
-   * @return if overriden - a transformer which transforms a [[scala.meta.Defn.Val]]<br>
-   *         otherwise - the default transformer which doesn't modify anything<br>
-   */
-  def defnValTransformer(): DefnValTransformer = DefnValTransformer.Identity
-
-  /** Override this method if you need to transform a [[scala.meta.Defn.Val]] (`val` definition) into a
-   * [[scala.meta.Decl.Var]] (`var` declaration).<br>
-   * @see [[DefnValToDeclVarTransformer]] for a usage example.
-   *
-   * @return if overriden - a transformer which transforms a [[scala.meta.Defn.Val]] into a [[scala.meta.Decl.Var]] where applicable<br>
-   *         otherwise - the default transformer which never transforms (returns `None`)<br>
-   */
-  def defnValToDeclVarTransformer(): DefnValToDeclVarTransformer = DefnValToDeclVarTransformer.Empty
-
-  /** Override this method if you need to modify a [[scala.meta.Defn.Def]] (method definition)
-   *
-   * @return if overriden - a transformer which modifies a given [[scala.meta.Defn.Def]]<br>
-   *         otherwise - the default transformer which doesn't modify anything<br>
-   */
-  def defnDefTransformer(): DefnDefTransformer = DefnDefTransformer.Identity
-
-  /** Override this method if you need to apply custom logic for inferring the type of a [[scala.meta.Term.ApplyType]] (parameterized type application).<br>
-   * If the inferrers of all the extensions return `None`, the tool will default to the core logic as follows:<br>
-   * It first checks the type of the `fun` part, and then (if resolved) appends the type argument.<br>
-   * For example, if the input is `foo[T]` and `foo` is of type `Foo`, then the inferred type will be `Foo[T]`
-   *
-   *
-   * @return if overriden - an inferrer which attempts to infer the type of a [[scala.meta.Term.ApplyType]]
-   *         otherwise - the empty inferrer which always returns `None` (could not be inferred)
-   */
-  def applyTypeTypeInferrer(): ApplyTypeTypeInferrer = ApplyTypeTypeInferrer.Empty
-
-  /** Override this method if you need to transform a [[scala.meta.Term.ApplyType]] (parameterized type application) into a
-   * [[scala.meta.Term.Apply]] (method invocation).<br>
-   * @see [[TermApplyTypeToTermApplyTransformer]] for a usage example.
-   *
-   * @return if overriden - a transformer which transforms a [[scala.meta.Term.ApplyType]] into a [[scala.meta.Term.Apply]] where applicable
-   *         otherwise - the default transformer which never transforms (returns `None`)
-   */
-  def termApplyTypeToTermApplyTransformer(): TermApplyTypeToTermApplyTransformer = TermApplyTypeToTermApplyTransformer.Empty
-
-  /** Override this method if you need to modify a [[scala.meta.Term.Apply]] (method invocation)
-   *
-   * @return if overriden - a transformer which modifies a given [[scala.meta.Term.Apply]]<br>
-   *         otherwise - the default transformer which doesn't modify anything<br>
-   */
-  def termApplyTransformer(): TermApplyTransformer = TermApplyTransformer.Identity
-
-  /** Override this method if you need to modify a [[scala.meta.Term.Select]] (qualified name).<br>
-   * Note: This can be a multi-purpose transformer as qualified names can appear in various language elements such as:
-   *   - imports
-   *   - method invocations
-   *   - inner member selections
-   *   - others...
-   *
-   * @return if overriden - a transformer which modifies a given [[scala.meta.Term.Select]]<br>
-   *         otherwise - the default transformer which doesn't modify anything<br>
-   */
-  def termSelectTransformer(): TermSelectTransformer = TermSelectTransformer.Identity
-
-  /** Override this method if you need to transform a Scala type name into an equivalent Java one
-   *
-   * @return if overriden - a transformer which changes the type name<br>
-   *         otherwise - the default which leaves the type name unchanged<br>
-   */
-  def typeNameTransformer(): TypeNameTransformer = TypeNameTransformer.Identity
 }

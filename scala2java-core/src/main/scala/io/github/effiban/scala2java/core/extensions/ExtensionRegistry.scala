@@ -8,15 +8,21 @@ import io.github.effiban.scala2java.spi.typeinferrers.ApplyTypeTypeInferrer
 
 case class ExtensionRegistry(extensions: List[Scala2JavaExtension] = Nil) {
 
-  val fileNameTransformers: List[FileNameTransformer] = extensions.map(_.fileNameTransformer())
-
-  val additionalImportersProviders: List[AdditionalImportersProvider] = extensions.map(_.additionalImportersProvider())
+  // --- PREDICATES --- //
 
   val importerExcludedPredicates: List[ImporterExcludedPredicate] = extensions.map(_.importerExcludedPredicate())
 
-  val importerTransformers: List[ImporterTransformer] = extensions.map(_.importerTransformer())
-
   val templateInitExcludedPredicates: List[TemplateInitExcludedPredicate] = extensions.map(_.templateInitExcludedPredicate())
+
+  // --- PROVIDERS --- //
+
+  val additionalImportersProviders: List[AdditionalImportersProvider] = extensions.map(_.additionalImportersProvider())
+
+  // --- TRANSFORMERS --- //
+
+  val fileNameTransformers: List[FileNameTransformer] = extensions.map(_.fileNameTransformer())
+
+  val importerTransformers: List[ImporterTransformer] = extensions.map(_.importerTransformer())
 
   val classTransformers: List[ClassTransformer] = extensions.map(_.classTransformer())
 
@@ -26,8 +32,6 @@ case class ExtensionRegistry(extensions: List[Scala2JavaExtension] = Nil) {
 
   val defnDefTransformers: List[DefnDefTransformer] = extensions.map(_.defnDefTransformer())
 
-  val applyTypeTypeInferrers: List[ApplyTypeTypeInferrer] = extensions.map(_.applyTypeTypeInferrer())
-
   val termApplyTypeToTermApplyTransformers: List[TermApplyTypeToTermApplyTransformer] =
     extensions.map(_.termApplyTypeToTermApplyTransformer())
 
@@ -36,4 +40,8 @@ case class ExtensionRegistry(extensions: List[Scala2JavaExtension] = Nil) {
   val termSelectTransformers: List[TermSelectTransformer] = extensions.map(_.termSelectTransformer())
 
   val typeNameTransformers: List[TypeNameTransformer] = extensions.map(_.typeNameTransformer())
+
+  // --- TYPE INFERRERS --- //
+
+  val applyTypeTypeInferrers: List[ApplyTypeTypeInferrer] = extensions.map(_.applyTypeTypeInferrer())
 }

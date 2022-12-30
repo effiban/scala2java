@@ -5,6 +5,7 @@ import io.github.effiban.scala2java.spi.Scala2JavaExtension
 import io.github.effiban.scala2java.spi.predicates.{ImporterExcludedPredicate, TemplateInitExcludedPredicate}
 import io.github.effiban.scala2java.spi.providers.AdditionalImportersProvider
 import io.github.effiban.scala2java.spi.transformers._
+import io.github.effiban.scala2java.spi.typeinferrers.ApplyTypeTypeInferrer
 
 class ExtensionRegistryTest extends UnitTestSuite {
 
@@ -12,18 +13,35 @@ class ExtensionRegistryTest extends UnitTestSuite {
   private val extension2 = mock[Scala2JavaExtension]
   private val extensions = List(extension1, extension2)
 
-  test("fileNameTransformers") {
-    val fileNameTransformer1 = mock[FileNameTransformer]
-    val fileNameTransformer2 = mock[FileNameTransformer]
-    val fileNameTransformers = List(fileNameTransformer1, fileNameTransformer2)
+  // --- PREDICATES --- //
 
-    when(extension1.fileNameTransformer()).thenReturn(fileNameTransformer1)
-    when(extension2.fileNameTransformer()).thenReturn(fileNameTransformer2)
+  test("importerExcludedPredicates") {
+    val importerExcludedPredicate1 = mock[ImporterExcludedPredicate]
+    val importerExcludedPredicate2 = mock[ImporterExcludedPredicate]
+    val importerExcludedPredicates = List(importerExcludedPredicate1, importerExcludedPredicate2)
+
+    when(extension1.importerExcludedPredicate()).thenReturn(importerExcludedPredicate1)
+    when(extension2.importerExcludedPredicate()).thenReturn(importerExcludedPredicate2)
 
     val extensionRegistry = ExtensionRegistry(extensions)
 
-    extensionRegistry.fileNameTransformers shouldBe fileNameTransformers
+    extensionRegistry.importerExcludedPredicates shouldBe importerExcludedPredicates
   }
+
+  test("templateInitExcludedPredicates") {
+    val templateInitExcludedPredicate1 = mock[TemplateInitExcludedPredicate]
+    val templateInitExcludedPredicate2 = mock[TemplateInitExcludedPredicate]
+    val templateInitExcludedPredicates = List(templateInitExcludedPredicate1, templateInitExcludedPredicate2)
+
+    when(extension1.templateInitExcludedPredicate()).thenReturn(templateInitExcludedPredicate1)
+    when(extension2.templateInitExcludedPredicate()).thenReturn(templateInitExcludedPredicate2)
+
+    val extensionRegistry = ExtensionRegistry(extensions)
+
+    extensionRegistry.templateInitExcludedPredicates shouldBe templateInitExcludedPredicates
+  }
+
+  // --- PROVIDERS --- //
 
   test("additionalImportersProviders") {
     val additionalImportersProvider1 = mock[AdditionalImportersProvider]
@@ -38,17 +56,19 @@ class ExtensionRegistryTest extends UnitTestSuite {
     extensionRegistry.additionalImportersProviders shouldBe additionalImportersProviders
   }
 
-  test("importerExcludedPredicates") {
-    val importerExcludedPredicate1 = mock[ImporterExcludedPredicate]
-    val importerExcludedPredicate2 = mock[ImporterExcludedPredicate]
-    val importerExcludedPredicates = List(importerExcludedPredicate1, importerExcludedPredicate2)
+  // --- TRANSFORMERS --- //
 
-    when(extension1.importerExcludedPredicate()).thenReturn(importerExcludedPredicate1)
-    when(extension2.importerExcludedPredicate()).thenReturn(importerExcludedPredicate2)
+  test("fileNameTransformers") {
+    val fileNameTransformer1 = mock[FileNameTransformer]
+    val fileNameTransformer2 = mock[FileNameTransformer]
+    val fileNameTransformers = List(fileNameTransformer1, fileNameTransformer2)
+
+    when(extension1.fileNameTransformer()).thenReturn(fileNameTransformer1)
+    when(extension2.fileNameTransformer()).thenReturn(fileNameTransformer2)
 
     val extensionRegistry = ExtensionRegistry(extensions)
 
-    extensionRegistry.importerExcludedPredicates shouldBe importerExcludedPredicates
+    extensionRegistry.fileNameTransformers shouldBe fileNameTransformers
   }
 
   test("importerTransformers") {
@@ -75,19 +95,6 @@ class ExtensionRegistryTest extends UnitTestSuite {
     val extensionRegistry = ExtensionRegistry(extensions)
 
     extensionRegistry.classTransformers shouldBe classTransformers
-  }
-
-  test("templateInitExcludedPredicates") {
-    val templateInitExcludedPredicate1 = mock[TemplateInitExcludedPredicate]
-    val templateInitExcludedPredicate2 = mock[TemplateInitExcludedPredicate]
-    val templateInitExcludedPredicates = List(templateInitExcludedPredicate1, templateInitExcludedPredicate2)
-
-    when(extension1.templateInitExcludedPredicate()).thenReturn(templateInitExcludedPredicate1)
-    when(extension2.templateInitExcludedPredicate()).thenReturn(templateInitExcludedPredicate2)
-
-    val extensionRegistry = ExtensionRegistry(extensions)
-
-    extensionRegistry.templateInitExcludedPredicates shouldBe templateInitExcludedPredicates
   }
 
   test("defnValTransformers") {
@@ -179,5 +186,20 @@ class ExtensionRegistryTest extends UnitTestSuite {
     val extensionRegistry = ExtensionRegistry(extensions)
 
     extensionRegistry.typeNameTransformers shouldBe typeNameTransformers
+  }
+
+  // --- TYPE INFERRERS --- //
+
+  test("applyTypeTypeInferrers") {
+    val applyTypeTypeInferrer1 = mock[ApplyTypeTypeInferrer]
+    val applyTypeTypeInferrer2 = mock[ApplyTypeTypeInferrer]
+    val applyTypeTypeInferrers = List(applyTypeTypeInferrer1, applyTypeTypeInferrer2)
+
+    when(extension1.applyTypeTypeInferrer()).thenReturn(applyTypeTypeInferrer1)
+    when(extension2.applyTypeTypeInferrer()).thenReturn(applyTypeTypeInferrer2)
+
+    val extensionRegistry = ExtensionRegistry(extensions)
+
+    extensionRegistry.applyTypeTypeInferrers shouldBe applyTypeTypeInferrers
   }
 }
