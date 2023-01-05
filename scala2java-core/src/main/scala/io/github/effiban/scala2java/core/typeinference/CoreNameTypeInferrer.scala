@@ -1,13 +1,11 @@
 package io.github.effiban.scala2java.core.typeinference
 
 import io.github.effiban.scala2java.core.entities.{TermNameValues, TypeNameValues}
-import io.github.effiban.scala2java.spi.typeinferrers.TypeInferrer
+import io.github.effiban.scala2java.spi.typeinferrers.NameTypeInferrer
 
 import scala.meta.{Term, Type}
 
-trait NameTypeInferrer extends TypeInferrer[Term.Name]
-
-object NameTypeInferrer extends NameTypeInferrer {
+object CoreNameTypeInferrer extends NameTypeInferrer {
 
   override def infer(termName: Term.Name): Option[Type] = {
     termName match {
