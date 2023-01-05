@@ -46,7 +46,7 @@ class TypeInferrers(classifiers: => Classifiers)(implicit extensionRegistry: Ext
     caseListTypeInferrer,
     ifTypeInferrer,
     LitTypeInferrer,
-    NameTypeInferrer,
+    new CompositeNameTypeInferrer(CoreNameTypeInferrer),
     SelectTypeInferrer,
     tryTypeInferrer,
     tryWithHandlerTypeInferrer,
