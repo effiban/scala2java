@@ -1,11 +1,11 @@
 package io.github.effiban.scala2java.core.typeinference
 
-import io.github.effiban.scala2java.spi.typeinferrers.TypeInferrer
+import io.github.effiban.scala2java.spi.typeinferrers.TypeInferrer0
 
 import scala.meta.Term.Try
 import scala.meta.Type
 
-trait TryTypeInferrer extends TypeInferrer[Try]
+trait TryTypeInferrer extends TypeInferrer0[Try]
 
 private[typeinference] class TryTypeInferrerImpl(termTypeInferrer: => TermTypeInferrer,
                                                  caseListTypeInferrer: => CaseListTypeInferrer,

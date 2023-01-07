@@ -6,8 +6,8 @@ import io.github.effiban.scala2java.core.entities.ListTraversalOptions
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
-import io.github.effiban.scala2java.core.typeinference.ScalarArgListTypeInferrer
-import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
+import io.github.effiban.scala2java.core.typeinference.{CompositeCollectiveTypeInferrer, TermTypeInferrer}
+import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.{eqOptionTreeList, eqTreeList}
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchers
 
@@ -20,13 +20,15 @@ class ArrayInitializerTraverserImplTest extends UnitTestSuite {
   private val typeTraverser = mock[TypeTraverser]
   private val termTraverser = mock[TermTraverser]
   private val argumentListTraverser = mock[ArgumentListTraverser]
-  private val scalarArgListTypeInferrer = mock[ScalarArgListTypeInferrer]
+  private val termTypeInferrer = mock[TermTypeInferrer]
+  private val compositeCollectiveTypeInferrer = mock[CompositeCollectiveTypeInferrer]
 
   private val arrayInitializerTraverser = new ArrayInitializerTraverserImpl(
     typeTraverser,
     termTraverser,
     argumentListTraverser,
-    scalarArgListTypeInferrer
+    termTypeInferrer,
+    compositeCollectiveTypeInferrer
   )
 
   test("traverseWithValues() when has type and values") {
@@ -64,9 +66,11 @@ class ArrayInitializerTraverserImplTest extends UnitTestSuite {
 
   test("traverseWithValues() when has no type but has values") {
     val values = List(Lit.String("a"), Lit.String("b"))
+    val maybeTypes = List(Some(TypeNames.String), Some(TypeNames.String))
     val context = ArrayInitializerValuesContext(values = values)
 
-    when(scalarArgListTypeInferrer.infer(eqTreeList(values))).thenReturn(TypeNames.String)
+    values.foreach(value => when(termTypeInferrer.infer(value)).thenReturn(Some(TypeNames.String)))
+    when(compositeCollectiveTypeInferrer.infer(eqOptionTreeList(maybeTypes))).thenReturn(TypeNames.String)
     doWrite("String").when(typeTraverser).traverse(eqTree(TypeNames.String))
     doWrite("""{ "a", "b" }""").when(argumentListTraverser).traverse(
       eqTreeList(values),

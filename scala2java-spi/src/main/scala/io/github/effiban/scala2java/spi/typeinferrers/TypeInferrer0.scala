@@ -2,8 +2,12 @@ package io.github.effiban.scala2java.spi.typeinferrers
 
 import scala.meta.Type
 
-/** An inferrer which attempts to infer the type of a Scala language element when not explicitly provided */
-trait TypeInferrer[T] {
+/** An inferrer which attempts to infer the type of a Scala language element when not explicitly provided.<br>
+ * Its only input is the element to be inferred.
+ *
+ * @tparam T the type of element to be inferred
+ */
+trait TypeInferrer0[T] {
 
   /** Attempts to infer the type of the given object, which is usually a subtype of [[scala.meta.Term]]
    *

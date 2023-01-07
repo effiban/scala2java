@@ -1,11 +1,11 @@
 package io.github.effiban.scala2java.core.typeinference
 
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.spi.typeinferrers.TypeInferrer
+import io.github.effiban.scala2java.spi.typeinferrers.TypeInferrer0
 
 import scala.meta.Type
 
-class CompositeCoreAndOthersTypeInferrerTest extends UnitTestSuite {
+class CompositeWithCoreTypeInferrer0Test extends UnitTestSuite {
 
   private val TheTestObj = TestObj("bla")
   private val TheType = Type.Name("MyType")
@@ -99,11 +99,11 @@ class CompositeCoreAndOthersTypeInferrerTest extends UnitTestSuite {
 
   private case class TestObj(name: String)
 
-  private sealed trait TestObjTypeInferrer extends TypeInferrer[TestObj]
+  private sealed trait TestObjTypeInferrer extends TypeInferrer0[TestObj]
 
   private class CompositeTestObjTypeInferrer(theCoreInferrer: => TestObjTypeInferrer,
                                              override protected val otherInferrers: List[TestObjTypeInferrer] = Nil)
-    extends CompositeCoreAndOthersTypeInferrer[TestObj] with TestObjTypeInferrer {
-    override protected def coreInferrer(): TypeInferrer[TestObj] = theCoreInferrer
+    extends CompositeWithCoreTypeInferrer0[TestObj] with TestObjTypeInferrer {
+    override protected def coreInferrer(): TypeInferrer0[TestObj] = theCoreInferrer
   }
 }

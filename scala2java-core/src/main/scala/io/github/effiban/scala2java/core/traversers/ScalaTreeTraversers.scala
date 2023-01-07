@@ -12,7 +12,7 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 
 class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: ExtensionRegistry) {
 
-  private implicit lazy val typeInferrers: TypeInferrers = new TypeInferrers(classifiers)
+  private implicit lazy val typeInferrers: TypeInferrers = new TypeInferrers()
   private implicit lazy val classifiers: Classifiers = new Classifiers(typeInferrers)
   private lazy val resolvers = new Resolvers()
 
@@ -45,7 +45,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     typeTraverser,
     termTraverser,
     argumentListTraverser,
-    scalarArgListTypeInferrer
+    termTypeInferrer,
+    compositeCollectiveTypeInferrer
   )
 
   private lazy val ascribeTraverser: AscribeTraverser = new AscribeTraverserImpl(typeTraverser, termTraverser)

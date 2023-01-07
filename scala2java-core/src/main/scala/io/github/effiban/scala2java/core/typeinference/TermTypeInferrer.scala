@@ -1,13 +1,14 @@
 package io.github.effiban.scala2java.core.typeinference
 
-import io.github.effiban.scala2java.spi.typeinferrers.{ApplyTypeInferrer, ApplyTypeTypeInferrer, NameTypeInferrer, TypeInferrer}
+import io.github.effiban.scala2java.spi.typeinferrers.{ApplyTypeInferrer, ApplyTypeTypeInferrer, NameTypeInferrer, TypeInferrer0}
 
 import scala.meta.Term.{Annotate, ApplyType, Ascribe, Assign, Block, Do, For, ForYield, If, New, Return, Throw, Try, TryWithHandler, While}
 import scala.meta.{Lit, Term, Type}
 
-trait TermTypeInferrer extends TypeInferrer[Term]
+trait TermTypeInferrer extends TypeInferrer0[Term]
 
-private[typeinference] class TermTypeInferrerImpl(applyTypeInferrer: => ApplyTypeInferrer,
+private[typeinference] class TermTypeInferrerImpl(applyInfixTypeInferrer: => ApplyInfixTypeInferrer,
+                                                  applyTypeInferrer: => ApplyTypeInferrer,
                                                   applyTypeTypeInferrer: => ApplyTypeTypeInferrer,
                                                   blockTypeInferrer: => BlockTypeInferrer,
                                                   caseListTypeInferrer: => CaseListTypeInferrer,
@@ -22,7 +23,8 @@ private[typeinference] class TermTypeInferrerImpl(applyTypeInferrer: => ApplyTyp
   override def infer(term: Term): Option[Type] = {
     term match {
       case _: Annotate => Some(Type.AnonymousName())
-      case apply: Term.Apply => applyTypeInferrer.infer(apply)
+      case apply: Term.Apply => inferApply(apply)
+      case applyInfix: Term.ApplyInfix => applyInfixTypeInferrer.infer(applyInfix)
       case applyType: ApplyType => applyTypeTypeInferrer.infer(applyType)
       case ascribe: Ascribe => Some(ascribe.tpe)
       case assign: Assign => infer(assign.rhs)
@@ -47,6 +49,10 @@ private[typeinference] class TermTypeInferrerImpl(applyTypeInferrer: => ApplyTyp
       // TODO - support NewAnonymous, Function, PartialFunction
       case _ => None
     }
+  }
+
+  private def inferApply(apply: Term.Apply) = {
+    applyTypeInferrer.infer(apply, apply.args.map(infer))
   }
 
   private def inferRepeated(repeated: Term.Repeated): Option[Type] = {

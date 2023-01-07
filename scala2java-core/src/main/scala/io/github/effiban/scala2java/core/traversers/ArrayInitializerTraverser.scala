@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.contexts.{ArrayInitializerSizeContext, 
 import io.github.effiban.scala2java.core.entities.EnclosingDelimiter.{CurlyBrace, SquareBracket}
 import io.github.effiban.scala2java.core.entities.JavaKeyword.New
 import io.github.effiban.scala2java.core.entities.{JavaKeyword, ListTraversalOptions, TypeNameValues}
-import io.github.effiban.scala2java.core.typeinference.ScalarArgListTypeInferrer
+import io.github.effiban.scala2java.core.typeinference.{CompositeCollectiveTypeInferrer, TermTypeInferrer}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.{Term, Type}
@@ -18,7 +18,8 @@ trait ArrayInitializerTraverser {
 private[traversers] class ArrayInitializerTraverserImpl(typeTraverser: => TypeTraverser,
                                                         termTraverser: => TermTraverser,
                                                         argumentListTraverser: => ArgumentListTraverser,
-                                                        scalarArgListTypeInferrer: ScalarArgListTypeInferrer)
+                                                        termTypeInferrer: => TermTypeInferrer,
+                                                        compositeCollectiveTypeInferrer: => CompositeCollectiveTypeInferrer)
                                                        (implicit javaWriter: JavaWriter) extends ArrayInitializerTraverser {
 
   import javaWriter._
@@ -52,7 +53,7 @@ private[traversers] class ArrayInitializerTraverserImpl(typeTraverser: => TypeTr
     (maybeType, values) match {
       case (Some(tpe), _) => tpe
       case (None, Nil) => Type.Name(TypeNameValues.ScalaAny)
-      case (None, values) => scalarArgListTypeInferrer.infer(values)
+      case (None, values) => compositeCollectiveTypeInferrer.infer(values.map(termTypeInferrer.infer))
     }
   }
 }

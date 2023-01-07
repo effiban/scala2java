@@ -1,10 +1,10 @@
 package io.github.effiban.scala2java.core.typeinference
 
-import io.github.effiban.scala2java.spi.typeinferrers.TypeInferrer
+import io.github.effiban.scala2java.spi.typeinferrers.TypeInferrer0
 
 import scala.meta.{Case, Type}
 
-trait CaseListTypeInferrer extends TypeInferrer[List[Case]]
+trait CaseListTypeInferrer extends TypeInferrer0[List[Case]]
 
 private[typeinference] class CaseListTypeInferrerImpl(caseTypeInferrer: => CaseTypeInferrer,
                                                       collectiveTypeInferrer: CollectiveTypeInferrer) extends CaseListTypeInferrer {
