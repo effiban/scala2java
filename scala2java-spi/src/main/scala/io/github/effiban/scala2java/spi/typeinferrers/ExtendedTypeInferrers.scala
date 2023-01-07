@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.spi.typeinferrers
 
 import io.github.effiban.scala2java.spi.Scala2JavaExtension
 
-/** A container for all extension provider hooks which are [[io.github.effiban.scala2java.spi.typeinferrers.TypeInferrer]]-s.<br>
+/** A container for all extension provider hooks which are type inferrers.<br>
  * '''NOTE regarding precedence''': Type inferrers are always invoked on the original Scala code before any transformers are invoked.
  *
  * @see [[Scala2JavaExtension]]

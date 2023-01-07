@@ -1,11 +1,11 @@
 package io.github.effiban.scala2java.core.typeinference
 
-import io.github.effiban.scala2java.spi.typeinferrers.TypeInferrer
+import io.github.effiban.scala2java.spi.typeinferrers.TypeInferrer0
 
 import scala.meta.Term.TryWithHandler
 import scala.meta.{Lit, Type}
 
-trait TryWithHandlerTypeInferrer extends TypeInferrer[TryWithHandler]
+trait TryWithHandlerTypeInferrer extends TypeInferrer0[TryWithHandler]
 
 private[typeinference] class TryWithHandlerTypeInferrerImpl(termTypeInferrer: => TermTypeInferrer,
                                                             collectiveTypeInferrer: CollectiveTypeInferrer) extends TryWithHandlerTypeInferrer {

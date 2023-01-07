@@ -3,16 +3,19 @@ package io.github.effiban.scala2java.core.typeinference
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.spi.typeinferrers.{ApplyTypeInferrer, ApplyTypeTypeInferrer, NameTypeInferrer}
-import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
+import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.{eqOptionTreeList, eqTreeList}
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
+import org.mockito.ArgumentMatchersSugar.any
 
 import scala.meta.Enumerator.Generator
 import scala.meta.Term.{Ascribe, Assign, Block, ForYield, If, Match, New}
-import scala.meta.{Case, Init, Lit, Name, Pat, Term, Type}
+import scala.meta.{Case, Init, Lit, Name, Pat, Term, Type, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 class TermTypeInferrerImplTest extends UnitTestSuite {
 
-  private val TheApply = Term.Apply(Term.Name("myMethod"), Nil)
+  private val ApplyArgNames = List(q"arg1", q"arg2")
+  private val ApplyArgTypes = List(t"type1", t"type2")
+  private val TheApply = Term.Apply(q"myMethod", ApplyArgNames)
 
   private val TheApplyType = Term.ApplyType(Term.Name("foo"), List(TypeNames.Int))
 
@@ -41,6 +44,7 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
   )
   private val MatchCases = List(MatchCase1, MatchCase2)
 
+  private val applyInfixTypeInferrer = mock[ApplyInfixTypeInferrer]
   private val applyTypeInferrer = mock[ApplyTypeInferrer]
   private val applyTypeTypeInferrer = mock[ApplyTypeTypeInferrer]
   private val caseListTypeInferrer = mock[CaseListTypeInferrer]
@@ -54,6 +58,7 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
   private val tupleTypeInferrer = mock[TupleTypeInferrer]
 
   private val termTypeInferrer = new TermTypeInferrerImpl(
+    applyInfixTypeInferrer,
     applyTypeInferrer,
     applyTypeTypeInferrer,
     blockTypeInferrer,
@@ -67,13 +72,15 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
     tupleTypeInferrer
   )
 
-  test("infer 'Apply' when 'ApplyTypeInferrer returns a result, should return it") {
-    when(applyTypeInferrer.infer(eqTree(TheApply))).thenReturn(Some(TypeNames.Int))
+  test("infer 'Apply' when 'ApplyTypeInferrer' returns a result, should return it") {
+    expectInferApplyArgTypes()
+    when(applyTypeInferrer.infer(eqTree(TheApply), eqOptionTreeList(ApplyArgTypes.map(Some(_))))).thenReturn(Some(TypeNames.Int))
     termTypeInferrer.infer(TheApply).value.structure shouldBe TypeNames.Int.structure
   }
 
-  test("infer 'Apply' when 'ApplyTypeInferrer returns None should return None") {
-    when(applyTypeInferrer.infer(eqTree(TheApply))).thenReturn(None)
+  test("infer 'Apply' when 'ApplyTypeInferrer' returns None should return None") {
+    expectInferApplyArgTypes()
+    when(applyTypeInferrer.infer(eqTree(TheApply), eqOptionTreeList(ApplyArgTypes.map(Some(_))))).thenReturn(None)
     termTypeInferrer.infer(TheApply) shouldBe None
   }
 
@@ -215,4 +222,12 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
     termTypeInferrer.infer(termTuple).value.structure shouldBe expectedTypeTuple.structure
   }
   // TODO complete the coverage
+
+  private def expectInferApplyArgTypes(): Unit = {
+    when(nameTypeInferrer.infer(any[Term.Name])).thenAnswer( (termName: Term.Name) => termName match {
+      case aTermName if aTermName.structure == ApplyArgNames.head.structure => Some(ApplyArgTypes.head)
+      case aTermName if aTermName.structure == ApplyArgNames(1).structure => Some(ApplyArgTypes(1))
+      case _ => None
+    })
+  }
 }

@@ -1,10 +1,11 @@
 package io.github.effiban.scala2java.core.typeinference
 
-import io.github.effiban.scala2java.core.classifiers.{Classifiers, TypeNameClassifier}
+import io.github.effiban.scala2java.core.classifiers.{TermApplyInfixClassifier, TypeNameClassifier}
 import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
-import io.github.effiban.scala2java.core.transformers.TermToTupleCaster
 
-class TypeInferrers(classifiers: => Classifiers)(implicit extensionRegistry: ExtensionRegistry) {
+class TypeInferrers(implicit extensionRegistry: ExtensionRegistry) {
+
+  private[typeinference] lazy val applyInfixTypeInferrer = new ApplyInfixTypeInferrerImpl(tupleTypeInferrer, TermApplyInfixClassifier)
 
   private[typeinference] lazy val applyTypeInferrer = new CompositeApplyTypeInferrer(coreApplyTypeInferrer)
 
@@ -18,29 +19,20 @@ class TypeInferrers(classifiers: => Classifiers)(implicit extensionRegistry: Ext
 
   private[typeinference] lazy val caseTypeInferrer = new CaseTypeInferrerImpl(termTypeInferrer)
 
-  private[typeinference] lazy val compositeArgListTypesInferrer = new CompositeArgListTypesInferrerImpl(
-    scalarArgListTypeInferrer,
-    tupleArgListTypesInferrer,
-    classifiers.termTypeClassifier,
-    TermToTupleCaster
-  )
+  lazy val compositeCollectiveTypeInferrer = new CompositeCollectiveTypeInferrerImpl(CollectiveTypeInferrer)
 
   private[typeinference] lazy val coreApplyTypeInferrer = new CoreApplyTypeInferrer(
     applyTypeTypeInferrer,
     termTypeInferrer,
-    compositeArgListTypesInferrer,
+    compositeCollectiveTypeInferrer,
     TypeNameClassifier
   )
 
   private[typeinference] lazy val ifTypeInferrer = new IfTypeInferrerImpl(termTypeInferrer)
 
-  lazy val scalarArgListTypeInferrer = new ScalarArgListTypeInferrerImpl(
-    termTypeInferrer,
-    CollectiveTypeInferrer
-  )
-
   lazy val termTypeInferrer: TermTypeInferrer = new TermTypeInferrerImpl(
-    coreApplyTypeInferrer,
+    applyInfixTypeInferrer,
+    applyTypeInferrer,
     applyTypeTypeInferrer,
     blockTypeInferrer,
     caseListTypeInferrer,
@@ -60,11 +52,6 @@ class TypeInferrers(classifiers: => Classifiers)(implicit extensionRegistry: Ext
   )
 
   private[typeinference] lazy val tryWithHandlerTypeInferrer = new TryWithHandlerTypeInferrerImpl(termTypeInferrer, CollectiveTypeInferrer)
-
-  private[typeinference] lazy val tupleArgListTypesInferrer = new TupleArgListTypesInferrerImpl(
-    tupleTypeInferrer,
-    CollectiveTypeInferrer
-  )
 
   private[typeinference] lazy val tupleTypeInferrer = new TupleTypeInferrerImpl(termTypeInferrer)
 }

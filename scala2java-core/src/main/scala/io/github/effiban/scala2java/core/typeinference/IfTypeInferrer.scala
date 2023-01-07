@@ -1,11 +1,11 @@
 package io.github.effiban.scala2java.core.typeinference
 
-import io.github.effiban.scala2java.spi.typeinferrers.TypeInferrer
+import io.github.effiban.scala2java.spi.typeinferrers.TypeInferrer0
 
 import scala.meta.Term.If
 import scala.meta.{Lit, Type}
 
-trait IfTypeInferrer extends TypeInferrer[If]
+trait IfTypeInferrer extends TypeInferrer0[If]
 
 private[typeinference] class IfTypeInferrerImpl(termTypeInferrer: => TermTypeInferrer) extends IfTypeInferrer {
 

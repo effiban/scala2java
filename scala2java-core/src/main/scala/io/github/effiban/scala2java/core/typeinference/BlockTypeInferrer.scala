@@ -1,11 +1,11 @@
 package io.github.effiban.scala2java.core.typeinference
 
-import io.github.effiban.scala2java.spi.typeinferrers.TypeInferrer
+import io.github.effiban.scala2java.spi.typeinferrers.TypeInferrer0
 
 import scala.meta.Term.Block
 import scala.meta.{Term, Type}
 
-trait BlockTypeInferrer extends TypeInferrer[Block]
+trait BlockTypeInferrer extends TypeInferrer0[Block]
 
 private[typeinference] class BlockTypeInferrerImpl(termTypeInferrer: TermTypeInferrer) extends BlockTypeInferrer {
 

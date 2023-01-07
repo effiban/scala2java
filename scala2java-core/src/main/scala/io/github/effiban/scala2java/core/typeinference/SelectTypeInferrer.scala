@@ -2,11 +2,11 @@ package io.github.effiban.scala2java.core.typeinference
 
 import io.github.effiban.scala2java.core.entities.TermNameValues.{Empty, ScalaInclusive}
 import io.github.effiban.scala2java.core.entities.{TermNameValues, TypeNameValues}
-import io.github.effiban.scala2java.spi.typeinferrers.TypeInferrer
+import io.github.effiban.scala2java.spi.typeinferrers.TypeInferrer0
 
 import scala.meta.{Term, Type}
 
-trait SelectTypeInferrer extends TypeInferrer[Term.Select]
+trait SelectTypeInferrer extends TypeInferrer0[Term.Select]
 
 object SelectTypeInferrer extends SelectTypeInferrer {
 
