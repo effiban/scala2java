@@ -1,9 +1,9 @@
 package io.github.effiban.scala2java.core.transformers
 
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.spi.transformers.DifferentTypeTransformer
+import io.github.effiban.scala2java.spi.transformers.DifferentTypeTransformer0
 
-class CompositeDifferentTypeTransformerTest extends UnitTestSuite {
+class CompositeDifferentTypeTransformer0Test extends UnitTestSuite {
 
   private val InputObj = TestInputObj("fun")
   private val OutputObj = TestOutputObj("fun")
@@ -42,12 +42,13 @@ class CompositeDifferentTypeTransformerTest extends UnitTestSuite {
   }
 
   private def compositeTransformer(transformers: List[TestInputToOutputObjTransformer] = Nil) = new CompositeTestInputToOutputObjTransformer(transformers)
+
+
+  private case class TestInputObj(name: String)
+  private case class TestOutputObj(name: String)
+
+  private sealed trait TestInputToOutputObjTransformer extends DifferentTypeTransformer0[TestInputObj, TestOutputObj]
+
+  private class CompositeTestInputToOutputObjTransformer(override protected val transformers: List[DifferentTypeTransformer0[TestInputObj, TestOutputObj]] = Nil)
+    extends CompositeDifferentTypeTransformer0[TestInputObj, TestOutputObj] with TestInputToOutputObjTransformer
 }
-
-private case class TestInputObj(name: String)
-private case class TestOutputObj(name: String)
-
-private sealed trait TestInputToOutputObjTransformer extends DifferentTypeTransformer[TestInputObj, TestOutputObj]
-
-private class CompositeTestInputToOutputObjTransformer(override protected val transformers: List[DifferentTypeTransformer[TestInputObj, TestOutputObj]] = Nil)
-  extends CompositeDifferentTypeTransformer[TestInputObj, TestOutputObj] with TestInputToOutputObjTransformer
