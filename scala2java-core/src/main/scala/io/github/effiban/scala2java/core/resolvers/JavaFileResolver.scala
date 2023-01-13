@@ -1,20 +1,24 @@
 package io.github.effiban.scala2java.core.resolvers
 
+import io.github.effiban.scala2java.core.collectors.SourceCollector
 import io.github.effiban.scala2java.spi.transformers.FileNameTransformer
 
 import java.io.File
 import java.nio.file.{Path, Paths}
+import scala.meta.{Init, Source}
 
 trait JavaFileResolver {
 
-  def resolve(scalaPath: Path, outputJavaBasePath: Path): File
+  def resolve(scalaPath: Path, scalaSource: Source, outputJavaBasePath: Path): File
 }
 
-class JavaFileResolverImpl(implicit fileNameTransformer: FileNameTransformer) extends JavaFileResolver {
+class JavaFileResolverImpl(mainClassInitsCollector: SourceCollector[Init])
+                          (implicit fileNameTransformer: FileNameTransformer) extends JavaFileResolver {
 
-  override def resolve(scalaPath: Path, outputJavaBasePath: Path): File = {
+  override def resolve(scalaPath: Path, scalaSource: Source, outputJavaBasePath: Path): File = {
     val baseFileName = scalaPath.getFileName.toString.stripSuffix(".scala")
-    val outputBaseFileName = fileNameTransformer.transform(baseFileName)
+    val scalaMainClassInits = mainClassInitsCollector.collect(scalaSource)
+    val outputBaseFileName = fileNameTransformer.transform(baseFileName, scalaMainClassInits)
     outputJavaBasePath.toFile.mkdirs()
     val javaFileName = s"$outputBaseFileName.java"
     Paths.get(outputJavaBasePath.toString, javaFileName).toFile
