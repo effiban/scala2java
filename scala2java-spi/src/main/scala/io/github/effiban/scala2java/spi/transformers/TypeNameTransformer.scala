@@ -3,7 +3,7 @@ package io.github.effiban.scala2java.spi.transformers
 import scala.meta.Type
 
 /** A transformer which can modify a given Scala [[Type.Name]] (e.g. name of class/trait) */
-trait TypeNameTransformer extends SameTypeTransformer[Type.Name]
+trait TypeNameTransformer extends SameTypeTransformer0[Type.Name]
 
 object TypeNameTransformer {
 

@@ -1,9 +1,9 @@
 package io.github.effiban.scala2java.core.transformers
 
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.spi.transformers.SameTypeTransformer
+import io.github.effiban.scala2java.spi.transformers.SameTypeTransformer0
 
-class CompositeSameTypeTransformerTest extends UnitTestSuite {
+class CompositeSameTypeTransformer0Test extends UnitTestSuite {
 
   private val InputObj = TestObj("input")
 
@@ -37,9 +37,9 @@ class CompositeSameTypeTransformerTest extends UnitTestSuite {
 
   private case class TestObj(name: String)
 
-  private sealed trait TestObjTransformer extends SameTypeTransformer[TestObj]
+  private sealed trait TestObjTransformer extends SameTypeTransformer0[TestObj]
 
-  private class CompositeTestObjTransformer(override protected val transformers: List[SameTypeTransformer[TestObj]] = Nil)
-    extends CompositeSameTypeTransformer[TestObj] with TestObjTransformer
+  private class CompositeTestObjTransformer(override protected val transformers: List[SameTypeTransformer0[TestObj]] = Nil)
+    extends CompositeSameTypeTransformer0[TestObj] with TestObjTransformer
 
 }

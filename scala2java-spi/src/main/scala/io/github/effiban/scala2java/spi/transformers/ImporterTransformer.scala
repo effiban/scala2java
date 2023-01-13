@@ -14,7 +14,7 @@ import scala.meta.Importer
  * Therefore, if the extension wishes to modify only `aaa.bbb.ccc` - it can simply check for it directly,
  * without worrying about having to extract it from a composite statement.
  */
-trait ImporterTransformer extends SameTypeTransformer[Importer]
+trait ImporterTransformer extends SameTypeTransformer0[Importer]
 
 object ImporterTransformer {
 

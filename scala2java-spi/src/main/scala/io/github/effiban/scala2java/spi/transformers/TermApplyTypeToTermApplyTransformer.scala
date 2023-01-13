@@ -10,7 +10,7 @@ import scala.meta.Term
  * while the corresponding Java code requires a method invocation with the class object, like this:
  * `mock(Foo.class)`
  */
-trait TermApplyTypeToTermApplyTransformer extends DifferentTypeTransformer[Term.ApplyType, Term.Apply]
+trait TermApplyTypeToTermApplyTransformer extends DifferentTypeTransformer0[Term.ApplyType, Term.Apply]
 
 object TermApplyTypeToTermApplyTransformer {
   /** The default transformer which returns `None`, indicating that no transformation is needed. */

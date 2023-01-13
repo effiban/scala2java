@@ -1,11 +1,11 @@
 package io.github.effiban.scala2java.spi.transformers
 
-/** A generic transformer between objects of different types.
+/** A generic transformer between objects of different types, with no additional arguments.
  *
  * @tparam I the type of input object
  * @tparam O the type of output object
  */
-trait DifferentTypeTransformer[I, O] {
+trait DifferentTypeTransformer0[I, O] {
 
   /** Transforms the input of type `I` into an output of type `O` when applicable.
    *
