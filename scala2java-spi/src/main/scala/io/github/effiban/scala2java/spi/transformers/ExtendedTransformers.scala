@@ -67,8 +67,17 @@ trait ExtendedTransformers {
    */
   def termApplyTypeToTermApplyTransformer(): TermApplyTypeToTermApplyTransformer = TermApplyTypeToTermApplyTransformer.Empty
 
+  /** Override this method if you need to transform a [[scala.meta.Term.Apply]] (method invocation) into a [[scala.meta.Defn.Class]] .<br>
+   * '''NOTE regarding precedence''': This transformer will be invoked before [[termApplyToDefnDefTransformer()]].
+   *
+   * @see [[TermApplyToClassTransformer]] for as usage example.
+   * @return if overriden - a transformer which transforms a [[scala.meta.Term.Apply]] into a [[scala.meta.Defn.Class]] where applicable<br>
+   *         otherwise - the default transformer which never transforms (returns `None`)
+   */
+  def termApplyToClassTransformer(): TermApplyToClassTransformer = TermApplyToClassTransformer.Empty
+
   /** Override this method if you need to transform a [[scala.meta.Term.Apply]] (method invocation) into a [[scala.meta.Defn.Def]] (method definition).<br>
-   * '''NOTE regarding precedence''': This transformer will be invoked before [[termApplyTransformer]].
+   * '''NOTE regarding precedence''': This transformer will be invoked after [[termApplyToClassTransformer]] but before [[termApplyTransformer]].
    *
    * @see [[TermApplyToDefnDefTransformer]] for as usage example.
    * @return if overriden - a transformer which transforms a [[scala.meta.Term.Apply]] into a [[scala.meta.Defn.Def]] where applicable<br>
@@ -76,7 +85,8 @@ trait ExtendedTransformers {
    */
   def termApplyToDefnDefTransformer(): TermApplyToDefnDefTransformer = TermApplyToDefnDefTransformer.Empty
 
-  /** Override this method if you need to modify a [[scala.meta.Term.Apply]] (method invocation)
+  /** Override this method if you need to modify a [[scala.meta.Term.Apply]] (method invocation).<br>
+   * '''NOTE regarding precedence''': This transformer will be invoked after all other transformers that try to change the type of the [[scala.meta.Term.Apply]]
    *
    * @return if overriden - a transformer which modifies a given [[scala.meta.Term.Apply]]<br>
    *         otherwise - the default transformer which doesn't modify anything<br>
