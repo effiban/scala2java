@@ -27,6 +27,7 @@ trait Scala2JavaExtension
     with ExtendedTransformers
     with ExtendedTypeInferrers {
 
+
   /** Indicates whether this extension should be applied if the given [[scala.meta.Term.Select]] (qualified name) appears in the Scala source file.<br>
    * The tool will invoke this method for every qualified name in the file, and if at least one returns `true` - the extension as a whole will be applied.
    *

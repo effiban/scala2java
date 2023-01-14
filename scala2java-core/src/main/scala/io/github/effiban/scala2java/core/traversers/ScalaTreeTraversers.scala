@@ -360,8 +360,10 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     termTraverser,
     arrayInitializerTraverser,
     invocationArgListTraverser,
+    classTraverser,
     defnDefTraverser,
     ArrayInitializerContextResolver,
+    new CompositeTermApplyToClassTransformer,
     new CompositeTermApplyToDefnDefTransformer,
     new CompositeTermApplyTransformer(CoreTermApplyTransformer)
   )
