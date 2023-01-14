@@ -67,6 +67,15 @@ trait ExtendedTransformers {
    */
   def termApplyTypeToTermApplyTransformer(): TermApplyTypeToTermApplyTransformer = TermApplyTypeToTermApplyTransformer.Empty
 
+  /** Override this method if you need to transform a [[scala.meta.Term.Apply]] (method invocation) into a [[scala.meta.Defn.Def]] (method definition).<br>
+   * '''NOTE regarding precedence''': This transformer will be invoked before [[termApplyTransformer]].
+   *
+   * @see [[TermApplyToDefnDefTransformer]] for as usage example.
+   * @return if overriden - a transformer which transforms a [[scala.meta.Term.Apply]] into a [[scala.meta.Defn.Def]] where applicable<br>
+   *         otherwise - the default transformer which never transforms (returns `None`)
+   */
+  def termApplyToDefnDefTransformer(): TermApplyToDefnDefTransformer = TermApplyToDefnDefTransformer.Empty
+
   /** Override this method if you need to modify a [[scala.meta.Term.Apply]] (method invocation)
    *
    * @return if overriden - a transformer which modifies a given [[scala.meta.Term.Apply]]<br>
