@@ -1,7 +1,8 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.classifiers.{Classifiers, DefnTypeClassifier, DefnValClassifier, JavaStatClassifier}
+import io.github.effiban.scala2java.core.classifiers.{Classifiers, DefnValClassifier, JavaStatClassifier}
 import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
+import io.github.effiban.scala2java.core.factories.TemplateChildContextFactory
 import io.github.effiban.scala2java.core.orderings.JavaTemplateChildOrdering
 import io.github.effiban.scala2java.core.predicates.{CompositeImporterExcludedPredicate, CompositeTemplateInitExcludedPredicate, CoreImporterExcludedPredicate, CoreTemplateInitExcludedPredicate}
 import io.github.effiban.scala2java.core.providers.{CompositeAdditionalImportersProvider, CoreAdditionalImportersProvider}
@@ -322,6 +323,18 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val superTraverser: SuperTraverser = new SuperTraverserImpl(nameTraverser)
 
+  private lazy val templateBodyTraverser: TemplateBodyTraverser = new TemplateBodyTraverserImpl(
+    templateChildrenTraverser,
+    new TemplateStatTransformerImpl(new CompositeTemplateTermApplyToDefnTransformer),
+    TemplateChildrenResolver,
+    TemplateChildContextFactory
+  )
+
+  private lazy val templateChildrenTraverser: TemplateChildrenTraverser = new TemplateChildrenTraverserImpl(
+    templateChildTraverser,
+    JavaTemplateChildOrdering
+  )
+
   private lazy val templateChildTraverser: TemplateChildTraverser = new TemplateChildTraverserImpl(
     ctorPrimaryTraverser,
     ctorSecondaryTraverser,
@@ -329,12 +342,6 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     statTraverser,
     DefnValClassifier,
     JavaStatClassifier
-  )
-
-  private lazy val templateBodyTraverser: TemplateBodyTraverser = new TemplateBodyTraverserImpl(
-    templateChildTraverser,
-    DefnTypeClassifier,
-    JavaTemplateChildOrdering
   )
 
   private lazy val templateTraverser: TemplateTraverser = new TemplateTraverserImpl(
@@ -360,11 +367,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     termTraverser,
     arrayInitializerTraverser,
     invocationArgListTraverser,
-    classTraverser,
-    defnDefTraverser,
     ArrayInitializerContextResolver,
-    new CompositeTermApplyToClassTransformer,
-    new CompositeTermApplyToDefnDefTransformer,
     new CompositeTermApplyTransformer(CoreTermApplyTransformer)
   )
 

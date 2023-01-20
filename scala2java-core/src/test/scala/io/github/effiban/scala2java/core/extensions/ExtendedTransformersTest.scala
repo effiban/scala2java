@@ -49,6 +49,19 @@ class ExtendedTransformersTest extends UnitTestSuite {
     extensionRegistry.classTransformers shouldBe classTransformers
   }
 
+  test("templateTermApplyToDefnTransformers") {
+    val templateTermApplyToDefnTransformer1 = mock[TemplateTermApplyToDefnTransformer]
+    val templateTermApplyToDefnTransformer2 = mock[TemplateTermApplyToDefnTransformer]
+    val templateTermApplyToDefnTransformers = List(templateTermApplyToDefnTransformer1, templateTermApplyToDefnTransformer2)
+
+    when(extension1.templateTermApplyToDefnTransformer()).thenReturn(templateTermApplyToDefnTransformer1)
+    when(extension2.templateTermApplyToDefnTransformer()).thenReturn(templateTermApplyToDefnTransformer2)
+
+    val extensionRegistry = ExtensionRegistry(extensions)
+
+    extensionRegistry.templateTermApplyToDefnTransformers shouldBe templateTermApplyToDefnTransformers
+  }
+
   test("defnValTransformers") {
     val defnValTransformer1 = mock[DefnValTransformer]
     val defnValTransformer2 = mock[DefnValTransformer]
@@ -99,32 +112,6 @@ class ExtendedTransformersTest extends UnitTestSuite {
     val extensionRegistry = ExtensionRegistry(extensions)
 
     extensionRegistry.termApplyTypeToTermApplyTransformers shouldBe termApplyTypeToTermApplyTransformers
-  }
-
-  test("termApplyToClassTransformers") {
-    val termApplyToClassTransformer1 = mock[TermApplyToClassTransformer]
-    val termApplyToClassTransformer2 = mock[TermApplyToClassTransformer]
-    val termApplyToClassTransformers = List(termApplyToClassTransformer1, termApplyToClassTransformer2)
-
-    when(extension1.termApplyToClassTransformer()).thenReturn(termApplyToClassTransformer1)
-    when(extension2.termApplyToClassTransformer()).thenReturn(termApplyToClassTransformer2)
-
-    val extensionRegistry = ExtensionRegistry(extensions)
-
-    extensionRegistry.termApplyToClassTransformers shouldBe termApplyToClassTransformers
-  }
-
-  test("termApplyToDefnDefTransformers") {
-    val termApplyToDefnDefTransformer1 = mock[TermApplyToDefnDefTransformer]
-    val termApplyToDefnDefTransformer2 = mock[TermApplyToDefnDefTransformer]
-    val termApplyToDefnDefTransformers = List(termApplyToDefnDefTransformer1, termApplyToDefnDefTransformer2)
-
-    when(extension1.termApplyToDefnDefTransformer()).thenReturn(termApplyToDefnDefTransformer1)
-    when(extension2.termApplyToDefnDefTransformer()).thenReturn(termApplyToDefnDefTransformer2)
-
-    val extensionRegistry = ExtensionRegistry(extensions)
-
-    extensionRegistry.termApplyToDefnDefTransformers shouldBe termApplyToDefnDefTransformers
   }
 
   test("termApplyTransformers") {
