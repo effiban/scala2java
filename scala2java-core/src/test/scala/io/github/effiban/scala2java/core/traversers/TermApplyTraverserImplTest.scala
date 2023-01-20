@@ -1,40 +1,30 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.{ArrayInitializerValuesContext, ClassOrTraitContext, DefnDefContext, InvocationArgListContext}
+import io.github.effiban.scala2java.core.contexts.{ArrayInitializerValuesContext, InvocationArgListContext}
 import io.github.effiban.scala2java.core.matchers.ArrayInitializerValuesContextMockitoMatcher.eqArrayInitializerValuesContext
-import io.github.effiban.scala2java.core.matchers.ClassOrTraitContextMatcher.eqClassOrTraitContext
-import io.github.effiban.scala2java.core.matchers.DefnDefContextMatcher.eqDefnDefContext
 import io.github.effiban.scala2java.core.resolvers.ArrayInitializerContextResolver
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{TermNames, TypeNames}
-import io.github.effiban.scala2java.spi.transformers.{TermApplyToClassTransformer, TermApplyToDefnDefTransformer, TermApplyTransformer}
+import io.github.effiban.scala2java.spi.transformers.TermApplyTransformer
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchers
 
-import scala.meta.{Lit, Term, XtensionQuasiquoteTerm}
+import scala.meta.{Lit, Term}
 
 class TermApplyTraverserImplTest extends UnitTestSuite {
   private val termTraverser = mock[TermTraverser]
   private val arrayInitializerTraverser = mock[ArrayInitializerTraverser]
   private val invocationArgListTraverser = mock[InvocationArgListTraverser]
-  private val classTraverser = mock[ClassTraverser]
-  private val defnDefTraverser = mock[DefnDefTraverser]
   private val arrayInitializerContextResolver = mock[ArrayInitializerContextResolver]
-  private val termApplyToClassTransformer = mock[TermApplyToClassTransformer]
-  private val termApplyToDefnDefTransformer = mock[TermApplyToDefnDefTransformer]
   private val termApplyTransformer = mock[TermApplyTransformer]
 
   private val termApplyTraverser = new TermApplyTraverserImpl(
     termTraverser,
     arrayInitializerTraverser,
     invocationArgListTraverser,
-    classTraverser,
-    defnDefTraverser,
     arrayInitializerContextResolver,
-    termApplyToClassTransformer,
-    termApplyToDefnDefTransformer,
     termApplyTransformer
   )
 
@@ -49,8 +39,6 @@ class TermApplyTraverserImplTest extends UnitTestSuite {
     )
 
     when(arrayInitializerContextResolver.tryResolve(eqTree(scalaTermApply))).thenReturn(None)
-    when(termApplyToClassTransformer.transform(eqTree(scalaTermApply))).thenReturn(None)
-    when(termApplyToDefnDefTransformer.transform(eqTree(scalaTermApply))).thenReturn(None)
     when(termApplyTransformer.transform(eqTree(scalaTermApply))).thenReturn(javaTermApply)
 
     doWrite("myJavaMethod").when(termTraverser).traverse(eqTree(javaTermApply.fun))
@@ -79,96 +67,5 @@ class TermApplyTraverserImplTest extends UnitTestSuite {
     termApplyTraverser.traverse(termApply)
 
     verify(arrayInitializerTraverser).traverseWithValues(eqArrayInitializerValuesContext(expectedContext))
-  }
-
-  test("traverse() a method invocation that is transformed into a class") {
-    val termApply =
-      q"""
-      describe("my process") {
-        it("should start") {
-          assertStarts()
-        }
-      }
-      """
-
-    val cls =
-      q"""
-      @Nested
-      class MyProcess {
-
-        @Test
-        def shouldStart(): Unit = {
-          assertStarts()
-        }
-      }
-      """
-
-    when(arrayInitializerContextResolver.tryResolve(eqTree(termApply))).thenReturn(None)
-    when(termApplyToClassTransformer.transform(eqTree(termApply))).thenReturn(Some(cls))
-    doWrite(
-      """
-        |@Nested
-        |class MyProcess {
-        |
-        |  @Test
-        |  void shouldStart() {
-        |    assertStarts()
-        |  }
-        |}
-        |""".stripMargin)
-      .when(classTraverser).traverse(eqTree(cls), eqClassOrTraitContext(ClassOrTraitContext()))
-
-    termApplyTraverser.traverse(termApply)
-
-    outputWriter.toString shouldBe
-      """
-        |@Nested
-        |class MyProcess {
-        |
-        |  @Test
-        |  void shouldStart() {
-        |    assertStarts()
-        |  }
-        |}
-        |""".stripMargin
-  }
-
-  test("traverse() a method invocation that is transformed into a method definition") {
-    val termApply =
-      q"""
-      test("myTest") {
-        checkSomething()
-      }
-      """
-
-    val defnDef =
-      q"""
-      @Test
-      def myTest(): Unit = {
-        checkSomething()
-      }
-      """
-
-    when(arrayInitializerContextResolver.tryResolve(eqTree(termApply))).thenReturn(None)
-    when(termApplyToClassTransformer.transform(eqTree(termApply))).thenReturn(None)
-    when(termApplyToDefnDefTransformer.transform(eqTree(termApply))).thenReturn(Some(defnDef))
-    doWrite(
-      """
-        |@Test
-        |public void myTest() {
-        |    checkSomething();
-        |}
-        |""".stripMargin)
-      .when(defnDefTraverser).traverse(eqTree(defnDef), eqDefnDefContext(DefnDefContext()))
-
-    termApplyTraverser.traverse(termApply)
-
-    outputWriter.toString shouldBe
-      """
-        |@Test
-        |public void myTest() {
-        |    checkSomething();
-        |}
-        |""".stripMargin
   }
 }

@@ -2,18 +2,23 @@ package io.github.effiban.scala2java.core.matchers
 
 import io.github.effiban.scala2java.core.contexts.TemplateChildContext
 import io.github.effiban.scala2java.test.utils.matchers.{ListMatcher, OptionMatcher, TreeMatcher}
-import org.mockito.ArgumentMatcher
-import org.mockito.ArgumentMatchers.argThat
+import org.scalatest.matchers.{MatchResult, Matcher}
 
 import scala.meta.{Init, Term, Type}
 
-class TemplateChildContextMatcher(expectedContext: TemplateChildContext) extends ArgumentMatcher[TemplateChildContext] {
+class TemplateChildContextScalatestMatcher(expectedContext: TemplateChildContext) extends Matcher[TemplateChildContext] {
 
-  override def matches(actualContext: TemplateChildContext): Boolean = {
-    actualContext.javaScope == expectedContext.javaScope &&
+  override def apply(actualContext: TemplateChildContext): MatchResult = {
+
+    val matches = actualContext.javaScope == expectedContext.javaScope &&
       maybeClassNameMatches(actualContext) &&
       initsMatch(actualContext) &&
       ctorTermsMatch(actualContext)
+
+    MatchResult(matches,
+      s"Actual context: $actualContext is NOT the same as expected context: $expectedContext",
+      s"Actual context: $actualContext the same as expected context: $expectedContext"
+    )
   }
 
   private def maybeClassNameMatches(actualContext: TemplateChildContext) = {
@@ -27,12 +32,10 @@ class TemplateChildContextMatcher(expectedContext: TemplateChildContext) extends
   private def ctorTermsMatch(actualCtorContext: TemplateChildContext) = {
     new ListMatcher(expectedContext.ctorTerms, new TreeMatcher[Term](_)).matches(actualCtorContext.ctorTerms)
   }
-
-
-  override def toString: String = s"Matcher for: $expectedContext"
 }
 
-object TemplateChildContextMatcher {
-  def eqTemplateChildContext(expectedContext: TemplateChildContext): TemplateChildContext = argThat(new TemplateChildContextMatcher(expectedContext))
+object TemplateChildContextScalatestMatcher {
+  def equalTemplateChildContext(expectedContext: TemplateChildContext): Matcher[TemplateChildContext] =
+    new TemplateChildContextScalatestMatcher(expectedContext)
 }
 
