@@ -35,6 +35,16 @@ trait ExtendedTransformers {
    */
   def classTransformer(): ClassTransformer = ClassTransformer.Identity
 
+  /** Override this method if you need to transform a [[scala.meta.Term.ApplyInfix]] (infix-style method invocation),
+   * appearing in a Scala template (class/trait/object) body, into a [[scala.meta.Defn]] (variable/method/class etc. definition).<br>
+   *
+   * @see [[TemplateTermApplyInfixToDefnTransformer]] for as usage example.
+   * @return if overriden - a transformer which transforms a [[scala.meta.Term.ApplyInfix]] appearing in a template body,
+   *         into a [[scala.meta.Defn.Def]] - where applicable<br>
+   *         otherwise - the default transformer which never transforms (returns `None`)
+   */
+  def templateTermApplyInfixToDefnTransformer(): TemplateTermApplyInfixToDefnTransformer = TemplateTermApplyInfixToDefnTransformer.Empty
+
   /** Override this method if you need to transform a [[scala.meta.Term.Apply]] (method invocation) appearing in a Scala template body
    * (class/trait/object body), into a [[scala.meta.Defn]] (variable/method/class etc. definition).<br>
    * '''NOTE regarding precedence''': This transformer will be applied before [[termApplyTransformer()]] (if needed).

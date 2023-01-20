@@ -10,6 +10,9 @@ private[extensions] trait ExtendedTransformers { this: ExtensionContainer =>
 
   val classTransformers: List[ClassTransformer] = extensions.map(_.classTransformer())
 
+  val templateTermApplyInfixToDefnTransformers: List[TemplateTermApplyInfixToDefnTransformer] =
+    extensions.map(_.templateTermApplyInfixToDefnTransformer())
+
   val templateTermApplyToDefnTransformers: List[TemplateTermApplyToDefnTransformer] = extensions.map(_.templateTermApplyToDefnTransformer())
 
   val defnValTransformers: List[DefnValTransformer] = extensions.map(_.defnValTransformer())
