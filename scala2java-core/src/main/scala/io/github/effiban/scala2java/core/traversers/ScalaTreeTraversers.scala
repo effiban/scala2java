@@ -325,7 +325,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val templateBodyTraverser: TemplateBodyTraverser = new TemplateBodyTraverserImpl(
     templateChildrenTraverser,
-    new TemplateStatTransformerImpl(new CompositeTemplateTermApplyToDefnTransformer),
+    new TemplateStatTransformerImpl(new CompositeTemplateTermApplyInfixToDefnTransformer, new CompositeTemplateTermApplyToDefnTransformer),
     TemplateChildrenResolver,
     TemplateChildContextFactory
   )
