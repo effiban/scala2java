@@ -6,16 +6,19 @@ import java.util.ServiceLoader
 import scala.jdk.StreamConverters._
 import scala.meta.{Source, Term}
 
-class ExtensionRegistryBuilder {
+class ExtensionRegistryBuilder(forcedExtensionNamesResolver: ForcedExtensionNamesResolver,
+                               extensionApplicablePredicate: ExtensionApplicablePredicate) {
 
   def buildFor(source: Source): ExtensionRegistry = {
     val termSelects = source
       .collect { case termSelect: Term.Select => termSelect }
       .distinctBy(_.structure)
 
+    val forcedExtensionNames = forcedExtensionNamesResolver.resolve()
+
     val extensions = loadExtensions()
       .map(_.get)
-      .filter(extension => shouldBeAppliedForAnyOf(extension, termSelects))
+      .filter(extension => extensionApplicablePredicate.apply(extension, forcedExtensionNames, termSelects))
       .toList
     ExtensionRegistry(extensions)
   }
@@ -24,8 +27,6 @@ class ExtensionRegistryBuilder {
   private[extensions] def loadExtensions() = ServiceLoader.load(classOf[Scala2JavaExtension])
     .stream()
     .toScala(LazyList)
-
-  private def shouldBeAppliedForAnyOf(extension: Scala2JavaExtension, termSelects: List[Term.Select]) = termSelects.exists(extension.shouldBeAppliedIfContains)
 }
 
-object ExtensionRegistryBuilder extends ExtensionRegistryBuilder
+object ExtensionRegistryBuilder extends ExtensionRegistryBuilder(ForcedExtensionNamesResolver, ExtensionApplicablePredicate)
