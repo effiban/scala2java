@@ -1,4 +1,6 @@
 package io.github.effiban.scala2java.core.transformers
+import io.github.effiban.scala2java.spi.transformers.TermApplyInfixToTermApplyTransformer
+
 import scala.meta.Term
 
 object BasicTermApplyInfixToTermApplyTransformer extends TermApplyInfixToTermApplyTransformer {

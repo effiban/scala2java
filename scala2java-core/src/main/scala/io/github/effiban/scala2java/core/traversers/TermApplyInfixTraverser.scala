@@ -1,8 +1,8 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.InvocationArgListContext
-import io.github.effiban.scala2java.core.transformers.TermApplyInfixToTermApplyTransformer
 import io.github.effiban.scala2java.core.writers.JavaWriter
+import io.github.effiban.scala2java.spi.transformers.TermApplyInfixToTermApplyTransformer
 
 import scala.meta.Term
 

@@ -8,8 +8,8 @@ import scala.meta.Term
 class CompositeTermApplyTransformer(override val coreTransformer: TermApplyTransformer)
                                    (implicit extensionRegistry: ExtensionRegistry)
   extends CompositeSameTypeTransformer0[Term.Apply]
-    with CoreAndOtherTransformers[TermApplyTransformer]
+    with ExtensionAndCoreTransformers[TermApplyTransformer]
     with TermApplyTransformer {
 
-  override protected val otherTransformers: List[TermApplyTransformer] = extensionRegistry.termApplyTransformers
+  override protected val extensionTransformers: List[TermApplyTransformer] = extensionRegistry.termApplyTransformers
 }

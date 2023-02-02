@@ -1,31 +1,15 @@
 package io.github.effiban.scala2java.core.transformers
 
-import io.github.effiban.scala2java.core.classifiers.TermApplyInfixClassifier
-import io.github.effiban.scala2java.core.entities.TermApplyInfixKind.{Association, Operator, Range, TermApplyInfixKind, Unclassified}
+import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
+import io.github.effiban.scala2java.spi.transformers.TermApplyInfixToTermApplyTransformer
 
 import scala.meta.Term
 
-private[transformers] class CompositeTermApplyInfixToTermApplyTransformer(classifier: TermApplyInfixClassifier,
-                                                                          transformerMap: Map[TermApplyInfixKind, TermApplyInfixToTermApplyTransformer])
-  extends TermApplyInfixToTermApplyTransformer {
+class CompositeTermApplyInfixToTermApplyTransformer(override protected val coreTransformer: TermApplyInfixToTermApplyTransformer)
+                                                   (implicit extensionRegistry: ExtensionRegistry)
+  extends CompositeDifferentTypeTransformer0[Term.ApplyInfix, Term.Apply]
+    with ExtensionAndCoreTransformers[TermApplyInfixToTermApplyTransformer]
+    with TermApplyInfixToTermApplyTransformer {
 
-  override def transform(termApplyInfix: Term.ApplyInfix): Option[Term.Apply] = {
-    val kind = classifier.classify(termApplyInfix)
-    transformerFor(kind).transform(termApplyInfix)
-  }
-
-  private def transformerFor(kind: TermApplyInfixKind) = {
-    transformerMap.getOrElse(kind, throw new IllegalStateException(s"No TermApplyInfixToTermApplyTransformer defined for kind $kind"))
-  }
+  override protected val extensionTransformers: List[TermApplyInfixToTermApplyTransformer] = extensionRegistry.termApplyInfixToTermApplyTransformers
 }
-
-object CompositeTermApplyInfixToTermApplyTransformer extends CompositeTermApplyInfixToTermApplyTransformer(
-  TermApplyInfixClassifier,
-  Map(
-    Association -> TermApplyInfixToMapEntryTransformer,
-    Range -> TermApplyInfixToRangeTransformer,
-    Operator -> TermApplyInfixToTermApplyTransformer.Empty,
-    Unclassified -> BasicTermApplyInfixToTermApplyTransformer
-  )
-)
-

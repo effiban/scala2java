@@ -360,7 +360,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     termApplyTraverser,
     termNameTraverser,
     invocationArgListTraverser,
-    CompositeTermApplyInfixToTermApplyTransformer
+    new CompositeTermApplyInfixToTermApplyTransformer(CoreTermApplyInfixToTermApplyTransformer)
   )
 
   private lazy val termApplyTraverser: TermApplyTraverser = new TermApplyTraverserImpl(

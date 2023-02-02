@@ -83,10 +83,20 @@ trait ExtendedTransformers {
    * [[scala.meta.Term.Apply]] (method invocation).<br>
    * @see [[TermApplyTypeToTermApplyTransformer]] for a usage example.
    *
-   * @return if overriden - a transformer which transforms a [[scala.meta.Term.ApplyType]] into a [[scala.meta.Term.Apply]] where applicable
+   * @return if overriden - a transformer which transforms a [[scala.meta.Term.ApplyType]] into a [[scala.meta.Term.Apply]] where applicable.<br>
    *         otherwise - the default transformer which never transforms (returns `None`)
    */
   def termApplyTypeToTermApplyTransformer(): TermApplyTypeToTermApplyTransformer = TermApplyTypeToTermApplyTransformer.Empty
+
+  /** Override this method if you need to transform a [[scala.meta.Term.ApplyInfix]] (infix method invocation) into a
+   * [[scala.meta.Term.Apply]] (regular method invocation).<br>
+   * '''NOTE regarding precedence''': The output of this transformer, if not empty, will be passed to [[termApplyTransformer]] for additional processing
+   *
+   * @see [[TermApplyInfixToTermApplyTransformer]] for a usage example.
+   * @return if overriden - a transformer which transforms a [[scala.meta.Term.ApplyInfix]] into a [[scala.meta.Term.Apply]] where applicable.<br>
+   *         otherwise - the default transformer which never transforms (returns `None`)
+   */
+  def termApplyInfixToTermApplyTransformer(): TermApplyInfixToTermApplyTransformer = TermApplyInfixToTermApplyTransformer.Empty
 
   /** Override this method if you need to modify a [[scala.meta.Term.Apply]] (method invocation).<br>
    * '''NOTE regarding precedence''': In the scope of a template body, this transformer will be invoked after [[templateTermApplyToDefnTransformer()]]

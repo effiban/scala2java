@@ -4,11 +4,12 @@ import io.github.effiban.scala2java.core.classifiers.TermApplyInfixClassifier
 import io.github.effiban.scala2java.core.entities.TermApplyInfixKind.{Range, _}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TermNames
+import io.github.effiban.scala2java.spi.transformers.TermApplyInfixToTermApplyTransformer
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.{Lit, Term}
 
-class CompositeTermApplyInfixToTermApplyTransformerTest extends UnitTestSuite {
+class CoreTermApplyInfixToTermApplyTransformerTest extends UnitTestSuite {
 
   private val RangeApplyInfix = Term.ApplyInfix(
     lhs = Lit.Int(1),
@@ -31,17 +32,17 @@ class CompositeTermApplyInfixToTermApplyTransformerTest extends UnitTestSuite {
     Range -> rangeTransformer,
   )
 
-  private val compositeTransformer = new CompositeTermApplyInfixToTermApplyTransformer(classifier, transformerMap)
+  private val coreTransformer = new CoreTermApplyInfixToTermApplyTransformer(classifier, transformerMap)
 
   test("transform() when inner transformer returns value") {
     when(classifier.classify(eqTree(RangeApplyInfix))).thenReturn(Range)
     when(rangeTransformer.transform(eqTree(RangeApplyInfix))).thenReturn(Some(RangeApply))
-    compositeTransformer.transform(RangeApplyInfix).value.structure shouldBe RangeApply.structure
+    coreTransformer.transform(RangeApplyInfix).value.structure shouldBe RangeApply.structure
   }
 
   test("transform() when inner transformer returns empty") {
     when(classifier.classify(eqTree(RangeApplyInfix))).thenReturn(Range)
     when(rangeTransformer.transform(eqTree(RangeApplyInfix))).thenReturn(None)
-    compositeTransformer.transform(RangeApplyInfix) shouldBe None
+    coreTransformer.transform(RangeApplyInfix) shouldBe None
   }
 }
