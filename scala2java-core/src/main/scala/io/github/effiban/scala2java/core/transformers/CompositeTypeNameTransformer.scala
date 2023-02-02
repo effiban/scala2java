@@ -8,8 +8,8 @@ import scala.meta.Type
 class CompositeTypeNameTransformer(override val coreTransformer: TypeNameTransformer)
                                   (implicit extensionRegistry: ExtensionRegistry)
   extends CompositeSameTypeTransformer0[Type.Name]
-    with CoreAndOtherTransformers[TypeNameTransformer]
+    with ExtensionAndCoreTransformers[TypeNameTransformer]
     with TypeNameTransformer {
 
-  override protected val otherTransformers: List[TypeNameTransformer] = extensionRegistry.typeNameTransformers
+  override protected val extensionTransformers: List[TypeNameTransformer] = extensionRegistry.typeNameTransformers
 }

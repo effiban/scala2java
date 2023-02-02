@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.transformers
 
 import io.github.effiban.scala2java.core.entities.TermNameValues.{ScalaTo, ScalaUntil}
+import io.github.effiban.scala2java.spi.transformers.TermApplyInfixToTermApplyTransformer
 
 import scala.meta.Term
 import scala.meta.Term.Select

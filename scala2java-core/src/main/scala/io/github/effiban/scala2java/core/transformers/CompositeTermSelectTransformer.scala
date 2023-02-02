@@ -8,8 +8,8 @@ import scala.meta.Term
 class CompositeTermSelectTransformer(override val coreTransformer: TermSelectTransformer)
                                     (implicit extensionRegistry: ExtensionRegistry)
   extends CompositeSameTypeTransformer0[Term.Select]
-    with CoreAndOtherTransformers[TermSelectTransformer]
+    with ExtensionAndCoreTransformers[TermSelectTransformer]
     with TermSelectTransformer {
 
-  override protected val otherTransformers: List[TermSelectTransformer] = extensionRegistry.termSelectTransformers
+  override protected val extensionTransformers: List[TermSelectTransformer] = extensionRegistry.termSelectTransformers
 }
