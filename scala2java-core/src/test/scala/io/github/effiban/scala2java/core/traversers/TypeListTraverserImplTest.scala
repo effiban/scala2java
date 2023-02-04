@@ -1,10 +1,12 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.contexts.ArgumentListContext
 import io.github.effiban.scala2java.core.entities.EnclosingDelimiter._
 import io.github.effiban.scala2java.core.entities.ListTraversalOptions
+import io.github.effiban.scala2java.core.matchers.ArgumentListContextMatcher.eqArgumentListContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
-import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.Type
 
@@ -16,18 +18,18 @@ class TypeListTraverserImplTest extends UnitTestSuite {
   )
 
   private val argumentListTraverser = mock[ArgumentListTraverser]
-  private val typeTraverser = mock[TypeTraverser]
+  private val typeArgTraverser = mock[ArgumentTraverser[Type]]
 
-  private val typeListTraverser = new TypeListTraverserImpl(argumentListTraverser, typeTraverser)
+  private val typeListTraverser = new TypeListTraverserImpl(argumentListTraverser, typeArgTraverser)
 
 
   test("traverse() when no types") {
     typeListTraverser.traverse(Nil)
 
     verify(argumentListTraverser).traverse(
-      args = ArgumentMatchers.eq(Nil),
-      argTraverser = ArgumentMatchers.eq(typeTraverser),
-      options = ArgumentMatchers.eq(ExpectedTraversalOptions)
+      args = eqTo(Nil),
+      argTraverser = eqTo(typeArgTraverser),
+      context = eqArgumentListContext(ArgumentListContext(options = ExpectedTraversalOptions))
     )
   }
 
@@ -39,8 +41,8 @@ class TypeListTraverserImplTest extends UnitTestSuite {
 
     verify(argumentListTraverser).traverse(
       args = eqTreeList(List(tpe)),
-      argTraverser = ArgumentMatchers.eq(typeTraverser),
-      options = ArgumentMatchers.eq(ExpectedTraversalOptions)
+      argTraverser = eqTo(typeArgTraverser),
+      context = eqArgumentListContext(ArgumentListContext(options = ExpectedTraversalOptions))
     )
   }
 
@@ -52,8 +54,8 @@ class TypeListTraverserImplTest extends UnitTestSuite {
 
     verify(argumentListTraverser).traverse(
       args = eqTreeList(List(type1, type2)),
-      argTraverser = ArgumentMatchers.eq(typeTraverser),
-      options = ArgumentMatchers.eq(ExpectedTraversalOptions)
+      argTraverser = eqTo(typeArgTraverser),
+      context = eqArgumentListContext(ArgumentListContext(options = ExpectedTraversalOptions))
     )
   }
 }

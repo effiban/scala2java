@@ -1,29 +1,31 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.contexts.ArgumentListContext
 import io.github.effiban.scala2java.core.entities.ListTraversalOptions
+import io.github.effiban.scala2java.core.matchers.ArgumentListContextMatcher.eqArgumentListContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
-import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.{Pat, Term}
 
 class PatListTraverserImplTest extends UnitTestSuite {
 
-  private val ExpectedTraversalOptions = ListTraversalOptions(onSameLine = true)
+  private val ExpectedArgListContext = ArgumentListContext(options = ListTraversalOptions(onSameLine = true))
 
   private val argumentListTraverser = mock[ArgumentListTraverser]
-  private val patTraverser = mock[PatTraverser]
+  private val patArgTraverser = mock[ArgumentTraverser[Pat]]
 
-  private val patListTraverser = new PatListTraverserImpl(argumentListTraverser, patTraverser)
+  private val patListTraverser = new PatListTraverserImpl(argumentListTraverser, patArgTraverser)
 
 
   test("traverse() when no pats") {
     patListTraverser.traverse(Nil)
 
     verify(argumentListTraverser).traverse(
-      args = ArgumentMatchers.eq(Nil),
-      argTraverser = ArgumentMatchers.eq(patTraverser),
-      options = ArgumentMatchers.eq(ExpectedTraversalOptions)
+      args = eqTo(Nil),
+      argTraverser = eqTo(patArgTraverser),
+      context = eqArgumentListContext(ExpectedArgListContext)
     )
   }
 
@@ -35,8 +37,8 @@ class PatListTraverserImplTest extends UnitTestSuite {
 
     verify(argumentListTraverser).traverse(
       args = eqTreeList(List(pat)),
-      argTraverser = ArgumentMatchers.eq(patTraverser),
-      options = ArgumentMatchers.eq(ExpectedTraversalOptions)
+      argTraverser = eqTo(patArgTraverser),
+      context = eqArgumentListContext(ExpectedArgListContext)
     )
   }
 
@@ -48,8 +50,8 @@ class PatListTraverserImplTest extends UnitTestSuite {
 
     verify(argumentListTraverser).traverse(
       args = eqTreeList(List(pat1, pat2)),
-      argTraverser = ArgumentMatchers.eq(patTraverser),
-      options = ArgumentMatchers.eq(ExpectedTraversalOptions)
+      argTraverser = eqTo(patArgTraverser),
+      context = eqArgumentListContext(ExpectedArgListContext)
     )
   }
 }

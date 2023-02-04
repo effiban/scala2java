@@ -1,8 +1,9 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.{ArrayInitializerSizeContext, ArrayInitializerValuesContext}
+import io.github.effiban.scala2java.core.contexts.{ArgumentListContext, ArrayInitializerSizeContext, ArrayInitializerValuesContext}
 import io.github.effiban.scala2java.core.entities.EnclosingDelimiter.CurlyBrace
 import io.github.effiban.scala2java.core.entities.ListTraversalOptions
+import io.github.effiban.scala2java.core.matchers.ArgumentListContextMatcher.eqArgumentListContext
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
@@ -10,22 +11,29 @@ import io.github.effiban.scala2java.core.typeinference.{CompositeCollectiveTypeI
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.{eqOptionTreeList, eqTreeList}
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchersSugar.eqTo
+import org.mockito.captor.ArgCaptor
 
-import scala.meta.Lit
+import scala.meta.{Lit, Term}
 
 class ArrayInitializerTraverserImplTest extends UnitTestSuite {
 
   private val ExpectedListTraversalOptions = ListTraversalOptions(maybeEnclosingDelimiter = Some(CurlyBrace), traverseEmpty = true)
+  private val ExpectedArgListContext = ArgumentListContext(options = ExpectedListTraversalOptions)
 
   private val typeTraverser = mock[TypeTraverser]
   private val termTraverser = mock[TermTraverser]
+  private val termArgumentTraverser = mock[ArgumentTraverser[Term]]
   private val argumentListTraverser = mock[ArgumentListTraverser]
   private val termTypeInferrer = mock[TermTypeInferrer]
   private val compositeCollectiveTypeInferrer = mock[CompositeCollectiveTypeInferrer]
 
+  private val argumentTraverserCaptor = ArgCaptor[ArgumentTraverser[Term]]
+
   private val arrayInitializerTraverser = new ArrayInitializerTraverserImpl(
     typeTraverser,
     termTraverser,
+    termArgumentTraverser,
     argumentListTraverser,
     termTypeInferrer,
     compositeCollectiveTypeInferrer
@@ -39,8 +47,8 @@ class ArrayInitializerTraverserImplTest extends UnitTestSuite {
     doWrite("String").when(typeTraverser).traverse(eqTree(tpe))
     doWrite("""{ "a", "b" }""").when(argumentListTraverser).traverse(
       eqTreeList(values),
-      ArgumentMatchers.eq(termTraverser),
-      ArgumentMatchers.eq(ExpectedListTraversalOptions)
+      eqTo(termArgumentTraverser),
+      eqArgumentListContext(ExpectedArgListContext)
     )
 
     arrayInitializerTraverser.traverseWithValues(context)
@@ -55,8 +63,8 @@ class ArrayInitializerTraverserImplTest extends UnitTestSuite {
     doWrite("String").when(typeTraverser).traverse(eqTree(tpe))
     doWrite("""{}""").when(argumentListTraverser).traverse(
       ArgumentMatchers.eq(Nil),
-      ArgumentMatchers.eq(termTraverser),
-      ArgumentMatchers.eq(ExpectedListTraversalOptions)
+      eqTo(termArgumentTraverser),
+      eqArgumentListContext(ExpectedArgListContext)
     )
 
     arrayInitializerTraverser.traverseWithValues(context)
@@ -74,8 +82,8 @@ class ArrayInitializerTraverserImplTest extends UnitTestSuite {
     doWrite("String").when(typeTraverser).traverse(eqTree(TypeNames.String))
     doWrite("""{ "a", "b" }""").when(argumentListTraverser).traverse(
       eqTreeList(values),
-      ArgumentMatchers.eq(termTraverser),
-      ArgumentMatchers.eq(ExpectedListTraversalOptions)
+      eqTo(termArgumentTraverser),
+      eqArgumentListContext(ExpectedArgListContext)
     )
 
     arrayInitializerTraverser.traverseWithValues(context)
@@ -87,8 +95,8 @@ class ArrayInitializerTraverserImplTest extends UnitTestSuite {
     doWrite("Object").when(typeTraverser).traverse(eqTree(TypeNames.ScalaAny))
     doWrite("""{}""").when(argumentListTraverser).traverse(
       eqTreeList(Nil),
-      ArgumentMatchers.eq(termTraverser),
-      ArgumentMatchers.eq(ExpectedListTraversalOptions)
+      eqTo(termArgumentTraverser),
+      eqArgumentListContext(ExpectedArgListContext)
     )
 
     arrayInitializerTraverser.traverseWithValues(ArrayInitializerValuesContext())

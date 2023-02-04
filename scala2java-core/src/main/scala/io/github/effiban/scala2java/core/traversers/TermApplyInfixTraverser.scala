@@ -1,6 +1,8 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.InvocationArgListContext
+import io.github.effiban.scala2java.core.contexts.ArgumentListContext
+import io.github.effiban.scala2java.core.entities.EnclosingDelimiter.Parentheses
+import io.github.effiban.scala2java.core.entities.ListTraversalOptions
 import io.github.effiban.scala2java.core.writers.JavaWriter
 import io.github.effiban.scala2java.spi.transformers.TermApplyInfixToTermApplyTransformer
 
@@ -11,7 +13,8 @@ trait TermApplyInfixTraverser extends ScalaTreeTraverser[Term.ApplyInfix]
 private[traversers] class TermApplyInfixTraverserImpl(termTraverser: => TermTraverser,
                                                       termApplyTraverser: => TermApplyTraverser,
                                                       termNameTraverser: => TermNameTraverser,
-                                                      invocationArgListTraverser: => InvocationArgListTraverser,
+                                                      argumentListTraverser: => ArgumentListTraverser,
+                                                      invocationArgTraverser: => ArgumentTraverser[Term],
                                                       termApplyInfixToTermApplyTransformer: TermApplyInfixToTermApplyTransformer)
                                                      (implicit javaWriter: JavaWriter) extends TermApplyInfixTraverser {
 
@@ -37,8 +40,13 @@ private[traversers] class TermApplyInfixTraverserImpl(termTraverser: => TermTrav
       case arg :: Nil => termTraverser.traverse(arg)
       case args =>
         //TODO - fix (should transform to Term.Apply, cannot use infix notation in Java with multiple RHS args)
-        val invocationArgListContext = InvocationArgListContext(onSameLine = true, argNameAsComment = true)
-        invocationArgListTraverser.traverse(args, invocationArgListContext)
+        val options = ListTraversalOptions(onSameLine = true, maybeEnclosingDelimiter = Some(Parentheses))
+        val argListContext = ArgumentListContext(maybeParent = Some(termApplyInfix), options = options, argNameAsComment = true)
+        argumentListTraverser.traverse(
+          args = args,
+          argTraverser = invocationArgTraverser,
+          context = argListContext
+        )
     }
   }
 }

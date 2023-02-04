@@ -1,6 +1,8 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.InvocationArgListContext
+import io.github.effiban.scala2java.core.contexts.ArgumentListContext
+import io.github.effiban.scala2java.core.entities.EnclosingDelimiter.Parentheses
+import io.github.effiban.scala2java.core.entities.ListTraversalOptions
 import io.github.effiban.scala2java.core.resolvers.ArrayInitializerContextResolver
 import io.github.effiban.scala2java.spi.transformers.TermApplyTransformer
 
@@ -10,7 +12,8 @@ trait TermApplyTraverser extends ScalaTreeTraverser[Term.Apply]
 
 private[traversers] class TermApplyTraverserImpl(termTraverser: => TermTraverser,
                                                  arrayInitializerTraverser: => ArrayInitializerTraverser,
-                                                 invocationArgListTraverser: => InvocationArgListTraverser,
+                                                 argumentListTraverser: => ArgumentListTraverser,
+                                                 invocationArgTraverser: => ArgumentTraverser[Term],
                                                  arrayInitializerContextResolver: ArrayInitializerContextResolver,
                                                  termApplyTransformer: TermApplyTransformer)
   extends TermApplyTraverser {
@@ -26,7 +29,12 @@ private[traversers] class TermApplyTraverserImpl(termTraverser: => TermTraverser
   private def traverseRegular(termApply: Term.Apply): Unit = {
     val transformedTermApply = termApplyTransformer.transform(termApply)
     termTraverser.traverse(transformedTermApply.fun)
-    val invocationArgListContext = InvocationArgListContext(traverseEmpty = true, argNameAsComment = true)
-    invocationArgListTraverser.traverse(transformedTermApply.args, invocationArgListContext)
+    val options = ListTraversalOptions(maybeEnclosingDelimiter = Some(Parentheses), traverseEmpty = true)
+    val argListContext = ArgumentListContext(maybeParent = Some(transformedTermApply), options = options, argNameAsComment = true)
+    argumentListTraverser.traverse(
+      args = transformedTermApply.args,
+      argTraverser = invocationArgTraverser,
+      context = argListContext
+    )
   }
 }

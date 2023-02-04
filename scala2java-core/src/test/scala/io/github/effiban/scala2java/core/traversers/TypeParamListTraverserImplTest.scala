@@ -1,11 +1,13 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.contexts.ArgumentListContext
 import io.github.effiban.scala2java.core.entities.EnclosingDelimiter._
 import io.github.effiban.scala2java.core.entities.ListTraversalOptions
+import io.github.effiban.scala2java.core.matchers.ArgumentListContextMatcher.eqArgumentListContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeBounds
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
-import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.Type
 
@@ -17,31 +19,18 @@ class TypeParamListTraverserImplTest extends UnitTestSuite {
   )
 
   private val argumentListTraverser = mock[ArgumentListTraverser]
-  private val typeParamTraverser = mock[TypeParamTraverser]
+  private val typeParamArgTraverser = mock[ArgumentTraverser[Type.Param]]
 
-  private val typeParamListTraverser = new TypeParamListTraverserImpl(argumentListTraverser, typeParamTraverser)
+  private val typeParamListTraverser = new TypeParamListTraverserImpl(argumentListTraverser, typeParamArgTraverser)
 
 
   test("traverse() when no params") {
     typeParamListTraverser.traverse(Nil)
 
     verify(argumentListTraverser).traverse(
-      args = ArgumentMatchers.eq(Nil),
-      argTraverser = ArgumentMatchers.eq(typeParamTraverser),
-      options = ArgumentMatchers.eq(ExpectedTraversalOptions)
-    )
-  }
-
-  test("traverse() when one param") {
-
-    val param = typeParam("T")
-
-    typeParamListTraverser.traverse(typeParams = List(param))
-
-    verify(argumentListTraverser).traverse(
-      args = eqTreeList(List(param)),
-      argTraverser = ArgumentMatchers.eq(typeParamTraverser),
-      options = ArgumentMatchers.eq(ExpectedTraversalOptions)
+      args = eqTo(Nil),
+      argTraverser = eqTo(typeParamArgTraverser),
+      context = eqArgumentListContext(ArgumentListContext(options = ExpectedTraversalOptions))
     )
   }
 
@@ -54,8 +43,8 @@ class TypeParamListTraverserImplTest extends UnitTestSuite {
 
     verify(argumentListTraverser).traverse(
       args = eqTreeList(params),
-      argTraverser = ArgumentMatchers.eq(typeParamTraverser),
-      options = ArgumentMatchers.eq(ExpectedTraversalOptions)
+      argTraverser = eqTo(typeParamArgTraverser),
+      context = eqArgumentListContext(ArgumentListContext(options = ExpectedTraversalOptions))
     )
   }
 

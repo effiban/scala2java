@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.contexts.ArgumentListContext
 import io.github.effiban.scala2java.core.entities.JavaKeyword.Permits
 import io.github.effiban.scala2java.core.entities.ListTraversalOptions
 import io.github.effiban.scala2java.core.writers.JavaWriter
@@ -21,8 +22,8 @@ private[traversers] class PermittedSubTypeNameListTraverserImpl(argumentListTrav
     write(" ")
     argumentListTraverser.traverse(
       args = permittedSubTypeNames,
-      argTraverser = (name: Name) => write(name.value),
-      options = ListTraversalOptions(onSameLine = true)
+      argTraverser = (name: Name, _) => write(name.value),
+      context = ArgumentListContext(options = ListTraversalOptions(onSameLine = true))
     )
   }
 }

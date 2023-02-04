@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.{ArrayInitializerSizeContext, ArrayInitializerValuesContext}
+import io.github.effiban.scala2java.core.contexts.{ArgumentListContext, ArrayInitializerSizeContext, ArrayInitializerValuesContext}
 import io.github.effiban.scala2java.core.entities.EnclosingDelimiter.{CurlyBrace, SquareBracket}
 import io.github.effiban.scala2java.core.entities.JavaKeyword.New
 import io.github.effiban.scala2java.core.entities.{JavaKeyword, ListTraversalOptions, TypeNameValues}
@@ -17,6 +17,7 @@ trait ArrayInitializerTraverser {
 
 private[traversers] class ArrayInitializerTraverserImpl(typeTraverser: => TypeTraverser,
                                                         termTraverser: => TermTraverser,
+                                                        termArgumentTraverser: => ArgumentTraverser[Term],
                                                         argumentListTraverser: => ArgumentListTraverser,
                                                         termTypeInferrer: => TermTypeInferrer,
                                                         compositeCollectiveTypeInferrer: => CompositeCollectiveTypeInferrer)
@@ -35,7 +36,10 @@ private[traversers] class ArrayInitializerTraverserImpl(typeTraverser: => TypeTr
     writeEndDelimiter(SquareBracket)
     write(" ")
     val options = ListTraversalOptions(maybeEnclosingDelimiter = Some(CurlyBrace), traverseEmpty = true)
-    argumentListTraverser.traverse(args = values, argTraverser = termTraverser, options = options)
+    argumentListTraverser.traverse(
+      args = values,
+      argTraverser = termArgumentTraverser,
+      context = ArgumentListContext(options = options))
   }
 
   override def traverseWithSize(context: ArrayInitializerSizeContext): Unit = {

@@ -1,19 +1,21 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.InvocationArgContext
+import io.github.effiban.scala2java.core.contexts.ArgumentContext
+import io.github.effiban.scala2java.core.entities.Decision.Uncertain
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchersSugar.eqTo
 
-import scala.meta.{Lit, Term}
+import scala.meta.{Lit, Term, XtensionQuasiquoteTerm}
 
-class InvocationArgTraverserImplTest extends UnitTestSuite {
+class InvocationArgTraverserTest extends UnitTestSuite {
 
   private val assignTraverser = mock[AssignTraverser]
   private val termFunctionTraverser = mock[TermFunctionTraverser]
   private val termTraverser = mock[TermTraverser]
 
-  private val invocationArgTraverser = new InvocationArgTraverserImpl(
+  private val invocationArgTraverser = new InvocationArgTraverser(
     assignTraverser,
     termFunctionTraverser,
     termTraverser
@@ -21,7 +23,7 @@ class InvocationArgTraverserImplTest extends UnitTestSuite {
 
   test("traverse when arg is a Lit") {
     val arg = Lit.Int(1)
-    invocationArgTraverser.traverse(arg)
+    invocationArgTraverser.traverse(arg, ArgumentContext(index = 0))
 
     verify(termTraverser).traverse(eqTree(arg))
   }
@@ -31,7 +33,7 @@ class InvocationArgTraverserImplTest extends UnitTestSuite {
     val rhs = Lit.Int(1)
     val assign = Term.Assign(lhs, rhs)
 
-    invocationArgTraverser.traverse(assign)
+    invocationArgTraverser.traverse(assign, ArgumentContext(index = 0))
 
     verify(assignTraverser).traverse(eqTree(assign), lhsAsComment = ArgumentMatchers.eq(false))
   }
@@ -41,8 +43,21 @@ class InvocationArgTraverserImplTest extends UnitTestSuite {
     val rhs = Lit.Int(1)
     val assign = Term.Assign(lhs, rhs)
 
-    invocationArgTraverser.traverse(assign, context = InvocationArgContext(argNameAsComment = true))
+    invocationArgTraverser.traverse(assign, context = ArgumentContext(index = 0, argNameAsComment = true))
 
     verify(assignTraverser).traverse(eqTree(assign), lhsAsComment = ArgumentMatchers.eq(true))
+  }
+
+  test("traverse when arg is a Block") {
+    val block =
+    q"""
+    {
+       x == y
+    }
+    """
+
+    invocationArgTraverser.traverse(block, context = ArgumentContext(index = 0))
+
+    verify(termFunctionTraverser).traverse(eqTree(Term.Function(Nil, block)), shouldBodyReturnValue = eqTo(Uncertain))
   }
 }
