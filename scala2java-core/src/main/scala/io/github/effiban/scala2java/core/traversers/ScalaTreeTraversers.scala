@@ -55,7 +55,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val ascribeTraverser: AscribeTraverser = new AscribeTraverserImpl(typeTraverser, termTraverser)
 
-  private lazy val assignTraverser: AssignTraverser = new AssignTraverserImpl(termTraverser, rhsTermTraverser)
+  private lazy val assignTraverser: AssignTraverser = new AssignTraverserImpl(termTraverser, expressionTraverser)
 
   private lazy val bindTraverser: BindTraverser = new BindTraverserImpl(patTraverser)
 
@@ -165,7 +165,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     modListTraverser,
     defnValOrVarTypeTraverser,
     patListTraverser,
-    rhsTermTraverser,
+    expressionTraverser,
     declVarTraverser,
     new CompositeDefnValToDeclVarTransformer,
     new CompositeDefnValTransformer
@@ -175,7 +175,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     modListTraverser,
     defnValOrVarTypeTraverser,
     patListTraverser,
-    rhsTermTraverser
+    expressionTraverser
   )
 
   private lazy val doTraverser: DoTraverser = new DoTraverserImpl(termTraverser, blockTraverser)
@@ -183,6 +183,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   private lazy val enumConstantListTraverser: EnumConstantListTraverser = new EnumConstantListTraverserImpl(argumentListTraverser)
 
   private lazy val etaTraverser: EtaTraverser = new EtaTraverserImpl(termTraverser)
+
+  private lazy val expressionTraverser: ExpressionTraverser = new ExpressionTraverserImpl(ifTraverser, termTraverser)
 
   private lazy val finallyTraverser: FinallyTraverser = new FinallyTraverserImpl(blockTraverser)
 
@@ -316,8 +318,6 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   )
 
   private lazy val returnTraverser: ReturnTraverser = new ReturnTraverserImpl(termTraverser)
-
-  private lazy val rhsTermTraverser: RhsTermTraverser = new RhsTermTraverserImpl(ifTraverser, termTraverser)
 
   private lazy val selfTraverser: SelfTraverser = new SelfTraverserImpl
 

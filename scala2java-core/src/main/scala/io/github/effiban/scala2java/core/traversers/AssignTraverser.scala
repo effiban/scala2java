@@ -10,7 +10,7 @@ trait AssignTraverser {
 }
 
 private[traversers] class AssignTraverserImpl(termTraverser: => TermTraverser,
-                                              rhsTermTraverser: => RhsTermTraverser)
+                                              expressionTraverser: => ExpressionTraverser)
                                              (implicit javaWriter: JavaWriter) extends AssignTraverser {
 
   import javaWriter._
@@ -24,6 +24,6 @@ private[traversers] class AssignTraverserImpl(termTraverser: => TermTraverser,
       termTraverser.traverse(assign.lhs)
       write(" = ")
     }
-    rhsTermTraverser.traverse(assign.rhs)
+    expressionTraverser.traverse(assign.rhs)
   }
 }
