@@ -21,7 +21,7 @@ private[traversers] class EnumConstantListTraverserImpl(argumentListTraverser: =
       case (enumConsts, _) =>
         argumentListTraverser.traverse(
           args = enumConsts,
-          argTraverser = (patVar: Pat.Var) => write(patVar.name.value)
+          argTraverser = (patVar: Pat.Var, _) => write(patVar.name.value)
         )
     }
   }

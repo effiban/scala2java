@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.contexts.ArgumentListContext
 import io.github.effiban.scala2java.core.entities.EnclosingDelimiter._
 import io.github.effiban.scala2java.core.entities.ListTraversalOptions
 
@@ -10,11 +11,11 @@ trait TypeParamListTraverser {
 }
 
 private[traversers] class TypeParamListTraverserImpl(argumentListTraverser: => ArgumentListTraverser,
-                                                     typeParamTraverser: => TypeParamTraverser) extends TypeParamListTraverser {
+                                                     typeParamArgTraverser: => ArgumentTraverser[Type.Param]) extends TypeParamListTraverser {
 
   override def traverse(typeParams: List[Type.Param]): Unit = {
     argumentListTraverser.traverse(args = typeParams,
-      argTraverser = typeParamTraverser,
-      ListTraversalOptions(maybeEnclosingDelimiter = Some(AngleBracket), onSameLine = true))
+      argTraverser = typeParamArgTraverser,
+      context = ArgumentListContext(options = ListTraversalOptions(maybeEnclosingDelimiter = Some(AngleBracket), onSameLine = true)))
   }
 }

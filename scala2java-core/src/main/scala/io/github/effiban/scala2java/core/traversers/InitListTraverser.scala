@@ -9,9 +9,12 @@ trait InitListTraverser {
 }
 
 private[traversers] class InitListTraverserImpl(argumentListTraverser: => ArgumentListTraverser,
-                                                initTraverser: => InitTraverser) extends InitListTraverser {
+                                                initArgTraverserFactory: => InitArgTraverserFactory) extends InitListTraverser {
 
   override def traverse(inits: List[Init], context: InitContext = InitContext()): Unit = {
-    argumentListTraverser.traverse(args = inits, argTraverser = (init: Init) => initTraverser.traverse(init, context))
+    argumentListTraverser.traverse(
+      args = inits,
+      argTraverser = initArgTraverserFactory(context)
+    )
   }
 }

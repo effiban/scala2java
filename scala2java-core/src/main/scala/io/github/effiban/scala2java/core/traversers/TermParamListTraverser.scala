@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.StatContext
+import io.github.effiban.scala2java.core.contexts.{ArgumentListContext, StatContext}
 import io.github.effiban.scala2java.core.entities.EnclosingDelimiter.Parentheses
 import io.github.effiban.scala2java.core.entities.ListTraversalOptions
 
@@ -13,7 +13,7 @@ trait TermParamListTraverser {
 }
 
 private[traversers] class TermParamListTraverserImpl(argumentListTraverser: => ArgumentListTraverser,
-                                                     termParamTraverser: => TermParamTraverser) extends TermParamListTraverser {
+                                                     termParamArgTraverserFactory: => TermParamArgTraverserFactory) extends TermParamListTraverser {
 
   override def traverse(termParams: List[Term.Param],
                         context: StatContext,
@@ -26,8 +26,8 @@ private[traversers] class TermParamListTraverserImpl(argumentListTraverser: => A
 
     argumentListTraverser.traverse(
       args = termParams,
-      argTraverser = (termParam: Term.Param) => termParamTraverser.traverse(termParam, context),
-      options = options
+      argTraverser = termParamArgTraverserFactory(context),
+      context = ArgumentListContext(options = options)
     )
   }
 }

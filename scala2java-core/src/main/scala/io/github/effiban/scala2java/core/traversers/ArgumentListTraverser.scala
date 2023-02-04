@@ -1,14 +1,14 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.entities.ListTraversalOptions
+import io.github.effiban.scala2java.core.contexts.{ArgumentContext, ArgumentListContext}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Tree
 
 trait ArgumentListTraverser {
   def traverse[T <: Tree](args: List[T],
-                          argTraverser: => ScalaTreeTraverser[T],
-                          options: ListTraversalOptions = ListTraversalOptions()): Unit
+                          argTraverser: => ArgumentTraverser[T],
+                          context: ArgumentListContext = ArgumentListContext()): Unit
 }
 
 class ArgumentListTraverserImpl(implicit javaWriter: JavaWriter) extends ArgumentListTraverser {
@@ -16,15 +16,21 @@ class ArgumentListTraverserImpl(implicit javaWriter: JavaWriter) extends Argumen
   import javaWriter._
 
   override def traverse[T <: Tree](args: List[T],
-                                   argTraverser: => ScalaTreeTraverser[T],
-                                   options: ListTraversalOptions = ListTraversalOptions()): Unit = {
-    if (args.nonEmpty || options.traverseEmpty) {
+                                   argTraverser: => ArgumentTraverser[T],
+                                   context: ArgumentListContext = ArgumentListContext()): Unit = {
+    if (args.nonEmpty || context.options.traverseEmpty) {
 
-      import options._
+      import context.options._
 
       maybeEnclosingDelimiter.foreach(writeArgumentsStart)
       args.zipWithIndex.foreach { case (tree, idx) =>
-        argTraverser.traverse(tree)
+        val argContext = ArgumentContext(
+          maybeParent = context.maybeParent,
+          index = idx,
+          argNameAsComment = context.argNameAsComment
+        )
+
+        argTraverser.traverse(tree, argContext)
         if (idx < args.size - 1) {
           writeListSeparator()
           writeWhitespaceIfNeeded(args.size, onSameLine)

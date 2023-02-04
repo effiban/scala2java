@@ -1,6 +1,9 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.{ArrayInitializerValuesContext, InvocationArgListContext}
+import io.github.effiban.scala2java.core.contexts.{ArgumentListContext, ArrayInitializerValuesContext}
+import io.github.effiban.scala2java.core.entities.EnclosingDelimiter.Parentheses
+import io.github.effiban.scala2java.core.entities.ListTraversalOptions
+import io.github.effiban.scala2java.core.matchers.ArgumentListContextMatcher.eqArgumentListContext
 import io.github.effiban.scala2java.core.matchers.ArrayInitializerValuesContextMockitoMatcher.eqArrayInitializerValuesContext
 import io.github.effiban.scala2java.core.resolvers.ArrayInitializerContextResolver
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
@@ -9,47 +12,56 @@ import io.github.effiban.scala2java.core.testtrees.{TermNames, TypeNames}
 import io.github.effiban.scala2java.spi.transformers.TermApplyTransformer
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
-import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.{Lit, Term}
 
 class TermApplyTraverserImplTest extends UnitTestSuite {
   private val termTraverser = mock[TermTraverser]
   private val arrayInitializerTraverser = mock[ArrayInitializerTraverser]
-  private val invocationArgListTraverser = mock[InvocationArgListTraverser]
+  private val argListTraverser = mock[ArgumentListTraverser]
+  private val invocationArgTraverser = mock[ArgumentTraverser[Term]]
   private val arrayInitializerContextResolver = mock[ArrayInitializerContextResolver]
   private val termApplyTransformer = mock[TermApplyTransformer]
 
   private val termApplyTraverser = new TermApplyTraverserImpl(
     termTraverser,
     arrayInitializerTraverser,
-    invocationArgListTraverser,
+    argListTraverser,
+    invocationArgTraverser,
     arrayInitializerContextResolver,
     termApplyTransformer
   )
 
   test("traverse() a regular method invocation") {
-    val scalaTermApply = Term.Apply(
+    val termApply = Term.Apply(
       fun = Term.Name("myMethod"),
       args = List(Term.Name("arg1"), Term.Name("arg2"))
     )
-    val javaTermApply = Term.Apply(
-      fun = Term.Name("myJavaMethod"),
-      args = List(Term.Name("arg1"), Term.Name("arg2"))
+    val transformedTermApply = Term.Apply(
+      fun = Term.Name("myTransformedMethod"),
+      args = List(Term.Name("transformedArg1"), Term.Name("transformedArg2"))
     )
 
-    when(arrayInitializerContextResolver.tryResolve(eqTree(scalaTermApply))).thenReturn(None)
-    when(termApplyTransformer.transform(eqTree(scalaTermApply))).thenReturn(javaTermApply)
-
-    doWrite("myJavaMethod").when(termTraverser).traverse(eqTree(javaTermApply.fun))
-    doWrite("(arg1, arg2)").when(invocationArgListTraverser).traverse(
-      args = eqTreeList(javaTermApply.args),
-      ArgumentMatchers.eq(InvocationArgListContext(traverseEmpty = true, argNameAsComment = true))
+    val expectedArgListContext = ArgumentListContext(
+      maybeParent = Some(transformedTermApply),
+      options = ListTraversalOptions(maybeEnclosingDelimiter = Some(Parentheses), traverseEmpty = true),
+      argNameAsComment = true
     )
 
-    termApplyTraverser.traverse(scalaTermApply)
+    when(arrayInitializerContextResolver.tryResolve(eqTree(termApply))).thenReturn(None)
+    when(termApplyTransformer.transform(eqTree(termApply))).thenReturn(transformedTermApply)
 
-    outputWriter.toString shouldBe "myJavaMethod(arg1, arg2)"
+    doWrite("myTransformedMethod").when(termTraverser).traverse(eqTree(transformedTermApply.fun))
+    doWrite("(transformedArg1, transformedArg2)").when(argListTraverser).traverse(
+      args = eqTreeList(transformedTermApply.args),
+      argTraverser = eqTo(invocationArgTraverser),
+      context = eqArgumentListContext(expectedArgListContext)
+    )
+
+    termApplyTraverser.traverse(termApply)
+
+    outputWriter.toString shouldBe "myTransformedMethod(transformedArg1, transformedArg2)"
 
   }
 

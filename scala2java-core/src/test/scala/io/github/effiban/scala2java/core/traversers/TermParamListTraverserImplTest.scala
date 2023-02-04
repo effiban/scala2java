@@ -1,13 +1,13 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.StatContext
+import io.github.effiban.scala2java.core.contexts.{ArgumentListContext, StatContext}
 import io.github.effiban.scala2java.core.entities.EnclosingDelimiter.Parentheses
 import io.github.effiban.scala2java.core.entities.ListTraversalOptions
+import io.github.effiban.scala2java.core.matchers.ArgumentListContextMatcher.eqArgumentListContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
-import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
-import org.mockito.{ArgumentCaptor, ArgumentMatchers}
+import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.{Name, Term}
 
@@ -27,13 +27,15 @@ class TermParamListTraverserImplTest extends UnitTestSuite {
   )
 
   private val argumentListTraverser = mock[ArgumentListTraverser]
-  private val termParamTraverser = mock[TermParamTraverser]
-  private val argTraverserCaptor: ArgumentCaptor[ScalaTreeTraverser[Term.Param]] = ArgumentCaptor.forClass(classOf[ScalaTreeTraverser[Term.Param]])
+  private val termParamArgTraverserFactory = mock[TermParamArgTraverserFactory]
+  private val termParamArgTraverser = mock[ArgumentTraverser[Term.Param]]
 
-  private val termParamListTraverser = new TermParamListTraverserImpl(argumentListTraverser, termParamTraverser)
+  private val termParamListTraverser = new TermParamListTraverserImpl(argumentListTraverser, termParamArgTraverserFactory)
 
 
   test("traverse() when no params") {
+    when(termParamArgTraverserFactory(TheStatContext)).thenReturn(termParamArgTraverser)
+
     termParamListTraverser.traverse(termParams = Nil, context = TheStatContext)
 
     verifyArgumentListTraverserInvocation(Nil, ExpectedOptionsForMultiLine)
@@ -42,6 +44,8 @@ class TermParamListTraverserImplTest extends UnitTestSuite {
   test("traverse() when one param and multi-line") {
     val param = termParam("x")
 
+    when(termParamArgTraverserFactory(TheStatContext)).thenReturn(termParamArgTraverser)
+
     termParamListTraverser.traverse(termParams = List(param), context = TheStatContext)
 
     verifyArgumentListTraverserInvocation(List(param), ExpectedOptionsForMultiLine)
@@ -49,6 +53,8 @@ class TermParamListTraverserImplTest extends UnitTestSuite {
 
   test("traverse() when one param and same line") {
     val param = termParam("x")
+
+    when(termParamArgTraverserFactory(TheStatContext)).thenReturn(termParamArgTraverser)
 
     termParamListTraverser.traverse(termParams = List(param), context = TheStatContext, onSameLine = true)
 
@@ -60,6 +66,8 @@ class TermParamListTraverserImplTest extends UnitTestSuite {
     val param2 = termParam("y")
     val params = List(param1, param2)
 
+    when(termParamArgTraverserFactory(TheStatContext)).thenReturn(termParamArgTraverser)
+
     termParamListTraverser.traverse(termParams = params, context = TheStatContext)
 
     verifyArgumentListTraverserInvocation(params, ExpectedOptionsForMultiLine)
@@ -70,6 +78,8 @@ class TermParamListTraverserImplTest extends UnitTestSuite {
     val param2 = termParam("y")
     val params = List(param1, param2)
 
+    when(termParamArgTraverserFactory(TheStatContext)).thenReturn(termParamArgTraverser)
+
     termParamListTraverser.traverse(termParams = params, context = TheStatContext, onSameLine = true)
 
     verifyArgumentListTraverserInvocation(params, ExpectedOptionsForSameLine)
@@ -78,14 +88,9 @@ class TermParamListTraverserImplTest extends UnitTestSuite {
   private def verifyArgumentListTraverserInvocation(args: List[Term.Param], options: ListTraversalOptions): Unit = {
     verify(argumentListTraverser).traverse(
       args = eqTreeList(args),
-      argTraverser = argTraverserCaptor.capture(),
-      options = ArgumentMatchers.eq(options)
+      argTraverser = eqTo(termParamArgTraverser),
+      context = eqArgumentListContext(ArgumentListContext(options = options))
     )
-
-    val argTraverser = argTraverserCaptor.getValue
-    val dummyTermParam = termParam("dummy")
-    argTraverser.traverse(dummyTermParam)
-    verify(termParamTraverser).traverse(eqTree(dummyTermParam), ArgumentMatchers.eq(TheStatContext))
   }
 
   private def termParam(name: String) = {
