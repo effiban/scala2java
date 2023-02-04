@@ -13,7 +13,7 @@ trait DefnVarTraverser {
 private[traversers] class DefnVarTraverserImpl(modListTraverser: => ModListTraverser,
                                                defnValOrVarTypeTraverser: => DefnValOrVarTypeTraverser,
                                                patListTraverser: => PatListTraverser,
-                                               rhsTermTraverser: => RhsTermTraverser)
+                                               expressionTraverser: => ExpressionTraverser)
                                               (implicit javaWriter: JavaWriter) extends DefnVarTraverser {
 
   import javaWriter._
@@ -27,7 +27,7 @@ private[traversers] class DefnVarTraverserImpl(modListTraverser: => ModListTrave
     patListTraverser.traverse(varDef.pats)
     varDef.rhs.foreach { rhs =>
       write(" = ")
-      rhsTermTraverser.traverse(rhs)
+      expressionTraverser.traverse(rhs)
     }
   }
 }

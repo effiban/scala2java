@@ -14,7 +14,7 @@ trait DefnValTraverser {
 private[traversers] class DefnValTraverserImpl(modListTraverser: => ModListTraverser,
                                                defnValOrVarTypeTraverser: => DefnValOrVarTypeTraverser,
                                                patListTraverser: => PatListTraverser,
-                                               rhsTermTraverser: => RhsTermTraverser,
+                                               expressionTraverser: => ExpressionTraverser,
                                                declVarTraverser: => DeclVarTraverser,
                                                defnValToDeclVarTransformer: DefnValToDeclVarTransformer,
                                                defnValTransformer: DefnValTransformer)
@@ -39,6 +39,6 @@ private[traversers] class DefnValTraverserImpl(modListTraverser: => ModListTrave
     //TODO verify for non-simple case
     patListTraverser.traverse(valDef.pats)
     write(" = ")
-    rhsTermTraverser.traverse(valDef.rhs)
+    expressionTraverser.traverse(valDef.rhs)
   }
 }
