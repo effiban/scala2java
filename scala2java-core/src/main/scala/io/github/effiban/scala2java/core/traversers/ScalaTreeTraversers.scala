@@ -40,20 +40,20 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     new CompositeTermApplyTypeToTermApplyTransformer()
   )
 
-  private lazy val applyUnaryTraverser: ApplyUnaryTraverser = new ApplyUnaryTraverserImpl(termNameTraverser, termTraverser)
+  private lazy val applyUnaryTraverser: ApplyUnaryTraverser = new ApplyUnaryTraverserImpl(termNameTraverser, expressionTraverser)
 
   private lazy val argumentListTraverser: ArgumentListTraverser = new ArgumentListTraverserImpl
 
   private lazy val arrayInitializerTraverser: ArrayInitializerTraverser = new ArrayInitializerTraverserImpl(
     typeTraverser,
-    termTraverser,
+    expressionTraverser,
     new SimpleArgumentTraverser(termTraverser),
     argumentListTraverser,
     termTypeInferrer,
     compositeCollectiveTypeInferrer
   )
 
-  private lazy val ascribeTraverser: AscribeTraverser = new AscribeTraverserImpl(typeTraverser, termTraverser)
+  private lazy val ascribeTraverser: AscribeTraverser = new AscribeTraverserImpl(typeTraverser, expressionTraverser)
 
   private lazy val assignTraverser: AssignTraverser = new AssignTraverserImpl(termTraverser, expressionTraverser)
 
@@ -82,7 +82,11 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     JavaChildScopeResolver
   )
 
-  private lazy val caseTraverser: CaseTraverser = new CaseTraverserImpl(patTraverser, termTraverser)
+  private lazy val caseTraverser: CaseTraverser = new CaseTraverserImpl(
+    patTraverser,
+    expressionTraverser,
+    termTraverser
+  )
 
   private lazy val catchHandlerTraverser: CatchHandlerTraverser = new CatchHandlerTraverserImpl(termParamListTraverser, blockTraverser)
 
@@ -178,7 +182,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     expressionTraverser
   )
 
-  private lazy val doTraverser: DoTraverser = new DoTraverserImpl(termTraverser, blockTraverser)
+  private lazy val doTraverser: DoTraverser = new DoTraverserImpl(expressionTraverser, blockTraverser)
 
   private lazy val enumConstantListTraverser: EnumConstantListTraverser = new EnumConstantListTraverserImpl(argumentListTraverser)
 
@@ -192,7 +196,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val forYieldTraverser: ForYieldTraverser = new ForYieldTraverserImpl(termApplyTraverser, ForYieldToTermApplyTransformer)
 
-  private lazy val ifTraverser: IfTraverser = new IfTraverserImpl(termTraverser, blockTraverser)
+  private lazy val ifTraverser: IfTraverser = new IfTraverserImpl(expressionTraverser, blockTraverser)
 
   private lazy val importeeTraverser: ImporteeTraverser = new ImporteeTraverserImpl(nameTraverser)
 
@@ -220,7 +224,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   private lazy val invocationArgTraverser: ArgumentTraverser[Term] = new InvocationArgTraverser(
     assignTraverser,
     termFunctionTraverser,
-    termTraverser
+    expressionTraverser
   )
 
   private lazy val litTraverser: LitTraverser = new LitTraverserImpl()
@@ -317,7 +321,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     JavaChildScopeResolver
   )
 
-  private lazy val returnTraverser: ReturnTraverser = new ReturnTraverserImpl(termTraverser)
+  private lazy val returnTraverser: ReturnTraverser = new ReturnTraverserImpl(expressionTraverser)
 
   private lazy val selfTraverser: SelfTraverser = new SelfTraverserImpl
 
@@ -366,7 +370,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   private lazy val termAnnotateTraverser: TermAnnotateTraverser = new TermAnnotateTraverserImpl(annotListTraverser, termTraverser)
 
   private lazy val termApplyInfixTraverser: TermApplyInfixTraverser = new TermApplyInfixTraverserImpl(
-    termTraverser,
+    expressionTraverser,
     termApplyTraverser,
     termNameTraverser,
     argumentListTraverser,
@@ -392,7 +396,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val termInterpolateTraverser: TermInterpolateTraverser = new TermInterpolateTraverserImpl(TermInterpolateTransformer, termApplyTraverser)
 
-  private lazy val termMatchTraverser: TermMatchTraverser = new TermMatchTraverserImpl(termTraverser, caseTraverser)
+  private lazy val termMatchTraverser: TermMatchTraverser = new TermMatchTraverserImpl(expressionTraverser, caseTraverser)
 
   private lazy val termNameTraverser: TermNameTraverser = new TermNameTraverserImpl(termTraverser, TermNameTransformer)
 
@@ -467,7 +471,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val thisTraverser: ThisTraverser = new ThisTraverserImpl(nameTraverser)
 
-  private lazy val throwTraverser: ThrowTraverser = new ThrowTraverserImpl(termTraverser)
+  private lazy val throwTraverser: ThrowTraverser = new ThrowTraverserImpl(expressionTraverser)
 
   private lazy val traitTraverser: TraitTraverser = new TraitTraverserImpl(
     modListTraverser,
@@ -568,5 +572,5 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val typeWithTraverser: TypeWithTraverser = new TypeWithTraverserImpl(typeTraverser)
 
-  private lazy val whileTraverser: WhileTraverser = new WhileTraverserImpl(termTraverser, blockTraverser)
+  private lazy val whileTraverser: WhileTraverser = new WhileTraverserImpl(expressionTraverser, blockTraverser)
 }

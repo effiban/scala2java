@@ -23,10 +23,10 @@ class DoTraverserImplTest extends UnitTestSuite {
     targs = Nil,
     args = List(Lit.Int(3)))
 
-  private val termTraverser = mock[TermTraverser]
+  private val expressionTraverser = mock[ExpressionTraverser]
   private val blockTraverser = mock[BlockTraverser]
 
-  private val doTraverser = new DoTraverserImpl(termTraverser, blockTraverser)
+  private val doTraverser = new DoTraverserImpl(expressionTraverser, blockTraverser)
 
 
   test("traverse() when body is single statement") {
@@ -41,7 +41,7 @@ class DoTraverserImplTest extends UnitTestSuite {
         |}""".stripMargin)
       .when(blockTraverser).traverse(stat = eqTree(Statement), context = eqBlockContext(BlockContext())
     )
-    doWrite("x < 3").when(termTraverser).traverse(eqTree(Expression))
+    doWrite("x < 3").when(expressionTraverser).traverse(eqTree(Expression))
 
     doTraverser.traverse(`do`)
 
@@ -75,7 +75,7 @@ class DoTraverserImplTest extends UnitTestSuite {
         |}""".stripMargin)
       .when(blockTraverser).traverse(stat = eqTree(body), context = eqBlockContext(BlockContext())
     )
-    doWrite("x < 3").when(termTraverser).traverse(eqTree(Expression))
+    doWrite("x < 3").when(expressionTraverser).traverse(eqTree(Expression))
 
     doTraverser.traverse(`do`)
 

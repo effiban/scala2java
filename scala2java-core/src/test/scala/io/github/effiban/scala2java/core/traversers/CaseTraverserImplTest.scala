@@ -13,9 +13,14 @@ class CaseTraverserImplTest extends UnitTestSuite {
   private val Body: Lit.Int = Lit.Int(3)
 
   private val patTraverser = mock[PatTraverser]
+  private val expressionTraverser = mock[ExpressionTraverser]
   private val termTraverser = mock[TermTraverser]
 
-  private val caseTraverser = new CaseTraverserImpl(patTraverser, termTraverser)
+  private val caseTraverser = new CaseTraverserImpl(
+    patTraverser,
+    expressionTraverser,
+    termTraverser
+  )
 
 
   test("traverse() non-default without condition") {
@@ -51,7 +56,7 @@ class CaseTraverserImplTest extends UnitTestSuite {
 
   test("traverse() with condition") {
     doWrite(""""value1"""").when(patTraverser).traverse(eqTree(StringPat))
-    doWrite("x > 2").when(termTraverser).traverse(eqTree(Cond))
+    doWrite("x > 2").when(expressionTraverser).traverse(eqTree(Cond))
     doWrite("3").when(termTraverser).traverse(eqTree(Body))
 
     caseTraverser.traverse(

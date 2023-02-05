@@ -10,7 +10,7 @@ import scala.meta.Term
 
 trait TermApplyInfixTraverser extends ScalaTreeTraverser[Term.ApplyInfix]
 
-private[traversers] class TermApplyInfixTraverserImpl(termTraverser: => TermTraverser,
+private[traversers] class TermApplyInfixTraverserImpl(expressionTraverser: => ExpressionTraverser,
                                                       termApplyTraverser: => TermApplyTraverser,
                                                       termNameTraverser: => TermNameTraverser,
                                                       argumentListTraverser: => ArgumentListTraverser,
@@ -30,14 +30,14 @@ private[traversers] class TermApplyInfixTraverserImpl(termTraverser: => TermTrav
   }
 
   private def traverseAsInfix(termApplyInfix: Term.ApplyInfix): Unit = {
-    termTraverser.traverse(termApplyInfix.lhs)
+    expressionTraverser.traverse(termApplyInfix.lhs)
     write(" ")
     termNameTraverser.traverse(termApplyInfix.op)
     write(" ")
     //TODO handle type args
     termApplyInfix.args match {
       case Nil => throw new IllegalStateException("An Term.ApplyInfix must have at least one RHS arg")
-      case arg :: Nil => termTraverser.traverse(arg)
+      case arg :: Nil => expressionTraverser.traverse(arg)
       case args =>
         //TODO - fix (should transform to Term.Apply, cannot use infix notation in Java with multiple RHS args)
         val options = ListTraversalOptions(onSameLine = true, maybeEnclosingDelimiter = Some(Parentheses))
