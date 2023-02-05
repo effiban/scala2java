@@ -8,12 +8,12 @@ import scala.meta.Term.{Assign, Block}
 
 private[traversers] class InvocationArgTraverser(assignTraverser: => AssignTraverser,
                                                  termFunctionTraverser: => TermFunctionTraverser,
-                                                 termTraverser: => TermTraverser) extends ArgumentTraverser[Term] {
+                                                 expressionTraverser: => ExpressionTraverser) extends ArgumentTraverser[Term] {
 
   override def traverse(arg: Term, context: ArgumentContext): Unit = arg match {
     case assign: Assign => assignTraverser.traverse(assign = assign, lhsAsComment = context.argNameAsComment)
     // A block cannot be passed as an argument in Java, so wrapping it in a Lambda
     case block: Block => termFunctionTraverser.traverse(Term.Function(Nil, block), shouldBodyReturnValue = Uncertain)
-    case term => termTraverser.traverse(term)
+    case term => expressionTraverser.traverse(term)
   }
 }

@@ -13,19 +13,19 @@ class InvocationArgTraverserTest extends UnitTestSuite {
 
   private val assignTraverser = mock[AssignTraverser]
   private val termFunctionTraverser = mock[TermFunctionTraverser]
-  private val termTraverser = mock[TermTraverser]
+  private val expressionTraverser = mock[ExpressionTraverser]
 
   private val invocationArgTraverser = new InvocationArgTraverser(
     assignTraverser,
     termFunctionTraverser,
-    termTraverser
+    expressionTraverser
   )
 
   test("traverse when arg is a Lit") {
     val arg = Lit.Int(1)
     invocationArgTraverser.traverse(arg, ArgumentContext(index = 0))
 
-    verify(termTraverser).traverse(eqTree(arg))
+    verify(expressionTraverser).traverse(eqTree(arg))
   }
 
   test("traverse when arg is an Assign and the default context") {

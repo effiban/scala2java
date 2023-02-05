@@ -22,7 +22,7 @@ class ArrayInitializerTraverserImplTest extends UnitTestSuite {
   private val ExpectedArgListContext = ArgumentListContext(options = ExpectedListTraversalOptions)
 
   private val typeTraverser = mock[TypeTraverser]
-  private val termTraverser = mock[TermTraverser]
+  private val expressionTraverser = mock[ExpressionTraverser]
   private val termArgumentTraverser = mock[ArgumentTraverser[Term]]
   private val argumentListTraverser = mock[ArgumentListTraverser]
   private val termTypeInferrer = mock[TermTypeInferrer]
@@ -32,7 +32,7 @@ class ArrayInitializerTraverserImplTest extends UnitTestSuite {
 
   private val arrayInitializerTraverser = new ArrayInitializerTraverserImpl(
     typeTraverser,
-    termTraverser,
+    expressionTraverser,
     termArgumentTraverser,
     argumentListTraverser,
     termTypeInferrer,
@@ -109,7 +109,7 @@ class ArrayInitializerTraverserImplTest extends UnitTestSuite {
     val context = ArrayInitializerSizeContext(tpe = TypeNames.String, size = size)
 
     doWrite("String").when(typeTraverser).traverse(eqTree(TypeNames.String))
-    doWrite("3").when(termTraverser).traverse(eqTree(size))
+    doWrite("3").when(expressionTraverser).traverse(eqTree(size))
 
     arrayInitializerTraverser.traverseWithSize(context)
 
@@ -120,7 +120,7 @@ class ArrayInitializerTraverserImplTest extends UnitTestSuite {
     val size = Lit.Int(0)
 
     doWrite("Object").when(typeTraverser).traverse(eqTree(TypeNames.ScalaAny))
-    doWrite("0").when(termTraverser).traverse(eqTree(size))
+    doWrite("0").when(expressionTraverser).traverse(eqTree(size))
 
     arrayInitializerTraverser.traverseWithSize(ArrayInitializerSizeContext())
 

@@ -8,17 +8,17 @@ import scala.meta.Term.Ascribe
 trait AscribeTraverser extends ScalaTreeTraverser[Ascribe]
 
 private[traversers] class AscribeTraverserImpl(typeTraverser: => TypeTraverser,
-                                               termTraverser: => TermTraverser)
+                                               expressionTraverser: => ExpressionTraverser)
                                               (implicit javaWriter: JavaWriter) extends AscribeTraverser {
 
   import javaWriter._
 
-  // Explicitly specified type, e.g.: x = 2:Short
-  // Java equivalent is casting. e.g. x = (short)2
+  // Explicitly specified type, e.g.: 2:Short
+  // Java equivalent is casting. e.g. (short)2
   override def traverse(ascribe: Ascribe): Unit = {
     writeStartDelimiter(Parentheses)
     typeTraverser.traverse(ascribe.tpe)
     writeEndDelimiter(Parentheses)
-    termTraverser.traverse(ascribe.expr)
+    expressionTraverser.traverse(ascribe.expr)
   }
 }
