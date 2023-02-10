@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.testtrees
 
-import scala.meta.Type
+import scala.meta.{Type, XtensionQuasiquoteType}
+
 
 object TypeNames {
 
@@ -24,8 +25,16 @@ object TypeNames {
   val Set: Type.Name = Type.Name("Set")
   val Map: Type.Name = Type.Name("Map")
 
+  val Function: Type.Name = t"Function"
+
   val ScalaArray: Type.Name = Type.Name("Array")
   val ScalaOption: Type.Name = Type.Name("Option")
   val ScalaAny: Type.Name = Type.Name("Any")
   val ScalaVector: Type.Name = Type.Name("Vector")
+
+  val JavaBiFunction: Type.Name = t"BiFunction"
+  val JavaBiConsumer: Type.Name = t"BiConsumer"
+  val JavaConsumer: Type.Name = t"Consumer"
+  val JavaSupplier: Type.Name = t"Supplier"
+  val JavaRunnable: Type.Name = t"Runnable"
 }

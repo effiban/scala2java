@@ -10,10 +10,10 @@ import scala.meta.Type
 
 class TypeFunctionTraverserImplTest extends UnitTestSuite {
 
-  private val typeApplyTraverser = mock[TypeApplyTraverser]
+  private val typeTraverser = mock[TypeTraverser]
   private val functionTypeTransformer = mock[FunctionTypeTransformer]
 
-  private val typeFunctionTraverser = new TypeFunctionTraverserImpl(typeApplyTraverser, functionTypeTransformer)
+  private val typeFunctionTraverser = new TypeFunctionTraverserImpl(typeTraverser, functionTypeTransformer)
 
   test("traverse() when corresponding function type is a native Java type") {
     val inputType = TypeNames.Int
@@ -24,7 +24,7 @@ class TypeFunctionTraverserImplTest extends UnitTestSuite {
 
     when(functionTypeTransformer.transform(eqTree(scalaFunctionType))).thenReturn(expectedJavaFunctionType)
 
-    doWrite("Function<Int, String>").when(typeApplyTraverser).traverse(eqTree(expectedJavaFunctionType))
+    doWrite("Function<Int, String>").when(typeTraverser).traverse(eqTree(expectedJavaFunctionType))
 
     typeFunctionTraverser.traverse(scalaFunctionType)
 
@@ -43,7 +43,7 @@ class TypeFunctionTraverserImplTest extends UnitTestSuite {
 
     when(functionTypeTransformer.transform(eqTree(scalaFunctionType))).thenReturn(expectedJavaFunctionType)
 
-    doWrite("Function3<T1, T2, T3, String>").when(typeApplyTraverser).traverse(eqTree(expectedJavaFunctionType))
+    doWrite("Function3<T1, T2, T3, String>").when(typeTraverser).traverse(eqTree(expectedJavaFunctionType))
 
     typeFunctionTraverser.traverse(scalaFunctionType)
 
