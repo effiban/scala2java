@@ -1,5 +1,7 @@
 package io.github.effiban.scala2java.core.typeinference
 
+import io.github.effiban.scala2java.core.entities.TermNameValues.{Print, Println}
+import io.github.effiban.scala2java.core.entities.TypeNameValues.ScalaUnit
 import io.github.effiban.scala2java.core.entities.{TermNameValues, TypeNameValues}
 import io.github.effiban.scala2java.spi.typeinferrers.NameTypeInferrer
 
@@ -30,6 +32,8 @@ object CoreNameTypeInferrer extends NameTypeInferrer {
       case Term.Name(TermNameValues.Seq) => Some(Type.Name(TypeNameValues.Seq))
       case Term.Name(TermNameValues.Set) => Some(Type.Name(TypeNameValues.Set))
       case Term.Name(TermNameValues.Map) => Some(Type.Name(TypeNameValues.Map))
+
+      case Term.Name(Print | Println) => Some(Type.Name(ScalaUnit))
 
       case _ => None
     }

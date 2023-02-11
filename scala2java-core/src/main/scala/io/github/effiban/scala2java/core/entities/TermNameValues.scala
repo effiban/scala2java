@@ -36,6 +36,12 @@ object TermNameValues {
   final val LessThan = "<"
   final val LessEquals = "<="
 
+  final val AndThen = "andThen"
+  final val Compose = "compose"
+  final val Get = "get"
+  final val Print = "print"
+  final val Println = "println"
+
   final val ScalaRange = "Range"
   final val ScalaInclusive = "inclusive"
   final val ScalaOption = "Option"
@@ -70,4 +76,7 @@ object TermNameValues {
   final val JavaOfSupplier = "ofSupplier"
   final val JavaSuccess = "success"
   final val JavaFailure = "failure"
+
+  final val JavaRun = "run"
+  final val JavaAccept = "accept"
 }

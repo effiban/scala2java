@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.testtrees
 
-import scala.meta.Term
+import scala.meta.{Term, XtensionQuasiquoteTerm}
 
 object TermNames {
 
@@ -36,6 +36,9 @@ object TermNames {
 
   val Apply: Term.Name = Term.Name("apply")
   val Empty: Term.Name = Term.Name("empty")
+  val AndThen: Term.Name = Term.Name("andThen")
+  val Print: Term.Name = q"print"
+  val Println: Term.Name = q"println"
 
   val Scala: Term.Name = Term.Name("scala")
   val ScalaRange: Term.Name = Term.Name("Range")

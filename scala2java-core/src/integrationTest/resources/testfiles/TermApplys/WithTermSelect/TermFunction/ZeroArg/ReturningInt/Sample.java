@@ -13,6 +13,6 @@ public class Sample {
     }
 
     public void foo() {
-        (() -> x).get();
+        ((Supplier<int>)() -> 3).get();
     }
 }

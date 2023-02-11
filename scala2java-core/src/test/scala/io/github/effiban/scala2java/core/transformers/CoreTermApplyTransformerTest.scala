@@ -1,11 +1,12 @@
 package io.github.effiban.scala2java.core.transformers
 
 import io.github.effiban.scala2java.core.classifiers.TermNameClassifier
+import io.github.effiban.scala2java.core.entities.TermNameValues
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{TermNames, TypeNames}
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.{Lit, Term}
+import scala.meta.{Lit, Term, XtensionQuasiquoteTerm}
 
 class CoreTermApplyTransformerTest extends UnitTestSuite {
 
@@ -106,5 +107,16 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
     when(termNameClassifier.isPreDefScalaObject(eqTree(fun))).thenReturn(false)
 
     termApplyTransformer.transform(scalaStyleTermApply).structure shouldBe expectedJavaStyleTermApply.structure
+  }
+
+  test("transform() of a Term.Function (lambda) invocation should transform it into a qualified expression with the explicit apply()") {
+    val termFunction = q"((x: Int) => x + 1)"
+    val args = List(Lit.Int(2))
+
+    val termFunctionInvocation = Term.Apply(termFunction, args)
+
+    val expectedTermFunctionInvocation = Term.Apply(Term.Select(termFunction, Term.Name(TermNameValues.Apply)), args)
+
+    termApplyTransformer.transform(termFunctionInvocation).structure shouldBe expectedTermFunctionInvocation.structure
   }
 }

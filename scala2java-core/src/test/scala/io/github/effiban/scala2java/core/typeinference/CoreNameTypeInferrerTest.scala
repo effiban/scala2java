@@ -26,6 +26,8 @@ class CoreNameTypeInferrerTest extends UnitTestSuite {
     (TermNames.Seq, Some(TypeNames.Seq)),
     (TermNames.Set, Some(TypeNames.Set)),
     (TermNames.Map, Some(TypeNames.Map)),
+    (TermNames.Print, Some(TypeNames.Unit)),
+    (TermNames.Println, Some(TypeNames.Unit)),
     (Term.Name("foo"), None)
   )
 
