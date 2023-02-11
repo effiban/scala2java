@@ -8,7 +8,7 @@ import io.github.effiban.scala2java.spi.transformers.TermSelectTransformer
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.{Lit, Term}
+import scala.meta.{Lit, Term, XtensionQuasiquoteType}
 
 class TermSelectTraverserImplTest extends UnitTestSuite {
 
@@ -71,6 +71,22 @@ class TermSelectTraverserImplTest extends UnitTestSuite {
     termSelectTraverser.traverse(scalaSelect)
 
     outputWriter.toString shouldBe "(() -> 1).get"
+  }
+
+  test("traverse() when qualifier is a Term.Ascribe applied to a Term.Function, should wrap in parentheses") {
+    val termFunction = Term.Function(Nil, Lit.Int(1))
+    val ascribedTermFunction = Term.Ascribe(termFunction, t"Supplier[Int]")
+    val inputTermSelect = Term.Select(ascribedTermFunction, MyMethod)
+    val outputTermSelect = Term.Select(ascribedTermFunction, MyJavaMethod)
+
+    when(termSelectTransformer.transform(eqTree(inputTermSelect))).thenReturn(outputTermSelect)
+
+    doWrite("(Supplier<Integer>)() -> 1").when(termTraverser).traverse(eqTree(ascribedTermFunction))
+    doWrite("get").when(termNameTraverser).traverse(eqTree(MyJavaMethod))
+
+    termSelectTraverser.traverse(inputTermSelect)
+
+    outputWriter.toString shouldBe "((Supplier<Integer>)() -> 1).get"
   }
 
   test("traverse() when qualifier is a Term.Apply should break the line") {

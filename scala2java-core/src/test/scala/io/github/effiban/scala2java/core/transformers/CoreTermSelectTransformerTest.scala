@@ -6,13 +6,15 @@ import io.github.effiban.scala2java.core.testtrees.TermNames
 import io.github.effiban.scala2java.core.testtrees.TermNames._
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.Term
+import scala.meta.{Term, XtensionQuasiquoteTerm}
 
 class CoreTermSelectTransformerTest extends UnitTestSuite {
 
   private val termNameClassifier = mock[TermNameClassifier]
+  private val termSelectTermFunctionTransformer = mock[TermSelectTermFunctionTransformer]
 
-  private val termSelectTransformer = new CoreTermSelectTransformer(termNameClassifier)
+  private val termSelectTransformer = new CoreTermSelectTransformer(termNameClassifier, termSelectTermFunctionTransformer)
+
 
   test("transform 'Range.apply' should return 'IntStream.range'") {
     val scalaTermSelect = Term.Select(ScalaRange, Apply)
@@ -173,6 +175,15 @@ class CoreTermSelectTransformerTest extends UnitTestSuite {
     when(termNameClassifier.isJavaMapLike(eqTree(TermNames.Map))).thenReturn(true)
 
     termSelectTransformer.transform(scalaTermSelect).structure shouldBe expectedJavaTermSelect.structure
+  }
+
+  test("transform a 'Term.Function' (lambda) with a method name, should return result of 'TermSelectTermFunctionTransformer'") {
+    val scalaTermSelect = q"((x: Int) => print(x)).apply"
+    val expectedTransformedTermSelect = q"(((x: Int) => print(x)): Consumer[Int]).accept"
+
+    when(termSelectTermFunctionTransformer.transform(eqTree(q"(x: Int) => print(x)"), eqTree(Apply))).thenReturn(expectedTransformedTermSelect)
+
+    termSelectTransformer.transform(scalaTermSelect).structure shouldBe expectedTransformedTermSelect.structure
   }
 
   test("transform 'Dummy.dummy' should return the same") {

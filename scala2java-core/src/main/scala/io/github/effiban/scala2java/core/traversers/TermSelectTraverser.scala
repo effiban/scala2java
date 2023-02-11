@@ -30,12 +30,15 @@ private[traversers] class TermSelectTraverserImpl(termTraverser: => TermTraverse
 
   private def traverseQualifier(qualifier: Term): Unit = {
     qualifier match {
-      case termFunction: Term.Function =>
-        writeArgumentsStart(Parentheses)
-        termTraverser.traverse(termFunction)
-        writeArgumentsEnd(Parentheses)
+      case qual@(_: Term.Function | Term.Ascribe(_: Term.Function,_)) => traverseInsideParens(qual)
       case qual => termTraverser.traverse(qual)
     }
+  }
+
+  private def traverseInsideParens(qual: Term): Unit = {
+    writeArgumentsStart(Parentheses)
+    termTraverser.traverse(qual)
+    writeArgumentsEnd(Parentheses)
   }
 
   private def writeQualifierSeparator(qualifier: Term): Unit = {

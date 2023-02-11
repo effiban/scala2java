@@ -2,6 +2,6 @@ package dummy
 
 class Sample {
   def foo: Unit = {
-    (() => x).get()
+    ((x: Int) => "bla")(3)
   }
 }

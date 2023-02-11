@@ -17,10 +17,12 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private implicit lazy val typeInferrers: TypeInferrers = new TypeInferrers()
   private implicit lazy val classifiers: Classifiers = new Classifiers(typeInferrers)
+  private implicit lazy val transformers: Transformers = new Transformers(typeInferrers)
   private lazy val resolvers = new Resolvers()
 
   import resolvers._
   import typeInferrers._
+  import transformers._
 
 
   private lazy val alternativeTraverser: AlternativeTraverser = new AlternativeTraverserImpl(patTraverser)
@@ -429,7 +431,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     termTraverser,
     termNameTraverser,
     typeListTraverser,
-    new CompositeTermSelectTransformer(CoreTermSelectTransformer)
+    new CompositeTermSelectTransformer(coreTermSelectTransformer)
   )
 
   private lazy val termTraverser: TermTraverser = new TermTraverserImpl(

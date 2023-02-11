@@ -9,9 +9,10 @@ import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.Term.Block
-import scala.meta.{Lit, Name, Term}
+import scala.meta.{Lit, Name, Term, XtensionQuasiquoteTermParam}
 
 class TermFunctionTraverserImplTest extends UnitTestSuite {
 
@@ -46,7 +47,7 @@ class TermFunctionTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe "() -> doSomething();"
   }
 
-  test("traverse with one arg and one statement") {
+  test("traverse with one untyped arg and one statement") {
     val param = termParam("val1")
     val functionBody = Term.Apply(Term.Name("doSomething"), List(Term.Name("val1")))
     val function = Term.Function(params = List(param), body = functionBody)
@@ -59,6 +60,24 @@ class TermFunctionTraverserImplTest extends UnitTestSuite {
     termFunctionTraverser.traverse(function)
 
     outputWriter.toString shouldBe "val1 -> doSomething(val1);"
+  }
+
+  test("traverse with one typed arg and one statement") {
+    val param = param"val1: Int"
+    val functionBody = Term.Apply(Term.Name("doSomething"), List(Term.Name("val1")))
+    val function = Term.Function(params = List(param), body = functionBody)
+
+    doWrite("(int val1)").when(termParamListTraverser).traverse(
+      termParams = eqTreeList(List(param)),
+      context = eqTo(LambdaStatContext),
+      onSameLine = eqTo(true)
+    )
+    doWrite("doSomething(val1);")
+      .when(statTraverser).traverse(eqTree(functionBody), ArgumentMatchers.eq(StatContext()))
+
+    termFunctionTraverser.traverse(function)
+
+    outputWriter.toString shouldBe "(int val1) -> doSomething(val1);"
   }
 
   test("traverse with one arg and block of one statement") {

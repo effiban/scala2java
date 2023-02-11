@@ -24,7 +24,7 @@ private[traversers] class TermFunctionTraverserImpl(termParamTraverser: => TermP
   override def traverse(function: Term.Function, shouldBodyReturnValue: Decision = Uncertain): Unit = {
     val paramContext = StatContext(JavaScope.LambdaSignature)
     function.params match {
-      case param :: Nil => termParamTraverser.traverse(termParam = param, context = paramContext)
+      case param :: Nil if param.decltpe.isEmpty => termParamTraverser.traverse(termParam = param, context = paramContext)
       case _ => termParamListTraverser.traverse(termParams = function.params, context = paramContext, onSameLine = true)
     }
     writeArrow()

@@ -6,7 +6,8 @@ import io.github.effiban.scala2java.spi.transformers.TermSelectTransformer
 
 import scala.meta.Term
 
-private[transformers] class CoreTermSelectTransformer(termNameClassifier: TermNameClassifier) extends TermSelectTransformer {
+private[transformers] class CoreTermSelectTransformer(termNameClassifier: TermNameClassifier,
+                                                      termSelectTermFunctionTransformer: => TermSelectTermFunctionTransformer) extends TermSelectTransformer {
 
   private final val TupleElementRegex = "_(\\d)".r
 
@@ -40,10 +41,10 @@ private[transformers] class CoreTermSelectTransformer(termNameClassifier: TermNa
       case (nm: Term.Name, Term.Name(Apply)) if termNameClassifier.isJavaMapLike(nm) => Term.Select(Term.Name(Map), Term.Name(JavaOfEntries))
       case (nm: Term.Name, Term.Name(Empty)) if termNameClassifier.isJavaMapLike(nm) => Term.Select(Term.Name(Map), Term.Name(JavaOf))
 
+      case (termFunction: Term.Function, methodName: Term.Name) => termSelectTermFunctionTransformer.transform(termFunction, methodName)
+
       case _ => termSelect
     }
   }
 }
-
-object CoreTermSelectTransformer extends CoreTermSelectTransformer(TermNameClassifier)
 
