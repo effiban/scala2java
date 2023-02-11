@@ -57,7 +57,9 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val ascribeTraverser: AscribeTraverser = new AscribeTraverserImpl(typeTraverser, expressionTraverser)
 
-  private lazy val assignTraverser: AssignTraverser = new AssignTraverserImpl(termTraverser, expressionTraverser)
+  private lazy val assignLHSTraverser: AssignLHSTraverser = new AssignLHSTraverserImpl(termTraverser)
+
+  private lazy val assignTraverser: AssignTraverser = new AssignTraverserImpl(assignLHSTraverser, expressionTraverser)
 
   private lazy val bindTraverser: BindTraverser = new BindTraverserImpl(patTraverser)
 
@@ -190,7 +192,12 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val etaTraverser: EtaTraverser = new EtaTraverserImpl(termTraverser)
 
-  private lazy val expressionTraverser: ExpressionTraverser = new ExpressionTraverserImpl(ifTraverser, termTraverser)
+  private lazy val expressionTraverser: ExpressionTraverser = new ExpressionTraverserImpl(
+    ifTraverser,
+    statTraverser,
+    termApplyTraverser,
+    termTraverser
+  )
 
   private lazy val finallyTraverser: FinallyTraverser = new FinallyTraverserImpl(blockTraverser)
 
@@ -224,8 +231,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   )
 
   private lazy val invocationArgTraverser: ArgumentTraverser[Term] = new InvocationArgTraverser(
-    assignTraverser,
-    termFunctionTraverser,
+    assignLHSTraverser,
     expressionTraverser
   )
 

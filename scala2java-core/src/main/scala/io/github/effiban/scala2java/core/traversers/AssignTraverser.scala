@@ -1,29 +1,19 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.writers.JavaWriter
-
 import scala.meta.Term.Assign
 
-trait AssignTraverser {
+trait AssignTraverser extends ScalaTreeTraverser[Assign] {
 
-  def traverse(assign: Assign, lhsAsComment: Boolean = false): Unit
+  def traverse(assign: Assign): Unit
 }
 
-private[traversers] class AssignTraverserImpl(termTraverser: => TermTraverser,
-                                              expressionTraverser: => ExpressionTraverser)
-                                             (implicit javaWriter: JavaWriter) extends AssignTraverser {
+private[traversers] class AssignTraverserImpl(assignLHSTraverser: => AssignLHSTraverser,
+                                              expressionTraverser: => ExpressionTraverser) extends AssignTraverser {
 
-  import javaWriter._
-
-  // Variable assignment, named arg in annotation, or named arg in method invocation.
-  // Java doesn't support the name in the last case - so in that case the LHS will be written as a comment.
-  override def traverse(assign: Assign, lhsAsComment: Boolean = false): Unit = {
-    if (lhsAsComment) {
-      writeComment(s"${assign.lhs} =")
-    } else {
-      termTraverser.traverse(assign.lhs)
-      write(" = ")
-    }
+  // This traverser handles a 'var' assignment only.
+  // The other two cases of a named argument in an annotation or a method invocation - are handled by a separate traverser
+  override def traverse(assign: Assign): Unit = {
+    assignLHSTraverser.traverse(assign.lhs)
     expressionTraverser.traverse(assign.rhs)
   }
 }
