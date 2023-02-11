@@ -12,6 +12,7 @@ private[typeinference] class TermTypeInferrerImpl(applyInfixTypeInferrer: => App
                                                   applyTypeTypeInferrer: => ApplyTypeTypeInferrer,
                                                   blockTypeInferrer: => BlockTypeInferrer,
                                                   caseListTypeInferrer: => CaseListTypeInferrer,
+                                                  functionTypeInferrer: => FunctionTypeInferrer,
                                                   ifTypeInferrer: => IfTypeInferrer,
                                                   litTypeInferrer: LitTypeInferrer,
                                                   nameTypeInferrer: NameTypeInferrer,
@@ -32,6 +33,7 @@ private[typeinference] class TermTypeInferrerImpl(applyInfixTypeInferrer: => App
       case _: Do => Some(Type.AnonymousName())
       case _: For => Some(Type.AnonymousName())
       case forYield: ForYield => infer(forYield.body)
+      case function: Term.Function => Some(functionTypeInferrer.infer(function))
       case `if`: If => ifTypeInferrer.infer(`if`)
       case _: Term.Interpolate => Some(Type.Name("String"))
       case lit: Lit => litTypeInferrer.infer(lit)
@@ -46,7 +48,7 @@ private[typeinference] class TermTypeInferrerImpl(applyInfixTypeInferrer: => App
       case tryWithHandler: TryWithHandler => tryWithHandlerTypeInferrer.infer(tryWithHandler)
       case tuple: Term.Tuple => Some(tupleTypeInferrer.infer(tuple))
       case _: While => Some(Type.AnonymousName())
-      // TODO - support NewAnonymous, Function, PartialFunction
+      // TODO - support NewAnonymous, PartialFunction
       case _ => None
     }
   }

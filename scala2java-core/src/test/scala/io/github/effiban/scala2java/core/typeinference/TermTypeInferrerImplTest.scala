@@ -44,12 +44,17 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
   )
   private val MatchCases = List(MatchCase1, MatchCase2)
 
+  private val TheTermFunction = q"((x: Int) => x + 1)"
+  private val TheTypeFunction = t"Int => Int"
+
+
   private val applyInfixTypeInferrer = mock[ApplyInfixTypeInferrer]
   private val applyTypeInferrer = mock[ApplyTypeInferrer]
   private val applyTypeTypeInferrer = mock[ApplyTypeTypeInferrer]
-  private val caseListTypeInferrer = mock[CaseListTypeInferrer]
-  private val ifTypeInferrer = mock[IfTypeInferrer]
   private val blockTypeInferrer = mock[BlockTypeInferrer]
+  private val caseListTypeInferrer = mock[CaseListTypeInferrer]
+  private val functionTypeInferrer = mock[FunctionTypeInferrer]
+  private val ifTypeInferrer = mock[IfTypeInferrer]
   private val litTypeInferrer = mock[LitTypeInferrer]
   private val nameTypeInferrer = mock[NameTypeInferrer]
   private val selectTypeInferrer = mock[SelectTypeInferrer]
@@ -63,6 +68,7 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
     applyTypeTypeInferrer,
     blockTypeInferrer,
     caseListTypeInferrer,
+    functionTypeInferrer,
     ifTypeInferrer,
     litTypeInferrer,
     nameTypeInferrer,
@@ -129,6 +135,12 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
     when(litTypeInferrer.infer(eqTree(body))).thenReturn(Some(TypeNames.String))
 
     termTypeInferrer.infer(forYield).value.structure shouldBe TypeNames.String.structure
+  }
+
+  test("infer Term.Function should return result of 'FunctionTypeInferrer'") {
+    when(functionTypeInferrer.infer(eqTree(TheTermFunction))).thenReturn(TheTypeFunction)
+
+    termTypeInferrer.infer(TheTermFunction).value.structure shouldBe TheTypeFunction.structure
   }
 
   test("infer 'If' when 'IfTypeInferrer' returns a result should return it") {
