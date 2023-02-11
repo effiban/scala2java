@@ -13,10 +13,11 @@ public class Sample {
     }
 
     public void foo() {
-        doSomething(() ->  {
-            final var x = 3;
-            /* return? */x;
+        doSomething(((Supplier<int>)() ->  {
+            doFirst();
+            doSecond();
+            /* return? */3;
             }
-            );
+            ).get());
     }
 }
