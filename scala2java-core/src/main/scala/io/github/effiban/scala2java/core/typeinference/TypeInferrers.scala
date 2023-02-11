@@ -28,6 +28,8 @@ class TypeInferrers(implicit extensionRegistry: ExtensionRegistry) {
     TypeNameClassifier
   )
 
+  private[typeinference] lazy val functionTypeInferrer = new FunctionTypeInferrerImpl(termTypeInferrer)
+
   private[typeinference] lazy val ifTypeInferrer = new IfTypeInferrerImpl(termTypeInferrer)
 
   lazy val termTypeInferrer: TermTypeInferrer = new TermTypeInferrerImpl(
@@ -36,6 +38,7 @@ class TypeInferrers(implicit extensionRegistry: ExtensionRegistry) {
     applyTypeTypeInferrer,
     blockTypeInferrer,
     caseListTypeInferrer,
+    functionTypeInferrer,
     ifTypeInferrer,
     LitTypeInferrer,
     new CompositeNameTypeInferrer(CoreNameTypeInferrer),
