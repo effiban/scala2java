@@ -6,3 +6,4 @@ case class ArgumentContext(maybeParent: Option[Tree] = None,
                            maybeName: Option[Term.Name] = None,
                            index: Int,
                            argNameAsComment: Boolean = false)
+

@@ -1,14 +1,13 @@
 package io.github.effiban.scala2java.core.classifiers
 
-import io.github.effiban.scala2java.core.contexts.ArgumentContext
-import io.github.effiban.scala2java.core.entities.TermNameValues
 import io.github.effiban.scala2java.core.entities.TermNameValues.Apply
+import io.github.effiban.scala2java.core.entities.{ArgumentCoordinates, TermNameValues}
 
 import scala.meta.Term
 
 trait InvocationArgClassifier {
 
-  def isPassedByName(argContext: ArgumentContext): Boolean
+  def isPassedByName(argCoords: ArgumentCoordinates): Boolean
 }
 
 object InvocationArgClassifier extends InvocationArgClassifier {
@@ -19,10 +18,10 @@ object InvocationArgClassifier extends InvocationArgClassifier {
   )
 
 
-  override def isPassedByName(argContext: ArgumentContext): Boolean = {
-    argContext match {
-      case ArgumentContext(Some(Term.Apply(method, _)), _, 0, _) if isFirstArgPassedByName(method) => true
-      case ArgumentContext(Some(Term.Apply(Term.ApplyType(method, _), _)), _, 0, _) if isFirstArgPassedByName(method) => true
+  override def isPassedByName(argCoords: ArgumentCoordinates): Boolean = {
+    argCoords match {
+      case ArgumentCoordinates(Term.Apply(method, _), _, 0) if isFirstArgPassedByName(method) => true
+      case ArgumentCoordinates(Term.Apply(Term.ApplyType(method, _), _), _, 0) if isFirstArgPassedByName(method) => true
       case _ => false
     }
   }

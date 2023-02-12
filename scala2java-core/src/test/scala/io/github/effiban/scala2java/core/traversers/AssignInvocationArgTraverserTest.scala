@@ -39,7 +39,7 @@ class AssignInvocationArgTraverserTest extends UnitTestSuite {
     val rhs = Lit.Int(1)
     val assign = Term.Assign(lhs, rhs)
     val initialContext = ArgumentContext(index = 0, argNameAsComment = true)
-    val expectedAdjustedContext = ArgumentContext(maybeName = Some(lhs), index = 0)
+    val expectedAdjustedContext = ArgumentContext(maybeName = Some(lhs), index = 0, argNameAsComment = true)
 
     doWrite("/* x = */").when(assignLHSTraverser).traverse(eqTree(lhs), asComment = eqTo(true))
     doWrite("1").when(defaultInvocationArgTraverser).traverse(eqTree(rhs), eqArgumentContext(expectedAdjustedContext))
