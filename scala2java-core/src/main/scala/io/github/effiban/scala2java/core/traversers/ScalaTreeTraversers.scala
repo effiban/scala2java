@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.classifiers.{Classifiers, DefnValClassifier, JavaStatClassifier}
+import io.github.effiban.scala2java.core.classifiers.{Classifiers, DefnValClassifier, InvocationArgClassifier, JavaStatClassifier}
 import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
 import io.github.effiban.scala2java.core.factories.TemplateChildContextFactory
 import io.github.effiban.scala2java.core.orderings.JavaTemplateChildOrdering
@@ -12,6 +12,7 @@ import io.github.effiban.scala2java.core.typeinference.TypeInferrers
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Term
+import scala.meta.Term.Assign
 
 class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: ExtensionRegistry) {
 
@@ -21,8 +22,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   private lazy val resolvers = new Resolvers()
 
   import resolvers._
-  import typeInferrers._
   import transformers._
+  import typeInferrers._
 
 
   private lazy val alternativeTraverser: AlternativeTraverser = new AlternativeTraverserImpl(patTraverser)
@@ -56,6 +57,11 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   )
 
   private lazy val ascribeTraverser: AscribeTraverser = new AscribeTraverserImpl(typeTraverser, expressionTraverser)
+
+  private lazy val assignInvocationArgTraverser: InvocationArgTraverser[Assign] = new AssignInvocationArgTraverser(
+    assignLHSTraverser,
+    defaultInvocationArgTraverser
+  )
 
   private lazy val assignLHSTraverser: AssignLHSTraverser = new AssignLHSTraverserImpl(termTraverser)
 
@@ -100,6 +106,11 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     new CompositeClassTransformer(),
   )
 
+  private lazy val compositeInvocationArgTraverser: InvocationArgTraverser[Term] = new CompositeInvocationArgTraverser(
+    assignInvocationArgTraverser,
+    defaultInvocationArgTraverser
+  )
+
   private lazy val ctorPrimaryTraverser: CtorPrimaryTraverser = new CtorPrimaryTraverserImpl(CtorPrimaryTransformer, defnDefTraverser)
 
   private lazy val ctorSecondaryTraverser: CtorSecondaryTraverser = new CtorSecondaryTraverserImpl(CtorSecondaryTransformer, defnDefTraverser)
@@ -133,6 +144,11 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     modListTraverser,
     typeTraverser,
     patListTraverser
+  )
+
+  private lazy val defaultInvocationArgTraverser: InvocationArgTraverser[Term] = new DefaultInvocationArgTraverser(
+    expressionTraverser,
+    InvocationArgClassifier
   )
 
   private lazy val defnDefTraverser: DefnDefTraverser = new DefnDefTraverserImpl(
@@ -227,12 +243,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   private lazy val initTraverser: InitTraverser = new InitTraverserImpl(
     typeTraverser,
     argumentListTraverser,
-    invocationArgTraverser
-  )
-
-  private lazy val invocationArgTraverser: ArgumentTraverser[Term] = new InvocationArgTraverser(
-    assignLHSTraverser,
-    expressionTraverser
+    compositeInvocationArgTraverser
   )
 
   private lazy val litTraverser: LitTraverser = new LitTraverserImpl()
@@ -382,7 +393,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     termApplyTraverser,
     termNameTraverser,
     argumentListTraverser,
-    invocationArgTraverser,
+    compositeInvocationArgTraverser,
     new CompositeTermApplyInfixToTermApplyTransformer(CoreTermApplyInfixToTermApplyTransformer)
   )
 
@@ -390,7 +401,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     termTraverser,
     arrayInitializerTraverser,
     argumentListTraverser,
-    invocationArgTraverser,
+    compositeInvocationArgTraverser,
     ArrayInitializerContextResolver,
     new CompositeTermApplyTransformer(CoreTermApplyTransformer)
   )

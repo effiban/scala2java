@@ -28,7 +28,7 @@ private[traversers] class ExpressionTraverserImpl(ifTraverser: => IfTraverser,
     block match {
       // When it has one statement - unwrapping it to the statement
       case Block(List(stat)) => statTraverser.traverse(stat)
-      // When it has more than one statement - wrapping it with an anonymous lambda which is immediately invoked
+      // When it has more than one statement - wrapping it with a zero-arg lambda which is immediately invoked
       case block: Block => termApplyTraverser.traverse(Term.Apply(Term.Function(Nil, block), Nil))
     }
   }

@@ -1,7 +1,6 @@
 package io.github.effiban.scala2java.core.transformers
 
 import io.github.effiban.scala2java.core.classifiers.TermNameClassifier
-import io.github.effiban.scala2java.core.entities.TermNameValues
 import io.github.effiban.scala2java.core.entities.TermNameValues.Apply
 import io.github.effiban.scala2java.spi.transformers.TermApplyTransformer
 
@@ -14,8 +13,8 @@ private[transformers] class CoreTermApplyTransformer(termNameClassifier: TermNam
   @tailrec
   override final def transform(termApply: Term.Apply): Term.Apply = {
     termApply match {
-      case Term.Apply(name : Term.Name, args) => Term.Apply(transformName(name), transformArgs(name, args))
-      case Term.Apply(Term.ApplyType(name: Term.Name, types), args) => Term.Apply(Term.ApplyType(transformName(name), types), transformArgs(name, args))
+      case Term.Apply(name : Term.Name, args) => Term.Apply(transformName(name), args)
+      case Term.Apply(Term.ApplyType(name: Term.Name, types), args) => Term.Apply(Term.ApplyType(transformName(name), types), args)
       // Invocation of method with more than one param list
       case Term.Apply(Term.Apply(fun, args1), args2) => transform(Term.Apply(fun, args1 ++ args2))
       // Invocation of lambda - must add the implicit apply so it can be further processed by the 'Select' transformer
@@ -27,12 +26,6 @@ private[transformers] class CoreTermApplyTransformer(termNameClassifier: TermNam
   private def transformName(name: Term.Name): Term = name match {
     case nm if termNameClassifier.isPreDefScalaObject(nm) => Term.Select(nm, Term.Name(Apply))
     case _ => name
-  }
-
-  private def transformArgs(name: Term.Name, args: List[Term]): List[Term] = (name, args) match {
-    // For objects that are instantiated with a single argument by-name, transform the argument to a supplier lambda for Java
-    case (nm, List(arg)) if termNameClassifier.isInstantiatedByName(nm) => List(Term.Function(Nil, arg))
-    case _ => args
   }
 }
 
