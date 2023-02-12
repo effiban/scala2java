@@ -1,16 +1,13 @@
-package io.github.effiban.scala2java.core.classifiers
+package io.github.effiban.scala2java.core.predicates
 
 import io.github.effiban.scala2java.core.entities.TermNameValues.Apply
 import io.github.effiban.scala2java.core.entities.{ArgumentCoordinates, TermNameValues}
 
 import scala.meta.Term
 
-trait InvocationArgClassifier {
+trait InvocationArgByNamePredicate extends (ArgumentCoordinates => Boolean)
 
-  def isPassedByName(argCoords: ArgumentCoordinates): Boolean
-}
-
-object InvocationArgClassifier extends InvocationArgClassifier {
+object InvocationArgByNamePredicate extends InvocationArgByNamePredicate {
 
   private final val MethodsWithFirstArgPassedByName: Set[Term] = Set(
     Term.Select(Term.Name(TermNameValues.Try), Term.Name(Apply)),
@@ -18,7 +15,7 @@ object InvocationArgClassifier extends InvocationArgClassifier {
   )
 
 
-  override def isPassedByName(argCoords: ArgumentCoordinates): Boolean = {
+  override def apply(argCoords: ArgumentCoordinates): Boolean = {
     argCoords match {
       case ArgumentCoordinates(Term.Apply(method, _), _, 0) if isFirstArgPassedByName(method) => true
       case ArgumentCoordinates(Term.Apply(Term.ApplyType(method, _), _), _, 0) if isFirstArgPassedByName(method) => true
