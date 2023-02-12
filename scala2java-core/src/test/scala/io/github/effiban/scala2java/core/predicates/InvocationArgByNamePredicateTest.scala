@@ -1,11 +1,11 @@
-package io.github.effiban.scala2java.core.classifiers
+package io.github.effiban.scala2java.core.predicates
 
 import io.github.effiban.scala2java.core.entities.ArgumentCoordinates
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 
 import scala.meta.XtensionQuasiquoteTerm
 
-class InvocationArgClassifierTest extends UnitTestSuite {
+class InvocationArgByNamePredicateTest extends UnitTestSuite {
 
   private val ArgumentContextClassifications = Table(
     ("ArgumentCoordinates", "ExpectedPassedByName"),
@@ -22,7 +22,7 @@ class InvocationArgClassifierTest extends UnitTestSuite {
 
   forAll(ArgumentContextClassifications) { case (argCoords: ArgumentCoordinates, expectedPassedByName: Boolean) =>
     test(s"The argument at: $argCoords is passed by ${if (expectedPassedByName) "name" else "value"}") {
-      InvocationArgClassifier.isPassedByName(argCoords)
+      InvocationArgByNamePredicate(argCoords)
     }
   }
 }
