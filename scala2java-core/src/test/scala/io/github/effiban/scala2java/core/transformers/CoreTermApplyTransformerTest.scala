@@ -40,29 +40,6 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
     termApplyTransformer.transform(initialTermApply).structure shouldBe expectedTermApply.structure
   }
 
-  test("transform() of a untyped pre-def object initializer, arg by-name, should return same with added 'apply' and arg wrapped by lambda") {
-    val initialTermApply = Term.Apply(TermNames.Future, List(Lit.Int(1)))
-    val expectedTermApply = Term.Apply(Term.Select(TermNames.Future, TermNames.Apply), List(Term.Function(Nil, Lit.Int(1))))
-
-    when(termNameClassifier.isPreDefScalaObject(eqTree(TermNames.Future))).thenReturn(true)
-    when(termNameClassifier.isInstantiatedByName(eqTree(TermNames.Future))).thenReturn(true)
-
-    termApplyTransformer.transform(initialTermApply).structure shouldBe expectedTermApply.structure
-  }
-
-  test("transform() of a typed pre-def object initializer, arg by-name, should return same with added 'apply' and arg wrapped by lambda") {
-    val initialTermApply = Term.Apply(Term.ApplyType(TermNames.Future, List(TypeNames.Int)), List(Lit.Int(1)))
-    val expectedTermApply = Term.Apply(
-      Term.ApplyType(Term.Select(TermNames.Future, TermNames.Apply), List(TypeNames.Int)),
-      List(Term.Function(Nil, Lit.Int(1)))
-    )
-
-    when(termNameClassifier.isPreDefScalaObject(eqTree(TermNames.Future))).thenReturn(true)
-    when(termNameClassifier.isInstantiatedByName(eqTree(TermNames.Future))).thenReturn(true)
-
-    termApplyTransformer.transform(initialTermApply).structure shouldBe expectedTermApply.structure
-  }
-
   test("transform() of a regular method invocation with an unqualified name, should return  same invocation") {
     val termApply = Term.Apply(Term.Name("Foo"), List(Lit.Int(1)))
 

@@ -14,8 +14,6 @@ trait TermNameClassifier {
   def isJavaMapLike(termName: Term.Name): Boolean
 
   def isPreDefScalaObject(termName: Term.Name): Boolean
-
-  def isInstantiatedByName(termName: Term.Name): Boolean
 }
 
 object TermNameClassifier extends TermNameClassifier {
@@ -44,11 +42,6 @@ object TermNameClassifier extends TermNameClassifier {
     "HashMap"
   )
 
-  final val InstantiatedByName: Set[String] = Set(
-    TermNameValues.Try,
-    TermNameValues.Future
-  )
-
   final val PreDefScalaObjects = Set(
     TermNameValues.ScalaRange,
     TermNameValues.ScalaOption,
@@ -70,6 +63,4 @@ object TermNameClassifier extends TermNameClassifier {
   override def isJavaMapLike(termName: Term.Name): Boolean = JavaMapLike.contains(termName.value)
 
   override def isPreDefScalaObject(termName: Term.Name): Boolean = PreDefScalaObjects.contains(termName.value)
-
-  override def isInstantiatedByName(termName: Term.Name): Boolean = InstantiatedByName.contains(termName.value)
 }
