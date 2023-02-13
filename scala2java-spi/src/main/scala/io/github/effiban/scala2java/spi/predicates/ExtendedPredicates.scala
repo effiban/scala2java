@@ -26,4 +26,11 @@ trait ExtendedPredicates {
    *         otherwise - the default predicate which doesn't exclude anything<br>
    */
   def templateInitExcludedPredicate(): TemplateInitExcludedPredicate = TemplateInitExcludedPredicate.None
+
+  /** Override this method if you need to indicate that an invocation argument is be passed by-name
+   *
+   * @return if overriden - a predicate which determines whether a given invocation argument is passed by-name
+   *         otherwise - the default predicate which always returns `false`, meaning passed by-value<br>
+   */
+  def invocationArgByNamePredicate(): InvocationArgByNamePredicate = InvocationArgByNamePredicate.Default
 }

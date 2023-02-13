@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.extensions
 
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.spi.Scala2JavaExtension
-import io.github.effiban.scala2java.spi.predicates.{ImporterExcludedPredicate, TemplateInitExcludedPredicate}
+import io.github.effiban.scala2java.spi.predicates.{ImporterExcludedPredicate, InvocationArgByNamePredicate, TemplateInitExcludedPredicate}
 
 class ExtendedPredicatesTest extends UnitTestSuite {
 
@@ -34,5 +34,18 @@ class ExtendedPredicatesTest extends UnitTestSuite {
     val extensionRegistry = ExtensionRegistry(extensions)
 
     extensionRegistry.templateInitExcludedPredicates shouldBe templateInitExcludedPredicates
+  }
+
+  test("invocationArgByNamePredicates") {
+    val invocationArgByNamePredicate1 = mock[InvocationArgByNamePredicate]
+    val invocationArgByNamePredicate2 = mock[InvocationArgByNamePredicate]
+    val invocationArgByNamePredicates = List(invocationArgByNamePredicate1, invocationArgByNamePredicate2)
+
+    when(extension1.invocationArgByNamePredicate()).thenReturn(invocationArgByNamePredicate1)
+    when(extension2.invocationArgByNamePredicate()).thenReturn(invocationArgByNamePredicate2)
+
+    val extensionRegistry = ExtensionRegistry(extensions)
+
+    extensionRegistry.invocationArgByNamePredicates shouldBe invocationArgByNamePredicates
   }
 }
