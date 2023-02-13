@@ -148,7 +148,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val defaultInvocationArgTraverser: InvocationArgTraverser[Term] = new DefaultInvocationArgTraverser(
     expressionTraverser,
-    InvocationArgByNamePredicate
+    new CompositeInvocationArgByNamePredicate(CoreInvocationArgByNamePredicate)
   )
 
   private lazy val defnDefTraverser: DefnDefTraverser = new DefnDefTraverserImpl(
