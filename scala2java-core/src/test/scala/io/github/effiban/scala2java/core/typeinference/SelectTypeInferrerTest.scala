@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{TermNames, TypeNames}
 import io.github.effiban.scala2java.core.typeinference.SelectTypeInferrer.infer
 
-import scala.meta.{Term, Type}
+import scala.meta.{Term, Type, XtensionQuasiquoteTerm}
 
 class SelectTypeInferrerTest extends UnitTestSuite {
 
@@ -12,6 +12,7 @@ class SelectTypeInferrerTest extends UnitTestSuite {
     ("TermSelect", "MaybeType"),
     (Term.Select(TermNames.Future, TermNames.ScalaSuccessful), Some(TypeNames.Future)),
     (Term.Select(TermNames.Future, TermNames.ScalaFailed), Some(TypeNames.Future)),
+    (Term.Select(q"obj", q"toString"), Some(TypeNames.String)),
     (Term.Select(Term.Name("foo"), Term.Name("bar")), None)
   )
 

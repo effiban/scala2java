@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.entities.TermNameValues.{Empty, ScalaIn
 import io.github.effiban.scala2java.core.entities.{TermNameValues, TypeNameValues}
 import io.github.effiban.scala2java.spi.typeinferrers.TypeInferrer0
 
-import scala.meta.{Term, Type}
+import scala.meta.{Term, Type, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 trait SelectTypeInferrer extends TypeInferrer0[Term.Select]
 
@@ -22,6 +22,7 @@ object SelectTypeInferrer extends SelectTypeInferrer {
       case (Term.Name(TermNameValues.ScalaVector), Term.Name(Empty)) => Some(Type.Name(TypeNameValues.ScalaVector))
       case (Term.Name(TermNameValues.Set), Term.Name(Empty)) => Some(Type.Name(TypeNameValues.Set))
       case (Term.Name(TermNameValues.Map), Term.Name(Empty)) => Some(Type.Name(TypeNameValues.Map))
+      case (_, q"toString") => Some(t"String")
       case _ => None
     }
   }
