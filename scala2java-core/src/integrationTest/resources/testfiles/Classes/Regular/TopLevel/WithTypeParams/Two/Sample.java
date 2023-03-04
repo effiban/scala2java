@@ -8,7 +8,4 @@ import java.util.function.*;
 import java.util.stream.*;
 
 public class Sample<T1, T2> {
-
-    public Sample() {
-    }
 }

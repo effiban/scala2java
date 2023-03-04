@@ -10,7 +10,4 @@ import java.util.stream.*;
 @MyAnnot1
 @MyAnnot2
 public class Sample {
-
-    public Sample() {
-    }
 }

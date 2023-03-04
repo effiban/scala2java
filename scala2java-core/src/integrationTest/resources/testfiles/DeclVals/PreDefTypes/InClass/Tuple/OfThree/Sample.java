@@ -9,7 +9,4 @@ import java.util.stream.*;
 
 public abstract class Sample {
     public final Tuple3<String, int, long> x;
-
-    public Sample() {
-    }
 }

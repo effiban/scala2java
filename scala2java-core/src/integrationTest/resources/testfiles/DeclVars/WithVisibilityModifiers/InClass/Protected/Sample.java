@@ -9,7 +9,4 @@ import java.util.stream.*;
 
 public class Sample {
     protected int x;
-    
-    public Sample() {
     }
-}

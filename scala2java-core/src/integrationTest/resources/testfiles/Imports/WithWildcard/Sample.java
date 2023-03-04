@@ -9,7 +9,4 @@ import java.util.stream.*;
 import aaa.*;
 
 public class Sample {
-
-    public Sample() {
-    }
 }

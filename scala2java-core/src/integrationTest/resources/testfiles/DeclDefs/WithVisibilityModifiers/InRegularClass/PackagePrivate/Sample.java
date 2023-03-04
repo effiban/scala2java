@@ -9,8 +9,5 @@ import java.util.stream.*;
 
 public class Sample {
 
-    public Sample() {
-    }
-
     void foo();
 }

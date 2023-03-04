@@ -9,9 +9,6 @@ import java.util.stream.*;
 
 public class Sample {
 
-    public Sample() {
-    }
-
     public Foo foo() {
         return new Foo("bar");
     }

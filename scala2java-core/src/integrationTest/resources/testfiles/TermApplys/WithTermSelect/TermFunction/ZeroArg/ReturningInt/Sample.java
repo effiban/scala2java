@@ -9,9 +9,6 @@ import java.util.stream.*;
 
 public class Sample {
 
-    public Sample() {
-    }
-
     public void foo() {
         ((Supplier<int>)() -> 3).get();
     }

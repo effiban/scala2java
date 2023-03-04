@@ -9,7 +9,4 @@ import java.util.stream.*;
 
 public class Sample {
     public final Either<Err, String> x = Either.<Err, String>right("abc");
-
-    public Sample() {
-    }
 }

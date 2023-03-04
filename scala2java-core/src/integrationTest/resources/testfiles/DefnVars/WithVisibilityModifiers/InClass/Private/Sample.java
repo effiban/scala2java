@@ -9,7 +9,4 @@ import java.util.stream.*;
 
 public class Sample {
     private int x = 3;
-
-    public Sample() {
-    }
 }

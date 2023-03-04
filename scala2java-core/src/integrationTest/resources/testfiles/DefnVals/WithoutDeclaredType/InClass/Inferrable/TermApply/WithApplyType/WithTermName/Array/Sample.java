@@ -9,7 +9,4 @@ import java.util.stream.*;
 
 public class Sample {
     public final String[] x = new String[] {"abc", "def"};
-
-    public Sample() {
-    }
 }

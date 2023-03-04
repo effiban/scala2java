@@ -9,7 +9,4 @@ import java.util.stream.*;
 
 public class Sample {
     public final List x = List.of;
-
-    public Sample() {
-    }
 }

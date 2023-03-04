@@ -9,9 +9,6 @@ import java.util.stream.*;
 
 public class Sample {
 
-    public Sample() {
-    }
-
     public int foo(final String str) {
         return switch (str) {
             case "one" -> 1;
