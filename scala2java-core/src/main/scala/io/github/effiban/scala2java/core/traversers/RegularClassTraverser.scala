@@ -33,9 +33,7 @@ private[traversers] class RegularClassTraverserImpl(modListTraverser: => ModList
   }
 
   private def traverseCtorAndTemplate(classDef: Defn.Class, javaTreeType: JavaTreeType, context: ClassOrTraitContext): Unit = {
-    val explicitMemberDecls = classDef.ctor.paramss.flatten.map(x =>
-      paramToDeclValTransformer.transform(x)
-    )
+    val explicitMemberDecls = classDef.ctor.paramss.flatten.map(paramToDeclValTransformer.transform)
     // TODO if the ctor. params have 'ValParam' or 'VarParam' modifiers, need to generate accessors/mutators for them as well
     val enrichedStats = explicitMemberDecls ++ classDef.templ.stats
     val enrichedTemplate = classDef.templ.copy(stats = enrichedStats)
