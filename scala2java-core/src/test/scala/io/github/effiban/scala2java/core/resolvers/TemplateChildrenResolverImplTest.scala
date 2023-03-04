@@ -1,10 +1,12 @@
 package io.github.effiban.scala2java.core.resolvers
 
 import io.github.effiban.scala2java.core.classifiers.DefnTypeClassifier
-import io.github.effiban.scala2java.core.contexts.TemplateBodyContext
+import io.github.effiban.scala2java.core.contexts.{CtorRequiredResolutionContext, TemplateBodyContext}
+import io.github.effiban.scala2java.core.matchers.CtorRequiredResolutionContextMatcher.eqCtorRequiredResolutionContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.spi.entities.JavaScope.JavaScope
+import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchers.any
 
 import scala.meta.{Defn, XtensionQuasiquoteInit, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
@@ -32,8 +34,9 @@ class TemplateChildrenResolverImplTest extends UnitTestSuite {
   private val RegularTypeDef = q"type MyType = MyOtherType"
 
   private val defnTypeClassifier = mock[DefnTypeClassifier]
+  private val javaCtorPrimaryRequiredResolver = mock[JavaCtorPrimaryRequiredResolver]
 
-  private val templateChildrenResolver = new TemplateChildrenResolverImpl(defnTypeClassifier)
+  private val templateChildrenResolver = new TemplateChildrenResolverImpl(defnTypeClassifier, javaCtorPrimaryRequiredResolver)
 
   override def beforeEach(): Unit = {
     super.beforeEach()
@@ -59,6 +62,14 @@ class TemplateChildrenResolverImplTest extends UnitTestSuite {
 
     val expectedChildren = nonTerms :+ ThePrimaryCtor
 
+    val ctorRequiredResolutionContext = CtorRequiredResolutionContext(
+      inits = TheInits,
+      terms = TheTerms,
+      otherStats = nonTerms
+    )
+
+    when(javaCtorPrimaryRequiredResolver.isRequired(eqTree(ThePrimaryCtor), eqCtorRequiredResolutionContext(ctorRequiredResolutionContext))).thenReturn(true)
+
     templateChildrenResolver.resolve(TheTerms, nonTerms, context).structure shouldBe expectedChildren.structure
   }
 
@@ -74,6 +85,14 @@ class TemplateChildrenResolverImplTest extends UnitTestSuite {
 
     val expectedChildren = nonTerms :+ ThePrimaryCtor
 
+    val ctorRequiredResolutionContext = CtorRequiredResolutionContext(
+      inits = TheInits,
+      terms = TheTerms,
+      otherStats = nonTerms
+    )
+
+    when(javaCtorPrimaryRequiredResolver.isRequired(eqTree(ThePrimaryCtor), eqCtorRequiredResolutionContext(ctorRequiredResolutionContext))).thenReturn(true)
+
     templateChildrenResolver.resolve(TheTerms, nonTerms, context).structure shouldBe expectedChildren.structure
   }
 
@@ -86,8 +105,17 @@ class TemplateChildrenResolverImplTest extends UnitTestSuite {
     )
 
     val nonTerms = List(DefnDef1, DefnDef2, EnumTypeDef)
+    val expectedFilteredNonTerms = List(DefnDef1, DefnDef2)
 
     val expectedChildren = List(DefnDef1, DefnDef2) :+ ThePrimaryCtor
+
+    val ctorRequiredResolutionContext = CtorRequiredResolutionContext(
+      inits = TheInits,
+      terms = TheTerms,
+      otherStats = expectedFilteredNonTerms
+    )
+
+    when(javaCtorPrimaryRequiredResolver.isRequired(eqTree(ThePrimaryCtor), eqCtorRequiredResolutionContext(ctorRequiredResolutionContext))).thenReturn(true)
 
     templateChildrenResolver.resolve(TheTerms, nonTerms, context).structure shouldBe expectedChildren.structure
   }
@@ -135,5 +163,28 @@ class TemplateChildrenResolverImplTest extends UnitTestSuite {
     val expectedChildren = TheTerms ++ List(DefnDef1, DefnDef2)
 
     templateChildrenResolver.resolve(TheTerms, nonTerms, context).structure shouldBe expectedChildren.structure
+  }
+
+  test("resolve() when has a redundant primary ctor.") {
+    val context = TemplateBodyContext(
+      JavaScope.Class,
+      Some(TheClassName),
+      Some(ThePrimaryCtor),
+      TheInits
+    )
+
+    val nonTerms = List(DefnDef1, DefnDef2)
+
+    val expectedChildren = nonTerms
+
+    val ctorRequiredResolutionContext = CtorRequiredResolutionContext(
+      inits = TheInits,
+      terms = TheTerms,
+      otherStats = nonTerms
+    )
+
+    when(javaCtorPrimaryRequiredResolver.isRequired(eqTree(ThePrimaryCtor), eqCtorRequiredResolutionContext(ctorRequiredResolutionContext))).thenReturn(false)
+
+    templateChildrenResolver.resolve(Nil, nonTerms, context).structure shouldBe expectedChildren.structure
   }
 }

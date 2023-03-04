@@ -9,7 +9,4 @@ import java.util.stream.*;
 
 public abstract class Sample {
     public final A<int> x;
-
-    public Sample() {
-    }
 }

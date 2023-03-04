@@ -1,3 +1,3 @@
 package dummy
 
-class Sample[T]()
+class Sample[T]

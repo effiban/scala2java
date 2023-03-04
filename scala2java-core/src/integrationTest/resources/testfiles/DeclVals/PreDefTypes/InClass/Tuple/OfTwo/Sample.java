@@ -9,7 +9,4 @@ import java.util.stream.*;
 
 public abstract class Sample {
     public final Map.Entry<String, int> x;
-
-    public Sample() {
-    }
 }

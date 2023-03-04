@@ -9,7 +9,4 @@ import java.util.stream.*;
 
 public class Sample {
     public final Set<String> x = Set.of("abc", "def");
-
-    public Sample() {
-    }
 }

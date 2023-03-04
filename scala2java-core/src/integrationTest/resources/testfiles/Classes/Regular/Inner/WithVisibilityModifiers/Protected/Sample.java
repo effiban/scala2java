@@ -9,12 +9,6 @@ import java.util.stream.*;
 
 public class Sample {
 
-    public Sample() {
-    }
-
     protected class InnerSample {
-
-        public InnerSample() {
-        }
     }
 }

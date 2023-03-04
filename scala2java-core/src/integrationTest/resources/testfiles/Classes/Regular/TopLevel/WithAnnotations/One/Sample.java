@@ -9,7 +9,4 @@ import java.util.stream.*;
 
 @MyAnnot
 public class Sample {
-
-    public Sample() {
-    }
 }

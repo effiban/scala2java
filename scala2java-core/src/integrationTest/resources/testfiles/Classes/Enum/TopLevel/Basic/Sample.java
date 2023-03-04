@@ -9,7 +9,4 @@ import java.util.stream.*;
 
 public enum Sample {
     First, Second;
-
-    public Sample() {
-    }
 }
