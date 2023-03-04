@@ -1,8 +1,9 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.TermSelectContext
 import io.github.effiban.scala2java.core.entities.EnclosingDelimiter.Parentheses
+import io.github.effiban.scala2java.core.typeinference.{SelectTypeInferrer, TermTypeInferrer}
 import io.github.effiban.scala2java.core.writers.JavaWriter
+import io.github.effiban.scala2java.spi.contexts.TermSelectContext
 import io.github.effiban.scala2java.spi.transformers.TermSelectTransformer
 
 import scala.meta.Term
@@ -14,6 +15,7 @@ trait TermSelectTraverser {
 private[traversers] class TermSelectTraverserImpl(termTraverser: => TermTraverser,
                                                   termNameTraverser: => TermNameTraverser,
                                                   typeListTraverser: => TypeListTraverser,
+                                                  termTypeInferrer: => TermTypeInferrer,
                                                   termSelectTransformer: TermSelectTransformer)
                                                  (implicit javaWriter: JavaWriter) extends TermSelectTraverser {
 
@@ -21,7 +23,8 @@ private[traversers] class TermSelectTraverserImpl(termTraverser: => TermTraverse
 
   // qualified name
   override def traverse(select: Term.Select, context: TermSelectContext = TermSelectContext()): Unit = {
-    val javaSelect = termSelectTransformer.transform(select)
+    val maybeQualType = termTypeInferrer.infer(select.qual)
+    val javaSelect = termSelectTransformer.transform(select, context.copy(maybeQualType = maybeQualType))
     traverseQualifier(javaSelect.qual)
     writeQualifierSeparator(javaSelect.qual)
     typeListTraverser.traverse(context.appliedTypeArgs)
