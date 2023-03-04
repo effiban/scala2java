@@ -448,6 +448,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     termTraverser,
     termNameTraverser,
     typeListTraverser,
+    termTypeInferrer,
     new CompositeTermSelectTransformer(coreTermSelectTransformer)
   )
 
