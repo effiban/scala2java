@@ -1,13 +1,13 @@
 package io.github.effiban.scala2java.core.typeinference
 
-import io.github.effiban.scala2java.core.contexts.TermSelectInferenceContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{TermNames, TypeNames}
-import io.github.effiban.scala2java.core.typeinference.SelectWithContextTypeInferrer.infer
+import io.github.effiban.scala2java.core.typeinference.CoreSelectTypeInferrer.infer
+import io.github.effiban.scala2java.spi.contexts.TermSelectInferenceContext
 
 import scala.meta.{Term, Type, XtensionQuasiquoteTerm}
 
-class SelectWithContextTypeInferrerTest extends UnitTestSuite {
+class CoreSelectTypeInferrerTest extends UnitTestSuite {
 
   private val TermSelectToMaybeTypeMappings = Table(
     ("TermSelect", "MaybeType"),

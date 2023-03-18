@@ -1,15 +1,13 @@
 package io.github.effiban.scala2java.core.typeinference
 
-import io.github.effiban.scala2java.core.contexts.TermSelectInferenceContext
 import io.github.effiban.scala2java.core.entities.TermNameValues.{Empty, ScalaInclusive}
 import io.github.effiban.scala2java.core.entities.{TermNameValues, TypeNameValues}
-import io.github.effiban.scala2java.spi.typeinferrers.TypeInferrer1
+import io.github.effiban.scala2java.spi.contexts.TermSelectInferenceContext
+import io.github.effiban.scala2java.spi.typeinferrers.SelectTypeInferrer
 
 import scala.meta.{Term, Type, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
-trait SelectWithContextTypeInferrer extends TypeInferrer1[Term.Select, TermSelectInferenceContext]
-
-object SelectWithContextTypeInferrer extends SelectWithContextTypeInferrer {
+object CoreSelectTypeInferrer extends SelectTypeInferrer {
 
   override def infer(termSelect: Term.Select, context: TermSelectInferenceContext): Option[Type] = {
     (termSelect.qual, termSelect.name) match {

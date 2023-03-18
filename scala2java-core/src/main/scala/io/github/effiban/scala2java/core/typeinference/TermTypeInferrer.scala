@@ -16,7 +16,7 @@ private[typeinference] class TermTypeInferrerImpl(applyInfixTypeInferrer: => App
                                                   ifTypeInferrer: => IfTypeInferrer,
                                                   litTypeInferrer: LitTypeInferrer,
                                                   nameTypeInferrer: NameTypeInferrer,
-                                                  selectTypeInferrer: SelectTypeInferrer,
+                                                  selectTypeInferrer: => InternalSelectTypeInferrer,
                                                   tryTypeInferrer: => TryTypeInferrer,
                                                   tryWithHandlerTypeInferrer: => TryWithHandlerTypeInferrer,
                                                   tupleTypeInferrer: => TupleTypeInferrer) extends TermTypeInferrer {

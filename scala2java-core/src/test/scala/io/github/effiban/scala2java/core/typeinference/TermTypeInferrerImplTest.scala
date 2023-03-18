@@ -57,7 +57,7 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
   private val ifTypeInferrer = mock[IfTypeInferrer]
   private val litTypeInferrer = mock[LitTypeInferrer]
   private val nameTypeInferrer = mock[NameTypeInferrer]
-  private val selectTypeInferrer = mock[SelectTypeInferrer]
+  private val selectTypeInferrer = mock[InternalSelectTypeInferrer]
   private val tryTypeInferrer = mock[TryTypeInferrer]
   private val tryWithHandlerTypeInferrer = mock[TryWithHandlerTypeInferrer]
   private val tupleTypeInferrer = mock[TupleTypeInferrer]
