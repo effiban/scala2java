@@ -1,11 +1,12 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.matchers.TermSelectContextMatcher.eqTermSelectContext
+import io.github.effiban.scala2java.core.contexts.TermSelectContext
+import io.github.effiban.scala2java.core.matchers.TermSelectTransformationContextMatcher.eqTermSelectTransformationContext
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
-import io.github.effiban.scala2java.core.typeinference.TermTypeInferrer
-import io.github.effiban.scala2java.spi.contexts.TermSelectContext
+import io.github.effiban.scala2java.core.typeinference.QualifierTypeInferrer
+import io.github.effiban.scala2java.spi.contexts.TermSelectTransformationContext
 import io.github.effiban.scala2java.spi.transformers.TermSelectTransformer
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -27,31 +28,31 @@ class TermSelectTraverserImplTest extends UnitTestSuite {
   private val termTraverser = mock[TermTraverser]
   private val termNameTraverser = mock[TermNameTraverser]
   private val typeListTraverser = mock[TypeListTraverser]
-  private val termTypeInferrer = mock[TermTypeInferrer]
+  private val qualifierTypeInferrer = mock[QualifierTypeInferrer]
   private val termSelectTransformer = mock[TermSelectTransformer]
 
   private val termSelectTraverser = new TermSelectTraverserImpl(
     termTraverser,
     termNameTraverser,
     typeListTraverser,
-    termTypeInferrer,
+    qualifierTypeInferrer,
     termSelectTransformer
   )
 
   test("traverse() when qualifier is a Term.Name, and has type args and inferred qualifier type") {
     val typeArgs = List(TypeNames.Int)
-    val inputContext = TermSelectContext(appliedTypeArgs = typeArgs)
-    val expectedAdjustedContext = TermSelectContext(appliedTypeArgs = typeArgs, maybeQualType = Some(MyType))
+    val context = TermSelectContext(appliedTypeArgs = typeArgs)
+    val expectedTransformationContext = TermSelectTransformationContext(Some(MyType))
 
-    when(termTypeInferrer.infer(eqTree(MyInstance))).thenReturn(Some(MyType))
-    when(termSelectTransformer.transform(eqTree(ScalaSelectWithTermName), eqTermSelectContext(expectedAdjustedContext)))
+    when(qualifierTypeInferrer.infer(eqTree(ScalaSelectWithTermName))).thenReturn(Some(MyType))
+    when(termSelectTransformer.transform(eqTree(ScalaSelectWithTermName), eqTermSelectTransformationContext(expectedTransformationContext)))
       .thenReturn(JavaSelectWithTermName)
 
     doWrite("MyJavaClass").when(termTraverser).traverse(eqTree(MyJavaClass))
     doWrite("myJavaMethod").when(termNameTraverser).traverse(eqTree(MyJavaMethod))
     doWrite("<Integer>").when(typeListTraverser).traverse(eqTreeList(typeArgs))
 
-    termSelectTraverser.traverse(ScalaSelectWithTermName, inputContext)
+    termSelectTraverser.traverse(ScalaSelectWithTermName, context)
 
     outputWriter.toString shouldBe "MyJavaClass.<Integer>myJavaMethod"
   }
@@ -59,9 +60,10 @@ class TermSelectTraverserImplTest extends UnitTestSuite {
   test("traverse() when qualifier is a Term.Name, and has type args but no inferred qualifier type") {
     val typeArgs = List(TypeNames.Int)
     val context = TermSelectContext(appliedTypeArgs = typeArgs)
+    val expectedTransformationContext = TermSelectTransformationContext()
 
-    when(termTypeInferrer.infer(eqTree(MyInstance))).thenReturn(None)
-    when(termSelectTransformer.transform(eqTree(ScalaSelectWithTermName), eqTermSelectContext(context)))
+    when(qualifierTypeInferrer.infer(eqTree(ScalaSelectWithTermName))).thenReturn(None)
+    when(termSelectTransformer.transform(eqTree(ScalaSelectWithTermName), eqTermSelectTransformationContext(expectedTransformationContext)))
       .thenReturn(JavaSelectWithTermName)
 
     doWrite("MyJavaClass").when(termTraverser).traverse(eqTree(MyJavaClass))
@@ -74,8 +76,8 @@ class TermSelectTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() when qualifier is a Term.Name and has no type args and no inferred qualifier type") {
-    when(termTypeInferrer.infer(eqTree(MyInstance))).thenReturn(None)
-    when(termSelectTransformer.transform(eqTree(ScalaSelectWithTermName), eqTermSelectContext(TermSelectContext())))
+    when(qualifierTypeInferrer.infer(eqTree(ScalaSelectWithTermName))).thenReturn(None)
+    when(termSelectTransformer.transform(eqTree(ScalaSelectWithTermName), eqTermSelectTransformationContext(TermSelectTransformationContext())))
       .thenReturn(JavaSelectWithTermName)
 
     doWrite("MyJavaClass").when(termTraverser).traverse(eqTree(MyJavaClass))
@@ -91,8 +93,9 @@ class TermSelectTraverserImplTest extends UnitTestSuite {
     val scalaSelect = Term.Select(termFunction, MyMethod)
     val javaSelect = Term.Select(termFunction, MyJavaMethod)
 
-    when(termTypeInferrer.infer(eqTree(termFunction))).thenReturn(None)
-    when(termSelectTransformer.transform(eqTree(scalaSelect), eqTermSelectContext(TermSelectContext()))).thenReturn(javaSelect)
+    when(qualifierTypeInferrer.infer(eqTree(scalaSelect))).thenReturn(None)
+    when(termSelectTransformer.transform(eqTree(scalaSelect), eqTermSelectTransformationContext(TermSelectTransformationContext())))
+      .thenReturn(javaSelect)
 
     doWrite("() -> 1").when(termTraverser).traverse(eqTree(termFunction))
     doWrite("get").when(termNameTraverser).traverse(eqTree(MyJavaMethod))
@@ -108,8 +111,9 @@ class TermSelectTraverserImplTest extends UnitTestSuite {
     val inputTermSelect = Term.Select(ascribedTermFunction, MyMethod)
     val outputTermSelect = Term.Select(ascribedTermFunction, MyJavaMethod)
 
-    when(termTypeInferrer.infer(eqTree(ascribedTermFunction))).thenReturn(None)
-    when(termSelectTransformer.transform(eqTree(inputTermSelect), eqTermSelectContext(TermSelectContext()))).thenReturn(outputTermSelect)
+    when(qualifierTypeInferrer.infer(eqTree(inputTermSelect))).thenReturn(None)
+    when(termSelectTransformer.transform(eqTree(inputTermSelect), eqTermSelectTransformationContext(TermSelectTransformationContext())))
+      .thenReturn(outputTermSelect)
 
     doWrite("(Supplier<Integer>)() -> 1").when(termTraverser).traverse(eqTree(ascribedTermFunction))
     doWrite("get").when(termNameTraverser).traverse(eqTree(MyJavaMethod))
@@ -128,8 +132,9 @@ class TermSelectTraverserImplTest extends UnitTestSuite {
     val javaQual = Term.Apply(JavaSelectWithTermName, arg)
     val javaSelect = Term.Select(javaQual, MyJavaMethod2)
 
-    when(termTypeInferrer.infer(eqTree(scalaQual))).thenReturn(None)
-    when(termSelectTransformer.transform(eqTree(scalaSelect), eqTermSelectContext(TermSelectContext()))).thenReturn(javaSelect)
+    when(qualifierTypeInferrer.infer(eqTree(scalaSelect))).thenReturn(None)
+    when(termSelectTransformer.transform(eqTree(scalaSelect), eqTermSelectTransformationContext(TermSelectTransformationContext())))
+      .thenReturn(javaSelect)
 
     doWrite("MyJavaClass.myJavaMethod(arg1)").when(termTraverser).traverse(eqTree(javaQual))
     doWrite("myJavaMethod2").when(termNameTraverser).traverse(eqTree(MyJavaMethod2))

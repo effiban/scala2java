@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.matchers.TermSelectContextMatcher.eqTermSelectContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.spi.contexts.TermSelectContext
+import io.github.effiban.scala2java.core.contexts.TermSelectContext
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.Term.{ApplyUnary, Super, This}

@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.contexts.TermSelectContext
 import io.github.effiban.scala2java.core.writers.JavaWriter
-import io.github.effiban.scala2java.spi.contexts.TermSelectContext
 import io.github.effiban.scala2java.spi.transformers.TermApplyTypeToTermApplyTransformer
 
 import scala.meta.Term

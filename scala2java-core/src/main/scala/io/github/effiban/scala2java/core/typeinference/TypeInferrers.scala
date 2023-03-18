@@ -32,6 +32,8 @@ class TypeInferrers(implicit extensionRegistry: ExtensionRegistry) {
 
   private[typeinference] lazy val ifTypeInferrer = new IfTypeInferrerImpl(termTypeInferrer)
 
+  lazy val qualifierTypeInferrer = new QualifierTypeInferrerImpl(termTypeInferrer)
+
   lazy val termTypeInferrer: TermTypeInferrer = new TermTypeInferrerImpl(
     applyInfixTypeInferrer,
     applyTypeInferrer,
@@ -42,11 +44,13 @@ class TypeInferrers(implicit extensionRegistry: ExtensionRegistry) {
     ifTypeInferrer,
     LitTypeInferrer,
     new CompositeNameTypeInferrer(CoreNameTypeInferrer),
-    SelectTypeInferrer,
+    selectTypeInferrer,
     tryTypeInferrer,
     tryWithHandlerTypeInferrer,
     tupleTypeInferrer
   )
+
+  private[typeinference] lazy val selectTypeInferrer = new SelectTypeInferrerImpl(qualifierTypeInferrer, SelectWithContextTypeInferrer)
 
   private[typeinference] lazy val tryTypeInferrer = new TryTypeInferrerImpl(
     termTypeInferrer,
