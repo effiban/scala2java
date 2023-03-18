@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.transformers
 
 import io.github.effiban.scala2java.core.classifiers.TermNameClassifier
 import io.github.effiban.scala2java.core.entities.TermNameValues._
-import io.github.effiban.scala2java.spi.contexts.TermSelectContext
+import io.github.effiban.scala2java.spi.contexts.TermSelectTransformationContext
 import io.github.effiban.scala2java.spi.transformers.TermSelectTransformer
 
 import scala.meta.Term
@@ -14,7 +14,7 @@ private[transformers] class CoreTermSelectTransformer(termNameClassifier: TermNa
 
   // Transform a Scala-specific qualified name into an equivalent in Java
   // Either and Try use the syntax of the VAVR framework (Maven: io.vavr:vavr)
-  override def transform(termSelect: Term.Select, context: TermSelectContext = TermSelectContext()): Term.Select = {
+  override def transform(termSelect: Term.Select, context: TermSelectTransformationContext = TermSelectTransformationContext()): Term.Select = {
     (termSelect.qual, termSelect.name) match {
       case (Term.Name(ScalaRange), Term.Name(Apply)) => Term.Select(Term.Name(JavaIntStream), Term.Name(JavaRange))
       case (Term.Name(ScalaRange), Term.Name(ScalaInclusive)) => Term.Select(Term.Name(JavaIntStream), Term.Name(JavaRangeClosed))
