@@ -9,13 +9,15 @@ import io.github.effiban.scala2java.spi.Scala2JavaExtension
  */
 trait ExtendedTypeInferrers {
 
-  /** Override this method if you need to apply custom logic for inferring the type of a [[scala.meta.Term.Apply]] (method invocation).<br>
-   * If the inferrers of all extensions return `None`, the tool will default to the core logic which is able to infer for Scala standard library methods.
+  /** Override this method if you need to apply custom logic for inferring a partial [[scala.meta.Decl.Def]] (method signature),
+   * corresponding to a [[scala.meta.Term.Apply]] (method invocation).<br>
+   * If the inferrers of all extensions return `None`, the tool will default to the core logic which is able to infer for
+   * some of the Scala standard library methods.
    *
-   * @return if overriden - an inferrer which attempts to infer the type of a [[scala.meta.Term.Apply]]
-   *         otherwise - the empty inferrer which always returns `None` (could not be inferred)
+   * @return if overriden - an inferrer which attempts to infer a partial method signature corresponding to a [[scala.meta.Term.Apply]]
+   *         otherwise - the empty inferrer which always returns the empty object (meaning nothing could be inferred)
    */
-  def applyTypeInferrer(): ApplyTypeInferrer = ApplyTypeInferrer.Empty
+  def applyDeclDefInferrer(): ApplyDeclDefInferrer = ApplyDeclDefInferrer.Empty
 
   /** Override this method if you need to apply custom logic for inferring the type of a [[scala.meta.Term.ApplyType]] (parameterized type application).<br>
    * If the inferrers of all extensions return `None`, the tool will default to the core logic as follows:<br>

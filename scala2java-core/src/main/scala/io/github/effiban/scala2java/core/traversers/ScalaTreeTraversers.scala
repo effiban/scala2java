@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.classifiers.{Classifiers, DefnValClassifier, JavaStatClassifier}
 import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
-import io.github.effiban.scala2java.core.factories.TemplateChildContextFactory
+import io.github.effiban.scala2java.core.factories.{Factories, TemplateChildContextFactory}
 import io.github.effiban.scala2java.core.orderings.JavaTemplateChildOrdering
 import io.github.effiban.scala2java.core.predicates._
 import io.github.effiban.scala2java.core.providers.{CompositeAdditionalImportersProvider, CoreAdditionalImportersProvider}
@@ -16,9 +16,10 @@ import scala.meta.Term.Assign
 
 class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: ExtensionRegistry) {
 
-  private implicit lazy val typeInferrers: TypeInferrers = new TypeInferrers()
+  private implicit lazy val typeInferrers: TypeInferrers = new TypeInferrers(factories)
   private implicit lazy val classifiers: Classifiers = new Classifiers(typeInferrers)
   private implicit lazy val transformers: Transformers = new Transformers(typeInferrers)
+  private implicit lazy val factories: Factories = new Factories(typeInferrers)
   private lazy val resolvers = new Resolvers()
 
   import resolvers._

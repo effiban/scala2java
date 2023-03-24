@@ -2,12 +2,19 @@ package io.github.effiban.scala2java.core.typeinference
 
 import io.github.effiban.scala2java.core.classifiers.{TermApplyInfixClassifier, TypeNameClassifier}
 import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
+import io.github.effiban.scala2java.core.factories.Factories
+import io.github.effiban.scala2java.spi.typeinferrers.ApplyDeclDefInferrer
 
-class TypeInferrers(implicit extensionRegistry: ExtensionRegistry) {
+class TypeInferrers(factories: => Factories)(implicit extensionRegistry: ExtensionRegistry) {
+
+  lazy val applyDeclDefInferrer: ApplyDeclDefInferrer =
+    new CompositeApplyDeclDefInferrer(coreApplyDeclDefInferrer)
 
   private[typeinference] lazy val applyInfixTypeInferrer = new ApplyInfixTypeInferrerImpl(tupleTypeInferrer, TermApplyInfixClassifier)
 
-  private[typeinference] lazy val applyTypeInferrer = new CompositeApplyTypeInferrer(coreApplyTypeInferrer)
+  lazy val applyParentTypeInferrer = new ApplyParentTypeInferrerImpl(qualifierTypeInferrer)
+
+  private[typeinference] lazy val applyReturnTypeInferrer = new ApplyReturnTypeInferrerImpl(factories.termApplyInferenceContextFactory, applyDeclDefInferrer)
 
   private[typeinference] lazy val applyTypeTypeInferrer = new CompositeApplyTypeTypeInferrer(
     new CoreApplyTypeTypeInferrer(termTypeInferrer)
@@ -21,7 +28,7 @@ class TypeInferrers(implicit extensionRegistry: ExtensionRegistry) {
 
   lazy val compositeCollectiveTypeInferrer = new CompositeCollectiveTypeInferrerImpl(CollectiveTypeInferrer)
 
-  private[typeinference] lazy val coreApplyTypeInferrer = new CoreApplyTypeInferrer(
+  private[typeinference] lazy val coreApplyDeclDefInferrer = new CoreApplyDeclDefInferrer(
     applyTypeTypeInferrer,
     termTypeInferrer,
     compositeCollectiveTypeInferrer,
@@ -32,11 +39,16 @@ class TypeInferrers(implicit extensionRegistry: ExtensionRegistry) {
 
   private[typeinference] lazy val ifTypeInferrer = new IfTypeInferrerImpl(termTypeInferrer)
 
+  private[typeinference] lazy val internalSelectTypeInferrer = new InternalSelectTypeInferrerImpl(
+    qualifierTypeInferrer,
+    new CompositeSelectTypeInferrer(CoreSelectTypeInferrer)
+  )
+
   lazy val qualifierTypeInferrer = new QualifierTypeInferrerImpl(termTypeInferrer)
 
   lazy val termTypeInferrer: TermTypeInferrer = new TermTypeInferrerImpl(
     applyInfixTypeInferrer,
-    applyTypeInferrer,
+    applyReturnTypeInferrer,
     applyTypeTypeInferrer,
     blockTypeInferrer,
     caseListTypeInferrer,
@@ -48,11 +60,6 @@ class TypeInferrers(implicit extensionRegistry: ExtensionRegistry) {
     tryTypeInferrer,
     tryWithHandlerTypeInferrer,
     tupleTypeInferrer
-  )
-
-  private[typeinference] lazy val internalSelectTypeInferrer = new InternalSelectTypeInferrerImpl(
-    qualifierTypeInferrer,
-    new CompositeSelectTypeInferrer(CoreSelectTypeInferrer)
   )
 
   private[typeinference] lazy val tryTypeInferrer = new TryTypeInferrerImpl(

@@ -1,10 +1,10 @@
 package io.github.effiban.scala2java.core.extensions
 
-import io.github.effiban.scala2java.spi.typeinferrers.{ApplyTypeInferrer, ApplyTypeTypeInferrer, NameTypeInferrer, SelectTypeInferrer}
+import io.github.effiban.scala2java.spi.typeinferrers.{ApplyDeclDefInferrer, ApplyTypeTypeInferrer, NameTypeInferrer, SelectTypeInferrer}
 
 private[extensions] trait ExtendedTypeInferrers { this: ExtensionContainer =>
 
-  val applyTypeInferrers: List[ApplyTypeInferrer] = extensions.map(_.applyTypeInferrer())
+  val applyDeclDefInferrers: List[ApplyDeclDefInferrer] = extensions.map(_.applyDeclDefInferrer())
 
   val applyTypeTypeInferrers: List[ApplyTypeTypeInferrer] = extensions.map(_.applyTypeTypeInferrer())
 

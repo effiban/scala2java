@@ -1,22 +1,25 @@
 package io.github.effiban.scala2java.core.typeinference
 
 import io.github.effiban.scala2java.core.classifiers.TypeNameClassifier
+import io.github.effiban.scala2java.core.matchers.PartialDeclDefScalatestMatcher.equalPartialDeclDef
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{TermNames, TypeNames}
+import io.github.effiban.scala2java.spi.contexts.TermApplyInferenceContext
+import io.github.effiban.scala2java.spi.entities.PartialDeclDef
 import io.github.effiban.scala2java.spi.typeinferrers.ApplyTypeTypeInferrer
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqOptionTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.{Lit, Term, Type, XtensionQuasiquoteTerm}
 
-class CoreApplyTypeInferrerTest extends UnitTestSuite {
+class CoreApplyDeclDefInferrerTest extends UnitTestSuite {
 
   private val applyTypeTypeInferrer = mock[ApplyTypeTypeInferrer]
   private val termTypeInferrer = mock[TermTypeInferrer]
   private val compositeCollectiveTypeInferrer = mock[CompositeCollectiveTypeInferrer]
   private val typeNameClassifier = mock[TypeNameClassifier]
 
-  private val coreApplyTypeInferrer = new CoreApplyTypeInferrer(
+  private val coreApplyDeclDefInferrer = new CoreApplyDeclDefInferrer(
     applyTypeTypeInferrer,
     termTypeInferrer,
     compositeCollectiveTypeInferrer,
@@ -28,11 +31,17 @@ class CoreApplyTypeInferrerTest extends UnitTestSuite {
     // List[String]("a", "b)
     val stringListInitializer = Term.Apply(stringListApplyType, List(Lit.String("a"), Lit.String("b")))
 
+    val argTypes = List(TypeNames.String)
+    val maybeArgTypes = argTypes.map(Some(_))
+    val context = TermApplyInferenceContext(maybeArgTypes = maybeArgTypes)
+
     val expectedTypeApply = Type.Apply(TypeNames.List, List(TypeNames.String))
 
     when(applyTypeTypeInferrer.infer(eqTree(stringListApplyType))).thenReturn(Some(expectedTypeApply))
 
-    coreApplyTypeInferrer.infer(stringListInitializer).value.structure shouldBe expectedTypeApply.structure
+    coreApplyDeclDefInferrer.infer(stringListInitializer, context) should equalPartialDeclDef(
+      PartialDeclDef(maybeParamTypes = maybeArgTypes, maybeReturnType = Some(expectedTypeApply))
+    )
   }
 
   test("infer() when 'fun' is a List with implicit type") {
@@ -42,6 +51,7 @@ class CoreApplyTypeInferrerTest extends UnitTestSuite {
 
     val argTypes = List(TypeNames.String)
     val maybeArgTypes = argTypes.map(Some(_))
+    val context = TermApplyInferenceContext(maybeArgTypes = maybeArgTypes)
 
     val expectedTypeApply = Type.Apply(TypeNames.List, argTypes)
 
@@ -49,7 +59,9 @@ class CoreApplyTypeInferrerTest extends UnitTestSuite {
     when(typeNameClassifier.isParameterizedType(eqTree(TypeNames.List))).thenReturn(true)
     when(compositeCollectiveTypeInferrer.infer(eqOptionTreeList(maybeArgTypes))).thenReturn(TypeNames.String)
 
-    coreApplyTypeInferrer.infer(listInitializer, maybeArgTypes).value.structure shouldBe expectedTypeApply.structure
+    coreApplyDeclDefInferrer.infer(listInitializer, context) should equalPartialDeclDef(
+      PartialDeclDef(maybeParamTypes = maybeArgTypes, maybeReturnType = Some(expectedTypeApply))
+    )
   }
 
   test("infer() when 'fun' is a Map with implicit types") {
@@ -58,30 +70,38 @@ class CoreApplyTypeInferrerTest extends UnitTestSuite {
       Term.Tuple(List(Lit.String("a"), Lit.Int(1))),
       Term.Tuple(List(Lit.String("b"), Lit.Int(2)))
     )
-    // Map("a" -> 1, "b" -> 2)
+
+    // Map(("a", 1), ("b", 2))
     val mapInitializer = Term.Apply(TermNames.Map, mapElements)
 
-    val argTypes = List(TypeNames.String, TypeNames.Int)
+    val tupleType = Type.Tuple(List(TypeNames.String, TypeNames.Int))
+    val argTypes = List(tupleType, tupleType)
     val maybeArgTypes = argTypes.map(Some(_))
+    val context = TermApplyInferenceContext(maybeArgTypes = maybeArgTypes)
 
-    val expectedTypeApply = Type.Apply(TypeNames.Map, argTypes)
+    val expectedTypeApply = Type.Apply(TypeNames.Map, tupleType.args)
 
     when(termTypeInferrer.infer(eqTree(TermNames.Map))).thenReturn(Some(TypeNames.Map))
     when(typeNameClassifier.isParameterizedType(eqTree(TypeNames.Map))).thenReturn(true)
-    when(compositeCollectiveTypeInferrer.infer(eqOptionTreeList(maybeArgTypes))).thenReturn(Type.Tuple(argTypes))
+    when(compositeCollectiveTypeInferrer.infer(eqOptionTreeList(maybeArgTypes))).thenReturn(tupleType)
 
-    coreApplyTypeInferrer.infer(mapInitializer, maybeArgTypes).value.structure shouldBe expectedTypeApply.structure
+    coreApplyDeclDefInferrer.infer(mapInitializer, context) should equalPartialDeclDef(
+      PartialDeclDef(maybeParamTypes = maybeArgTypes, maybeReturnType = Some(expectedTypeApply))
+    )
   }
 
   test("infer() when 'fun' is a non-parametrized type name") {
 
     val stringTermApply = Term.Apply(TermNames.String, List(Term.Name("a")))
     val maybeArgTypes = List(Some(TypeNames.String))
+    val context = TermApplyInferenceContext(maybeArgTypes = maybeArgTypes)
 
     when(termTypeInferrer.infer(eqTree(TermNames.String))).thenReturn(Some(TypeNames.String))
     when(typeNameClassifier.isParameterizedType(eqTree(TypeNames.Map))).thenReturn(false)
 
-    coreApplyTypeInferrer.infer(stringTermApply, maybeArgTypes).value.structure shouldBe TypeNames.String.structure
+    coreApplyDeclDefInferrer.infer(stringTermApply, context) should equalPartialDeclDef(
+      PartialDeclDef(maybeParamTypes = maybeArgTypes, maybeReturnType = Some(TypeNames.String))
+    )
   }
 
   test("infer() when 'fun' is a Type.Select and inferrable") {
@@ -89,12 +109,15 @@ class CoreApplyTypeInferrerTest extends UnitTestSuite {
     val termSelect = Term.Select(Term.Name("A"), Term.Name("b"))
     val termApply = Term.Apply(termSelect, Nil)
     val maybeArgTypes = List(Some(TypeNames.String), Some(TypeNames.String))
+    val context = TermApplyInferenceContext(maybeArgTypes = maybeArgTypes)
 
     val expectedTypeSelect = Type.Select(Term.Name("A"), Type.Name("B"))
 
     when(termTypeInferrer.infer(eqTree(termSelect))).thenReturn(Some(expectedTypeSelect))
 
-    coreApplyTypeInferrer.infer(termApply, maybeArgTypes).value.structure shouldBe expectedTypeSelect.structure
+    coreApplyDeclDefInferrer.infer(termApply, context) should equalPartialDeclDef(
+      PartialDeclDef(maybeParamTypes = maybeArgTypes, maybeReturnType = Some(expectedTypeSelect))
+    )
   }
 
   test("infer() when 'fun' is not inferrable") {
@@ -102,9 +125,12 @@ class CoreApplyTypeInferrerTest extends UnitTestSuite {
     val nonInferrableFun = Term.Name("blabla")
     val nonInferrableTermApply = Term.Apply(nonInferrableFun, Nil)
     val maybeArgTypes = List(Some(TypeNames.String))
+    val context = TermApplyInferenceContext(maybeArgTypes = maybeArgTypes)
 
     when(termTypeInferrer.infer(eqTree(nonInferrableFun))).thenReturn(None)
 
-    coreApplyTypeInferrer.infer(nonInferrableTermApply, maybeArgTypes) shouldBe None
+    coreApplyDeclDefInferrer.infer(nonInferrableTermApply, context) should equalPartialDeclDef(
+      PartialDeclDef(maybeParamTypes = maybeArgTypes)
+    )
   }
 }
