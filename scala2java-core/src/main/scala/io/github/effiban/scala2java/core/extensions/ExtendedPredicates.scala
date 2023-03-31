@@ -1,12 +1,18 @@
 package io.github.effiban.scala2java.core.extensions
 
-import io.github.effiban.scala2java.spi.predicates.{ImporterExcludedPredicate, InvocationArgByNamePredicate, TemplateInitExcludedPredicate}
+import io.github.effiban.scala2java.spi.predicates._
 
 private[extensions] trait ExtendedPredicates { this: ExtensionContainer =>
 
   val importerExcludedPredicates: List[ImporterExcludedPredicate] = extensions.map(_.importerExcludedPredicate())
 
+  val invocationArgByNamePredicates: List[InvocationArgByNamePredicate] = extensions.map(_.invocationArgByNamePredicate())
+
   val templateInitExcludedPredicates: List[TemplateInitExcludedPredicate] = extensions.map(_.templateInitExcludedPredicate())
 
-  val invocationArgByNamePredicates: List[InvocationArgByNamePredicate] = extensions.map(_.invocationArgByNamePredicate())
+  def termNameHasApplyMethods(): List[TermNameHasApplyMethod] = extensions.map(_.termNameHasApplyMethod())
+
+  def termNameSupportsNoArgInvocations(): List[TermNameSupportsNoArgInvocation] = extensions.map(_.termNameSupportsNoArgInvocation())
+
+  def termSelectSupportsNoArgInvocations(): List[TermSelectSupportsNoArgInvocation] = extensions.map(_.termSelectSupportsNoArgInvocation())
 }

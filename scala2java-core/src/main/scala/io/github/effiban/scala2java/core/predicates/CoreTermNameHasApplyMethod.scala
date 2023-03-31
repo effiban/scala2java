@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.predicates
 
 import io.github.effiban.scala2java.core.classifiers.TermNameClassifier
+import io.github.effiban.scala2java.spi.predicates.TermNameHasApplyMethod
 
 import scala.meta.Term
 

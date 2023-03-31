@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.typeinference
 
-import io.github.effiban.scala2java.core.predicates.TermSelectSupportsNoArgInvocation
 import io.github.effiban.scala2java.spi.contexts.TermSelectInferenceContext
+import io.github.effiban.scala2java.spi.predicates.TermSelectSupportsNoArgInvocation
 import io.github.effiban.scala2java.spi.typeinferrers.{SelectTypeInferrer, TypeInferrer0}
 
 import scala.meta.{Term, Type}

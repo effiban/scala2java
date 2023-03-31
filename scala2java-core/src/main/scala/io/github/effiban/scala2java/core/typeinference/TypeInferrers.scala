@@ -4,7 +4,8 @@ import io.github.effiban.scala2java.core.classifiers.TermApplyInfixClassifier
 import io.github.effiban.scala2java.core.entities.ParameterizedInitializerNameTypeMapping
 import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
 import io.github.effiban.scala2java.core.factories.Factories
-import io.github.effiban.scala2java.core.predicates.{CoreTermNameHasApplyMethod, CoreTermNameSupportsNoArgInvocation, CoreTermSelectSupportsNoArgInvocation}
+import io.github.effiban.scala2java.core.predicates._
+import io.github.effiban.scala2java.spi.predicates.TermNameHasApplyMethod
 
 class TypeInferrers(factories: => Factories)(implicit extensionRegistry: ExtensionRegistry) {
 
@@ -19,7 +20,7 @@ class TypeInferrers(factories: => Factories)(implicit extensionRegistry: Extensi
 
   private[typeinference] lazy val applyTypeTypeInferrer = new ApplyTypeTypeInferrerImpl(
     applyReturnTypeInferrer,
-    CoreTermNameHasApplyMethod
+    compositeTermNameHasApplyMethod
   )
 
   private[typeinference] lazy val blockTypeInferrer = new BlockTypeInferrerImpl(termTypeInferrer)
@@ -30,6 +31,9 @@ class TypeInferrers(factories: => Factories)(implicit extensionRegistry: Extensi
 
   lazy val compositeCollectiveTypeInferrer = new CompositeCollectiveTypeInferrerImpl(CollectiveTypeInferrer)
 
+  private[typeinference] lazy val compositeTermNameHasApplyMethod: TermNameHasApplyMethod =
+    new CompositeTermNameHasApplyMethod(CoreTermNameHasApplyMethod)
+
   private[typeinference] lazy val coreApplyDeclDefInferrer = new CoreApplyDeclDefInferrer(parameterizedInitializerDeclDefInferrer)
 
   lazy val functionTypeInferrer = new FunctionTypeInferrerImpl(termTypeInferrer)
@@ -38,20 +42,20 @@ class TypeInferrers(factories: => Factories)(implicit extensionRegistry: Extensi
 
   private[typeinference] lazy val internalApplyDeclDefInferrer: InternalApplyDeclDefInferrer = new InternalApplyDeclDefInferrerImpl(
     new CompositeApplyDeclDefInferrer(coreApplyDeclDefInferrer),
-    CoreTermNameHasApplyMethod
+    compositeTermNameHasApplyMethod
   )
 
   private[typeinference] lazy val internalNameTypeInferrer = new InternalNameTypeInferrerImpl(
     applyReturnTypeInferrer,
     new CompositeNameTypeInferrer(CoreNameTypeInferrer),
-    CoreTermNameSupportsNoArgInvocation
+    new CompositeTermNameSupportsNoArgInvocation(CoreTermNameSupportsNoArgInvocation)
   )
 
   private[typeinference] lazy val internalSelectTypeInferrer = new InternalSelectTypeInferrerImpl(
     applyReturnTypeInferrer,
     qualifierTypeInferrer,
     new CompositeSelectTypeInferrer(CoreSelectTypeInferrer),
-    CoreTermSelectSupportsNoArgInvocation
+    new CompositeTermSelectSupportsNoArgInvocation(CoreTermSelectSupportsNoArgInvocation)
   )
 
   private lazy val parameterizedInitializerDeclDefInferrer = new InitializerDeclDefInferrerImpl(

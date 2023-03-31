@@ -1,4 +1,4 @@
-package io.github.effiban.scala2java.core.predicates
+package io.github.effiban.scala2java.spi.predicates
 
 import scala.meta.Term
 
