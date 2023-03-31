@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.typeinference
 
 import io.github.effiban.scala2java.core.entities.TermNameValues.Apply
-import io.github.effiban.scala2java.core.predicates.TermNameHasApplyMethod
+import io.github.effiban.scala2java.spi.predicates.TermNameHasApplyMethod
 
 import scala.meta.{Term, Type}
 

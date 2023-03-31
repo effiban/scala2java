@@ -1,9 +1,9 @@
 package io.github.effiban.scala2java.core.typeinference
 
-import io.github.effiban.scala2java.core.predicates.TermSelectSupportsNoArgInvocation
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.spi.contexts.TermSelectInferenceContext
+import io.github.effiban.scala2java.spi.predicates.TermSelectSupportsNoArgInvocation
 import io.github.effiban.scala2java.spi.typeinferrers.SelectTypeInferrer
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 

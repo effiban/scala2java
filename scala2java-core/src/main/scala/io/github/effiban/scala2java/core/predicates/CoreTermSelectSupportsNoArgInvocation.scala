@@ -2,6 +2,7 @@ package io.github.effiban.scala2java.core.predicates
 
 import io.github.effiban.scala2java.core.classifiers.TermNameClassifier
 import io.github.effiban.scala2java.core.entities.TermNameValues.{Apply, Empty}
+import io.github.effiban.scala2java.spi.predicates.TermSelectSupportsNoArgInvocation
 
 import scala.meta.{Term, XtensionQuasiquoteTerm}
 

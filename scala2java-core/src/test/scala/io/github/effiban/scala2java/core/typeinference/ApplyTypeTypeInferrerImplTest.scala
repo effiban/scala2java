@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.typeinference
 
-import io.github.effiban.scala2java.core.predicates.TermNameHasApplyMethod
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
+import io.github.effiban.scala2java.spi.predicates.TermNameHasApplyMethod
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.{XtensionQuasiquoteTerm, XtensionQuasiquoteType}

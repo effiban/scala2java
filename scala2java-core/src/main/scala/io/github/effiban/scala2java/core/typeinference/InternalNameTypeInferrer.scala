@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.typeinference
 
-import io.github.effiban.scala2java.core.predicates.TermNameSupportsNoArgInvocation
+import io.github.effiban.scala2java.spi.predicates.TermNameSupportsNoArgInvocation
 import io.github.effiban.scala2java.spi.typeinferrers.NameTypeInferrer
 
 import scala.meta.{Term, Type}
