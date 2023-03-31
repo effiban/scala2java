@@ -2,7 +2,6 @@ package io.github.effiban.scala2java.core.typeinference
 
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
-import io.github.effiban.scala2java.spi.typeinferrers.{ApplyTypeTypeInferrer, NameTypeInferrer}
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
@@ -54,7 +53,7 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
   private val functionTypeInferrer = mock[FunctionTypeInferrer]
   private val ifTypeInferrer = mock[IfTypeInferrer]
   private val litTypeInferrer = mock[LitTypeInferrer]
-  private val nameTypeInferrer = mock[NameTypeInferrer]
+  private val nameTypeInferrer = mock[InternalNameTypeInferrer]
   private val selectTypeInferrer = mock[InternalSelectTypeInferrer]
   private val tryTypeInferrer = mock[TryTypeInferrer]
   private val tryWithHandlerTypeInferrer = mock[TryWithHandlerTypeInferrer]

@@ -19,16 +19,6 @@ trait ExtendedTypeInferrers {
    */
   def applyDeclDefInferrer(): ApplyDeclDefInferrer = ApplyDeclDefInferrer.Empty
 
-  /** Override this method if you need to apply custom logic for inferring the type of a [[scala.meta.Term.ApplyType]] (parameterized type application).<br>
-   * If the inferrers of all extensions return `None`, the tool will default to the core logic as follows:<br>
-   * It first checks the type of the `fun` part, and then (if resolved) appends the type argument.<br>
-   * For example, if the input is `foo[T]` and `foo` is of type `Foo`, then the inferred type will be `Foo[T]`
-   *
-   * @return if overriden - an inferrer which attempts to infer the type of a [[scala.meta.Term.ApplyType]]
-   *         otherwise - the empty inferrer which always returns `None` (could not be inferred)
-   */
-  def applyTypeTypeInferrer(): ApplyTypeTypeInferrer = ApplyTypeTypeInferrer.Empty
-
   /** Override this method if you need to apply custom logic for inferring the type of a [[scala.meta.Term.Name]] (identifier).
    * If the inferrers of all extensions return `None`, the tool will default to the core logic which is able to infer for Scala standard library identifiers.<br>
    *

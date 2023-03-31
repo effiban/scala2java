@@ -12,7 +12,6 @@ object TermNames {
   val Future: Term.Name = Term.Name("Future")
   val Stream: Term.Name = Term.Name("Stream")
   val List: Term.Name = Term.Name("List")
-  val Vector: Term.Name = Term.Name("Vector")
   val Seq: Term.Name = Term.Name("Seq")
   val Set: Term.Name = Term.Name("Set")
   val Map: Term.Name = Term.Name("Map")
@@ -56,6 +55,7 @@ object TermNames {
   val ScalaFailure: Term.Name = Term.Name("Failure")
   val ScalaSuccessful: Term.Name = Term.Name("successful")
   val ScalaFailed: Term.Name = Term.Name("failed")
+  val ScalaVector: Term.Name = Term.Name("Vector")
   val ScalaNil: Term.Name = Term.Name("Nil")
 
   val Java: Term.Name = Term.Name("java")

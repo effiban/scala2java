@@ -6,7 +6,6 @@ import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.spi.contexts.TermApplyInferenceContext
 import io.github.effiban.scala2java.spi.entities.PartialDeclDef
-import io.github.effiban.scala2java.spi.typeinferrers.ApplyDeclDefInferrer
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.{XtensionQuasiquoteTerm, XtensionQuasiquoteType}
@@ -20,7 +19,7 @@ class ApplyReturnTypeInferrerImplTest extends UnitTestSuite {
   private val ReturnType = TypeNames.Long
 
   private val inferenceContextFactory = mock[TermApplyInferenceContextFactory]
-  private val applyDeclDefInferrer = mock[ApplyDeclDefInferrer]
+  private val applyDeclDefInferrer = mock[InternalApplyDeclDefInferrer]
 
   private val applyReturnTypeInferrer = new ApplyReturnTypeInferrerImpl(inferenceContextFactory, applyDeclDefInferrer)
 

@@ -4,6 +4,8 @@ object TypeNameValues {
 
   // Please maintain alphabetical order in each section
 
+  final val String = "String"
+
   final val Either = "Either"
   final val Function = "Function"
   final val Future = "Future"

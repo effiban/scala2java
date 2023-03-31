@@ -31,6 +31,7 @@ object TypeNames {
   val ScalaOption: Type.Name = Type.Name("Option")
   val ScalaAny: Type.Name = Type.Name("Any")
   val ScalaVector: Type.Name = Type.Name("Vector")
+  val ScalaRange: Type.Name = Type.Name("Range")
 
   val JavaBiFunction: Type.Name = t"BiFunction"
   val JavaBiConsumer: Type.Name = t"BiConsumer"

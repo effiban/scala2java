@@ -18,4 +18,6 @@ case class PartialDeclDef(maybeParamNames: List[Option[Term.Name]] = Nil,
       maybeParamTypes.isEmpty &&
       maybeReturnType.isEmpty
   }
+
+  def nonEmpty: Boolean = !isEmpty
 }

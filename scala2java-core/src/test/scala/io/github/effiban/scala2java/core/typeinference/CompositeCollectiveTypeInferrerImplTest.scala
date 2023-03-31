@@ -62,4 +62,10 @@ class CompositeCollectiveTypeInferrerImplTest extends UnitTestSuite {
 
     compositeCollectiveTypeInferrer.infer(maybeInputTypes).structure shouldBe ScalaAny.structure
   }
+
+  test("infer when empty should return result of inferring as scalar") {
+    when(collectiveTypeInferrer.inferScalar(Nil)).thenReturn(Some(ScalaAny))
+
+    compositeCollectiveTypeInferrer.infer(Nil).structure shouldBe ScalaAny.structure
+  }
 }

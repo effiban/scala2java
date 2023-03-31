@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.typeinference
 
-import io.github.effiban.scala2java.spi.typeinferrers.{ApplyTypeTypeInferrer, NameTypeInferrer, TypeInferrer0}
+import io.github.effiban.scala2java.spi.typeinferrers.TypeInferrer0
 
 import scala.meta.Term.{Annotate, ApplyType, Ascribe, Assign, Block, Do, For, ForYield, If, New, Return, Throw, Try, TryWithHandler, While}
 import scala.meta.{Lit, Term, Type}
@@ -15,7 +15,7 @@ private[typeinference] class TermTypeInferrerImpl(applyInfixTypeInferrer: => App
                                                   functionTypeInferrer: => FunctionTypeInferrer,
                                                   ifTypeInferrer: => IfTypeInferrer,
                                                   litTypeInferrer: LitTypeInferrer,
-                                                  nameTypeInferrer: NameTypeInferrer,
+                                                  nameTypeInferrer: => InternalNameTypeInferrer,
                                                   selectTypeInferrer: => InternalSelectTypeInferrer,
                                                   tryTypeInferrer: => TryTypeInferrer,
                                                   tryWithHandlerTypeInferrer: => TryWithHandlerTypeInferrer,

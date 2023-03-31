@@ -8,5 +8,5 @@ import java.util.function.*;
 import java.util.stream.*;
 
 public class Sample {
-    public final Optional x = Optional.absent;
+    public final Optional<Object> x = Optional.absent;
 }
