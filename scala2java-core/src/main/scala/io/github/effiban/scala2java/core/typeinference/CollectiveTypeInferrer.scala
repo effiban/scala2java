@@ -11,6 +11,25 @@ trait CollectiveTypeInferrer {
 private[typeinference] object CollectiveTypeInferrer extends CollectiveTypeInferrer {
 
   override def inferScalar(maybeTypes: List[Option[Type]]): Option[Type] = {
+    maybeTypes match {
+      case Nil => None
+      case theMaybeTypes => inferScalarForNonEmpty(theMaybeTypes)
+    }
+  }
+
+  override def inferTuple(typeTuples: List[Type.Tuple]): Type.Tuple = {
+    typeTuples match {
+      case Nil => throw new IllegalStateException("Cannot infer collective tuple type - no types provided")
+      case theTupleTypes if !allHaveSameLength(theTupleTypes) => throw new IllegalStateException("Cannot infer collective tuple type - tuples have different lengths")
+      case theTupleTypes =>
+        val collectiveTypes = theTupleTypes.head.args.indices
+          .map(typeIndex => inferTypeAtIndex(theTupleTypes, typeIndex))
+          .toList
+        Type.Tuple(collectiveTypes)
+    }
+  }
+
+  private def inferScalarForNonEmpty(maybeTypes: List[Option[Type]]) = {
     val filteredMaybeTypes = maybeTypes
       .filterNot(_.exists(_.structure == Type.AnonymousName().structure))
 
@@ -20,17 +39,6 @@ private[typeinference] object CollectiveTypeInferrer extends CollectiveTypeInfer
       case theMaybeTypes if theMaybeTypes.forall(_.structure == theMaybeTypes.head.structure) => theMaybeTypes.head
       // TODO can be improved by finding a common type
       case _ => None
-    }
-  }
-
-  override def inferTuple(typeTuples: List[Type.Tuple]): Type.Tuple = {
-    typeTuples match {
-      case theTupleTypes if !allHaveSameLength(theTupleTypes) => throw new IllegalStateException("Cannot infer collective tuple type - tuples have different lengths")
-      case theTupleTypes =>
-        val collectiveTypes = theTupleTypes.head.args.indices
-          .map(typeIndex => inferTypeAtIndex(theTupleTypes, typeIndex))
-          .toList
-        Type.Tuple(collectiveTypes)
     }
   }
 

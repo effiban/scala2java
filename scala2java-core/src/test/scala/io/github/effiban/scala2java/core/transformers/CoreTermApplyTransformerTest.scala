@@ -26,7 +26,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
     val initialTermApply = Term.Apply(Term.Name("ScalaObject"), List(Lit.Int(1)))
     val expectedTermApply = Term.Apply(Term.Select(Term.Name("ScalaObject"), TermNames.Apply), List(Lit.Int(1)))
 
-    when(termNameClassifier.isPreDefScalaObject(eqTree(Term.Name("ScalaObject")))).thenReturn(true)
+    when(termNameClassifier.hasApplyMethod(eqTree(Term.Name("ScalaObject")))).thenReturn(true)
 
     termApplyTransformer.transform(initialTermApply).structure shouldBe expectedTermApply.structure
   }
@@ -35,7 +35,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
     val initialTermApply = Term.Apply(Term.ApplyType(Term.Name("ScalaObject"), List(TypeNames.Int)), List(Lit.Int(1)))
     val expectedTermApply = Term.Apply(Term.ApplyType(Term.Select(Term.Name("ScalaObject"), TermNames.Apply), List(TypeNames.Int)), List(Lit.Int(1)))
 
-    when(termNameClassifier.isPreDefScalaObject(eqTree(Term.Name("ScalaObject")))).thenReturn(true)
+    when(termNameClassifier.hasApplyMethod(eqTree(Term.Name("ScalaObject")))).thenReturn(true)
 
     termApplyTransformer.transform(initialTermApply).structure shouldBe expectedTermApply.structure
   }
@@ -43,7 +43,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
   test("transform() of a regular method invocation with an unqualified name, should return  same invocation") {
     val termApply = Term.Apply(Term.Name("Foo"), List(Lit.Int(1)))
 
-    when(termNameClassifier.isPreDefScalaObject(eqTree(Term.Name("Foo")))).thenReturn(false)
+    when(termNameClassifier.hasApplyMethod(eqTree(Term.Name("Foo")))).thenReturn(false)
 
     termApplyTransformer.transform(termApply).structure shouldBe termApply.structure
   }
@@ -65,7 +65,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
     )
     val expectedJavaStyleTermApply = Term.Apply(fun, List(arg1, arg2, arg3, arg4))
 
-    when(termNameClassifier.isPreDefScalaObject(eqTree(fun))).thenReturn(false)
+    when(termNameClassifier.hasApplyMethod(eqTree(fun))).thenReturn(false)
 
     termApplyTransformer.transform(scalaStyleTermApply).structure shouldBe expectedJavaStyleTermApply.structure
   }
@@ -81,7 +81,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
       )
     val expectedJavaStyleTermApply = Term.Apply(fun, List(arg1, arg2, arg3, arg4, arg5, arg6))
 
-    when(termNameClassifier.isPreDefScalaObject(eqTree(fun))).thenReturn(false)
+    when(termNameClassifier.hasApplyMethod(eqTree(fun))).thenReturn(false)
 
     termApplyTransformer.transform(scalaStyleTermApply).structure shouldBe expectedJavaStyleTermApply.structure
   }

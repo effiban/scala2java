@@ -13,7 +13,11 @@ trait TermNameClassifier {
 
   def isJavaMapLike(termName: Term.Name): Boolean
 
-  def isPreDefScalaObject(termName: Term.Name): Boolean
+  def hasApplyMethod(termName: Term.Name): Boolean
+
+  def hasEmptyMethod(termName: Term.Name): Boolean
+
+  def supportsNoArgInvocation(termName: Term.Name): Boolean
 }
 
 object TermNameClassifier extends TermNameClassifier {
@@ -42,7 +46,17 @@ object TermNameClassifier extends TermNameClassifier {
     "HashMap"
   )
 
-  final val PreDefScalaObjects = Set(
+  final val IterableLike: Set[String] =
+    JavaStreamLike ++
+      JavaListLike ++
+      JavaSetLike ++
+      Set("SortedSet", "TreeSet", "ListSet") ++
+      JavaMapLike ++
+      Set("SortedMap", "TreeMap", "ListMap")
+
+
+  final val ObjectsWithApplyMethod = Set(
+    TermNameValues.ScalaArray,
     TermNameValues.ScalaRange,
     TermNameValues.ScalaOption,
     TermNameValues.ScalaSome,
@@ -52,7 +66,18 @@ object TermNameClassifier extends TermNameClassifier {
     TermNameValues.ScalaSuccess,
     TermNameValues.ScalaFailure,
     TermNameValues.Future
-  ) ++ JavaStreamLike ++ JavaListLike ++ JavaSetLike ++ JavaMapLike
+  ) ++ IterableLike
+
+  final val ObjectsWithEmptyMethod = Set(
+    TermNameValues.ScalaArray,
+    TermNameValues.ScalaOption
+  ) ++ IterableLike
+
+  // TODO - add more
+  final val SupportNoArgInvocations = Set(
+    TermNameValues.Print,
+    TermNameValues.Println
+  )
 
   override def isJavaStreamLike(termName: Term.Name): Boolean = JavaStreamLike.contains(termName.value)
 
@@ -62,5 +87,9 @@ object TermNameClassifier extends TermNameClassifier {
 
   override def isJavaMapLike(termName: Term.Name): Boolean = JavaMapLike.contains(termName.value)
 
-  override def isPreDefScalaObject(termName: Term.Name): Boolean = PreDefScalaObjects.contains(termName.value)
+  override def hasApplyMethod(termName: Term.Name): Boolean = ObjectsWithApplyMethod.contains(termName.value)
+
+  override def hasEmptyMethod(termName: Term.Name): Boolean = ObjectsWithEmptyMethod.contains(termName.value)
+
+  override def supportsNoArgInvocation(termName: Term.Name): Boolean = SupportNoArgInvocations.contains(termName.value)
 }

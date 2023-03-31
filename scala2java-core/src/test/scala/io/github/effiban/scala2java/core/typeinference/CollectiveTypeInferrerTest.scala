@@ -19,7 +19,7 @@ class CollectiveTypeInferrerTest extends UnitTestSuite {
     ("two defined identical types and an anonymous type", "the defined type",
       List(Some(TypeNames.String), Some(TypeNames.String), Some(Type.AnonymousName())), Some(TypeNames.String)),
     ("two defined identical types and a None", "None", List(Some(TypeNames.String), Some(TypeNames.String), None), None),
-    ("empty", "the anonymous type", Nil, Some(Type.AnonymousName()))
+    ("empty", "None", Nil, None)
   )
 
   private val TypeTupleStrIntA = Type.Tuple(List(TypeNames.String, TypeNames.Int))
@@ -57,6 +57,12 @@ class CollectiveTypeInferrerTest extends UnitTestSuite {
   test("inferTuple when tuples have different sizes should throw exception") {
     intercept[IllegalStateException] {
       inferTuple(List(Type.Tuple(List(TypeNames.String)), Type.Tuple(List(TypeNames.String, TypeNames.Int))))
+    }
+  }
+
+  test("inferTuple when empty should throw exception") {
+    intercept[IllegalStateException] {
+      inferTuple(List.empty)
     }
   }
 }

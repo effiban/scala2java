@@ -1,136 +1,271 @@
 package io.github.effiban.scala2java.core.typeinference
 
-import io.github.effiban.scala2java.core.classifiers.TypeNameClassifier
 import io.github.effiban.scala2java.core.matchers.PartialDeclDefScalatestMatcher.equalPartialDeclDef
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{TermNames, TypeNames}
 import io.github.effiban.scala2java.spi.contexts.TermApplyInferenceContext
 import io.github.effiban.scala2java.spi.entities.PartialDeclDef
-import io.github.effiban.scala2java.spi.typeinferrers.ApplyTypeTypeInferrer
-import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqOptionTreeList
+import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.{eqOptionTreeList, eqTreeList}
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
+import org.mockito.ArgumentMatchersSugar.eqTo
 
-import scala.meta.{Lit, Term, Type, XtensionQuasiquoteTerm}
+import scala.meta.{Type, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 class CoreApplyDeclDefInferrerTest extends UnitTestSuite {
 
-  private val applyTypeTypeInferrer = mock[ApplyTypeTypeInferrer]
-  private val termTypeInferrer = mock[TermTypeInferrer]
-  private val compositeCollectiveTypeInferrer = mock[CompositeCollectiveTypeInferrer]
-  private val typeNameClassifier = mock[TypeNameClassifier]
+  private val initializerDeclDefInferrer = mock[InitializerDeclDefInferrer]
 
-  private val coreApplyDeclDefInferrer = new CoreApplyDeclDefInferrer(
-    applyTypeTypeInferrer,
-    termTypeInferrer,
-    compositeCollectiveTypeInferrer,
-    typeNameClassifier
-  )
+  private val coreApplyDeclDefInferrer = new CoreApplyDeclDefInferrer(initializerDeclDefInferrer)
 
-  test("infer() when 'fun' is a explicit parameterized type ('Term.ApplyType')") {
-    val stringListApplyType = Term.ApplyType(TermNames.List, List(TypeNames.String))
-    // List[String]("a", "b)
-    val stringListInitializer = Term.Apply(stringListApplyType, List(Lit.String("a"), Lit.String("b")))
+  test("""infer List.apply[String]("a", "b")""") {
+    val termApply = q"""List.apply[String]("a", "b")"""
 
-    val argTypes = List(TypeNames.String)
+    val argTypes = List(TypeNames.String, TypeNames.String)
     val maybeArgTypes = argTypes.map(Some(_))
     val context = TermApplyInferenceContext(maybeArgTypes = maybeArgTypes)
 
-    val expectedTypeApply = Type.Apply(TypeNames.List, List(TypeNames.String))
+    val expectedReturnType = Type.Apply(TypeNames.List, List(TypeNames.String))
 
-    when(applyTypeTypeInferrer.infer(eqTree(stringListApplyType))).thenReturn(Some(expectedTypeApply))
-
-    coreApplyDeclDefInferrer.infer(stringListInitializer, context) should equalPartialDeclDef(
-      PartialDeclDef(maybeParamTypes = maybeArgTypes, maybeReturnType = Some(expectedTypeApply))
-    )
-  }
-
-  test("infer() when 'fun' is a List with implicit type") {
-
-    // List("a", "b)
-    val listInitializer = Term.Apply(TermNames.List, List(q"a", q"b"))
-
-    val argTypes = List(TypeNames.String)
-    val maybeArgTypes = argTypes.map(Some(_))
-    val context = TermApplyInferenceContext(maybeArgTypes = maybeArgTypes)
-
-    val expectedTypeApply = Type.Apply(TypeNames.List, argTypes)
-
-    when(termTypeInferrer.infer(eqTree(TermNames.List))).thenReturn(Some(TypeNames.List))
-    when(typeNameClassifier.isParameterizedType(eqTree(TypeNames.List))).thenReturn(true)
-    when(compositeCollectiveTypeInferrer.infer(eqOptionTreeList(maybeArgTypes))).thenReturn(TypeNames.String)
-
-    coreApplyDeclDefInferrer.infer(listInitializer, context) should equalPartialDeclDef(
-      PartialDeclDef(maybeParamTypes = maybeArgTypes, maybeReturnType = Some(expectedTypeApply))
-    )
-  }
-
-  test("infer() when 'fun' is a Map with implicit types") {
-
-    val mapElements = List(
-      Term.Tuple(List(Lit.String("a"), Lit.Int(1))),
-      Term.Tuple(List(Lit.String("b"), Lit.Int(2)))
-    )
-
-    // Map(("a", 1), ("b", 2))
-    val mapInitializer = Term.Apply(TermNames.Map, mapElements)
-
-    val tupleType = Type.Tuple(List(TypeNames.String, TypeNames.Int))
-    val argTypes = List(tupleType, tupleType)
-    val maybeArgTypes = argTypes.map(Some(_))
-    val context = TermApplyInferenceContext(maybeArgTypes = maybeArgTypes)
-
-    val expectedTypeApply = Type.Apply(TypeNames.Map, tupleType.args)
-
-    when(termTypeInferrer.infer(eqTree(TermNames.Map))).thenReturn(Some(TypeNames.Map))
-    when(typeNameClassifier.isParameterizedType(eqTree(TypeNames.Map))).thenReturn(true)
-    when(compositeCollectiveTypeInferrer.infer(eqOptionTreeList(maybeArgTypes))).thenReturn(tupleType)
-
-    coreApplyDeclDefInferrer.infer(mapInitializer, context) should equalPartialDeclDef(
-      PartialDeclDef(maybeParamTypes = maybeArgTypes, maybeReturnType = Some(expectedTypeApply))
-    )
-  }
-
-  test("infer() when 'fun' is a non-parametrized type name") {
-
-    val stringTermApply = Term.Apply(TermNames.String, List(Term.Name("a")))
-    val maybeArgTypes = List(Some(TypeNames.String))
-    val context = TermApplyInferenceContext(maybeArgTypes = maybeArgTypes)
-
-    when(termTypeInferrer.infer(eqTree(TermNames.String))).thenReturn(Some(TypeNames.String))
-    when(typeNameClassifier.isParameterizedType(eqTree(TypeNames.Map))).thenReturn(false)
-
-    coreApplyDeclDefInferrer.infer(stringTermApply, context) should equalPartialDeclDef(
-      PartialDeclDef(maybeParamTypes = maybeArgTypes, maybeReturnType = Some(TypeNames.String))
-    )
-  }
-
-  test("infer() when 'fun' is a Type.Select and inferrable") {
-
-    val termSelect = Term.Select(Term.Name("A"), Term.Name("b"))
-    val termApply = Term.Apply(termSelect, Nil)
-    val maybeArgTypes = List(Some(TypeNames.String), Some(TypeNames.String))
-    val context = TermApplyInferenceContext(maybeArgTypes = maybeArgTypes)
-
-    val expectedTypeSelect = Type.Select(Term.Name("A"), Type.Name("B"))
-
-    when(termTypeInferrer.infer(eqTree(termSelect))).thenReturn(Some(expectedTypeSelect))
+    when(initializerDeclDefInferrer.inferByAppliedTypes(eqTree(TermNames.List), eqTreeList(List(TypeNames.String)), eqTo(2)))
+      .thenReturn(PartialDeclDef(
+        maybeParamTypes = List(Some(TypeNames.String), Some(TypeNames.String)),
+        maybeReturnType = Some(expectedReturnType))
+      )
 
     coreApplyDeclDefInferrer.infer(termApply, context) should equalPartialDeclDef(
-      PartialDeclDef(maybeParamTypes = maybeArgTypes, maybeReturnType = Some(expectedTypeSelect))
+      PartialDeclDef(maybeParamTypes = maybeArgTypes, maybeReturnType = Some(expectedReturnType))
+    )
+  }
+
+  test("""infer Map.apply[String, Int](("a", 1), ("b", 2))""") {
+    val termApply = q"""Map.apply[String, Int](("a", 1), ("b", 2))"""
+
+    val appliedTypes = List(TypeNames.String, TypeNames.Int)
+    val argTypes = List.fill(2)(Type.Tuple(appliedTypes))
+    val maybeArgTypes = argTypes.map(Some(_))
+    val context = TermApplyInferenceContext(maybeArgTypes = maybeArgTypes)
+
+    val expectedReturnType = Type.Apply(TypeNames.Map, appliedTypes)
+
+    when(initializerDeclDefInferrer.inferByAppliedTypes(eqTree(TermNames.Map), eqTreeList(appliedTypes), eqTo(2)))
+      .thenReturn(PartialDeclDef(
+        maybeParamTypes = maybeArgTypes,
+        maybeReturnType = Some(expectedReturnType))
+      )
+
+    coreApplyDeclDefInferrer.infer(termApply, context) should equalPartialDeclDef(
+      PartialDeclDef(maybeParamTypes = maybeArgTypes, maybeReturnType = Some(expectedReturnType))
+    )
+  }
+
+  test("""infer Map.empty[String, Int]()""") {
+    val termApply = q"""Map.empty[String, Int]()"""
+
+    val appliedTypes = List(TypeNames.String, TypeNames.Int)
+    val context = TermApplyInferenceContext(maybeArgTypes = Nil)
+
+    val expectedReturnType = Type.Apply(TypeNames.Map, appliedTypes)
+
+    when(initializerDeclDefInferrer.inferByAppliedTypes(eqTree(TermNames.Map), eqTreeList(appliedTypes), eqTo(0)))
+      .thenReturn(PartialDeclDef(
+        maybeParamTypes = Nil,
+        maybeReturnType = Some(expectedReturnType))
+      )
+
+    coreApplyDeclDefInferrer.infer(termApply, context) should equalPartialDeclDef(
+      PartialDeclDef(maybeParamTypes = Nil, maybeReturnType = Some(expectedReturnType))
+    )
+  }
+
+  test("""infer Range.inclusive[Int](1, 10)""") {
+    val termApply = q"""Range.inclusive[Int](1, 10)"""
+
+    val appliedTypes = List(TypeNames.Int)
+    val argTypes = List.fill(2)(TypeNames.Int)
+    val maybeArgTypes = argTypes.map(Some(_))
+    val context = TermApplyInferenceContext(maybeArgTypes = maybeArgTypes)
+
+    val expectedReturnType = Type.Apply(TypeNames.ScalaRange, appliedTypes)
+
+    when(initializerDeclDefInferrer.inferByAppliedTypes(eqTree(TermNames.ScalaRange), eqTreeList(appliedTypes), eqTo(2)))
+      .thenReturn(PartialDeclDef(
+        maybeParamTypes = maybeArgTypes,
+        maybeReturnType = Some(expectedReturnType))
+      )
+
+    coreApplyDeclDefInferrer.infer(termApply, context) should equalPartialDeclDef(
+      PartialDeclDef(maybeParamTypes = maybeArgTypes, maybeReturnType = Some(expectedReturnType))
+    )
+  }
+
+  test("""infer Future.successful[Int](1)""") {
+    val termApply = q"""Future.successful[Int](1)"""
+
+    val appliedTypes = List(TypeNames.Int)
+    val argTypes = List(TypeNames.Int)
+    val maybeArgTypes = argTypes.map(Some(_))
+    val context = TermApplyInferenceContext(maybeArgTypes = maybeArgTypes)
+
+    val expectedReturnType = Type.Apply(TypeNames.Future, appliedTypes)
+
+    when(initializerDeclDefInferrer.inferByAppliedTypes(eqTree(TermNames.Future), eqTreeList(appliedTypes), eqTo(1)))
+      .thenReturn(PartialDeclDef(
+        maybeParamTypes = maybeArgTypes,
+        maybeReturnType = Some(expectedReturnType))
+      )
+
+    coreApplyDeclDefInferrer.infer(termApply, context) should equalPartialDeclDef(
+      PartialDeclDef(maybeParamTypes = maybeArgTypes, maybeReturnType = Some(expectedReturnType))
+    )
+  }
+
+  test("infer Future.failed[Int](new RuntimeException())") {
+    val termApply = q"Future.failed[Int](new RuntimeException())"
+
+    val appliedTypes = List(TypeNames.Int)
+    val argTypes = List(TypeNames.Int)
+    val maybeArgTypes = argTypes.map(Some(_))
+    val context = TermApplyInferenceContext(maybeArgTypes = maybeArgTypes)
+
+    val expectedReturnType = Type.Apply(TypeNames.Future, appliedTypes)
+
+    coreApplyDeclDefInferrer.infer(termApply, context) should equalPartialDeclDef(
+      PartialDeclDef(maybeParamTypes = maybeArgTypes, maybeReturnType = Some(expectedReturnType))
+    )
+  }
+
+  test("""infer List.apply("a", "b")""") {
+    val termApply = q"""List.apply("a", "b")"""
+
+    val argTypes = List(TypeNames.String, TypeNames.String)
+    val maybeArgTypes = argTypes.map(Some(_))
+    val context = TermApplyInferenceContext(maybeArgTypes = maybeArgTypes)
+
+    val expectedReturnType = Type.Apply(TypeNames.List, List(TypeNames.String))
+
+    when(initializerDeclDefInferrer.inferByArgTypes(eqTree(TermNames.List), eqOptionTreeList(maybeArgTypes)))
+      .thenReturn(PartialDeclDef(
+        maybeParamTypes = maybeArgTypes,
+        maybeReturnType = Some(expectedReturnType))
+      )
+
+    coreApplyDeclDefInferrer.infer(termApply, context) should equalPartialDeclDef(
+      PartialDeclDef(maybeParamTypes = maybeArgTypes, maybeReturnType = Some(expectedReturnType))
+    )
+  }
+
+  test("""infer Map.apply(("a", 1), ("b", 2))""") {
+    val termApply = q"""Map.apply(("a", 1), ("b", 2))"""
+
+    val tupleTypes = List(TypeNames.String, TypeNames.Int)
+    val argTypes = List.fill(2)(Type.Tuple(tupleTypes))
+    val maybeArgTypes = argTypes.map(Some(_))
+    val context = TermApplyInferenceContext(maybeArgTypes = maybeArgTypes)
+
+    val expectedReturnType = Type.Apply(TypeNames.Map, tupleTypes)
+
+    when(initializerDeclDefInferrer.inferByArgTypes(eqTree(TermNames.Map), eqOptionTreeList(maybeArgTypes)))
+      .thenReturn(PartialDeclDef(
+        maybeParamTypes = maybeArgTypes,
+        maybeReturnType = Some(expectedReturnType))
+      )
+
+    coreApplyDeclDefInferrer.infer(termApply, context) should equalPartialDeclDef(
+      PartialDeclDef(maybeParamTypes = maybeArgTypes, maybeReturnType = Some(expectedReturnType))
+    )
+  }
+
+  test("infer Map.empty()") {
+    val termApply = q"Map.empty()"
+
+    val context = TermApplyInferenceContext()
+
+    val expectedReturnType = Type.Apply(TypeNames.Map, List(TypeNames.ScalaAny))
+
+    when(initializerDeclDefInferrer.inferByArgTypes(eqTree(TermNames.Map), eqTo(Nil)))
+      .thenReturn(PartialDeclDef(
+        maybeParamTypes = Nil,
+        maybeReturnType = Some(expectedReturnType))
+      )
+
+    coreApplyDeclDefInferrer.infer(termApply, context) should equalPartialDeclDef(
+      PartialDeclDef(maybeParamTypes = Nil, maybeReturnType = Some(expectedReturnType))
+    )
+  }
+
+  test("infer Range.inclusive(1, 10)") {
+    val termApply = q"Range.inclusive(1, 10)"
+
+    val argTypes = List.fill(2)(TypeNames.Int)
+    val maybeArgTypes = argTypes.map(Some(_))
+    val context = TermApplyInferenceContext(maybeArgTypes = maybeArgTypes)
+
+    val expectedReturnType = Type.Apply(TypeNames.ScalaRange, List(TypeNames.Int))
+
+    when(initializerDeclDefInferrer.inferByArgTypes(eqTree(TermNames.ScalaRange), eqOptionTreeList(maybeArgTypes)))
+      .thenReturn(PartialDeclDef(
+        maybeParamTypes = maybeArgTypes,
+        maybeReturnType = Some(expectedReturnType))
+      )
+
+    coreApplyDeclDefInferrer.infer(termApply, context) should equalPartialDeclDef(
+      PartialDeclDef(maybeParamTypes = maybeArgTypes, maybeReturnType = Some(expectedReturnType))
+    )
+  }
+
+  test("infer Future.successful(1)") {
+    val termApply = q"Future.successful(1)"
+
+    val argTypes = List(TypeNames.Int)
+    val maybeArgTypes = argTypes.map(Some(_))
+    val context = TermApplyInferenceContext(maybeArgTypes = maybeArgTypes)
+
+    val expectedReturnType = Type.Apply(TypeNames.Future, List(TypeNames.Int))
+
+    when(initializerDeclDefInferrer.inferByArgTypes(eqTree(TermNames.Future), eqOptionTreeList(maybeArgTypes)))
+      .thenReturn(PartialDeclDef(
+        maybeParamTypes = maybeArgTypes,
+        maybeReturnType = Some(expectedReturnType))
+      )
+
+    coreApplyDeclDefInferrer.infer(termApply, context) should equalPartialDeclDef(
+      PartialDeclDef(maybeParamTypes = maybeArgTypes, maybeReturnType = Some(expectedReturnType))
+    )
+  }
+
+  test("infer Future.failed(new RuntimeException())") {
+    val termApply = q"Future.failed(new RuntimeException())"
+
+    val argTypes = List(t"RuntimeException")
+    val maybeArgTypes = argTypes.map(Some(_))
+    val context = TermApplyInferenceContext(maybeArgTypes = maybeArgTypes)
+
+    val expectedReturnType = Type.Apply(TypeNames.Future, List(TypeNames.ScalaAny))
+
+    coreApplyDeclDefInferrer.infer(termApply, context) should equalPartialDeclDef(
+      PartialDeclDef(maybeParamTypes = maybeArgTypes, maybeReturnType = Some(expectedReturnType))
+    )
+  }
+
+  test("infer x.toString()") {
+    coreApplyDeclDefInferrer.infer(q"x.toString()", TermApplyInferenceContext()) should equalPartialDeclDef(
+      PartialDeclDef(maybeReturnType = Some(TypeNames.String))
+    )
+  }
+
+  test("""infer print("abc"")""") {
+    coreApplyDeclDefInferrer.infer(q"""print("abc")""", TermApplyInferenceContext()) should equalPartialDeclDef(
+      PartialDeclDef(maybeReturnType = Some(TypeNames.Unit))
+    )
+  }
+
+  test("""infer println("abc"")""") {
+    coreApplyDeclDefInferrer.infer(q"""println("abc")""", TermApplyInferenceContext()) should equalPartialDeclDef(
+      PartialDeclDef(maybeReturnType = Some(TypeNames.Unit))
     )
   }
 
   test("infer() when 'fun' is not inferrable") {
-
-    val nonInferrableFun = Term.Name("blabla")
-    val nonInferrableTermApply = Term.Apply(nonInferrableFun, Nil)
-    val maybeArgTypes = List(Some(TypeNames.String))
-    val context = TermApplyInferenceContext(maybeArgTypes = maybeArgTypes)
-
-    when(termTypeInferrer.infer(eqTree(nonInferrableFun))).thenReturn(None)
-
-    coreApplyDeclDefInferrer.infer(nonInferrableTermApply, context) should equalPartialDeclDef(
-      PartialDeclDef(maybeParamTypes = maybeArgTypes)
-    )
+    coreApplyDeclDefInferrer.infer(q"blabla()", TermApplyInferenceContext()) should equalPartialDeclDef(PartialDeclDef())
   }
 }
