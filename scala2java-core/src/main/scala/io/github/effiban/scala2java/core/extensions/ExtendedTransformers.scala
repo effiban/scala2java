@@ -30,6 +30,8 @@ private[extensions] trait ExtendedTransformers { this: ExtensionContainer =>
 
   val termSelectTransformers: List[TermSelectTransformer] = extensions.map(_.termSelectTransformer())
 
+  val termNameTransformers: List[TermNameTransformer] = extensions.map(_.termNameTransformer())
+
   val typeNameTransformers: List[TypeNameTransformer] = extensions.map(_.typeNameTransformer())
 
 }

@@ -1,7 +1,8 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.{ModifiersContext, StatContext}
+import io.github.effiban.scala2java.core.contexts.{InternalTermNameTransformationContext, ModifiersContext, StatContext}
 import io.github.effiban.scala2java.core.entities.JavaTreeType
+import io.github.effiban.scala2java.core.matchers.InternalTermNameTransformationContextMatcher.eqInternalTermNameTransformationContext
 import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
@@ -76,7 +77,10 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
         |public """.stripMargin)
       .when(modListTraverser).traverse(eqExpectedModifiers(declDef, javaScope), annotsOnSameLine = ArgumentMatchers.eq(false))
     doWrite("int").when(typeTraverser).traverse(eqTree(MethodType))
-    doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
+    doWrite("myMethod").when(termNameTraverser).traverse(
+      eqTree(MethodName),
+      eqInternalTermNameTransformationContext(InternalTermNameTransformationContext())
+    )
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1),
       context = ArgumentMatchers.eq(StatContext(JavaScope.MethodSignature)),
@@ -108,7 +112,10 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
       .when(modListTraverser).traverse(eqExpectedModifiers(declDef, javaScope), annotsOnSameLine = ArgumentMatchers.eq(false))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     doWrite("int").when(typeTraverser).traverse(eqTree(MethodType))
-    doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
+    doWrite("myMethod").when(termNameTraverser).traverse(
+      eqTree(MethodName),
+      eqInternalTermNameTransformationContext(InternalTermNameTransformationContext())
+    )
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1),
       context = ArgumentMatchers.eq(StatContext(JavaScope.MethodSignature)),
@@ -139,7 +146,10 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(modListTraverser).traverse(eqExpectedModifiers(declDef, javaScope), annotsOnSameLine = ArgumentMatchers.eq(false))
     doWrite("int").when(typeTraverser).traverse(eqTree(MethodType))
-    doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
+    doWrite("myMethod").when(termNameTraverser).traverse(
+      eqTree(MethodName),
+      eqInternalTermNameTransformationContext(InternalTermNameTransformationContext())
+    )
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1),
       context = ArgumentMatchers.eq(StatContext(JavaScope.MethodSignature)),
@@ -170,7 +180,10 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(modListTraverser).traverse(eqExpectedModifiers(declDef, javaScope), annotsOnSameLine = ArgumentMatchers.eq(false))
     doWrite("int").when(typeTraverser).traverse(eqTree(MethodType))
-    doWrite("myMethod").when(termNameTraverser).traverse(eqTree(MethodName))
+    doWrite("myMethod").when(termNameTraverser).traverse(
+      eqTree(MethodName),
+      eqInternalTermNameTransformationContext(InternalTermNameTransformationContext())
+    )
     doWrite("(int param1, int param2, int param3, int param4)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1 ++ MethodParams2),
       context = ArgumentMatchers.eq(StatContext(JavaScope.MethodSignature)),

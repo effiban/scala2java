@@ -10,9 +10,9 @@ private[extensions] trait ExtendedPredicates { this: ExtensionContainer =>
 
   val templateInitExcludedPredicates: List[TemplateInitExcludedPredicate] = extensions.map(_.templateInitExcludedPredicate())
 
-  def termNameHasApplyMethods(): List[TermNameHasApplyMethod] = extensions.map(_.termNameHasApplyMethod())
+  val termNameHasApplyMethods: List[TermNameHasApplyMethod] = extensions.map(_.termNameHasApplyMethod())
 
-  def termNameSupportsNoArgInvocations(): List[TermNameSupportsNoArgInvocation] = extensions.map(_.termNameSupportsNoArgInvocation())
+  val termNameSupportsNoArgInvocations: List[TermNameSupportsNoArgInvocation] = extensions.map(_.termNameSupportsNoArgInvocation())
 
-  def termSelectSupportsNoArgInvocations(): List[TermSelectSupportsNoArgInvocation] = extensions.map(_.termSelectSupportsNoArgInvocation())
+  val termSelectSupportsNoArgInvocations: List[TermSelectSupportsNoArgInvocation] = extensions.map(_.termSelectSupportsNoArgInvocation())
 }

@@ -9,5 +9,5 @@ class CompositeTermNameHasApplyMethod(coreTermNameHasApplyMethod: TermNameHasApp
                                      (implicit extensionRegistry: ExtensionRegistry)
   extends CompositeAtLeastOneTruePredicate[Term.Name] with TermNameHasApplyMethod {
 
-  override protected val predicates: List[Term.Name => Boolean] = coreTermNameHasApplyMethod +: extensionRegistry.termNameHasApplyMethods()
+  override protected val predicates: List[Term.Name => Boolean] = coreTermNameHasApplyMethod +: extensionRegistry.termNameHasApplyMethods
 }

@@ -1,5 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.contexts.InternalTermNameTransformationContext
+import io.github.effiban.scala2java.core.matchers.InternalTermNameTransformationContextMatcher.eqInternalTermNameTransformationContext
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TermNames.{Plus, ScalaRange, ScalaTo}
@@ -60,7 +62,10 @@ class TermApplyInfixTraverserImplTest extends UnitTestSuite {
 
     when(termApplyInfixToTermApplyTransformer.transform(eqTree(applyInfix))).thenReturn(None)
     doWrite("a").when(expressionTraverser).traverse(eqTree(lhs))
-    doWrite("+").when(termNameTraverser).traverse(eqTree(op))
+    doWrite("+").when(termNameTraverser).traverse(
+      eqTree(op),
+      eqInternalTermNameTransformationContext(InternalTermNameTransformationContext())
+    )
     doWrite("b").when(expressionTraverser).traverse(eqTree(rhs))
 
     termApplyInfixTraverser.traverse(applyInfix)

@@ -1,5 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.contexts.InternalTermNameTransformationContext
+import io.github.effiban.scala2java.core.matchers.InternalTermNameTransformationContextMatcher.eqInternalTermNameTransformationContext
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -17,7 +19,10 @@ class ApplyUnaryTraverserImplTest extends UnitTestSuite {
     val op = Term.Name("!")
     val arg = Term.Name("myFlag")
 
-    doWrite("!").when(termNameTraverser).traverse(eqTree(op))
+    doWrite("!").when(termNameTraverser).traverse(
+      eqTree(op),
+      eqInternalTermNameTransformationContext(InternalTermNameTransformationContext())
+    )
     doWrite("myFlag").when(expressionTraverser).traverse(eqTree(arg))
 
     applyUnaryTraverser.traverse(Term.ApplyUnary(op = op, arg = arg))
