@@ -10,5 +10,5 @@ class CompositeTermNameSupportsNoArgInvocation(coreTermNameSupportsNoArgInvocati
   extends CompositeAtLeastOneTruePredicate[Term.Name] with TermNameSupportsNoArgInvocation {
 
   override protected val predicates: List[Term.Name => Boolean] =
-    coreTermNameSupportsNoArgInvocation +: extensionRegistry.termNameSupportsNoArgInvocations()
+    coreTermNameSupportsNoArgInvocation +: extensionRegistry.termNameSupportsNoArgInvocations
 }

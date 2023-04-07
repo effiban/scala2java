@@ -118,6 +118,13 @@ trait ExtendedTransformers {
    */
   def termSelectTransformer(): TermSelectTransformer = TermSelectTransformer.Identity
 
+  /** Override this method if you need to modify a [[scala.meta.Term.Name]] (identifier) appearing by itself.<br>
+   *
+   * @return if overriden - a transformer which modifies a given [[scala.meta.Term.Name]]<br>
+   *         otherwise - the default transformer which doesn't modify anything<br>
+   */
+  def termNameTransformer(): TermNameTransformer = TermNameTransformer.Empty
+
   /** Override this method if you need to transform a Scala type name into an equivalent Java one
    *
    * @return if overriden - a transformer which changes the type name<br>

@@ -10,5 +10,5 @@ class CompositeTermSelectSupportsNoArgInvocation(coreTermSelectSupportsNoArgInvo
   extends CompositeAtLeastOneTruePredicate[Term.Select] with TermSelectSupportsNoArgInvocation {
 
   override protected val predicates: List[Term.Select => Boolean] =
-    coreTermSelectSupportsNoArgInvocation +: extensionRegistry.termSelectSupportsNoArgInvocations()
+    coreTermSelectSupportsNoArgInvocation +: extensionRegistry.termSelectSupportsNoArgInvocations
 }

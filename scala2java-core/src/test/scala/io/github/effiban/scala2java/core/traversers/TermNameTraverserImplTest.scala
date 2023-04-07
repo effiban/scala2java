@@ -1,9 +1,11 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.contexts.InternalTermNameTransformationContext
+import io.github.effiban.scala2java.core.matchers.InternalTermNameTransformationContextMatcher.eqInternalTermNameTransformationContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TermNames
 import io.github.effiban.scala2java.core.testtrees.TermNames.{Empty, ScalaOption}
-import io.github.effiban.scala2java.core.transformers.TermNameTransformer
+import io.github.effiban.scala2java.core.transformers.InternalTermNameTransformer
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.Term
@@ -11,14 +13,15 @@ import scala.meta.Term
 class TermNameTraverserImplTest extends UnitTestSuite {
 
   private val termTraverser = mock[TermTraverser]
-  private val termNameTransformer = mock[TermNameTransformer]
+  private val termNameTransformer = mock[InternalTermNameTransformer]
 
   private val termNameTraverser = new TermNameTraverserImpl(termTraverser, termNameTransformer)
 
   test("traverse when transformer returns the same") {
     val termName = Term.Name("xyz")
 
-    when(termNameTransformer.transform(eqTree(termName))).thenReturn(termName)
+    when(termNameTransformer.transform(eqTree(termName), eqInternalTermNameTransformationContext(InternalTermNameTransformationContext())))
+      .thenReturn(termName)
 
     termNameTraverser.traverse(termName)
 
@@ -29,7 +32,8 @@ class TermNameTraverserImplTest extends UnitTestSuite {
     val termName = TermNames.ScalaNone
     val term = Term.Select(ScalaOption, Empty)
 
-    when(termNameTransformer.transform(eqTree(termName))).thenReturn(term)
+    when(termNameTransformer.transform(eqTree(termName), eqInternalTermNameTransformationContext(InternalTermNameTransformationContext())))
+      .thenReturn(term)
 
     termNameTraverser.traverse(termName)
 

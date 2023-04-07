@@ -1,8 +1,9 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.contexts.{InternalTermNameTransformationContext, TermSelectContext}
+import io.github.effiban.scala2java.core.matchers.InternalTermNameTransformationContextMatcher.eqInternalTermNameTransformationContext
 import io.github.effiban.scala2java.core.matchers.TermSelectContextMatcher.eqTermSelectContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.contexts.TermSelectContext
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.Term.{ApplyUnary, Super, This}
@@ -45,7 +46,10 @@ class TermRefTraverserImplTest extends UnitTestSuite {
 
     termRefTraverser.traverse(termName)
 
-    verify(termNameTraverser).traverse(eqTree(termName))
+    verify(termNameTraverser).traverse(
+      eqTree(termName),
+      eqInternalTermNameTransformationContext(InternalTermNameTransformationContext())
+    )
   }
 
   test("traverse termSelect") {

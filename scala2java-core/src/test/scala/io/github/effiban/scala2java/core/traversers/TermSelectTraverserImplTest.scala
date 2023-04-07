@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.TermSelectContext
+import io.github.effiban.scala2java.core.contexts.{InternalTermNameTransformationContext, TermSelectContext}
+import io.github.effiban.scala2java.core.matchers.InternalTermNameTransformationContextMatcher.eqInternalTermNameTransformationContext
 import io.github.effiban.scala2java.core.matchers.TermSelectTransformationContextMatcher.eqTermSelectTransformationContext
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
@@ -49,7 +50,10 @@ class TermSelectTraverserImplTest extends UnitTestSuite {
       .thenReturn(JavaSelectWithTermName)
 
     doWrite("MyJavaClass").when(termTraverser).traverse(eqTree(MyJavaClass))
-    doWrite("myJavaMethod").when(termNameTraverser).traverse(eqTree(MyJavaMethod))
+    doWrite("myJavaMethod").when(termNameTraverser).traverse(
+      eqTree(MyJavaMethod),
+      eqInternalTermNameTransformationContext(InternalTermNameTransformationContext())
+    )
     doWrite("<Integer>").when(typeListTraverser).traverse(eqTreeList(typeArgs))
 
     termSelectTraverser.traverse(ScalaSelectWithTermName, context)
@@ -67,7 +71,10 @@ class TermSelectTraverserImplTest extends UnitTestSuite {
       .thenReturn(JavaSelectWithTermName)
 
     doWrite("MyJavaClass").when(termTraverser).traverse(eqTree(MyJavaClass))
-    doWrite("myJavaMethod").when(termNameTraverser).traverse(eqTree(MyJavaMethod))
+    doWrite("myJavaMethod").when(termNameTraverser).traverse(
+      eqTree(MyJavaMethod),
+      eqInternalTermNameTransformationContext(InternalTermNameTransformationContext())
+    )
     doWrite("<Integer>").when(typeListTraverser).traverse(eqTreeList(typeArgs))
 
     termSelectTraverser.traverse(ScalaSelectWithTermName, context)
@@ -81,8 +88,10 @@ class TermSelectTraverserImplTest extends UnitTestSuite {
       .thenReturn(JavaSelectWithTermName)
 
     doWrite("MyJavaClass").when(termTraverser).traverse(eqTree(MyJavaClass))
-    doWrite("myJavaMethod").when(termNameTraverser).traverse(eqTree(MyJavaMethod))
-
+    doWrite("myJavaMethod").when(termNameTraverser).traverse(
+      eqTree(MyJavaMethod),
+      eqInternalTermNameTransformationContext(InternalTermNameTransformationContext())
+    )
     termSelectTraverser.traverse(ScalaSelectWithTermName)
 
     outputWriter.toString shouldBe "MyJavaClass.myJavaMethod"
@@ -98,8 +107,10 @@ class TermSelectTraverserImplTest extends UnitTestSuite {
       .thenReturn(javaSelect)
 
     doWrite("() -> 1").when(termTraverser).traverse(eqTree(termFunction))
-    doWrite("get").when(termNameTraverser).traverse(eqTree(MyJavaMethod))
-
+    doWrite("get").when(termNameTraverser).traverse(
+      eqTree(MyJavaMethod),
+      eqInternalTermNameTransformationContext(InternalTermNameTransformationContext())
+    )
     termSelectTraverser.traverse(scalaSelect)
 
     outputWriter.toString shouldBe "(() -> 1).get"
@@ -116,7 +127,10 @@ class TermSelectTraverserImplTest extends UnitTestSuite {
       .thenReturn(outputTermSelect)
 
     doWrite("(Supplier<Integer>)() -> 1").when(termTraverser).traverse(eqTree(ascribedTermFunction))
-    doWrite("get").when(termNameTraverser).traverse(eqTree(MyJavaMethod))
+    doWrite("get").when(termNameTraverser).traverse(
+      eqTree(MyJavaMethod),
+      eqInternalTermNameTransformationContext(InternalTermNameTransformationContext())
+    )
 
     termSelectTraverser.traverse(inputTermSelect)
 
@@ -137,8 +151,10 @@ class TermSelectTraverserImplTest extends UnitTestSuite {
       .thenReturn(javaSelect)
 
     doWrite("MyJavaClass.myJavaMethod(arg1)").when(termTraverser).traverse(eqTree(javaQual))
-    doWrite("myJavaMethod2").when(termNameTraverser).traverse(eqTree(MyJavaMethod2))
-
+    doWrite("myJavaMethod2").when(termNameTraverser).traverse(
+      eqTree(MyJavaMethod2),
+      eqInternalTermNameTransformationContext(InternalTermNameTransformationContext())
+    )
     termSelectTraverser.traverse(scalaSelect)
 
     outputWriter.toString shouldBe

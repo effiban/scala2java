@@ -1,5 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.contexts.InternalTermNameTransformationContext
+import io.github.effiban.scala2java.core.matchers.InternalTermNameTransformationContextMatcher.eqInternalTermNameTransformationContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
@@ -46,7 +48,10 @@ class PatTraverserImplTest extends UnitTestSuite {
 
   test("traverse Term.Name") {
     patTraverser.traverse(TermName)
-    verify(termNameTraverser).traverse(eqTree(TermName))
+    verify(termNameTraverser).traverse(
+      eqTree(TermName),
+      eqInternalTermNameTransformationContext(InternalTermNameTransformationContext())
+    )
   }
 
   test("traverse Pat.Wildcard") {
