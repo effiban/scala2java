@@ -17,7 +17,7 @@ import org.mockito.ArgumentMatchersSugar.eqTo
 import scala.meta.{Lit, Term}
 
 class TermApplyTraverserImplTest extends UnitTestSuite {
-  private val funTermTraverser = mock[FunTermTraverser]
+  private val funTermTraverser = mock[TermTraverser]
   private val arrayInitializerTraverser = mock[ArrayInitializerTraverser]
   private val argListTraverser = mock[ArgumentListTraverser]
   private val invocationArgTraverser = mock[ArgumentTraverser[Term]]

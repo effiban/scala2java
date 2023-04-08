@@ -1,7 +1,5 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.InternalTermNameTransformationContext
-import io.github.effiban.scala2java.core.matchers.InternalTermNameTransformationContextMatcher.eqInternalTermNameTransformationContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
@@ -39,10 +37,7 @@ class NameTraverserImplTest extends UnitTestSuite {
 
     nameTraverser.traverse(name)
 
-    verify(termNameTraverser).traverse(
-      eqTree(name),
-      eqInternalTermNameTransformationContext(InternalTermNameTransformationContext())
-    )
+    verify(termNameTraverser).traverse(eqTree(name))
   }
 
   test("traverse for Term.Type") {

@@ -4,11 +4,11 @@ import scala.meta.Term.ApplyUnary
 
 trait ApplyUnaryTraverser extends ScalaTreeTraverser[ApplyUnary]
 
-private[traversers] class ApplyUnaryTraverserImpl(termNameTraverser: => TermNameTraverser,
+private[traversers] class ApplyUnaryTraverserImpl(defaultTermNameTraverser: => TermNameTraverser,
                                                   expressionTermTraverser: => TermTraverser) extends ApplyUnaryTraverser {
 
   override def traverse(applyUnary: ApplyUnary): Unit = {
-    termNameTraverser.traverse(applyUnary.op)
+    defaultTermNameTraverser.traverse(applyUnary.op)
     expressionTermTraverser.traverse(applyUnary.arg)
   }
 }

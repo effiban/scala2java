@@ -1,7 +1,5 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.InternalTermNameTransformationContext
-import io.github.effiban.scala2java.core.matchers.InternalTermNameTransformationContextMatcher.eqInternalTermNameTransformationContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
@@ -13,7 +11,7 @@ class PatTraverserImplTest extends UnitTestSuite {
   private val TermName: Term.Name = Term.Name("x")
 
   private val litTraverser = mock[LitTraverser]
-  private val termNameTraverser = mock[TermNameTraverser]
+  private val defaultTermNameTraverser = mock[TermNameTraverser]
   private val patWildcardTraverser = mock[PatWildcardTraverser]
   private val patSeqWildcardTraverser = mock[PatSeqWildcardTraverser]
   private val patVarTraverser = mock[PatVarTraverser]
@@ -27,7 +25,7 @@ class PatTraverserImplTest extends UnitTestSuite {
 
   val patTraverser = new PatTraverserImpl(
     litTraverser,
-    termNameTraverser,
+    defaultTermNameTraverser,
     patWildcardTraverser,
     patSeqWildcardTraverser,
     patVarTraverser,
@@ -48,10 +46,7 @@ class PatTraverserImplTest extends UnitTestSuite {
 
   test("traverse Term.Name") {
     patTraverser.traverse(TermName)
-    verify(termNameTraverser).traverse(
-      eqTree(TermName),
-      eqInternalTermNameTransformationContext(InternalTermNameTransformationContext())
-    )
+    verify(defaultTermNameTraverser).traverse(eqTree(TermName))
   }
 
   test("traverse Pat.Wildcard") {
