@@ -10,7 +10,7 @@ import scala.meta.Term
 
 trait TermApplyTraverser extends ScalaTreeTraverser[Term.Apply]
 
-private[traversers] class TermApplyTraverserImpl(funTermTraverser: => FunTermTraverser,
+private[traversers] class TermApplyTraverserImpl(funTermTraverser: => TermTraverser,
                                                  arrayInitializerTraverser: => ArrayInitializerTraverser,
                                                  argumentListTraverser: => ArgumentListTraverser,
                                                  invocationArgTraverser: => ArgumentTraverser[Term],

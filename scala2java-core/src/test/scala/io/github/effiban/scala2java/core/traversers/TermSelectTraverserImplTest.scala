@@ -1,7 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.{InternalTermNameTransformationContext, TermSelectContext}
-import io.github.effiban.scala2java.core.matchers.InternalTermNameTransformationContextMatcher.eqInternalTermNameTransformationContext
+import io.github.effiban.scala2java.core.contexts.TermSelectContext
 import io.github.effiban.scala2java.core.matchers.TermSelectTransformationContextMatcher.eqTermSelectTransformationContext
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
@@ -27,14 +26,14 @@ class TermSelectTraverserImplTest extends UnitTestSuite {
   private val JavaSelectWithTermName = Term.Select(qual = MyJavaClass, name = MyJavaMethod)
 
   private val expressionTermTraverser = mock[ExpressionTermTraverser]
-  private val termNameTraverser = mock[TermNameTraverser]
+  private val defaultTermNameTraverser = mock[TermNameTraverser]
   private val typeListTraverser = mock[TypeListTraverser]
   private val qualifierTypeInferrer = mock[QualifierTypeInferrer]
   private val termSelectTransformer = mock[TermSelectTransformer]
 
   private val termSelectTraverser = new TermSelectTraverserImpl(
     expressionTermTraverser,
-    termNameTraverser,
+    defaultTermNameTraverser,
     typeListTraverser,
     qualifierTypeInferrer,
     termSelectTransformer
@@ -50,10 +49,7 @@ class TermSelectTraverserImplTest extends UnitTestSuite {
       .thenReturn(JavaSelectWithTermName)
 
     doWrite("MyJavaClass").when(expressionTermTraverser).traverse(eqTree(MyJavaClass))
-    doWrite("myJavaMethod").when(termNameTraverser).traverse(
-      eqTree(MyJavaMethod),
-      eqInternalTermNameTransformationContext(InternalTermNameTransformationContext())
-    )
+    doWrite("myJavaMethod").when(defaultTermNameTraverser).traverse(eqTree(MyJavaMethod))
     doWrite("<Integer>").when(typeListTraverser).traverse(eqTreeList(typeArgs))
 
     termSelectTraverser.traverse(ScalaSelectWithTermName, context)
@@ -71,10 +67,7 @@ class TermSelectTraverserImplTest extends UnitTestSuite {
       .thenReturn(JavaSelectWithTermName)
 
     doWrite("MyJavaClass").when(expressionTermTraverser).traverse(eqTree(MyJavaClass))
-    doWrite("myJavaMethod").when(termNameTraverser).traverse(
-      eqTree(MyJavaMethod),
-      eqInternalTermNameTransformationContext(InternalTermNameTransformationContext())
-    )
+    doWrite("myJavaMethod").when(defaultTermNameTraverser).traverse(eqTree(MyJavaMethod))
     doWrite("<Integer>").when(typeListTraverser).traverse(eqTreeList(typeArgs))
 
     termSelectTraverser.traverse(ScalaSelectWithTermName, context)
@@ -88,10 +81,7 @@ class TermSelectTraverserImplTest extends UnitTestSuite {
       .thenReturn(JavaSelectWithTermName)
 
     doWrite("MyJavaClass").when(expressionTermTraverser).traverse(eqTree(MyJavaClass))
-    doWrite("myJavaMethod").when(termNameTraverser).traverse(
-      eqTree(MyJavaMethod),
-      eqInternalTermNameTransformationContext(InternalTermNameTransformationContext())
-    )
+    doWrite("myJavaMethod").when(defaultTermNameTraverser).traverse(eqTree(MyJavaMethod))
     termSelectTraverser.traverse(ScalaSelectWithTermName)
 
     outputWriter.toString shouldBe "MyJavaClass.myJavaMethod"
@@ -107,10 +97,7 @@ class TermSelectTraverserImplTest extends UnitTestSuite {
       .thenReturn(javaSelect)
 
     doWrite("() -> 1").when(expressionTermTraverser).traverse(eqTree(termFunction))
-    doWrite("get").when(termNameTraverser).traverse(
-      eqTree(MyJavaMethod),
-      eqInternalTermNameTransformationContext(InternalTermNameTransformationContext())
-    )
+    doWrite("get").when(defaultTermNameTraverser).traverse(eqTree(MyJavaMethod))
     termSelectTraverser.traverse(scalaSelect)
 
     outputWriter.toString shouldBe "(() -> 1).get"
@@ -127,10 +114,7 @@ class TermSelectTraverserImplTest extends UnitTestSuite {
       .thenReturn(outputTermSelect)
 
     doWrite("(Supplier<Integer>)() -> 1").when(expressionTermTraverser).traverse(eqTree(ascribedTermFunction))
-    doWrite("get").when(termNameTraverser).traverse(
-      eqTree(MyJavaMethod),
-      eqInternalTermNameTransformationContext(InternalTermNameTransformationContext())
-    )
+    doWrite("get").when(defaultTermNameTraverser).traverse(eqTree(MyJavaMethod))
 
     termSelectTraverser.traverse(inputTermSelect)
 
@@ -151,10 +135,7 @@ class TermSelectTraverserImplTest extends UnitTestSuite {
       .thenReturn(javaSelect)
 
     doWrite("MyJavaClass.myJavaMethod(arg1)").when(expressionTermTraverser).traverse(eqTree(javaQual))
-    doWrite("myJavaMethod2").when(termNameTraverser).traverse(
-      eqTree(MyJavaMethod2),
-      eqInternalTermNameTransformationContext(InternalTermNameTransformationContext())
-    )
+    doWrite("myJavaMethod2").when(defaultTermNameTraverser).traverse(eqTree(MyJavaMethod2))
     termSelectTraverser.traverse(scalaSelect)
 
     outputWriter.toString shouldBe

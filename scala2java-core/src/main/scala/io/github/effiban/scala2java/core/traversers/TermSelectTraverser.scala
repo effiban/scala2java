@@ -14,7 +14,7 @@ trait TermSelectTraverser {
 }
 
 private[traversers] class TermSelectTraverserImpl(expressionTermTraverser: => TermTraverser,
-                                                  termNameTraverser: => TermNameTraverser,
+                                                  defaultTermNameTraverser: => TermNameTraverser,
                                                   typeListTraverser: => TypeListTraverser,
                                                   qualifierTypeInferrer: => QualifierTypeInferrer,
                                                   termSelectTransformer: TermSelectTransformer)
@@ -29,7 +29,7 @@ private[traversers] class TermSelectTraverserImpl(expressionTermTraverser: => Te
     traverseQualifier(javaSelect.qual)
     writeQualifierSeparator(javaSelect.qual)
     typeListTraverser.traverse(context.appliedTypeArgs)
-    termNameTraverser.traverse(javaSelect.name)
+    defaultTermNameTraverser.traverse(javaSelect.name)
   }
 
   private def traverseQualifier(qualifier: Term): Unit = {

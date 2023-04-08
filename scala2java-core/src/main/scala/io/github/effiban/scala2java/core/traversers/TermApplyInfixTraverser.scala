@@ -12,7 +12,7 @@ trait TermApplyInfixTraverser extends ScalaTreeTraverser[Term.ApplyInfix]
 
 private[traversers] class TermApplyInfixTraverserImpl(expressionTermTraverser: => TermTraverser,
                                                       termApplyTraverser: => TermApplyTraverser,
-                                                      termNameTraverser: => TermNameTraverser,
+                                                      defaultTermNameTraverser: => TermNameTraverser,
                                                       argumentListTraverser: => ArgumentListTraverser,
                                                       invocationArgTraverser: => ArgumentTraverser[Term],
                                                       termApplyInfixToTermApplyTransformer: TermApplyInfixToTermApplyTransformer)
@@ -32,7 +32,7 @@ private[traversers] class TermApplyInfixTraverserImpl(expressionTermTraverser: =
   private def traverseAsInfix(termApplyInfix: Term.ApplyInfix): Unit = {
     expressionTermTraverser.traverse(termApplyInfix.lhs)
     write(" ")
-    termNameTraverser.traverse(termApplyInfix.op)
+    defaultTermNameTraverser.traverse(termApplyInfix.op)
     write(" ")
     //TODO handle type args
     termApplyInfix.args match {

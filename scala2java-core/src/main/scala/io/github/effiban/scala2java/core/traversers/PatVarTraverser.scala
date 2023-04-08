@@ -4,10 +4,10 @@ import scala.meta.Pat
 
 trait PatVarTraverser extends ScalaTreeTraverser[Pat.Var]
 
-private[traversers] class PatVarTraverserImpl(termNameTraverser: => TermNameTraverser) extends PatVarTraverser {
+private[traversers] class PatVarTraverserImpl(defaultTermNameTraverser: => TermNameTraverser) extends PatVarTraverser {
 
   // Pattern match variable, e.g. `a` in case a =>
   override def traverse(patternVar: Pat.Var): Unit = {
-    termNameTraverser.traverse(patternVar.name)
+    defaultTermNameTraverser.traverse(patternVar.name)
   }
 }

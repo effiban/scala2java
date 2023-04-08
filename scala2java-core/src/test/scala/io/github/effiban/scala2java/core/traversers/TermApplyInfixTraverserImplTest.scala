@@ -1,7 +1,5 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.InternalTermNameTransformationContext
-import io.github.effiban.scala2java.core.matchers.InternalTermNameTransformationContextMatcher.eqInternalTermNameTransformationContext
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TermNames.{Plus, ScalaRange, ScalaTo}
@@ -14,7 +12,7 @@ class TermApplyInfixTraverserImplTest extends UnitTestSuite {
 
   private val expressionTermTraverser = mock[ExpressionTermTraverser]
   private val termApplyTraverser = mock[TermApplyTraverser]
-  private val termNameTraverser = mock[TermNameTraverser]
+  private val defaultTermNameTraverser = mock[TermNameTraverser]
   private val argumentListTraverser = mock[ArgumentListTraverser]
   private val invocationArgTraverser = mock[ArgumentTraverser[Term]]
   private val termApplyInfixToTermApplyTransformer = mock[TermApplyInfixToTermApplyTransformer]
@@ -22,7 +20,7 @@ class TermApplyInfixTraverserImplTest extends UnitTestSuite {
   private val termApplyInfixTraverser = new TermApplyInfixTraverserImpl(
     expressionTermTraverser,
     termApplyTraverser,
-    termNameTraverser,
+    defaultTermNameTraverser,
     argumentListTraverser,
     invocationArgTraverser,
     termApplyInfixToTermApplyTransformer)
@@ -62,10 +60,7 @@ class TermApplyInfixTraverserImplTest extends UnitTestSuite {
 
     when(termApplyInfixToTermApplyTransformer.transform(eqTree(applyInfix))).thenReturn(None)
     doWrite("a").when(expressionTermTraverser).traverse(eqTree(lhs))
-    doWrite("+").when(termNameTraverser).traverse(
-      eqTree(op),
-      eqInternalTermNameTransformationContext(InternalTermNameTransformationContext())
-    )
+    doWrite("+").when(defaultTermNameTraverser).traverse(eqTree(op))
     doWrite("b").when(expressionTermTraverser).traverse(eqTree(rhs))
 
     termApplyInfixTraverser.traverse(applyInfix)

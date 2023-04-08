@@ -5,7 +5,7 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 import scala.meta.Term.{AnonymousFunction, ApplyType, Ascribe, Assign, Block, Do, Eta, For, ForYield, If, New, NewAnonymous, Return, Throw, Try, TryWithHandler, While}
 import scala.meta.{Lit, Term}
 
-private[traversers] class DefaultTermTraverser(termRefTraverser: => TermRefTraverser,
+private[traversers] class DefaultTermTraverser(defaultTermRefTraverser: => TermRefTraverser,
                                                termApplyTraverser: => TermApplyTraverser,
                                                applyTypeTraverser: => ApplyTypeTraverser,
                                                termApplyInfixTraverser: => TermApplyInfixTraverser,
@@ -39,7 +39,7 @@ private[traversers] class DefaultTermTraverser(termRefTraverser: => TermRefTrave
   import javaWriter._
 
   override def traverse(term: Term): Unit = term match {
-    case termRef: Term.Ref => termRefTraverser.traverse(termRef)
+    case termRef: Term.Ref => defaultTermRefTraverser.traverse(termRef)
     case apply: Term.Apply => termApplyTraverser.traverse(apply)
     case applyType: ApplyType => applyTypeTraverser.traverse(applyType)
     case applyInfix: Term.ApplyInfix => termApplyInfixTraverser.traverse(applyInfix)
