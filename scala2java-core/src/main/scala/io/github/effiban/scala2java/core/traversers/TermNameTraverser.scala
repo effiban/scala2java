@@ -10,7 +10,7 @@ trait TermNameTraverser {
   def traverse(termName: Term.Name, context: InternalTermNameTransformationContext = InternalTermNameTransformationContext()): Unit
 }
 
-private[traversers] class TermNameTraverserImpl(expressionTermTraverser: => ExpressionTermTraverser,
+private[traversers] class TermNameTraverserImpl(expressionTermTraverser: => TermTraverser,
                                                 termNameTransformer: InternalTermNameTransformer)
                                                (implicit javaWriter: JavaWriter) extends TermNameTraverser {
 

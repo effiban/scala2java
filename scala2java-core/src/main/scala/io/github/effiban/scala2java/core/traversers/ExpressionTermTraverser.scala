@@ -8,12 +8,11 @@ import scala.meta.Term.{Block, If}
  *   - method argument
  *   - return value
  */
-trait ExpressionTermTraverser extends ScalaTreeTraverser[Term]
 
-private[traversers] class ExpressionTermTraverserImpl(ifTraverser: => IfTraverser,
-                                                      statTraverser: => StatTraverser,
-                                                      termApplyTraverser: => TermApplyTraverser,
-                                                      defaultTermTraverser: => DefaultTermTraverser) extends ExpressionTermTraverser {
+private[traversers] class ExpressionTermTraverser(ifTraverser: => IfTraverser,
+                                                  statTraverser: => StatTraverser,
+                                                  termApplyTraverser: => TermApplyTraverser,
+                                                  defaultTermTraverser: => TermTraverser) extends TermTraverser {
 
   override def traverse(expression: Term): Unit = {
     expression match {

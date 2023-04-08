@@ -16,7 +16,7 @@ trait ArrayInitializerTraverser {
 }
 
 private[traversers] class ArrayInitializerTraverserImpl(typeTraverser: => TypeTraverser,
-                                                        expressionTermTraverser: => ExpressionTermTraverser,
+                                                        expressionTermTraverser: => TermTraverser,
                                                         termArgumentTraverser: => ArgumentTraverser[Term],
                                                         argumentListTraverser: => ArgumentListTraverser,
                                                         termTypeInferrer: => TermTypeInferrer,
