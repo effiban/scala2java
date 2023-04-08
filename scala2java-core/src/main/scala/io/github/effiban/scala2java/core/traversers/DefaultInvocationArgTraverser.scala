@@ -6,7 +6,7 @@ import io.github.effiban.scala2java.spi.predicates.InvocationArgByNamePredicate
 
 import scala.meta.Term
 
-private[traversers] class DefaultInvocationArgTraverser(expressionTermTraverser: => ExpressionTermTraverser,
+private[traversers] class DefaultInvocationArgTraverser(expressionTermTraverser: => TermTraverser,
                                                         invocationArgByNamePredicate: InvocationArgByNamePredicate)
   extends InvocationArgTraverser[Term] {
 

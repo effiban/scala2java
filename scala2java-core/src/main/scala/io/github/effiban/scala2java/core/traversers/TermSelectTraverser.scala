@@ -13,7 +13,7 @@ trait TermSelectTraverser {
   def traverse(termSelect: Term.Select, context: TermSelectContext = TermSelectContext()): Unit
 }
 
-private[traversers] class TermSelectTraverserImpl(expressionTermTraverser: => ExpressionTermTraverser,
+private[traversers] class TermSelectTraverserImpl(expressionTermTraverser: => TermTraverser,
                                                   termNameTraverser: => TermNameTraverser,
                                                   typeListTraverser: => TypeListTraverser,
                                                   qualifierTypeInferrer: => QualifierTypeInferrer,

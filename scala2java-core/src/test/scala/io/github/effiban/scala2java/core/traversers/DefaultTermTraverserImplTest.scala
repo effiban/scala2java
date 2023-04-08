@@ -47,7 +47,7 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
   private val litTraverser = mock[LitTraverser]
 
 
-  private val defaultTermTraverser = new DefaultTermTraverserImpl(
+  private val defaultTermTraverser = new DefaultTermTraverser(
     termRefTraverser,
     termApplyTraverser,
     applyTypeTraverser,

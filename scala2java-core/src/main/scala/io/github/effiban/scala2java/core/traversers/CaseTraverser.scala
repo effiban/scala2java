@@ -7,7 +7,7 @@ import scala.meta.{Case, Pat}
 trait CaseTraverser extends ScalaTreeTraverser[Case]
 
 private[traversers] class CaseTraverserImpl(patTraverser: => PatTraverser,
-                                            expressionTermTraverser: => ExpressionTermTraverser)
+                                            expressionTermTraverser: => TermTraverser)
                                            (implicit javaWriter: JavaWriter) extends CaseTraverser {
 
   import javaWriter._

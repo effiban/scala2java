@@ -5,11 +5,11 @@ import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.XtensionQuasiquoteTerm
 
-class FunTermTraverserImplTest extends UnitTestSuite {
+class FunTermTraverserTest extends UnitTestSuite {
 
   private val expressionTermTraverser = mock[ExpressionTermTraverser]
 
-  private val funTermTraverser = new FunTermTraverserImpl(expressionTermTraverser)
+  private val funTermTraverser = new FunTermTraverser(expressionTermTraverser)
 
   test("traverse() should call expression traverser") {
     val fun = q"abc"

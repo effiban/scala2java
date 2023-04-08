@@ -5,38 +5,36 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 import scala.meta.Term.{AnonymousFunction, ApplyType, Ascribe, Assign, Block, Do, Eta, For, ForYield, If, New, NewAnonymous, Return, Throw, Try, TryWithHandler, While}
 import scala.meta.{Lit, Term}
 
-trait DefaultTermTraverser extends ScalaTreeTraverser[Term]
-
-private[traversers] class DefaultTermTraverserImpl(termRefTraverser: => TermRefTraverser,
-                                                   termApplyTraverser: => TermApplyTraverser,
-                                                   applyTypeTraverser: => ApplyTypeTraverser,
-                                                   termApplyInfixTraverser: => TermApplyInfixTraverser,
-                                                   assignTraverser: => AssignTraverser,
-                                                   returnTraverser: => ReturnTraverser,
-                                                   throwTraverser: => ThrowTraverser,
-                                                   ascribeTraverser: => AscribeTraverser,
-                                                   termAnnotateTraverser: => TermAnnotateTraverser,
-                                                   termTupleTraverser: => TermTupleTraverser,
-                                                   blockTraverser: => BlockTraverser,
-                                                   ifTraverser: => IfTraverser,
-                                                   termMatchTraverser: => TermMatchTraverser,
-                                                   tryTraverser: => TryTraverser,
-                                                   tryWithHandlerTraverser: => TryWithHandlerTraverser,
-                                                   termFunctionTraverser: => TermFunctionTraverser,
-                                                   partialFunctionTraverser: => PartialFunctionTraverser,
-                                                   anonymousFunctionTraverser: => AnonymousFunctionTraverser,
-                                                   whileTraverser: => WhileTraverser,
-                                                   doTraverser: => DoTraverser,
-                                                   forTraverser: => ForTraverser,
-                                                   forYieldTraverser: => ForYieldTraverser,
-                                                   newTraverser: => NewTraverser,
-                                                   newAnonymousTraverser: => NewAnonymousTraverser,
-                                                   termPlaceholderTraverser: => TermPlaceholderTraverser,
-                                                   etaTraverser: => EtaTraverser,
-                                                   termRepeatedTraverser: => TermRepeatedTraverser,
-                                                   termInterpolateTraverser: => TermInterpolateTraverser,
-                                                   litTraverser: => LitTraverser)
-                                                  (implicit javaWriter: JavaWriter) extends DefaultTermTraverser {
+private[traversers] class DefaultTermTraverser(termRefTraverser: => TermRefTraverser,
+                                               termApplyTraverser: => TermApplyTraverser,
+                                               applyTypeTraverser: => ApplyTypeTraverser,
+                                               termApplyInfixTraverser: => TermApplyInfixTraverser,
+                                               assignTraverser: => AssignTraverser,
+                                               returnTraverser: => ReturnTraverser,
+                                               throwTraverser: => ThrowTraverser,
+                                               ascribeTraverser: => AscribeTraverser,
+                                               termAnnotateTraverser: => TermAnnotateTraverser,
+                                               termTupleTraverser: => TermTupleTraverser,
+                                               blockTraverser: => BlockTraverser,
+                                               ifTraverser: => IfTraverser,
+                                               termMatchTraverser: => TermMatchTraverser,
+                                               tryTraverser: => TryTraverser,
+                                               tryWithHandlerTraverser: => TryWithHandlerTraverser,
+                                               termFunctionTraverser: => TermFunctionTraverser,
+                                               partialFunctionTraverser: => PartialFunctionTraverser,
+                                               anonymousFunctionTraverser: => AnonymousFunctionTraverser,
+                                               whileTraverser: => WhileTraverser,
+                                               doTraverser: => DoTraverser,
+                                               forTraverser: => ForTraverser,
+                                               forYieldTraverser: => ForYieldTraverser,
+                                               newTraverser: => NewTraverser,
+                                               newAnonymousTraverser: => NewAnonymousTraverser,
+                                               termPlaceholderTraverser: => TermPlaceholderTraverser,
+                                               etaTraverser: => EtaTraverser,
+                                               termRepeatedTraverser: => TermRepeatedTraverser,
+                                               termInterpolateTraverser: => TermInterpolateTraverser,
+                                               litTraverser: => LitTraverser)
+                                              (implicit javaWriter: JavaWriter) extends TermTraverser {
 
   import javaWriter._
 

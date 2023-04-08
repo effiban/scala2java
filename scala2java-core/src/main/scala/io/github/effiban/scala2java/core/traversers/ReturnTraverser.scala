@@ -6,7 +6,7 @@ import scala.meta.Term.Return
 
 trait ReturnTraverser extends ScalaTreeTraverser[Return]
 
-private[traversers] class ReturnTraverserImpl(expressionTermTraverser: => ExpressionTermTraverser)
+private[traversers] class ReturnTraverserImpl(expressionTermTraverser: => TermTraverser)
                                              (implicit javaWriter: JavaWriter) extends ReturnTraverser {
 
   import javaWriter._

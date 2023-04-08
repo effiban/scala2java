@@ -6,7 +6,7 @@ import scala.meta.Term
 
 trait TermMatchTraverser extends ScalaTreeTraverser[Term.Match]
 
-private[traversers] class TermMatchTraverserImpl(expressionTermTraverser: => ExpressionTermTraverser,
+private[traversers] class TermMatchTraverserImpl(expressionTermTraverser: => TermTraverser,
                                                  caseTraverser: => CaseTraverser)
                                                 (implicit javaWriter: JavaWriter) extends TermMatchTraverser {
 

@@ -8,7 +8,7 @@ import scala.meta.Term.Ascribe
 trait AscribeTraverser extends ScalaTreeTraverser[Ascribe]
 
 private[traversers] class AscribeTraverserImpl(typeTraverser: => TypeTraverser,
-                                               expressionTermTraverser: => ExpressionTermTraverser)
+                                               expressionTermTraverser: => TermTraverser)
                                               (implicit javaWriter: JavaWriter) extends AscribeTraverser {
 
   import javaWriter._

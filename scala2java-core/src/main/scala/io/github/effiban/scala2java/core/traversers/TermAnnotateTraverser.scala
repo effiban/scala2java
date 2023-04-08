@@ -7,7 +7,7 @@ import scala.meta.Term
 trait TermAnnotateTraverser extends ScalaTreeTraverser[Term.Annotate]
 
 private[traversers] class TermAnnotateTraverserImpl(annotListTraverser: => AnnotListTraverser,
-                                                    expressionTermTraverser: => ExpressionTermTraverser)
+                                                    expressionTermTraverser: => TermTraverser)
                                                    (implicit javaWriter: JavaWriter) extends TermAnnotateTraverser {
 
   import javaWriter._

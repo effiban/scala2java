@@ -13,7 +13,7 @@ trait DefnVarTraverser {
 private[traversers] class DefnVarTraverserImpl(modListTraverser: => ModListTraverser,
                                                defnValOrVarTypeTraverser: => DefnValOrVarTypeTraverser,
                                                patListTraverser: => PatListTraverser,
-                                               expressionTermTraverser: => ExpressionTermTraverser)
+                                               expressionTermTraverser: => TermTraverser)
                                               (implicit javaWriter: JavaWriter) extends DefnVarTraverser {
 
   import javaWriter._
