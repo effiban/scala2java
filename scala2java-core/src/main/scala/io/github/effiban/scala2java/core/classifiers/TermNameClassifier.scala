@@ -75,7 +75,6 @@ object TermNameClassifier extends TermNameClassifier {
 
   // TODO - add more
   final val SupportNoArgInvocations = Set(
-    TermNameValues.Print,
     TermNameValues.Println
   )
 

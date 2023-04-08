@@ -7,7 +7,9 @@ import io.github.effiban.scala2java.core.factories.Factories
 import io.github.effiban.scala2java.core.predicates._
 import io.github.effiban.scala2java.spi.predicates.TermNameHasApplyMethod
 
-class TypeInferrers(factories: => Factories)(implicit extensionRegistry: ExtensionRegistry) {
+class TypeInferrers(factories: => Factories,
+                    predicates: => Predicates)
+                   (implicit extensionRegistry: ExtensionRegistry) {
 
   private[typeinference] lazy val applyInfixTypeInferrer = new ApplyInfixTypeInferrerImpl(tupleTypeInferrer, TermApplyInfixClassifier)
 
@@ -48,7 +50,7 @@ class TypeInferrers(factories: => Factories)(implicit extensionRegistry: Extensi
   private[typeinference] lazy val internalNameTypeInferrer = new InternalNameTypeInferrerImpl(
     applyReturnTypeInferrer,
     new CompositeNameTypeInferrer(CoreNameTypeInferrer),
-    new CompositeTermNameSupportsNoArgInvocation(CoreTermNameSupportsNoArgInvocation)
+    predicates.compositeTermNameSupportsNoArgInvocation
   )
 
   private[typeinference] lazy val internalSelectTypeInferrer = new InternalSelectTypeInferrerImpl(

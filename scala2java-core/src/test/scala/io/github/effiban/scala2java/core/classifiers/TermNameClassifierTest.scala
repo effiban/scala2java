@@ -108,8 +108,8 @@ class TermNameClassifierTest extends UnitTestSuite {
 
   private val SupportsNoArgInvocationScenarios = Table(
     ("ObjectName", "ExpectedHasEmptyMethod"),
-    ("print", true),
     ("println", true),
+    ("print", false),
     ("List", false),
     ("Map", false)
   )
