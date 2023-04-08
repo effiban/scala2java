@@ -253,6 +253,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val forYieldTraverser: ForYieldTraverser = new ForYieldTraverserImpl(termApplyTraverser, ForYieldToTermApplyTransformer)
 
+  private lazy val funTermTraverser: FunTermTraverser = new FunTermTraverserImpl(expressionTermTraverser)
+
   private lazy val ifTraverser: IfTraverser = new IfTraverserImpl(expressionTermTraverser, blockTraverser)
 
   private lazy val importeeTraverser: ImporteeTraverser = new ImporteeTraverserImpl(nameTraverser)
@@ -430,7 +432,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   )
 
   private lazy val termApplyTraverser: TermApplyTraverser = new TermApplyTraverserImpl(
-    expressionTermTraverser,
+    funTermTraverser,
     arrayInitializerTraverser,
     argumentListTraverser,
     compositeInvocationArgTraverser,
