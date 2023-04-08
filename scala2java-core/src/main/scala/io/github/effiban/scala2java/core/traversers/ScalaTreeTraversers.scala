@@ -16,11 +16,12 @@ import scala.meta.Term.Assign
 
 class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: ExtensionRegistry) {
 
-  private implicit lazy val typeInferrers: TypeInferrers = new TypeInferrers(factories)
+  private implicit lazy val typeInferrers: TypeInferrers = new TypeInferrers(factories, predicates)
   private implicit lazy val classifiers: Classifiers = new Classifiers(typeInferrers)
-  private implicit lazy val transformers: Transformers = new Transformers(typeInferrers)
+  private implicit lazy val transformers: Transformers = new Transformers(typeInferrers, predicates)
   private implicit lazy val factories: Factories = new Factories(typeInferrers)
   private lazy val resolvers = new Resolvers()
+  private lazy val predicates = new Predicates()
 
   import resolvers._
   import transformers._
@@ -251,6 +252,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     ifTraverser,
     statTraverser,
     termApplyTraverser,
+    termRefTraverser(new TermNameTraverserImpl(expressionTermTraverser, evaluatedInternalTermNameTransformer)),
     defaultTermTraverser
   )
 
@@ -260,7 +262,13 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val forYieldTraverser: ForYieldTraverser = new ForYieldTraverserImpl(termApplyTraverser, ForYieldToTermApplyTransformer)
 
-  private lazy val funTermTraverser: FunTermTraverser = new FunTermTraverser(expressionTermTraverser)
+  /** When a method name is a Term.Ref we need to make sure that no desugaring is performed to aovid infinite recursion.
+   * On the other hand, other types should be handled as expressions.
+   */
+  private lazy val funTermTraverser: TermTraverser = new TermRefOverridingTermTraverser(
+    termRefTraverser(new TermNameTraverserImpl(funTermTraverser, defaultInternalTermNameTransformer)),
+    expressionTermTraverser
+  )
 
   private lazy val ifTraverser: IfTraverser = new IfTraverserImpl(expressionTermTraverser, blockTraverser)
 
@@ -395,7 +403,13 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     declTraverser
   )
 
-  private lazy val statTermTraverser: StatTermTraverser = new StatTermTraverser(defaultTermTraverser)
+  /** When a Stat is a Term.Ref, we need to allow for possible desugaring.
+   * On the other hand, other types should be handled regularly - not as expressions.
+   */
+  private lazy val statTermTraverser: TermTraverser = new TermRefOverridingTermTraverser(
+    termRefTraverser(new TermNameTraverserImpl(statTermTraverser, evaluatedInternalTermNameTransformer)),
+    defaultTermTraverser
+  )
 
   private lazy val superTraverser: SuperTraverser = new SuperTraverserImpl(nameTraverser)
 

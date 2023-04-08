@@ -13,18 +13,21 @@ class ExpressionTermTraverserTest extends UnitTestSuite {
   private val ifTraverser = mock[IfTraverser]
   private val statTraverser = mock[StatTraverser]
   private val termApplyTraverser = mock[TermApplyTraverser]
+  private val expressionTermRefTraverser = mock[TermRefTraverser]
   private val defaultTermTraverser = mock[DefaultTermTraverser]
 
   private val expressionTraverser = new ExpressionTermTraverser(
     ifTraverser,
     statTraverser,
     termApplyTraverser,
+    expressionTermRefTraverser,
     defaultTermTraverser
   )
 
   test("traverse() for Term.Name") {
     val expression = q"abc"
-    doWrite("abc").when(defaultTermTraverser).traverse(eqTree(expression))
+
+    doWrite("abc").when(expressionTermRefTraverser).traverse(eqTree(expression))
 
     expressionTraverser.traverse(expression)
 
@@ -93,4 +96,14 @@ class ExpressionTermTraverserTest extends UnitTestSuite {
         |}).get()
         |""".stripMargin
   }
+
+  test("traverse() for Lit.Int") {
+    val expression = q"3"
+    doWrite("3").when(defaultTermTraverser).traverse(eqTree(expression))
+
+    expressionTraverser.traverse(expression)
+
+    outputWriter.toString shouldBe "3"
+  }
+
 }

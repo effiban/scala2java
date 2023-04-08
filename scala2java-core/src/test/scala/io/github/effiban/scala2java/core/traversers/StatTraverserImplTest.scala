@@ -13,7 +13,7 @@ import scala.meta.{Decl, Defn, Import, Importee, Importer, Lit, Name, Pat, Pkg, 
 
 class StatTraverserImplTest extends UnitTestSuite {
 
-  private val statTermTraverser = mock[StatTermTraverser]
+  private val statTermTraverser = mock[TermRefOverridingTermTraverser]
   private val importTraverser = mock[ImportTraverser]
   private val pkgTraverser = mock[PkgTraverser]
   private val defnTraverser = mock[DefnTraverser]

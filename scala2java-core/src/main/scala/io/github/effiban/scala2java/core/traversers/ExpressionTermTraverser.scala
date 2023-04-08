@@ -12,10 +12,12 @@ import scala.meta.Term.{Block, If}
 private[traversers] class ExpressionTermTraverser(ifTraverser: => IfTraverser,
                                                   statTraverser: => StatTraverser,
                                                   termApplyTraverser: => TermApplyTraverser,
+                                                  expressionTermRefTraverser: => TermRefTraverser,
                                                   defaultTermTraverser: => TermTraverser) extends TermTraverser {
 
   override def traverse(expression: Term): Unit = {
     expression match {
+      case ref: Term.Ref => expressionTermRefTraverser.traverse(ref)
       case `if`: If => ifTraverser.traverseAsTertiaryOp(`if`)
       case block: Block => traverseBlock(block)
       case aTerm => defaultTermTraverser.traverse(aTerm)
