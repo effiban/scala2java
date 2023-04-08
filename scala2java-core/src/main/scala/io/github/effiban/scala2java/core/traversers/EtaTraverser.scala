@@ -7,7 +7,7 @@ import scala.meta.Term.Eta
 
 trait EtaTraverser extends ScalaTreeTraverser[Eta]
 
-private[traversers] class EtaTraverserImpl(termTraverser: => TermTraverser)
+private[traversers] class EtaTraverserImpl(expressionTermTraverser: => ExpressionTermTraverser)
                                           (implicit javaWriter: JavaWriter) extends EtaTraverser {
 
   import javaWriter._
@@ -18,6 +18,6 @@ private[traversers] class EtaTraverserImpl(termTraverser: => TermTraverser)
     // We also can't tell if it is an instance method or class method, so arbitrarily using `this`
     //TODO if type inference is added later on, use that to ensure correctness
     write("this::")
-    termTraverser.traverse(eta.expr)
+    expressionTermTraverser.traverse(eta.expr)
   }
 }

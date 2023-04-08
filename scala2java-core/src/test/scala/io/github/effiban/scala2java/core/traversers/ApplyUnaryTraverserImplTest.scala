@@ -11,9 +11,9 @@ import scala.meta.Term
 class ApplyUnaryTraverserImplTest extends UnitTestSuite {
 
   private val termNameTraverser = mock[TermNameTraverser]
-  private val expressionTraverser = mock[ExpressionTraverser]
+  private val expressionTermTraverser = mock[ExpressionTermTraverser]
 
-  private val applyUnaryTraverser = new ApplyUnaryTraverserImpl(termNameTraverser, expressionTraverser)
+  private val applyUnaryTraverser = new ApplyUnaryTraverserImpl(termNameTraverser, expressionTermTraverser)
 
   test("traverse") {
     val op = Term.Name("!")
@@ -23,7 +23,7 @@ class ApplyUnaryTraverserImplTest extends UnitTestSuite {
       eqTree(op),
       eqInternalTermNameTransformationContext(InternalTermNameTransformationContext())
     )
-    doWrite("myFlag").when(expressionTraverser).traverse(eqTree(arg))
+    doWrite("myFlag").when(expressionTermTraverser).traverse(eqTree(arg))
 
     applyUnaryTraverser.traverse(Term.ApplyUnary(op = op, arg = arg))
 

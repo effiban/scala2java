@@ -8,23 +8,23 @@ import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.XtensionQuasiquoteTerm
 
-class ExpressionTraverserImplTest extends UnitTestSuite {
+class ExpressionTermTraverserImplTest extends UnitTestSuite {
 
   private val ifTraverser = mock[IfTraverser]
   private val statTraverser = mock[StatTraverser]
   private val termApplyTraverser = mock[TermApplyTraverser]
-  private val termTraverser = mock[TermTraverser]
+  private val defaultTermTraverser = mock[DefaultTermTraverser]
 
-  private val expressionTraverser = new ExpressionTraverserImpl(
+  private val expressionTraverser = new ExpressionTermTraverserImpl(
     ifTraverser,
     statTraverser,
     termApplyTraverser,
-    termTraverser
+    defaultTermTraverser
   )
 
   test("traverse() for Term.Name") {
     val expression = q"abc"
-    doWrite("abc").when(termTraverser).traverse(eqTree(expression))
+    doWrite("abc").when(defaultTermTraverser).traverse(eqTree(expression))
 
     expressionTraverser.traverse(expression)
 

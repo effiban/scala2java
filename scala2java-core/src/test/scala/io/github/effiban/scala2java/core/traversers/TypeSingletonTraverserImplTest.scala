@@ -9,10 +9,10 @@ import scala.meta.{Term, Type}
 
 class TypeSingletonTraverserImplTest extends UnitTestSuite {
 
-  private val termTraverser = mock[TermTraverser]
+  private val defaultTermTraverser = mock[DefaultTermTraverser]
   private val typeSingletonTransformer = mock[TypeSingletonToTermTransformer]
 
-  private val typeSingletonTraverser = new TypeSingletonTraverserImpl(termTraverser, typeSingletonTransformer)
+  private val typeSingletonTraverser = new TypeSingletonTraverserImpl(defaultTermTraverser, typeSingletonTransformer)
 
   test("traverse") {
     val initialTermRef = Term.Name("initial")
@@ -20,7 +20,7 @@ class TypeSingletonTraverserImplTest extends UnitTestSuite {
     val singletonType = Type.Singleton(initialTermRef)
 
     when(typeSingletonTransformer.transform(eqTree(singletonType))).thenReturn(transformedTermRef)
-    doWrite("transformed").when(termTraverser).traverse(eqTree(transformedTermRef))
+    doWrite("transformed").when(defaultTermTraverser).traverse(eqTree(transformedTermRef))
 
     typeSingletonTraverser.traverse(singletonType)
 

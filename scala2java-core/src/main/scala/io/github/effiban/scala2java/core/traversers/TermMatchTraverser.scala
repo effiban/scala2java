@@ -6,7 +6,7 @@ import scala.meta.Term
 
 trait TermMatchTraverser extends ScalaTreeTraverser[Term.Match]
 
-private[traversers] class TermMatchTraverserImpl(expressionTraverser: => ExpressionTraverser,
+private[traversers] class TermMatchTraverserImpl(expressionTermTraverser: => ExpressionTermTraverser,
                                                  caseTraverser: => CaseTraverser)
                                                 (implicit javaWriter: JavaWriter) extends TermMatchTraverser {
 
@@ -16,7 +16,7 @@ private[traversers] class TermMatchTraverserImpl(expressionTraverser: => Express
     //TODO handle mods (what is this in a 'match'?...)
     write("switch ")
     write("(")
-    expressionTraverser.traverse(termMatch.expr)
+    expressionTermTraverser.traverse(termMatch.expr)
     write(")")
     writeBlockStart()
     termMatch.cases.foreach(caseTraverser.traverse)

@@ -7,8 +7,7 @@ import scala.meta.{Case, Pat}
 trait CaseTraverser extends ScalaTreeTraverser[Case]
 
 private[traversers] class CaseTraverserImpl(patTraverser: => PatTraverser,
-                                            expressionTraverser: => ExpressionTraverser,
-                                            termTraverser: => TermTraverser)
+                                            expressionTermTraverser: => ExpressionTermTraverser)
                                            (implicit javaWriter: JavaWriter) extends CaseTraverser {
 
   import javaWriter._
@@ -17,10 +16,10 @@ private[traversers] class CaseTraverserImpl(patTraverser: => PatTraverser,
     traversePat(`case`.pat)
     `case`.cond.foreach(cond => {
       write(" && ")
-      expressionTraverser.traverse(cond)
+      expressionTermTraverser.traverse(cond)
     })
     writeArrow()
-    termTraverser.traverse(`case`.body)
+    expressionTermTraverser.traverse(`case`.body)
     writeStatementEnd()
   }
 

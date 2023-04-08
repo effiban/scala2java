@@ -6,13 +6,13 @@ import scala.meta.Term.Return
 
 trait ReturnTraverser extends ScalaTreeTraverser[Return]
 
-private[traversers] class ReturnTraverserImpl(expressionTraverser: => ExpressionTraverser)
+private[traversers] class ReturnTraverserImpl(expressionTermTraverser: => ExpressionTermTraverser)
                                              (implicit javaWriter: JavaWriter) extends ReturnTraverser {
 
   import javaWriter._
 
   override def traverse(`return`: Return): Unit = {
     write("return ")
-    expressionTraverser.traverse(`return`.expr)
+    expressionTermTraverser.traverse(`return`.expr)
   }
 }

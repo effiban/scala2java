@@ -12,7 +12,6 @@ import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.{eqOpti
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchersSugar.eqTo
-import org.mockito.captor.ArgCaptor
 
 import scala.meta.{Lit, Term}
 
@@ -22,17 +21,15 @@ class ArrayInitializerTraverserImplTest extends UnitTestSuite {
   private val ExpectedArgListContext = ArgumentListContext(options = ExpectedListTraversalOptions)
 
   private val typeTraverser = mock[TypeTraverser]
-  private val expressionTraverser = mock[ExpressionTraverser]
+  private val expressionTermTraverser = mock[ExpressionTermTraverser]
   private val termArgumentTraverser = mock[ArgumentTraverser[Term]]
   private val argumentListTraverser = mock[ArgumentListTraverser]
   private val termTypeInferrer = mock[TermTypeInferrer]
   private val compositeCollectiveTypeInferrer = mock[CompositeCollectiveTypeInferrer]
 
-  private val argumentTraverserCaptor = ArgCaptor[ArgumentTraverser[Term]]
-
   private val arrayInitializerTraverser = new ArrayInitializerTraverserImpl(
     typeTraverser,
-    expressionTraverser,
+    expressionTermTraverser,
     termArgumentTraverser,
     argumentListTraverser,
     termTypeInferrer,
@@ -109,7 +106,7 @@ class ArrayInitializerTraverserImplTest extends UnitTestSuite {
     val context = ArrayInitializerSizeContext(tpe = TypeNames.String, size = size)
 
     doWrite("String").when(typeTraverser).traverse(eqTree(TypeNames.String))
-    doWrite("3").when(expressionTraverser).traverse(eqTree(size))
+    doWrite("3").when(expressionTermTraverser).traverse(eqTree(size))
 
     arrayInitializerTraverser.traverseWithSize(context)
 
@@ -120,7 +117,7 @@ class ArrayInitializerTraverserImplTest extends UnitTestSuite {
     val size = Lit.Int(0)
 
     doWrite("Object").when(typeTraverser).traverse(eqTree(TypeNames.ScalaAny))
-    doWrite("0").when(expressionTraverser).traverse(eqTree(size))
+    doWrite("0").when(expressionTermTraverser).traverse(eqTree(size))
 
     arrayInitializerTraverser.traverseWithSize(ArrayInitializerSizeContext())
 

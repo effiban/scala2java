@@ -9,14 +9,14 @@ import scala.meta.Term.Eta
 
 class EtaTraverserImplTest extends UnitTestSuite {
 
-  private val termTraverser = mock[TermTraverser]
+  private val expressionTermTraverser = mock[ExpressionTermTraverser]
 
-  private val etaTraverser = new EtaTraverserImpl(termTraverser)
+  private val etaTraverser = new EtaTraverserImpl(expressionTermTraverser)
 
   test("traverse()") {
     val methodName = Term.Name("myMethod")
 
-    doWrite("myMethod").when(termTraverser).traverse(eqTree(methodName))
+    doWrite("myMethod").when(expressionTermTraverser).traverse(eqTree(methodName))
 
     etaTraverser.traverse(Eta(methodName))
 

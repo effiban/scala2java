@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.TermSelectContext
 import io.github.effiban.scala2java.core.entities.EnclosingDelimiter.Parentheses
-import io.github.effiban.scala2java.core.typeinference.{QualifierTypeInferrer, TermTypeInferrer}
+import io.github.effiban.scala2java.core.typeinference.QualifierTypeInferrer
 import io.github.effiban.scala2java.core.writers.JavaWriter
 import io.github.effiban.scala2java.spi.contexts.TermSelectTransformationContext
 import io.github.effiban.scala2java.spi.transformers.TermSelectTransformer
@@ -13,7 +13,7 @@ trait TermSelectTraverser {
   def traverse(termSelect: Term.Select, context: TermSelectContext = TermSelectContext()): Unit
 }
 
-private[traversers] class TermSelectTraverserImpl(termTraverser: => TermTraverser,
+private[traversers] class TermSelectTraverserImpl(expressionTermTraverser: => ExpressionTermTraverser,
                                                   termNameTraverser: => TermNameTraverser,
                                                   typeListTraverser: => TypeListTraverser,
                                                   qualifierTypeInferrer: => QualifierTypeInferrer,
@@ -35,13 +35,13 @@ private[traversers] class TermSelectTraverserImpl(termTraverser: => TermTraverse
   private def traverseQualifier(qualifier: Term): Unit = {
     qualifier match {
       case qual@(_: Term.Function | Term.Ascribe(_: Term.Function,_)) => traverseInsideParens(qual)
-      case qual => termTraverser.traverse(qual)
+      case qual => expressionTermTraverser.traverse(qual)
     }
   }
 
   private def traverseInsideParens(qual: Term): Unit = {
     writeArgumentsStart(Parentheses)
-    termTraverser.traverse(qual)
+    expressionTermTraverser.traverse(qual)
     writeArgumentsEnd(Parentheses)
   }
 

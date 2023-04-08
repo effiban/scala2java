@@ -8,10 +8,10 @@ import scala.meta.{Case, Lit, Term}
 
 class TermMatchTraverserImplTest extends UnitTestSuite {
 
-  private val expressionTraverser = mock[ExpressionTraverser]
+  private val expressionTermTraverser = mock[ExpressionTermTraverser]
   private val caseTraverser = mock[CaseTraverser]
 
-  private val termMatchTraverser = new TermMatchTraverserImpl(expressionTraverser, caseTraverser)
+  private val termMatchTraverser = new TermMatchTraverserImpl(expressionTermTraverser, caseTraverser)
 
   test("traverse") {
     val expr = Term.Name("x")
@@ -23,7 +23,7 @@ class TermMatchTraverserImplTest extends UnitTestSuite {
       cases = List(case1, case2),
       mods = Nil
     )
-    doWrite("x").when(expressionTraverser).traverse(eqTree(expr))
+    doWrite("x").when(expressionTermTraverser).traverse(eqTree(expr))
     doWrite(
       """  case 1 -> "one";
         |""".stripMargin).when(caseTraverser).traverse(eqTree(case1))

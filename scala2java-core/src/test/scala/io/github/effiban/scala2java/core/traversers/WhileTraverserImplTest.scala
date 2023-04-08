@@ -15,10 +15,10 @@ class WhileTraverserImplTest extends UnitTestSuite {
   private val Expression = Term.ApplyInfix(lhs = X, op = Term.Name("<"), targs = List.empty, args = List(Lit.Int(3)))
   private val Statement = Term.Apply(fun = Term.Name("doSomething"), args = List(X))
 
-  private val expressionTraverser = mock[ExpressionTraverser]
+  private val expressionTermTraverser = mock[ExpressionTermTraverser]
   private val blockTraverser = mock[BlockTraverser]
 
-  private val whileTraverser = new WhileTraverserImpl(expressionTraverser, blockTraverser)
+  private val whileTraverser = new WhileTraverserImpl(expressionTermTraverser, blockTraverser)
 
 
   test("traverse() when body is a single statement") {
@@ -27,7 +27,7 @@ class WhileTraverserImplTest extends UnitTestSuite {
       body = Statement
     )
 
-    doWrite("x < 3").when(expressionTraverser).traverse(eqTree(Expression))
+    doWrite("x < 3").when(expressionTermTraverser).traverse(eqTree(Expression))
     doWrite(
       """ {
         |  doSomething(x);
@@ -50,7 +50,7 @@ class WhileTraverserImplTest extends UnitTestSuite {
       body = Block(List(Statement))
     )
 
-    doWrite("x < 3").when(expressionTraverser).traverse(eqTree(Expression))
+    doWrite("x < 3").when(expressionTermTraverser).traverse(eqTree(Expression))
     doWrite(
       """ {
         |  doSomething(x);

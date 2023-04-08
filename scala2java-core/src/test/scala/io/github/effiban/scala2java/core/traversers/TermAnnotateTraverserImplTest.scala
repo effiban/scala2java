@@ -12,9 +12,9 @@ import scala.meta.{Init, Name, Term, Type}
 class TermAnnotateTraverserImplTest extends UnitTestSuite {
 
   private val annotListTraverser = mock[AnnotListTraverser]
-  private val termTraverser = mock[TermTraverser]
+  private val expressionTermTraverser = mock[ExpressionTermTraverser]
 
-  private val termAnnotateTraverser = new TermAnnotateTraverserImpl(annotListTraverser, termTraverser)
+  private val termAnnotateTraverser = new TermAnnotateTraverserImpl(annotListTraverser, expressionTermTraverser)
 
   test("traverse") {
     val annots = List(
@@ -29,7 +29,7 @@ class TermAnnotateTraverserImplTest extends UnitTestSuite {
     doWrite("@MyAnnot1 @MyAnnot2 ")
       .when(annotListTraverser).traverseAnnotations(annotations = eqTreeList(annots), onSameLine = ArgumentMatchers.eq(true))
 
-    doWrite("myName").when(termTraverser).traverse(eqTree(termName))
+    doWrite("myName").when(expressionTermTraverser).traverse(eqTree(termName))
 
     termAnnotateTraverser.traverse(termAnnotate)
 

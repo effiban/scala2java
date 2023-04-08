@@ -12,7 +12,7 @@ trait ApplyTypeTraverser extends ScalaTreeTraverser[ApplyType]
 private[traversers] class ApplyTypeTraverserImpl(typeTraverser: => TypeTraverser,
                                                  termSelectTraverser: => TermSelectTraverser,
                                                  typeListTraverser: => TypeListTraverser,
-                                                 termTraverser: => TermTraverser,
+                                                 defaultTermTraverser: => DefaultTermTraverser,
                                                  termApplyTraverser: => TermApplyTraverser,
                                                  termApplyTypeToTermTransformer: TermApplyTypeToTermApplyTransformer)
                                                 (implicit javaWriter: JavaWriter) extends ApplyTypeTraverser {
@@ -47,6 +47,6 @@ private[traversers] class ApplyTypeTraverserImpl(typeTraverser: => TypeTraverser
     writeComment("this?")
     writeQualifierSeparator()
     typeListTraverser.traverse(termApplyType.targs)
-    termTraverser.traverse(term)
+    defaultTermTraverser.traverse(term)
   }
 }

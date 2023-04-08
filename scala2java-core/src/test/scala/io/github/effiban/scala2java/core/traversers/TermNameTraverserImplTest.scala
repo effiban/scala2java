@@ -12,10 +12,10 @@ import scala.meta.Term
 
 class TermNameTraverserImplTest extends UnitTestSuite {
 
-  private val termTraverser = mock[TermTraverser]
+  private val expressionTermTraverser = mock[ExpressionTermTraverser]
   private val termNameTransformer = mock[InternalTermNameTransformer]
 
-  private val termNameTraverser = new TermNameTraverserImpl(termTraverser, termNameTransformer)
+  private val termNameTraverser = new TermNameTraverserImpl(expressionTermTraverser, termNameTransformer)
 
   test("traverse when transformer returns the same") {
     val termName = Term.Name("xyz")
@@ -37,6 +37,6 @@ class TermNameTraverserImplTest extends UnitTestSuite {
 
     termNameTraverser.traverse(termName)
 
-    verify(termTraverser).traverse(eqTree(term))
+    verify(expressionTermTraverser).traverse(eqTree(term))
   }
 }

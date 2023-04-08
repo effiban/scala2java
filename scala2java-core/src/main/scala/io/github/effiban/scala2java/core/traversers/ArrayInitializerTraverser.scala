@@ -16,7 +16,7 @@ trait ArrayInitializerTraverser {
 }
 
 private[traversers] class ArrayInitializerTraverserImpl(typeTraverser: => TypeTraverser,
-                                                        expressionTraverser: => ExpressionTraverser,
+                                                        expressionTermTraverser: => ExpressionTermTraverser,
                                                         termArgumentTraverser: => ArgumentTraverser[Term],
                                                         argumentListTraverser: => ArgumentListTraverser,
                                                         termTypeInferrer: => TermTypeInferrer,
@@ -49,7 +49,7 @@ private[traversers] class ArrayInitializerTraverserImpl(typeTraverser: => TypeTr
     write(" ")
     typeTraverser.traverse(tpe)
     writeStartDelimiter(SquareBracket)
-    expressionTraverser.traverse(size)
+    expressionTermTraverser.traverse(size)
     writeEndDelimiter(SquareBracket)
   }
 

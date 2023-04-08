@@ -5,10 +5,10 @@ import scala.meta.Term.ApplyUnary
 trait ApplyUnaryTraverser extends ScalaTreeTraverser[ApplyUnary]
 
 private[traversers] class ApplyUnaryTraverserImpl(termNameTraverser: => TermNameTraverser,
-                                                  expressionTraverser: => ExpressionTraverser) extends ApplyUnaryTraverser {
+                                                  expressionTermTraverser: => ExpressionTermTraverser) extends ApplyUnaryTraverser {
 
   override def traverse(applyUnary: ApplyUnary): Unit = {
     termNameTraverser.traverse(applyUnary.op)
-    expressionTraverser.traverse(applyUnary.arg)
+    expressionTermTraverser.traverse(applyUnary.arg)
   }
 }

@@ -10,16 +10,16 @@ import scala.meta.{Lit, Term}
 class AssignTraverserImplTest extends UnitTestSuite {
 
   private val assignLHSTraverser = mock[AssignLHSTraverser]
-  private val expressionTraverser = mock[ExpressionTraverser]
+  private val expressionTermTraverser = mock[ExpressionTermTraverser]
 
-  private val assignTraverser = new AssignTraverserImpl(assignLHSTraverser, expressionTraverser)
+  private val assignTraverser = new AssignTraverserImpl(assignLHSTraverser, expressionTermTraverser)
 
   test("traverse()") {
     val lhs = Term.Name("myVal")
     val rhs = Lit.Int(3)
 
     doWrite("myVal = ").when(assignLHSTraverser).traverse(eqTree(lhs), asComment = eqTo(false))
-    doWrite("3").when(expressionTraverser).traverse(eqTree(rhs))
+    doWrite("3").when(expressionTermTraverser).traverse(eqTree(rhs))
 
     assignTraverser.traverse(assign = Term.Assign(lhs = lhs, rhs = rhs))
 

@@ -13,14 +13,14 @@ import scala.meta.{Decl, Defn, Import, Importee, Importer, Lit, Name, Pat, Pkg, 
 
 class StatTraverserImplTest extends UnitTestSuite {
 
-  private val termTravserser = mock[TermTraverser]
+  private val defaultTermTravserser = mock[DefaultTermTraverser]
   private val importTraverser = mock[ImportTraverser]
   private val pkgTraverser = mock[PkgTraverser]
   private val defnTraverser = mock[DefnTraverser]
   private val declTraverser = mock[DeclTraverser]
 
   private val statTraverser = new StatTraverserImpl(
-    termTravserser,
+    defaultTermTravserser,
     importTraverser,
     pkgTraverser,
     defnTraverser,
@@ -32,7 +32,7 @@ class StatTraverserImplTest extends UnitTestSuite {
   test("traverse Term.Name") {
     val termName = Term.Name("myName")
 
-    doWrite("myName").when(termTravserser).traverse(eqTree(termName))
+    doWrite("myName").when(defaultTermTravserser).traverse(eqTree(termName))
 
     statTraverser.traverse(termName, StatContext(JavaScope.Class))
 

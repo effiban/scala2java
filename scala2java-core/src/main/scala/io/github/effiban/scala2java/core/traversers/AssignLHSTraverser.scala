@@ -9,7 +9,7 @@ trait AssignLHSTraverser {
   def traverse(lhs: Term, asComment: Boolean = false): Unit
 }
 
-private[traversers] class AssignLHSTraverserImpl(termTraverser: => TermTraverser)
+private[traversers] class AssignLHSTraverserImpl(expressionTermTraverser: => ExpressionTermTraverser)
                                                 (implicit javaWriter: JavaWriter) extends AssignLHSTraverser {
 
   import javaWriter._
@@ -20,7 +20,7 @@ private[traversers] class AssignLHSTraverserImpl(termTraverser: => TermTraverser
     if (asComment) {
       writeComment(s"$lhs =")
     } else {
-      termTraverser.traverse(lhs)
+      expressionTermTraverser.traverse(lhs)
       write(" = ")
     }
   }

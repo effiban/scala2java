@@ -3,20 +3,19 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
-import org.mockito.ArgumentMatchersSugar.eqTo
 
-import scala.meta.{Lit, Term}
+import scala.meta.Term
 
 class AssignLHSTraverserImplTest extends UnitTestSuite {
 
-  private val termTraverser = mock[TermTraverser]
+  private val expressionTermTraverser = mock[ExpressionTermTraverser]
 
-  private val assignLHSTraverser = new AssignLHSTraverserImpl(termTraverser)
+  private val assignLHSTraverser = new AssignLHSTraverserImpl(expressionTermTraverser)
 
   test("traverse when LHS should be traversed normally") {
     val lhs = Term.Name("myVal")
 
-    doWrite("myVal").when(termTraverser).traverse(eqTree(lhs))
+    doWrite("myVal").when(expressionTermTraverser).traverse(eqTree(lhs))
 
     assignLHSTraverser.traverse(lhs)
 

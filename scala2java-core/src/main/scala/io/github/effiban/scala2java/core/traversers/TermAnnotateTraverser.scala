@@ -7,7 +7,7 @@ import scala.meta.Term
 trait TermAnnotateTraverser extends ScalaTreeTraverser[Term.Annotate]
 
 private[traversers] class TermAnnotateTraverserImpl(annotListTraverser: => AnnotListTraverser,
-                                                    termTraverser: => TermTraverser)
+                                                    expressionTermTraverser: => ExpressionTermTraverser)
                                                    (implicit javaWriter: JavaWriter) extends TermAnnotateTraverser {
 
   import javaWriter._
@@ -17,7 +17,7 @@ private[traversers] class TermAnnotateTraverserImpl(annotListTraverser: => Annot
   override def traverse(termAnnotation: Term.Annotate): Unit = {
     write("(")
     annotListTraverser.traverseAnnotations(termAnnotation.annots, onSameLine = true)
-    termTraverser.traverse(termAnnotation.expr)
+    expressionTermTraverser.traverse(termAnnotation.expr)
     write(")")
   }
 }

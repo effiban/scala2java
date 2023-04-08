@@ -12,7 +12,7 @@ import scala.meta.Term
 
 class TermApplyInfixTraverserImplTest extends UnitTestSuite {
 
-  private val expressionTraverser = mock[ExpressionTraverser]
+  private val expressionTermTraverser = mock[ExpressionTermTraverser]
   private val termApplyTraverser = mock[TermApplyTraverser]
   private val termNameTraverser = mock[TermNameTraverser]
   private val argumentListTraverser = mock[ArgumentListTraverser]
@@ -20,7 +20,7 @@ class TermApplyInfixTraverserImplTest extends UnitTestSuite {
   private val termApplyInfixToTermApplyTransformer = mock[TermApplyInfixToTermApplyTransformer]
 
   private val termApplyInfixTraverser = new TermApplyInfixTraverserImpl(
-    expressionTraverser,
+    expressionTermTraverser,
     termApplyTraverser,
     termNameTraverser,
     argumentListTraverser,
@@ -61,12 +61,12 @@ class TermApplyInfixTraverserImplTest extends UnitTestSuite {
     )
 
     when(termApplyInfixToTermApplyTransformer.transform(eqTree(applyInfix))).thenReturn(None)
-    doWrite("a").when(expressionTraverser).traverse(eqTree(lhs))
+    doWrite("a").when(expressionTermTraverser).traverse(eqTree(lhs))
     doWrite("+").when(termNameTraverser).traverse(
       eqTree(op),
       eqInternalTermNameTransformationContext(InternalTermNameTransformationContext())
     )
-    doWrite("b").when(expressionTraverser).traverse(eqTree(rhs))
+    doWrite("b").when(expressionTermTraverser).traverse(eqTree(rhs))
 
     termApplyInfixTraverser.traverse(applyInfix)
 
