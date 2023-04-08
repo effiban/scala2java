@@ -17,7 +17,7 @@ import org.mockito.ArgumentMatchersSugar.eqTo
 import scala.meta.{Lit, Term}
 
 class TermApplyTraverserImplTest extends UnitTestSuite {
-  private val expressionTermTraverser = mock[ExpressionTermTraverser]
+  private val funTermTraverser = mock[FunTermTraverser]
   private val arrayInitializerTraverser = mock[ArrayInitializerTraverser]
   private val argListTraverser = mock[ArgumentListTraverser]
   private val invocationArgTraverser = mock[ArgumentTraverser[Term]]
@@ -25,7 +25,7 @@ class TermApplyTraverserImplTest extends UnitTestSuite {
   private val termApplyTransformer = mock[TermApplyTransformer]
 
   private val termApplyTraverser = new TermApplyTraverserImpl(
-    expressionTermTraverser,
+    funTermTraverser,
     arrayInitializerTraverser,
     argListTraverser,
     invocationArgTraverser,
@@ -52,7 +52,7 @@ class TermApplyTraverserImplTest extends UnitTestSuite {
     when(arrayInitializerContextResolver.tryResolve(eqTree(termApply))).thenReturn(None)
     when(termApplyTransformer.transform(eqTree(termApply))).thenReturn(transformedTermApply)
 
-    doWrite("myTransformedMethod").when(expressionTermTraverser).traverse(eqTree(transformedTermApply.fun))
+    doWrite("myTransformedMethod").when(funTermTraverser).traverse(eqTree(transformedTermApply.fun))
     doWrite("(transformedArg1, transformedArg2)").when(argListTraverser).traverse(
       args = eqTreeList(transformedTermApply.args),
       argTraverser = eqTo(invocationArgTraverser),
