@@ -381,12 +381,14 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   lazy val sourceTraverser: SourceTraverser = new SourceTraverserImpl(statTraverser)
 
   private lazy val statTraverser: StatTraverser = new StatTraverserImpl(
-    defaultTermTraverser,
+    statTermTraverser,
     importTraverser,
     pkgTraverser,
     defnTraverser,
     declTraverser
   )
+
+  private lazy val statTermTraverser: StatTermTraverser = new StatTermTraverserImpl(defaultTermTraverser)
 
   private lazy val superTraverser: SuperTraverser = new SuperTraverserImpl(nameTraverser)
 
