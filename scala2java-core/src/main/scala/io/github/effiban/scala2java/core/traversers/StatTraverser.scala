@@ -9,7 +9,7 @@ trait StatTraverser {
   def traverse(stat: Stat, statContext: StatContext = StatContext()): Unit
 }
 
-private[traversers] class StatTraverserImpl(defaultTermTraverser: => DefaultTermTraverser,
+private[traversers] class StatTraverserImpl(statTermTraverser: => StatTermTraverser,
                                             importTraverser: => ImportTraverser,
                                             pkgTraverser: => PkgTraverser,
                                             defnTraverser: => DefnTraverser,
@@ -19,7 +19,7 @@ private[traversers] class StatTraverserImpl(defaultTermTraverser: => DefaultTerm
   import javaWriter._
 
   override def traverse(stat: Stat, statContext: StatContext = StatContext()): Unit = stat match {
-    case term: Term => defaultTermTraverser.traverse(term)
+    case term: Term => statTermTraverser.traverse(term)
     case `import`: Import => importTraverser.traverse(`import`, statContext)
     case pkg: Pkg => pkgTraverser.traverse(pkg)
     case defn: Defn => defnTraverser.traverse(defn, statContext)
