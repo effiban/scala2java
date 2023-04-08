@@ -15,7 +15,7 @@ class ApplyTypeTraverserImplTest extends UnitTestSuite {
   private val typeTraverser = mock[TypeTraverser]
   private val termSelectTraverser = mock[TermSelectTraverser]
   private val typeListTraverser = mock[TypeListTraverser]
-  private val termTraverser = mock[TermTraverser]
+  private val defaultTermTraverser = mock[DefaultTermTraverser]
   private val termApplyTraverser = mock[TermApplyTraverser]
   private val termApplyTypeToTermApplyTransformer = mock[TermApplyTypeToTermApplyTransformer]
 
@@ -23,7 +23,7 @@ class ApplyTypeTraverserImplTest extends UnitTestSuite {
     typeTraverser,
     termSelectTraverser,
     typeListTraverser,
-    termTraverser,
+    defaultTermTraverser,
     termApplyTraverser,
     termApplyTypeToTermApplyTransformer)
 
@@ -39,7 +39,7 @@ class ApplyTypeTraverserImplTest extends UnitTestSuite {
 
     outputWriter.toString shouldBe "T.class"
 
-    verifyNoMoreInteractions(termSelectTraverser, termTraverser, termApplyTraverser)
+    verifyNoMoreInteractions(termSelectTraverser, defaultTermTraverser, termApplyTraverser)
   }
 
   test("traverse() when not transformed and function is a 'Select', should traverse properly") {
@@ -54,7 +54,7 @@ class ApplyTypeTraverserImplTest extends UnitTestSuite {
 
     outputWriter.toString shouldBe "myObj<T1, T2>.myFunc"
 
-    verifyNoMoreInteractions(typeTraverser, termTraverser, termApplyTraverser)
+    verifyNoMoreInteractions(typeTraverser, defaultTermTraverser, termApplyTraverser)
   }
 
   test("traverse() when when not transformed and function is a 'Term.Name', should prefix with a commented 'this'") {
@@ -63,7 +63,7 @@ class ApplyTypeTraverserImplTest extends UnitTestSuite {
     val termApplyType = Term.ApplyType(fun = fun, targs = typeArgs)
 
     when(termApplyTypeToTermApplyTransformer.transform(eqTree(termApplyType))).thenReturn(None)
-    doWrite("myFunc").when(termTraverser).traverse(eqTree(fun))
+    doWrite("myFunc").when(defaultTermTraverser).traverse(eqTree(fun))
     doWrite("<T1, T2>").when(typeListTraverser).traverse(eqTreeList(typeArgs))
 
     applyTypeTraverser.traverse(Term.ApplyType(fun = fun, targs = typeArgs))
@@ -87,6 +87,6 @@ class ApplyTypeTraverserImplTest extends UnitTestSuite {
 
     outputWriter.toString shouldBe "myFunc(classOf[T])"
 
-    verifyNoMoreInteractions(typeTraverser, termTraverser, termSelectTraverser)
+    verifyNoMoreInteractions(typeTraverser, defaultTermTraverser, termSelectTraverser)
   }
 }

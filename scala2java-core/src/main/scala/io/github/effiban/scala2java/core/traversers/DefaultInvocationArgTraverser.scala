@@ -6,7 +6,7 @@ import io.github.effiban.scala2java.spi.predicates.InvocationArgByNamePredicate
 
 import scala.meta.Term
 
-private[traversers] class DefaultInvocationArgTraverser(expressionTraverser: => ExpressionTraverser,
+private[traversers] class DefaultInvocationArgTraverser(expressionTermTraverser: => ExpressionTermTraverser,
                                                         invocationArgByNamePredicate: InvocationArgByNamePredicate)
   extends InvocationArgTraverser[Term] {
 
@@ -17,6 +17,6 @@ private[traversers] class DefaultInvocationArgTraverser(expressionTraverser: => 
       case Some(coords) if invocationArgByNamePredicate(coords) => Term.Function(Nil, arg)
       case _ => arg
     }
-    expressionTraverser.traverse(adjustedArg)
+    expressionTermTraverser.traverse(adjustedArg)
   }
 }

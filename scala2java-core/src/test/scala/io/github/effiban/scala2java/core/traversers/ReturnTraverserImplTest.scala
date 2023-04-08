@@ -9,14 +9,14 @@ import scala.meta.Term.Return
 
 class ReturnTraverserImplTest extends UnitTestSuite {
 
-  private val expressionTraverser = mock[ExpressionTraverser]
+  private val expressionTermTraverser = mock[ExpressionTermTraverser]
 
-  private val returnTraverser = new ReturnTraverserImpl(expressionTraverser)
+  private val returnTraverser = new ReturnTraverserImpl(expressionTermTraverser)
 
   test("traverse()") {
     val x = Term.Name("x")
 
-    doWrite("x").when(expressionTraverser).traverse(eqTree(x))
+    doWrite("x").when(expressionTermTraverser).traverse(eqTree(x))
 
     returnTraverser.traverse(Return(x))
 

@@ -8,9 +8,9 @@ import scala.meta.{Init, Name, Term, Type}
 
 class ThrowTraverserImplTest extends UnitTestSuite {
 
-  private val expressionTraverser = mock[ExpressionTraverser]
+  private val expressionTermTraverser = mock[ExpressionTermTraverser]
 
-  private val throwTraverser = new ThrowTraverserImpl(expressionTraverser)
+  private val throwTraverser = new ThrowTraverserImpl(expressionTermTraverser)
 
   test("traverse") {
     val exception = Term.New(Init(tpe = Type.Name("IllegalStateException"), name = Name.Anonymous(), argss = Nil))
@@ -18,6 +18,6 @@ class ThrowTraverserImplTest extends UnitTestSuite {
 
     throwTraverser.traverse(`throw`)
 
-    verify(expressionTraverser).traverse(eqTree(exception))
+    verify(expressionTermTraverser).traverse(eqTree(exception))
   }
 }

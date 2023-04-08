@@ -19,7 +19,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
   private val modListTraverser = mock[ModListTraverser]
   private val defnValOrVarTypeTraverser = mock[DefnValOrVarTypeTraverser]
   private val patListTraverser = mock[PatListTraverser]
-  private val expressionTraverser = mock[ExpressionTraverser]
+  private val expressionTermTraverser = mock[ExpressionTermTraverser]
   private val declVarTraverser = mock[DeclVarTraverser]
   private val defnValToDeclVarTransformer = mock[DefnValToDeclVarTransformer]
   private val defnValTransformer = mock[DefnValTransformer]
@@ -28,7 +28,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
     modListTraverser,
     defnValOrVarTypeTraverser,
     patListTraverser,
-    expressionTraverser,
+    expressionTermTraverser,
     declVarTraverser,
     defnValToDeclVarTransformer,
     defnValTransformer
@@ -65,7 +65,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
     doWrite("int")
       .when(defnValOrVarTypeTraverser).traverse(eqSomeTree(t"Int"), eqSomeTree(q"3"), ArgumentMatchers.eq(StatContext(javaScope)))
     doWrite("myVal2").when(patListTraverser).traverse(eqTreeList(List(p"myVal2")))
-    doWrite("3").when(expressionTraverser).traverse(eqTree(q"3"))
+    doWrite("3").when(expressionTermTraverser).traverse(eqTree(q"3"))
 
     defnValTraverser.traverse(defnVal, StatContext(javaScope))
 
@@ -89,7 +89,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
     doWrite("int")
       .when(defnValOrVarTypeTraverser).traverse(ArgumentMatchers.eq(None), eqSomeTree(q"3"), ArgumentMatchers.eq(StatContext(javaScope)))
     doWrite("myVal2").when(patListTraverser).traverse(eqTreeList(List(p"myVal2")))
-    doWrite("3").when(expressionTraverser).traverse(eqTree(q"3"))
+    doWrite("3").when(expressionTermTraverser).traverse(eqTree(q"3"))
 
     defnValTraverser.traverse(defnVal, StatContext(javaScope))
 
@@ -113,7 +113,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
     doWrite("int")
       .when(defnValOrVarTypeTraverser).traverse(eqSomeTree(t"Int"), eqSomeTree(q"3"), ArgumentMatchers.eq(StatContext(javaScope)))
     doWrite("myVal2").when(patListTraverser).traverse(eqTreeList(List(p"myVal2")))
-    doWrite("3").when(expressionTraverser).traverse(eqTree(q"3"))
+    doWrite("3").when(expressionTermTraverser).traverse(eqTree(q"3"))
 
     defnValTraverser.traverse(defnVal, StatContext(javaScope))
 
@@ -137,7 +137,7 @@ class DefnValTraverserImplTest extends UnitTestSuite {
     doWrite("int")
       .when(defnValOrVarTypeTraverser).traverse(ArgumentMatchers.eq(None), eqSomeTree(q"3"), ArgumentMatchers.eq(StatContext(javaScope)))
     doWrite("myVal2").when(patListTraverser).traverse(eqTreeList(List(p"myVal2")))
-    doWrite("3").when(expressionTraverser).traverse(eqTree(q"3"))
+    doWrite("3").when(expressionTermTraverser).traverse(eqTree(q"3"))
 
     defnValTraverser.traverse(defnVal, StatContext(javaScope))
 

@@ -13,7 +13,7 @@ trait IfTraverser {
   def traverseAsTertiaryOp(`if`: If): Unit
 }
 
-private[traversers] class IfTraverserImpl(expressionTraverser: => ExpressionTraverser,
+private[traversers] class IfTraverserImpl(expressionTermTraverser: => ExpressionTermTraverser,
                                           blockTraverser: => BlockTraverser)
                                          (implicit javaWriter: JavaWriter) extends IfTraverser {
 
@@ -22,7 +22,7 @@ private[traversers] class IfTraverserImpl(expressionTraverser: => ExpressionTrav
   override def traverse(`if`: If, shouldReturnValue: Decision = No): Unit = {
     //TODO handle mods (what do they represent in an 'if'?...)
     write("if (")
-    expressionTraverser.traverse(`if`.cond)
+    expressionTermTraverser.traverse(`if`.cond)
     write(")")
     blockTraverser.traverse(`if`.thenp, BlockContext(shouldReturnValue = shouldReturnValue))
     `if`.elsep match {
@@ -37,13 +37,13 @@ private[traversers] class IfTraverserImpl(expressionTraverser: => ExpressionTrav
 
   override def traverseAsTertiaryOp(`if`: If): Unit = {
     write("(")
-    expressionTraverser.traverse(`if`.cond)
+    expressionTermTraverser.traverse(`if`.cond)
     write(") ? ")
-    expressionTraverser.traverse(`if`.thenp)
+    expressionTermTraverser.traverse(`if`.thenp)
     write(" : ")
     `if`.elsep match {
       case Lit.Unit() => throw new IllegalStateException("Trying to traverse as a tertiary op with no 'else' clause")
-      case elsep => expressionTraverser.traverse(elsep)
+      case elsep => expressionTermTraverser.traverse(elsep)
     }
   }
 }

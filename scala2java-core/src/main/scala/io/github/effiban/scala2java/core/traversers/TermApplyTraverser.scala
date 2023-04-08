@@ -10,7 +10,7 @@ import scala.meta.Term
 
 trait TermApplyTraverser extends ScalaTreeTraverser[Term.Apply]
 
-private[traversers] class TermApplyTraverserImpl(termTraverser: => TermTraverser,
+private[traversers] class TermApplyTraverserImpl(expressionTermTraverser: => ExpressionTermTraverser,
                                                  arrayInitializerTraverser: => ArrayInitializerTraverser,
                                                  argumentListTraverser: => ArgumentListTraverser,
                                                  invocationArgTraverser: => ArgumentTraverser[Term],
@@ -28,7 +28,7 @@ private[traversers] class TermApplyTraverserImpl(termTraverser: => TermTraverser
 
   private def traverseRegular(termApply: Term.Apply): Unit = {
     val transformedTermApply = termApplyTransformer.transform(termApply)
-    termTraverser.traverse(transformedTermApply.fun)
+    expressionTermTraverser.traverse(transformedTermApply.fun)
     val options = ListTraversalOptions(maybeEnclosingDelimiter = Some(Parentheses), traverseEmpty = true)
     val argListContext = ArgumentListContext(maybeParent = Some(transformedTermApply), options = options, argNameAsComment = true)
     argumentListTraverser.traverse(

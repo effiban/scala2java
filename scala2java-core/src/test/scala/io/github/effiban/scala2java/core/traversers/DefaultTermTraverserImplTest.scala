@@ -14,7 +14,7 @@ import scala.meta.Mod.Annot
 import scala.meta.Term.{Apply, ApplyInfix, ApplyType, Assign, Block, Eta, For, ForYield, If, NewAnonymous}
 import scala.meta.{Case, Init, Lit, Name, Pat, Self, Template, Term, Type}
 
-class TermTraverserImplTest extends UnitTestSuite {
+class DefaultTermTraverserImplTest extends UnitTestSuite {
 
   private val termRefTraverser = mock[TermRefTraverser]
   private val termApplyTraverser = mock[TermApplyTraverser]
@@ -47,7 +47,7 @@ class TermTraverserImplTest extends UnitTestSuite {
   private val litTraverser = mock[LitTraverser]
 
 
-  private val termTraverser = new TermTraverserImpl(
+  private val defaultTermTraverser = new DefaultTermTraverserImpl(
     termRefTraverser,
     termApplyTraverser,
     applyTypeTraverser,
@@ -81,19 +81,19 @@ class TermTraverserImplTest extends UnitTestSuite {
 
   test("traverse() for Term.Name") {
     val termName = Term.Name("x")
-    termTraverser.traverse(termName)
+    defaultTermTraverser.traverse(termName)
     verify(termRefTraverser).traverse(eqTree(termName))
   }
 
   test("traverse() for Term.Apply") {
     val termApply = Term.Apply(Term.Name("myFunc"), List(Term.Name("x"), Term.Name("y")))
-    termTraverser.traverse(termApply)
+    defaultTermTraverser.traverse(termApply)
     verify(termApplyTraverser).traverse(eqTree(termApply))
   }
 
   test("traverse() for ApplyType") {
     val applyType = ApplyType(Term.Name("myFunc"), List(Type.Name("T"), Type.Name("U")))
-    termTraverser.traverse(applyType)
+    defaultTermTraverser.traverse(applyType)
     verify(applyTypeTraverser).traverse(eqTree(applyType))
   }
 
@@ -104,31 +104,31 @@ class TermTraverserImplTest extends UnitTestSuite {
       targs = Nil,
       args = List(Term.Name("y"))
     )
-    termTraverser.traverse(applyInfix)
+    defaultTermTraverser.traverse(applyInfix)
     verify(termApplyInfixTraverser).traverse(eqTree(applyInfix))
   }
 
   test("traverse() for Assign") {
     val assign = Term.Assign(lhs = Term.Name("x"), rhs = Lit.Int(3))
-    termTraverser.traverse(assign)
+    defaultTermTraverser.traverse(assign)
     verify(assignTraverser).traverse(eqTree(assign))
   }
 
   test("traverse() for Return") {
     val `return` = Term.Return(Term.Name("x"))
-    termTraverser.traverse(`return`)
+    defaultTermTraverser.traverse(`return`)
     verify(returnTraverser).traverse(eqTree(`return`))
   }
 
   test("traverse() for Throw") {
     val `throw` = Term.Throw(Term.Name("IllegalStateException"))
-    termTraverser.traverse(`throw`)
+    defaultTermTraverser.traverse(`throw`)
     verify(throwTraverser).traverse(eqTree(`throw`))
   }
 
   test("traverse() for Ascribe") {
     val ascribe = Term.Ascribe(Term.Name("myVar"), Type.Name("T"))
-    termTraverser.traverse(ascribe)
+    defaultTermTraverser.traverse(ascribe)
     verify(ascribeTraverser).traverse(eqTree(ascribe))
   }
 
@@ -140,13 +140,13 @@ class TermTraverserImplTest extends UnitTestSuite {
         Annot(Init(tpe = Type.Name("MyAnnot2"), name = Name.Anonymous(), argss = List()))
       )
     )
-    termTraverser.traverse(annotate)
+    defaultTermTraverser.traverse(annotate)
     verify(termAnnotateTraverser).traverse(eqTree(annotate))
   }
 
   test("traverse() for Term.Tuple") {
     val tuple = Term.Tuple(List(Term.Name("x"), Term.Name("y")))
-    termTraverser.traverse(tuple)
+    defaultTermTraverser.traverse(tuple)
     verify(termTupleTraverser).traverse(eqTree(tuple))
   }
 
@@ -157,7 +157,7 @@ class TermTraverserImplTest extends UnitTestSuite {
         Assign(Term.Name("y"), Lit.Int(4))
       )
     )
-    termTraverser.traverse(block)
+    defaultTermTraverser.traverse(block)
     verify(blockTraverser).traverse(stat = eqTree(block), context = eqBlockContext(BlockContext()))
   }
 
@@ -176,7 +176,7 @@ class TermTraverserImplTest extends UnitTestSuite {
       ),
       elsep = Lit.Unit()
     )
-    termTraverser.traverse(`if`)
+    defaultTermTraverser.traverse(`if`)
     verify(ifTraverser).traverse(`if` = eqTree(`if`), shouldReturnValue = ArgumentMatchers.eq(No))
   }
 
@@ -189,7 +189,7 @@ class TermTraverserImplTest extends UnitTestSuite {
       cases = List(case1, case2),
       mods = Nil
     )
-    termTraverser.traverse(termMatch)
+    defaultTermTraverser.traverse(termMatch)
     verify(termMatchTraverser).traverse(eqTree(termMatch))
   }
 
@@ -205,7 +205,7 @@ class TermTraverserImplTest extends UnitTestSuite {
       ),
       finallyp = None
     )
-    termTraverser.traverse(`try`)
+    defaultTermTraverser.traverse(`try`)
     verify(tryTraverser).traverse(eqTree(`try`), ArgumentMatchers.eq(TryContext()))
   }
 
@@ -222,7 +222,7 @@ class TermTraverserImplTest extends UnitTestSuite {
       ),
       finallyp = None
     )
-    termTraverser.traverse(tryWithHandler)
+    defaultTermTraverser.traverse(tryWithHandler)
     verify(tryWithHandlerTraverser).traverse(eqTree(tryWithHandler), ArgumentMatchers.eq(TryContext()))
   }
 
@@ -231,7 +231,7 @@ class TermTraverserImplTest extends UnitTestSuite {
       params = List(Term.Param(mods = Nil, name = Term.Name("x"), decltpe = Some(TypeNames.Int), default = None)),
       body = Apply(fun = Term.Name("doSomething"), args = List(Term.Name("x")))
     )
-    termTraverser.traverse(function)
+    defaultTermTraverser.traverse(function)
     verify(termFunctionTraverser).traverse(eqTree(function), ArgumentMatchers.eq(Uncertain))
   }
 
@@ -242,13 +242,13 @@ class TermTraverserImplTest extends UnitTestSuite {
         Case(pat = Lit.Int(2), cond = None, body = Lit.String("two"))
       )
     )
-    termTraverser.traverse(partialFunction)
+    defaultTermTraverser.traverse(partialFunction)
     verify(partialFunctionTraverser).traverse(eqTree(partialFunction), ArgumentMatchers.eq(Uncertain))
   }
 
   test("traverse() for AnonymousFunction") {
     val anonymousFunction = Term.AnonymousFunction(Apply(Term.Name("doSomething"), Nil))
-    termTraverser.traverse(anonymousFunction)
+    defaultTermTraverser.traverse(anonymousFunction)
     verify(anonymousFunctionTraverser).traverse(eqTree(anonymousFunction), ArgumentMatchers.eq(Uncertain))
   }
 
@@ -257,7 +257,7 @@ class TermTraverserImplTest extends UnitTestSuite {
       expr = Term.ApplyInfix(lhs = Term.Name("x"), op = Term.Name("<"), targs = Nil, args = List(Lit.Int(3))),
       body = Term.Name("doSomething")
     )
-    termTraverser.traverse(`while`)
+    defaultTermTraverser.traverse(`while`)
     verify(whileTraverser).traverse(eqTree(`while`))
   }
 
@@ -266,7 +266,7 @@ class TermTraverserImplTest extends UnitTestSuite {
       body = Term.Name("doSomething"),
       expr = Term.ApplyInfix(lhs = Term.Name("x"), op = Term.Name("<"), targs = Nil, args = List(Lit.Int(3))),
     )
-    termTraverser.traverse(`do`)
+    defaultTermTraverser.traverse(`do`)
     verify(doTraverser).traverse(eqTree(`do`))
   }
 
@@ -278,7 +278,7 @@ class TermTraverserImplTest extends UnitTestSuite {
       ),
       body = Term.Name("result")
     )
-    termTraverser.traverse(`for`)
+    defaultTermTraverser.traverse(`for`)
     verify(forTraverser).traverse(eqTree(`for`))
   }
 
@@ -290,13 +290,13 @@ class TermTraverserImplTest extends UnitTestSuite {
       ),
       body = Term.Name("result")
     )
-    termTraverser.traverse(forYield)
+    defaultTermTraverser.traverse(forYield)
     verify(forYieldTraverser).traverse(eqTree(forYield))
   }
 
   test("traverse() for New") {
     val `new` = Term.New(Init(tpe = Type.Name("MyClass"), name = Name.Anonymous(), argss = Nil))
-    termTraverser.traverse(`new`)
+    defaultTermTraverser.traverse(`new`)
     verify(newTraverser).traverse(eqTree(`new`))
   }
 
@@ -309,24 +309,24 @@ class TermTraverserImplTest extends UnitTestSuite {
         stats = List(Term.Apply(Term.Name("doSomething"), List(Term.Name("arg"))))
       )
     )
-    termTraverser.traverse(newAnonymous)
+    defaultTermTraverser.traverse(newAnonymous)
     verify(newAnonymousTraverser).traverse(eqTree(newAnonymous))
   }
 
   test("traverse() for Term.Placeholder") {
-    termTraverser.traverse(Term.Placeholder())
+    defaultTermTraverser.traverse(Term.Placeholder())
     verify(termPlaceholderTraverser).traverse(eqTree(Term.Placeholder()))
   }
 
   test("traverse() for Eta") {
     val eta = Eta(Term.Name("myFunc"))
-    termTraverser.traverse(eta)
+    defaultTermTraverser.traverse(eta)
     verify(etaTraverser).traverse(eqTree(eta))
   }
 
   test("traverse() for Term.Repeated") {
     val termRepeated = Term.Repeated(Term.Name("x"))
-    termTraverser.traverse(termRepeated)
+    defaultTermTraverser.traverse(termRepeated)
     verify(termRepeatedTraverser).traverse(eqTree(termRepeated))
   }
 
@@ -336,13 +336,13 @@ class TermTraverserImplTest extends UnitTestSuite {
       parts = List(Lit.String("start-"), Lit.String("-end")),
       args = List(Term.Name("myVal"))
     )
-    termTraverser.traverse(interpolate)
+    defaultTermTraverser.traverse(interpolate)
     verify(termInterpolateTraverser).traverse(eqTree(interpolate))
   }
 
   test("traverse() for Lit.Int") {
     val lit = Lit.Int(3)
-    termTraverser.traverse(lit)
+    defaultTermTraverser.traverse(lit)
     verify(litTraverser).traverse(eqTree(lit))
   }
 }

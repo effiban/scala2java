@@ -6,9 +6,9 @@ import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import scala.meta.Term
 
 class TermRepeatedTraverserImplTest extends UnitTestSuite {
-  private val termTraverser = mock[TermTraverser]
+  private val expressionTermTraverser = mock[ExpressionTermTraverser]
 
-  private val termRepeatedTraverser = new TermRepeatedTraverserImpl(termTraverser)
+  private val termRepeatedTraverser = new TermRepeatedTraverserImpl(expressionTermTraverser)
 
   test("traverse") {
     val expr = Term.Name("x")
@@ -16,6 +16,6 @@ class TermRepeatedTraverserImplTest extends UnitTestSuite {
 
     termRepeatedTraverser.traverse(termRepeated)
 
-    verify(termTraverser).traverse(eqTree(expr))
+    verify(expressionTermTraverser).traverse(eqTree(expr))
   }
 }

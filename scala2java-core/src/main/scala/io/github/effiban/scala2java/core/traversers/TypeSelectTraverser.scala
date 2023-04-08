@@ -6,7 +6,7 @@ import scala.meta.Type
 
 trait TypeSelectTraverser extends ScalaTreeTraverser[Type.Select]
 
-private[traversers] class TypeSelectTraverserImpl(termRefTraverser: => TermRefTraverser,
+private[traversers] class TypeSelectTraverserImpl(expressionTermTraverser: => ExpressionTermTraverser,
                                                   typeNameTraverser: => TypeNameTraverser)
                                                  (implicit javaWriter: JavaWriter) extends TypeSelectTraverser {
 
@@ -15,7 +15,7 @@ private[traversers] class TypeSelectTraverserImpl(termRefTraverser: => TermRefTr
   // A scala type selecting a type from a term, e.g.: a.B where 'a' is of some class 'A' that has a 'B' type inside.
   // I think it's supported in Java, but will produce a warning that a 'static member is being accessed from a non-static context'.
   override def traverse(typeSelect: Type.Select): Unit = {
-    termRefTraverser.traverse(typeSelect.qual)
+    expressionTermTraverser.traverse(typeSelect.qual)
     writeQualifierSeparator()
     typeNameTraverser.traverse(typeSelect.name)
   }

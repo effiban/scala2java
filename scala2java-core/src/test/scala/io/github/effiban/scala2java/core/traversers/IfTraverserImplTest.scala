@@ -12,10 +12,10 @@ import scala.meta.{Lit, Term}
 
 class IfTraverserImplTest extends UnitTestSuite {
 
-  private val expressionTraverser = mock[ExpressionTraverser]
+  private val expressionTermTraverser = mock[ExpressionTermTraverser]
   private val blockTraverser = mock[BlockTraverser]
 
-  private val ifTraverser = new IfTraverserImpl(expressionTraverser, blockTraverser)
+  private val ifTraverser = new IfTraverserImpl(expressionTermTraverser, blockTraverser)
 
   private val x = Term.Name("x")
   private val y = Term.Name("y")
@@ -58,7 +58,7 @@ class IfTraverserImplTest extends UnitTestSuite {
       elsep = Lit.Unit()
     )
 
-    doWrite("x < 3").when(expressionTraverser).traverse(eqTree(Condition))
+    doWrite("x < 3").when(expressionTermTraverser).traverse(eqTree(Condition))
     doWrite(
       """ {
         |  /* BODY */
@@ -82,7 +82,7 @@ class IfTraverserImplTest extends UnitTestSuite {
       elsep = Lit.Unit()
     )
 
-    doWrite("x < 3").when(expressionTraverser).traverse(eqTree(Condition))
+    doWrite("x < 3").when(expressionTermTraverser).traverse(eqTree(Condition))
     doWrite(
       """ {
         |  /* BODY */
@@ -108,7 +108,7 @@ class IfTraverserImplTest extends UnitTestSuite {
       elsep = Lit.Unit()
     )
 
-    doWrite("x < 3").when(expressionTraverser).traverse(eqTree(Condition))
+    doWrite("x < 3").when(expressionTermTraverser).traverse(eqTree(Condition))
     doWrite(
       """ {
         |  /* BODY */
@@ -132,7 +132,7 @@ class IfTraverserImplTest extends UnitTestSuite {
       elsep = ElseBlock
     )
 
-    doWrite("x < 3").when(expressionTraverser).traverse(eqTree(Condition))
+    doWrite("x < 3").when(expressionTermTraverser).traverse(eqTree(Condition))
     doWrite(
       """ {
         |  /* THEN BODY */
@@ -165,7 +165,7 @@ class IfTraverserImplTest extends UnitTestSuite {
       elsep = ElseBlock
     )
 
-    doWrite("x < 3").when(expressionTraverser).traverse(eqTree(Condition))
+    doWrite("x < 3").when(expressionTermTraverser).traverse(eqTree(Condition))
     doWrite(
       """ {
         |  /* THEN BODY */
@@ -199,7 +199,7 @@ class IfTraverserImplTest extends UnitTestSuite {
       elsep = ElseStatement
     )
 
-    doWrite("x < 3").when(expressionTraverser).traverse(eqTree(Condition))
+    doWrite("x < 3").when(expressionTermTraverser).traverse(eqTree(Condition))
     doWrite(
       """ {
         |  /* THEN BODY */
@@ -237,9 +237,9 @@ class IfTraverserImplTest extends UnitTestSuite {
       elsep = threeOrMore
     )
 
-    doWrite("x < 3").when(expressionTraverser).traverse(eqTree(Condition))
-    doWrite(""""LessThanThree"""").when(expressionTraverser).traverse(eqTree(lessThanThree))
-    doWrite(""""ThreeOrMore"""").when(expressionTraverser).traverse(eqTree(threeOrMore))
+    doWrite("x < 3").when(expressionTermTraverser).traverse(eqTree(Condition))
+    doWrite(""""LessThanThree"""").when(expressionTermTraverser).traverse(eqTree(lessThanThree))
+    doWrite(""""ThreeOrMore"""").when(expressionTermTraverser).traverse(eqTree(threeOrMore))
 
     ifTraverser.traverseAsTertiaryOp(`if`)
 

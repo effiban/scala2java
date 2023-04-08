@@ -6,13 +6,13 @@ import scala.meta.Term.Throw
 
 trait ThrowTraverser extends ScalaTreeTraverser[Throw]
 
-private[traversers] class ThrowTraverserImpl(expressionTraverser: => ExpressionTraverser)
+private[traversers] class ThrowTraverserImpl(expressionTermTraverser: => ExpressionTermTraverser)
                                             (implicit javaWriter: JavaWriter) extends ThrowTraverser {
 
   import javaWriter._
 
   override def traverse(`throw`: Throw): Unit = {
     write("throw ")
-    expressionTraverser.traverse(`throw`.expr)
+    expressionTermTraverser.traverse(`throw`.expr)
   }
 }

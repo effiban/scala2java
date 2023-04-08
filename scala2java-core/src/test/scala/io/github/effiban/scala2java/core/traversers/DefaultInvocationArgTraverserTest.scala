@@ -11,11 +11,11 @@ import scala.meta.XtensionQuasiquoteTerm
 
 class DefaultInvocationArgTraverserTest extends UnitTestSuite {
 
-  private val expressionTraverser = mock[ExpressionTraverser]
+  private val expressionTermTraverser = mock[ExpressionTermTraverser]
   private val invocationArgByNamePredicate = mock[InvocationArgByNamePredicate]
 
   private val invocationArgTraverser = new DefaultInvocationArgTraverser(
-    expressionTraverser,
+    expressionTermTraverser,
     invocationArgByNamePredicate
   )
 
@@ -30,7 +30,7 @@ class DefaultInvocationArgTraverserTest extends UnitTestSuite {
 
     invocationArgTraverser.traverse(arg, context)
 
-    verify(expressionTraverser).traverse(eqTree(arg))
+    verify(expressionTermTraverser).traverse(eqTree(arg))
   }
 
   test("traverse when has an invocation, has no name, and is a Lit passed by value") {
@@ -43,7 +43,7 @@ class DefaultInvocationArgTraverserTest extends UnitTestSuite {
 
     invocationArgTraverser.traverse(arg, context)
 
-    verify(expressionTraverser).traverse(eqTree(arg))
+    verify(expressionTermTraverser).traverse(eqTree(arg))
   }
 
   test("traverse when has an invocation, and is a Lit passed by name") {
@@ -57,7 +57,7 @@ class DefaultInvocationArgTraverserTest extends UnitTestSuite {
 
     invocationArgTraverser.traverse(arg, context)
 
-    verify(expressionTraverser).traverse(eqTree(expectedArg))
+    verify(expressionTermTraverser).traverse(eqTree(expectedArg))
   }
 
   test("traverse when has an invocation, and is a Term.Apply passed by value") {
@@ -70,7 +70,7 @@ class DefaultInvocationArgTraverserTest extends UnitTestSuite {
 
     invocationArgTraverser.traverse(arg, context)
 
-    verify(expressionTraverser).traverse(eqTree(arg))
+    verify(expressionTermTraverser).traverse(eqTree(arg))
   }
 
   test("traverse when has an invocation, and is a Term.Apply passed by name") {
@@ -84,7 +84,7 @@ class DefaultInvocationArgTraverserTest extends UnitTestSuite {
 
     invocationArgTraverser.traverse(arg, context)
 
-    verify(expressionTraverser).traverse(eqTree(expectedArg))
+    verify(expressionTermTraverser).traverse(eqTree(expectedArg))
   }
 
   test("traverse when has no invocation") {
@@ -93,7 +93,7 @@ class DefaultInvocationArgTraverserTest extends UnitTestSuite {
 
     invocationArgTraverser.traverse(arg, context)
 
-    verify(expressionTraverser).traverse(eqTree(arg))
+    verify(expressionTermTraverser).traverse(eqTree(arg))
 
     verifyNoMoreInteractions(invocationArgByNamePredicate)
   }

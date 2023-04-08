@@ -6,7 +6,7 @@ import scala.meta.Term.While
 
 trait WhileTraverser extends ScalaTreeTraverser[While]
 
-private[traversers] class WhileTraverserImpl(expressionTraverser: => ExpressionTraverser,
+private[traversers] class WhileTraverserImpl(expressionTermTraverser: => ExpressionTermTraverser,
                                              blockTraverser: => BlockTraverser)
                                             (implicit javaWriter: JavaWriter) extends WhileTraverser {
 
@@ -14,7 +14,7 @@ private[traversers] class WhileTraverserImpl(expressionTraverser: => ExpressionT
 
   override def traverse(`while`: While): Unit = {
     write("while (")
-    expressionTraverser.traverse(`while`.expr)
+    expressionTermTraverser.traverse(`while`.expr)
     write(")")
     blockTraverser.traverse(`while`.body)
   }
