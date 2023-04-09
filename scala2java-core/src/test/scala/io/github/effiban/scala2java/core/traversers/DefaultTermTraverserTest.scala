@@ -18,7 +18,7 @@ class DefaultTermTraverserTest extends UnitTestSuite {
 
   private val defaultTermRefTraverser = mock[TermRefTraverser]
   private val termApplyTraverser = mock[TermApplyTraverser]
-  private val mainApplyTypeTraverser = mock[ApplyTypeTraverser]
+  private val defaultMainApplyTypeTraverser = mock[MainApplyTypeTraverser]
   private val termApplyInfixTraverser = mock[TermApplyInfixTraverser]
   private val assignTraverser = mock[AssignTraverser]
   private val returnTraverser = mock[ReturnTraverser]
@@ -50,7 +50,7 @@ class DefaultTermTraverserTest extends UnitTestSuite {
   private val defaultTermTraverser = new DefaultTermTraverser(
     defaultTermRefTraverser,
     termApplyTraverser,
-    mainApplyTypeTraverser,
+    defaultMainApplyTypeTraverser,
     termApplyInfixTraverser,
     assignTraverser,
     returnTraverser,
@@ -94,7 +94,7 @@ class DefaultTermTraverserTest extends UnitTestSuite {
   test("traverse() for ApplyType") {
     val applyType = ApplyType(Term.Name("myFunc"), List(Type.Name("T"), Type.Name("U")))
     defaultTermTraverser.traverse(applyType)
-    verify(mainApplyTypeTraverser).traverse(eqTree(applyType))
+    verify(defaultMainApplyTypeTraverser).traverse(eqTree(applyType))
   }
 
   test("traverse() for Term.ApplyInfix") {

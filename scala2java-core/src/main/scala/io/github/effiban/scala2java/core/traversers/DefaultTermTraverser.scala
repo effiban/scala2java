@@ -7,7 +7,7 @@ import scala.meta.{Lit, Term}
 
 private[traversers] class DefaultTermTraverser(defaultTermRefTraverser: => TermRefTraverser,
                                                termApplyTraverser: => TermApplyTraverser,
-                                               mainApplyTypeTraverser: => ApplyTypeTraverser,
+                                               defaultMainApplyTypeTraverser: => MainApplyTypeTraverser,
                                                termApplyInfixTraverser: => TermApplyInfixTraverser,
                                                assignTraverser: => AssignTraverser,
                                                returnTraverser: => ReturnTraverser,
@@ -41,7 +41,7 @@ private[traversers] class DefaultTermTraverser(defaultTermRefTraverser: => TermR
   override def traverse(term: Term): Unit = term match {
     case termRef: Term.Ref => defaultTermRefTraverser.traverse(termRef)
     case apply: Term.Apply => termApplyTraverser.traverse(apply)
-    case applyType: ApplyType => mainApplyTypeTraverser.traverse(applyType)
+    case applyType: ApplyType => defaultMainApplyTypeTraverser.traverse(applyType)
     case applyInfix: Term.ApplyInfix => termApplyInfixTraverser.traverse(applyInfix)
     case assign: Assign => assignTraverser.traverse(assign)
     case `return`: Return => returnTraverser.traverse(`return`)
