@@ -9,7 +9,7 @@ import io.github.effiban.scala2java.core.resolvers.ArrayInitializerContextResolv
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{TermNames, TypeNames}
-import io.github.effiban.scala2java.spi.transformers.TermApplyTransformer
+import io.github.effiban.scala2java.core.transformers.InternalTermApplyTransformer
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
@@ -22,7 +22,7 @@ class TermApplyTraverserImplTest extends UnitTestSuite {
   private val argListTraverser = mock[ArgumentListTraverser]
   private val invocationArgTraverser = mock[ArgumentTraverser[Term]]
   private val arrayInitializerContextResolver = mock[ArrayInitializerContextResolver]
-  private val termApplyTransformer = mock[TermApplyTransformer]
+  private val termApplyTransformer = mock[InternalTermApplyTransformer]
 
   private val termApplyTraverser = new TermApplyTraverserImpl(
     funTermTraverser,

@@ -460,7 +460,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     argumentListTraverser,
     compositeInvocationArgTraverser,
     ArrayInitializerContextResolver,
-    new CompositeTermApplyTransformer(CoreTermApplyTransformer)
+    internalTermApplyTransformer
   )
 
   private lazy val termFunctionTraverser: TermFunctionTraverser = new TermFunctionTraverserImpl(

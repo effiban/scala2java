@@ -28,6 +28,11 @@ class Transformers(typeInferrers: => TypeInferrers,
     predicates.compositeTermNameSupportsNoArgInvocation
   )
 
+  lazy val internalTermApplyTransformer: InternalTermApplyTransformer = new InternalTermApplyTransformerImpl(
+    new CompositeTermApplyTransformer(CoreTermApplyTransformer),
+    TermNameClassifier
+  )
+
   private lazy val termSelectTermFunctionTransformer: TermSelectTermFunctionTransformer = new TermSelectTermFunctionTransformerImpl(
     typeInferrers.functionTypeInferrer,
     FunctionTypeTransformer
