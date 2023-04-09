@@ -36,13 +36,6 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val anonymousFunctionTraverser: AnonymousFunctionTraverser = new AnonymousFunctionTraverserImpl(termFunctionTraverser)
 
-  private lazy val applyTypeTraverser: ApplyTypeTraverser = new ApplyTypeTraverserImpl(
-    classOfTraverser,
-    defaultTermSelectTraverser,
-    typeListTraverser,
-    defaultTermTraverser
-  )
-
   private lazy val applyUnaryTraverser: ApplyUnaryTraverser = new ApplyUnaryTraverserImpl(defaultTermNameTraverser, expressionTermTraverser)
 
   private lazy val argumentListTraverser: ArgumentListTraverser = new ArgumentListTraverserImpl
@@ -155,7 +148,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   private lazy val defaultTermTraverser: TermTraverser = new DefaultTermTraverser(
     defaultTermRefTraverser,
     termApplyTraverser,
-    applyTypeTraverser,
+    mainApplyTypeTraverser,
     termApplyInfixTraverser,
     assignTraverser,
     returnTraverser,
@@ -316,7 +309,18 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     compositeInvocationArgTraverser
   )
 
+  private lazy val invocationApplyTypeTraverser: ApplyTypeTraverser = new InvocationApplyTypeTraverser(
+    defaultTermSelectTraverser,
+    typeListTraverser,
+    defaultTermTraverser
+  )
+
   private lazy val litTraverser: LitTraverser = new LitTraverserImpl()
+
+  private lazy val mainApplyTypeTraverser: ApplyTypeTraverser = new MainApplyTypeTraverser(
+    classOfTraverser,
+    invocationApplyTypeTraverser
+  )
 
   private lazy val modListTraverser: ModListTraverser = new ModListTraverserImpl(annotListTraverser, JavaModifiersResolver)
 
