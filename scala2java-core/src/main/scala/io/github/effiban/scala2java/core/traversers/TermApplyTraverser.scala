@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.contexts.ArgumentListContext
 import io.github.effiban.scala2java.core.entities.EnclosingDelimiter.Parentheses
 import io.github.effiban.scala2java.core.entities.ListTraversalOptions
 import io.github.effiban.scala2java.core.resolvers.ArrayInitializerContextResolver
-import io.github.effiban.scala2java.spi.transformers.TermApplyTransformer
+import io.github.effiban.scala2java.core.transformers.InternalTermApplyTransformer
 
 import scala.meta.Term
 
@@ -15,7 +15,7 @@ private[traversers] class TermApplyTraverserImpl(funTermTraverser: => TermTraver
                                                  argumentListTraverser: => ArgumentListTraverser,
                                                  invocationArgTraverser: => ArgumentTraverser[Term],
                                                  arrayInitializerContextResolver: ArrayInitializerContextResolver,
-                                                 termApplyTransformer: TermApplyTransformer)
+                                                 termApplyTransformer: InternalTermApplyTransformer)
   extends TermApplyTraverser {
 
   // method invocation
