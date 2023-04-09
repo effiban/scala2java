@@ -9,14 +9,14 @@ import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.{Term, Type}
 
-class InvocationApplyTypeTraverserTest extends UnitTestSuite {
+class DefaultStandardApplyTypeTraverserTest extends UnitTestSuite {
 
   private val termSelectTraverser = mock[TermSelectTraverser]
   private val typeListTraverser = mock[TypeListTraverser]
-  private val defaultTermTraverser = mock[DefaultTermTraverser]
+  private val defaultTermTraverser = mock[TermTraverser]
   private val termApplyTraverser = mock[TermApplyTraverser]
 
-  private val invocationApplyTypeTraverser = new InvocationApplyTypeTraverser(
+  private val defaultStandardApplyTypeTraverser = new DefaultStandardApplyTypeTraverser(
     termSelectTraverser,
     typeListTraverser,
     defaultTermTraverser
@@ -28,7 +28,7 @@ class InvocationApplyTypeTraverserTest extends UnitTestSuite {
 
     doWrite("myObj<T1, T2>.myFunc")
       .when(termSelectTraverser).traverse(eqTree(fun), eqTermSelectContext(TermSelectContext(typeArgs)))
-    invocationApplyTypeTraverser.traverse(Term.ApplyType(fun = fun, targs = typeArgs))
+    defaultStandardApplyTypeTraverser.traverse(Term.ApplyType(fun = fun, targs = typeArgs))
 
     outputWriter.toString shouldBe "myObj<T1, T2>.myFunc"
 
@@ -42,7 +42,7 @@ class InvocationApplyTypeTraverserTest extends UnitTestSuite {
     doWrite("myFunc").when(defaultTermTraverser).traverse(eqTree(fun))
     doWrite("<T1, T2>").when(typeListTraverser).traverse(eqTreeList(typeArgs))
 
-    invocationApplyTypeTraverser.traverse(Term.ApplyType(fun = fun, targs = typeArgs))
+    defaultStandardApplyTypeTraverser.traverse(Term.ApplyType(fun = fun, targs = typeArgs))
 
     outputWriter.toString shouldBe "/* this? */.<T1, T2>myFunc"
 

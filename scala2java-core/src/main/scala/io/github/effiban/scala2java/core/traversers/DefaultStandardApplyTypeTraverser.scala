@@ -6,10 +6,10 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 import scala.meta.Term
 import scala.meta.Term.ApplyType
 
-private[traversers] class InvocationApplyTypeTraverser(termSelectTraverser: => TermSelectTraverser,
-                                                       typeListTraverser: => TypeListTraverser,
-                                                       defaultTermTraverser: => TermTraverser)
-                                                      (implicit javaWriter: JavaWriter) extends ApplyTypeTraverser {
+private[traversers] class DefaultStandardApplyTypeTraverser(termSelectTraverser: => TermSelectTraverser,
+                                                            typeListTraverser: => TypeListTraverser,
+                                                            defaultTermTraverser: => TermTraverser)
+                                                           (implicit javaWriter: JavaWriter) extends StandardApplyTypeTraverser {
 
   import javaWriter._
 

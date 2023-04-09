@@ -145,10 +145,21 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     new CompositeInvocationArgByNamePredicate(CoreInvocationArgByNamePredicate)
   )
 
+  private lazy val defaultMainApplyTypeTraverser: MainApplyTypeTraverser = new MainApplyTypeTraverserImpl(
+    classOfTraverser,
+    defaultStandardApplyTypeTraverser
+  )
+
+  private lazy val defaultStandardApplyTypeTraverser: StandardApplyTypeTraverser = new DefaultStandardApplyTypeTraverser(
+    defaultTermSelectTraverser,
+    typeListTraverser,
+    defaultTermTraverser
+  )
+
   private lazy val defaultTermTraverser: TermTraverser = new DefaultTermTraverser(
     defaultTermRefTraverser,
     termApplyTraverser,
-    mainApplyTypeTraverser,
+    defaultMainApplyTypeTraverser,
     termApplyInfixTraverser,
     assignTraverser,
     returnTraverser,
@@ -309,18 +320,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     compositeInvocationArgTraverser
   )
 
-  private lazy val invocationApplyTypeTraverser: ApplyTypeTraverser = new InvocationApplyTypeTraverser(
-    defaultTermSelectTraverser,
-    typeListTraverser,
-    defaultTermTraverser
-  )
-
   private lazy val litTraverser: LitTraverser = new LitTraverserImpl()
-
-  private lazy val mainApplyTypeTraverser: ApplyTypeTraverser = new MainApplyTypeTraverser(
-    classOfTraverser,
-    invocationApplyTypeTraverser
-  )
 
   private lazy val modListTraverser: ModListTraverser = new ModListTraverserImpl(annotListTraverser, JavaModifiersResolver)
 

@@ -6,14 +6,14 @@ import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.{Term, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
-class MainApplyTypeTraverserTest extends UnitTestSuite {
+class MainApplyTypeTraverserImplTest extends UnitTestSuite {
 
   private val classOfTraverser = mock[ClassOfTraverser]
-  private val invocationApplyTypeTraverser = mock[ApplyTypeTraverser]
+  private val standardApplyTypeTraverser = mock[StandardApplyTypeTraverser]
 
-  private val mainApplyTypeTraverser = new MainApplyTypeTraverser(
+  private val mainApplyTypeTraverser = new MainApplyTypeTraverserImpl(
     classOfTraverser,
-    invocationApplyTypeTraverser
+    standardApplyTypeTraverser
   )
 
 
@@ -26,11 +26,11 @@ class MainApplyTypeTraverserTest extends UnitTestSuite {
     verify(classOfTraverser).traverse(eqTreeList(List(typeName)))
   }
 
-  test("traverse() when function is 'foo', should call the invocation traverser") {
+  test("traverse() when function is 'foo', should call the standard traverser") {
     val termApplyType = q"foo[T1, T2]"
 
     mainApplyTypeTraverser.traverse(termApplyType)
 
-    verify(invocationApplyTypeTraverser).traverse(eqTree(termApplyType))
+    verify(standardApplyTypeTraverser).traverse(eqTree(termApplyType))
   }
 }
