@@ -8,5 +8,5 @@ import java.util.function.*;
 import java.util.stream.*;
 
 public class Sample {
-    public final Set<Object> x = Set.of;
+    public final Set<Object> x = Set.of();
 }

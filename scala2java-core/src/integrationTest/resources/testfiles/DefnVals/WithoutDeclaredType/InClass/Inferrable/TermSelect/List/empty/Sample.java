@@ -8,5 +8,5 @@ import java.util.function.*;
 import java.util.stream.*;
 
 public class Sample {
-    public final List<Object> x = List.of;
+    public final List<Object> x = List.of();
 }

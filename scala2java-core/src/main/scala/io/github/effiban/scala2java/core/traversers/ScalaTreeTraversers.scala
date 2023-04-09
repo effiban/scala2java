@@ -38,7 +38,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val applyTypeTraverser: ApplyTypeTraverser = new ApplyTypeTraverserImpl(
     typeTraverser,
-    termSelectTraverser,
+    defaultTermSelectTraverser,
     typeListTraverser,
     defaultTermTraverser,
     termApplyTraverser,
@@ -189,7 +189,15 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     defaultInternalTermNameTransformer
   )
 
-  private lazy val defaultTermRefTraverser: TermRefTraverser = termRefTraverser(defaultTermNameTraverser)
+  private lazy val defaultTermRefTraverser: TermRefTraverser = termRefTraverser(
+    defaultTermNameTraverser,
+    defaultTermSelectTraverser
+  )
+
+  private val defaultTermSelectTraverser: TermSelectTraverser = termSelectTraverser(
+    defaultTermTraverser,
+    defaultInternalTermSelectTransformer
+  )
 
   private lazy val defnDefTraverser: DefnDefTraverser = new DefnDefTraverserImpl(
     modListTraverser,
@@ -252,8 +260,18 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     ifTraverser,
     statTraverser,
     termApplyTraverser,
-    termRefTraverser(new TermNameTraverserImpl(expressionTermTraverser, evaluatedInternalTermNameTransformer)),
+    expressionTermRefTraverser,
     defaultTermTraverser
+  )
+
+  private lazy val expressionTermRefTraverser = termRefTraverser(
+    new TermNameTraverserImpl(expressionTermTraverser, evaluatedInternalTermNameTransformer),
+    expressionTermSelectTraverser
+  )
+
+  private lazy val expressionTermSelectTraverser = termSelectTraverser(
+    expressionTermTraverser,
+    evaluatedInternalTermSelectTransformer
   )
 
   private lazy val finallyTraverser: FinallyTraverser = new FinallyTraverserImpl(blockTraverser)
@@ -266,7 +284,10 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
    * On the other hand, other types should be handled as expressions.
    */
   private lazy val funTermTraverser: TermTraverser = new TermRefOverridingTermTraverser(
-    termRefTraverser(new TermNameTraverserImpl(funTermTraverser, defaultInternalTermNameTransformer)),
+    termRefTraverser(
+      new TermNameTraverserImpl(funTermTraverser, defaultInternalTermNameTransformer),
+      termSelectTraverser(funTermTraverser, defaultInternalTermSelectTransformer)
+    ),
     expressionTermTraverser
   )
 
@@ -407,7 +428,10 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
    * On the other hand, other types should be handled regularly - not as expressions.
    */
   private lazy val statTermTraverser: TermTraverser = new TermRefOverridingTermTraverser(
-    termRefTraverser(new TermNameTraverserImpl(statTermTraverser, evaluatedInternalTermNameTransformer)),
+    termRefTraverser(
+      new TermNameTraverserImpl(statTermTraverser, evaluatedInternalTermNameTransformer),
+      termSelectTraverser(statTermTraverser, evaluatedInternalTermSelectTransformer)
+    ),
     defaultTermTraverser
   )
 
@@ -489,7 +513,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val termPlaceholderTraverser: TermPlaceholderTraverser = new TermPlaceholderTraverserImpl
 
-  private def termRefTraverser(termNameTraverser: => TermNameTraverser): TermRefTraverser = {
+  private def termRefTraverser(termNameTraverser: => TermNameTraverser,
+                               termSelectTraverser: => TermSelectTraverser): TermRefTraverser = {
     new TermRefTraverserImpl(
       thisTraverser,
       superTraverser,
@@ -501,14 +526,16 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val termRepeatedTraverser: TermRepeatedTraverser = new TermRepeatedTraverserImpl(expressionTermTraverser)
 
-  private lazy val termSelectTraverser: TermSelectTraverser = new TermSelectTraverserImpl(
-    qualifierTraverser = expressionTermTraverser,
-    transformedTermTraverser = defaultTermTraverser,
-    defaultTermNameTraverser,
-    typeListTraverser,
-    qualifierTypeInferrer,
-    defaultInternalTermSelectTransformer
-  )
+  private def termSelectTraverser(transformedTermTraverser: => TermTraverser,
+                                  internalTermSelectTransformer: => InternalTermSelectTransformer): TermSelectTraverser =
+    new TermSelectTraverserImpl(
+      qualifierTraverser = expressionTermTraverser,
+      transformedTermTraverser = transformedTermTraverser,
+      defaultTermNameTraverser,
+      typeListTraverser,
+      qualifierTypeInferrer,
+      internalTermSelectTransformer
+    )
 
   private lazy val termTupleTraverser: TermTupleTraverser = new TermTupleTraverserImpl(
     termApplyTraverser,

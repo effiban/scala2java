@@ -8,5 +8,5 @@ import java.util.function.*;
 import java.util.stream.*;
 
 public class Sample {
-    public final String x = y.toString;
+    public final String x = y.toString();
 }
