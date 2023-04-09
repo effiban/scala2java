@@ -79,15 +79,6 @@ trait ExtendedTransformers {
    */
   def defnDefTransformer(): DefnDefTransformer = DefnDefTransformer.Identity
 
-  /** Override this method if you need to transform a [[scala.meta.Term.ApplyType]] (parameterized type application) into a
-   * [[scala.meta.Term.Apply]] (method invocation).<br>
-   * @see [[TermApplyTypeToTermApplyTransformer]] for a usage example.
-   *
-   * @return if overriden - a transformer which transforms a [[scala.meta.Term.ApplyType]] into a [[scala.meta.Term.Apply]] where applicable.<br>
-   *         otherwise - the default transformer which never transforms (returns `None`)
-   */
-  def termApplyTypeToTermApplyTransformer(): TermApplyTypeToTermApplyTransformer = TermApplyTypeToTermApplyTransformer.Empty
-
   /** Override this method if you need to transform a [[scala.meta.Term.ApplyInfix]] (infix method invocation) into a
    * [[scala.meta.Term.Apply]] (regular method invocation).<br>
    * '''NOTE regarding precedence''': The output of this transformer, if not empty, will be passed to [[termApplyTransformer]] for additional processing
