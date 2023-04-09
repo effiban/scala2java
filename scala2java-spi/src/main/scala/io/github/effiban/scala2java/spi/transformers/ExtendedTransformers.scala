@@ -116,7 +116,7 @@ trait ExtendedTransformers {
    * @return if overriden - a transformer which modifies a given [[scala.meta.Term.Select]]<br>
    *         otherwise - the default transformer which doesn't modify anything<br>
    */
-  def termSelectTransformer(): TermSelectTransformer = TermSelectTransformer.Identity
+  def termSelectTransformer(): TermSelectTransformer = TermSelectTransformer.Empty
 
   /** Override this method if you need to modify a [[scala.meta.Term.Name]] (identifier) appearing by itself.<br>
    *

@@ -4,22 +4,23 @@ import io.github.effiban.scala2java.core.classifiers.TermNameClassifier
 import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
 import io.github.effiban.scala2java.core.predicates.Predicates
 import io.github.effiban.scala2java.core.typeinference.TypeInferrers
-import io.github.effiban.scala2java.spi.transformers.{TermNameTransformer, TermSelectTransformer}
+import io.github.effiban.scala2java.spi.transformers.TermSelectTransformer
 
 class Transformers(typeInferrers: => TypeInferrers,
                    predicates: => Predicates)
                   (implicit extensionRegistry: ExtensionRegistry) {
 
-  private lazy val compositeTermNameTransformer: TermNameTransformer =
-    new CompositeTermNameTransformer(CoreTermNameTransformer)
-
-  lazy val coreTermSelectTransformer: TermSelectTransformer = new CoreTermSelectTransformer(
+  private lazy val coreTermSelectTransformer: TermSelectTransformer = new CoreTermSelectTransformer(
     TermNameClassifier,
     termSelectTermFunctionTransformer
   )
 
   lazy val defaultInternalTermNameTransformer: InternalTermNameTransformer = new DefaultInternalTermNameTransformer(
-    compositeTermNameTransformer
+    new CompositeTermNameTransformer(CoreTermNameTransformer)
+  )
+
+  lazy val defaultInternalTermSelectTransformer: InternalTermSelectTransformer = new DefaultInternalTermSelectTransformer(
+    new CompositeTermSelectTransformer(coreTermSelectTransformer)
   )
 
   lazy val evaluatedInternalTermNameTransformer: EvaluatedInternalTermNameTransformer = new EvaluatedInternalTermNameTransformer(

@@ -502,11 +502,12 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   private lazy val termRepeatedTraverser: TermRepeatedTraverser = new TermRepeatedTraverserImpl(expressionTermTraverser)
 
   private lazy val termSelectTraverser: TermSelectTraverser = new TermSelectTraverserImpl(
-    expressionTermTraverser,
+    qualifierTraverser = expressionTermTraverser,
+    transformedTermTraverser = defaultTermTraverser,
     defaultTermNameTraverser,
     typeListTraverser,
     qualifierTypeInferrer,
-    new CompositeTermSelectTransformer(coreTermSelectTransformer)
+    defaultInternalTermSelectTransformer
   )
 
   private lazy val termTupleTraverser: TermTupleTraverser = new TermTupleTraverserImpl(
