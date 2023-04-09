@@ -114,19 +114,6 @@ class ExtendedTransformersTest extends UnitTestSuite {
     extensionRegistry.defnDefTransformers shouldBe defnDefTransformers
   }
 
-  test("termApplyTypeToTermApplyTransformers") {
-    val termApplyTypeToTermApplyTransformer1 = mock[TermApplyTypeToTermApplyTransformer]
-    val termApplyTypeToTermApplyTransformer2 = mock[TermApplyTypeToTermApplyTransformer]
-    val termApplyTypeToTermApplyTransformers = List(termApplyTypeToTermApplyTransformer1, termApplyTypeToTermApplyTransformer2)
-
-    when(extension1.termApplyTypeToTermApplyTransformer()).thenReturn(termApplyTypeToTermApplyTransformer1)
-    when(extension2.termApplyTypeToTermApplyTransformer()).thenReturn(termApplyTypeToTermApplyTransformer2)
-
-    val extensionRegistry = ExtensionRegistry(extensions)
-
-    extensionRegistry.termApplyTypeToTermApplyTransformers shouldBe termApplyTypeToTermApplyTransformers
-  }
-
   test("termApplyInfixToTermApplyTransformers") {
     val termApplyInfixToTermApplyTransformer1 = mock[TermApplyInfixToTermApplyTransformer]
     val termApplyInfixToTermApplyTransformer2 = mock[TermApplyInfixToTermApplyTransformer]

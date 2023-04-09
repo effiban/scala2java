@@ -2,7 +2,6 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.TermSelectContext
 import io.github.effiban.scala2java.core.writers.JavaWriter
-import io.github.effiban.scala2java.spi.transformers.TermApplyTypeToTermApplyTransformer
 
 import scala.meta.Term
 import scala.meta.Term.ApplyType
@@ -12,22 +11,13 @@ trait ApplyTypeTraverser extends ScalaTreeTraverser[ApplyType]
 private[traversers] class ApplyTypeTraverserImpl(typeTraverser: => TypeTraverser,
                                                  termSelectTraverser: => TermSelectTraverser,
                                                  typeListTraverser: => TypeListTraverser,
-                                                 defaultTermTraverser: => TermTraverser,
-                                                 termApplyTraverser: => TermApplyTraverser,
-                                                 termApplyTypeToTermTransformer: TermApplyTypeToTermApplyTransformer)
+                                                 defaultTermTraverser: => TermTraverser)
                                                 (implicit javaWriter: JavaWriter) extends ApplyTypeTraverser {
 
   import javaWriter._
 
   // parametrized type application, e.g.: classOf[X], identity[X]
-  override def traverse(termApplyType: ApplyType): Unit = {
-    termApplyTypeToTermTransformer.transform(termApplyType) match {
-      case Some(termApply) => termApplyTraverser.traverse(termApply)
-      case None => traverseOriginal(termApplyType)
-    }
-  }
-
-  private def traverseOriginal(termApplyType: ApplyType): Unit = termApplyType.fun match {
+  override def traverse(termApplyType: ApplyType): Unit = termApplyType.fun match {
     case Term.Name("classOf") => traverseClassOf(termApplyType)
     case termSelect: Term.Select => termSelectTraverser.traverse(termSelect, TermSelectContext(termApplyType.targs))
     case term => traverseUnqualified(termApplyType, term)

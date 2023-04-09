@@ -40,9 +40,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     typeTraverser,
     defaultTermSelectTraverser,
     typeListTraverser,
-    defaultTermTraverser,
-    termApplyTraverser,
-    new CompositeTermApplyTypeToTermApplyTransformer()
+    defaultTermTraverser
   )
 
   private lazy val applyUnaryTraverser: ApplyUnaryTraverser = new ApplyUnaryTraverserImpl(defaultTermNameTraverser, expressionTermTraverser)
