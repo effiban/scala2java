@@ -8,7 +8,7 @@ import scala.meta.Term.ApplyType
 
 trait ApplyTypeTraverser extends ScalaTreeTraverser[ApplyType]
 
-private[traversers] class ApplyTypeTraverserImpl(typeTraverser: => TypeTraverser,
+private[traversers] class ApplyTypeTraverserImpl(classOfTraverser: => ClassOfTraverser,
                                                  termSelectTraverser: => TermSelectTraverser,
                                                  typeListTraverser: => TypeListTraverser,
                                                  defaultTermTraverser: => TermTraverser)
@@ -18,18 +18,9 @@ private[traversers] class ApplyTypeTraverserImpl(typeTraverser: => TypeTraverser
 
   // parametrized type application, e.g.: classOf[X], identity[X]
   override def traverse(termApplyType: ApplyType): Unit = termApplyType.fun match {
-    case Term.Name("classOf") => traverseClassOf(termApplyType)
+    case Term.Name("classOf") => classOfTraverser.traverse(termApplyType.targs)
     case termSelect: Term.Select => termSelectTraverser.traverse(termSelect, TermSelectContext(termApplyType.targs))
     case term => traverseUnqualified(termApplyType, term)
-  }
-
-  private def traverseClassOf(termApplyType: ApplyType): Unit = {
-    termApplyType.targs match {
-      case arg :: _ =>
-        typeTraverser.traverse(arg)
-        write(".class")
-      case _ => write(s"UNPARSEABLE class type: $termApplyType")
-    }
   }
 
   private def traverseUnqualified(termApplyType: ApplyType, term: Term): Unit = {
