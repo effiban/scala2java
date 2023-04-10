@@ -145,10 +145,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     new CompositeInvocationArgByNamePredicate(CoreInvocationArgByNamePredicate)
   )
 
-  private lazy val defaultMainApplyTypeTraverser: MainApplyTypeTraverser = new MainApplyTypeTraverserImpl(
-    classOfTraverser,
-    defaultStandardApplyTypeTraverser
-  )
+  private lazy val defaultMainApplyTypeTraverser: MainApplyTypeTraverser = mainApplyTypeTraverser(defaultStandardApplyTypeTraverser)
 
   private lazy val defaultStandardApplyTypeTraverser: StandardApplyTypeTraverser = new DefaultStandardApplyTypeTraverser(
     defaultTermSelectTraverser,
@@ -284,14 +281,16 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val forYieldTraverser: ForYieldTraverser = new ForYieldTraverserImpl(termApplyTraverser, ForYieldToTermApplyTransformer)
 
-  /** When a method name is a Term.Ref we need to make sure that no desugaring is performed to aovid infinite recursion.
-   * On the other hand, other types should be handled as expressions.
+  /** When a term has already been identified as a 'fun' (function name), and it is a Term.Ref or Term.ApplyType -
+   * we need to apply the default traversal, to make sure no desugaring to Term.Apply is performed (which would cause an infinite recursion).
+   * Otherwise, it should be traversed as an evaluated expression
    */
-  private lazy val funTermTraverser: TermTraverser = new TermRefOverridingTermTraverser(
+  private lazy val funTermTraverser: TermTraverser = new FunOverridingTermTraverser(
     termRefTraverser(
       new TermNameTraverserImpl(funTermTraverser, defaultInternalTermNameTransformer),
       termSelectTraverser(funTermTraverser, defaultInternalTermSelectTransformer)
     ),
+    defaultMainApplyTypeTraverser,
     expressionTermTraverser
   )
 
@@ -321,6 +320,12 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   )
 
   private lazy val litTraverser: LitTraverser = new LitTraverserImpl()
+
+  private def mainApplyTypeTraverser(standardApplyTypeTraverser: StandardApplyTypeTraverser): MainApplyTypeTraverser =
+    new MainApplyTypeTraverserImpl(
+      classOfTraverser,
+      standardApplyTypeTraverser
+    )
 
   private lazy val modListTraverser: ModListTraverser = new ModListTraverserImpl(annotListTraverser, JavaModifiersResolver)
 
@@ -428,13 +433,16 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     declTraverser
   )
 
-  /** When a Stat is a Term.Ref, we need to allow for possible desugaring.
-   * On the other hand, other types should be handled regularly - not as expressions.
+  /** When a Stat is a Term.Ref or Term.ApplyType, we need to allow for a possible desugaring into a Term.Apply.
+   * Otherwise, the default traversal should be applied.
    */
-  private lazy val statTermTraverser: TermTraverser = new TermRefOverridingTermTraverser(
+  private lazy val statTermTraverser: TermTraverser = new FunOverridingTermTraverser(
     termRefTraverser(
       new TermNameTraverserImpl(statTermTraverser, evaluatedInternalTermNameTransformer),
       termSelectTraverser(statTermTraverser, evaluatedInternalTermSelectTransformer)
+    ),
+    mainApplyTypeTraverser(
+      new EvaluatedStandardApplyTypeTraverser(termApplyTraverser, defaultStandardApplyTypeTraverser)
     ),
     defaultTermTraverser
   )
