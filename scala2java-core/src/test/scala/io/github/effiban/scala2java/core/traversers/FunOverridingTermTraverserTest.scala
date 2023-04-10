@@ -5,17 +5,21 @@ import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.XtensionQuasiquoteTerm
 
-class TermRefOverridingTermTraverserTest extends UnitTestSuite {
+class FunOverridingTermTraverserTest extends UnitTestSuite {
 
-  private val termTraverser = mock[TermTraverser]
   private val termRefTraverser = mock[TermRefTraverser]
+  private val mainApplyTypeTraverser = mock[MainApplyTypeTraverser]
+  private val termTraverser = mock[TermTraverser]
 
-  private val termRefOverridingTermTraverser = new TermRefOverridingTermTraverser(termRefTraverser, termTraverser)
+  private val funOverridingTermTraverser = new FunOverridingTermTraverser(
+    termRefTraverser,
+    mainApplyTypeTraverser,
+    termTraverser)
 
   test("traverse() when fun is a Term.Name should call the overriding TermRefTraverser") {
     val fun = q"abc"
 
-    termRefOverridingTermTraverser.traverse(fun)
+    funOverridingTermTraverser.traverse(fun)
 
     verify(termRefTraverser).traverse(eqTree(fun))
   }
@@ -23,23 +27,23 @@ class TermRefOverridingTermTraverserTest extends UnitTestSuite {
   test("traverse() when fun is a Term.Select should call the overriding TermRefTraverser") {
     val fun = q"A.a"
 
-    termRefOverridingTermTraverser.traverse(fun)
+    funOverridingTermTraverser.traverse(fun)
 
     verify(termRefTraverser).traverse(eqTree(fun))
+  }
+
+  test("traverse() when fun is a Term.ApplyType should call the overriding MainApplyTypeTraverser") {
+    val fun = q"a[Int]"
+
+    funOverridingTermTraverser.traverse(fun)
+
+    verify(mainApplyTypeTraverser).traverse(eqTree(fun))
   }
 
   test("traverse() when fun is a Term.Apply should call the TermTraverser") {
     val fun = q"a(1)"
 
-    termRefOverridingTermTraverser.traverse(fun)
-
-    verify(termTraverser).traverse(eqTree(fun))
-  }
-
-  test("traverse() when fun is a Term.ApplyType should call the TermTraverser") {
-    val fun = q"a[Int]"
-
-    termRefOverridingTermTraverser.traverse(fun)
+    funOverridingTermTraverser.traverse(fun)
 
     verify(termTraverser).traverse(eqTree(fun))
   }
@@ -47,7 +51,7 @@ class TermRefOverridingTermTraverserTest extends UnitTestSuite {
   test("traverse() when fun is a Term.ApplyInfix should call the TermTraverser") {
     val fun = q"a + b"
 
-    termRefOverridingTermTraverser.traverse(fun)
+    funOverridingTermTraverser.traverse(fun)
 
     verify(termTraverser).traverse(eqTree(fun))
   }
