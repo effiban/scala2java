@@ -57,6 +57,7 @@ object TermNames {
   val ScalaFailed: Term.Name = Term.Name("failed")
   val ScalaVector: Term.Name = Term.Name("Vector")
   val ScalaNil: Term.Name = Term.Name("Nil")
+  val ScalaClassOf: Term.Name = Term.Name("classOf")
 
   val Java: Term.Name = Term.Name("java")
   val JavaIntStream: Term.Name = Term.Name("IntStream")

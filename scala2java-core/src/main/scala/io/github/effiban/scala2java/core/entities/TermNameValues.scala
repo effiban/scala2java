@@ -59,6 +59,7 @@ object TermNameValues {
   final val ScalaTo = "to"
   final val ScalaUntil = "until"
   final val ScalaAssociate = "->"
+  final val ScalaClassOf = "classOf"
 
   final val Java = "java"
   final val JavaIntStream = "IntStream"
