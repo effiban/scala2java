@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.classifiers.TermNameClassifier
 import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
 import io.github.effiban.scala2java.core.predicates.Predicates
 import io.github.effiban.scala2java.core.typeinference.TypeInferrers
-import io.github.effiban.scala2java.spi.transformers.{TermApplyTransformer, TermSelectTransformer}
+import io.github.effiban.scala2java.spi.transformers.TermApplyTransformer
 
 class Transformers(typeInferrers: => TypeInferrers,
                    predicates: => Predicates)
@@ -15,17 +15,12 @@ class Transformers(typeInferrers: => TypeInferrers,
     termSelectTermFunctionTransformer
   )
 
-  private lazy val coreTermSelectTransformer: TermSelectTransformer = new CoreTermSelectTransformer(
-    TermNameClassifier,
-    termSelectTermFunctionTransformer
-  )
-
   lazy val defaultInternalTermNameTransformer: InternalTermNameTransformer = new DefaultInternalTermNameTransformer(
     new CompositeTermNameTransformer(CoreTermNameTransformer)
   )
 
   lazy val defaultInternalTermSelectTransformer: InternalTermSelectTransformer = new DefaultInternalTermSelectTransformer(
-    new CompositeTermSelectTransformer(coreTermSelectTransformer)
+    new CompositeTermSelectTransformer(CoreTermSelectTransformer)
   )
 
   lazy val evaluatedInternalTermNameTransformer: EvaluatedInternalTermNameTransformer = new EvaluatedInternalTermNameTransformer(
@@ -33,14 +28,14 @@ class Transformers(typeInferrers: => TypeInferrers,
     predicates.compositeTermNameSupportsNoArgInvocation
   )
 
-  lazy val internalTermApplyTransformer: InternalTermApplyTransformer = new InternalTermApplyTransformerImpl(
-    new CompositeTermApplyTransformer(coreTermApplyTransformer),
-    TermNameClassifier
-  )
-
   lazy val evaluatedInternalTermSelectTransformer: EvaluatedInternalTermSelectTransformer = new EvaluatedInternalTermSelectTransformer(
     defaultInternalTermSelectTransformer,
     predicates.compositeTermSelectSupportsNoArgInvocation
+  )
+
+  lazy val internalTermApplyTransformer: InternalTermApplyTransformer = new InternalTermApplyTransformerImpl(
+    new CompositeTermApplyTransformer(coreTermApplyTransformer),
+    TermNameClassifier
   )
 
   private lazy val termSelectTermFunctionTransformer: TermSelectTermFunctionTransformer = new TermSelectTermFunctionTransformerImpl(

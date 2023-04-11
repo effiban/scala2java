@@ -27,6 +27,8 @@ object TypeNames {
 
   val Function: Type.Name = t"Function"
 
+  val Throwable: Type.Name = t"Throwable"
+
   val ScalaArray: Type.Name = Type.Name("Array")
   val ScalaOption: Type.Name = Type.Name("Option")
   val ScalaAny: Type.Name = Type.Name("Any")
