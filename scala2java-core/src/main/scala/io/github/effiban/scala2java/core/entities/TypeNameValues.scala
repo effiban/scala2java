@@ -15,6 +15,7 @@ object TypeNameValues {
   final val Set = "Set"
   final val Stream = "Stream"
   final val Try = "Try"
+  final val Class = "Class"
 
   final val ScalaAny = "Any"
   final val ScalaArray = "Array"

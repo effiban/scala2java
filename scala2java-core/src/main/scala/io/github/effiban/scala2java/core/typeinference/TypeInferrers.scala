@@ -20,10 +20,7 @@ class TypeInferrers(factories: => Factories,
     internalApplyDeclDefInferrer
   )
 
-  private[typeinference] lazy val applyTypeTypeInferrer = new ApplyTypeTypeInferrerImpl(
-    applyReturnTypeInferrer,
-    compositeTermNameHasApplyMethod
-  )
+  private[typeinference] lazy val applyTypeTypeInferrer = new ApplyTypeTypeInferrerImpl(applyReturnTypeInferrer)
 
   private[typeinference] lazy val blockTypeInferrer = new BlockTypeInferrerImpl(termTypeInferrer)
 
