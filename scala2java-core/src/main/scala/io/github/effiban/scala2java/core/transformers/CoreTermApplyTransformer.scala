@@ -16,6 +16,11 @@ private[transformers] class CoreTermApplyTransformer(termNameClassifier: TermNam
           .map(transformedSelect => Term.Apply(transformedSelect, args))
           .getOrElse(termApply)
 
+      case Term.Apply(Term.ApplyType(termSelect: Term.Select, targs), args) =>
+        transformQualifiedMethodName(termSelect)
+          .map(transformedSelect => Term.Apply(Term.ApplyType(transformedSelect, targs), args))
+          .getOrElse(termApply)
+
       case _ => termApply
     }
   }
@@ -42,7 +47,7 @@ private[transformers] class CoreTermApplyTransformer(termNameClassifier: TermNam
       case (Term.Name(Future), Term.Name(ScalaSuccessful)) => Some(Term.Select(Term.Name(JavaCompletableFuture), Term.Name(JavaCompletedFuture)))
       case (Term.Name(Future), Term.Name(ScalaFailed)) => Some(Term.Select(Term.Name(JavaCompletableFuture), Term.Name(JavaFailedFuture)))
 
-      case (nm: Term.Name, Term.Name(Apply)) if termNameClassifier.isJavaStreamLike(nm) => Some(Term.Select(Term.Name(Stream), Term.Name(JavaOf)))
+      case (nm: Term.Name, Term.Name(Apply) | Term.Name(Empty)) if termNameClassifier.isJavaStreamLike(nm) => Some(Term.Select(Term.Name(Stream), Term.Name(JavaOf)))
       case (nm: Term.Name, Term.Name(Apply) | Term.Name(Empty)) if termNameClassifier.isJavaListLike(nm) => Some(Term.Select(Term.Name(List), Term.Name(JavaOf)))
       case (nm: Term.Name, Term.Name(Apply) | Term.Name(Empty)) if termNameClassifier.isJavaSetLike(nm) => Some(Term.Select(Term.Name(Set), Term.Name(JavaOf)))
       case (nm: Term.Name, Term.Name(Apply)) if termNameClassifier.isJavaMapLike(nm) => Some(Term.Select(Term.Name(Map), Term.Name(JavaOfEntries)))
