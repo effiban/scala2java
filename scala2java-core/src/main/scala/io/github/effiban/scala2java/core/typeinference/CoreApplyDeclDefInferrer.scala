@@ -47,15 +47,19 @@ private[typeinference] class CoreApplyDeclDefInferrer(initializerDeclDefInferrer
 
 
   private def inferOther(termApply: Term.Apply, context: TermApplyInferenceContext) = {
-    val maybeReturnType = termApply.fun match {
-      case Term.ApplyType(Term.Select(Term.Name(TermNameValues.Future), Term.Name(ScalaFailed)), List(tpe)) =>
+    val maybeReturnType = (termApply.fun, context) match {
+      case (Term.ApplyType(Term.Select(Term.Name(TermNameValues.Future), Term.Name(ScalaFailed)), List(tpe)), _) =>
         Some(Type.Apply(Type.Name(TypeNameValues.Future), List(tpe)))
 
-      case Term.Select(Term.Name(TermNameValues.Future), Term.Name(ScalaFailed)) =>
+      case (Term.Select(Term.Name(TermNameValues.Future), Term.Name(ScalaFailed)), _) =>
         Some(Type.Apply(Type.Name(TypeNameValues.Future), List(Type.Name(ScalaAny))))
-      case Term.Select(_, q"toString") => Some(Type.Name(TypeNameValues.String))
 
-      case Term.Name(Print) | Term.Name(Println) => Some(Type.Name(ScalaUnit))
+      case (Term.Select(_, q"take"), TermApplyInferenceContext(Some(listType@Type.Apply(Type.Name(TypeNameValues.List), _)), _)) =>
+        Some(listType)
+
+      case (Term.Select(_, q"toString"), _) => Some(Type.Name(TypeNameValues.String))
+
+      case (Term.Name(Print) | Term.Name(Println), _) => Some(Type.Name(ScalaUnit))
 
       // TODO add more
       case _ => None
