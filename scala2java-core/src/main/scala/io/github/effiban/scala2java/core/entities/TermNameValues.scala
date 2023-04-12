@@ -61,6 +61,8 @@ object TermNameValues {
   final val ScalaAssociate = "->"
   final val ScalaClassOf = "classOf"
 
+  final val ScalaTupleElementRegex = "_(\\d)".r
+
   final val Java = "java"
   final val JavaIntStream = "IntStream"
   final val JavaRange = "range"
