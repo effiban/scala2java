@@ -247,6 +247,21 @@ class CoreApplyDeclDefInferrerTest extends UnitTestSuite {
     )
   }
 
+  test("infer List(1, 2).take(1)") {
+    val termApply = q"List(1, 2).take(1)"
+
+    val parentType = Type.Apply(TypeNames.List, List(TypeNames.Int))
+    val argTypes = List(TypeNames.Int, TypeNames.Int)
+    val maybeArgTypes = argTypes.map(Some(_))
+    val context = TermApplyInferenceContext(maybeParentType = Some(parentType), maybeArgTypes = maybeArgTypes)
+
+    val expectedReturnType = parentType
+
+    coreApplyDeclDefInferrer.infer(termApply, context) should equalPartialDeclDef(
+      PartialDeclDef(maybeParamTypes = maybeArgTypes, maybeReturnType = Some(expectedReturnType))
+    )
+  }
+
   test("infer x.toString()") {
     coreApplyDeclDefInferrer.infer(q"x.toString()", TermApplyInferenceContext()) should equalPartialDeclDef(
       PartialDeclDef(maybeReturnType = Some(TypeNames.String))
