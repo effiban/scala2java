@@ -8,7 +8,7 @@ import scala.meta.Term.ApplyType
 
 private[traversers] class DefaultStandardApplyTypeTraverser(termSelectTraverser: => TermSelectTraverser,
                                                             typeListTraverser: => TypeListTraverser,
-                                                            defaultTermTraverser: => TermTraverser)
+                                                            unqualifiedTermTraverser: => TermTraverser)
                                                            (implicit javaWriter: JavaWriter) extends StandardApplyTypeTraverser {
 
   import javaWriter._
@@ -24,6 +24,6 @@ private[traversers] class DefaultStandardApplyTypeTraverser(termSelectTraverser:
     writeComment("this?")
     writeQualifierSeparator()
     typeListTraverser.traverse(termApplyType.targs)
-    defaultTermTraverser.traverse(term)
+    unqualifiedTermTraverser.traverse(term)
   }
 }

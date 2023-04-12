@@ -13,13 +13,13 @@ class DefaultStandardApplyTypeTraverserTest extends UnitTestSuite {
 
   private val termSelectTraverser = mock[TermSelectTraverser]
   private val typeListTraverser = mock[TypeListTraverser]
-  private val defaultTermTraverser = mock[TermTraverser]
+  private val unqualifiedTermTraverser = mock[TermTraverser]
   private val termApplyTraverser = mock[TermApplyTraverser]
 
   private val defaultStandardApplyTypeTraverser = new DefaultStandardApplyTypeTraverser(
     termSelectTraverser,
     typeListTraverser,
-    defaultTermTraverser
+    unqualifiedTermTraverser
   )
 
   test("traverse() when function is a 'Select', should traverse properly") {
@@ -32,14 +32,14 @@ class DefaultStandardApplyTypeTraverserTest extends UnitTestSuite {
 
     outputWriter.toString shouldBe "myObj<T1, T2>.myFunc"
 
-    verifyNoMoreInteractions(defaultTermTraverser, termApplyTraverser)
+    verifyNoMoreInteractions(unqualifiedTermTraverser, termApplyTraverser)
   }
 
   test("traverse() when function is a 'Term.Name', should prefix with a commented 'this'") {
     val fun = Term.Name("myFunc1")
     val typeArgs = List(Type.Name("T1"), Type.Name("T2"))
 
-    doWrite("myFunc").when(defaultTermTraverser).traverse(eqTree(fun))
+    doWrite("myFunc").when(unqualifiedTermTraverser).traverse(eqTree(fun))
     doWrite("<T1, T2>").when(typeListTraverser).traverse(eqTreeList(typeArgs))
 
     defaultStandardApplyTypeTraverser.traverse(Term.ApplyType(fun = fun, targs = typeArgs))
