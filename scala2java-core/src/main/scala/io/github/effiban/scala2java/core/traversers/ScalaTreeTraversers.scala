@@ -265,6 +265,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     statTraverser,
     termApplyTraverser,
     expressionTermRefTraverser,
+    expressionMainApplyTypeTraverser,
     defaultTermTraverser
   )
 
