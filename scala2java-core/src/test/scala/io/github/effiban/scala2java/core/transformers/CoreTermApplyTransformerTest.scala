@@ -4,12 +4,15 @@ import io.github.effiban.scala2java.core.classifiers.TermNameClassifier
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TermNames.{Apply, Empty, Future, JavaAbsent, JavaCompletableFuture, JavaCompletedFuture, JavaFailedFuture, JavaFailure, JavaIntStream, JavaOf, JavaOfNullable, JavaOfSupplier, JavaOptional, JavaRange, JavaRangeClosed, JavaSuccess, JavaSupplyAsync, LowercaseLeft, LowercaseRight, ScalaFailed, ScalaFailure, ScalaInclusive, ScalaLeft, ScalaOption, ScalaRange, ScalaRight, ScalaSome, ScalaSuccess, ScalaSuccessful, Try}
 import io.github.effiban.scala2java.core.testtrees.{TermNames, TypeNames}
+import io.github.effiban.scala2java.spi.contexts.TermApplyTransformationContext
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.{Term, XtensionQuasiquoteTerm}
+import scala.meta.{Term, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 
 class CoreTermApplyTransformerTest extends UnitTestSuite {
+  
+  private val Context = TermApplyTransformationContext(maybeParentType = Some(t"Parent"))
 
   private val termNameClassifier = mock[TermNameClassifier]
   private val termSelectTermFunctionTransformer = mock[TermSelectTermFunctionTransformer]
@@ -21,7 +24,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
     val scalaTermApply = Term.Apply(Term.Select(ScalaRange, Apply), args)
     val expectedJavaTermApply = Term.Apply(Term.Select(JavaIntStream, JavaRange), args)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Range.inclusive(1, 10)' should return 'IntStream.rangeClosed(1, 10)'") {
@@ -29,7 +32,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
     val scalaTermApply = Term.Apply(Term.Select(ScalaRange, ScalaInclusive), args)
     val expectedJavaTermApply = Term.Apply(Term.Select(JavaIntStream, JavaRangeClosed), args)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Option.apply(1)' should return 'Optional.ofNullable(1)'") {
@@ -37,7 +40,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
     val scalaTermApply = Term.Apply(Term.Select(ScalaOption, Apply), args)
     val expectedJavaTermApply = Term.Apply(Term.Select(JavaOptional, JavaOfNullable), args)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Option.apply[Int](1)' should return 'Optional.ofNullable[Int](1)'") {
@@ -50,14 +53,14 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
       Term.ApplyType(Term.Select(JavaOptional, JavaOfNullable), typeArgs),
       args)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Option.empty()' should return 'Optional.absent()'") {
     val scalaTermApply = Term.Apply(Term.Select(ScalaOption, Empty), Nil)
     val expectedJavaTermApply = Term.Apply(Term.Select(JavaOptional, JavaAbsent), Nil)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Option.empty[Int]()' should return 'Optional.absent[Int]()'") {
@@ -65,7 +68,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
     val scalaTermApply = Term.Apply(Term.ApplyType(Term.Select(ScalaOption, Empty), typeArgs), Nil)
     val expectedJavaTermApply = Term.Apply(Term.ApplyType(Term.Select(JavaOptional, JavaAbsent), typeArgs), Nil)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Some.apply(1)' should return 'Optional.of(1)'") {
@@ -73,7 +76,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
     val scalaTermApply = Term.Apply(Term.Select(ScalaSome, Apply), args)
     val expectedJavaTermApply = Term.Apply(Term.Select(JavaOptional, JavaOf), args)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Some.apply[Int](1)' should return 'Optional.of[Int](1)'") {
@@ -82,7 +85,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
     val scalaTermApply = Term.Apply(Term.ApplyType(Term.Select(ScalaSome, Apply), typeArgs), args)
     val expectedJavaTermApply = Term.Apply(Term.ApplyType(Term.Select(JavaOptional, JavaOf), typeArgs), args)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Right.apply(1)' should return 'Either.right(1)'") {
@@ -90,7 +93,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
     val scalaTermApply = Term.Apply(Term.Select(ScalaRight, Apply), args)
     val expectedJavaTermApply = Term.Apply(Term.Select(TermNames.Either, LowercaseRight), args)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Right.apply[Throwable, Int](1)' should return 'Either.right[Throwable, Int](1)'") {
@@ -99,7 +102,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
     val scalaTermApply = Term.Apply(Term.ApplyType(Term.Select(ScalaRight, Apply), typeArgs), args)
     val expectedJavaTermApply = Term.Apply(Term.ApplyType(Term.Select(TermNames.Either, LowercaseRight), typeArgs), args)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("""transform 'Left.apply("error")' should return 'Either.left("error")'""") {
@@ -107,7 +110,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
     val scalaTermApply = Term.Apply(Term.Select(ScalaLeft, Apply), args)
     val expectedJavaTermApply = Term.Apply(Term.Select(TermNames.Either, LowercaseLeft), args)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("""transform 'Left.apply[String, Int]("error")' should return 'Either.left[String, Int]("error")'""") {
@@ -116,7 +119,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
     val scalaTermApply = Term.Apply(Term.ApplyType(Term.Select(ScalaLeft, Apply), typeArgs), args)
     val expectedJavaTermApply = Term.Apply(Term.ApplyType(Term.Select(TermNames.Either, LowercaseLeft), typeArgs), args)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Try.apply(1)' should return 'Try.ofSupplier(1)'") {
@@ -124,7 +127,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
     val scalaTermApply = Term.Apply(Term.Select(Try, Apply), args)
     val expectedJavaTermApply = Term.Apply(Term.Select(Try, JavaOfSupplier), args)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Try.apply[Int](1)' should return 'Try.ofSupplier[Int](1)'") {
@@ -133,7 +136,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
     val scalaTermApply = Term.Apply(Term.ApplyType(Term.Select(Try, Apply), typeArgs), args)
     val expectedJavaTermApply = Term.Apply(Term.ApplyType(Term.Select(Try, JavaOfSupplier), typeArgs), args)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Success.apply(1)' should return 'Try.success(1)'") {
@@ -141,7 +144,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
     val scalaTermApply = Term.Apply(Term.Select(ScalaSuccess, Apply), args)
     val expectedJavaTermApply = Term.Apply(Term.Select(Try, JavaSuccess), args)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Success.apply[Int](1)' should return 'Try.success[Int](1)'") {
@@ -150,7 +153,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
     val scalaTermApply = Term.Apply(Term.ApplyType(Term.Select(ScalaSuccess, Apply), typeArgs), args)
     val expectedJavaTermApply = Term.Apply( Term.ApplyType(Term.Select(Try, JavaSuccess), typeArgs), args)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Failure.apply(new RuntimeException())' should return 'Try.failure(new RuntimeException())'") {
@@ -158,7 +161,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
     val scalaTermApply = Term.Apply(Term.Select(ScalaFailure, Apply), args)
     val expectedJavaTermApply = Term.Apply(Term.Select(Try, JavaFailure), args)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Failure.apply[Int](new RuntimeException())' should return 'Try.failure[Int](new RuntimeException())'") {
@@ -167,7 +170,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
     val scalaTermApply = Term.Apply(Term.ApplyType(Term.Select(ScalaFailure, Apply), typeArgs), args)
     val expectedJavaTermApply = Term.Apply(Term.ApplyType(Term.Select(Try, JavaFailure), typeArgs), args)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Future.apply(1)' should return 'CompletableFuture.supplyAsync(1)'") {
@@ -175,7 +178,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
     val scalaTermApply = Term.Apply(Term.Select(TermNames.Future, Apply), args)
     val expectedJavaTermApply = Term.Apply(Term.Select(JavaCompletableFuture, JavaSupplyAsync), args)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Future.apply[Int](1)' should return 'CompletableFuture.supplyAsync[Int](1)'") {
@@ -184,7 +187,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
     val scalaTermApply = Term.Apply(Term.ApplyType(Term.Select(TermNames.Future, Apply), typeArgs), args)
     val expectedJavaTermApply = Term.Apply(Term.ApplyType(Term.Select(JavaCompletableFuture, JavaSupplyAsync), typeArgs), args)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Future.successful(1)' should return 'CompletableFuture.completedFuture(1)'") {
@@ -192,7 +195,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
     val scalaTermApply = Term.Apply(Term.Select(Future, ScalaSuccessful), args)
     val expectedJavaTermApply = Term.Apply(Term.Select(JavaCompletableFuture, JavaCompletedFuture), args)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Future.successful[Int](1)' should return 'CompletableFuture.completedFuture[Int](1)'") {
@@ -201,7 +204,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
     val scalaTermApply = Term.Apply(Term.ApplyType(Term.Select(Future, ScalaSuccessful), typeArgs), args)
     val expectedJavaTermApply = Term.Apply(Term.ApplyType(Term.Select(JavaCompletableFuture, JavaCompletedFuture), typeArgs), args)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("""transform 'Future.failed("error")' should return 'CompletableFuture.failedFuture("error")'""") {
@@ -209,7 +212,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
     val scalaTermApply = Term.Apply(Term.Select(Future, ScalaFailed), args)
     val expectedJavaTermApply = Term.Apply(Term.Select(JavaCompletableFuture, JavaFailedFuture), args)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("""transform 'Future.failed[Int]("error")' should return 'CompletableFuture.failedFuture[Int]("error")'""") {
@@ -218,7 +221,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
     val scalaTermApply = Term.Apply(Term.ApplyType(Term.Select(Future, ScalaFailed), typeArgs), args)
     val expectedJavaTermApply = Term.Apply(Term.ApplyType(Term.Select(JavaCompletableFuture, JavaFailedFuture), typeArgs), args)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Stream.apply(1, 2)' should return 'Stream.of(1, 2)'") {
@@ -228,7 +231,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
 
     when(termNameClassifier.isJavaStreamLike(eqTree(TermNames.Stream))).thenReturn(true)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Stream.apply[Int](1, 2)' should return 'Stream.of[Int](1, 2)'") {
@@ -239,7 +242,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
 
     when(termNameClassifier.isJavaStreamLike(eqTree(TermNames.Stream))).thenReturn(true)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Stream.empty()' should return 'Stream.of()'") {
@@ -248,7 +251,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
 
     when(termNameClassifier.isJavaStreamLike(eqTree(TermNames.Stream))).thenReturn(true)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Stream.empty[Int]()' should return 'Stream.of[Int]()'") {
@@ -258,7 +261,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
 
     when(termNameClassifier.isJavaStreamLike(eqTree(TermNames.Stream))).thenReturn(true)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Seq.apply(1, 2)' should return 'List.of(1, 2)'") {
@@ -268,7 +271,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
 
     when(termNameClassifier.isJavaListLike(eqTree(TermNames.Seq))).thenReturn(true)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Seq.apply[Int](1, 2)' should return 'List.of[Int](1, 2)'") {
@@ -279,7 +282,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
 
     when(termNameClassifier.isJavaListLike(eqTree(TermNames.Seq))).thenReturn(true)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Seq.empty()' should return 'List.of()'") {
@@ -288,7 +291,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
 
     when(termNameClassifier.isJavaListLike(eqTree(TermNames.Seq))).thenReturn(true)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Seq.empty[Int]()' should return 'List.of[Int]()'") {
@@ -298,7 +301,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
 
     when(termNameClassifier.isJavaListLike(eqTree(TermNames.Seq))).thenReturn(true)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Set.apply(1, 2)' should return 'Set.of(1, 2)'") {
@@ -308,7 +311,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
 
     when(termNameClassifier.isJavaSetLike(eqTree(TermNames.Set))).thenReturn(true)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Set.apply[Int](1, 2)' should return 'Set.of[Int](1, 2)'") {
@@ -319,7 +322,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
 
     when(termNameClassifier.isJavaSetLike(eqTree(TermNames.Set))).thenReturn(true)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Set.empty()' should return 'Set.of()'") {
@@ -328,7 +331,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
 
     when(termNameClassifier.isJavaSetLike(eqTree(TermNames.Set))).thenReturn(true)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Set.empty[Int]()' should return 'Set.of[Int]()'") {
@@ -338,7 +341,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
 
     when(termNameClassifier.isJavaSetLike(eqTree(TermNames.Set))).thenReturn(true)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("""transform 'Map.apply(("a", 1), ("b", 2))' should return 'Map.ofEntries(("a", 1), ("b", 2))'""") {
@@ -348,7 +351,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
 
     when(termNameClassifier.isJavaMapLike(eqTree(TermNames.Map))).thenReturn(true)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("""transform 'Map.apply[String, Int](("a", 1), ("b", 2))' should return 'Map.ofEntries[String, Int](("a", 1), ("b", 2))'""") {
@@ -359,7 +362,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
 
     when(termNameClassifier.isJavaMapLike(eqTree(TermNames.Map))).thenReturn(true)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Map.empty()' should return 'Map.of()'") {
@@ -368,7 +371,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
 
     when(termNameClassifier.isJavaMapLike(eqTree(TermNames.Map))).thenReturn(true)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform 'Map.empty[String, Int]()' should return 'Map.of[String, Int]()'") {
@@ -378,7 +381,7 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
 
     when(termNameClassifier.isJavaMapLike(eqTree(TermNames.Map))).thenReturn(true)
 
-    termApplyTransformer.transform(scalaTermApply).structure shouldBe expectedJavaTermApply.structure
+    termApplyTransformer.transform(scalaTermApply, Context).structure shouldBe expectedJavaTermApply.structure
   }
 
   test("transform a 'Term.Function' (lambda) with a method name, should return result of 'TermSelectTermFunctionTransformer'") {
