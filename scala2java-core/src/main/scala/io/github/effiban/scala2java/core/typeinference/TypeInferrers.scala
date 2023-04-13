@@ -5,7 +5,6 @@ import io.github.effiban.scala2java.core.entities.ParameterizedInitializerNameTy
 import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
 import io.github.effiban.scala2java.core.factories.Factories
 import io.github.effiban.scala2java.core.predicates._
-import io.github.effiban.scala2java.spi.predicates.TermNameHasApplyMethod
 
 class TypeInferrers(factories: => Factories,
                     predicates: => Predicates)
@@ -30,9 +29,6 @@ class TypeInferrers(factories: => Factories,
 
   lazy val compositeCollectiveTypeInferrer = new CompositeCollectiveTypeInferrerImpl(CollectiveTypeInferrer)
 
-  private[typeinference] lazy val compositeTermNameHasApplyMethod: TermNameHasApplyMethod =
-    new CompositeTermNameHasApplyMethod(CoreTermNameHasApplyMethod)
-
   private[typeinference] lazy val coreApplyDeclDefInferrer = new CoreApplyDeclDefInferrer(
     parameterizedInitializerDeclDefInferrer,
     CompositeTypeClassifier
@@ -44,7 +40,7 @@ class TypeInferrers(factories: => Factories,
 
   lazy val internalApplyDeclDefInferrer: InternalApplyDeclDefInferrer = new InternalApplyDeclDefInferrerImpl(
     new CompositeApplyDeclDefInferrer(coreApplyDeclDefInferrer),
-    compositeTermNameHasApplyMethod
+    predicates.compositeTermNameHasApplyMethod
   )
 
   private[typeinference] lazy val internalNameTypeInferrer = new InternalNameTypeInferrerImpl(
