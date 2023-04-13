@@ -23,6 +23,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   private lazy val resolvers = new Resolvers()
   private lazy val predicates = new Predicates()
 
+  import factories._
   import resolvers._
   import transformers._
   import typeInferrers._
@@ -484,6 +485,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     arrayInitializerTraverser,
     argumentListTraverser,
     compositeInvocationArgTraverser,
+    termApplyTransformationContextFactory,
     ArrayInitializerContextResolver,
     internalTermApplyTransformer
   )

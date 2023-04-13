@@ -8,4 +8,9 @@ class Factories(typeInferrers: => TypeInferrers) {
     typeInferrers.applyParentTypeInferrer,
     typeInferrers.termTypeInferrer,
   )
+
+  lazy val termApplyTransformationContextFactory: TermApplyTransformationContextFactory = new TermApplyTransformationContextFactoryImpl(
+    termApplyInferenceContextFactory,
+    typeInferrers.internalApplyDeclDefInferrer
+  )
 }

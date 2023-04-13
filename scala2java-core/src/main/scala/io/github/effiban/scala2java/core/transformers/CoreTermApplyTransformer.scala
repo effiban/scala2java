@@ -2,6 +2,7 @@ package io.github.effiban.scala2java.core.transformers
 
 import io.github.effiban.scala2java.core.classifiers.TermNameClassifier
 import io.github.effiban.scala2java.core.entities.TermNameValues._
+import io.github.effiban.scala2java.spi.contexts.TermApplyTransformationContext
 import io.github.effiban.scala2java.spi.transformers.TermApplyTransformer
 
 import scala.meta.Term
@@ -9,7 +10,7 @@ import scala.meta.Term
 private[transformers] class CoreTermApplyTransformer(termNameClassifier: TermNameClassifier,
                                                      termSelectTermFunctionTransformer: => TermSelectTermFunctionTransformer) extends TermApplyTransformer {
 
-  override final def transform(termApply: Term.Apply): Term.Apply = {
+  override final def transform(termApply: Term.Apply, context: TermApplyTransformationContext = TermApplyTransformationContext()): Term.Apply = {
     termApply match {
       case Term.Apply(termSelect: Term.Select, args) =>
         transformQualifiedMethodName(termSelect)

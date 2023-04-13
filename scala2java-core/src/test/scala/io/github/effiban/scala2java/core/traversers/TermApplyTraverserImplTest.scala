@@ -3,24 +3,28 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.{ArgumentListContext, ArrayInitializerValuesContext}
 import io.github.effiban.scala2java.core.entities.EnclosingDelimiter.Parentheses
 import io.github.effiban.scala2java.core.entities.ListTraversalOptions
+import io.github.effiban.scala2java.core.factories.TermApplyTransformationContextFactory
 import io.github.effiban.scala2java.core.matchers.ArgumentListContextMatcher.eqArgumentListContext
 import io.github.effiban.scala2java.core.matchers.ArrayInitializerValuesContextMockitoMatcher.eqArrayInitializerValuesContext
+import io.github.effiban.scala2java.core.matchers.TermApplyTransformationContextMockitoMatcher.eqTermApplyTransformationContext
 import io.github.effiban.scala2java.core.resolvers.ArrayInitializerContextResolver
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{TermNames, TypeNames}
 import io.github.effiban.scala2java.core.transformers.InternalTermApplyTransformer
+import io.github.effiban.scala2java.spi.contexts.TermApplyTransformationContext
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
 
-import scala.meta.{Lit, Term}
+import scala.meta.{Lit, Term, XtensionQuasiquoteType}
 
 class TermApplyTraverserImplTest extends UnitTestSuite {
   private val termApplyFunTraverser = mock[TermTraverser]
   private val arrayInitializerTraverser = mock[ArrayInitializerTraverser]
   private val argListTraverser = mock[ArgumentListTraverser]
   private val invocationArgTraverser = mock[ArgumentTraverser[Term]]
+  private val termApplyTransformationContextFactory = mock[TermApplyTransformationContextFactory]
   private val arrayInitializerContextResolver = mock[ArrayInitializerContextResolver]
   private val termApplyTransformer = mock[InternalTermApplyTransformer]
 
@@ -29,6 +33,7 @@ class TermApplyTraverserImplTest extends UnitTestSuite {
     arrayInitializerTraverser,
     argListTraverser,
     invocationArgTraverser,
+    termApplyTransformationContextFactory,
     arrayInitializerContextResolver,
     termApplyTransformer
   )
@@ -43,6 +48,8 @@ class TermApplyTraverserImplTest extends UnitTestSuite {
       args = List(Term.Name("transformedArg1"), Term.Name("transformedArg2"))
     )
 
+    val expectedTransformationContext = TermApplyTransformationContext(maybeParentType = Some(t"MyParent"))
+
     val expectedArgListContext = ArgumentListContext(
       maybeParent = Some(transformedTermApply),
       options = ListTraversalOptions(maybeEnclosingDelimiter = Some(Parentheses), traverseEmpty = true),
@@ -50,7 +57,8 @@ class TermApplyTraverserImplTest extends UnitTestSuite {
     )
 
     when(arrayInitializerContextResolver.tryResolve(eqTree(termApply))).thenReturn(None)
-    when(termApplyTransformer.transform(eqTree(termApply))).thenReturn(transformedTermApply)
+    when(termApplyTransformationContextFactory.create(termApply)).thenReturn(expectedTransformationContext)
+    when(termApplyTransformer.transform(eqTree(termApply), eqTermApplyTransformationContext(expectedTransformationContext))).thenReturn(transformedTermApply)
 
     doWrite("myTransformedMethod").when(termApplyFunTraverser).traverse(eqTree(transformedTermApply.fun))
     doWrite("(transformedArg1, transformedArg2)").when(argListTraverser).traverse(
