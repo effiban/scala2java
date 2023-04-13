@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.typeinference
 
+import io.github.effiban.scala2java.core.classifiers.TypeClassifier
 import io.github.effiban.scala2java.core.entities.TermNameValues.{Empty, Print, Println, ScalaFailed, ScalaInclusive, ScalaRange, ScalaSuccessful}
 import io.github.effiban.scala2java.core.entities.TypeNameValues.{ScalaAny, ScalaUnit}
 import io.github.effiban.scala2java.core.entities.{TermNameValues, TypeNameValues}
@@ -9,8 +10,8 @@ import io.github.effiban.scala2java.spi.typeinferrers.ApplyDeclDefInferrer
 
 import scala.meta.{Term, Type, XtensionQuasiquoteTerm}
 
-private[typeinference] class CoreApplyDeclDefInferrer(initializerDeclDefInferrer: => InitializerDeclDefInferrer)
-  extends ApplyDeclDefInferrer {
+private[typeinference] class CoreApplyDeclDefInferrer(initializerDeclDefInferrer: => InitializerDeclDefInferrer,
+                                                      typeClassifier: TypeClassifier[Type]) extends ApplyDeclDefInferrer {
 
   override def infer(termApply: Term.Apply, context: TermApplyInferenceContext): PartialDeclDef = {
 
@@ -54,8 +55,8 @@ private[typeinference] class CoreApplyDeclDefInferrer(initializerDeclDefInferrer
       case (Term.Select(Term.Name(TermNameValues.Future), Term.Name(ScalaFailed)), _) =>
         Some(Type.Apply(Type.Name(TypeNameValues.Future), List(Type.Name(ScalaAny))))
 
-      case (Term.Select(_, q"take"), TermApplyInferenceContext(Some(listType@Type.Apply(Type.Name(TypeNameValues.List), _)), _)) =>
-        Some(listType)
+      case (Term.Select(_, q"take"), TermApplyInferenceContext(Some(parentType), _)) if typeClassifier.isJavaListLike(parentType) =>
+        Some(parentType)
 
       case (Term.Select(_, q"toString"), _) => Some(Type.Name(TypeNameValues.String))
 

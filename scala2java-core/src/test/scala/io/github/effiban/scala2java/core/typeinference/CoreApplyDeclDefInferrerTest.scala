@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.typeinference
 
+import io.github.effiban.scala2java.core.classifiers.TypeClassifier
 import io.github.effiban.scala2java.core.matchers.PartialDeclDefScalatestMatcher.equalPartialDeclDef
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{TermNames, TypeNames}
@@ -14,8 +15,9 @@ import scala.meta.{Type, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 class CoreApplyDeclDefInferrerTest extends UnitTestSuite {
 
   private val initializerDeclDefInferrer = mock[InitializerDeclDefInferrer]
+  private val typeClassifier = mock[TypeClassifier[Type]]
 
-  private val coreApplyDeclDefInferrer = new CoreApplyDeclDefInferrer(initializerDeclDefInferrer)
+  private val coreApplyDeclDefInferrer = new CoreApplyDeclDefInferrer(initializerDeclDefInferrer, typeClassifier)
 
   test("""infer List.apply[String]("a", "b")""") {
     val termApply = q"""List.apply[String]("a", "b")"""
@@ -257,8 +259,25 @@ class CoreApplyDeclDefInferrerTest extends UnitTestSuite {
 
     val expectedReturnType = parentType
 
+    when(typeClassifier.isJavaListLike(eqTree(parentType))).thenReturn(true)
+
     coreApplyDeclDefInferrer.infer(termApply, context) should equalPartialDeclDef(
       PartialDeclDef(maybeParamTypes = maybeArgTypes, maybeReturnType = Some(expectedReturnType))
+    )
+  }
+
+  test("infer foo.take(1) when the type of 'foo' is not a list") {
+    val termApply = q"foo.take(1)"
+
+    val parentType = t"Foo"
+    val argTypes = List(TypeNames.Int)
+    val maybeArgTypes = argTypes.map(Some(_))
+    val context = TermApplyInferenceContext(maybeParentType = Some(parentType), maybeArgTypes = maybeArgTypes)
+
+    when(typeClassifier.isJavaListLike(eqTree(parentType))).thenReturn(false)
+
+    coreApplyDeclDefInferrer.infer(termApply, context) should equalPartialDeclDef(
+      PartialDeclDef(maybeParamTypes = maybeArgTypes)
     )
   }
 
