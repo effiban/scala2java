@@ -36,7 +36,7 @@ class Transformers(typeInferrers: => TypeInferrers,
 
   lazy val internalTermApplyTransformer: InternalTermApplyTransformer = new InternalTermApplyTransformerImpl(
     new CompositeTermApplyTransformer(coreTermApplyTransformer),
-    TermNameClassifier
+    predicates.compositeTermNameHasApplyMethod
   )
 
   private lazy val termSelectTermFunctionTransformer: TermSelectTermFunctionTransformer = new TermSelectTermFunctionTransformerImpl(

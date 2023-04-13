@@ -1,9 +1,9 @@
 package io.github.effiban.scala2java.core.transformers
 
-import io.github.effiban.scala2java.core.classifiers.TermNameClassifier
 import io.github.effiban.scala2java.core.matchers.TermApplyTransformationContextMockitoMatcher.eqTermApplyTransformationContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.spi.contexts.TermApplyTransformationContext
+import io.github.effiban.scala2java.spi.predicates.TermNameHasApplyMethod
 import io.github.effiban.scala2java.spi.transformers.TermApplyTransformer
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
@@ -22,10 +22,10 @@ class InternalTermApplyTransformerImplTest extends UnitTestSuite {
 
   private val Context = TermApplyTransformationContext(maybeParentType = Some(t"Parent"))
 
-  private val termNameClassifier = mock[TermNameClassifier]
   private val termApplyTransformer = mock[TermApplyTransformer]
+  private val termNameHasApplyMethod = mock[TermNameHasApplyMethod]
 
-  private val internalTermApplyTransformer = new InternalTermApplyTransformerImpl(termApplyTransformer, termNameClassifier)
+  private val internalTermApplyTransformer = new InternalTermApplyTransformerImpl(termApplyTransformer, termNameHasApplyMethod)
 
   test("transform() of an untyped method invocation of an implicit 'apply()', should add the 'apply()' and call inner transformer") {
     val termName = q"MyObject"
@@ -33,7 +33,7 @@ class InternalTermApplyTransformerImplTest extends UnitTestSuite {
     val adjustedTermApply = q"MyObject.apply(1)"
     val expectedTransformedTermApply = q"MyObject.create(1)"
 
-    when(termNameClassifier.hasApplyMethod(eqTree(termName))).thenReturn(true)
+    when(termNameHasApplyMethod(eqTree(termName))).thenReturn(true)
     when(termApplyTransformer.transform(eqTree(adjustedTermApply), eqTermApplyTransformationContext(Context)))
       .thenReturn(expectedTransformedTermApply)
 
@@ -46,7 +46,7 @@ class InternalTermApplyTransformerImplTest extends UnitTestSuite {
     val adjustedTermApply = q"MyObject.apply[Int](1)"
     val expectedTransformedTermApply = q"MyObject.create[Int](1)"
 
-    when(termNameClassifier.hasApplyMethod(eqTree(termName))).thenReturn(true)
+    when(termNameHasApplyMethod(eqTree(termName))).thenReturn(true)
     when(termApplyTransformer.transform(eqTree(adjustedTermApply), eqTermApplyTransformationContext(Context)))
       .thenReturn(expectedTransformedTermApply)
 
@@ -58,7 +58,7 @@ class InternalTermApplyTransformerImplTest extends UnitTestSuite {
     val termApply = q"myMethod(1)"
     val expectedTransformedTermApply = q"myTransformedMethod(1)"
 
-    when(termNameClassifier.hasApplyMethod(eqTree(termName))).thenReturn(false)
+    when(termNameHasApplyMethod(eqTree(termName))).thenReturn(false)
     when(termApplyTransformer.transform(eqTree(termApply), eqTermApplyTransformationContext(Context)))
       .thenReturn(expectedTransformedTermApply)
 
@@ -70,7 +70,7 @@ class InternalTermApplyTransformerImplTest extends UnitTestSuite {
     val termApply = q"myMethod[Int](1)"
     val expectedTransformedTermApply = q"myTransformedMethod[Int](1)"
 
-    when(termNameClassifier.hasApplyMethod(eqTree(termName))).thenReturn(false)
+    when(termNameHasApplyMethod(eqTree(termName))).thenReturn(false)
     when(termApplyTransformer.transform(eqTree(termApply), eqTermApplyTransformationContext(Context)))
       .thenReturn(expectedTransformedTermApply)
 
@@ -97,7 +97,7 @@ class InternalTermApplyTransformerImplTest extends UnitTestSuite {
     val expectedFlattenedTermApply = Term.Apply(fun, List(arg1, arg2, arg3, arg4))
     val expectedTransformedTermApply = Term.Apply(transformedFun, List(arg1, arg2, arg3, arg4))
 
-    when(termNameClassifier.hasApplyMethod(eqTree(fun))).thenReturn(false)
+    when(termNameHasApplyMethod(eqTree(fun))).thenReturn(false)
     when(termApplyTransformer.transform(eqTree(expectedFlattenedTermApply), eqTermApplyTransformationContext(Context)))
       .thenReturn(expectedTransformedTermApply)
 
@@ -116,7 +116,7 @@ class InternalTermApplyTransformerImplTest extends UnitTestSuite {
     val expectedFlattenedTermApply = Term.Apply(fun, List(arg1, arg2, arg3, arg4, arg5, arg6))
     val expectedTransformedTermApply = Term.Apply(transformedFun, List(arg1, arg2, arg3, arg4, arg5, arg6))
 
-    when(termNameClassifier.hasApplyMethod(eqTree(fun))).thenReturn(false)
+    when(termNameHasApplyMethod(eqTree(fun))).thenReturn(false)
     when(termApplyTransformer.transform(eqTree(expectedFlattenedTermApply), eqTermApplyTransformationContext(Context)))
       .thenReturn(expectedTransformedTermApply)
 

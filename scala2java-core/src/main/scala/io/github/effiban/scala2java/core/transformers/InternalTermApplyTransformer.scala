@@ -1,8 +1,8 @@
 package io.github.effiban.scala2java.core.transformers
 
-import io.github.effiban.scala2java.core.classifiers.TermNameClassifier
 import io.github.effiban.scala2java.core.entities.TermNameValues.Apply
 import io.github.effiban.scala2java.spi.contexts.TermApplyTransformationContext
+import io.github.effiban.scala2java.spi.predicates.TermNameHasApplyMethod
 import io.github.effiban.scala2java.spi.transformers.TermApplyTransformer
 
 import scala.annotation.tailrec
@@ -13,13 +13,13 @@ trait InternalTermApplyTransformer {
 }
 
 private[transformers] class InternalTermApplyTransformerImpl(termApplyTransformer: TermApplyTransformer,
-                                                             termNameClassifier: TermNameClassifier) extends InternalTermApplyTransformer {
+                                                             termNameHasApplyMethod: TermNameHasApplyMethod) extends InternalTermApplyTransformer {
 
   @tailrec
   override final def transform(termApply: Term.Apply, context: TermApplyTransformationContext = TermApplyTransformationContext()): Term.Apply = {
     termApply match {
-      case Term.Apply(name : Term.Name, args) if termNameClassifier.hasApplyMethod(name) => transform(Term.Apply(toQualifiedApply(name), args), context)
-      case Term.Apply(Term.ApplyType(name: Term.Name, types), args) if termNameClassifier.hasApplyMethod(name) =>
+      case Term.Apply(name : Term.Name, args) if termNameHasApplyMethod(name) => transform(Term.Apply(toQualifiedApply(name), args), context)
+      case Term.Apply(Term.ApplyType(name: Term.Name, types), args) if termNameHasApplyMethod(name) =>
         transform(Term.Apply(Term.ApplyType(toQualifiedApply(name), types), args), context)
       // Invocation of method with more than one param list
       case Term.Apply(Term.Apply(fun, args1), args2) => transform(Term.Apply(fun, args1 ++ args2), context)
