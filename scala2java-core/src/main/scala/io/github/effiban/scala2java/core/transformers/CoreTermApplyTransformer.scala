@@ -101,6 +101,7 @@ private[transformers] class CoreTermApplyTransformer(termNameClassifier: TermNam
     (context.maybeParentType, termSelect.name, args) match {
       case (Some(parentType), q"take", arg :: Nil) if typeClassifier.isJavaListLike(parentType) =>
         Some(termSelect.copy(name = q"subList"), List(q"0", arg))
+      case (Some(parentType), q"length", Nil) if typeClassifier.isJavaListLike(parentType) => Some(termSelect.copy(name = q"size"), Nil)
       case _ => None
     }
   }
