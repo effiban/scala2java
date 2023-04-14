@@ -8,6 +8,9 @@ import java.util.function.*;
 import java.util.stream.*;
 
 public class Sample {
-    public final int x = List.of(1, 2)
-            .size();
+
+    public void foo() {
+        List.of(1, 2)
+        .size();
+    }
 }

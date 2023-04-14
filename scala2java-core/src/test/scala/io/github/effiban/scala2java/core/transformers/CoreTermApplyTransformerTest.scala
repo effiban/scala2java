@@ -400,12 +400,6 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
     termApplyTransformer.transform(termApply).structure shouldBe expectedTransformedTermApply.structure
   }
 
-  test("transform 'Dummy.dummy(1)' should return same") {
-    val termApply = q"Dummy.dummy(1)"
-
-    termApplyTransformer.transform(termApply).structure shouldBe termApply.structure
-  }
-
   test("transform 'myList.take(2)' with parent type 'List[String]', should return 'myList.subList(0, 2)'") {
     val arg = q"2"
     val scalaTermApply = Term.Apply(q"myList.take", List(arg))
@@ -417,5 +411,23 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
 
     termApplyTransformer.transform(scalaTermApply, context).structure shouldBe expectedJavaTermApply.structure
   }
+
+  test("transform 'myList.length()' with parent type 'List[String]', should return 'myList.size()'") {
+    val scalaTermApply = q"myList.length()"
+    val parentType = Type.Apply(TypeNames.List, List(TypeNames.String))
+    val context = TermApplyTransformationContext(maybeParentType = Some(parentType))
+    val expectedJavaTermApply = q"myList.size()"
+
+    when(typeClassifier.isJavaListLike(eqTree(parentType))).thenReturn(true)
+
+    termApplyTransformer.transform(scalaTermApply, context).structure shouldBe expectedJavaTermApply.structure
+  }
+
+  test("transform 'Dummy.dummy(1)' should return same") {
+    val termApply = q"Dummy.dummy(1)"
+
+    termApplyTransformer.transform(termApply).structure shouldBe termApply.structure
+  }
+
 }
 
