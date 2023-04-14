@@ -5,6 +5,7 @@ import io.github.effiban.scala2java.spi.entities.PartialDeclDef
 
 import scala.meta.Term
 
+/** An inferrer which attempts to infer a partial method signature corresponding to a `Term.Apply` (method invocation) */
 trait ApplyDeclDefInferrer {
 
   def infer(termApply: Term.Apply, context: TermApplyInferenceContext): PartialDeclDef
