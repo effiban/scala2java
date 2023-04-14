@@ -1,9 +1,8 @@
 package io.github.effiban.scala2java.core.predicates
 
-import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 
-class CompositeAtLeastOneTruePredicateTest extends UnitTestSuite {
+class CompositeAtLeastOneTruePredicate0Test extends UnitTestSuite {
 
   private val IncludedObj1 = TestObj("A")
   private val IncludedObj2 = TestObj("B")
@@ -20,12 +19,10 @@ class CompositeAtLeastOneTruePredicateTest extends UnitTestSuite {
     ("ExcludedLibraryObj2", ExcludedObj2, true)
   )
 
-  private val predicate1 = mock[TestExcludedPredicate]
-  private val predicate2 = mock[TestExcludedPredicate]
+  private val predicate1 = mock[TestPredicate]
+  private val predicate2 = mock[TestPredicate]
 
-  private implicit val extensionRegistry: ExtensionRegistry = mock[ExtensionRegistry]
-
-  private val compositePredicate = new CompositeAtLeastOneTruePredicate[TestObj] {
+  private val compositePredicate = new CompositeAtLeastOneTruePredicate0[TestObj] {
     override protected val predicates: List[TestObj => Boolean] = List(predicate1, predicate2)
   }
 
@@ -43,5 +40,5 @@ class CompositeAtLeastOneTruePredicateTest extends UnitTestSuite {
 
   private case class TestObj(name: String)
 
-  private trait TestExcludedPredicate extends (TestObj => Boolean)
+  private trait TestPredicate extends (TestObj => Boolean)
 }

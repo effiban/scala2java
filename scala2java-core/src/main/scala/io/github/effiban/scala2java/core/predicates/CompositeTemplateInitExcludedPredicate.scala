@@ -7,7 +7,7 @@ import scala.meta.Init
 
 class CompositeTemplateInitExcludedPredicate(coreTemplateInitExcludedPredicate: TemplateInitExcludedPredicate)
                                             (implicit extensionRegistry: ExtensionRegistry)
-  extends CompositeAtLeastOneTruePredicate[Init] with TemplateInitExcludedPredicate {
+  extends CompositeAtLeastOneTruePredicate0[Init] with TemplateInitExcludedPredicate {
 
   override protected val predicates: List[Init => Boolean] = coreTemplateInitExcludedPredicate +: extensionRegistry.templateInitExcludedPredicates
 }

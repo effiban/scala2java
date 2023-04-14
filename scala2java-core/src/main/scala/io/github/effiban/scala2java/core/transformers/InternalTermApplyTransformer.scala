@@ -23,7 +23,7 @@ private[transformers] class InternalTermApplyTransformerImpl(termApplyTransforme
         transform(Term.Apply(Term.ApplyType(toQualifiedApply(name), types), args), context)
       // Invocation of method with more than one param list
       case Term.Apply(Term.Apply(fun, args1), args2) => transform(Term.Apply(fun, args1 ++ args2), context)
-      // Invocation of lambda - must add the implicit apply so it can be further processed by the 'Select' transformer
+      // Invocation of lambda - we must add the implicit apply just like case classes and objects
       case Term.Apply(termFunction: Term.Function, args) => transform(Term.Apply(Term.Select(termFunction, Term.Name(Apply)), args), context)
 
       case other => termApplyTransformer.transform(other, context)

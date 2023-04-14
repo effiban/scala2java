@@ -7,7 +7,7 @@ import scala.meta.Importer
 
 class CompositeImporterExcludedPredicate(coreImporterExcludedPredicate: ImporterExcludedPredicate)
                                         (implicit extensionRegistry: ExtensionRegistry)
-  extends CompositeAtLeastOneTruePredicate[Importer] with ImporterExcludedPredicate {
+  extends CompositeAtLeastOneTruePredicate0[Importer] with ImporterExcludedPredicate {
 
   override val predicates: List[Importer => Boolean] = coreImporterExcludedPredicate +: extensionRegistry.importerExcludedPredicates
 }

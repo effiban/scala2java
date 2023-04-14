@@ -15,11 +15,12 @@ private[typeinference] class InternalSelectTypeInferrerImpl(applyReturnTypeInfer
   extends InternalSelectTypeInferrer {
 
   override def infer(termSelect: Term.Select): Option[Type] = {
-    if (termSelectSupportsNoArgInvocation(termSelect)) {
+    val maybeQualType = qualifierTypeInferrer.infer(termSelect)
+    val inferenceContext = TermSelectInferenceContext(maybeQualType)
+    if (termSelectSupportsNoArgInvocation(termSelect, inferenceContext)) {
       applyReturnTypeInferrer.infer(Term.Apply(termSelect, Nil))
     } else {
-      val maybeQualType = qualifierTypeInferrer.infer(termSelect)
-      selectTypeInferrer.infer(termSelect, TermSelectInferenceContext(maybeQualType))
+      selectTypeInferrer.infer(termSelect, inferenceContext)
     }
   }
 }

@@ -7,7 +7,7 @@ import scala.meta.Term
 
 class CompositeTermNameSupportsNoArgInvocation(coreTermNameSupportsNoArgInvocation: TermNameSupportsNoArgInvocation)
                                               (implicit extensionRegistry: ExtensionRegistry)
-  extends CompositeAtLeastOneTruePredicate[Term.Name] with TermNameSupportsNoArgInvocation {
+  extends CompositeAtLeastOneTruePredicate0[Term.Name] with TermNameSupportsNoArgInvocation {
 
   override protected val predicates: List[Term.Name => Boolean] =
     coreTermNameSupportsNoArgInvocation +: extensionRegistry.termNameSupportsNoArgInvocations

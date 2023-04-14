@@ -1,9 +1,10 @@
 package io.github.effiban.scala2java.core.transformers
 
+import io.github.effiban.scala2java.core.matchers.TermSelectInferenceContextMatcher.eqTermSelectInferenceContext
 import io.github.effiban.scala2java.core.matchers.TermSelectTransformationContextMatcher.eqTermSelectTransformationContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
-import io.github.effiban.scala2java.spi.contexts.TermSelectTransformationContext
+import io.github.effiban.scala2java.spi.contexts.{TermSelectInferenceContext, TermSelectTransformationContext}
 import io.github.effiban.scala2java.spi.predicates.TermSelectSupportsNoArgInvocation
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
@@ -21,20 +22,22 @@ class EvaluatedInternalTermSelectTransformerTest extends UnitTestSuite {
 
   test("transform() when supports no-arg invocation - should return a corresponding Term.Apply with no args") {
     val termSelect = q"foo.bar"
-    val context = TermSelectTransformationContext(Some(TypeNames.Int))
+    val transformationContext = TermSelectTransformationContext(Some(TypeNames.Int))
+    val inferenceContext = TermSelectInferenceContext(Some(TypeNames.Int))
     val expectedTermApply = q"foo.bar()"
 
-    when(termSelectSupportsNoArgInvocation(eqTree(termSelect))).thenReturn(true)
+    when(termSelectSupportsNoArgInvocation(eqTree(termSelect), eqTermSelectInferenceContext(inferenceContext))).thenReturn(true)
 
-    internalTermSelectTransformer.transform(termSelect, context).structure shouldBe expectedTermApply.structure
+    internalTermSelectTransformer.transform(termSelect, transformationContext).structure shouldBe expectedTermApply.structure
   }
 
   test("transform() when does not support no-arg invocation - should call default transformer and return its result") {
     val termSelect = q"foo.bar"
     val context = TermSelectTransformationContext(Some(TypeNames.Int))
+    val inferenceContext = TermSelectInferenceContext(Some(TypeNames.Int))
     val expectedTerm = q"javaFoo"
 
-    when(termSelectSupportsNoArgInvocation(eqTree(termSelect))).thenReturn(false)
+    when(termSelectSupportsNoArgInvocation(eqTree(termSelect), eqTermSelectInferenceContext(inferenceContext))).thenReturn(false)
     when(defaultInternalTermSelectTransformer.transform(eqTree(termSelect), eqTermSelectTransformationContext(context)))
       .thenReturn(expectedTerm)
 

@@ -7,7 +7,7 @@ import scala.meta.Term
 
 class CompositeTermNameHasApplyMethod(coreTermNameHasApplyMethod: TermNameHasApplyMethod)
                                      (implicit extensionRegistry: ExtensionRegistry)
-  extends CompositeAtLeastOneTruePredicate[Term.Name] with TermNameHasApplyMethod {
+  extends CompositeAtLeastOneTruePredicate0[Term.Name] with TermNameHasApplyMethod {
 
   override protected val predicates: List[Term.Name => Boolean] = coreTermNameHasApplyMethod +: extensionRegistry.termNameHasApplyMethods
 }
