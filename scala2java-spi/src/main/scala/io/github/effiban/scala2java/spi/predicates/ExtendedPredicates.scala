@@ -50,7 +50,7 @@ trait ExtendedPredicates {
    * is actually a no-argument invocation to a method.<br>
    * In Scala some methods are defined without parentheses and must be called that way, while others have repeated (variable) argument lists
    * and may also be optionally invoked without parentheses.<br>
-   * For example: The expression `println` (with no parentheses) is a call to the `println` method.<br>
+   * For example: The expression `println` (with no parentheses) is a call to the `println()` method.<br>
    * The framework will use this in order to properly identify such invocations, so as to be able to infer their types
    * and also transform them properly into Java.
    */

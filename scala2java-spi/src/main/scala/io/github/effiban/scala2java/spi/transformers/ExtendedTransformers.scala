@@ -98,11 +98,10 @@ trait ExtendedTransformers {
   def termApplyTransformer(): TermApplyTransformer = TermApplyTransformer.Identity
 
   /** Override this method if you need to modify a [[scala.meta.Term.Select]] (qualified name).<br>
-   * Note: This can be a multi-purpose transformer as qualified names can appear in various language elements such as:
-   *   - imports
-   *   - method invocations
-   *   - inner member selections
-   *   - others...
+   * '''NOTE''': This transformer will only be called for qualified names that are __not__ method invocations.<br>
+   * If some method invocation is a qualified name with no args and no parentheses,
+   * it will be automatically 'desugared' into a method invocation and eventually passed to [[termApplyTransformer]].<br>
+   * The framework will identify such cases by calling [[io.github.effiban.scala2java.spi.predicates.ExtendedPredicates.termSelectSupportsNoArgInvocation]]
    *
    * @return if overriden - a transformer which modifies a given [[scala.meta.Term.Select]]<br>
    *         otherwise - the default transformer which doesn't modify anything<br>
@@ -110,6 +109,10 @@ trait ExtendedTransformers {
   def termSelectTransformer(): TermSelectTransformer = TermSelectTransformer.Empty
 
   /** Override this method if you need to modify a [[scala.meta.Term.Name]] (identifier) appearing by itself.<br>
+   * '''NOTE''': This transformer will only be called for identifiers that are __not__ method invocations.<br>
+   * If some method invocation is an identifier with no args and no parentheses,
+   * it will be automatically 'desugared' into a method invocation and eventually passed to [[termApplyTransformer]].<br>
+   * The framework will identify such cases by calling [[io.github.effiban.scala2java.spi.predicates.ExtendedPredicates.termNameSupportsNoArgInvocation]]
    *
    * @return if overriden - a transformer which modifies a given [[scala.meta.Term.Name]]<br>
    *         otherwise - the default transformer which doesn't modify anything<br>
