@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.predicates
 
-trait CompositeAtLeastOneTruePredicate[T] extends (T => Boolean) {
+trait CompositeAtLeastOneTruePredicate0[T] extends (T => Boolean) {
 
   protected val predicates: List[T => Boolean]
 

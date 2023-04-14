@@ -8,7 +8,7 @@ import scala.meta.Term
  * The framework will use this in order to properly identify invocations where the `apply()`
  * does not appear explicitly.
  */
-// TODO - add ability to check by a given type as well
+// TODO - once file-scope or external type inference is added, add ability to check by a given type as well
 trait TermNameHasApplyMethod extends (Term.Name => Boolean)
 
 object TermNameHasApplyMethod {
