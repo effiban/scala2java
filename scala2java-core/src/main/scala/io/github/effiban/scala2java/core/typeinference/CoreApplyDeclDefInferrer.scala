@@ -55,6 +55,8 @@ private[typeinference] class CoreApplyDeclDefInferrer(initializerDeclDefInferrer
       case (Term.Select(Term.Name(TermNameValues.Future), Term.Name(ScalaFailed)), _) =>
         Some(Type.Apply(Type.Name(TypeNameValues.Future), List(Type.Name(ScalaAny))))
 
+      case (Term.Select(_, q"length"), TermApplyInferenceContext(Some(parentType), _)) if typeClassifier.isJavaListLike(parentType) =>
+        Some(Type.Name(TypeNameValues.Int))
       case (Term.Select(_, q"take"), TermApplyInferenceContext(Some(parentType), _)) if typeClassifier.isJavaListLike(parentType) =>
         Some(parentType)
 

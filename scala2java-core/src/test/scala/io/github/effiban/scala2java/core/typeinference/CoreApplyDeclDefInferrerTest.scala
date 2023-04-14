@@ -253,7 +253,7 @@ class CoreApplyDeclDefInferrerTest extends UnitTestSuite {
     val termApply = q"List(1, 2).take(1)"
 
     val parentType = Type.Apply(TypeNames.List, List(TypeNames.Int))
-    val argTypes = List(TypeNames.Int, TypeNames.Int)
+    val argTypes = List(TypeNames.Int)
     val maybeArgTypes = argTypes.map(Some(_))
     val context = TermApplyInferenceContext(maybeParentType = Some(parentType), maybeArgTypes = maybeArgTypes)
 
@@ -278,6 +278,20 @@ class CoreApplyDeclDefInferrerTest extends UnitTestSuite {
 
     coreApplyDeclDefInferrer.infer(termApply, context) should equalPartialDeclDef(
       PartialDeclDef(maybeParamTypes = maybeArgTypes)
+    )
+  }
+
+  test("infer List(1, 2).length()") {
+    val termApply = q"List(1, 2).length()"
+
+    val parentType = Type.Apply(TypeNames.List, List(TypeNames.Int))
+    val context = TermApplyInferenceContext(maybeParentType = Some(parentType))
+    val expectedReturnType = TypeNames.Int
+
+    when(typeClassifier.isJavaListLike(eqTree(parentType))).thenReturn(true)
+
+    coreApplyDeclDefInferrer.infer(termApply, context) should equalPartialDeclDef(
+      PartialDeclDef(maybeReturnType = Some(expectedReturnType))
     )
   }
 
