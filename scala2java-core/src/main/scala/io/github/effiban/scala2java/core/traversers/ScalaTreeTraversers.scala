@@ -6,6 +6,7 @@ import io.github.effiban.scala2java.core.factories.{Factories, TemplateChildCont
 import io.github.effiban.scala2java.core.orderings.JavaTemplateChildOrdering
 import io.github.effiban.scala2java.core.predicates._
 import io.github.effiban.scala2java.core.providers.{CompositeAdditionalImportersProvider, CoreAdditionalImportersProvider}
+import io.github.effiban.scala2java.core.renderers.Renderers
 import io.github.effiban.scala2java.core.resolvers._
 import io.github.effiban.scala2java.core.transformers._
 import io.github.effiban.scala2java.core.typeinference.TypeInferrers
@@ -22,8 +23,10 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   private implicit lazy val factories: Factories = new Factories(typeInferrers)
   private lazy val resolvers = new Resolvers()
   private lazy val predicates = new Predicates()
+  private lazy val renderers = new Renderers()
 
   import factories._
+  import renderers._
   import resolvers._
   import transformers._
   import typeInferrers._
@@ -186,7 +189,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     litTraverser
   )
 
-  private lazy val defaultTermNameTraverser: TermNameTraverser = new TermNameTraverserImpl(
+  private lazy val defaultTermNameTraverser: TermNameTraverser = termNameTraverser(
     defaultTermTraverser,
     defaultInternalTermNameTransformer
   )
@@ -271,7 +274,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   )
 
   private lazy val expressionTermRefTraverser = termRefTraverser(
-    new TermNameTraverserImpl(expressionTermTraverser, evaluatedInternalTermNameTransformer),
+    termNameTraverser(expressionTermTraverser, evaluatedInternalTermNameTransformer),
     expressionTermSelectTraverser
   )
 
@@ -430,7 +433,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
    */
   private lazy val statTermTraverser: TermTraverser = new FunOverridingTermTraverser(
     termRefTraverser(
-      new TermNameTraverserImpl(statTermTraverser, evaluatedInternalTermNameTransformer),
+      termNameTraverser(statTermTraverser, evaluatedInternalTermNameTransformer),
       termSelectTraverser(statTermTraverser, evaluatedInternalTermSelectTransformer)
     ),
     expressionMainApplyTypeTraverser,
@@ -496,7 +499,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
    */
   private lazy val termApplyFunTraverser: TermTraverser = new FunOverridingTermTraverser(
     termRefTraverser(
-      new TermNameTraverserImpl(termApplyFunTraverser, defaultInternalTermNameTransformer),
+      termNameTraverser(termApplyFunTraverser, defaultInternalTermNameTransformer),
       termSelectTraverser(termApplyFunTraverser, defaultInternalTermSelectTransformer)
     ),
     defaultMainApplyTypeTraverser,
@@ -509,7 +512,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
    */
   private lazy val termApplyTypeFunTraverser: TermTraverser = new FunOverridingTermTraverser(
     termRefTraverser(
-      new TermNameTraverserImpl(termApplyTypeFunTraverser, defaultInternalTermNameTransformer),
+      termNameTraverser(termApplyTypeFunTraverser, defaultInternalTermNameTransformer),
       termSelectTraverser(termApplyTypeFunTraverser, defaultInternalTermSelectTransformer)
     ),
     expressionMainApplyTypeTraverser,
@@ -526,6 +529,15 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   private lazy val termInterpolateTraverser: TermInterpolateTraverser = new TermInterpolateTraverserImpl(TermInterpolateTransformer, termApplyTraverser)
 
   private lazy val termMatchTraverser: TermMatchTraverser = new TermMatchTraverserImpl(expressionTermTraverser, caseTraverser)
+
+  private def termNameTraverser(termTraverser: => TermTraverser,
+                                termNameTransformer: => InternalTermNameTransformer): TermNameTraverser = {
+    new TermNameTraverserImpl(
+      termTraverser,
+      termNameTransformer,
+      termNameRenderer
+    )
+  }
 
   private lazy val termParamArgTraverserFactory: TermParamArgTraverserFactory = new TermParamArgTraverserFactoryImpl(termParamTraverser)
 
