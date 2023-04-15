@@ -8,6 +8,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   val litRenderer: LitRenderer = new LitRendererImpl()
 
+  val nameIndeterminateRenderer: NameIndeterminateRenderer = new NameIndeterminateRendererImpl()
+
   val termNameRenderer: TermNameRenderer = new TermNameRendererImpl()
 
   val typeNameRenderer: TypeNameRenderer = new TypeNameRendererImpl()
