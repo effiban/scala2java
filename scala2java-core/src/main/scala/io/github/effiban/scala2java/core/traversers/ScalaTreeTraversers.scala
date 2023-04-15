@@ -627,7 +627,10 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     new SimpleArgumentTraverser(typeTraverser)
   )
 
-  private lazy val typeNameTraverser: TypeNameTraverser = new TypeNameTraverserImpl(new CompositeTypeNameTransformer(CoreTypeNameTransformer))
+  private lazy val typeNameTraverser: TypeNameTraverser = new TypeNameTraverserImpl(
+    new CompositeTypeNameTransformer(CoreTypeNameTransformer),
+    typeNameRenderer
+  )
 
   private lazy val typeParamListTraverser: TypeParamListTraverser = new TypeParamListTraverserImpl(
     argumentListTraverser,
