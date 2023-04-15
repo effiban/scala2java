@@ -351,7 +351,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val patExtractInfixTraverser: PatExtractInfixTraverser = new PatExtractInfixTraverserImpl(patExtractTraverser)
 
-  private lazy val patExtractTraverser: PatExtractTraverser = new PatExtractTraverserImpl()
+  private lazy val patExtractTraverser: PatExtractTraverser = new PatExtractTraverserImpl(patExtractRenderer)
 
   private lazy val patInterpolateTraverser: PatInterpolateTraverser = new PatInterpolateTraverserImpl()
 

@@ -1,12 +1,15 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.renderers.PatExtractRenderer
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
+import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.{Pat, Term}
 
 class PatExtractTraverserImplTest extends UnitTestSuite {
 
-  val patExtractTraverser = new PatExtractTraverserImpl()
+  private val patExtractRenderer = mock[PatExtractRenderer]
+  private val patExtractTraverser = new PatExtractTraverserImpl(patExtractRenderer)
 
   test("traverse") {
     val patExtract = Pat.Extract(
@@ -15,7 +18,7 @@ class PatExtractTraverserImplTest extends UnitTestSuite {
     )
     patExtractTraverser.traverse(patExtract)
 
-    outputWriter.toString shouldBe "/* MyClass(x, y) */"
+    verify(patExtractRenderer).render(eqTree(patExtract))
   }
 
 }
