@@ -6,4 +6,5 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   val termNameRenderer: TermNameRenderer = new TermNameRendererImpl()
 
+  val typeNameRenderer: TypeNameRenderer = new TypeNameRendererImpl()
 }

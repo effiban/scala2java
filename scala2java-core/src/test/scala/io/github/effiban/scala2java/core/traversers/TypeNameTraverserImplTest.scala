@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.renderers.TypeNameRenderer
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.spi.transformers.TypeNameTransformer
 
@@ -8,8 +9,9 @@ import scala.meta.Type
 class TypeNameTraverserImplTest extends UnitTestSuite {
 
   private val typeNameTransformer = mock[TypeNameTransformer]
+  private val typeNameRenderer = mock[TypeNameRenderer]
 
-  private val typeNameTraverser = new TypeNameTraverserImpl(typeNameTransformer)
+  private val typeNameTraverser = new TypeNameTraverserImpl(typeNameTransformer, typeNameRenderer)
 
   test("traverse") {
     val scalaTypeName = Type.Name("Option")
@@ -19,6 +21,6 @@ class TypeNameTraverserImplTest extends UnitTestSuite {
 
     typeNameTraverser.traverse(scalaTypeName)
 
-    outputWriter.toString shouldBe "Optional"
+    verify(typeNameRenderer).render(javaTypeName)
   }
 }
