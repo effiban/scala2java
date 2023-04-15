@@ -64,7 +64,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val assignTraverser: AssignTraverser = new AssignTraverserImpl(assignLHSTraverser, expressionTermTraverser)
 
-  private lazy val bindTraverser: BindTraverser = new BindTraverserImpl(patTraverser)
+  private lazy val bindTraverser: BindTraverser = new BindTraverserImpl(bindRenderer)
 
   private lazy val blockStatTraverser: BlockStatTraverser = new BlockStatTraverserImpl(
     ifTraverser,

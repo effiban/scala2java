@@ -4,6 +4,8 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 
 class Renderers(implicit javaWriter: JavaWriter) {
 
+  val bindRenderer: BindRenderer = new BindRendererImpl()
+
   val termNameRenderer: TermNameRenderer = new TermNameRendererImpl()
 
   val typeNameRenderer: TypeNameRenderer = new TypeNameRendererImpl()
