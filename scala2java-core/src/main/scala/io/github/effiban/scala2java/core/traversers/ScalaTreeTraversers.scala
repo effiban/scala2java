@@ -314,7 +314,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     compositeInvocationArgTraverser
   )
 
-  private lazy val litTraverser: LitTraverser = new LitTraverserImpl()
+  private lazy val litTraverser: LitTraverser = new LitTraverserImpl(litRenderer)
 
   private def mainApplyTypeTraverser(standardApplyTypeTraverser: StandardApplyTypeTraverser): MainApplyTypeTraverser =
     new MainApplyTypeTraverserImpl(
