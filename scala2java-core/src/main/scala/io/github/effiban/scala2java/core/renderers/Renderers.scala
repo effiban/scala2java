@@ -6,6 +6,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   val bindRenderer: BindRenderer = new BindRendererImpl()
 
+  val litRenderer: LitRenderer = new LitRendererImpl()
+
   val termNameRenderer: TermNameRenderer = new TermNameRendererImpl()
 
   val typeNameRenderer: TypeNameRenderer = new TypeNameRendererImpl()
