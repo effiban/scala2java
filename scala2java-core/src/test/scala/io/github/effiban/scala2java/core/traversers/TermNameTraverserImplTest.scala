@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.renderers.TermNameRenderer
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TermNames
 import io.github.effiban.scala2java.core.testtrees.TermNames.{Empty, ScalaOption}
@@ -12,8 +13,13 @@ class TermNameTraverserImplTest extends UnitTestSuite {
 
   private val termTraverser = mock[TermTraverser]
   private val termNameTransformer = mock[InternalTermNameTransformer]
+  private val termNameRenderer = mock[TermNameRenderer]
 
-  private val termNameTraverser = new TermNameTraverserImpl(termTraverser, termNameTransformer)
+  private val termNameTraverser = new TermNameTraverserImpl(
+    termTraverser,
+    termNameTransformer,
+    termNameRenderer
+  )
 
   test("traverse when transformer returns the same") {
     val termName = Term.Name("xyz")
@@ -22,7 +28,7 @@ class TermNameTraverserImplTest extends UnitTestSuite {
 
     termNameTraverser.traverse(termName)
 
-    outputWriter.toString shouldBe "xyz"
+    verify(termNameRenderer).render(termName)
   }
 
   test("traverse when transformer returns different term") {
