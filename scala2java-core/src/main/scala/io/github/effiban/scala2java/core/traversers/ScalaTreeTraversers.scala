@@ -383,7 +383,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val patVarTraverser: PatVarTraverser = new PatVarTraverserImpl(defaultTermNameTraverser)
 
-  private lazy val patWildcardTraverser: PatWildcardTraverser = new PatWildcardTraverserImpl()
+  private lazy val patWildcardTraverser: PatWildcardTraverser = new PatWildcardTraverserImpl(patWildcardRenderer)
 
   private lazy val permittedSubTypeNameListTraverser = new PermittedSubTypeNameListTraverserImpl(argumentListTraverser)
 
