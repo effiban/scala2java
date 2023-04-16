@@ -1,25 +1,21 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.renderers.SelfRenderer
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.testtrees.Selfs
 
 import scala.meta.{Name, Self, Type}
 
 class SelfTraverserImplTest extends UnitTestSuite {
 
-  private val selfTraverser = new SelfTraverserImpl()
+  private val selfRenderer = mock[SelfRenderer]
 
-  test("traverse when has a type") {
+  private val selfTraverser = new SelfTraverserImpl(selfRenderer)
+
+  test("traverse") {
     val `self` = Self(name = Name.Indeterminate("SelfName"), decltpe = Some(Type.Name("SelfType")))
 
     selfTraverser.traverse(`self`)
 
-    outputWriter.toString shouldBe "/* extends SelfName: SelfType */"
-  }
-
-  test("traverse when empty") {
-    selfTraverser.traverse(Selfs.Empty)
-
-    outputWriter.toString shouldBe ""
+    verify(selfRenderer).render(`self`)
   }
 }
