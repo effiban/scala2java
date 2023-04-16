@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Lit
 
-trait LitRenderer extends TreeRenderer[Lit]
+trait LitRenderer extends JavaTreeRenderer[Lit]
 
 class LitRendererImpl(implicit javaWriter: JavaWriter) extends LitRenderer {
 

@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Type
 
-trait TypeApplyInfixRenderer extends TreeRenderer[Type.ApplyInfix]
+trait TypeApplyInfixRenderer extends JavaTreeRenderer[Type.ApplyInfix]
 
 private[renderers] class TypeApplyInfixRendererImpl(implicit javaWriter: JavaWriter) extends TypeApplyInfixRenderer {
 

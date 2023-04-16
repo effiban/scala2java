@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Pat
 
-trait PatInterpolateRenderer extends TreeRenderer[Pat.Interpolate]
+trait PatInterpolateRenderer extends JavaTreeRenderer[Pat.Interpolate]
 
 private[renderers] class PatInterpolateRendererImpl(implicit javaWriter: JavaWriter) extends PatInterpolateRenderer {
 

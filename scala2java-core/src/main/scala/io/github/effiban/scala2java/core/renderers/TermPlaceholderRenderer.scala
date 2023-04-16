@@ -5,7 +5,7 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Term
 
-trait TermPlaceholderRenderer extends TreeRenderer[Term.Placeholder]
+trait TermPlaceholderRenderer extends JavaTreeRenderer[Term.Placeholder]
 
 private[renderers] class TermPlaceholderRendererImpl(implicit javaWriter: JavaWriter) extends TermPlaceholderRenderer {
 

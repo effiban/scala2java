@@ -5,7 +5,7 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Pat
 
-trait PatWildcardRenderer extends TreeRenderer[Pat.Wildcard]
+trait PatWildcardRenderer extends JavaTreeRenderer[Pat.Wildcard]
 
 private[renderers] class PatWildcardRendererImpl(implicit javaWriter: JavaWriter) extends PatWildcardRenderer {
 

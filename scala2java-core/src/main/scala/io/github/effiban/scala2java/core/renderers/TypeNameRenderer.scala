@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Type
 
-trait TypeNameRenderer extends TreeRenderer[Type.Name]
+trait TypeNameRenderer extends JavaTreeRenderer[Type.Name]
 
 private[renderers] class TypeNameRendererImpl(implicit javaWriter: JavaWriter) extends TypeNameRenderer {
 

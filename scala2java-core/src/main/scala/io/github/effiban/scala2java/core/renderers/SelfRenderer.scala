@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Self
 
-trait SelfRenderer extends TreeRenderer[Self]
+trait SelfRenderer extends JavaTreeRenderer[Self]
 
 private[renderers] class SelfRendererImpl(implicit javaWriter: JavaWriter) extends SelfRenderer {
 
