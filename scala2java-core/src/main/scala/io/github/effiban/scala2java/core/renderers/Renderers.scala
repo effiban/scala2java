@@ -18,6 +18,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   val patTupleRenderer: PatTupleRenderer = new PatTupleRendererImpl()
 
+  val patWildcardRenderer: PatWildcardRenderer = new PatWildcardRendererImpl()
+
   val termNameRenderer: TermNameRenderer = new TermNameRendererImpl()
 
   val typeNameRenderer: TypeNameRenderer = new TypeNameRendererImpl()
