@@ -2,7 +2,6 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.renderers.TermNameRenderer
 import io.github.effiban.scala2java.core.transformers.InternalTermNameTransformer
-import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Term
 
@@ -12,8 +11,7 @@ trait TermNameTraverser {
 
 private[traversers] class TermNameTraverserImpl(termTraverser: => TermTraverser,
                                                 termNameTransformer: => InternalTermNameTransformer,
-                                                termNameRenderer: TermNameRenderer)
-                                               (implicit javaWriter: JavaWriter) extends TermNameTraverser {
+                                                termNameRenderer: TermNameRenderer) extends TermNameTraverser {
 
   override def traverse(termName: Term.Name): Unit = {
     termNameTransformer.transform(termName) match {

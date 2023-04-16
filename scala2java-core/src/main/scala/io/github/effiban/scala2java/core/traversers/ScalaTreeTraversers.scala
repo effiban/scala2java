@@ -552,7 +552,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     nameTraverser
   )
 
-  private lazy val termPlaceholderTraverser: TermPlaceholderTraverser = new TermPlaceholderTraverserImpl
+  private lazy val termPlaceholderTraverser: TermPlaceholderTraverser = new TermPlaceholderTraverserImpl(termPlaceholderRenderer)
 
   private def termRefTraverser(termNameTraverser: => TermNameTraverser,
                                termSelectTraverser: => TermSelectTraverser): TermRefTraverser = {
