@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Term
 
-trait TermNameRenderer extends TreeRenderer[Term.Name]
+trait TermNameRenderer extends JavaTreeRenderer[Term.Name]
 
 private[renderers] class TermNameRendererImpl(implicit javaWriter: JavaWriter) extends TermNameRenderer {
 

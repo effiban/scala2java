@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Pat
 
-trait PatExtractRenderer extends TreeRenderer[Pat.Extract]
+trait PatExtractRenderer extends JavaTreeRenderer[Pat.Extract]
 
 private[renderers] class PatExtractRendererImpl(implicit javaWriter: JavaWriter) extends PatExtractRenderer {
 

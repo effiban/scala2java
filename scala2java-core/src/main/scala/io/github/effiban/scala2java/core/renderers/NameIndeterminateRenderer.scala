@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Name
 
-trait NameIndeterminateRenderer extends TreeRenderer[Name.Indeterminate]
+trait NameIndeterminateRenderer extends JavaTreeRenderer[Name.Indeterminate]
 
 class NameIndeterminateRendererImpl(implicit javaWriter: JavaWriter) extends NameIndeterminateRenderer {
 
