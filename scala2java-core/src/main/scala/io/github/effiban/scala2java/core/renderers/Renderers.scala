@@ -20,6 +20,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   val patWildcardRenderer: PatWildcardRenderer = new PatWildcardRendererImpl()
 
+  val selfRenderer: SelfRenderer = new SelfRendererImpl()
+
   val termNameRenderer: TermNameRenderer = new TermNameRendererImpl()
 
   val typeNameRenderer: TypeNameRenderer = new TypeNameRendererImpl()

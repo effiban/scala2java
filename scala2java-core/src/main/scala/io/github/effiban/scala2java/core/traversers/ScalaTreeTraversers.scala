@@ -416,7 +416,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val returnTraverser: ReturnTraverser = new ReturnTraverserImpl(expressionTermTraverser)
 
-  private lazy val selfTraverser: SelfTraverser = new SelfTraverserImpl
+  private lazy val selfTraverser: SelfTraverser = new SelfTraverserImpl(selfRenderer)
 
   lazy val sourceTraverser: SourceTraverser = new SourceTraverserImpl(statTraverser)
 
