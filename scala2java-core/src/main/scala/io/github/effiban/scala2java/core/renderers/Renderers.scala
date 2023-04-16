@@ -24,5 +24,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   val termNameRenderer: TermNameRenderer = new TermNameRendererImpl()
 
+  val termPlaceholderRenderer: TermPlaceholderRenderer = new TermPlaceholderRendererImpl()
+
   val typeNameRenderer: TypeNameRenderer = new TypeNameRendererImpl()
 }
