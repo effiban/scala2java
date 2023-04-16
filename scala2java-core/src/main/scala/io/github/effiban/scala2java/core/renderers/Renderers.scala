@@ -28,5 +28,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   val typeAnonymousParamRenderer: TypeAnonymousParamRenderer = new TypeAnonymousParamRendererImpl()
 
+  val typeApplyInfixRenderer: TypeApplyInfixRenderer = new TypeApplyInfixRendererImpl()
+
   val typeNameRenderer: TypeNameRenderer = new TypeNameRendererImpl()
 }
