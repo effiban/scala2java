@@ -620,7 +620,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val typeFunctionTraverser: TypeFunctionTraverser = new TypeFunctionTraverserImpl(typeTraverser, FunctionTypeTransformer)
 
-  private lazy val typeLambdaTraverser: TypeLambdaTraverser = new TypeLambdaTraverserImpl
+  private lazy val typeLambdaTraverser: TypeLambdaTraverser = new TypeLambdaTraverserImpl(typeLambdaRenderer)
 
   private lazy val typeListTraverser: TypeListTraverser = new TypeListTraverserImpl(
     argumentListTraverser,
