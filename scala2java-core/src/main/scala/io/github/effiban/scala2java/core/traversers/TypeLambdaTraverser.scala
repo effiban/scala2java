@@ -1,19 +1,16 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.writers.JavaWriter
+import io.github.effiban.scala2java.core.renderers.TypeLambdaRenderer
 
 import scala.meta.Type
 
 trait TypeLambdaTraverser extends ScalaTreeTraverser[Type.Lambda]
 
-private[traversers] class TypeLambdaTraverserImpl(implicit javaWriter: JavaWriter) extends TypeLambdaTraverser {
+private[traversers] class TypeLambdaTraverserImpl(typeLambdaRenderer: TypeLambdaRenderer) extends TypeLambdaTraverser {
 
-  import javaWriter._
-
-  // generic lambda type [T] => (T, T)
+  // higher-kinded type, e.g. [K, V] =>> Map[K, V]
   // According to documentation supported only in some dialects (what does this mean?)
   override def traverse(lambdaType: Type.Lambda): Unit = {
-    //TODO maybe convert simple case to Java
-    writeComment(lambdaType.toString())
+    typeLambdaRenderer.render(lambdaType)
   }
 }
