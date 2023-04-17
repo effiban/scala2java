@@ -683,7 +683,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     TypeTupleToTypeApplyTransformer
   )
 
-  private lazy val typeVarTraverser: TypeVarTraverser = new TypeVarTraverserImpl
+  private lazy val typeVarTraverser: TypeVarTraverser = new TypeVarTraverserImpl(typeVarRenderer)
 
   private lazy val typeWildcardTraverser: TypeWildcardTraverser = new TypeWildcardTraverserImpl(typeBoundsTraverser)
 
