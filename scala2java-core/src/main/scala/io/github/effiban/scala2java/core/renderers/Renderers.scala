@@ -33,4 +33,6 @@ class Renderers(implicit javaWriter: JavaWriter) {
   val typeLambdaRenderer: TypeLambdaRenderer = new TypeLambdaRendererImpl()
 
   val typeNameRenderer: TypeNameRenderer = new TypeNameRendererImpl()
+
+  val typeVarRenderer: TypeVarRenderer = new TypeVarRendererImpl()
 }
