@@ -15,7 +15,7 @@ private[traversers] class PatTraverserImpl(litTraverser: LitTraverser,
                                            patWildcardRenderer: PatWildcardRenderer,
                                            patSeqWildcardTraverser: PatSeqWildcardTraverser,
                                            patSeqWildcardRenderer: PatSeqWildcardRenderer,
-                                           patVarTraverser: => PatVarTraverser,
+                                           patVarRenderer: PatVarRenderer,
                                            bindTraverser: BindTraverser,
                                            bindRenderer: BindRenderer,
                                            alternativeTraverser: => AlternativeTraverser,
@@ -42,7 +42,8 @@ private[traversers] class PatTraverserImpl(litTraverser: LitTraverser,
     case patternSeqWildcard: Pat.SeqWildcard =>
       val traversedPatSeqWildcard = patSeqWildcardTraverser.traverse(patternSeqWildcard)
       patSeqWildcardRenderer.render(traversedPatSeqWildcard)
-    case patternVar: Pat.Var => patVarTraverser.traverse(patternVar)
+    case patternVar: Pat.Var =>
+      patVarRenderer.render(patternVar)
     case patternBind: Bind =>
       val traversedBind = bindTraverser.traverse(patternBind)
       bindRenderer.render(traversedBind)

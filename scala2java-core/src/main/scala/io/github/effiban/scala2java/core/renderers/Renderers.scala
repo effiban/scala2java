@@ -18,11 +18,13 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   val patTupleRenderer: PatTupleRenderer = new PatTupleRendererImpl()
 
+  val patVarRenderer: PatVarRenderer = new PatVarRendererImpl(termNameRenderer)
+
   val patWildcardRenderer: PatWildcardRenderer = new PatWildcardRendererImpl()
 
   val selfRenderer: SelfRenderer = new SelfRendererImpl()
 
-  val termNameRenderer: TermNameRenderer = new TermNameRendererImpl()
+  lazy val termNameRenderer: TermNameRenderer = new TermNameRendererImpl()
 
   val termPlaceholderRenderer: TermPlaceholderRenderer = new TermPlaceholderRendererImpl()
 
