@@ -40,12 +40,12 @@ class PkgTraverserImplTest extends UnitTestSuite {
     )
   )
 
-  private val termRefTraverser = mock[DefaultTermRefTraverser]
+  private val defaultTermRefTraverser = mock[TermRefTraverser]
   private val pkgStatListTraverser = mock[PkgStatListTraverser]
   private val additionalImportersProvider = mock[AdditionalImportersProvider]
 
   private val pkgTraverser = new PkgTraverserImpl(
-    termRefTraverser,
+    defaultTermRefTraverser,
     pkgStatListTraverser,
     additionalImportersProvider
   )
@@ -57,7 +57,7 @@ class PkgTraverserImplTest extends UnitTestSuite {
     val stats = List(ArbitraryImport, TheClass)
     val expectedEnrichedStats = Import(CoreImporters) +: stats
 
-    doWrite("mypkg.myinnerpkg").when(termRefTraverser).traverse(eqTree(pkgRef))
+    doWrite("mypkg.myinnerpkg").when(defaultTermRefTraverser).traverse(eqTree(pkgRef))
     when(additionalImportersProvider.provide()).thenReturn(CoreImporters)
     doWrite(
       """/*

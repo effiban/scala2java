@@ -12,7 +12,7 @@ import scala.meta.Term.{Block, If}
 private[traversers] class ExpressionTermTraverser(ifTraverser: => IfTraverser,
                                                   statTraverser: => StatTraverser,
                                                   termApplyTraverser: => TermApplyTraverser,
-                                                  expressionTermRefTraverser: => ExpressionTermRefTraverser,
+                                                  expressionTermRefTraverser: => TermRefTraverser,
                                                   expressionMainApplyTypeTraverser: MainApplyTypeTraverser,
                                                   defaultTermTraverser: => TermTraverser) extends TermTraverser {
 

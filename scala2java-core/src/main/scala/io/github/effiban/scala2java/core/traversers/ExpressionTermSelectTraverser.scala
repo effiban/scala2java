@@ -10,21 +10,21 @@ import io.github.effiban.scala2java.spi.contexts.TermSelectTransformationContext
 
 import scala.meta.Term
 
-trait TermSelectTraverser {
+trait ExpressionTermSelectTraverser {
   def traverse(termSelect: Term.Select, context: TermSelectContext = TermSelectContext()): Unit
 }
 
-private[traversers] class TermSelectTraverserImpl(qualifierTraverser: => TermTraverser,
-                                                  transformedTermTraverser: => TermTraverser,
-                                                  termNameRenderer: TermNameRenderer,
-                                                  typeListTraverser: => TypeListTraverser,
-                                                  qualifierTypeInferrer: => QualifierTypeInferrer,
-                                                  termSelectTransformer: InternalTermSelectTransformer)
-                                                 (implicit javaWriter: JavaWriter) extends TermSelectTraverser {
+private[traversers] class ExpressionTermSelectTraverserImpl(qualifierTraverser: => TermTraverser,
+                                                            transformedTermTraverser: => TermTraverser,
+                                                            termNameRenderer: TermNameRenderer,
+                                                            typeListTraverser: => TypeListTraverser,
+                                                            qualifierTypeInferrer: => QualifierTypeInferrer,
+                                                            termSelectTransformer: InternalTermSelectTransformer)
+                                                           (implicit javaWriter: JavaWriter) extends ExpressionTermSelectTraverser {
 
   import javaWriter._
 
-  // qualified name
+  // qualified name in the context of an evaluated expression, that might need to be desugared or otherwise transformed into a Java equivalent
   override def traverse(select: Term.Select, context: TermSelectContext = TermSelectContext()): Unit = {
     val maybeQualType = qualifierTypeInferrer.infer(select)
     val transformedTerm = termSelectTransformer.transform(select, TermSelectTransformationContext(maybeQualType))

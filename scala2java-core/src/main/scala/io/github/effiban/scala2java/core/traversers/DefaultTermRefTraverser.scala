@@ -6,13 +6,11 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 import scala.meta.Term
 import scala.meta.Term.{Super, This}
 
-trait DefaultTermRefTraverser extends ScalaTreeTraverser[Term.Ref]
-
-private[traversers] class DefaultTermRefTraverserImpl(thisTraverser: => ThisTraverser,
-                                                      superTraverser: => SuperTraverser,
-                                                      termNameRenderer: TermNameRenderer,
-                                                      termSelectTraverser: => TermSelectTraverser)
-                                                     (implicit javaWriter: JavaWriter) extends DefaultTermRefTraverser {
+private[traversers] class DefaultTermRefTraverser(thisTraverser: => ThisTraverser,
+                                                  superTraverser: => SuperTraverser,
+                                                  termNameRenderer: TermNameRenderer,
+                                                  defaultTermSelectTraverser: => DefaultTermSelectTraverser)
+                                                 (implicit javaWriter: JavaWriter) extends TermRefTraverser {
 
   import javaWriter._
 
@@ -20,7 +18,7 @@ private[traversers] class DefaultTermRefTraverserImpl(thisTraverser: => ThisTrav
     case `this`: This => thisTraverser.traverse(`this`)
     case `super`: Super => superTraverser.traverse(`super`)
     case termName: Term.Name => termNameRenderer.render(termName)
-    case termSelect: Term.Select => termSelectTraverser.traverse(termSelect)
+    case termSelect: Term.Select => defaultTermSelectTraverser.traverse(termSelect)
     case _ => writeComment(s"UNSUPPORTED Term.Ref in a Path context: $termRef")
   }
 }

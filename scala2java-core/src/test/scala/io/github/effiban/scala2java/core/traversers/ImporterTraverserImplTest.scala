@@ -8,10 +8,10 @@ import scala.meta.{Importee, Importer, Name, Term}
 
 class ImporterTraverserImplTest extends UnitTestSuite {
 
-  private val termRefTraverser = mock[DefaultTermRefTraverser]
+  private val defaultTermRefTraverser = mock[TermRefTraverser]
   private val importeeTraverser = mock[ImporteeTraverser]
 
-  private val importerTraverser = new ImporterTraverserImpl(termRefTraverser, importeeTraverser)
+  private val importerTraverser = new ImporterTraverserImpl(defaultTermRefTraverser, importeeTraverser)
 
 
   test("traverse when there is one importee") {
@@ -23,7 +23,7 @@ class ImporterTraverserImplTest extends UnitTestSuite {
       importees = List(importee)
     )
 
-    doWrite("mypackage").when(termRefTraverser).traverse(eqTree(termRef))
+    doWrite("mypackage").when(defaultTermRefTraverser).traverse(eqTree(termRef))
     doWrite("myclass").when(importeeTraverser).traverse(eqTree(importee))
 
     importerTraverser.traverse(importer)
@@ -43,7 +43,7 @@ class ImporterTraverserImplTest extends UnitTestSuite {
       importees = List(importee1, importee2)
     )
 
-    doWrite("mypackage").when(termRefTraverser).traverse(eqTree(termRef))
+    doWrite("mypackage").when(defaultTermRefTraverser).traverse(eqTree(termRef))
     doWrite("myclass1").when(importeeTraverser).traverse(eqTree(importee1))
     doWrite("myclass2").when(importeeTraverser).traverse(eqTree(importee2))
 

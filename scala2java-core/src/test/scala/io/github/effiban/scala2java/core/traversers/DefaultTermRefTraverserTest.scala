@@ -1,7 +1,5 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.TermSelectContext
-import io.github.effiban.scala2java.core.matchers.TermSelectContextMatcher.eqTermSelectContext
 import io.github.effiban.scala2java.core.renderers.TermNameRenderer
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -9,18 +7,18 @@ import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import scala.meta.Term.{Super, This}
 import scala.meta.{Name, Term}
 
-class DefaultTermRefTraverserImplTest extends UnitTestSuite {
+class DefaultTermRefTraverserTest extends UnitTestSuite {
 
   private val thisTraverser = mock[ThisTraverser]
   private val superTraverser = mock[SuperTraverser]
   private val termNameRenderer = mock[TermNameRenderer]
-  private val termSelectTraverser = mock[TermSelectTraverser]
+  private val defaultTermSelectTraverser = mock[DefaultTermSelectTraverser]
 
-  private val defaultTermRefTraverser = new DefaultTermRefTraverserImpl(
+  private val defaultTermRefTraverser = new DefaultTermRefTraverser(
     thisTraverser,
     superTraverser,
     termNameRenderer,
-    termSelectTraverser
+    defaultTermSelectTraverser
   )
   
   test("traverse 'this'") {
@@ -52,6 +50,6 @@ class DefaultTermRefTraverserImplTest extends UnitTestSuite {
 
     defaultTermRefTraverser.traverse(termSelect)
 
-    verify(termSelectTraverser).traverse(eqTree(termSelect), eqTermSelectContext(TermSelectContext()))
+    verify(defaultTermSelectTraverser).traverse(eqTree(termSelect))
   }
 }
