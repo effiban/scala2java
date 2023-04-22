@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.{PatExtractRenderer, PatInterpolateRenderer}
+import io.github.effiban.scala2java.core.renderers.{PatExtractRenderer, PatInterpolateRenderer, PatSeqWildcardRenderer}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
@@ -15,6 +15,7 @@ class PatTraverserImplTest extends UnitTestSuite {
   private val defaultTermNameTraverser = mock[TermNameTraverser]
   private val patWildcardTraverser = mock[PatWildcardTraverser]
   private val patSeqWildcardTraverser = mock[PatSeqWildcardTraverser]
+  private val patSeqWildcardRenderer = mock[PatSeqWildcardRenderer]
   private val patVarTraverser = mock[PatVarTraverser]
   private val bindTraverser = mock[BindTraverser]
   private val alternativeTraverser = mock[AlternativeTraverser]
@@ -31,6 +32,7 @@ class PatTraverserImplTest extends UnitTestSuite {
     defaultTermNameTraverser,
     patWildcardTraverser,
     patSeqWildcardTraverser,
+    patSeqWildcardRenderer,
     patVarTraverser,
     bindTraverser,
     alternativeTraverser,
@@ -60,8 +62,9 @@ class PatTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse Pat.SeqWildcard") {
+    doReturn(Pat.SeqWildcard()).when(patSeqWildcardTraverser).traverse(eqTree(Pat.SeqWildcard()))
     patTraverser.traverse(Pat.SeqWildcard())
-    verify(patSeqWildcardTraverser).traverse(eqTree(Pat.SeqWildcard()))
+    verify(patSeqWildcardRenderer).render(eqTree(Pat.SeqWildcard()))
   }
 
   test("traverse Pat.Var") {
