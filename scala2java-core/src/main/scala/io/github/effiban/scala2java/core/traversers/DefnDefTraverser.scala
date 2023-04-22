@@ -4,6 +4,7 @@ import io.github.effiban.scala2java.core.contexts.{BlockContext, DefnDefContext,
 import io.github.effiban.scala2java.core.entities.Decision.{No, Uncertain, Yes}
 import io.github.effiban.scala2java.core.entities.JavaTreeType
 import io.github.effiban.scala2java.core.entities.TraversalConstants.UnknownType
+import io.github.effiban.scala2java.core.renderers.TermNameRenderer
 import io.github.effiban.scala2java.core.typeinference.TermTypeInferrer
 import io.github.effiban.scala2java.core.writers.JavaWriter
 import io.github.effiban.scala2java.spi.entities.JavaScope
@@ -17,7 +18,7 @@ trait DefnDefTraverser {
 
 private[traversers] class DefnDefTraverserImpl(modListTraverser: => ModListTraverser,
                                                typeParamListTraverser: => TypeParamListTraverser,
-                                               termNameTraverser: => TermNameTraverser,
+                                               termNameRenderer: TermNameRenderer,
                                                typeTraverser: => TypeTraverser,
                                                termParamListTraverser: => TermParamListTraverser,
                                                blockTraverser: => BlockTraverser,
@@ -34,7 +35,7 @@ private[traversers] class DefnDefTraverserImpl(modListTraverser: => ModListTrave
     traverseTypeParams(transformedDefnDef.tparams)
     val maybeMethodType = resolveMethodType(transformedDefnDef)
     traverseMethodType(maybeMethodType)
-    termNameTraverser.traverse(transformedDefnDef.name)
+    termNameRenderer.render(transformedDefnDef.name)
     traverseMethodParamsAndBody(transformedDefnDef, maybeMethodType, context.maybeInit)
   }
 
