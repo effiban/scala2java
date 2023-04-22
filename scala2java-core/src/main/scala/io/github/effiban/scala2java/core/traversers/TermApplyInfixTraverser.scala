@@ -3,6 +3,7 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.ArgumentListContext
 import io.github.effiban.scala2java.core.entities.EnclosingDelimiter.Parentheses
 import io.github.effiban.scala2java.core.entities.ListTraversalOptions
+import io.github.effiban.scala2java.core.renderers.TermNameRenderer
 import io.github.effiban.scala2java.core.writers.JavaWriter
 import io.github.effiban.scala2java.spi.transformers.TermApplyInfixToTermApplyTransformer
 
@@ -12,7 +13,7 @@ trait TermApplyInfixTraverser extends ScalaTreeTraverser[Term.ApplyInfix]
 
 private[traversers] class TermApplyInfixTraverserImpl(expressionTermTraverser: => TermTraverser,
                                                       termApplyTraverser: => TermApplyTraverser,
-                                                      defaultTermNameTraverser: => TermNameTraverser,
+                                                      termNameRenderer: TermNameRenderer,
                                                       argumentListTraverser: => ArgumentListTraverser,
                                                       invocationArgTraverser: => ArgumentTraverser[Term],
                                                       termApplyInfixToTermApplyTransformer: TermApplyInfixToTermApplyTransformer)
@@ -32,7 +33,7 @@ private[traversers] class TermApplyInfixTraverserImpl(expressionTermTraverser: =
   private def traverseAsInfix(termApplyInfix: Term.ApplyInfix): Unit = {
     expressionTermTraverser.traverse(termApplyInfix.lhs)
     write(" ")
-    defaultTermNameTraverser.traverse(termApplyInfix.op)
+    termNameRenderer.render(termApplyInfix.op)
     write(" ")
     //TODO handle type args
     termApplyInfix.args match {
