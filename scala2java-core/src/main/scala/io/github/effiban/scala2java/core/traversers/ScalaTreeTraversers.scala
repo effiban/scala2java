@@ -206,7 +206,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   private lazy val defnDefTraverser: DefnDefTraverser = new DefnDefTraverserImpl(
     modListTraverser,
     typeParamListTraverser,
-    defaultTermNameTraverser,
+    termNameRenderer,
     typeTraverser,
     termParamListTraverser,
     blockTraverser,
