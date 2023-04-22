@@ -186,7 +186,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     etaTraverser,
     termRepeatedTraverser,
     termInterpolateTraverser,
-    litTraverser
+    LitTraverser,
+    litRenderer
   )
 
   private lazy val defaultTermNameTraverser: TermNameTraverser = termNameTraverser(
@@ -314,8 +315,6 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     compositeInvocationArgTraverser
   )
 
-  private lazy val litTraverser: LitTraverser = new LitTraverserImpl(litRenderer)
-
   private def mainApplyTypeTraverser(standardApplyTypeTraverser: StandardApplyTypeTraverser): MainApplyTypeTraverser =
     new MainApplyTypeTraverserImpl(
       classOfTraverser,
@@ -355,7 +354,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   )
 
   private lazy val patTraverser: PatTraverser = new PatTraverserImpl(
-    litTraverser,
+    LitTraverser,
+    litRenderer,
     defaultTermNameTraverser,
     PatWildcardTraverser,
     patWildcardRenderer,

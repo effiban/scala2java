@@ -3,6 +3,7 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.{BlockContext, TryContext}
 import io.github.effiban.scala2java.core.entities.Decision.{No, Uncertain}
 import io.github.effiban.scala2java.core.matchers.BlockContextMatcher.eqBlockContext
+import io.github.effiban.scala2java.core.renderers.LitRenderer
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TermNames.Plus
 import io.github.effiban.scala2java.core.testtrees.TypeNames
@@ -45,6 +46,7 @@ class DefaultTermTraverserTest extends UnitTestSuite {
   private val termRepeatedTraverser = mock[TermRepeatedTraverser]
   private val termInterpolateTraverser = mock[TermInterpolateTraverser]
   private val litTraverser = mock[LitTraverser]
+  private val litRenderer = mock[LitRenderer]
 
 
   private val defaultTermTraverser = new DefaultTermTraverser(
@@ -76,7 +78,8 @@ class DefaultTermTraverserTest extends UnitTestSuite {
     etaTraverser,
     termRepeatedTraverser,
     termInterpolateTraverser,
-    litTraverser
+    litTraverser,
+    litRenderer
   )
 
   test("traverse() for Term.Name") {
@@ -342,7 +345,8 @@ class DefaultTermTraverserTest extends UnitTestSuite {
 
   test("traverse() for Lit.Int") {
     val lit = Lit.Int(3)
+    doReturn(lit).when(litTraverser).traverse(eqTree(lit))
     defaultTermTraverser.traverse(lit)
-    verify(litTraverser).traverse(eqTree(lit))
+    verify(litRenderer).render(eqTree(lit))
   }
 }

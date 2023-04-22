@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.renderers.LitRenderer
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Term.{AnonymousFunction, ApplyType, Ascribe, Assign, Block, Do, Eta, For, ForYield, If, New, NewAnonymous, Return, Throw, Try, TryWithHandler, While}
@@ -33,7 +34,8 @@ private[traversers] class DefaultTermTraverser(defaultTermRefTraverser: => TermR
                                                etaTraverser: => EtaTraverser,
                                                termRepeatedTraverser: => TermRepeatedTraverser,
                                                termInterpolateTraverser: => TermInterpolateTraverser,
-                                               litTraverser: => LitTraverser)
+                                               litTraverser: LitTraverser,
+                                               litRenderer: LitRenderer)
                                               (implicit javaWriter: JavaWriter) extends TermTraverser {
 
   import javaWriter._
@@ -67,7 +69,9 @@ private[traversers] class DefaultTermTraverser(defaultTermRefTraverser: => TermR
     case eta: Eta => etaTraverser.traverse(eta)
     case termRepeated: Term.Repeated => termRepeatedTraverser.traverse(termRepeated)
     case interpolate: Term.Interpolate => termInterpolateTraverser.traverse(interpolate)
-    case literal: Lit => litTraverser.traverse(literal)
+    case literal: Lit =>
+      val traversedLit = litTraverser.traverse(literal)
+      litRenderer.render(traversedLit)
     case _ => writeComment(s"UNSUPPORTED: $term")
   }
 }
