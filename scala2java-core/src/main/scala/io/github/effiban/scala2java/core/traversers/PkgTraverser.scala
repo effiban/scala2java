@@ -7,7 +7,7 @@ import scala.meta.{Import, Pkg}
 
 trait PkgTraverser extends ScalaTreeTraverser[Pkg]
 
-private[traversers] class PkgTraverserImpl(termRefTraverser: => TermRefTraverser,
+private[traversers] class PkgTraverserImpl(termRefTraverser: => DefaultTermRefTraverser,
                                            pkgStatListTraverser: => PkgStatListTraverser,
                                            additionalImportersProvider: AdditionalImportersProvider)
                                           (implicit javaWriter: JavaWriter) extends PkgTraverser {

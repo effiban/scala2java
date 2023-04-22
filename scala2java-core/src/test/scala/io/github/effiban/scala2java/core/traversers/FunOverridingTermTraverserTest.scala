@@ -7,7 +7,7 @@ import scala.meta.XtensionQuasiquoteTerm
 
 class FunOverridingTermTraverserTest extends UnitTestSuite {
 
-  private val termRefTraverser = mock[TermRefTraverser]
+  private val termRefTraverser = mock[ExpressionTermRefTraverser]
   private val mainApplyTypeTraverser = mock[MainApplyTypeTraverser]
   private val termTraverser = mock[TermTraverser]
 

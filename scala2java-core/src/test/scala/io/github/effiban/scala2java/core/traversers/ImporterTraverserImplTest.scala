@@ -8,7 +8,7 @@ import scala.meta.{Importee, Importer, Name, Term}
 
 class ImporterTraverserImplTest extends UnitTestSuite {
 
-  private val termRefTraverser = mock[TermRefTraverser]
+  private val termRefTraverser = mock[DefaultTermRefTraverser]
   private val importeeTraverser = mock[ImporteeTraverser]
 
   private val importerTraverser = new ImporterTraverserImpl(termRefTraverser, importeeTraverser)

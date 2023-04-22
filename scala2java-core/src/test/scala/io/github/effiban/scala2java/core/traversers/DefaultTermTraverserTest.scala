@@ -17,7 +17,7 @@ import scala.meta.{Case, Init, Lit, Name, Pat, Self, Template, Term, Type}
 
 class DefaultTermTraverserTest extends UnitTestSuite {
 
-  private val defaultTermRefTraverser = mock[TermRefTraverser]
+  private val defaultTermRefTraverser = mock[DefaultTermRefTraverser]
   private val termApplyTraverser = mock[TermApplyTraverser]
   private val defaultMainApplyTypeTraverser = mock[MainApplyTypeTraverser]
   private val termApplyInfixTraverser = mock[TermApplyInfixTraverser]

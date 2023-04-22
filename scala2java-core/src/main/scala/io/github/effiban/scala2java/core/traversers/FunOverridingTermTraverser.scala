@@ -6,7 +6,7 @@ import scala.meta.Term
  * For such terms we need to either enable or disable the ability to 'desugar' into a method invocation - according to the context.<br>
  * This is because in the wrong context, it could either cause an invalid expression or else an infinite recursion.
  */
-private[traversers] class FunOverridingTermTraverser(termRefTraverser: => TermRefTraverser,
+private[traversers] class FunOverridingTermTraverser(termRefTraverser: => ExpressionTermRefTraverser,
                                                      applyTypeTraverser: => MainApplyTypeTraverser,
                                                      termTraverser: => TermTraverser) extends TermTraverser {
 

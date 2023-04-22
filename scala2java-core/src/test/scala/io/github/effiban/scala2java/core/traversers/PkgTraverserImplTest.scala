@@ -40,7 +40,7 @@ class PkgTraverserImplTest extends UnitTestSuite {
     )
   )
 
-  private val termRefTraverser = mock[TermRefTraverser]
+  private val termRefTraverser = mock[DefaultTermRefTraverser]
   private val pkgStatListTraverser = mock[PkgStatListTraverser]
   private val additionalImportersProvider = mock[AdditionalImportersProvider]
 
