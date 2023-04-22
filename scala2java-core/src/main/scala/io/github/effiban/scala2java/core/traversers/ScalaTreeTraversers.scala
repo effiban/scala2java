@@ -115,7 +115,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     modListTraverser,
     typeParamListTraverser,
     typeTraverser,
-    defaultTermNameTraverser,
+    termNameRenderer,
     termParamListTraverser,
   )
 
