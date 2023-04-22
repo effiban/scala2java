@@ -525,11 +525,17 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   private def termNameTraverser(termTraverser: => TermTraverser,
                                 termNameTransformer: => InternalTermNameTransformer): TermNameTraverser = {
     new TermNameTraverserImpl(
-      termTraverser,
-      termNameTransformer,
+      termNameWithoutRenderTraverser(termTraverser, termNameTransformer),
       termNameRenderer
     )
   }
+
+  private def termNameWithoutRenderTraverser(termTraverser: => TermTraverser,
+                                             termNameTransformer: => InternalTermNameTransformer): TermNameWithoutRenderTraverser =
+    new TermNameWithoutRenderTraverserImpl(
+      termTraverser,
+      termNameTransformer,
+    )
 
   private lazy val termParamArgTraverserFactory: TermParamArgTraverserFactory = new TermParamArgTraverserFactoryImpl(termParamTraverser)
 
