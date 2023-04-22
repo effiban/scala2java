@@ -193,12 +193,14 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     defaultInternalTermNameTransformer
   )
 
-  private lazy val defaultTermRefTraverser: TermRefTraverser = termRefTraverser(
-    defaultTermNameTraverser,
+  private lazy val defaultTermRefTraverser: DefaultTermRefTraverser = new DefaultTermRefTraverserImpl(
+    thisTraverser,
+    superTraverser,
+    termNameRenderer,
     defaultTermSelectTraverser
   )
 
-  private val defaultTermSelectTraverser: TermSelectTraverser = termSelectTraverser(
+  private lazy val defaultTermSelectTraverser: TermSelectTraverser = termSelectTraverser(
     defaultTermTraverser,
     defaultInternalTermSelectTransformer
   )
@@ -272,7 +274,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     defaultTermTraverser
   )
 
-  private lazy val expressionTermRefTraverser = termRefTraverser(
+  private lazy val expressionTermRefTraverser: ExpressionTermRefTraverser = expressionTermRefTraverser(
     termNameTraverser(expressionTermTraverser, evaluatedInternalTermNameTransformer),
     expressionTermSelectTraverser
   )
@@ -422,7 +424,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
    * Otherwise, the default traversal should be applied.
    */
   private lazy val statTermTraverser: TermTraverser = new FunOverridingTermTraverser(
-    termRefTraverser(
+    expressionTermRefTraverser(
       termNameTraverser(statTermTraverser, evaluatedInternalTermNameTransformer),
       termSelectTraverser(statTermTraverser, evaluatedInternalTermSelectTransformer)
     ),
@@ -488,7 +490,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
    * In other cases, it should be traversed as an evaluated expression
    */
   private lazy val termApplyFunTraverser: TermTraverser = new FunOverridingTermTraverser(
-    termRefTraverser(
+    expressionTermRefTraverser(
       termNameTraverser(termApplyFunTraverser, defaultInternalTermNameTransformer),
       termSelectTraverser(termApplyFunTraverser, defaultInternalTermSelectTransformer)
     ),
@@ -501,7 +503,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
    * In other cases, it should be traversed as an evaluated expression
    */
   private lazy val termApplyTypeFunTraverser: TermTraverser = new FunOverridingTermTraverser(
-    termRefTraverser(
+    expressionTermRefTraverser(
       termNameTraverser(termApplyTypeFunTraverser, defaultInternalTermNameTransformer),
       termSelectTraverser(termApplyTypeFunTraverser, defaultInternalTermSelectTransformer)
     ),
@@ -550,9 +552,9 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val termPlaceholderTraverser: TermPlaceholderTraverser = new TermPlaceholderTraverserImpl(termPlaceholderRenderer)
 
-  private def termRefTraverser(termNameTraverser: => TermNameTraverser,
-                               termSelectTraverser: => TermSelectTraverser): TermRefTraverser = {
-    new TermRefTraverserImpl(
+  private def expressionTermRefTraverser(termNameTraverser: => TermNameTraverser,
+                                         termSelectTraverser: => TermSelectTraverser): ExpressionTermRefTraverser = {
+    new ExpressionTermRefTraverserImpl(
       thisTraverser,
       superTraverser,
       termNameTraverser,

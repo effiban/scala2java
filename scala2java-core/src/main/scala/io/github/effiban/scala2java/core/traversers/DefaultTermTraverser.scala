@@ -6,7 +6,7 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 import scala.meta.Term.{AnonymousFunction, ApplyType, Ascribe, Assign, Block, Do, Eta, For, ForYield, If, New, NewAnonymous, Return, Throw, Try, TryWithHandler, While}
 import scala.meta.{Lit, Term}
 
-private[traversers] class DefaultTermTraverser(defaultTermRefTraverser: => TermRefTraverser,
+private[traversers] class DefaultTermTraverser(defaultTermRefTraverser: => DefaultTermRefTraverser,
                                                termApplyTraverser: => TermApplyTraverser,
                                                defaultMainApplyTypeTraverser: => MainApplyTypeTraverser,
                                                termApplyInfixTraverser: => TermApplyInfixTraverser,

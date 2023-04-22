@@ -6,7 +6,7 @@ import scala.meta.Importer
 
 trait ImporterTraverser extends ScalaTreeTraverser[Importer]
 
-private[traversers] class ImporterTraverserImpl(termRefTraverser: => TermRefTraverser,
+private[traversers] class ImporterTraverserImpl(termRefTraverser: => DefaultTermRefTraverser,
                                                 importeeTraverser: => ImporteeTraverser)
                                                (implicit javaWriter: JavaWriter) extends ImporterTraverser {
 

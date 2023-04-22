@@ -13,7 +13,7 @@ class ExpressionTermTraverserTest extends UnitTestSuite {
   private val ifTraverser = mock[IfTraverser]
   private val statTraverser = mock[StatTraverser]
   private val termApplyTraverser = mock[TermApplyTraverser]
-  private val expressionTermRefTraverser = mock[TermRefTraverser]
+  private val expressionTermRefTraverser = mock[ExpressionTermRefTraverser]
   private val expressionMainApplyTypeTraverser = mock[MainApplyTypeTraverser]
   private val defaultTermTraverser = mock[DefaultTermTraverser]
 
