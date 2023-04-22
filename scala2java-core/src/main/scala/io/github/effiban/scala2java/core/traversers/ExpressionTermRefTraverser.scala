@@ -5,14 +5,12 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 import scala.meta.Term
 import scala.meta.Term.{ApplyUnary, Super, This}
 
-trait ExpressionTermRefTraverser extends ScalaTreeTraverser[Term.Ref]
-
-private[traversers] class ExpressionTermRefTraverserImpl(thisTraverser: => ThisTraverser,
-                                                         superTraverser: => SuperTraverser,
-                                                         termNameTraverser: => TermNameTraverser,
-                                                         termSelectTraverser: => TermSelectTraverser,
-                                                         applyUnaryTraverser: => ApplyUnaryTraverser)
-                                                        (implicit javaWriter: JavaWriter) extends ExpressionTermRefTraverser {
+private[traversers] class ExpressionTermRefTraverser(thisTraverser: => ThisTraverser,
+                                                     superTraverser: => SuperTraverser,
+                                                     termNameTraverser: => TermNameTraverser,
+                                                     termSelectTraverser: => ExpressionTermSelectTraverser,
+                                                     applyUnaryTraverser: => ApplyUnaryTraverser)
+                                                    (implicit javaWriter: JavaWriter) extends TermRefTraverser {
 
   import javaWriter._
 

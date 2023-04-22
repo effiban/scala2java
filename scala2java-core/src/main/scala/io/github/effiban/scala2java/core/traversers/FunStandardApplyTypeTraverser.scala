@@ -6,16 +6,16 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 import scala.meta.Term
 import scala.meta.Term.ApplyType
 
-private[traversers] class DefaultStandardApplyTypeTraverser(termSelectTraverser: => TermSelectTraverser,
-                                                            typeListTraverser: => TypeListTraverser,
-                                                            unqualifiedTermTraverser: => TermTraverser)
-                                                           (implicit javaWriter: JavaWriter) extends StandardApplyTypeTraverser {
+private[traversers] class FunStandardApplyTypeTraverser(funTermSelectTraverser: => FunTermSelectTraverser,
+                                                        typeListTraverser: => TypeListTraverser,
+                                                        unqualifiedTermTraverser: => TermTraverser)
+                                                       (implicit javaWriter: JavaWriter) extends StandardApplyTypeTraverser {
 
   import javaWriter._
 
-  // parametrized type application which is an implicit method invocation, e.g.: identity[X]
+  // parametrized type application which is the 'fun' of a method invocation (after a possible desugaring and transformation)
   override def traverse(termApplyType: ApplyType): Unit = termApplyType.fun match {
-    case termSelect: Term.Select => termSelectTraverser.traverse(termSelect, TermSelectContext(termApplyType.targs))
+    case termSelect: Term.Select => funTermSelectTraverser.traverse(termSelect, TermSelectContext(termApplyType.targs))
     case term => traverseUnqualified(termApplyType, term)
   }
 

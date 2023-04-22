@@ -14,7 +14,7 @@ import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.{Lit, Term, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
-class TermSelectTraverserImplTest extends UnitTestSuite {
+class ExpressionTermSelectTraverserImplTest extends UnitTestSuite {
 
   private val MyInstance = Term.Name("MyObject")
   private val MyType = t"MyType"
@@ -33,7 +33,7 @@ class TermSelectTraverserImplTest extends UnitTestSuite {
   private val qualifierTypeInferrer = mock[QualifierTypeInferrer]
   private val termSelectTransformer = mock[InternalTermSelectTransformer]
 
-  private val termSelectTraverser = new TermSelectTraverserImpl(
+  private val termSelectTraverser = new ExpressionTermSelectTraverserImpl(
     qualifierTraverser,
     transformedTermTraverser,
     termNameRenderer,
