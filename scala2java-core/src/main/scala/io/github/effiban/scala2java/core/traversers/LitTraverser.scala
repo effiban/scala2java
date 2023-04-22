@@ -1,13 +1,11 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.LitRenderer
-
 import scala.meta.Lit
 
-trait LitTraverser extends ScalaTreeTraverser[Lit]
+trait LitTraverser extends ScalaTreeTraverser1[Lit]
 
-class LitTraverserImpl(litRenderer: LitRenderer) extends LitTraverser {
+object LitTraverser extends LitTraverser {
 
   // Literals in the code
-  override def traverse(lit: Lit): Unit = litRenderer.render(lit)
+  override def traverse(lit: Lit): Lit = lit
 }
