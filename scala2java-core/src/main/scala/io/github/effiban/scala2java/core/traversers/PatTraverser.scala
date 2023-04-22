@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.renderers.PatExtractRenderer
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Pat.{Alternative, Bind}
@@ -15,7 +16,8 @@ private[traversers] class PatTraverserImpl(litTraverser: => LitTraverser,
                                            bindTraverser: => BindTraverser,
                                            alternativeTraverser: => AlternativeTraverser,
                                            patTupleTraverser: => PatTupleTraverser,
-                                           patExtractTraverser: => PatExtractTraverser,
+                                           patExtractTraverser: PatExtractTraverser,
+                                           patExtractRenderer: PatExtractRenderer,
                                            patExtractInfixTraverser: => PatExtractInfixTraverser,
                                            patInterpolateTraverser: => PatInterpolateTraverser,
                                            patTypedTraverser: => PatTypedTraverser)
@@ -32,8 +34,12 @@ private[traversers] class PatTraverserImpl(litTraverser: => LitTraverser,
     case patternBind: Bind => bindTraverser.traverse(patternBind)
     case patternAlternative: Alternative => alternativeTraverser.traverse(patternAlternative)
     case patternTuple: Pat.Tuple => patTupleTraverser.traverse(patternTuple)
-    case patternExtract: Pat.Extract => patExtractTraverser.traverse(patternExtract)
-    case patternExtractInfix: Pat.ExtractInfix => patExtractInfixTraverser.traverse(patternExtractInfix)
+    case patternExtract: Pat.Extract =>
+      val traversedPatExtract = patExtractTraverser.traverse(patternExtract)
+      patExtractRenderer.render(traversedPatExtract)
+    case patternExtractInfix: Pat.ExtractInfix =>
+      val traversedPatExtract = patExtractInfixTraverser.traverse(patternExtractInfix)
+      patExtractRenderer.render(traversedPatExtract)
     case patternInterpolate: Pat.Interpolate => patInterpolateTraverser.traverse(patternInterpolate)
     case patternTyped: Pat.Typed => patTypedTraverser.traverse(patternTyped)
     case _ => writeComment(s"UNSUPPORTED: $pat")
