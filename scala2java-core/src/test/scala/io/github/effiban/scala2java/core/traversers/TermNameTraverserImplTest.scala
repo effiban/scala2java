@@ -2,43 +2,38 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.renderers.TermNameRenderer
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.testtrees.TermNames
-import io.github.effiban.scala2java.core.testtrees.TermNames.{Empty, ScalaOption}
-import io.github.effiban.scala2java.core.transformers.InternalTermNameTransformer
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.Term
+import scala.meta.XtensionQuasiquoteTerm
 
 class TermNameTraverserImplTest extends UnitTestSuite {
 
-  private val termTraverser = mock[TermTraverser]
-  private val termNameTransformer = mock[InternalTermNameTransformer]
+  private val termWithoutRenderTraverser = mock[TermNameWithoutRenderTraverser]
   private val termNameRenderer = mock[TermNameRenderer]
 
   private val termNameTraverser = new TermNameTraverserImpl(
-    termTraverser,
-    termNameTransformer,
+    termWithoutRenderTraverser,
     termNameRenderer
   )
 
-  test("traverse when transformer returns the same") {
-    val termName = Term.Name("xyz")
+  test("traverse when inner traverser returns a Term.Name") {
+    val termName = q"aa"
+    val traversedTermName = q"bb"
 
-    when(termNameTransformer.transform(eqTree(termName))).thenReturn(termName)
+    when(termWithoutRenderTraverser.traverse(eqTree(termName))).thenReturn(Some(traversedTermName))
 
     termNameTraverser.traverse(termName)
 
-    verify(termNameRenderer).render(termName)
+    verify(termNameRenderer).render(traversedTermName)
   }
 
-  test("traverse when transformer returns different term") {
-    val termName = TermNames.ScalaNone
-    val term = Term.Select(ScalaOption, Empty)
+  test("traverse when transformer returns None") {
+    val termName = q"aa"
 
-    when(termNameTransformer.transform(eqTree(termName))).thenReturn(term)
+    when(termWithoutRenderTraverser.traverse(eqTree(termName))).thenReturn(None)
 
     termNameTraverser.traverse(termName)
 
-    verify(termTraverser).traverse(eqTree(term))
+    verifyZeroInteractions(termNameRenderer)
   }
 }
