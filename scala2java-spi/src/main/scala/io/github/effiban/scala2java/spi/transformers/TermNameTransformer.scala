@@ -2,7 +2,14 @@ package io.github.effiban.scala2java.spi.transformers
 
 import scala.meta.Term
 
-/** A transformer which can modify a given Scala [[Term.Name]] (identifier) when appearing by itself */
+/** A transformer which can modify a given Scala [[Term.Name]] (identifier) when appearing in the context of
+ * an evaulated expression, for example:
+ * - return value
+ * - method argument
+ * - RHS of an assignment
+ * - RHS of a 'case' clause
+ */
+
 trait TermNameTransformer extends DifferentTypeTransformer0[Term.Name, Term]
 
 object TermNameTransformer {
