@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.{PatExtractRenderer, PatInterpolateRenderer, PatSeqWildcardRenderer, PatWildcardRenderer}
+import io.github.effiban.scala2java.core.renderers._
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Pat.{Alternative, Bind}
@@ -17,7 +17,8 @@ private[traversers] class PatTraverserImpl(litTraverser: => LitTraverser,
                                            patVarTraverser: => PatVarTraverser,
                                            bindTraverser: => BindTraverser,
                                            alternativeTraverser: => AlternativeTraverser,
-                                           patTupleTraverser: => PatTupleTraverser,
+                                           patTupleTraverser: PatTupleTraverser,
+                                           patTupleRenderer: PatTupleRenderer,
                                            patExtractTraverser: PatExtractTraverser,
                                            patExtractRenderer: PatExtractRenderer,
                                            patExtractInfixTraverser: PatExtractInfixTraverser,
@@ -40,7 +41,9 @@ private[traversers] class PatTraverserImpl(litTraverser: => LitTraverser,
     case patternVar: Pat.Var => patVarTraverser.traverse(patternVar)
     case patternBind: Bind => bindTraverser.traverse(patternBind)
     case patternAlternative: Alternative => alternativeTraverser.traverse(patternAlternative)
-    case patternTuple: Pat.Tuple => patTupleTraverser.traverse(patternTuple)
+    case patternTuple: Pat.Tuple =>
+      val traversedTuple = patTupleTraverser.traverse(patternTuple)
+      patTupleRenderer.render(traversedTuple)
     case patternExtract: Pat.Extract =>
       val traversedPatExtract = patExtractTraverser.traverse(patternExtract)
       patExtractRenderer.render(traversedPatExtract)
