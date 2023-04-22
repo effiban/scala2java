@@ -354,13 +354,12 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     new SimpleArgumentTraverser(patTraverser)
   )
 
-  private lazy val patSeqWildcardTraverser: PatSeqWildcardTraverser = new PatSeqWildcardTraverserImpl(patSeqWildcardRenderer)
-
   private lazy val patTraverser: PatTraverser = new PatTraverserImpl(
     litTraverser,
     defaultTermNameTraverser,
     patWildcardTraverser,
-    patSeqWildcardTraverser,
+    PatSeqWildcardTraverser,
+    patSeqWildcardRenderer,
     patVarTraverser,
     bindTraverser,
     alternativeTraverser,

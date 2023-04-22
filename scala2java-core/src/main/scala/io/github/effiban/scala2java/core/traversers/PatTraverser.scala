@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.{PatExtractRenderer, PatInterpolateRenderer}
+import io.github.effiban.scala2java.core.renderers.{PatExtractRenderer, PatInterpolateRenderer, PatSeqWildcardRenderer}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Pat.{Alternative, Bind}
@@ -11,7 +11,8 @@ trait PatTraverser extends ScalaTreeTraverser[Pat]
 private[traversers] class PatTraverserImpl(litTraverser: => LitTraverser,
                                            defaultTermNameTraverser: => TermNameTraverser,
                                            patWildcardTraverser: => PatWildcardTraverser,
-                                           patSeqWildcardTraverser: => PatSeqWildcardTraverser,
+                                           patSeqWildcardTraverser: PatSeqWildcardTraverser,
+                                           patSeqWildcardRenderer: PatSeqWildcardRenderer,
                                            patVarTraverser: => PatVarTraverser,
                                            bindTraverser: => BindTraverser,
                                            alternativeTraverser: => AlternativeTraverser,
@@ -30,7 +31,9 @@ private[traversers] class PatTraverserImpl(litTraverser: => LitTraverser,
     case lit: Lit => litTraverser.traverse(lit)
     case termName: Term.Name => defaultTermNameTraverser.traverse(termName)
     case patternWildcard: Pat.Wildcard => patWildcardTraverser.traverse(patternWildcard)
-    case patternSeqWildcard: Pat.SeqWildcard => patSeqWildcardTraverser.traverse(patternSeqWildcard)
+    case patternSeqWildcard: Pat.SeqWildcard =>
+      val traversedPatSeqWildcard = patSeqWildcardTraverser.traverse(patternSeqWildcard)
+      patSeqWildcardRenderer.render(traversedPatSeqWildcard)
     case patternVar: Pat.Var => patVarTraverser.traverse(patternVar)
     case patternBind: Bind => bindTraverser.traverse(patternBind)
     case patternAlternative: Alternative => alternativeTraverser.traverse(patternAlternative)
