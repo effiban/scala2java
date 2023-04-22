@@ -354,7 +354,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   private lazy val patTraverser: PatTraverser = new PatTraverserImpl(
     LitTraverser,
     litRenderer,
-    defaultTermNameTraverser,
+    termNameRenderer,
     PatWildcardTraverser,
     patWildcardRenderer,
     PatSeqWildcardTraverser,
