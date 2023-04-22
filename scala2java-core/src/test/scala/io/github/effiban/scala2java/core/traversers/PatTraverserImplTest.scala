@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.PatExtractRenderer
+import io.github.effiban.scala2java.core.renderers.{PatExtractRenderer, PatInterpolateRenderer}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
@@ -23,6 +23,7 @@ class PatTraverserImplTest extends UnitTestSuite {
   private val patExtractRenderer = mock[PatExtractRenderer]
   private val patExtractInfixTraverser = mock[PatExtractInfixTraverser]
   private val patInterpolateTraverser = mock[PatInterpolateTraverser]
+  private val patInterpolateRenderer = mock[PatInterpolateRenderer]
   private val patTypedTraverser = mock[PatTypedTraverser]
 
   val patTraverser = new PatTraverserImpl(
@@ -38,6 +39,7 @@ class PatTraverserImplTest extends UnitTestSuite {
     patExtractRenderer,
     patExtractInfixTraverser,
     patInterpolateTraverser,
+    patInterpolateRenderer,
     patTypedTraverser)
 
 
@@ -106,8 +108,9 @@ class PatTraverserImplTest extends UnitTestSuite {
       parts = List(Lit.String("Hello "), Lit.String(", have a (.+) day")),
       args = List(Term.Name("name"))
     )
+    doReturn(patInterpolate).when(patInterpolateTraverser).traverse(eqTree(patInterpolate))
     patTraverser.traverse(patInterpolate)
-    verify(patInterpolateTraverser).traverse(eqTree(patInterpolate))
+    verify(patInterpolateRenderer).render(eqTree(patInterpolate))
   }
 
   test("traverse Pat.Typed") {

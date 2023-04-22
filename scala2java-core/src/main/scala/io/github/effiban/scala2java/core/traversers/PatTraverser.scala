@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.PatExtractRenderer
+import io.github.effiban.scala2java.core.renderers.{PatExtractRenderer, PatInterpolateRenderer}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Pat.{Alternative, Bind}
@@ -18,8 +18,9 @@ private[traversers] class PatTraverserImpl(litTraverser: => LitTraverser,
                                            patTupleTraverser: => PatTupleTraverser,
                                            patExtractTraverser: PatExtractTraverser,
                                            patExtractRenderer: PatExtractRenderer,
-                                           patExtractInfixTraverser: => PatExtractInfixTraverser,
-                                           patInterpolateTraverser: => PatInterpolateTraverser,
+                                           patExtractInfixTraverser: PatExtractInfixTraverser,
+                                           patInterpolateTraverser: PatInterpolateTraverser,
+                                           patInterpolateRenderer: PatInterpolateRenderer,
                                            patTypedTraverser: => PatTypedTraverser)
                                           (implicit javaWriter: JavaWriter) extends PatTraverser {
 
@@ -40,7 +41,9 @@ private[traversers] class PatTraverserImpl(litTraverser: => LitTraverser,
     case patternExtractInfix: Pat.ExtractInfix =>
       val traversedPatExtract = patExtractInfixTraverser.traverse(patternExtractInfix)
       patExtractRenderer.render(traversedPatExtract)
-    case patternInterpolate: Pat.Interpolate => patInterpolateTraverser.traverse(patternInterpolate)
+    case patternInterpolate: Pat.Interpolate =>
+      val traversedPatInterpolator = patInterpolateTraverser.traverse(patternInterpolate)
+      patInterpolateRenderer.render(traversedPatInterpolator)
     case patternTyped: Pat.Typed => patTypedTraverser.traverse(patternTyped)
     case _ => writeComment(s"UNSUPPORTED: $pat")
   }
