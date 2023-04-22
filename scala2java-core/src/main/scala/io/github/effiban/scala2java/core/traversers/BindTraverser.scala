@@ -1,17 +1,14 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.BindRenderer
-
-import scala.meta.Pat
 import scala.meta.Pat.Bind
 
-trait BindTraverser extends ScalaTreeTraverser[Pat.Bind]
+trait BindTraverser extends ScalaTreeTraverser1[Bind]
 
-private[traversers] class BindTraverserImpl(bindRenderer: BindRenderer) extends BindTraverser {
+object BindTraverser extends BindTraverser {
 
   // Pattern match bind variable, e.g.: a @ A().
-  override def traverse(patternBind: Bind): Unit = {
+  override def traverse(patternBind: Bind): Bind = {
     //TODO - consider supporting in Java by converting to a guard?
-    bindRenderer.render(patternBind)
+    patternBind
   }
 }
