@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.{PatExtractRenderer, PatInterpolateRenderer, PatSeqWildcardRenderer}
+import io.github.effiban.scala2java.core.renderers.{PatExtractRenderer, PatInterpolateRenderer, PatSeqWildcardRenderer, PatWildcardRenderer}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Pat.{Alternative, Bind}
@@ -10,7 +10,8 @@ trait PatTraverser extends ScalaTreeTraverser[Pat]
 
 private[traversers] class PatTraverserImpl(litTraverser: => LitTraverser,
                                            defaultTermNameTraverser: => TermNameTraverser,
-                                           patWildcardTraverser: => PatWildcardTraverser,
+                                           patWildcardTraverser: PatWildcardTraverser,
+                                           patWildcardRenderer: PatWildcardRenderer,
                                            patSeqWildcardTraverser: PatSeqWildcardTraverser,
                                            patSeqWildcardRenderer: PatSeqWildcardRenderer,
                                            patVarTraverser: => PatVarTraverser,
@@ -30,7 +31,9 @@ private[traversers] class PatTraverserImpl(litTraverser: => LitTraverser,
   override def traverse(pat: Pat): Unit = pat match {
     case lit: Lit => litTraverser.traverse(lit)
     case termName: Term.Name => defaultTermNameTraverser.traverse(termName)
-    case patternWildcard: Pat.Wildcard => patWildcardTraverser.traverse(patternWildcard)
+    case patternWildcard: Pat.Wildcard =>
+      val traversedPatWildcard = patWildcardTraverser.traverse(patternWildcard)
+      patWildcardRenderer.render(traversedPatWildcard)
     case patternSeqWildcard: Pat.SeqWildcard =>
       val traversedPatSeqWildcard = patSeqWildcardTraverser.traverse(patternSeqWildcard)
       patSeqWildcardRenderer.render(traversedPatSeqWildcard)
