@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.renderers.PatExtractRenderer
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
@@ -19,6 +20,7 @@ class PatTraverserImplTest extends UnitTestSuite {
   private val alternativeTraverser = mock[AlternativeTraverser]
   private val patTupleTraverser = mock[PatTupleTraverser]
   private val patExtractTraverser = mock[PatExtractTraverser]
+  private val patExtractRenderer = mock[PatExtractRenderer]
   private val patExtractInfixTraverser = mock[PatExtractInfixTraverser]
   private val patInterpolateTraverser = mock[PatInterpolateTraverser]
   private val patTypedTraverser = mock[PatTypedTraverser]
@@ -33,6 +35,7 @@ class PatTraverserImplTest extends UnitTestSuite {
     alternativeTraverser,
     patTupleTraverser,
     patExtractTraverser,
+    patExtractRenderer,
     patExtractInfixTraverser,
     patInterpolateTraverser,
     patTypedTraverser)
@@ -84,14 +87,17 @@ class PatTraverserImplTest extends UnitTestSuite {
 
   test("traverse Pat.Extract") {
     val patExtract = Pat.Extract(fun = Term.Name("MyRecord"), args = List(Pat.Var(TermName), Lit.Int(3)))
+    doReturn(patExtract).when(patExtractTraverser).traverse(eqTree(patExtract))
     patTraverser.traverse(patExtract)
-    verify(patExtractTraverser).traverse(eqTree(patExtract))
+    verify(patExtractRenderer).render(eqTree(patExtract))
   }
 
   test("traverse Pat.ExtractInfix") {
     val patExtractInfix = Pat.ExtractInfix(lhs = Pat.Var(TermName), op = Term.Name("MyRecord"), rhs = List(Lit.Int(3)))
+    val expectedPatExtract = Pat.Extract(fun = Term.Name("MyRecord"), args = List(Pat.Var(TermName), Lit.Int(3)))
+    doReturn(expectedPatExtract).when(patExtractInfixTraverser).traverse(eqTree(patExtractInfix))
     patTraverser.traverse(patExtractInfix)
-    verify(patExtractInfixTraverser).traverse(eqTree(patExtractInfix))
+    verify(patExtractRenderer).render(eqTree(expectedPatExtract))
   }
 
   test("traverse Pat.Interpolate") {

@@ -1,16 +1,10 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.{Pat, Term}
 
 class PatExtractInfixTraverserImplTest extends UnitTestSuite {
-
-  private val patExtractTraverser = mock[PatExtractTraverser]
-
-  private val patExtractInfixTraverser = new PatExtractInfixTraverserImpl(patExtractTraverser)
 
   test("traverse") {
     val caseClassCreator = Term.Name("MyClass")
@@ -21,11 +15,6 @@ class PatExtractInfixTraverserImplTest extends UnitTestSuite {
 
     val expectedPatExtract = Pat.Extract(fun = caseClassCreator, args = lhs :: rhs)
 
-    doWrite("/* MyClass(x, y, z) */").when(patExtractTraverser).traverse(eqTree(expectedPatExtract))
-
-    patExtractInfixTraverser.traverse(patExtractInfix)
-
-    outputWriter.toString shouldBe "/* MyClass(x, y, z) */"
+    PatExtractInfixTraverser.traverse(patExtractInfix).structure shouldBe expectedPatExtract.structure
   }
-
 }

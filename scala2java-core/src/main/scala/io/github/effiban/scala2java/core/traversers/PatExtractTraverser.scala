@@ -1,15 +1,14 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.PatExtractRenderer
-
 import scala.meta.Pat
 
-trait PatExtractTraverser extends ScalaTreeTraverser[Pat.Extract]
+trait PatExtractTraverser extends ScalaTreeTraverser1[Pat.Extract]
 
-class PatExtractTraverserImpl(patExtractRenderer: PatExtractRenderer) extends PatExtractTraverser {
+object PatExtractTraverser extends PatExtractTraverser {
 
-  override def traverse(patternExtractor: Pat.Extract): Unit = {
-    //TODO - unsupported in Java, but consider transforming it to a guard
-    patExtractRenderer.render(patternExtractor)
+  /** Pattern extractor, e.g. {{{MyObj(1, 2)}}} in {{{case MyObj(1, 2) => ....}}} */
+  //TODO - unsupported in Java, but consider transforming it to a guard
+  override def traverse(patternExtractor: Pat.Extract): Pat.Extract = {
+    patternExtractor
   }
 }

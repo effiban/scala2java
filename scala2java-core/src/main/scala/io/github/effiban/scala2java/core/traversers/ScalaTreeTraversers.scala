@@ -349,10 +349,6 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val partialFunctionTraverser: PartialFunctionTraverser = new PartialFunctionTraverserImpl(termFunctionTraverser)
 
-  private lazy val patExtractInfixTraverser: PatExtractInfixTraverser = new PatExtractInfixTraverserImpl(patExtractTraverser)
-
-  private lazy val patExtractTraverser: PatExtractTraverser = new PatExtractTraverserImpl(patExtractRenderer)
-
   private lazy val patInterpolateTraverser: PatInterpolateTraverser = new PatInterpolateTraverserImpl(patInterpolateRenderer)
 
   private lazy val patListTraverser: PatListTraverser = new PatListTraverserImpl(
@@ -371,8 +367,9 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     bindTraverser,
     alternativeTraverser,
     patTupleTraverser,
-    patExtractTraverser,
-    patExtractInfixTraverser,
+    PatExtractTraverser,
+    patExtractRenderer,
+    PatExtractInfixTraverser,
     patInterpolateTraverser,
     patTypedTraverser
   )
