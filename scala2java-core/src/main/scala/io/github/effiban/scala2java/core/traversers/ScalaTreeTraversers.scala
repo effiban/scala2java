@@ -570,7 +570,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     new TermSelectTraverserImpl(
       qualifierTraverser = expressionTermTraverser,
       transformedTermTraverser = transformedTermTraverser,
-      defaultTermNameTraverser,
+      termNameRenderer,
       typeListTraverser,
       qualifierTypeInferrer,
       internalTermSelectTransformer
