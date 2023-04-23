@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.renderers.TypeNameRenderer
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Type
@@ -7,7 +8,8 @@ import scala.meta.Type
 trait TypeProjectTraverser extends ScalaTreeTraverser[Type.Project]
 
 private[traversers] class TypeProjectTraverserImpl(typeTraverser: => TypeTraverser,
-                                                   typeNameTraverser: => TypeNameTraverser)
+                                                   typeNameTraverser: TypeNameTraverser,
+                                                   typeNameRenderer: TypeNameRenderer)
                                                   (implicit javaWriter: JavaWriter) extends TypeProjectTraverser {
 
   import javaWriter._
@@ -17,6 +19,7 @@ private[traversers] class TypeProjectTraverserImpl(typeTraverser: => TypeTravers
   override def traverse(typeProject: Type.Project): Unit = {
     typeTraverser.traverse(typeProject.qual)
     writeQualifierSeparator()
-    typeNameTraverser.traverse(typeProject.name)
+    val traversedTypeName = typeNameTraverser.traverse(typeProject.name)
+    typeNameRenderer.render(traversedTypeName)
   }
 }
