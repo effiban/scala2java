@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.TermNameRenderer
+import io.github.effiban.scala2java.core.renderers.{NameIndeterminateRenderer, TermNameRenderer}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
@@ -8,13 +8,13 @@ import scala.meta.{Name, Term, Type}
 
 class NameTraverserImplTest extends UnitTestSuite {
 
-  private val nameIndeterminateTraverser = mock[NameIndeterminateTraverser]
+  private val nameIndeterminateRenderer = mock[NameIndeterminateRenderer]
   private val termNameRenderer = mock[TermNameRenderer]
   private val typeNameTraverser = mock[TypeNameTraverser]
 
 
   private val nameTraverser = new NameTraverserImpl(
-    nameIndeterminateTraverser,
+    nameIndeterminateRenderer,
     termNameRenderer,
     typeNameTraverser)
 
@@ -27,7 +27,7 @@ class NameTraverserImplTest extends UnitTestSuite {
 
     nameTraverser.traverse(name)
 
-    verify(nameIndeterminateTraverser).traverse(eqTree(name))
+    verify(nameIndeterminateRenderer).render(eqTree(name))
   }
 
   test("traverse for Term.Name") {
