@@ -8,7 +8,13 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   val litRenderer: LitRenderer = new LitRendererImpl()
 
-  val nameIndeterminateRenderer: NameIndeterminateRenderer = new NameIndeterminateRendererImpl()
+  private val nameIndeterminateRenderer: NameIndeterminateRenderer = new NameIndeterminateRendererImpl()
+
+  val nameRenderer: NameRenderer = new NameRendererImpl(
+    nameIndeterminateRenderer,
+    termNameRenderer,
+    typeNameRenderer
+  )
 
   val patExtractRenderer: PatExtractRenderer = new PatExtractRendererImpl()
 
@@ -34,7 +40,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   val typeLambdaRenderer: TypeLambdaRenderer = new TypeLambdaRendererImpl()
 
-  val typeNameRenderer: TypeNameRenderer = new TypeNameRendererImpl()
+  lazy val typeNameRenderer: TypeNameRenderer = new TypeNameRendererImpl()
 
   val typeVarRenderer: TypeVarRenderer = new TypeVarRendererImpl()
 }

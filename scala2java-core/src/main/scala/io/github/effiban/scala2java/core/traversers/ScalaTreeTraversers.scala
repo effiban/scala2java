@@ -329,12 +329,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val modListTraverser: ModListTraverser = new ModListTraverserImpl(annotListTraverser, JavaModifiersResolver)
 
-  private lazy val nameTraverser: NameTraverser = new NameTraverserImpl(
-    nameIndeterminateRenderer,
-    termNameRenderer,
-    typeNameTraverser,
-    typeNameRenderer
-  )
+  private lazy val nameTraverser: NameTraverser = new NameTraverserImpl(typeNameTraverser, nameRenderer)
 
   private lazy val newAnonymousTraverser: NewAnonymousTraverser = new NewAnonymousTraverserImpl(templateTraverser)
 
