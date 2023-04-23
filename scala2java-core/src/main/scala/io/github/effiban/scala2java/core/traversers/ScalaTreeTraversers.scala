@@ -332,7 +332,6 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   private lazy val nameIndeterminateTraverser: NameIndeterminateTraverser = new NameIndeterminateTraverserImpl(nameIndeterminateRenderer)
 
   private lazy val nameTraverser: NameTraverser = new NameTraverserImpl(
-    NameAnonymousTraverser,
     nameIndeterminateTraverser,
     termNameRenderer,
     typeNameTraverser
