@@ -1,13 +1,13 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.TermNameRenderer
+import io.github.effiban.scala2java.core.renderers.{NameIndeterminateRenderer, TermNameRenderer}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.{Name, Term, Type}
 
 trait NameTraverser extends ScalaTreeTraverser[Name]
 
-private[traversers] class NameTraverserImpl(nameIndeterminateTraverser: => NameIndeterminateTraverser,
+private[traversers] class NameTraverserImpl(nameIndeterminateRenderer: NameIndeterminateRenderer,
                                             termNameRenderer: TermNameRenderer,
                                             typeNameTraverser: => TypeNameTraverser)
                                            (implicit javaWriter: JavaWriter) extends NameTraverser {
@@ -18,7 +18,7 @@ private[traversers] class NameTraverserImpl(nameIndeterminateTraverser: => NameI
     // Type with no explicit name, by default should be left empty in Java
     // (except special cases e.g. `this` and `super` which are handled in their traversers)
     case _: Name.Anonymous =>
-    case indeterminateName: Name.Indeterminate => nameIndeterminateTraverser.traverse(indeterminateName)
+    case indeterminateName: Name.Indeterminate => nameIndeterminateRenderer.render(indeterminateName)
     case termName: Term.Name => termNameRenderer.render(termName)
     case typeName: Type.Name => typeNameTraverser.traverse(typeName)
     case other => writeComment(s"UNSUPPORTED: $other")
