@@ -8,10 +8,10 @@ import scala.meta.{Term, Type}
 
 class TypeSelectTraverserImplTest extends UnitTestSuite {
 
-  private val expressionTermTraverser = mock[ExpressionTermTraverser]
+  private val defaultTermRefTraverser = mock[TermRefTraverser]
   private val typeNameTraverser = mock[TypeNameTraverser]
 
-  private val typeSelectTraverser = new TypeSelectTraverserImpl(expressionTermTraverser, typeNameTraverser)
+  private val typeSelectTraverser = new TypeSelectTraverserImpl(defaultTermRefTraverser, typeNameTraverser)
 
   test("traverse()") {
     val qual = Term.Name("myObj")
@@ -19,7 +19,7 @@ class TypeSelectTraverserImplTest extends UnitTestSuite {
 
     val typeSelect = Type.Select(qual, tpe)
 
-    doWrite("myObj").when(expressionTermTraverser).traverse(eqTree(qual))
+    doWrite("myObj").when(defaultTermRefTraverser).traverse(eqTree(qual))
     doWrite("MyType").when(typeNameTraverser).traverse(eqTree(tpe))
 
     typeSelectTraverser.traverse(typeSelect)
