@@ -332,7 +332,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   private lazy val nameTraverser: NameTraverser = new NameTraverserImpl(
     nameIndeterminateRenderer,
     termNameRenderer,
-    typeNameTraverser
+    typeNameTraverser,
+    typeNameRenderer
   )
 
   private lazy val newAnonymousTraverser: NewAnonymousTraverser = new NewAnonymousTraverserImpl(templateTraverser)
@@ -622,10 +623,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     new SimpleArgumentTraverser(typeTraverser)
   )
 
-  private lazy val typeNameTraverser: TypeNameTraverser = new TypeNameTraverserImpl(
-    new CompositeTypeNameTransformer(CoreTypeNameTransformer),
-    typeNameRenderer
-  )
+  private lazy val typeNameTraverser: TypeNameTraverser = new TypeNameTraverserImpl(new CompositeTypeNameTransformer(CoreTypeNameTransformer))
 
   private lazy val typeParamListTraverser: TypeParamListTraverser = new TypeParamListTraverserImpl(
     argumentListTraverser,
@@ -638,12 +636,17 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     typeBoundsTraverser
   )
 
-  private lazy val typeProjectTraverser: TypeProjectTraverser = new TypeProjectTraverserImpl(typeTraverser, typeNameTraverser)
+  private lazy val typeProjectTraverser: TypeProjectTraverser = new TypeProjectTraverserImpl(
+    typeTraverser,
+    typeNameTraverser,
+    typeNameRenderer
+  )
 
   private lazy val typeRefineTraverser: TypeRefineTraverser = new TypeRefineTraverserImpl(typeTraverser)
 
   private lazy val typeRefTraverser: TypeRefTraverser = new TypeRefTraverserImpl(
     typeNameTraverser,
+    typeNameRenderer,
     typeSelectTraverser,
     typeProjectTraverser,
     typeSingletonTraverser
@@ -651,7 +654,11 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val typeRepeatedTraverser: TypeRepeatedTraverser = new TypeRepeatedTraverserImpl(typeTraverser)
 
-  private lazy val typeSelectTraverser: TypeSelectTraverser = new TypeSelectTraverserImpl(defaultTermRefTraverser, typeNameTraverser)
+  private lazy val typeSelectTraverser: TypeSelectTraverser = new TypeSelectTraverserImpl(
+    defaultTermRefTraverser,
+    typeNameTraverser,
+    typeNameRenderer
+  )
 
   private lazy val typeSingletonTraverser: TypeSingletonTraverser = new TypeSingletonTraverserImpl(defaultTermTraverser, TypeSingletonToTermTransformer)
 

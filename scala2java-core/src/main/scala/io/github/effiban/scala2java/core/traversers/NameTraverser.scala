@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.{NameIndeterminateRenderer, TermNameRenderer}
+import io.github.effiban.scala2java.core.renderers.{NameIndeterminateRenderer, TermNameRenderer, TypeNameRenderer}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.{Name, Term, Type}
@@ -9,7 +9,8 @@ trait NameTraverser extends ScalaTreeTraverser[Name]
 
 private[traversers] class NameTraverserImpl(nameIndeterminateRenderer: NameIndeterminateRenderer,
                                             termNameRenderer: TermNameRenderer,
-                                            typeNameTraverser: => TypeNameTraverser)
+                                            typeNameTraverser: TypeNameTraverser,
+                                            typeNameRenderer: TypeNameRenderer)
                                            (implicit javaWriter: JavaWriter) extends NameTraverser {
 
   import javaWriter._
@@ -20,7 +21,9 @@ private[traversers] class NameTraverserImpl(nameIndeterminateRenderer: NameIndet
     case _: Name.Anonymous =>
     case indeterminateName: Name.Indeterminate => nameIndeterminateRenderer.render(indeterminateName)
     case termName: Term.Name => termNameRenderer.render(termName)
-    case typeName: Type.Name => typeNameTraverser.traverse(typeName)
+    case typeName: Type.Name =>
+      val traversedTypeName = typeNameTraverser.traverse(typeName)
+      typeNameRenderer.render(traversedTypeName)
     case other => writeComment(s"UNSUPPORTED: $other")
   }
 

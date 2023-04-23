@@ -1,30 +1,36 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.renderers.TypeNameRenderer
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.{Term, Type}
+import scala.meta.{Term, Type, XtensionQuasiquoteType}
 
 class TypeRefTraverserImplTest extends UnitTestSuite {
 
   private val typeNameTraverser = mock[TypeNameTraverser]
+  private val typeNameRenderer = mock[TypeNameRenderer]
   private val typeSelectTraverser = mock[TypeSelectTraverser]
   private val typeProjectTraverser = mock[TypeProjectTraverser]
   private val typeSingletonTraverser = mock[TypeSingletonTraverser]
 
   private val typeRefTraverser = new TypeRefTraverserImpl(
     typeNameTraverser,
+    typeNameRenderer,
     typeSelectTraverser,
     typeProjectTraverser,
     typeSingletonTraverser
   )
 
   test("traverse Type.Name") {
-    val typeName = Type.Name("MyType")
+    val typeName = t"MyType"
+    val traversedTypeName = t"MyTraversedType"
+
+    doReturn(traversedTypeName).when(typeNameTraverser).traverse(eqTree(typeName))
 
     typeRefTraverser.traverse(typeName)
 
-    verify(typeNameTraverser).traverse(eqTree(typeName))
+    verify(typeNameRenderer).render(eqTree(traversedTypeName))
   }
 
   test("traverse Type.Select") {
