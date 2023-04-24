@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.renderers.NameIndeterminateRenderer
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -8,15 +9,15 @@ import scala.meta.{Importee, Name}
 
 class ImporteeTraverserImplTest extends UnitTestSuite {
 
-  private val nameTraverser = mock[NameTraverser]
+  private val nameIndeterminateRenderer = mock[NameIndeterminateRenderer]
 
-  private val importeeTraverser = new ImporteeTraverserImpl(nameTraverser)
+  private val importeeTraverser = new ImporteeTraverserImpl(nameIndeterminateRenderer)
 
 
   test("traverse name") {
     val name = Name.Indeterminate("myName")
 
-    doWrite("myName").when(nameTraverser).traverse(eqTree(name))
+    doWrite("myName").when(nameIndeterminateRenderer).render(eqTree(name))
 
     importeeTraverser.traverse(Importee.Name(name))
 
@@ -33,8 +34,8 @@ class ImporteeTraverserImplTest extends UnitTestSuite {
     val origName = Name.Indeterminate("origName")
     val newName = Name.Indeterminate("newName")
 
-    doWrite("origName").when(nameTraverser).traverse(eqTree(origName))
-    doWrite("newName").when(nameTraverser).traverse(eqTree(newName))
+    doWrite("origName").when(nameIndeterminateRenderer).render(eqTree(origName))
+    doWrite("newName").when(nameIndeterminateRenderer).render(eqTree(newName))
 
     importeeTraverser.traverse(Importee.Rename(name = origName, rename = newName))
 
@@ -44,7 +45,7 @@ class ImporteeTraverserImplTest extends UnitTestSuite {
   test("traverse unimported") {
     val name = Name.Indeterminate("myName")
 
-    doWrite("myName").when(nameTraverser).traverse(eqTree(name))
+    doWrite("myName").when(nameIndeterminateRenderer).render(eqTree(name))
 
     importeeTraverser.traverse(Importee.Unimport(name))
 
