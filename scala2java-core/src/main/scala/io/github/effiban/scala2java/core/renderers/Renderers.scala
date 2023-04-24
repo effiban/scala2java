@@ -8,7 +8,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   val litRenderer: LitRenderer = new LitRendererImpl()
 
-  private val nameIndeterminateRenderer: NameIndeterminateRenderer = new NameIndeterminateRendererImpl()
+  val nameIndeterminateRenderer: NameIndeterminateRenderer = new NameIndeterminateRendererImpl()
 
   val nameRenderer: NameRenderer = new NameRendererImpl(
     nameIndeterminateRenderer,
