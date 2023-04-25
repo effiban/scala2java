@@ -1,69 +1,39 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.renderers.NameRenderer
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.testtrees.TypeBounds
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.Type
+import scala.meta.{Type, XtensionQuasiquoteType, XtensionQuasiquoteTypeParam}
 
 class TypeParamTraverserImplTest extends UnitTestSuite {
 
   private val nameTraverser = mock[NameTraverser]
+  private val nameRenderer = mock[NameRenderer]
   private val typeParamListTraverser = mock[TypeParamListTraverser]
   private val typeBoundsTraverser = mock[TypeBoundsTraverser]
 
   private val typeParamTraverser = new TypeParamTraverserImpl(
     nameTraverser,
+    nameRenderer,
     typeParamListTraverser,
     typeBoundsTraverser
   )
 
 
   test("testTraverse") {
+    val typeParam = tparam"T[K, V] <: Sortable"
 
-    val nestedTypeParams = List(
-      Type.Param(
-        mods = Nil,
-        name = Type.Name("K"),
-        tparams = Nil,
-        tbounds = TypeBounds.Empty,
-        vbounds = Nil,
-        cbounds = Nil
-      ),
-      Type.Param(
-        mods = Nil,
-        name = Type.Name("V"),
-        tparams = Nil,
-        tbounds = TypeBounds.Empty,
-        vbounds = Nil,
-        cbounds = Nil
-      )
-    )
+    doReturn(t"T2").when(nameTraverser).traverse(eqTree(t"T"))
+    doWrite("T2").when(nameRenderer).render(eqTree(t"T2"))
+    doWrite("<K, V>").when(typeParamListTraverser).traverse(eqTreeList(List(tparam"K", tparam"V")))
+    doWrite(" extends Sortable").when(typeBoundsTraverser).traverse(eqTree(Type.Bounds(lo = None, hi = Some(t"Sortable"))))
 
-    val mainTypeParamName = Type.Name("T")
-    val mainTypeParamBounds = Type.Bounds(
-      lo = None,
-      hi = Some(Type.Name("Sortable"))
-    )
+    typeParamTraverser.traverse(typeParam)
 
-    val mainTypeParam = Type.Param(
-      mods = Nil,
-      name = mainTypeParamName,
-      tparams = nestedTypeParams,
-      tbounds = mainTypeParamBounds,
-      vbounds = Nil,
-      cbounds = Nil
-    )
-
-    doWrite("T").when(nameTraverser).traverse(eqTree(mainTypeParamName))
-    doWrite("<K, V>").when(typeParamListTraverser).traverse(eqTreeList(nestedTypeParams))
-    doWrite(" extends Sortable").when(typeBoundsTraverser).traverse(eqTree(mainTypeParamBounds))
-
-    typeParamTraverser.traverse(mainTypeParam)
-
-    outputWriter.toString shouldBe "T<K, V> extends Sortable"
+    outputWriter.toString shouldBe "T2<K, V> extends Sortable"
   }
 
 }

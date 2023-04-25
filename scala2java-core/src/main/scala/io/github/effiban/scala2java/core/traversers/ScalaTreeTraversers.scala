@@ -329,7 +329,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val modListTraverser: ModListTraverser = new ModListTraverserImpl(annotListTraverser, JavaModifiersResolver)
 
-  private lazy val nameTraverser: NameTraverser = new NameTraverserImpl(typeNameTraverser, nameRenderer)
+  private lazy val nameTraverser: NameTraverser = new NameTraverserImpl(typeNameTraverser)
 
   private lazy val newAnonymousTraverser: NewAnonymousTraverser = new NewAnonymousTraverserImpl(templateTraverser)
 
@@ -431,7 +431,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     defaultTermTraverser
   )
 
-  private lazy val superTraverser: SuperTraverser = new SuperTraverserImpl(nameTraverser)
+  private lazy val superTraverser: SuperTraverser = new SuperTraverserImpl(nameTraverser, nameRenderer)
 
   private lazy val templateBodyTraverser: TemplateBodyTraverser = new TemplateBodyTraverserImpl(
     templateChildrenTraverser,
@@ -540,7 +540,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   private lazy val termParamTraverser: TermParamTraverser = new TermParamTraverserImpl(
     modListTraverser,
     typeTraverser,
-    nameTraverser
+    nameTraverser,
+    nameRenderer
   )
 
   private lazy val termPlaceholderTraverser: TermPlaceholderTraverser = new TermPlaceholderTraverserImpl(termPlaceholderRenderer)
@@ -574,7 +575,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     TermTupleToTermApplyTransformer
   )
 
-  private lazy val thisTraverser: ThisTraverser = new ThisTraverserImpl(nameTraverser)
+  private lazy val thisTraverser: ThisTraverser = new ThisTraverserImpl(nameTraverser, nameRenderer)
 
   private lazy val throwTraverser: ThrowTraverser = new ThrowTraverserImpl(expressionTermTraverser)
 
@@ -627,6 +628,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val typeParamTraverser: TypeParamTraverser = new TypeParamTraverserImpl(
     nameTraverser,
+    nameRenderer,
     typeParamListTraverser,
     typeBoundsTraverser
   )
