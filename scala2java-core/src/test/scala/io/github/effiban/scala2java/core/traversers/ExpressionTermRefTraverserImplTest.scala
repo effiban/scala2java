@@ -2,6 +2,7 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.TermSelectContext
 import io.github.effiban.scala2java.core.matchers.TermSelectContextMatcher.eqTermSelectContext
+import io.github.effiban.scala2java.core.renderers.ThisRenderer
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
@@ -11,13 +12,15 @@ import scala.meta.{Name, Term}
 class ExpressionTermRefTraverserImplTest extends UnitTestSuite {
 
   private val thisTraverser = mock[ThisTraverser]
+  private val thisRenderer = mock[ThisRenderer]
   private val superTraverser = mock[SuperTraverser]
   private val termNameTraverser = mock[TermNameTraverser]
   private val termSelectTraverser = mock[ExpressionTermSelectTraverser]
   private val applyUnaryTraverser = mock[ApplyUnaryTraverser]
 
-  private val termRefTraverser = new ExpressionTermRefTraverser(
+  private val expressionTermRefTraverser = new ExpressionTermRefTraverser(
     thisTraverser,
+    thisRenderer,
     superTraverser,
     termNameTraverser,
     termSelectTraverser,
@@ -26,16 +29,19 @@ class ExpressionTermRefTraverserImplTest extends UnitTestSuite {
   
   test("traverse 'this'") {
     val `this` = This(Name.Indeterminate("MyName"))
+    val traversedThis = This(Name.Indeterminate("MyTraversedName"))
 
-    termRefTraverser.traverse(`this`)
+    doReturn(traversedThis).when(thisTraverser).traverse(eqTree(`this`))
 
-    verify(thisTraverser).traverse(eqTree(`this`))
+    expressionTermRefTraverser.traverse(`this`)
+
+    verify(thisRenderer).render(eqTree(traversedThis))
   }
 
   test("traverse 'super'") {
     val `super` = Super(thisp = Name.Indeterminate("superName"), superp = Name.Anonymous())
 
-    termRefTraverser.traverse(`super`)
+    expressionTermRefTraverser.traverse(`super`)
 
     verify(superTraverser).traverse(eqTree(`super`))
   }
@@ -43,7 +49,7 @@ class ExpressionTermRefTraverserImplTest extends UnitTestSuite {
   test("traverse termName") {
     val termName = Term.Name("x")
 
-    termRefTraverser.traverse(termName)
+    expressionTermRefTraverser.traverse(termName)
 
     verify(termNameTraverser).traverse(eqTree(termName))
   }
@@ -51,7 +57,7 @@ class ExpressionTermRefTraverserImplTest extends UnitTestSuite {
   test("traverse termSelect") {
     val termSelect = Term.Select(Term.Name("X"), Term.Name("x"))
 
-    termRefTraverser.traverse(termSelect)
+    expressionTermRefTraverser.traverse(termSelect)
 
     verify(termSelectTraverser).traverse(eqTree(termSelect), eqTermSelectContext(TermSelectContext()))
   }
@@ -59,7 +65,7 @@ class ExpressionTermRefTraverserImplTest extends UnitTestSuite {
   test("traverse applyUnary") {
     val applyUnary = ApplyUnary(Term.Name("!"), Term.Name("x"))
 
-    termRefTraverser.traverse(applyUnary)
+    expressionTermRefTraverser.traverse(applyUnary)
 
     verify(applyUnaryTraverser).traverse(eqTree(applyUnary))
   }
