@@ -3,6 +3,7 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.{ModifiersContext, StatContext}
 import io.github.effiban.scala2java.core.entities.JavaTreeType
 import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
+import io.github.effiban.scala2java.core.renderers.NameRenderer
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
@@ -10,7 +11,7 @@ import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchers
 
-import scala.meta.{Init, Lit, Mod, Name, Term, Type}
+import scala.meta.{Init, Lit, Mod, Name, Term, Type, XtensionQuasiquoteTerm}
 
 class TermParamTraverserImplTest extends UnitTestSuite {
 
@@ -20,16 +21,19 @@ class TermParamTraverserImplTest extends UnitTestSuite {
     Init(tpe = Type.Name("MyAnnotation"), name = Name.Anonymous(), argss = List())
   )
   private val Modifiers = List(TheAnnot)
-  private val ParamName = Name.Indeterminate("myParam")
+  private val ParamName = q"myParam"
+  private val TraversedParamName = q"traversedMyParam"
 
   private val modListTraverser = mock[ModListTraverser]
   private val typeTraverser = mock[TypeTraverser]
   private val nameTraverser = mock[NameTraverser]
+  private val nameRenderer = mock[NameRenderer]
 
   private val termParamTraverser = new TermParamTraverserImpl(
     modListTraverser,
     typeTraverser,
-    nameTraverser
+    nameTraverser,
+    nameRenderer
   )
 
   test("traverse with type and default") {
@@ -43,11 +47,12 @@ class TermParamTraverserImplTest extends UnitTestSuite {
     doWrite("@MyAnnotation final ")
       .when(modListTraverser).traverse(eqExpectedModifiers(termParam), annotsOnSameLine = ArgumentMatchers.eq(true))
     doWrite("int").when(typeTraverser).traverse(eqTree(TypeNames.Int))
-    doWrite("myParam").when(nameTraverser).traverse(eqTree(ParamName))
+    doReturn(TraversedParamName).when(nameTraverser).traverse(eqTree(ParamName))
+    doWrite("myTraversedParam").when(nameRenderer).render(eqTree(TraversedParamName))
 
     termParamTraverser.traverse(termParam, TheStatContext)
 
-    outputWriter.toString shouldBe "@MyAnnotation final int myParam/* = 3 */"
+    outputWriter.toString shouldBe "@MyAnnotation final int myTraversedParam/* = 3 */"
   }
 
   test("traverse without type and without default") {
@@ -60,11 +65,12 @@ class TermParamTraverserImplTest extends UnitTestSuite {
 
     doWrite("@MyAnnotation ")
       .when(modListTraverser).traverse(eqExpectedModifiers(termParam), annotsOnSameLine = ArgumentMatchers.eq(true))
-    doWrite("myParam").when(nameTraverser).traverse(eqTree(ParamName))
+    doReturn(TraversedParamName).when(nameTraverser).traverse(eqTree(ParamName))
+    doWrite("myTraversedParam").when(nameRenderer).render(eqTree(TraversedParamName))
 
     termParamTraverser.traverse(termParam, TheStatContext)
 
-    outputWriter.toString shouldBe "@MyAnnotation myParam"
+    outputWriter.toString shouldBe "@MyAnnotation myTraversedParam"
   }
 
   private def eqExpectedModifiers(termParam: Term.Param) = {
