@@ -2,40 +2,32 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.TermSelectContext
 import io.github.effiban.scala2java.core.matchers.TermSelectContextMatcher.eqTermSelectContext
-import io.github.effiban.scala2java.core.renderers.ThisRenderer
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.Term.{ApplyUnary, Super, This}
 import scala.meta.{Name, Term}
 
-class ExpressionTermRefTraverserImplTest extends UnitTestSuite {
+class ExpressionTermRefTraverserTest extends UnitTestSuite {
 
-  private val thisTraverser = mock[ThisTraverser]
-  private val thisRenderer = mock[ThisRenderer]
-  private val superTraverser = mock[SuperTraverser]
   private val termNameTraverser = mock[TermNameTraverser]
   private val termSelectTraverser = mock[ExpressionTermSelectTraverser]
   private val applyUnaryTraverser = mock[ApplyUnaryTraverser]
+  private val defaultTermRefTraverser = mock[DefaultTermRefTraverser]
 
   private val expressionTermRefTraverser = new ExpressionTermRefTraverser(
-    thisTraverser,
-    thisRenderer,
-    superTraverser,
     termNameTraverser,
     termSelectTraverser,
-    applyUnaryTraverser
+    applyUnaryTraverser,
+    defaultTermRefTraverser
   )
   
   test("traverse 'this'") {
     val `this` = This(Name.Indeterminate("MyName"))
-    val traversedThis = This(Name.Indeterminate("MyTraversedName"))
-
-    doReturn(traversedThis).when(thisTraverser).traverse(eqTree(`this`))
 
     expressionTermRefTraverser.traverse(`this`)
 
-    verify(thisRenderer).render(eqTree(traversedThis))
+    verify(defaultTermRefTraverser).traverse(eqTree(`this`))
   }
 
   test("traverse 'super'") {
@@ -43,7 +35,7 @@ class ExpressionTermRefTraverserImplTest extends UnitTestSuite {
 
     expressionTermRefTraverser.traverse(`super`)
 
-    verify(superTraverser).traverse(eqTree(`super`))
+    verify(defaultTermRefTraverser).traverse(eqTree(`super`))
   }
 
   test("traverse termName") {
