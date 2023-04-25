@@ -575,7 +575,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     TermTupleToTermApplyTransformer
   )
 
-  private lazy val thisTraverser: ThisTraverser = new ThisTraverserImpl(nameTraverser, nameRenderer)
+  private lazy val thisTraverser: ThisTraverser = new ThisTraverserImpl(nameTraverser, thisRenderer)
 
   private lazy val throwTraverser: ThrowTraverser = new ThrowTraverserImpl(expressionTermTraverser)
 

@@ -34,6 +34,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   val termPlaceholderRenderer: TermPlaceholderRenderer = new TermPlaceholderRendererImpl()
 
+  val thisRenderer: ThisRenderer = new ThisRendererImpl(nameRenderer)
+
   val typeAnonymousParamRenderer: TypeAnonymousParamRenderer = new TypeAnonymousParamRendererImpl()
 
   val typeApplyInfixRenderer: TypeApplyInfixRenderer = new TypeApplyInfixRendererImpl()
