@@ -550,12 +550,10 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   private def expressionTermRefTraverser(termNameTraverser: => TermNameTraverser,
                                          termSelectTraverser: => ExpressionTermSelectTraverser): TermRefTraverser = {
     new ExpressionTermRefTraverser(
-      thisTraverser,
-      thisRenderer,
-      superTraverser,
       termNameTraverser,
       termSelectTraverser,
-      applyUnaryTraverser
+      applyUnaryTraverser,
+      defaultTermRefTraverser
     )
   }
 
