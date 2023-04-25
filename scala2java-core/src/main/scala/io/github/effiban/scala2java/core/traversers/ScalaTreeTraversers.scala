@@ -190,6 +190,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val defaultTermRefTraverser: TermRefTraverser = new DefaultTermRefTraverser(
     thisTraverser,
+    thisRenderer,
     superTraverser,
     termNameRenderer,
     defaultTermSelectTraverser
@@ -550,6 +551,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
                                          termSelectTraverser: => ExpressionTermSelectTraverser): TermRefTraverser = {
     new ExpressionTermRefTraverser(
       thisTraverser,
+      thisRenderer,
       superTraverser,
       termNameTraverser,
       termSelectTraverser,
@@ -575,7 +577,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     TermTupleToTermApplyTransformer
   )
 
-  private lazy val thisTraverser: ThisTraverser = new ThisTraverserImpl(nameTraverser, thisRenderer)
+  private lazy val thisTraverser: ThisTraverser = new ThisTraverserImpl(nameTraverser)
 
   private lazy val throwTraverser: ThrowTraverser = new ThrowTraverserImpl(expressionTermTraverser)
 

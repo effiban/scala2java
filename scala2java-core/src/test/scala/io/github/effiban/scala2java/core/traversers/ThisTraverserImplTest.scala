@@ -1,23 +1,19 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.ThisRenderer
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.Name
 import scala.meta.Term.This
+import scala.meta.{Name, XtensionStructure}
 
 class ThisTraverserImplTest extends UnitTestSuite {
 
   private val nameTraverser = mock[NameTraverser]
-  private val thisRenderer = mock[ThisRenderer]
 
-  private val thisTraverser = new ThisTraverserImpl(nameTraverser, thisRenderer)
+  private val thisTraverser = new ThisTraverserImpl(nameTraverser)
 
   test("traverse() when name is anonymous") {
-    thisTraverser.traverse(This(Name.Anonymous()))
-
-    verify(thisRenderer).render(eqTree(This(Name.Anonymous())))
+    thisTraverser.traverse(This(Name.Anonymous())).structure shouldBe This(Name.Anonymous()).structure
   }
 
   test("traverse() when name is specified") {
@@ -26,8 +22,6 @@ class ThisTraverserImplTest extends UnitTestSuite {
 
     doReturn(traversedName).when(nameTraverser).traverse(eqTree(name))
 
-    thisTraverser.traverse(This(name))
-
-    verify(thisRenderer).render(eqTree(This(traversedName)))
+    thisTraverser.traverse(This(name)).structure shouldBe This(traversedName).structure
   }
 }

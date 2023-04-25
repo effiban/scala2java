@@ -1,20 +1,16 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.ThisRenderer
-
 import scala.meta.Name
 import scala.meta.Term.This
 
-trait ThisTraverser extends ScalaTreeTraverser[This]
+trait ThisTraverser extends ScalaTreeTraverser1[This]
 
-private[traversers] class ThisTraverserImpl(nameTraverser: NameTraverser,
-                                            thisRenderer: ThisRenderer) extends ThisTraverser {
+private[traversers] class ThisTraverserImpl(nameTraverser: NameTraverser) extends ThisTraverser {
 
-  override def traverse(`this`: This): Unit = {
-    val traversedThis = `this`.qual match {
+  override def traverse(`this`: This): This = {
+    `this`.qual match {
       case Name.Anonymous() => `this`
       case qual => `this`.copy(qual = nameTraverser.traverse(qual))
     }
-    thisRenderer.render(traversedThis)
   }
 }
