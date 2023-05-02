@@ -1,7 +1,5 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.TypeSelectRenderer
-import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
@@ -11,12 +9,10 @@ class TypeSelectTraverserImplTest extends UnitTestSuite {
 
   private val defaultTermRefTraverser = mock[DefaultTermRefTraverser]
   private val typeNameTraverser = mock[TypeNameTraverser]
-  private val typeSelectRenderer = mock[TypeSelectRenderer]
 
   private val typeSelectTraverser = new TypeSelectTraverserImpl(
     defaultTermRefTraverser,
-    typeNameTraverser,
-    typeSelectRenderer
+    typeNameTraverser
   )
 
   test("traverse()") {
@@ -30,10 +26,7 @@ class TypeSelectTraverserImplTest extends UnitTestSuite {
 
     doReturn(traversedQual).when(defaultTermRefTraverser).traverse(eqTree(qual))
     doReturn(traversedType).when(typeNameTraverser).traverse(eqTree(tpe))
-    doWrite("myTraversedObj.MyTraversedType").when(typeSelectRenderer).render(eqTree(traversedTypeSelect))
 
-    typeSelectTraverser.traverse(typeSelect)
-
-    outputWriter.toString shouldBe "myTraversedObj.MyTraversedType"
+    typeSelectTraverser.traverse(typeSelect).structure shouldBe traversedTypeSelect.structure
   }
 }
