@@ -7,7 +7,7 @@ import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import scala.meta.Term.{Super, This}
 import scala.meta.{Name, Term}
 
-class DefaultTermRefTraverserTest extends UnitTestSuite {
+class DefaultTermRefTraverserImplTest extends UnitTestSuite {
 
   private val thisTraverser = mock[ThisTraverser]
   private val thisRenderer = mock[ThisRenderer]
@@ -16,7 +16,7 @@ class DefaultTermRefTraverserTest extends UnitTestSuite {
   private val termNameRenderer = mock[TermNameRenderer]
   private val defaultTermSelectTraverser = mock[DefaultTermSelectTraverser]
 
-  private val defaultTermRefTraverser = new DefaultTermRefTraverser(
+  private val defaultTermRefTraverser = new DefaultTermRefTraverserImpl(
     thisTraverser,
     thisRenderer,
     superTraverser,

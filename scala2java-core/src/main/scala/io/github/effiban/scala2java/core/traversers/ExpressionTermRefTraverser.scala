@@ -6,7 +6,7 @@ import scala.meta.Term.ApplyUnary
 private[traversers] class ExpressionTermRefTraverser(termNameTraverser: => TermNameTraverser,
                                                      expressionTermSelectTraverser: => ExpressionTermSelectTraverser,
                                                      applyUnaryTraverser: => ApplyUnaryTraverser,
-                                                     defaultTermRefTraverser: => TermRefTraverser) extends TermRefTraverser {
+                                                     defaultTermRefTraverser: => DefaultTermRefTraverser) extends TermRefTraverser {
 
   override def traverse(termRef: Term.Ref): Unit = termRef match {
     case termName: Term.Name => termNameTraverser.traverse(termName)
