@@ -30,6 +30,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   val selfRenderer: SelfRenderer = new SelfRendererImpl()
 
+  val superRenderer: SuperRenderer = new SuperRendererImpl(nameRenderer)
+
   lazy val termNameRenderer: TermNameRenderer = new TermNameRendererImpl()
 
   val termPlaceholderRenderer: TermPlaceholderRenderer = new TermPlaceholderRendererImpl()
