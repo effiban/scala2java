@@ -1,6 +1,5 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.SuperRenderer
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
@@ -10,17 +9,14 @@ import scala.meta.Term.Super
 class SuperTraverserImplTest extends UnitTestSuite {
 
   private val nameTraverser = mock[NameTraverser]
-  private val superRenderer = mock[SuperRenderer]
 
-  private val superTraverser = new SuperTraverserImpl(nameTraverser, superRenderer)
+  private val superTraverser = new SuperTraverserImpl(nameTraverser)
 
 
   test("traverse() without clauses") {
     val `super` = Super(thisp = Name.Anonymous(), superp = Name.Anonymous())
 
-    superTraverser.traverse(`super`)
-
-    verify(superRenderer).render(`super`)
+    superTraverser.traverse(`super`).structure shouldBe `super`.structure
   }
 
   test("traverse() with 'thisp' clause only") {
@@ -31,9 +27,7 @@ class SuperTraverserImplTest extends UnitTestSuite {
 
     doReturn(traversedName).when(nameTraverser).traverse(eqTree(name))
 
-    superTraverser.traverse(`super`)
-
-    verify(superRenderer).render(eqTree(traversedSuper))
+    superTraverser.traverse(`super`).structure shouldBe traversedSuper.structure
   }
 
   test("traverse() with both clauses") {
@@ -45,17 +39,13 @@ class SuperTraverserImplTest extends UnitTestSuite {
 
     doReturn(traversedThisName).when(nameTraverser).traverse(eqTree(thisName))
 
-    superTraverser.traverse(`super`)
-
-    verify(superRenderer).render(eqTree(traversedSuper))
+    superTraverser.traverse(`super`).structure shouldBe traversedSuper.structure
   }
 
   test("traverse() with 'superp' clause only") {
     val superName = Name.Indeterminate("SuperTrait")
     val `super` = Super(thisp = Name.Anonymous(), superp = superName)
 
-    superTraverser.traverse(`super`)
-
-    verify(superRenderer).render(eqTree(`super`))
+    superTraverser.traverse(`super`).structure shouldBe `super`.structure
   }
 }
