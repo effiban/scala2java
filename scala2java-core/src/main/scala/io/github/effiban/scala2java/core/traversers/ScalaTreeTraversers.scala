@@ -192,6 +192,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     thisTraverser,
     thisRenderer,
     superTraverser,
+    superRenderer,
     termNameRenderer,
     defaultTermSelectTraverser
   )
@@ -432,7 +433,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     defaultTermTraverser
   )
 
-  private lazy val superTraverser: SuperTraverser = new SuperTraverserImpl(nameTraverser, superRenderer)
+  private lazy val superTraverser: SuperTraverser = new SuperTraverserImpl(nameTraverser)
 
   private lazy val templateBodyTraverser: TemplateBodyTraverser = new TemplateBodyTraverserImpl(
     templateChildrenTraverser,
