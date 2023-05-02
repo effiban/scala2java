@@ -3,7 +3,7 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.{BlockContext, TryContext}
 import io.github.effiban.scala2java.core.entities.Decision.{No, Uncertain}
 import io.github.effiban.scala2java.core.matchers.BlockContextMatcher.eqBlockContext
-import io.github.effiban.scala2java.core.renderers.LitRenderer
+import io.github.effiban.scala2java.core.renderers.{DefaultTermRefRenderer, LitRenderer}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TermNames.Plus
 import io.github.effiban.scala2java.core.testtrees.TypeNames
@@ -13,11 +13,12 @@ import org.mockito.ArgumentMatchers
 import scala.meta.Enumerator.Generator
 import scala.meta.Mod.Annot
 import scala.meta.Term.{Apply, ApplyInfix, ApplyType, Assign, Block, Eta, For, ForYield, If, NewAnonymous}
-import scala.meta.{Case, Init, Lit, Name, Pat, Self, Template, Term, Type}
+import scala.meta.{Case, Init, Lit, Name, Pat, Self, Template, Term, Type, XtensionQuasiquoteTerm}
 
 class DefaultTermTraverserTest extends UnitTestSuite {
 
   private val defaultTermRefTraverser = mock[DefaultTermRefTraverser]
+  private val defaultTermRefRenderer = mock[DefaultTermRefRenderer]
   private val termApplyTraverser = mock[TermApplyTraverser]
   private val defaultMainApplyTypeTraverser = mock[MainApplyTypeTraverser]
   private val termApplyInfixTraverser = mock[TermApplyInfixTraverser]
@@ -51,6 +52,7 @@ class DefaultTermTraverserTest extends UnitTestSuite {
 
   private val defaultTermTraverser = new DefaultTermTraverser(
     defaultTermRefTraverser,
+    defaultTermRefRenderer,
     termApplyTraverser,
     defaultMainApplyTypeTraverser,
     termApplyInfixTraverser,
@@ -83,9 +85,13 @@ class DefaultTermTraverserTest extends UnitTestSuite {
   )
 
   test("traverse() for Term.Name") {
-    val termName = Term.Name("x")
+    val termName = q"x"
+    val traversedTermName = q"traversedX"
+    doReturn(traversedTermName).when(defaultTermRefTraverser).traverse(eqTree(termName))
+
     defaultTermTraverser.traverse(termName)
-    verify(defaultTermRefTraverser).traverse(eqTree(termName))
+
+    verify(defaultTermRefRenderer).render(eqTree(traversedTermName))
   }
 
   test("traverse() for Term.Apply") {

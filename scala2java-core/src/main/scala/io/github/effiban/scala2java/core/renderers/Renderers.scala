@@ -6,6 +6,18 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   val bindRenderer: BindRenderer = new BindRendererImpl()
 
+  lazy val defaultTermRefRenderer: DefaultTermRefRenderer = new DefaultTermRefRendererImpl(
+    thisRenderer,
+    superRenderer,
+    termNameRenderer,
+    defaultTermSelectRenderer
+  )
+
+  lazy val defaultTermSelectRenderer: DefaultTermSelectRenderer = new DefaultTermSelectRendererImpl(
+    defaultTermRefRenderer,
+    termNameRenderer
+  )
+
   val litRenderer: LitRenderer = new LitRendererImpl()
 
   val nameIndeterminateRenderer: NameIndeterminateRenderer = new NameIndeterminateRendererImpl()

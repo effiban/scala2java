@@ -2,6 +2,7 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.TermSelectContext
 import io.github.effiban.scala2java.core.matchers.TermSelectContextMatcher.eqTermSelectContext
+import io.github.effiban.scala2java.core.renderers.DefaultTermRefRenderer
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
@@ -14,28 +15,36 @@ class ExpressionTermRefTraverserTest extends UnitTestSuite {
   private val termSelectTraverser = mock[ExpressionTermSelectTraverser]
   private val applyUnaryTraverser = mock[ApplyUnaryTraverser]
   private val defaultTermRefTraverser = mock[DefaultTermRefTraverser]
+  private val defaultTermRefRenderer = mock[DefaultTermRefRenderer]
 
   private val expressionTermRefTraverser = new ExpressionTermRefTraverser(
     termNameTraverser,
     termSelectTraverser,
     applyUnaryTraverser,
-    defaultTermRefTraverser
+    defaultTermRefTraverser,
+    defaultTermRefRenderer
   )
-  
+
   test("traverse 'this'") {
     val `this` = This(Name.Indeterminate("MyName"))
+    val traversedThis = This(Name.Indeterminate("MyTraversedName"))
+
+    doAnswer(traversedThis).when(defaultTermRefTraverser).traverse(eqTree(`this`))
 
     expressionTermRefTraverser.traverse(`this`)
 
-    verify(defaultTermRefTraverser).traverse(eqTree(`this`))
+    verify(defaultTermRefRenderer).render(eqTree(traversedThis))
   }
 
   test("traverse 'super'") {
     val `super` = Super(thisp = Name.Indeterminate("superName"), superp = Name.Anonymous())
+    val traversedSuper = Super(thisp = Name.Indeterminate("traversedSuperName"), superp = Name.Anonymous())
+
+    doAnswer(traversedSuper).when(defaultTermRefTraverser).traverse(eqTree(`super`))
 
     expressionTermRefTraverser.traverse(`super`)
 
-    verify(defaultTermRefTraverser).traverse(eqTree(`super`))
+    verify(defaultTermRefRenderer).render(eqTree(traversedSuper))
   }
 
   test("traverse termName") {

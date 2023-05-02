@@ -1,7 +1,5 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.TermNameRenderer
-import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
@@ -9,36 +7,28 @@ import scala.meta.XtensionQuasiquoteTerm
 
 class DefaultTermSelectTraverserTest extends UnitTestSuite {
   private val defaultTermRefTraverser = mock[DefaultTermRefTraverser]
-  private val termNameRenderer = mock[TermNameRenderer]
 
-  private val termSelectTraverser = new DefaultTermSelectTraverserImpl(
-    defaultTermRefTraverser,
-    termNameRenderer
-  )
+  private val termSelectTraverser = new DefaultTermSelectTraverserImpl(defaultTermRefTraverser)
 
   test("traverse() when qualifier is a Term.Name") {
     val qualifier = q"myObj"
-    val name = q"myMember"
+    val traversedQualifier = q"myTraversedObj"
     val termSelect = q"myObj.myMember"
+    val traversedTermSelect = q"myTraversedObj.myMember"
 
-    doWrite("myObj").when(defaultTermRefTraverser).traverse(eqTree(qualifier))
-    doWrite("myMember").when(termNameRenderer).render(eqTree(name))
+    doAnswer(traversedQualifier).when(defaultTermRefTraverser).traverse(eqTree(qualifier))
 
-    termSelectTraverser.traverse(termSelect)
-
-    outputWriter.toString shouldBe "myObj.myMember"
+    termSelectTraverser.traverse(termSelect).structure shouldBe traversedTermSelect.structure
   }
 
   test("traverse() when qualifier is a Term.Select") {
     val qualifier = q"myObj1.myObj2"
-    val name = q"myMember"
+    val traversedQualifier = q"myTraversedObj1.myTraversedObj2"
     val termSelect = q"myObj1.myObj2.myMember"
+    val traversedTermSelect = q"myTraversedObj1.myTraversedObj2.myMember"
 
-    doWrite("myObj1.myObj2").when(defaultTermRefTraverser).traverse(eqTree(qualifier))
-    doWrite("myMember").when(termNameRenderer).render(eqTree(name))
+    doAnswer(traversedQualifier).when(defaultTermRefTraverser).traverse(eqTree(qualifier))
 
-    termSelectTraverser.traverse(termSelect)
-
-    outputWriter.toString shouldBe "myObj1.myObj2.myMember"
+    termSelectTraverser.traverse(termSelect).structure shouldBe traversedTermSelect.structure
   }
 }

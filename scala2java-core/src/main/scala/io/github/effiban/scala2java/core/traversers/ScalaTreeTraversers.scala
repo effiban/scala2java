@@ -157,6 +157,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val defaultTermTraverser: TermTraverser = new DefaultTermTraverser(
     defaultTermRefTraverser,
+    defaultTermRefRenderer,
     termApplyTraverser,
     funMainApplyTypeTraverser,
     termApplyInfixTraverser,
@@ -190,17 +191,11 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val defaultTermRefTraverser: DefaultTermRefTraverser = new DefaultTermRefTraverserImpl(
     thisTraverser,
-    thisRenderer,
     superTraverser,
-    superRenderer,
-    termNameRenderer,
     defaultTermSelectTraverser
   )
 
-  private lazy val defaultTermSelectTraverser: DefaultTermSelectTraverser = new DefaultTermSelectTraverserImpl(
-    defaultTermRefTraverser,
-    termNameRenderer
-  )
+  private lazy val defaultTermSelectTraverser: DefaultTermSelectTraverser = new DefaultTermSelectTraverserImpl(defaultTermRefTraverser)
 
   private lazy val defnDefTraverser: DefnDefTraverser = new DefnDefTraverserImpl(
     modListTraverser,
@@ -295,14 +290,19 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val funTermRefTraverser: FunTermRefTraverser = new FunTermRefTraverser(
     funTermSelectTraverser,
-    defaultTermRefTraverser
+    defaultTermRefTraverser,
+    defaultTermRefRenderer
   )
 
   private lazy val ifTraverser: IfTraverser = new IfTraverserImpl(expressionTermTraverser, blockTraverser)
 
   private lazy val importeeTraverser: ImporteeTraverser = new ImporteeTraverserImpl(nameIndeterminateRenderer)
 
-  private lazy val importerTraverser: ImporterTraverser = new ImporterTraverserImpl(defaultTermRefTraverser, importeeTraverser)
+  private lazy val importerTraverser: ImporterTraverser = new ImporterTraverserImpl(
+    defaultTermRefTraverser,
+    defaultTermRefRenderer,
+    importeeTraverser
+  )
 
   private lazy val importTraverser: ImportTraverser = new ImportTraverserImpl(
     importerTraverser,
@@ -394,6 +394,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val pkgTraverser: PkgTraverser = new PkgTraverserImpl(
     defaultTermRefTraverser,
+    defaultTermRefRenderer,
     pkgStatListTraverser,
     new CompositeAdditionalImportersProvider(CoreAdditionalImportersProvider)
   )
@@ -554,7 +555,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
       termNameTraverser,
       termSelectTraverser,
       applyUnaryTraverser,
-      defaultTermRefTraverser
+      defaultTermRefTraverser,
+      defaultTermRefRenderer
     )
   }
 
@@ -654,6 +656,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val typeSelectTraverser: TypeSelectTraverser = new TypeSelectTraverserImpl(
     defaultTermRefTraverser,
+    defaultTermRefRenderer,
     typeNameTraverser,
     typeNameRenderer
   )
