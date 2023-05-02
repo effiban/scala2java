@@ -58,5 +58,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   lazy val typeNameRenderer: TypeNameRenderer = new TypeNameRendererImpl()
 
+  lazy val typeSelectRenderer: TypeSelectRenderer = new TypeSelectRendererImpl(defaultTermRefRenderer, typeNameRenderer)
+
   val typeVarRenderer: TypeVarRenderer = new TypeVarRendererImpl()
 }
