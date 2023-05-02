@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.renderers.DefaultTermRefRenderer
 import io.github.effiban.scala2java.core.writers.JavaWriter
 import io.github.effiban.scala2java.spi.providers.AdditionalImportersProvider
 
@@ -7,7 +8,8 @@ import scala.meta.{Import, Pkg}
 
 trait PkgTraverser extends ScalaTreeTraverser[Pkg]
 
-private[traversers] class PkgTraverserImpl(termRefTraverser: => DefaultTermRefTraverser,
+private[traversers] class PkgTraverserImpl(defaultTermRefTraverser: => DefaultTermRefTraverser,
+                                           defaultTermRefRenderer: => DefaultTermRefRenderer,
                                            pkgStatListTraverser: => PkgStatListTraverser,
                                            additionalImportersProvider: AdditionalImportersProvider)
                                           (implicit javaWriter: JavaWriter) extends PkgTraverser {
@@ -16,7 +18,8 @@ private[traversers] class PkgTraverserImpl(termRefTraverser: => DefaultTermRefTr
 
   override def traverse(pkg: Pkg): Unit = {
     write("package ")
-    termRefTraverser.traverse(pkg.ref)
+    val traversedPkgRef = defaultTermRefTraverser.traverse(pkg.ref)
+    defaultTermRefRenderer.render(traversedPkgRef)
     writeStatementEnd()
     writeLine()
 

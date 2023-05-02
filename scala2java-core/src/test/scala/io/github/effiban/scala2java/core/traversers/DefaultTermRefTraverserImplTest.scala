@@ -1,27 +1,20 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.{SuperRenderer, TermNameRenderer, ThisRenderer}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.Term.{Super, This}
-import scala.meta.{Name, Term}
+import scala.meta.{Name, XtensionQuasiquoteTerm}
 
 class DefaultTermRefTraverserImplTest extends UnitTestSuite {
 
   private val thisTraverser = mock[ThisTraverser]
-  private val thisRenderer = mock[ThisRenderer]
   private val superTraverser = mock[SuperTraverser]
-  private val superRenderer = mock[SuperRenderer]
-  private val termNameRenderer = mock[TermNameRenderer]
   private val defaultTermSelectTraverser = mock[DefaultTermSelectTraverser]
 
   private val defaultTermRefTraverser = new DefaultTermRefTraverserImpl(
     thisTraverser,
-    thisRenderer,
     superTraverser,
-    superRenderer,
-    termNameRenderer,
     defaultTermSelectTraverser
   )
 
@@ -31,9 +24,7 @@ class DefaultTermRefTraverserImplTest extends UnitTestSuite {
 
     doReturn(traversedThis).when(thisTraverser).traverse(eqTree(`this`))
 
-    defaultTermRefTraverser.traverse(`this`)
-
-    verify(thisRenderer).render(eqTree(traversedThis))
+    defaultTermRefTraverser.traverse(`this`).structure shouldBe traversedThis.structure
   }
 
   test("traverse 'super'") {
@@ -42,24 +33,21 @@ class DefaultTermRefTraverserImplTest extends UnitTestSuite {
 
     doReturn(traversedSuper).when(superTraverser).traverse(eqTree(`super`))
 
-    defaultTermRefTraverser.traverse(`super`)
-
-    verify(superRenderer).render(eqTree(traversedSuper))
+    defaultTermRefTraverser.traverse(`super`).structure shouldBe traversedSuper.structure
   }
 
   test("traverse termName") {
-    val termName = Term.Name("x")
+    val termName = q"x"
 
-    defaultTermRefTraverser.traverse(termName)
-
-    verify(termNameRenderer).render(eqTree(termName))
+    defaultTermRefTraverser.traverse(termName).structure shouldBe termName.structure
   }
 
   test("traverse termSelect") {
-    val termSelect = Term.Select(Term.Name("X"), Term.Name("x"))
+    val termSelect = q"X.x"
+    val traversedTermSelect = q"Y.x"
 
-    defaultTermRefTraverser.traverse(termSelect)
+    doReturn(traversedTermSelect).when(defaultTermSelectTraverser).traverse(eqTree(termSelect))
 
-    verify(defaultTermSelectTraverser).traverse(eqTree(termSelect))
+    defaultTermRefTraverser.traverse(termSelect).structure shouldBe traversedTermSelect.structure
   }
 }

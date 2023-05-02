@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.renderers.DefaultTermRefRenderer
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{PrimaryCtors, TermNames}
@@ -7,7 +8,7 @@ import io.github.effiban.scala2java.spi.providers.AdditionalImportersProvider
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.{Decl, Defn, Import, Importee, Importer, Name, Pat, Pkg, Self, Template, Term, Type}
+import scala.meta.{Decl, Defn, Import, Importee, Importer, Name, Pat, Pkg, Self, Template, Term, Type, XtensionQuasiquoteTerm}
 
 class PkgTraverserImplTest extends UnitTestSuite {
 
@@ -41,23 +42,27 @@ class PkgTraverserImplTest extends UnitTestSuite {
   )
 
   private val defaultTermRefTraverser = mock[DefaultTermRefTraverser]
+  private val defaultTermRefRenderer = mock[DefaultTermRefRenderer]
   private val pkgStatListTraverser = mock[PkgStatListTraverser]
   private val additionalImportersProvider = mock[AdditionalImportersProvider]
 
   private val pkgTraverser = new PkgTraverserImpl(
     defaultTermRefTraverser,
+    defaultTermRefRenderer,
     pkgStatListTraverser,
     additionalImportersProvider
   )
 
 
   test("traverse()") {
-    val pkgRef = Term.Select(Term.Name("mypkg"), Term.Name("myinnerpkg"))
+    val pkgRef = q"mypkg.myinnerpkg"
+    val traversedPkgRef = q"mytraversedpkg.myinnerpkg"
 
     val stats = List(ArbitraryImport, TheClass)
     val expectedEnrichedStats = Import(CoreImporters) +: stats
 
-    doWrite("mypkg.myinnerpkg").when(defaultTermRefTraverser).traverse(eqTree(pkgRef))
+    doReturn(traversedPkgRef).when(defaultTermRefTraverser).traverse(eqTree(pkgRef))
+    doWrite("mytraversedpkg.myinnerpkg").when(defaultTermRefRenderer).render(eqTree(traversedPkgRef))
     when(additionalImportersProvider.provide()).thenReturn(CoreImporters)
     doWrite(
       """/*
@@ -72,7 +77,7 @@ class PkgTraverserImplTest extends UnitTestSuite {
     pkgTraverser.traverse(Pkg(ref = pkgRef, stats = stats))
 
     outputWriter.toString shouldBe
-      """package mypkg.myinnerpkg;
+      """package mytraversedpkg.myinnerpkg;
         |
         |/*
         |*  IMPORT DEFINITIONS
