@@ -9,7 +9,7 @@ trait DefaultTermSelectTraverser {
   def traverse(termSelect: Term.Select): Unit
 }
 
-private[traversers] class DefaultTermSelectTraverserImpl(qualifierTraverser: => TermTraverser,
+private[traversers] class DefaultTermSelectTraverserImpl(defaultTermRefTraverser: => DefaultTermRefTraverser,
                                                          termNameRenderer: TermNameRenderer)
                                                         (implicit javaWriter: JavaWriter) extends DefaultTermSelectTraverser {
 
@@ -17,8 +17,15 @@ private[traversers] class DefaultTermSelectTraverserImpl(qualifierTraverser: => 
 
   // A qualified name in a stable, non-expression and non-function context
   override def traverse(select: Term.Select): Unit = {
-    qualifierTraverser.traverse(select.qual)
+    traverseQualifier(select.qual)
     writeQualifierSeparator()
     termNameRenderer.render(select.name)
+  }
+
+  private def traverseQualifier(qual: Term): Unit = {
+    qual match {
+      case aQual: Term.Ref => defaultTermRefTraverser.traverse(aQual)
+      case aQual => throw new IllegalStateException(s"Invalid qualifier in stable path context: $aQual")
+    }
   }
 }
