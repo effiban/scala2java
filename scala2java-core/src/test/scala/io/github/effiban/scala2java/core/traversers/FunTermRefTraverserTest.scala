@@ -10,7 +10,7 @@ import scala.meta.{XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 class FunTermRefTraverserTest extends UnitTestSuite {
 
   private val funTermSelectTraverser = mock[FunTermSelectTraverser]
-  private val defaultTermRefTraverser = mock[TermRefTraverser]
+  private val defaultTermRefTraverser = mock[DefaultTermRefTraverser]
 
   private val funTermRefTraverser = new FunTermRefTraverser(funTermSelectTraverser, defaultTermRefTraverser)
 

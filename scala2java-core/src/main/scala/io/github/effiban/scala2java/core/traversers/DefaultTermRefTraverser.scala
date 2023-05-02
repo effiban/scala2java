@@ -6,13 +6,15 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 import scala.meta.Term
 import scala.meta.Term.{Super, This}
 
-private[traversers] class DefaultTermRefTraverser(thisTraverser: ThisTraverser,
-                                                  thisRenderer: ThisRenderer,
-                                                  superTraverser: SuperTraverser,
-                                                  superRenderer: SuperRenderer,
-                                                  termNameRenderer: TermNameRenderer,
-                                                  defaultTermSelectTraverser: => DefaultTermSelectTraverser)
-                                                 (implicit javaWriter: JavaWriter) extends TermRefTraverser {
+trait DefaultTermRefTraverser extends TermRefTraverser
+
+private[traversers] class DefaultTermRefTraverserImpl(thisTraverser: ThisTraverser,
+                                                      thisRenderer: ThisRenderer,
+                                                      superTraverser: SuperTraverser,
+                                                      superRenderer: SuperRenderer,
+                                                      termNameRenderer: TermNameRenderer,
+                                                      defaultTermSelectTraverser: => DefaultTermSelectTraverser)
+                                                     (implicit javaWriter: JavaWriter) extends DefaultTermRefTraverser {
 
   import javaWriter._
 

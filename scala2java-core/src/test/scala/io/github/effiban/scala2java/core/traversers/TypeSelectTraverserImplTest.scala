@@ -9,7 +9,7 @@ import scala.meta.{Term, Type}
 
 class TypeSelectTraverserImplTest extends UnitTestSuite {
 
-  private val defaultTermRefTraverser = mock[TermRefTraverser]
+  private val defaultTermRefTraverser = mock[DefaultTermRefTraverser]
   private val typeNameTraverser = mock[TypeNameTraverser]
   private val typeNameRenderer = mock[TypeNameRenderer]
 
