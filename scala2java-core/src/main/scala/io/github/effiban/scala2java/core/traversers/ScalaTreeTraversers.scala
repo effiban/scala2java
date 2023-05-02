@@ -198,7 +198,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   )
 
   private lazy val defaultTermSelectTraverser: DefaultTermSelectTraverser = new DefaultTermSelectTraverserImpl(
-    defaultTermTraverser,
+    defaultTermRefTraverser,
     termNameRenderer
   )
 

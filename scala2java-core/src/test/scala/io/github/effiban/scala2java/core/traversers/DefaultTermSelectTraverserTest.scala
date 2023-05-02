@@ -8,25 +8,37 @@ import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import scala.meta.XtensionQuasiquoteTerm
 
 class DefaultTermSelectTraverserTest extends UnitTestSuite {
-  private val qualifier = q"myObj"
-  private val name = q"myMember"
-
-  private val qualifierTraverser = mock[TermTraverser]
+  private val defaultTermRefTraverser = mock[DefaultTermRefTraverser]
   private val termNameRenderer = mock[TermNameRenderer]
 
   private val termSelectTraverser = new DefaultTermSelectTraverserImpl(
-    qualifierTraverser,
+    defaultTermRefTraverser,
     termNameRenderer
   )
 
-  test("traverse()") {
+  test("traverse() when qualifier is a Term.Name") {
+    val qualifier = q"myObj"
+    val name = q"myMember"
     val termSelect = q"myObj.myMember"
 
-    doWrite("myObj").when(qualifierTraverser).traverse(eqTree(qualifier))
+    doWrite("myObj").when(defaultTermRefTraverser).traverse(eqTree(qualifier))
     doWrite("myMember").when(termNameRenderer).render(eqTree(name))
 
     termSelectTraverser.traverse(termSelect)
 
     outputWriter.toString shouldBe "myObj.myMember"
+  }
+
+  test("traverse() when qualifier is a Term.Select") {
+    val qualifier = q"myObj1.myObj2"
+    val name = q"myMember"
+    val termSelect = q"myObj1.myObj2.myMember"
+
+    doWrite("myObj1.myObj2").when(defaultTermRefTraverser).traverse(eqTree(qualifier))
+    doWrite("myMember").when(termNameRenderer).render(eqTree(name))
+
+    termSelectTraverser.traverse(termSelect)
+
+    outputWriter.toString shouldBe "myObj1.myObj2.myMember"
   }
 }
