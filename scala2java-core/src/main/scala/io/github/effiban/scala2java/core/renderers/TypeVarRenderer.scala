@@ -10,6 +10,8 @@ private[renderers] class TypeVarRendererImpl(implicit javaWriter: JavaWriter) ex
 
   import javaWriter._
 
+  // Variable in type, e.g.: `t` in `case _: List[t]` =>
+  // Unsupported in Java and no replacement I can think of
   override def render(typeVar: Type.Var): Unit = {
     writeComment(typeVar.toString())
   }

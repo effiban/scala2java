@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.{TypeAnonymousParamRenderer, TypeApplyInfixRenderer, TypeLambdaRenderer}
+import io.github.effiban.scala2java.core.renderers.{TypeAnonymousParamRenderer, TypeApplyInfixRenderer, TypeLambdaRenderer, TypeVarRenderer}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{TypeBounds, TypeNames}
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -26,7 +26,7 @@ class TypeTraverserImplTest extends UnitTestSuite {
   private val typeWildcardTraverser = mock[TypeWildcardTraverser]
   private val typeByNameTraverser = mock[TypeByNameTraverser]
   private val typeRepeatedTraverser = mock[TypeRepeatedTraverser]
-  private val typeVarTraverser = mock[TypeVarTraverser]
+  private val typeVarRenderer = mock[TypeVarRenderer]
 
   private val typeTraverser = new TypeTraverserImpl(
     typeRefTraverser,
@@ -44,7 +44,7 @@ class TypeTraverserImplTest extends UnitTestSuite {
     typeWildcardTraverser,
     typeByNameTraverser,
     typeRepeatedTraverser,
-    typeVarTraverser
+    typeVarRenderer
   )
 
   test("traverse Type.Name") {
@@ -160,7 +160,7 @@ class TypeTraverserImplTest extends UnitTestSuite {
   test("traverse Type.Var") {
     val typeVar = Type.Var(Type.Name("x"))
     typeTraverser.traverse(typeVar)
-    verify(typeVarTraverser).traverse(eqTree(typeVar))
+    verify(typeVarRenderer).render(eqTree(typeVar))
   }
 
   private def typeParamOf(name: String) = {
