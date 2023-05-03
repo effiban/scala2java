@@ -1,16 +1,14 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.TypeApplyInfixRenderer
-
 import scala.meta.Type
 
-trait TypeApplyInfixTraverser extends ScalaTreeTraverser[Type.ApplyInfix]
+trait TypeApplyInfixTraverser extends ScalaTreeTraverser1[Type.ApplyInfix]
 
-private[traversers] class TypeApplyInfixTraverserImpl(typeApplyInfixRenderer: TypeApplyInfixRenderer) extends TypeApplyInfixTraverser {
+private[traversers] class TypeApplyInfixTraverserImpl extends TypeApplyInfixTraverser {
 
   // type with generic args in infix notation, e.g. K Map V
-  override def traverse(typeApplyInfix: Type.ApplyInfix): Unit = {
-    //TODO - convert to Type.Apply instead of rendering
-    typeApplyInfixRenderer.render(typeApplyInfix)
+  override def traverse(typeApplyInfix: Type.ApplyInfix): Type.ApplyInfix = {
+    //TODO - convert to Type.Apply
+    typeApplyInfix
   }
 }
