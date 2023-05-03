@@ -615,8 +615,6 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val typeFunctionTraverser: TypeFunctionTraverser = new TypeFunctionTraverserImpl(typeTraverser, FunctionTypeTransformer)
 
-  private lazy val typeLambdaTraverser: TypeLambdaTraverser = new TypeLambdaTraverserImpl(typeLambdaRenderer)
-
   private lazy val typeListTraverser: TypeListTraverser = new TypeListTraverserImpl(
     argumentListTraverser,
     new SimpleArgumentTraverser(typeTraverser)
@@ -674,7 +672,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     typeRefineTraverser,
     typeExistentialTraverser,
     typeAnnotateTraverser,
-    typeLambdaTraverser,
+    typeLambdaRenderer,
     typeAnonymousParamTraverser,
     typeWildcardTraverser,
     typeByNameTraverser,

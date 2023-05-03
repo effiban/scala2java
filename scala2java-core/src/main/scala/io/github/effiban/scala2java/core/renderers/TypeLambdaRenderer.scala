@@ -10,6 +10,8 @@ private[renderers] class TypeLambdaRendererImpl(implicit javaWriter: JavaWriter)
 
   import javaWriter._
 
+  // higher-kinded type, e.g. [K, V] =>> Map[K, V]
+  // According to documentation supported only in some dialects (what does this mean?)
   override def render(lambdaType: Type.Lambda): Unit = {
     writeComment(lambdaType.toString())
   }
