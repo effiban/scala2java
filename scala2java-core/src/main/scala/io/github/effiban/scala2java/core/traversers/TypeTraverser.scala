@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.{TypeAnonymousParamRenderer, TypeApplyInfixRenderer, TypeLambdaRenderer}
+import io.github.effiban.scala2java.core.renderers.{TypeAnonymousParamRenderer, TypeApplyInfixRenderer, TypeLambdaRenderer, TypeVarRenderer}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Type
@@ -22,7 +22,7 @@ private[traversers] class TypeTraverserImpl(typeRefTraverser: => TypeRefTraverse
                                             typeWildcardTraverser: => TypeWildcardTraverser,
                                             typeByNameTraverser: => TypeByNameTraverser,
                                             typeRepeatedTraverser: => TypeRepeatedTraverser,
-                                            typeVarTraverser: => TypeVarTraverser)
+                                            typeVarRenderer: TypeVarRenderer)
                                            (implicit javaWriter: JavaWriter) extends TypeTraverser {
 
   import javaWriter._
@@ -46,7 +46,8 @@ private[traversers] class TypeTraverserImpl(typeRefTraverser: => TypeRefTraverse
     case wildcardType: Type.Wildcard => typeWildcardTraverser.traverse(wildcardType)
     case byNameType: Type.ByName => typeByNameTraverser.traverse(byNameType)
     case repeatedType: Type.Repeated => typeRepeatedTraverser.traverse(repeatedType)
-    case typeVar: Type.Var => typeVarTraverser.traverse(typeVar)
+    case typeVar: Type.Var =>
+      typeVarRenderer.render(typeVar)
     case _ => writeComment(s"UNSUPPORTED: ${`type`}")
   }
 }
