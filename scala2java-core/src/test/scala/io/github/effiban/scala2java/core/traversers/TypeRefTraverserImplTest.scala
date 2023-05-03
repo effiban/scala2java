@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.{TypeNameRenderer, TypeSelectRenderer, TypeSingletonRenderer}
+import io.github.effiban.scala2java.core.renderers.TypeRefRenderer
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
@@ -9,21 +9,17 @@ import scala.meta.{Term, Type, XtensionQuasiquoteType}
 class TypeRefTraverserImplTest extends UnitTestSuite {
 
   private val typeNameTraverser = mock[TypeNameTraverser]
-  private val typeNameRenderer = mock[TypeNameRenderer]
   private val typeSelectTraverser = mock[TypeSelectTraverser]
-  private val typeSelectRenderer = mock[TypeSelectRenderer]
   private val typeProjectTraverser = mock[TypeProjectTraverser]
   private val typeSingletonTraverser = mock[TypeSingletonTraverser]
-  private val typeSingletonRenderer = mock[TypeSingletonRenderer]
+  private val typeRefRenderer = mock[TypeRefRenderer]
 
   private val typeRefTraverser = new TypeRefTraverserImpl(
     typeNameTraverser,
-    typeNameRenderer,
     typeSelectTraverser,
-    typeSelectRenderer,
     typeProjectTraverser,
     typeSingletonTraverser,
-    typeSingletonRenderer
+    typeRefRenderer
   )
 
   test("traverse Type.Name") {
@@ -34,7 +30,7 @@ class TypeRefTraverserImplTest extends UnitTestSuite {
 
     typeRefTraverser.traverse(typeName)
 
-    verify(typeNameRenderer).render(eqTree(traversedTypeName))
+    verify(typeRefRenderer).render(eqTree(traversedTypeName))
   }
 
   test("traverse Type.Select") {
@@ -45,7 +41,7 @@ class TypeRefTraverserImplTest extends UnitTestSuite {
 
     typeRefTraverser.traverse(typeSelect)
 
-    verify(typeSelectRenderer).render(eqTree(traversedTypeSelect))
+    verify(typeRefRenderer).render(eqTree(traversedTypeSelect))
   }
 
   test("traverse Type.Project") {
@@ -64,6 +60,6 @@ class TypeRefTraverserImplTest extends UnitTestSuite {
 
     typeRefTraverser.traverse(typeSingleton)
 
-    verify(typeSingletonRenderer).render(eqTree(traversedTypeSingleton))
+    verify(typeRefRenderer).render(eqTree(traversedTypeSingleton))
   }
 }
