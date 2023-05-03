@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.{TypeAnonymousParamRenderer, TypeApplyInfixRenderer, TypeLambdaRenderer, TypeVarRenderer}
+import io.github.effiban.scala2java.core.renderers.TypeRenderer
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{TypeBounds, TypeNames}
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -14,37 +14,31 @@ class TypeTraverserImplTest extends UnitTestSuite {
   private val typeRefTraverser = mock[TypeRefTraverser]
   private val typeApplyTraverser = mock[TypeApplyTraverser]
   private val typeApplyInfixTraverser = mock[TypeApplyInfixTraverser]
-  private val typeApplyInfixRenderer = mock[TypeApplyInfixRenderer]
   private val typeFunctionTraverser = mock[TypeFunctionTraverser]
   private val typeTupleTraverser = mock[TypeTupleTraverser]
   private val typeWithTraverser = mock[TypeWithTraverser]
   private val typeRefineTraverser = mock[TypeRefineTraverser]
   private val typeExistentialTraverser = mock[TypeExistentialTraverser]
   private val typeAnnotateTraverser = mock[TypeAnnotateTraverser]
-  private val typeLambdaRenderer = mock[TypeLambdaRenderer]
-  private val typeAnonymousParamRenderer = mock[TypeAnonymousParamRenderer]
   private val typeWildcardTraverser = mock[TypeWildcardTraverser]
   private val typeByNameTraverser = mock[TypeByNameTraverser]
   private val typeRepeatedTraverser = mock[TypeRepeatedTraverser]
-  private val typeVarRenderer = mock[TypeVarRenderer]
+  private val typeRenderer = mock[TypeRenderer]
 
   private val typeTraverser = new TypeTraverserImpl(
     typeRefTraverser,
     typeApplyTraverser,
     typeApplyInfixTraverser,
-    typeApplyInfixRenderer,
     typeFunctionTraverser,
     typeTupleTraverser,
     typeWithTraverser,
     typeRefineTraverser,
     typeExistentialTraverser,
     typeAnnotateTraverser,
-    typeLambdaRenderer,
-    typeAnonymousParamRenderer,
     typeWildcardTraverser,
     typeByNameTraverser,
     typeRepeatedTraverser,
-    typeVarRenderer
+    typeRenderer
   )
 
   test("traverse Type.Name") {
@@ -67,7 +61,7 @@ class TypeTraverserImplTest extends UnitTestSuite {
 
     typeTraverser.traverse(typeApplyInfix)
 
-    verify(typeApplyInfixRenderer).render(eqTree(traversedTypeApplyInfix))
+    verify(typeRenderer).render(eqTree(traversedTypeApplyInfix))
   }
 
   test("traverse Type.Function") {
@@ -130,13 +124,13 @@ class TypeTraverserImplTest extends UnitTestSuite {
   test("traverse Type.Lambda") {
     val typeLambda = Type.Lambda(tparams = List(tparam"T1", tparam"T2"), tpe = t"U")
     typeTraverser.traverse(typeLambda)
-    verify(typeLambdaRenderer).render(eqTree(typeLambda))
+    verify(typeRenderer).render(eqTree(typeLambda))
   }
 
   test("traverse Type.AnonymousParam") {
     val typeAnonymousParam = Type.AnonymousParam(Some(Mod.Contravariant()))
     typeTraverser.traverse(typeAnonymousParam)
-    verify(typeAnonymousParamRenderer).render(eqTree(typeAnonymousParam))
+    verify(typeRenderer).render(eqTree(typeAnonymousParam))
   }
 
   test("traverse Type.Wildcard") {
@@ -160,7 +154,7 @@ class TypeTraverserImplTest extends UnitTestSuite {
   test("traverse Type.Var") {
     val typeVar = Type.Var(Type.Name("x"))
     typeTraverser.traverse(typeVar)
-    verify(typeVarRenderer).render(eqTree(typeVar))
+    verify(typeRenderer).render(eqTree(typeVar))
   }
 
   private def typeParamOf(name: String) = {
