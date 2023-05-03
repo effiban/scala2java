@@ -1,13 +1,13 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.TypeApplyInfixRenderer
+import io.github.effiban.scala2java.core.renderers.{TypeApplyInfixRenderer, TypeLambdaRenderer}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{TypeBounds, TypeNames}
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.Mod.Annot
 import scala.meta.Type.Bounds
-import scala.meta.{Decl, Init, Mod, Name, Pat, Term, Type, XtensionQuasiquoteType}
+import scala.meta.{Decl, Init, Mod, Name, Pat, Term, Type, XtensionQuasiquoteType, XtensionQuasiquoteTypeParam}
 
 class TypeTraverserImplTest extends UnitTestSuite {
 
@@ -21,7 +21,7 @@ class TypeTraverserImplTest extends UnitTestSuite {
   private val typeRefineTraverser = mock[TypeRefineTraverser]
   private val typeExistentialTraverser = mock[TypeExistentialTraverser]
   private val typeAnnotateTraverser = mock[TypeAnnotateTraverser]
-  private val typeLambdaTraverser = mock[TypeLambdaTraverser]
+  private val typeLambdaRenderer = mock[TypeLambdaRenderer]
   private val typeAnonymousParamTraverser = mock[TypeAnonymousParamTraverser]
   private val typeWildcardTraverser = mock[TypeWildcardTraverser]
   private val typeByNameTraverser = mock[TypeByNameTraverser]
@@ -39,7 +39,7 @@ class TypeTraverserImplTest extends UnitTestSuite {
     typeRefineTraverser,
     typeExistentialTraverser,
     typeAnnotateTraverser,
-    typeLambdaTraverser,
+    typeLambdaRenderer,
     typeAnonymousParamTraverser,
     typeWildcardTraverser,
     typeByNameTraverser,
@@ -128,12 +128,9 @@ class TypeTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse Type.Lambda") {
-    val typeLambda = Type.Lambda(
-      tparams = List(typeParamOf("T1"), typeParamOf("T2")),
-      tpe = Type.Name("U")
-    )
+    val typeLambda = Type.Lambda(tparams = List(tparam"T1", tparam"T2"), tpe = t"U")
     typeTraverser.traverse(typeLambda)
-    verify(typeLambdaTraverser).traverse(eqTree(typeLambda))
+    verify(typeLambdaRenderer).render(eqTree(typeLambda))
   }
 
   test("traverse Type.AnonymousParam") {

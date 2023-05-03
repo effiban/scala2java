@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.TypeApplyInfixRenderer
+import io.github.effiban.scala2java.core.renderers.{TypeApplyInfixRenderer, TypeLambdaRenderer}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Type
@@ -17,7 +17,7 @@ private[traversers] class TypeTraverserImpl(typeRefTraverser: => TypeRefTraverse
                                             typeRefineTraverser: => TypeRefineTraverser,
                                             typeExistentialTraverser: => TypeExistentialTraverser,
                                             typeAnnotateTraverser: => TypeAnnotateTraverser,
-                                            typeLambdaTraverser: => TypeLambdaTraverser,
+                                            typeLambdaRenderer: TypeLambdaRenderer,
                                             typeAnonymousParamTraverser: => TypeAnonymousParamTraverser,
                                             typeWildcardTraverser: => TypeWildcardTraverser,
                                             typeByNameTraverser: => TypeByNameTraverser,
@@ -39,7 +39,8 @@ private[traversers] class TypeTraverserImpl(typeRefTraverser: => TypeRefTraverse
     case typeRefine: Type.Refine => typeRefineTraverser.traverse(typeRefine)
     case existentialType: Type.Existential => typeExistentialTraverser.traverse(existentialType)
     case typeAnnotation: Type.Annotate => typeAnnotateTraverser.traverse(typeAnnotation)
-    case lambdaType: Type.Lambda => typeLambdaTraverser.traverse(lambdaType)
+    case lambdaType: Type.Lambda =>
+      typeLambdaRenderer.render(lambdaType)
     case anonymousParamType: Type.AnonymousParam => typeAnonymousParamTraverser.traverse(anonymousParamType)
     case wildcardType: Type.Wildcard => typeWildcardTraverser.traverse(wildcardType)
     case byNameType: Type.ByName => typeByNameTraverser.traverse(byNameType)
