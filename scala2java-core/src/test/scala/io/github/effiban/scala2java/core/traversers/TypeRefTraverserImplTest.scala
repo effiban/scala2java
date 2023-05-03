@@ -1,10 +1,10 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.{TypeNameRenderer, TypeSelectRenderer}
+import io.github.effiban.scala2java.core.renderers.{TypeNameRenderer, TypeSelectRenderer, TypeSingletonRenderer}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.{Term, Type, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
+import scala.meta.{Term, Type, XtensionQuasiquoteType}
 
 class TypeRefTraverserImplTest extends UnitTestSuite {
 
@@ -14,6 +14,7 @@ class TypeRefTraverserImplTest extends UnitTestSuite {
   private val typeSelectRenderer = mock[TypeSelectRenderer]
   private val typeProjectTraverser = mock[TypeProjectTraverser]
   private val typeSingletonTraverser = mock[TypeSingletonTraverser]
+  private val typeSingletonRenderer = mock[TypeSingletonRenderer]
 
   private val typeRefTraverser = new TypeRefTraverserImpl(
     typeNameTraverser,
@@ -21,7 +22,8 @@ class TypeRefTraverserImplTest extends UnitTestSuite {
     typeSelectTraverser,
     typeSelectRenderer,
     typeProjectTraverser,
-    typeSingletonTraverser
+    typeSingletonTraverser,
+    typeSingletonRenderer
   )
 
   test("traverse Type.Name") {
@@ -56,9 +58,12 @@ class TypeRefTraverserImplTest extends UnitTestSuite {
 
   test("traverse Type.Singleton") {
     val typeSingleton = Type.Singleton(Term.Name("myObj"))
+    val traversedTypeSingleton = Type.Singleton(Term.Name("myTraversedObj"))
+
+    doAnswer(traversedTypeSingleton).when(typeSingletonTraverser).traverse(eqTree(typeSingleton))
 
     typeRefTraverser.traverse(typeSingleton)
 
-    verify(typeSingletonTraverser).traverse(eqTree(typeSingleton))
+    verify(typeSingletonRenderer).render(eqTree(traversedTypeSingleton))
   }
 }

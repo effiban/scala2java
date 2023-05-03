@@ -1,6 +1,5 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.TypeSingletonRenderer
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
@@ -9,9 +8,8 @@ import scala.meta.{Name, Term, Type, XtensionQuasiquoteTerm}
 class TypeSingletonTraverserImplTest extends UnitTestSuite {
 
   private val thisTraverser = mock[ThisTraverser]
-  private val typeSingletonRenderer = mock[TypeSingletonRenderer]
 
-  private val typeSingletonTraverser = new TypeSingletonTraverserImpl(thisTraverser, typeSingletonRenderer)
+  private val typeSingletonTraverser = new TypeSingletonTraverserImpl(thisTraverser)
 
   test("traverse() for 'this'") {
     val `this` = Term.This(Name.Anonymous())
@@ -22,16 +20,12 @@ class TypeSingletonTraverserImplTest extends UnitTestSuite {
 
     doAnswer(traversedThis).when(thisTraverser).traverse(eqTree(`this`))
 
-    typeSingletonTraverser.traverse(singletonType)
-
-    verify(typeSingletonRenderer).render(eqTree(traversedSingletonType))
+    typeSingletonTraverser.traverse(singletonType).structure shouldBe traversedSingletonType.structure
   }
 
   test("traverse() for non-'this'") {
     val singletonType = Type.Singleton(q"x")
 
-    typeSingletonTraverser.traverse(singletonType)
-
-    verify(typeSingletonRenderer).render(eqTree(singletonType))
+    typeSingletonTraverser.traverse(singletonType).structure shouldBe singletonType.structure
   }
 }

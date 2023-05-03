@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.{TypeNameRenderer, TypeSelectRenderer}
+import io.github.effiban.scala2java.core.renderers.{TypeNameRenderer, TypeSelectRenderer, TypeSingletonRenderer}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Type
@@ -12,7 +12,8 @@ private[traversers] class TypeRefTraverserImpl(typeNameTraverser: TypeNameTraver
                                                typeSelectTraverser: TypeSelectTraverser,
                                                typeSelectRenderer: TypeSelectRenderer,
                                                typeProjectTraverser: => TypeProjectTraverser,
-                                               typeSingletonTraverser: => TypeSingletonTraverser)
+                                               typeSingletonTraverser: TypeSingletonTraverser,
+                                               typeSingletonRenderer: TypeSingletonRenderer)
                                               (implicit javaWriter: JavaWriter) extends TypeRefTraverser {
 
   import javaWriter._
@@ -25,7 +26,9 @@ private[traversers] class TypeRefTraverserImpl(typeNameTraverser: TypeNameTraver
       val traversedTypeSelect = typeSelectTraverser.traverse(typeSelect)
       typeSelectRenderer.render(traversedTypeSelect)
     case typeProject: Type.Project => typeProjectTraverser.traverse(typeProject)
-    case typeSingleton: Type.Singleton => typeSingletonTraverser.traverse(typeSingleton)
+    case typeSingleton: Type.Singleton =>
+      val traversedTypeSingleton = typeSingletonTraverser.traverse(typeSingleton)
+      typeSingletonRenderer.render(traversedTypeSingleton)
     case _ => writeComment(s"UNSUPPORTED: $typeRef")
   }
 }
