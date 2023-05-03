@@ -661,19 +661,16 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     typeRefTraverser,
     typeApplyTraverser,
     typeApplyInfixTraverser,
-    typeApplyInfixRenderer,
     typeFunctionTraverser,
     typeTupleTraverser,
     typeWithTraverser,
     typeRefineTraverser,
     typeExistentialTraverser,
     typeAnnotateTraverser,
-    typeLambdaRenderer,
-    typeAnonymousParamRenderer,
     typeWildcardTraverser,
     typeByNameTraverser,
     typeRepeatedTraverser,
-    typeVarRenderer
+    typeRenderer
   )
 
   private lazy val typeTupleTraverser: TypeTupleTraverser = new TypeTupleTraverserImpl(
