@@ -1,18 +1,20 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.renderers.TypeApplyInfixRenderer
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{TypeBounds, TypeNames}
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.Mod.Annot
 import scala.meta.Type.Bounds
-import scala.meta.{Decl, Init, Mod, Name, Pat, Term, Type}
+import scala.meta.{Decl, Init, Mod, Name, Pat, Term, Type, XtensionQuasiquoteType}
 
 class TypeTraverserImplTest extends UnitTestSuite {
 
   private val typeRefTraverser = mock[TypeRefTraverser]
   private val typeApplyTraverser = mock[TypeApplyTraverser]
   private val typeApplyInfixTraverser = mock[TypeApplyInfixTraverser]
+  private val typeApplyInfixRenderer = mock[TypeApplyInfixRenderer]
   private val typeFunctionTraverser = mock[TypeFunctionTraverser]
   private val typeTupleTraverser = mock[TypeTupleTraverser]
   private val typeWithTraverser = mock[TypeWithTraverser]
@@ -30,6 +32,7 @@ class TypeTraverserImplTest extends UnitTestSuite {
     typeRefTraverser,
     typeApplyTraverser,
     typeApplyInfixTraverser,
+    typeApplyInfixRenderer,
     typeFunctionTraverser,
     typeTupleTraverser,
     typeWithTraverser,
@@ -57,9 +60,14 @@ class TypeTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse Type.ApplyInfix") {
-    val typeApplyInfix = Type.ApplyInfix(lhs = Type.Name("K"), op = Type.Name("Map"), rhs = Type.Name("V"))
+    val typeApplyInfix = t"K Map V"
+    val traversedTypeApplyInfix = t"U Map W"
+
+    doReturn(traversedTypeApplyInfix).when(typeApplyInfixTraverser).traverse(eqTree(typeApplyInfix))
+
     typeTraverser.traverse(typeApplyInfix)
-    verify(typeApplyInfixTraverser).traverse(eqTree(typeApplyInfix))
+
+    verify(typeApplyInfixRenderer).render(eqTree(traversedTypeApplyInfix))
   }
 
   test("traverse Type.Function") {

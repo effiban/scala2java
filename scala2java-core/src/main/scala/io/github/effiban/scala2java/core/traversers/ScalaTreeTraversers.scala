@@ -603,7 +603,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val typeAnonymousParamTraverser: TypeAnonymousParamTraverser = new TypeAnonymousParamTraverserImpl(typeAnonymousParamRenderer)
 
-  private lazy val typeApplyInfixTraverser: TypeApplyInfixTraverser = new TypeApplyInfixTraverserImpl(typeApplyInfixRenderer)
+  private lazy val typeApplyInfixTraverser: TypeApplyInfixTraverser = new TypeApplyInfixTraverserImpl()
 
   private lazy val typeApplyTraverser: TypeApplyTraverser = new TypeApplyTraverserImpl(typeTraverser, typeListTraverser)
 
@@ -667,6 +667,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     typeRefTraverser,
     typeApplyTraverser,
     typeApplyInfixTraverser,
+    typeApplyInfixRenderer,
     typeFunctionTraverser,
     typeTupleTraverser,
     typeWithTraverser,

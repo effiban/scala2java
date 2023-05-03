@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.renderers.TypeApplyInfixRenderer
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Type
@@ -9,6 +10,7 @@ trait TypeTraverser extends ScalaTreeTraverser[Type]
 private[traversers] class TypeTraverserImpl(typeRefTraverser: => TypeRefTraverser,
                                             typeApplyTraverser: => TypeApplyTraverser,
                                             typeApplyInfixTraverser: => TypeApplyInfixTraverser,
+                                            typeApplyInfixRenderer: TypeApplyInfixRenderer,
                                             typeFunctionTraverser: => TypeFunctionTraverser,
                                             typeTupleTraverser: => TypeTupleTraverser,
                                             typeWithTraverser: => TypeWithTraverser,
@@ -28,7 +30,9 @@ private[traversers] class TypeTraverserImpl(typeRefTraverser: => TypeRefTraverse
   override def traverse(`type`: Type): Unit = `type` match {
     case typeRef: Type.Ref => typeRefTraverser.traverse(typeRef)
     case typeApply: Type.Apply => typeApplyTraverser.traverse(typeApply)
-    case typeApplyInfix: Type.ApplyInfix => typeApplyInfixTraverser.traverse(typeApplyInfix)
+    case typeApplyInfix: Type.ApplyInfix =>
+      val traversedTypeApplyInfix = typeApplyInfixTraverser.traverse(typeApplyInfix)
+      typeApplyInfixRenderer.render(traversedTypeApplyInfix)
     case functionType: Type.Function => typeFunctionTraverser.traverse(functionType)
     case tupleType: Type.Tuple => typeTupleTraverser.traverse(tupleType)
     case withType: Type.With => typeWithTraverser.traverse(withType)
