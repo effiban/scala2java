@@ -1,30 +1,27 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
+import io.github.effiban.scala2java.core.renderers.ThisRenderer
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.transformers.TypeSingletonToTermTransformer
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.{Term, Type}
+import scala.meta.{Name, Term, Type}
 
 class TypeSingletonTraverserImplTest extends UnitTestSuite {
 
-  private val defaultTermTraverser = mock[DefaultTermTraverser]
-  private val typeSingletonTransformer = mock[TypeSingletonToTermTransformer]
+  private val thisTraverser = mock[ThisTraverser]
+  private val thisRenderer = mock[ThisRenderer]
 
-  private val typeSingletonTraverser = new TypeSingletonTraverserImpl(defaultTermTraverser, typeSingletonTransformer)
+  private val typeSingletonTraverser = new TypeSingletonTraverserImpl(thisTraverser, thisRenderer)
 
-  test("traverse") {
-    val initialTermRef = Term.Name("initial")
-    val transformedTermRef = Term.Name("transformed")
-    val singletonType = Type.Singleton(initialTermRef)
+  test("traverse() for 'this'") {
+    val `this` = Term.This(Name.Anonymous())
+    val singletonType = Type.Singleton(`this`)
 
-    when(typeSingletonTransformer.transform(eqTree(singletonType))).thenReturn(transformedTermRef)
-    doWrite("transformed").when(defaultTermTraverser).traverse(eqTree(transformedTermRef))
+    doAnswer(`this`).when(thisTraverser).traverse(eqTree(`this`))
 
     typeSingletonTraverser.traverse(singletonType)
 
-    outputWriter.toString shouldBe "transformed"
+    verify(thisRenderer).render(eqTree(`this`))
   }
 
 }
