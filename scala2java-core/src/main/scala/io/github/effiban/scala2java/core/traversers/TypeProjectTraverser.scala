@@ -15,7 +15,7 @@ private[traversers] class TypeProjectTraverserImpl(typeTraverser: => TypeTravers
   import javaWriter._
 
   // A Scala type projection such as 'A#B' is a way to reference an inner type 'B' through an outer type 'A'.
-  // In Java it would be 'A.B'
+  // In Java the equivalent is 'A.B' (but Java only has nested classes/interfaces, whereas Scala also has nested abstract types)
   override def traverse(typeProject: Type.Project): Unit = {
     typeTraverser.traverse(typeProject.qual)
     writeQualifierSeparator()
