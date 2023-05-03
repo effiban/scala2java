@@ -10,6 +10,7 @@ private[renderers] class TypeAnonymousParamRendererImpl(implicit javaWriter: Jav
 
   import javaWriter._
 
+  // Underscore in type param with variance modifier e.g. T[+_] (not sure about this, anyway ignoring the variance)
   override def render(ignored: Type.AnonymousParam): Unit = {
     write("?")
   }

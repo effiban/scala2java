@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.{TypeApplyInfixRenderer, TypeLambdaRenderer}
+import io.github.effiban.scala2java.core.renderers.{TypeAnonymousParamRenderer, TypeApplyInfixRenderer, TypeLambdaRenderer}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{TypeBounds, TypeNames}
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -22,7 +22,7 @@ class TypeTraverserImplTest extends UnitTestSuite {
   private val typeExistentialTraverser = mock[TypeExistentialTraverser]
   private val typeAnnotateTraverser = mock[TypeAnnotateTraverser]
   private val typeLambdaRenderer = mock[TypeLambdaRenderer]
-  private val typeAnonymousParamTraverser = mock[TypeAnonymousParamTraverser]
+  private val typeAnonymousParamRenderer = mock[TypeAnonymousParamRenderer]
   private val typeWildcardTraverser = mock[TypeWildcardTraverser]
   private val typeByNameTraverser = mock[TypeByNameTraverser]
   private val typeRepeatedTraverser = mock[TypeRepeatedTraverser]
@@ -40,7 +40,7 @@ class TypeTraverserImplTest extends UnitTestSuite {
     typeExistentialTraverser,
     typeAnnotateTraverser,
     typeLambdaRenderer,
-    typeAnonymousParamTraverser,
+    typeAnonymousParamRenderer,
     typeWildcardTraverser,
     typeByNameTraverser,
     typeRepeatedTraverser,
@@ -136,7 +136,7 @@ class TypeTraverserImplTest extends UnitTestSuite {
   test("traverse Type.AnonymousParam") {
     val typeAnonymousParam = Type.AnonymousParam(Some(Mod.Contravariant()))
     typeTraverser.traverse(typeAnonymousParam)
-    verify(typeAnonymousParamTraverser).traverse(eqTree(typeAnonymousParam))
+    verify(typeAnonymousParamRenderer).render(eqTree(typeAnonymousParam))
   }
 
   test("traverse Type.Wildcard") {
