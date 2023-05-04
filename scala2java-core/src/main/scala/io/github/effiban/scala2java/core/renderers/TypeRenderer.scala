@@ -9,6 +9,7 @@ trait TypeRenderer extends JavaTreeRenderer[Type]
 private[renderers] class TypeRendererImpl(typeRefRenderer: => TypeRefRenderer,
                                           typeApplyRenderer: => TypeApplyRenderer,
                                           typeApplyInfixRenderer: TypeApplyInfixRenderer,
+                                          typeWithRenderer: => TypeWithRenderer,
                                           typeLambdaRenderer: TypeLambdaRenderer,
                                           typeAnonymousParamRenderer: TypeAnonymousParamRenderer,
                                           typeVarRenderer: TypeVarRenderer)
@@ -20,9 +21,7 @@ private[renderers] class TypeRendererImpl(typeRefRenderer: => TypeRefRenderer,
     case typeRef: Type.Ref => typeRefRenderer.render(typeRef)
     case typeApply: Type.Apply => typeApplyRenderer.render(typeApply)
     case typeApplyInfix: Type.ApplyInfix => typeApplyInfixRenderer.render(typeApplyInfix)
-    case functionType: Type.Function => // TODO
-    case tupleType: Type.Tuple => // TODO
-    case withType: Type.With => // TODO
+    case withType: Type.With => typeWithRenderer.render(withType)
     case typeRefine: Type.Refine => // TODO
     case existentialType: Type.Existential => // TODO
     case typeAnnotation: Type.Annotate => // TODO
