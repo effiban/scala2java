@@ -4,6 +4,8 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 
 class Renderers(implicit javaWriter: JavaWriter) {
 
+  val argumentListRenderer: ArgumentListRenderer = new ArgumentListRendererImpl()
+
   val bindRenderer: BindRenderer = new BindRendererImpl()
 
   lazy val defaultTermRefRenderer: DefaultTermRefRenderer = new DefaultTermRefRendererImpl(
