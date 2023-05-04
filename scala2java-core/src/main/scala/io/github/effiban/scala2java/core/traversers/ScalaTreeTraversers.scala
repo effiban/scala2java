@@ -6,7 +6,7 @@ import io.github.effiban.scala2java.core.factories.{Factories, TemplateChildCont
 import io.github.effiban.scala2java.core.orderings.JavaTemplateChildOrdering
 import io.github.effiban.scala2java.core.predicates._
 import io.github.effiban.scala2java.core.providers.{CompositeAdditionalImportersProvider, CoreAdditionalImportersProvider}
-import io.github.effiban.scala2java.core.renderers.Renderers
+import io.github.effiban.scala2java.core.renderers.{Renderers, SimpleArgumentRenderer}
 import io.github.effiban.scala2java.core.resolvers._
 import io.github.effiban.scala2java.core.transformers._
 import io.github.effiban.scala2java.core.typeinference.TypeInferrers
@@ -614,8 +614,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   private lazy val typeFunctionTraverser: TypeFunctionTraverser = new TypeFunctionTraverserImpl(typeTraverser, FunctionTypeTransformer)
 
   private lazy val typeListTraverser: TypeListTraverser = new TypeListTraverserImpl(
-    argumentListTraverser,
-    new SimpleArgumentTraverser(typeTraverser)
+    argumentListRenderer,
+    new SimpleArgumentRenderer(typeTraverser.traverse)
   )
 
   private lazy val typeNameTraverser: TypeNameTraverser = new TypeNameTraverserImpl(new CompositeTypeNameTransformer(CoreTypeNameTransformer))
