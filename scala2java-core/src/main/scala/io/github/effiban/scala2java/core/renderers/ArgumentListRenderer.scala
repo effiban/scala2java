@@ -7,7 +7,7 @@ import scala.meta.Tree
 
 trait ArgumentListRenderer {
   def render[T <: Tree](args: List[T],
-                        argTraverser: => ArgumentRenderer[T],
+                        argRenderer: => ArgumentRenderer[T],
                         context: ArgumentListContext = ArgumentListContext()): Unit
 }
 

@@ -4,11 +4,12 @@ import io.github.effiban.scala2java.core.contexts.ArgumentListContext
 import io.github.effiban.scala2java.core.entities.EnclosingDelimiter._
 import io.github.effiban.scala2java.core.entities.ListTraversalOptions
 import io.github.effiban.scala2java.core.matchers.ArgumentListContextMatcher.eqArgumentListContext
+import io.github.effiban.scala2java.core.renderers.{ArgumentListRenderer, ArgumentRenderer}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import org.mockito.ArgumentMatchersSugar.eqTo
 
-import scala.meta.Type
+import scala.meta.{Type, XtensionQuasiquoteType}
 
 class TypeListTraverserImplTest extends UnitTestSuite {
 
@@ -17,44 +18,46 @@ class TypeListTraverserImplTest extends UnitTestSuite {
     maybeEnclosingDelimiter = Some(AngleBracket)
   )
 
-  private val argumentListTraverser = mock[ArgumentListTraverser]
-  private val typeArgTraverser = mock[ArgumentTraverser[Type]]
+  private val argumentListRenderer = mock[ArgumentListRenderer]
+  private val typeArgRenderer = mock[ArgumentRenderer[Type]]
 
-  private val typeListTraverser = new TypeListTraverserImpl(argumentListTraverser, typeArgTraverser)
+  private val typeListTraverser = new TypeListTraverserImpl(
+    argumentListRenderer,
+    typeArgRenderer
+  )
 
 
   test("traverse() when no types") {
     typeListTraverser.traverse(Nil)
 
-    verify(argumentListTraverser).traverse(
+    verify(argumentListRenderer).render(
       args = eqTo(Nil),
-      argTraverser = eqTo(typeArgTraverser),
+      argRenderer = eqTo(typeArgRenderer),
       context = eqArgumentListContext(ArgumentListContext(options = ExpectedTraversalOptions))
     )
   }
 
   test("traverse() when one type") {
-
-    val tpe = Type.Name("x")
+    val tpe = t"X"
 
     typeListTraverser.traverse(types = List(tpe))
 
-    verify(argumentListTraverser).traverse(
+    verify(argumentListRenderer).render(
       args = eqTreeList(List(tpe)),
-      argTraverser = eqTo(typeArgTraverser),
+      argRenderer = eqTo(typeArgRenderer),
       context = eqArgumentListContext(ArgumentListContext(options = ExpectedTraversalOptions))
     )
   }
 
   test("traverse() when two types") {
-    val type1 = Type.Name("x")
-    val type2 = Type.Name("y")
+    val type1 = t"X"
+    val type2 = t"Y"
 
     typeListTraverser.traverse(types = List(type1, type2))
 
-    verify(argumentListTraverser).traverse(
+    verify(argumentListRenderer).render(
       args = eqTreeList(List(type1, type2)),
-      argTraverser = eqTo(typeArgTraverser),
+      argRenderer = eqTo(typeArgRenderer),
       context = eqArgumentListContext(ArgumentListContext(options = ExpectedTraversalOptions))
     )
   }
