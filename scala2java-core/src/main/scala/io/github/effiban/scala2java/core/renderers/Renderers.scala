@@ -65,6 +65,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
   )
 
   lazy val typeRenderer: TypeRenderer = new TypeRendererImpl(
+    typeRefRenderer,
     typeApplyInfixRenderer,
     typeLambdaRenderer,
     typeAnonymousParamRenderer,

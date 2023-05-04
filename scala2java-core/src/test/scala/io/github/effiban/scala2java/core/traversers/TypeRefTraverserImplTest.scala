@@ -1,6 +1,5 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.TypeRefRenderer
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
@@ -10,16 +9,12 @@ class TypeRefTraverserImplTest extends UnitTestSuite {
 
   private val typeNameTraverser = mock[TypeNameTraverser]
   private val typeSelectTraverser = mock[TypeSelectTraverser]
-  private val typeProjectTraverser = mock[TypeProjectTraverser]
   private val typeSingletonTraverser = mock[TypeSingletonTraverser]
-  private val typeRefRenderer = mock[TypeRefRenderer]
 
   private val typeRefTraverser = new TypeRefTraverserImpl(
     typeNameTraverser,
     typeSelectTraverser,
-    typeProjectTraverser,
-    typeSingletonTraverser,
-    typeRefRenderer
+    typeSingletonTraverser
   )
 
   test("traverse Type.Name") {
@@ -28,9 +23,7 @@ class TypeRefTraverserImplTest extends UnitTestSuite {
 
     doReturn(traversedTypeName).when(typeNameTraverser).traverse(eqTree(typeName))
 
-    typeRefTraverser.traverse(typeName)
-
-    verify(typeRefRenderer).render(eqTree(traversedTypeName))
+    typeRefTraverser.traverse(typeName).structure shouldBe traversedTypeName.structure
   }
 
   test("traverse Type.Select") {
@@ -39,17 +32,13 @@ class TypeRefTraverserImplTest extends UnitTestSuite {
 
     doReturn(traversedTypeSelect).when(typeSelectTraverser).traverse(eqTree(typeSelect))
 
-    typeRefTraverser.traverse(typeSelect)
-
-    verify(typeRefRenderer).render(eqTree(traversedTypeSelect))
+    typeRefTraverser.traverse(typeSelect).structure shouldBe traversedTypeSelect.structure
   }
 
   test("traverse Type.Project") {
     val typeProject = Type.Project(Type.Name("MyType"), Type.Name("MyInnerType"))
 
-    typeRefTraverser.traverse(typeProject)
-
-    verify(typeProjectTraverser).traverse(eqTree(typeProject))
+    typeRefTraverser.traverse(typeProject).structure shouldBe typeProject.structure
   }
 
   test("traverse Type.Singleton") {
@@ -58,8 +47,6 @@ class TypeRefTraverserImplTest extends UnitTestSuite {
 
     doAnswer(traversedTypeSingleton).when(typeSingletonTraverser).traverse(eqTree(typeSingleton))
 
-    typeRefTraverser.traverse(typeSingleton)
-
-    verify(typeRefRenderer).render(eqTree(traversedTypeSingleton))
+    typeRefTraverser.traverse(typeSingleton).structure shouldBe traversedTypeSingleton.structure
   }
 }

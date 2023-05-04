@@ -12,6 +12,7 @@ import scala.meta.{Decl, Init, Mod, Name, Pat, Term, Type, XtensionQuasiquoteTyp
 class TypeTraverserImplTest extends UnitTestSuite {
 
   private val typeRefTraverser = mock[TypeRefTraverser]
+  private val typeProjectTraverser = mock[TypeProjectTraverser]
   private val typeApplyTraverser = mock[TypeApplyTraverser]
   private val typeApplyInfixTraverser = mock[TypeApplyInfixTraverser]
   private val typeFunctionTraverser = mock[TypeFunctionTraverser]
@@ -27,6 +28,7 @@ class TypeTraverserImplTest extends UnitTestSuite {
 
   private val typeTraverser = new TypeTraverserImpl(
     typeRefTraverser,
+    typeProjectTraverser,
     typeApplyTraverser,
     typeApplyInfixTraverser,
     typeFunctionTraverser,
@@ -43,8 +45,19 @@ class TypeTraverserImplTest extends UnitTestSuite {
 
   test("traverse Type.Name") {
     val typeName = Type.Name("T")
+    val traversedTypeName = Type.Name("U")
+
+    doReturn(traversedTypeName).when(typeRefTraverser).traverse(eqTree(typeName))
+
     typeTraverser.traverse(typeName)
-    verify(typeRefTraverser).traverse(eqTree(typeName))
+
+    verify(typeRenderer).render(eqTree(traversedTypeName))
+  }
+
+  test("traverse Type.Project") {
+    val typeProject = t"A#B"
+    typeTraverser.traverse(typeProject)
+    verify(typeProjectTraverser).traverse(eqTree(typeProject))
   }
 
   test("traverse Type.Apply") {
