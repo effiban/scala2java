@@ -7,6 +7,7 @@ import scala.meta.Type
 trait TypeRenderer extends JavaTreeRenderer[Type]
 
 private[renderers] class TypeRendererImpl(typeRefRenderer: => TypeRefRenderer,
+                                          typeApplyRenderer: => TypeApplyRenderer,
                                           typeApplyInfixRenderer: TypeApplyInfixRenderer,
                                           typeLambdaRenderer: TypeLambdaRenderer,
                                           typeAnonymousParamRenderer: TypeAnonymousParamRenderer,
@@ -17,7 +18,7 @@ private[renderers] class TypeRendererImpl(typeRefRenderer: => TypeRefRenderer,
 
   override def render(`type`: Type): Unit = `type` match {
     case typeRef: Type.Ref => typeRefRenderer.render(typeRef)
-    case typeApply: Type.Apply => // TODO
+    case typeApply: Type.Apply => typeApplyRenderer.render(typeApply)
     case typeApplyInfix: Type.ApplyInfix => typeApplyInfixRenderer.render(typeApplyInfix)
     case functionType: Type.Function => // TODO
     case tupleType: Type.Tuple => // TODO
