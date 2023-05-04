@@ -9,11 +9,13 @@ class TypeRefRendererImplTest extends UnitTestSuite {
 
   private val typeNameRenderer = mock[TypeNameRenderer]
   private val typeSelectRenderer = mock[TypeSelectRenderer]
+  private val typeProjectRenderer = mock[TypeProjectRenderer]
   private val typeSingletonRenderer = mock[TypeSingletonRenderer]
 
   private val typeRefRenderer = new TypeRefRendererImpl(
     typeNameRenderer,
     typeSelectRenderer,
+    typeProjectRenderer,
     typeSingletonRenderer
   )
 
@@ -31,6 +33,14 @@ class TypeRefRendererImplTest extends UnitTestSuite {
     typeRefRenderer.render(typeSelect)
 
     verify(typeSelectRenderer).render(eqTree(typeSelect))
+  }
+
+  test("render Type.Project") {
+    val typeProject = t"MyType#MyInnerType"
+
+    typeRefRenderer.render(typeProject)
+
+    verify(typeProjectRenderer).render(eqTree(typeProject))
   }
 
   test("render Type.Singleton") {
