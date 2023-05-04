@@ -10,6 +10,7 @@ private[renderers] class TypeRendererImpl(typeRefRenderer: => TypeRefRenderer,
                                           typeApplyRenderer: => TypeApplyRenderer,
                                           typeApplyInfixRenderer: TypeApplyInfixRenderer,
                                           typeWithRenderer: => TypeWithRenderer,
+                                          typeRefineRenderer: => TypeRefineRenderer,
                                           typeAnonymousParamRenderer: TypeAnonymousParamRenderer,
                                           typeVarRenderer: TypeVarRenderer)
                                          (implicit javaWriter: JavaWriter) extends TypeRenderer {
@@ -21,7 +22,7 @@ private[renderers] class TypeRendererImpl(typeRefRenderer: => TypeRefRenderer,
     case typeApply: Type.Apply => typeApplyRenderer.render(typeApply)
     case typeApplyInfix: Type.ApplyInfix => typeApplyInfixRenderer.render(typeApplyInfix)
     case withType: Type.With => typeWithRenderer.render(withType)
-    case typeRefine: Type.Refine => // TODO
+    case typeRefine: Type.Refine => typeRefineRenderer.render(typeRefine)
     case existentialType: Type.Existential => // TODO
     case typeAnnotation: Type.Annotate => // TODO
     case anonymousParamType: Type.AnonymousParam => typeAnonymousParamRenderer.render(anonymousParamType)

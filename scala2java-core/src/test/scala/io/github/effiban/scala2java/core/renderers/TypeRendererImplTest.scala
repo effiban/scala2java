@@ -11,6 +11,7 @@ class TypeRendererImplTest extends UnitTestSuite {
   private val typeApplyRenderer = mock[TypeApplyRenderer]
   private val typeApplyInfixRenderer = mock[TypeApplyInfixRenderer]
   private val typeWithRenderer = mock[TypeWithRenderer]
+  private val typeRefineRenderer = mock[TypeRefineRenderer]
   private val typeAnonymousParamRenderer = mock[TypeAnonymousParamRenderer]
   private val typeVarRenderer = mock[TypeVarRenderer]
 
@@ -19,6 +20,7 @@ class TypeRendererImplTest extends UnitTestSuite {
     typeApplyRenderer,
     typeApplyInfixRenderer,
     typeWithRenderer,
+    typeRefineRenderer,
     typeAnonymousParamRenderer,
     typeVarRenderer
   )
@@ -51,6 +53,12 @@ class TypeRendererImplTest extends UnitTestSuite {
     val typeWith = t"A with B"
     typeRenderer.render(typeWith)
     verify(typeWithRenderer).render(eqTree(typeWith))
+  }
+
+  test("render Type.Refine") {
+    val typeRefine = t"A { def foo(): Int }"
+    typeRenderer.render(typeRefine)
+    verify(typeRefineRenderer).render(eqTree(typeRefine))
   }
 
   test("render Type.AnonymousParam") {

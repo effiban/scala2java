@@ -77,11 +77,14 @@ class Renderers(implicit javaWriter: JavaWriter) {
     typeSingletonRenderer
   )
 
+  lazy val typeRefineRenderer: TypeRefineRenderer = new TypeRefineRendererImpl(typeRenderer)
+
   lazy val typeRenderer: TypeRenderer = new TypeRendererImpl(
     typeRefRenderer,
     typeApplyRenderer,
     typeApplyInfixRenderer,
     typeWithRenderer,
+    typeRefineRenderer,
     typeAnonymousParamRenderer,
     typeVarRenderer
   )
