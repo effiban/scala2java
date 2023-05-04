@@ -643,9 +643,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   private lazy val typeRefTraverser: TypeRefTraverser = new TypeRefTraverserImpl(
     typeNameTraverser,
     typeSelectTraverser,
-    typeProjectTraverser,
-    typeSingletonTraverser,
-    typeRefRenderer
+    typeSingletonTraverser
   )
 
   private lazy val typeRepeatedTraverser: TypeRepeatedTraverser = new TypeRepeatedTraverserImpl(typeTraverser)
@@ -659,6 +657,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val typeTraverser: TypeTraverser = new TypeTraverserImpl(
     typeRefTraverser,
+    typeProjectTraverser,
     typeApplyTraverser,
     typeApplyInfixTraverser,
     typeFunctionTraverser,

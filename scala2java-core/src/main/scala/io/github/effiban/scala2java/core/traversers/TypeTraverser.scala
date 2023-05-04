@@ -8,6 +8,7 @@ import scala.meta.Type
 trait TypeTraverser extends ScalaTreeTraverser[Type]
 
 private[traversers] class TypeTraverserImpl(typeRefTraverser: => TypeRefTraverser,
+                                            typeProjectTraverser: => TypeProjectTraverser,
                                             typeApplyTraverser: => TypeApplyTraverser,
                                             typeApplyInfixTraverser: => TypeApplyInfixTraverser,
                                             typeFunctionTraverser: => TypeFunctionTraverser,
@@ -25,7 +26,12 @@ private[traversers] class TypeTraverserImpl(typeRefTraverser: => TypeRefTraverse
   import javaWriter._
 
   override def traverse(`type`: Type): Unit = `type` match {
-    case typeRef: Type.Ref => typeRefTraverser.traverse(typeRef)
+    case typeRef: Type.Ref => typeRef match {
+      case typeProject: Type.Project => typeProjectTraverser.traverse(typeProject)
+      case aTypeRef =>
+        val traversedTypeRef = typeRefTraverser.traverse(aTypeRef)
+        typeRenderer.render(traversedTypeRef)
+    }
     case typeApply: Type.Apply => typeApplyTraverser.traverse(typeApply)
     case typeApplyInfix: Type.ApplyInfix =>
       val traversedTypeApplyInfix = typeApplyInfixTraverser.traverse(typeApplyInfix)

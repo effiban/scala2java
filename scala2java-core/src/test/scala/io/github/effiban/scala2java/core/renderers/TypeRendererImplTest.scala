@@ -7,17 +7,27 @@ import scala.meta.{Mod, Type, XtensionQuasiquoteType, XtensionQuasiquoteTypePara
 
 class TypeRendererImplTest extends UnitTestSuite {
 
+  private val typeRefRenderer = mock[TypeRefRenderer]
   private val typeApplyInfixRenderer = mock[TypeApplyInfixRenderer]
   private val typeLambdaRenderer = mock[TypeLambdaRenderer]
   private val typeAnonymousParamRenderer = mock[TypeAnonymousParamRenderer]
   private val typeVarRenderer = mock[TypeVarRenderer]
 
   private val typeRenderer = new TypeRendererImpl(
+    typeRefRenderer,
     typeApplyInfixRenderer,
     typeLambdaRenderer,
     typeAnonymousParamRenderer,
     typeVarRenderer
   )
+
+  test("render Type.Select") {
+    val typeSelect = t"a.b.C"
+
+    typeRenderer.render(typeSelect)
+
+    verify(typeRefRenderer).render(eqTree(typeSelect))
+  }
 
   test("render Type.ApplyInfix") {
     val typeApplyInfix = t"K Map V"
