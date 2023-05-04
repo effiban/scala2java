@@ -42,8 +42,6 @@ private[traversers] class TypeTraverserImpl(typeRefTraverser: => TypeRefTraverse
     case typeRefine: Type.Refine => typeRefineTraverser.traverse(typeRefine)
     case existentialType: Type.Existential => typeExistentialTraverser.traverse(existentialType)
     case typeAnnotation: Type.Annotate => typeAnnotateTraverser.traverse(typeAnnotation)
-    case lambdaType: Type.Lambda =>
-      typeRenderer.render(lambdaType)
     case anonymousParamType: Type.AnonymousParam =>
       typeRenderer.render(anonymousParamType)
     case wildcardType: Type.Wildcard => typeWildcardTraverser.traverse(wildcardType)

@@ -7,7 +7,7 @@ import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.Mod.Annot
 import scala.meta.Type.Bounds
-import scala.meta.{Decl, Init, Mod, Name, Pat, Term, Type, XtensionQuasiquoteType, XtensionQuasiquoteTypeParam}
+import scala.meta.{Decl, Init, Mod, Name, Pat, Term, Type, XtensionQuasiquoteType}
 
 class TypeTraverserImplTest extends UnitTestSuite {
 
@@ -132,12 +132,6 @@ class TypeTraverserImplTest extends UnitTestSuite {
     )
     typeTraverser.traverse(typeAnnotate)
     verify(typeAnnotateTraverser).traverse(eqTree(typeAnnotate))
-  }
-
-  test("traverse Type.Lambda") {
-    val typeLambda = Type.Lambda(tparams = List(tparam"T1", tparam"T2"), tpe = t"U")
-    typeTraverser.traverse(typeLambda)
-    verify(typeRenderer).render(eqTree(typeLambda))
   }
 
   test("traverse Type.AnonymousParam") {
