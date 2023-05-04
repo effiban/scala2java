@@ -52,6 +52,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   val thisRenderer: ThisRenderer = new ThisRendererImpl(nameRenderer)
 
+  lazy val typeAnnotateRenderer: TypeAnnotateRenderer = new TypeAnnotateRendererImpl(typeRenderer)
+
   val typeAnonymousParamRenderer: TypeAnonymousParamRenderer = new TypeAnonymousParamRendererImpl()
 
   val typeApplyInfixRenderer: TypeApplyInfixRenderer = new TypeApplyInfixRendererImpl()
@@ -88,6 +90,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
     typeWithRenderer,
     typeRefineRenderer,
     typeExistentialRenderer,
+    typeAnnotateRenderer,
     typeAnonymousParamRenderer,
     typeVarRenderer
   )
