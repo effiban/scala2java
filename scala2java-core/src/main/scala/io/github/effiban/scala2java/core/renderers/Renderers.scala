@@ -58,8 +58,6 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   lazy val typeApplyRenderer: TypeApplyRenderer = new TypeApplyRendererImpl(typeRenderer, typeListRenderer)
 
-  val typeLambdaRenderer: TypeLambdaRenderer = new TypeLambdaRendererImpl()
-
   lazy val typeListRenderer: TypeListRenderer = new TypeListRendererImpl(
     argumentListRenderer,
     new SimpleArgumentRenderer(typeRenderer)
@@ -84,7 +82,6 @@ class Renderers(implicit javaWriter: JavaWriter) {
     typeApplyRenderer,
     typeApplyInfixRenderer,
     typeWithRenderer,
-    typeLambdaRenderer,
     typeAnonymousParamRenderer,
     typeVarRenderer
   )

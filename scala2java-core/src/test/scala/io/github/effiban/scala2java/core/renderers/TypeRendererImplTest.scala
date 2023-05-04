@@ -3,7 +3,7 @@ package io.github.effiban.scala2java.core.renderers
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.{Mod, Type, XtensionQuasiquoteType, XtensionQuasiquoteTypeParam}
+import scala.meta.{Mod, Type, XtensionQuasiquoteType}
 
 class TypeRendererImplTest extends UnitTestSuite {
 
@@ -11,7 +11,6 @@ class TypeRendererImplTest extends UnitTestSuite {
   private val typeApplyRenderer = mock[TypeApplyRenderer]
   private val typeApplyInfixRenderer = mock[TypeApplyInfixRenderer]
   private val typeWithRenderer = mock[TypeWithRenderer]
-  private val typeLambdaRenderer = mock[TypeLambdaRenderer]
   private val typeAnonymousParamRenderer = mock[TypeAnonymousParamRenderer]
   private val typeVarRenderer = mock[TypeVarRenderer]
 
@@ -20,7 +19,6 @@ class TypeRendererImplTest extends UnitTestSuite {
     typeApplyRenderer,
     typeApplyInfixRenderer,
     typeWithRenderer,
-    typeLambdaRenderer,
     typeAnonymousParamRenderer,
     typeVarRenderer
   )
@@ -53,12 +51,6 @@ class TypeRendererImplTest extends UnitTestSuite {
     val typeWith = t"A with B"
     typeRenderer.render(typeWith)
     verify(typeWithRenderer).render(eqTree(typeWith))
-  }
-
-  test("render Type.Lambda") {
-    val typeLambda = Type.Lambda(tparams = List(tparam"T1", tparam"T2"), tpe = t"U")
-    typeRenderer.render(typeLambda)
-    verify(typeLambdaRenderer).render(eqTree(typeLambda))
   }
 
   test("render Type.AnonymousParam") {
