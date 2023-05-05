@@ -46,7 +46,6 @@ class DefaultTermTraverserTest extends UnitTestSuite {
   private val etaTraverser = mock[EtaTraverser]
   private val termRepeatedTraverser = mock[TermRepeatedTraverser]
   private val termInterpolateTraverser = mock[TermInterpolateTraverser]
-  private val litTraverser = mock[LitTraverser]
   private val litRenderer = mock[LitRenderer]
 
 
@@ -80,7 +79,6 @@ class DefaultTermTraverserTest extends UnitTestSuite {
     etaTraverser,
     termRepeatedTraverser,
     termInterpolateTraverser,
-    litTraverser,
     litRenderer
   )
 
@@ -351,7 +349,6 @@ class DefaultTermTraverserTest extends UnitTestSuite {
 
   test("traverse() for Lit.Int") {
     val lit = Lit.Int(3)
-    doReturn(lit).when(litTraverser).traverse(eqTree(lit))
     defaultTermTraverser.traverse(lit)
     verify(litRenderer).render(eqTree(lit))
   }

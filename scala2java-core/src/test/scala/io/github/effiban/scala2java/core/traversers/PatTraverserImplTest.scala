@@ -11,7 +11,6 @@ class PatTraverserImplTest extends UnitTestSuite {
 
   private val TermName: Term.Name = Term.Name("x")
 
-  private val litTraverser = mock[LitTraverser]
   private val litRenderer = mock[LitRenderer]
   private val termNameRenderer = mock[TermNameRenderer]
   private val patWildcardTraverser = mock[PatWildcardTraverser]
@@ -32,7 +31,6 @@ class PatTraverserImplTest extends UnitTestSuite {
   private val patTypedTraverser = mock[PatTypedTraverser]
 
   val patTraverser = new PatTraverserImpl(
-    litTraverser,
     litRenderer,
     termNameRenderer,
     patWildcardTraverser,
@@ -55,7 +53,6 @@ class PatTraverserImplTest extends UnitTestSuite {
 
   test("traverse Lit.Int") {
     val lit = Lit.Int(3)
-    doReturn(lit).when(litTraverser).traverse(eqTree(lit))
     patTraverser.traverse(lit)
     verify(litRenderer).render(eqTree(lit))
   }

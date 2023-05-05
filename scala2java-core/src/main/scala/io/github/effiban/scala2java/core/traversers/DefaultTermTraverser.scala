@@ -35,7 +35,6 @@ private[traversers] class DefaultTermTraverser(defaultTermRefTraverser: => Defau
                                                etaTraverser: => EtaTraverser,
                                                termRepeatedTraverser: => TermRepeatedTraverser,
                                                termInterpolateTraverser: => TermInterpolateTraverser,
-                                               litTraverser: LitTraverser,
                                                litRenderer: LitRenderer)
                                               (implicit javaWriter: JavaWriter) extends TermTraverser {
 
@@ -73,8 +72,7 @@ private[traversers] class DefaultTermTraverser(defaultTermRefTraverser: => Defau
     case termRepeated: Term.Repeated => termRepeatedTraverser.traverse(termRepeated)
     case interpolate: Term.Interpolate => termInterpolateTraverser.traverse(interpolate)
     case literal: Lit =>
-      val traversedLit = litTraverser.traverse(literal)
-      litRenderer.render(traversedLit)
+      litRenderer.render(literal)
     case _ => writeComment(s"UNSUPPORTED: $term")
   }
 }
