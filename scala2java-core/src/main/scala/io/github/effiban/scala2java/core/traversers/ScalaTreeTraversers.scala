@@ -378,7 +378,6 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     alternativeTraverser,
     PatTupleTraverser,
     PatExtractTraverser,
-    patExtractRenderer,
     PatExtractInfixTraverser,
     PatInterpolateTraverser,
     patInterpolateRenderer,
