@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.contexts.{BlockContext, DefnDefContext,
 import io.github.effiban.scala2java.core.entities.Decision.{No, Uncertain, Yes}
 import io.github.effiban.scala2java.core.entities.JavaTreeType
 import io.github.effiban.scala2java.core.entities.TraversalConstants.UnknownType
-import io.github.effiban.scala2java.core.renderers.TermNameRenderer
+import io.github.effiban.scala2java.core.renderers.{TermNameRenderer, TypeRenderer}
 import io.github.effiban.scala2java.core.typeinference.TermTypeInferrer
 import io.github.effiban.scala2java.core.writers.JavaWriter
 import io.github.effiban.scala2java.spi.entities.JavaScope
@@ -20,6 +20,7 @@ private[traversers] class DefnDefTraverserImpl(modListTraverser: => ModListTrave
                                                typeParamListTraverser: => TypeParamListTraverser,
                                                termNameRenderer: TermNameRenderer,
                                                typeTraverser: => TypeTraverser,
+                                               typeRenderer: => TypeRenderer,
                                                termParamListTraverser: => TermParamListTraverser,
                                                blockTraverser: => BlockTraverser,
                                                termTypeInferrer: => TermTypeInferrer,
@@ -70,7 +71,8 @@ private[traversers] class DefnDefTraverserImpl(modListTraverser: => ModListTrave
     maybeType match {
       case Some(Type.AnonymousName()) =>
       case Some(tpe) =>
-        typeTraverser.traverse(tpe)
+        val traversedType = typeTraverser.traverse(tpe)
+        typeRenderer.render(traversedType)
         write(" ")
       case None =>
         writeComment(UnknownType)

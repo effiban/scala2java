@@ -2,6 +2,7 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{JavaTreeTypeContext, ModifiersContext, StatContext}
 import io.github.effiban.scala2java.core.entities.JavaTreeTypeToKeywordMapping
+import io.github.effiban.scala2java.core.renderers.{TypeBoundsRenderer, TypeRenderer}
 import io.github.effiban.scala2java.core.resolvers.JavaTreeTypeResolver
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
@@ -15,7 +16,9 @@ trait DefnTypeTraverser {
 private[traversers] class DefnTypeTraverserImpl(modListTraverser: => ModListTraverser,
                                                 typeParamListTraverser: => TypeParamListTraverser,
                                                 typeTraverser: => TypeTraverser,
+                                                typeRenderer: => TypeRenderer,
                                                 typeBoundsTraverser: => TypeBoundsTraverser,
+                                                typeBoundsRenderer: => TypeBoundsRenderer,
                                                 javaTreeTypeResolver: JavaTreeTypeResolver)
                                                (implicit javaWriter: JavaWriter) extends DefnTypeTraverser {
 
@@ -32,14 +35,16 @@ private[traversers] class DefnTypeTraverserImpl(modListTraverser: => ModListTrav
       case Bounds(None, None) =>
       case bounds =>
         write(" ")
-        typeBoundsTraverser.traverse(bounds)
+        val traversedTypeBounds = typeBoundsTraverser.traverse(bounds)
+        typeBoundsRenderer.render(traversedTypeBounds)
     }
     // If the body type exists, extend it in Java
     typeDef.body match {
       case _: Type.AnonymousName =>
       case rhsType =>
         write(" extends ")
-        typeTraverser.traverse(rhsType)
+        val traversedType = typeTraverser.traverse(rhsType)
+        typeRenderer.render(traversedType)
     }
     writeBlockStart()
     writeBlockEnd()

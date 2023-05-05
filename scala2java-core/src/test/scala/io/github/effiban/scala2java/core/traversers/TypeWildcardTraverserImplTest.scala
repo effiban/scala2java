@@ -1,10 +1,9 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.Type
+import scala.meta.{Type, XtensionQuasiquoteType}
 
 class TypeWildcardTraverserImplTest extends UnitTestSuite {
 
@@ -13,13 +12,11 @@ class TypeWildcardTraverserImplTest extends UnitTestSuite {
   private val typeAnonymousParamTraverser = new TypeWildcardTraverserImpl(typeBoundsTraverser)
 
   test("traverse") {
-    val bounds = Type.Bounds(lo = None, hi = Some(Type.Name("T")))
+    val bounds = Type.Bounds(lo = None, hi = Some(t"T"))
+    val traversedBounds = Type.Bounds(lo = None, hi = Some(t"U"))
 
-    doWrite(" extends T").when(typeBoundsTraverser).traverse(eqTree(bounds))
+    doReturn(traversedBounds).when(typeBoundsTraverser).traverse(eqTree(bounds))
 
-    typeAnonymousParamTraverser.traverse(Type.Wildcard(bounds))
-
-    outputWriter.toString shouldBe "? extends T"
+    typeAnonymousParamTraverser.traverse(Type.Wildcard(bounds)).structure shouldBe Type.Wildcard(traversedBounds).structure
   }
-
 }

@@ -42,4 +42,5 @@ object TypeNames {
   val JavaConsumer: Type.Name = t"Consumer"
   val JavaSupplier: Type.Name = t"Supplier"
   val JavaRunnable: Type.Name = t"Runnable"
+  val JavaObject: Type.Name = t"Object"
 }

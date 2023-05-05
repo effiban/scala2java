@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{ModifiersContext, StatContext}
 import io.github.effiban.scala2java.core.entities.JavaTreeType
-import io.github.effiban.scala2java.core.renderers.TermNameRenderer
+import io.github.effiban.scala2java.core.renderers.{TermNameRenderer, TypeRenderer}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 import io.github.effiban.scala2java.spi.entities.JavaScope
 
@@ -15,6 +15,7 @@ trait DeclDefTraverser {
 private[traversers] class DeclDefTraverserImpl(modListTraverser: => ModListTraverser,
                                                typeParamListTraverser: => TypeParamListTraverser,
                                                typeTraverser: => TypeTraverser,
+                                               typeRenderer: => TypeRenderer,
                                                termNameRenderer: TermNameRenderer,
                                                termParamListTraverser: => TermParamListTraverser)
                                               (implicit javaWriter: JavaWriter) extends DeclDefTraverser {
@@ -25,7 +26,8 @@ private[traversers] class DeclDefTraverserImpl(modListTraverser: => ModListTrave
     writeLine()
     modListTraverser.traverse(ModifiersContext(defDecl, JavaTreeType.Method, context.javaScope))
     traverseTypeParams(defDecl.tparams)
-    typeTraverser.traverse(defDecl.decltpe)
+    val traversedType = typeTraverser.traverse(defDecl.decltpe)
+    typeRenderer.render(traversedType)
     write(" ")
     termNameRenderer.render(defDecl.name)
     termParamListTraverser.traverse(termParams = defDecl.paramss.flatten, context = StatContext(JavaScope.MethodSignature))

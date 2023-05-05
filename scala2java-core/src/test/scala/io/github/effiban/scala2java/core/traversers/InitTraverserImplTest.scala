@@ -4,26 +4,30 @@ import io.github.effiban.scala2java.core.contexts.{ArgumentListContext, InitCont
 import io.github.effiban.scala2java.core.entities.EnclosingDelimiter.Parentheses
 import io.github.effiban.scala2java.core.entities.ListTraversalOptions
 import io.github.effiban.scala2java.core.matchers.ArgumentListContextMatcher.eqArgumentListContext
+import io.github.effiban.scala2java.core.renderers.TypeRenderer
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
 
-import scala.meta.{Init, Name, Term, Type}
+import scala.meta.{Init, Name, Term, XtensionQuasiquoteType}
 
 class InitTraverserImplTest extends UnitTestSuite {
 
-  private val TypeName: Type.Name = Type.Name("MyType")
+  private val TypeName = t"MyType"
+  private val TraversedTypeName = t"MyTraversedType"
   private val ArgList1 = List(Term.Name("arg1"), Term.Name("arg2"))
   private val ArgList2 = List(Term.Name("arg3"), Term.Name("arg4"))
 
   private val typeTraverser = mock[TypeTraverser]
+  private val typeRenderer = mock[TypeRenderer]
   private val argumentListTraverser = mock[ArgumentListTraverser]
   private val invocationArgTraverser = mock[ArgumentTraverser[Term]]
 
   private val initTraverser = new InitTraverserImpl(
     typeTraverser,
+    typeRenderer,
     argumentListTraverser,
     invocationArgTraverser
   )
@@ -34,11 +38,12 @@ class InitTraverserImplTest extends UnitTestSuite {
     val expectedOptions = ListTraversalOptions(maybeEnclosingDelimiter = Some(Parentheses))
     val expectedArgListContext = ArgumentListContext(options = expectedOptions)
 
-    doWrite("MyType").when(typeTraverser).traverse(eqTree(TypeName))
+    doReturn(TraversedTypeName).when(typeTraverser).traverse(eqTree(TypeName))
+    doWrite("MyTraversedType").when(typeRenderer).render(eqTree(TraversedTypeName))
 
     initTraverser.traverse(init)
 
-    outputWriter.toString shouldBe "MyType"
+    outputWriter.toString shouldBe "MyTraversedType"
 
     verify(argumentListTraverser).traverse(
       eqTo(Nil),
@@ -50,7 +55,8 @@ class InitTraverserImplTest extends UnitTestSuite {
   test("traverse() with no arguments, traverseEmpty = true and the rest default") {
     val init = Init(tpe = TypeName, name = Name.Anonymous(), argss = Nil)
 
-    doWrite("MyType()").when(typeTraverser).traverse(eqTree(TypeName))
+    doReturn(TraversedTypeName).when(typeTraverser).traverse(eqTree(TypeName))
+    doWrite("MyTraversedType()").when(typeRenderer).render(eqTree(TraversedTypeName))
 
     initTraverser.traverse(init, InitContext(traverseEmpty = true))
 
@@ -60,7 +66,7 @@ class InitTraverserImplTest extends UnitTestSuite {
     )
     val expectedArgListContext = ArgumentListContext(options = expectedOptions)
 
-    outputWriter.toString shouldBe "MyType()"
+    outputWriter.toString shouldBe "MyTraversedType()"
 
     verify(argumentListTraverser).traverse(
       eqTo(Nil),
@@ -72,11 +78,12 @@ class InitTraverserImplTest extends UnitTestSuite {
   test("traverse() for no arguments when ignored") {
     val init = Init(tpe = TypeName, name = Name.Anonymous(), argss = Nil)
 
-    doWrite("MyType").when(typeTraverser).traverse(eqTree(TypeName))
+    doReturn(TraversedTypeName).when(typeTraverser).traverse(eqTree(TypeName))
+    doWrite("MyTraversedType").when(typeRenderer).render(eqTree(TraversedTypeName))
 
     initTraverser.traverse(init, InitContext(ignoreArgs = true))
 
-    outputWriter.toString shouldBe "MyType"
+    outputWriter.toString shouldBe "MyTraversedType"
 
     verifyNoMoreInteractions(argumentListTraverser)
   }
@@ -87,7 +94,8 @@ class InitTraverserImplTest extends UnitTestSuite {
     val expectedOptions = ListTraversalOptions(maybeEnclosingDelimiter = Some(Parentheses))
     val expectedArgListContext = ArgumentListContext(options = expectedOptions)
 
-    doWrite("MyType").when(typeTraverser).traverse(eqTree(TypeName))
+    doReturn(TraversedTypeName).when(typeTraverser).traverse(eqTree(TypeName))
+    doWrite("MyTraversedType").when(typeRenderer).render(eqTree(TraversedTypeName))
     doWrite(
       """(arg1,
         |arg2)""".stripMargin)
@@ -100,7 +108,7 @@ class InitTraverserImplTest extends UnitTestSuite {
     initTraverser.traverse(init)
 
     outputWriter.toString shouldBe
-      """MyType(arg1,
+      """MyTraversedType(arg1,
         |arg2)""".stripMargin
   }
 
@@ -110,7 +118,8 @@ class InitTraverserImplTest extends UnitTestSuite {
     val expectedOptions = ListTraversalOptions(maybeEnclosingDelimiter = Some(Parentheses))
     val expectedArgListContext = ArgumentListContext(options = expectedOptions, argNameAsComment = true)
 
-    doWrite("MyType").when(typeTraverser).traverse(eqTree(TypeName))
+    doReturn(TraversedTypeName).when(typeTraverser).traverse(eqTree(TypeName))
+    doWrite("MyTraversedType").when(typeRenderer).render(eqTree(TraversedTypeName))
     doWrite(
       """(/*arg1Name = */arg1,
         |/*arg2Name = */arg2)""".stripMargin)
@@ -123,18 +132,19 @@ class InitTraverserImplTest extends UnitTestSuite {
     initTraverser.traverse(init, InitContext(argNameAsComment = true))
 
     outputWriter.toString shouldBe
-      """MyType(/*arg1Name = */arg1,
+      """MyTraversedType(/*arg1Name = */arg1,
         |/*arg2Name = */arg2)""".stripMargin
   }
 
   test("traverse() for one argument list when ignored") {
     val init = Init(tpe = TypeName, name = Name.Anonymous(), argss = List(ArgList1))
 
-    doWrite("MyType").when(typeTraverser).traverse(eqTree(TypeName))
+    doReturn(TraversedTypeName).when(typeTraverser).traverse(eqTree(TypeName))
+    doWrite("MyTraversedType").when(typeRenderer).render(eqTree(TraversedTypeName))
 
     initTraverser.traverse(init, InitContext(ignoreArgs = true))
 
-    outputWriter.toString shouldBe "MyType"
+    outputWriter.toString shouldBe "MyTraversedType"
 
     verifyNoMoreInteractions(argumentListTraverser)
   }
@@ -150,7 +160,8 @@ class InitTraverserImplTest extends UnitTestSuite {
     val expectedOptions = ListTraversalOptions(maybeEnclosingDelimiter = Some(Parentheses))
     val expectedArgListContext = ArgumentListContext(options = expectedOptions)
 
-    doWrite("MyType").when(typeTraverser).traverse(eqTree(TypeName))
+    doReturn(TraversedTypeName).when(typeTraverser).traverse(eqTree(TypeName))
+    doWrite("MyTraversedType").when(typeRenderer).render(eqTree(TraversedTypeName))
     doWrite(
       """(arg1,
         |arg2,
@@ -165,7 +176,7 @@ class InitTraverserImplTest extends UnitTestSuite {
     initTraverser.traverse(init)
 
     outputWriter.toString shouldBe
-      """MyType(arg1,
+      """MyTraversedType(arg1,
         |arg2,
         |arg3,
         |arg4)""".stripMargin

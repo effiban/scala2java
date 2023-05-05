@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.TermSelectContext
 import io.github.effiban.scala2java.core.matchers.TermSelectTransformationContextMatcher.eqTermSelectTransformationContext
-import io.github.effiban.scala2java.core.renderers.TermNameRenderer
+import io.github.effiban.scala2java.core.renderers.{TermNameRenderer, TypeListRenderer}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
@@ -29,7 +29,8 @@ class ExpressionTermSelectTraverserImplTest extends UnitTestSuite {
   private val qualifierTraverser = mock[TermTraverser]
   private val transformedTermTraverser = mock[TermTraverser]
   private val termNameRenderer = mock[TermNameRenderer]
-  private val typeListTraverser = mock[TypeListTraverser]
+  private val typeTraverser = mock[TypeTraverser]
+  private val typeListRenderer = mock[TypeListRenderer]
   private val qualifierTypeInferrer = mock[QualifierTypeInferrer]
   private val termSelectTransformer = mock[InternalTermSelectTransformer]
 
@@ -37,13 +38,15 @@ class ExpressionTermSelectTraverserImplTest extends UnitTestSuite {
     qualifierTraverser,
     transformedTermTraverser,
     termNameRenderer,
-    typeListTraverser,
+    typeTraverser,
+    typeListRenderer,
     qualifierTypeInferrer,
     termSelectTransformer
   )
 
   test("traverse() when qualifier is a Term.Name, and has type args and inferred qualifier type") {
-    val typeArgs = List(TypeNames.Int)
+    val typeArg = TypeNames.Int
+    val typeArgs = List(typeArg)
     val context = TermSelectContext(appliedTypeArgs = typeArgs)
     val expectedTransformationContext = TermSelectTransformationContext(Some(MyType))
 
@@ -53,7 +56,8 @@ class ExpressionTermSelectTraverserImplTest extends UnitTestSuite {
 
     doWrite("MyJavaClass").when(qualifierTraverser).traverse(eqTree(MyJavaClass))
     doWrite("myJavaMethod").when(termNameRenderer).render(eqTree(MyJavaMethod))
-    doWrite("<Integer>").when(typeListTraverser).traverse(eqTreeList(typeArgs))
+    doReturn(t"int").when(typeTraverser).traverse(eqTree(typeArg))
+    doWrite("<Integer>").when(typeListRenderer).render(eqTreeList(List(t"int")))
 
     termSelectTraverser.traverse(ScalaSelectWithTermName, context)
 
@@ -61,6 +65,7 @@ class ExpressionTermSelectTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() when qualifier is a Term.Name, and has type args but no inferred qualifier type") {
+    val typeArg = TypeNames.Int
     val typeArgs = List(TypeNames.Int)
     val context = TermSelectContext(appliedTypeArgs = typeArgs)
     val expectedTransformationContext = TermSelectTransformationContext()
@@ -71,7 +76,8 @@ class ExpressionTermSelectTraverserImplTest extends UnitTestSuite {
 
     doWrite("MyJavaClass").when(qualifierTraverser).traverse(eqTree(MyJavaClass))
     doWrite("myJavaMethod").when(termNameRenderer).render(eqTree(MyJavaMethod))
-    doWrite("<Integer>").when(typeListTraverser).traverse(eqTreeList(typeArgs))
+    doReturn(t"int").when(typeTraverser).traverse(eqTree(typeArg))
+    doWrite("<Integer>").when(typeListRenderer).render(eqTreeList(List(t"int")))
 
     termSelectTraverser.traverse(ScalaSelectWithTermName, context)
 

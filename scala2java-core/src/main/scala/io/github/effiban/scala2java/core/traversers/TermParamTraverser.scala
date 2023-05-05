@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{ModifiersContext, StatContext}
 import io.github.effiban.scala2java.core.entities.JavaTreeType
-import io.github.effiban.scala2java.core.renderers.NameRenderer
+import io.github.effiban.scala2java.core.renderers.{NameRenderer, TypeRenderer}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Term
@@ -13,6 +13,7 @@ trait TermParamTraverser {
 
 private[traversers] class TermParamTraverserImpl(modListTraverser: => ModListTraverser,
                                                  typeTraverser: => TypeTraverser,
+                                                 typeRenderer: => TypeRenderer,
                                                  nameTraverser: NameTraverser,
                                                  nameRenderer: NameRenderer)
                                                 (implicit javaWriter: JavaWriter) extends TermParamTraverser {
@@ -26,7 +27,8 @@ private[traversers] class TermParamTraverserImpl(modListTraverser: => ModListTra
     val modifiersContext = ModifiersContext(termParam, JavaTreeType.Parameter, context.javaScope)
     modListTraverser.traverse(modifiersContext, annotsOnSameLine = true)
     termParam.decltpe.foreach(declType => {
-      typeTraverser.traverse(declType)
+      val traversedType = typeTraverser.traverse(declType)
+      typeRenderer.render(traversedType)
       write(" ")
     })
     val traversedName = nameTraverser.traverse(termParam.name)

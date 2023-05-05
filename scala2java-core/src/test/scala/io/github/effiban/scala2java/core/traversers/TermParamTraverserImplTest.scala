@@ -3,7 +3,7 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.{ModifiersContext, StatContext}
 import io.github.effiban.scala2java.core.entities.JavaTreeType
 import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
-import io.github.effiban.scala2java.core.renderers.NameRenderer
+import io.github.effiban.scala2java.core.renderers.{NameRenderer, TypeRenderer}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
@@ -11,7 +11,7 @@ import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchers
 
-import scala.meta.{Init, Lit, Mod, Name, Term, Type, XtensionQuasiquoteTerm}
+import scala.meta.{Init, Lit, Mod, Name, Term, Type, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 class TermParamTraverserImplTest extends UnitTestSuite {
 
@@ -26,12 +26,14 @@ class TermParamTraverserImplTest extends UnitTestSuite {
 
   private val modListTraverser = mock[ModListTraverser]
   private val typeTraverser = mock[TypeTraverser]
+  private val typeRenderer = mock[TypeRenderer]
   private val nameTraverser = mock[NameTraverser]
   private val nameRenderer = mock[NameRenderer]
 
   private val termParamTraverser = new TermParamTraverserImpl(
     modListTraverser,
     typeTraverser,
+    typeRenderer,
     nameTraverser,
     nameRenderer
   )
@@ -46,7 +48,8 @@ class TermParamTraverserImplTest extends UnitTestSuite {
 
     doWrite("@MyAnnotation final ")
       .when(modListTraverser).traverse(eqExpectedModifiers(termParam), annotsOnSameLine = ArgumentMatchers.eq(true))
-    doWrite("int").when(typeTraverser).traverse(eqTree(TypeNames.Int))
+    doReturn(t"int").when(typeTraverser).traverse(eqTree(TypeNames.Int))
+    doWrite("int").when(typeRenderer).render(eqTree(t"int"))
     doReturn(TraversedParamName).when(nameTraverser).traverse(eqTree(ParamName))
     doWrite("myTraversedParam").when(nameRenderer).render(eqTree(TraversedParamName))
 

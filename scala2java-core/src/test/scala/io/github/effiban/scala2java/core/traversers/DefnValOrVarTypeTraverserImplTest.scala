@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.StatContext
+import io.github.effiban.scala2java.core.renderers.TypeRenderer
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
@@ -8,7 +9,7 @@ import io.github.effiban.scala2java.core.typeinference.TermTypeInferrer
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.{Lit, Term}
+import scala.meta.{Lit, Term, XtensionQuasiquoteType}
 
 class DefnValOrVarTypeTraverserImplTest extends UnitTestSuite {
 
@@ -16,14 +17,20 @@ class DefnValOrVarTypeTraverserImplTest extends UnitTestSuite {
   private val NonInferrableTerm = Term.Apply(Term.Name("externalMethod"), Nil)
 
   private val typeTraverser = mock[TypeTraverser]
+  private val typeRenderer = mock[TypeRenderer]
   private val termTypeInferrer = mock[TermTypeInferrer]
 
-  private val defnValOrVarTypeTraverser = new DefnValOrVarTypeTraverserImpl(typeTraverser, termTypeInferrer)
+  private val defnValOrVarTypeTraverser = new DefnValOrVarTypeTraverserImpl(
+    typeTraverser,
+    typeRenderer,
+    termTypeInferrer
+  )
 
   test("traverse when has declared type should traverse it") {
     val javaScope = JavaScope.Class
 
-    doWrite("Int").when(typeTraverser).traverse(eqTree(TypeNames.Int))
+    doReturn(t"int").when(typeTraverser).traverse(eqTree(TypeNames.Int))
+    doWrite("int").when(typeRenderer).render(eqTree(t"int"))
 
     defnValOrVarTypeTraverser.traverse(
       maybeDeclType = Some(TypeNames.Int),
@@ -31,14 +38,15 @@ class DefnValOrVarTypeTraverserImplTest extends UnitTestSuite {
       context = StatContext(javaScope)
     )
 
-    outputWriter.toString shouldBe "Int"
+    outputWriter.toString shouldBe "int"
   }
 
   test("traverse when has no declared type, has RHS, JavaScope is none, and type is inferred - should traverse it") {
     val javaScope = JavaScope.Class
 
     when(termTypeInferrer.infer(eqTree(LiteralInt))).thenReturn(Some(TypeNames.Int))
-    doWrite("Int").when(typeTraverser).traverse(eqTree(TypeNames.Int))
+    doReturn(t"int").when(typeTraverser).traverse(eqTree(TypeNames.Int))
+    doWrite("int").when(typeRenderer).render(eqTree(t"int"))
 
     defnValOrVarTypeTraverser.traverse(
       maybeDeclType = None,
@@ -46,7 +54,7 @@ class DefnValOrVarTypeTraverserImplTest extends UnitTestSuite {
       context = StatContext(javaScope)
     )
 
-    outputWriter.toString shouldBe "Int"
+    outputWriter.toString shouldBe "int"
   }
 
   test("traverse when has no declared type, has RHS, JavaScope is none, and type not inferred - should write 'UnknownType'") {

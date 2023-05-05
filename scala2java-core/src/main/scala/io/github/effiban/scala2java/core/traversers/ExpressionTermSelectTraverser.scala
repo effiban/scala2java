@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.TermSelectContext
 import io.github.effiban.scala2java.core.entities.EnclosingDelimiter.Parentheses
-import io.github.effiban.scala2java.core.renderers.TermNameRenderer
+import io.github.effiban.scala2java.core.renderers.{TermNameRenderer, TypeListRenderer}
 import io.github.effiban.scala2java.core.transformers.InternalTermSelectTransformer
 import io.github.effiban.scala2java.core.typeinference.QualifierTypeInferrer
 import io.github.effiban.scala2java.core.writers.JavaWriter
@@ -17,7 +17,8 @@ trait ExpressionTermSelectTraverser {
 private[traversers] class ExpressionTermSelectTraverserImpl(qualifierTraverser: => TermTraverser,
                                                             transformedTermTraverser: => TermTraverser,
                                                             termNameRenderer: TermNameRenderer,
-                                                            typeListTraverser: => TypeListTraverser,
+                                                            typeTraverser: => TypeTraverser,
+                                                            typeListRenderer: => TypeListRenderer,
                                                             qualifierTypeInferrer: => QualifierTypeInferrer,
                                                             termSelectTransformer: InternalTermSelectTransformer)
                                                            (implicit javaWriter: JavaWriter) extends ExpressionTermSelectTraverser {
@@ -37,7 +38,8 @@ private[traversers] class ExpressionTermSelectTraverserImpl(qualifierTraverser: 
   private def traverseAsSelect(transformedSelect: Term.Select, context: TermSelectContext): Unit = {
     traverseQualifier(transformedSelect.qual)
     writeQualifierSeparator(transformedSelect.qual)
-    typeListTraverser.traverse(context.appliedTypeArgs)
+    val traversedTypeArgs = context.appliedTypeArgs.map(typeTraverser.traverse)
+    typeListRenderer.render(traversedTypeArgs)
     termNameRenderer.render(transformedSelect.name)
   }
 

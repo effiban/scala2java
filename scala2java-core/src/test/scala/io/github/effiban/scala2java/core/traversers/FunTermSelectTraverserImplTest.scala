@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.TermSelectContext
-import io.github.effiban.scala2java.core.renderers.TermNameRenderer
+import io.github.effiban.scala2java.core.renderers.{TermNameRenderer, TypeListRenderer}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
@@ -19,21 +19,25 @@ class FunTermSelectTraverserImplTest extends UnitTestSuite {
 
   private val qualifierTraverser = mock[TermTraverser]
   private val termNameRenderer = mock[TermNameRenderer]
-  private val typeListTraverser = mock[TypeListTraverser]
+  private val typeTraverser = mock[TypeTraverser]
+  private val typeListRenderer = mock[TypeListRenderer]
 
   private val funTermSelectTraverser = new FunTermSelectTraverserImpl(
     qualifierTraverser,
     termNameRenderer,
-    typeListTraverser,
+    typeTraverser,
+    typeListRenderer,
   )
 
   test("traverse() when qualifier is a Term.Name, and has type args") {
-    val typeArgs = List(TypeNames.Int)
+    val typeArg = TypeNames.Int
+    val typeArgs = List(typeArg)
     val context = TermSelectContext(appliedTypeArgs = typeArgs)
 
     doWrite("MyObject").when(qualifierTraverser).traverse(eqTree(MyInstance))
     doWrite("myMethod").when(termNameRenderer).render(eqTree(MyMethod))
-    doWrite("<Integer>").when(typeListTraverser).traverse(eqTreeList(typeArgs))
+    doReturn(t"int").when(typeTraverser).traverse(typeArg)
+    doWrite("<Integer>").when(typeListRenderer).render(eqTreeList(List(t"int")))
 
     funTermSelectTraverser.traverse(SelectWithTermName, context)
 

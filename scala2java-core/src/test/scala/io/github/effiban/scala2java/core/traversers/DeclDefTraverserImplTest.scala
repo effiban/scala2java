@@ -3,7 +3,7 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.{ModifiersContext, StatContext}
 import io.github.effiban.scala2java.core.entities.JavaTreeType
 import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
-import io.github.effiban.scala2java.core.renderers.TermNameRenderer
+import io.github.effiban.scala2java.core.renderers.{TermNameRenderer, TypeRenderer}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
@@ -14,11 +14,12 @@ import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchers
 
 import scala.meta.Type.Bounds
-import scala.meta.{Decl, Init, Mod, Name, Term, Type}
+import scala.meta.{Decl, Init, Mod, Name, Term, Type, XtensionQuasiquoteType}
 
 class DeclDefTraverserImplTest extends UnitTestSuite {
 
-  private val MethodType: Type.Name = TypeNames.Int
+  private val MethodType = t"MethodType"
+  private val TraversedMethodType = t"TraversedMethodType"
   private val MethodName: Term.Name = Term.Name("myMethod")
 
   private val Modifiers: List[Mod] = List(
@@ -49,6 +50,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
 
   private val modListTraverser = mock[ModListTraverser]
   private val typeTraverser = mock[TypeTraverser]
+  private val typeRenderer = mock[TypeRenderer]
   private val typeParamListTraverser = mock[TypeParamListTraverser]
   private val termNameRenderer = mock[TermNameRenderer]
   private val termParamListTraverser = mock[TermParamListTraverser]
@@ -57,6 +59,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     modListTraverser,
     typeParamListTraverser,
     typeTraverser,
+    typeRenderer,
     termNameRenderer,
     termParamListTraverser)
 
@@ -76,7 +79,8 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |public """.stripMargin)
       .when(modListTraverser).traverse(eqExpectedModifiers(declDef, javaScope), annotsOnSameLine = ArgumentMatchers.eq(false))
-    doWrite("int").when(typeTraverser).traverse(eqTree(MethodType))
+    doReturn(TraversedMethodType).when(typeTraverser).traverse(eqTree(MethodType))
+    doWrite("TraversedMethodType").when(typeRenderer).render(eqTree(TraversedMethodType))
     doWrite("myMethod").when(termNameRenderer).render(eqTree(MethodName))
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1),
@@ -89,7 +93,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """
         |@MyAnnotation
-        |public int myMethod(int param1, int param2)""".stripMargin
+        |public TraversedMethodType myMethod(int param1, int param2)""".stripMargin
   }
 
   test("traverse() for class method when has type params") {
@@ -108,7 +112,8 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
         |public """.stripMargin)
       .when(modListTraverser).traverse(eqExpectedModifiers(declDef, javaScope), annotsOnSameLine = ArgumentMatchers.eq(false))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
-    doWrite("int").when(typeTraverser).traverse(eqTree(MethodType))
+    doReturn(TraversedMethodType).when(typeTraverser).traverse(eqTree(MethodType))
+    doWrite("TraversedMethodType").when(typeRenderer).render(eqTree(TraversedMethodType))
     doWrite("myMethod").when(termNameRenderer).render(eqTree(MethodName))
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1),
@@ -121,7 +126,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """
         |@MyAnnotation
-        |public <T> int myMethod(int param1, int param2)""".stripMargin
+        |public <T> TraversedMethodType myMethod(int param1, int param2)""".stripMargin
   }
 
   test("traverse() for interface method when has one list of params") {
@@ -139,7 +144,8 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(modListTraverser).traverse(eqExpectedModifiers(declDef, javaScope), annotsOnSameLine = ArgumentMatchers.eq(false))
-    doWrite("int").when(typeTraverser).traverse(eqTree(MethodType))
+    doReturn(TraversedMethodType).when(typeTraverser).traverse(eqTree(MethodType))
+    doWrite("TraversedMethodType").when(typeRenderer).render(eqTree(TraversedMethodType))
     doWrite("myMethod").when(termNameRenderer).render(eqTree(MethodName))
     doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1),
@@ -152,7 +158,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """
         |@MyAnnotation
-        |int myMethod(int param1, int param2)""".stripMargin
+        |TraversedMethodType myMethod(int param1, int param2)""".stripMargin
   }
 
   test("traverse() for interface method when has two lists of params") {
@@ -170,7 +176,8 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |""".stripMargin)
       .when(modListTraverser).traverse(eqExpectedModifiers(declDef, javaScope), annotsOnSameLine = ArgumentMatchers.eq(false))
-    doWrite("int").when(typeTraverser).traverse(eqTree(MethodType))
+    doReturn(TraversedMethodType).when(typeTraverser).traverse(eqTree(MethodType))
+    doWrite("TraversedMethodType").when(typeRenderer).render(eqTree(TraversedMethodType))
     doWrite("myMethod").when(termNameRenderer).render(eqTree(MethodName))
     doWrite("(int param1, int param2, int param3, int param4)").when(termParamListTraverser).traverse(
       termParams = eqTreeList(MethodParams1 ++ MethodParams2),
@@ -183,7 +190,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """
         |@MyAnnotation
-        |int myMethod(int param1, int param2, int param3, int param4)""".stripMargin
+        |TraversedMethodType myMethod(int param1, int param2, int param3, int param4)""".stripMargin
   }
 
   private def termParamInt(name: String) = {
