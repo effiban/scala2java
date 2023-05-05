@@ -8,8 +8,7 @@ import scala.meta.{Lit, Pat, Term}
 
 trait PatTraverser extends ScalaTreeTraverser[Pat]
 
-private[traversers] class PatTraverserImpl(litTraverser: LitTraverser,
-                                           litRenderer: LitRenderer,
+private[traversers] class PatTraverserImpl(litRenderer: LitRenderer,
                                            termNameRenderer: TermNameRenderer,
                                            patWildcardTraverser: PatWildcardTraverser,
                                            patWildcardRenderer: PatWildcardRenderer,
@@ -33,8 +32,7 @@ private[traversers] class PatTraverserImpl(litTraverser: LitTraverser,
 
   override def traverse(pat: Pat): Unit = pat match {
     case lit: Lit =>
-      val traversedLit = litTraverser.traverse(lit)
-      litRenderer.render(traversedLit)
+      litRenderer.render(lit)
     case termName: Term.Name =>
       termNameRenderer.render(termName)
     case patternWildcard: Pat.Wildcard =>
