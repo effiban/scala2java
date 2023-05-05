@@ -95,8 +95,11 @@ class Renderers(implicit javaWriter: JavaWriter) {
     typeAnnotateRenderer,
     typeAnonymousParamRenderer,
     typeWildcardRenderer,
+    typeRepeatedRenderer,
     typeVarRenderer
   )
+
+  lazy val typeRepeatedRenderer: TypeRepeatedRenderer = new TypeRepeatedRendererImpl(typeRenderer)
 
   lazy val typeSelectRenderer: TypeSelectRenderer = new TypeSelectRendererImpl(defaultTermRefRenderer, typeNameRenderer)
 

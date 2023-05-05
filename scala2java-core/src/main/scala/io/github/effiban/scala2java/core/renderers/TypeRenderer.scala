@@ -15,6 +15,7 @@ private[renderers] class TypeRendererImpl(typeRefRenderer: => TypeRefRenderer,
                                           typeAnnotateRenderer: => TypeAnnotateRenderer,
                                           typeAnonymousParamRenderer: TypeAnonymousParamRenderer,
                                           typeWildcardRenderer: => TypeWildcardRenderer,
+                                          typeRepeatedRenderer: => TypeRepeatedRenderer,
                                           typeVarRenderer: TypeVarRenderer)
                                          (implicit javaWriter: JavaWriter) extends TypeRenderer {
 
@@ -30,8 +31,7 @@ private[renderers] class TypeRendererImpl(typeRefRenderer: => TypeRefRenderer,
     case typeAnnotation: Type.Annotate => typeAnnotateRenderer.render(typeAnnotation)
     case anonymousParamType: Type.AnonymousParam => typeAnonymousParamRenderer.render(anonymousParamType)
     case wildcardType: Type.Wildcard => typeWildcardRenderer.render(wildcardType)
-    case byNameType: Type.ByName => // TODO
-    case repeatedType: Type.Repeated => // TODO
+    case repeatedType: Type.Repeated => typeRepeatedRenderer.render(repeatedType)
     case typeVar: Type.Var => typeVarRenderer.render(typeVar)
     case _ => writeComment(s"UNSUPPORTED: ${`type`}")
   }
