@@ -60,6 +60,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   lazy val typeApplyRenderer: TypeApplyRenderer = new TypeApplyRendererImpl(typeRenderer, typeListRenderer)
 
+  lazy val typeBoundsRenderer: TypeBoundsRenderer = new TypeBoundsRendererImpl(typeRenderer)
+
   lazy val typeExistentialRenderer: TypeExistentialRenderer = new TypeExistentialRendererImpl(typeRenderer)
 
   lazy val typeListRenderer: TypeListRenderer = new TypeListRendererImpl(
