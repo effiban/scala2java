@@ -376,7 +376,6 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     patSeqWildcardRenderer,
     patVarRenderer,
     BindTraverser,
-    bindRenderer,
     alternativeTraverser,
     PatTupleTraverser,
     patTupleRenderer,

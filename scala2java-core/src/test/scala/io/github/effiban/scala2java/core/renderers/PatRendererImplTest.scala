@@ -3,7 +3,6 @@ package io.github.effiban.scala2java.core.renderers
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.Pat.Bind
 import scala.meta.{Lit, Pat, Term}
 
 class PatRendererImplTest extends UnitTestSuite {
@@ -14,7 +13,6 @@ class PatRendererImplTest extends UnitTestSuite {
   private val patWildcardRenderer = mock[PatWildcardRenderer]
   private val patSeqWildcardRenderer = mock[PatSeqWildcardRenderer]
   private val patVarRenderer = mock[PatVarRenderer]
-  private val bindRenderer = mock[BindRenderer]
   private val patTupleRenderer = mock[PatTupleRenderer]
   private val patExtractRenderer = mock[PatExtractRenderer]
   private val patInterpolateRenderer = mock[PatInterpolateRenderer]
@@ -25,7 +23,6 @@ class PatRendererImplTest extends UnitTestSuite {
     patWildcardRenderer,
     patSeqWildcardRenderer,
     patVarRenderer,
-    bindRenderer,
     patTupleRenderer,
     patExtractRenderer,
     patInterpolateRenderer
@@ -56,12 +53,6 @@ class PatRendererImplTest extends UnitTestSuite {
   test("render Pat.Var") {
     patRenderer.render(Pat.Var(TermName))
     verify(patVarRenderer).render(eqTree(Pat.Var(TermName)))
-  }
-
-  test("render Bind") {
-    val bind = Bind(lhs = Pat.Var(TermName), rhs = Term.Name("X"))
-    patRenderer.render(bind)
-    verify(bindRenderer).render(eqTree(bind))
   }
 
   test("render Alternative") {
