@@ -15,7 +15,6 @@ class PatTraverserImplTest extends UnitTestSuite {
   private val termNameRenderer = mock[TermNameRenderer]
   private val patWildcardRenderer = mock[PatWildcardRenderer]
   private val patSeqWildcardTraverser = mock[PatSeqWildcardTraverser]
-  private val patSeqWildcardRenderer = mock[PatSeqWildcardRenderer]
   private val patVarRenderer = mock[PatVarRenderer]
   private val bindTraverser = mock[BindTraverser]
   private val alternativeTraverser = mock[AlternativeTraverser]
@@ -32,7 +31,6 @@ class PatTraverserImplTest extends UnitTestSuite {
     termNameRenderer,
     patWildcardRenderer,
     patSeqWildcardTraverser,
-    patSeqWildcardRenderer,
     patVarRenderer,
     bindTraverser,
     alternativeTraverser,
@@ -64,7 +62,6 @@ class PatTraverserImplTest extends UnitTestSuite {
   test("traverse Pat.SeqWildcard") {
     doReturn(Pat.SeqWildcard()).when(patSeqWildcardTraverser).traverse(eqTree(Pat.SeqWildcard()))
     patTraverser.traverse(Pat.SeqWildcard())
-    verify(patSeqWildcardRenderer).render(eqTree(Pat.SeqWildcard()))
   }
 
   test("traverse Pat.Var") {

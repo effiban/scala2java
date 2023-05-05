@@ -11,7 +11,6 @@ class PatRendererImplTest extends UnitTestSuite {
   private val litRenderer = mock[LitRenderer]
   private val termNameRenderer = mock[TermNameRenderer]
   private val patWildcardRenderer = mock[PatWildcardRenderer]
-  private val patSeqWildcardRenderer = mock[PatSeqWildcardRenderer]
   private val patVarRenderer = mock[PatVarRenderer]
   private val patExtractRenderer = mock[PatExtractRenderer]
   private val patInterpolateRenderer = mock[PatInterpolateRenderer]
@@ -20,7 +19,6 @@ class PatRendererImplTest extends UnitTestSuite {
     litRenderer,
     termNameRenderer,
     patWildcardRenderer,
-    patSeqWildcardRenderer,
     patVarRenderer,
     patExtractRenderer,
     patInterpolateRenderer
@@ -41,11 +39,6 @@ class PatRendererImplTest extends UnitTestSuite {
   test("render Pat.Wildcard") {
     patRenderer.render(Pat.Wildcard())
     verify(patWildcardRenderer).render(eqTree(Pat.Wildcard()))
-  }
-
-  test("render Pat.SeqWildcard") {
-    patRenderer.render(Pat.SeqWildcard())
-    verify(patSeqWildcardRenderer).render(eqTree(Pat.SeqWildcard()))
   }
 
   test("render Pat.Var") {
