@@ -15,7 +15,6 @@ private[traversers] class PatTraverserImpl(litRenderer: LitRenderer,
                                            patSeqWildcardRenderer: PatSeqWildcardRenderer,
                                            patVarRenderer: PatVarRenderer,
                                            bindTraverser: BindTraverser,
-                                           bindRenderer: BindRenderer,
                                            alternativeTraverser: => AlternativeTraverser,
                                            patTupleTraverser: PatTupleTraverser,
                                            patTupleRenderer: PatTupleRenderer,
@@ -43,7 +42,7 @@ private[traversers] class PatTraverserImpl(litRenderer: LitRenderer,
       patVarRenderer.render(patternVar)
     case patternBind: Bind =>
       val traversedBind = bindTraverser.traverse(patternBind)
-      bindRenderer.render(traversedBind)
+      writeComment(s"UNSUPPORTED: $traversedBind")
     case patternAlternative: Alternative => alternativeTraverser.traverse(patternAlternative)
     case patternTuple: Pat.Tuple =>
       val traversedTuple = patTupleTraverser.traverse(patternTuple)

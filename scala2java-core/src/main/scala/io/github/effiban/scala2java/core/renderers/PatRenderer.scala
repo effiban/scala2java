@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
-import scala.meta.Pat.{Alternative, Bind}
+import scala.meta.Pat.Alternative
 import scala.meta.{Lit, Pat, Term}
 
 trait PatRenderer extends JavaTreeRenderer[Pat]
@@ -12,7 +12,6 @@ private[renderers] class PatRendererImpl(litRenderer: LitRenderer,
                                          patWildcardRenderer: PatWildcardRenderer,
                                          patSeqWildcardRenderer: PatSeqWildcardRenderer,
                                          patVarRenderer: PatVarRenderer,
-                                         bindRenderer: BindRenderer,
                                          patTupleRenderer: PatTupleRenderer,
                                          patExtractRenderer: PatExtractRenderer,
                                          patInterpolateRenderer: PatInterpolateRenderer)
@@ -26,7 +25,6 @@ private[renderers] class PatRendererImpl(litRenderer: LitRenderer,
     case patternWildcard: Pat.Wildcard => patWildcardRenderer.render(patternWildcard)
     case patternSeqWildcard: Pat.SeqWildcard => patSeqWildcardRenderer.render(patternSeqWildcard)
     case patternVar: Pat.Var => patVarRenderer.render(patternVar)
-    case patternBind: Bind => bindRenderer.render(patternBind)
     case patternAlternative: Alternative => // TODO
     case patternTuple: Pat.Tuple => patTupleRenderer.render(patternTuple)
     case patternExtract: Pat.Extract => patExtractRenderer.render(patternExtract)

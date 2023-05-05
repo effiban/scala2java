@@ -6,8 +6,6 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   val argumentListRenderer: ArgumentListRenderer = new ArgumentListRendererImpl()
 
-  val bindRenderer: BindRenderer = new BindRendererImpl()
-
   lazy val defaultTermRefRenderer: DefaultTermRefRenderer = new DefaultTermRefRendererImpl(
     thisRenderer,
     superRenderer,
@@ -40,7 +38,6 @@ class Renderers(implicit javaWriter: JavaWriter) {
     patWildcardRenderer,
     patSeqWildcardRenderer,
     patVarRenderer,
-    bindRenderer,
     patTupleRenderer,
     patExtractRenderer,
     patInterpolateRenderer
