@@ -12,14 +12,12 @@ class PatRendererImplTest extends UnitTestSuite {
   private val termNameRenderer = mock[TermNameRenderer]
   private val patWildcardRenderer = mock[PatWildcardRenderer]
   private val patVarRenderer = mock[PatVarRenderer]
-  private val patInterpolateRenderer = mock[PatInterpolateRenderer]
 
   val patRenderer = new PatRendererImpl(
     litRenderer,
     termNameRenderer,
     patWildcardRenderer,
-    patVarRenderer,
-    patInterpolateRenderer
+    patVarRenderer
   )
 
 
@@ -46,16 +44,6 @@ class PatRendererImplTest extends UnitTestSuite {
 
   test("render Alternative") {
     // TODO
-  }
-
-  test("render Pat.Interpolate") {
-    val patInterpolate = Pat.Interpolate(
-      prefix = Term.Name("r"),
-      parts = List(Lit.String("Hello "), Lit.String(", have a (.+) day")),
-      args = List(Term.Name("name"))
-    )
-    patRenderer.render(patInterpolate)
-    verify(patInterpolateRenderer).render(eqTree(patInterpolate))
   }
 
   test("render Pat.Typed") {

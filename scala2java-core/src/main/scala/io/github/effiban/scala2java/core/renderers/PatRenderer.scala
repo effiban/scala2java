@@ -10,8 +10,7 @@ trait PatRenderer extends JavaTreeRenderer[Pat]
 private[renderers] class PatRendererImpl(litRenderer: LitRenderer,
                                          termNameRenderer: TermNameRenderer,
                                          patWildcardRenderer: PatWildcardRenderer,
-                                         patVarRenderer: PatVarRenderer,
-                                         patInterpolateRenderer: PatInterpolateRenderer)
+                                         patVarRenderer: PatVarRenderer)
                                         (implicit javaWriter: JavaWriter) extends PatRenderer {
 
   import javaWriter._
@@ -22,7 +21,6 @@ private[renderers] class PatRendererImpl(litRenderer: LitRenderer,
     case patternWildcard: Pat.Wildcard => patWildcardRenderer.render(patternWildcard)
     case patternVar: Pat.Var => patVarRenderer.render(patternVar)
     case patternAlternative: Alternative => // TODO
-    case patternInterpolate: Pat.Interpolate => patInterpolateRenderer.render(patternInterpolate)
     case patternTyped: Pat.Typed => // TODO
     case _ => writeComment(s"UNSUPPORTED: $pat")
   }
