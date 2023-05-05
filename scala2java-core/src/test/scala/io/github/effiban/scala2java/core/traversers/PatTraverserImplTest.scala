@@ -20,7 +20,6 @@ class PatTraverserImplTest extends UnitTestSuite {
   private val bindTraverser = mock[BindTraverser]
   private val alternativeTraverser = mock[AlternativeTraverser]
   private val patTupleTraverser = mock[PatTupleTraverser]
-  private val patTupleRenderer = mock[PatTupleRenderer]
   private val patExtractTraverser = mock[PatExtractTraverser]
   private val patExtractRenderer = mock[PatExtractRenderer]
   private val patExtractInfixTraverser = mock[PatExtractInfixTraverser]
@@ -38,7 +37,6 @@ class PatTraverserImplTest extends UnitTestSuite {
     bindTraverser,
     alternativeTraverser,
     patTupleTraverser,
-    patTupleRenderer,
     patExtractTraverser,
     patExtractRenderer,
     patExtractInfixTraverser,
@@ -90,7 +88,6 @@ class PatTraverserImplTest extends UnitTestSuite {
     val tuple = Pat.Tuple(List(Lit.String("myName"), Lit.Int(2), Lit.Boolean(true)))
     doReturn(tuple).when(patTupleTraverser).traverse(eqTree(tuple))
     patTraverser.traverse(tuple)
-    verify(patTupleRenderer).render(eqTree(tuple))
   }
 
   test("traverse Pat.Extract") {
