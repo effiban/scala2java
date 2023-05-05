@@ -10,7 +10,6 @@ trait PatTraverser extends ScalaTreeTraverser[Pat]
 
 private[traversers] class PatTraverserImpl(litRenderer: LitRenderer,
                                            termNameRenderer: TermNameRenderer,
-                                           patWildcardTraverser: PatWildcardTraverser,
                                            patWildcardRenderer: PatWildcardRenderer,
                                            patSeqWildcardTraverser: PatSeqWildcardTraverser,
                                            patSeqWildcardRenderer: PatSeqWildcardRenderer,
@@ -36,8 +35,7 @@ private[traversers] class PatTraverserImpl(litRenderer: LitRenderer,
     case termName: Term.Name =>
       termNameRenderer.render(termName)
     case patternWildcard: Pat.Wildcard =>
-      val traversedPatWildcard = patWildcardTraverser.traverse(patternWildcard)
-      patWildcardRenderer.render(traversedPatWildcard)
+      patWildcardRenderer.render(patternWildcard)
     case patternSeqWildcard: Pat.SeqWildcard =>
       val traversedPatSeqWildcard = patSeqWildcardTraverser.traverse(patternSeqWildcard)
       patSeqWildcardRenderer.render(traversedPatSeqWildcard)
