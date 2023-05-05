@@ -3,7 +3,7 @@ package io.github.effiban.scala2java.core.renderers
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.{Lit, Pat, Term}
+import scala.meta.{Lit, Pat, Term, XtensionQuasiquoteCaseOrPattern}
 
 class PatRendererImplTest extends UnitTestSuite {
   private val TermName: Term.Name = Term.Name("x")
@@ -12,12 +12,14 @@ class PatRendererImplTest extends UnitTestSuite {
   private val termNameRenderer = mock[TermNameRenderer]
   private val patWildcardRenderer = mock[PatWildcardRenderer]
   private val patVarRenderer = mock[PatVarRenderer]
+  private val alternativeRenderer = mock[AlternativeRenderer]
 
   val patRenderer = new PatRendererImpl(
     litRenderer,
     termNameRenderer,
     patWildcardRenderer,
-    patVarRenderer
+    patVarRenderer,
+    alternativeRenderer
   )
 
 
@@ -43,7 +45,9 @@ class PatRendererImplTest extends UnitTestSuite {
   }
 
   test("render Alternative") {
-    // TODO
+    val alternative = p"2 | 3"
+    patRenderer.render(alternative)
+    verify(alternativeRenderer).render(eqTree(alternative))
   }
 
   test("render Pat.Typed") {

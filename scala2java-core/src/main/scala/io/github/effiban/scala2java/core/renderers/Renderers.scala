@@ -4,6 +4,8 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 
 class Renderers(implicit javaWriter: JavaWriter) {
 
+  lazy val alternativeRenderer: AlternativeRenderer = new AlternativeRendererImpl(patRenderer)
+
   val argumentListRenderer: ArgumentListRenderer = new ArgumentListRendererImpl()
 
   lazy val defaultTermRefRenderer: DefaultTermRefRenderer = new DefaultTermRefRendererImpl(
@@ -32,7 +34,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
     litRenderer,
     termNameRenderer,
     patWildcardRenderer,
-    patVarRenderer
+    patVarRenderer,
+    alternativeRenderer
   )
 
   val patVarRenderer: PatVarRenderer = new PatVarRendererImpl(termNameRenderer)
