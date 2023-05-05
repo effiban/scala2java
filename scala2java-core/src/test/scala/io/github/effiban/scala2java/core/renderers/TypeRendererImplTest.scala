@@ -16,6 +16,7 @@ class TypeRendererImplTest extends UnitTestSuite {
   private val typeAnnotateRenderer = mock[TypeAnnotateRenderer]
   private val typeAnonymousParamRenderer = mock[TypeAnonymousParamRenderer]
   private val typeWildcardRenderer = mock[TypeWildcardRenderer]
+  private val typeRepeatedRenderer = mock[TypeRepeatedRenderer]
   private val typeVarRenderer = mock[TypeVarRenderer]
 
   private val typeRenderer = new TypeRendererImpl(
@@ -28,6 +29,7 @@ class TypeRendererImplTest extends UnitTestSuite {
     typeAnnotateRenderer,
     typeAnonymousParamRenderer,
     typeWildcardRenderer,
+    typeRepeatedRenderer,
     typeVarRenderer
   )
 
@@ -89,6 +91,12 @@ class TypeRendererImplTest extends UnitTestSuite {
     val typeWildcard = Type.Wildcard(Type.Bounds(lo = None, hi = Some(t"T")))
     typeRenderer.render(typeWildcard)
     verify(typeWildcardRenderer).render(eqTree(typeWildcard))
+  }
+
+  test("render Type.Repeated") {
+    val typeRepeated = t"T*"
+    typeRenderer.render(typeRepeated)
+    verify(typeRepeatedRenderer).render(eqTree(typeRepeated))
   }
 
   test("render Type.Var") {
