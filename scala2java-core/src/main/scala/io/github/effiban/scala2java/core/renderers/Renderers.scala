@@ -36,13 +36,10 @@ class Renderers(implicit javaWriter: JavaWriter) {
     litRenderer,
     termNameRenderer,
     patWildcardRenderer,
-    patSeqWildcardRenderer,
     patVarRenderer,
     patExtractRenderer,
     patInterpolateRenderer
   )
-
-  val patSeqWildcardRenderer: PatSeqWildcardRenderer = new PatSeqWildcardRendererImpl()
 
   val patVarRenderer: PatVarRenderer = new PatVarRendererImpl(termNameRenderer)
 

@@ -10,7 +10,6 @@ trait PatRenderer extends JavaTreeRenderer[Pat]
 private[renderers] class PatRendererImpl(litRenderer: LitRenderer,
                                          termNameRenderer: TermNameRenderer,
                                          patWildcardRenderer: PatWildcardRenderer,
-                                         patSeqWildcardRenderer: PatSeqWildcardRenderer,
                                          patVarRenderer: PatVarRenderer,
                                          patExtractRenderer: PatExtractRenderer,
                                          patInterpolateRenderer: PatInterpolateRenderer)
@@ -22,7 +21,6 @@ private[renderers] class PatRendererImpl(litRenderer: LitRenderer,
     case lit: Lit => litRenderer.render(lit)
     case termName: Term.Name => termNameRenderer.render(termName)
     case patternWildcard: Pat.Wildcard => patWildcardRenderer.render(patternWildcard)
-    case patternSeqWildcard: Pat.SeqWildcard => patSeqWildcardRenderer.render(patternSeqWildcard)
     case patternVar: Pat.Var => patVarRenderer.render(patternVar)
     case patternAlternative: Alternative => // TODO
     case patternExtract: Pat.Extract => patExtractRenderer.render(patternExtract)
