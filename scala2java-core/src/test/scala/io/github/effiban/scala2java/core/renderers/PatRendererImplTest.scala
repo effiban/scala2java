@@ -13,13 +13,15 @@ class PatRendererImplTest extends UnitTestSuite {
   private val patWildcardRenderer = mock[PatWildcardRenderer]
   private val patVarRenderer = mock[PatVarRenderer]
   private val alternativeRenderer = mock[AlternativeRenderer]
+  private val patTypedRenderer = mock[PatTypedRenderer]
 
   val patRenderer = new PatRendererImpl(
     litRenderer,
     termNameRenderer,
     patWildcardRenderer,
     patVarRenderer,
-    alternativeRenderer
+    alternativeRenderer,
+    patTypedRenderer
   )
 
 
@@ -51,7 +53,9 @@ class PatRendererImplTest extends UnitTestSuite {
   }
 
   test("render Pat.Typed") {
-    // TODO
+    val patTyped = p"x: Int"
+    patRenderer.render(patTyped)
+    verify(patTypedRenderer).render(eqTree(patTyped))
   }
 
 }
