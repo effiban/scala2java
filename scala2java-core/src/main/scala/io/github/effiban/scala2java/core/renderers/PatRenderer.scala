@@ -11,7 +11,6 @@ private[renderers] class PatRendererImpl(litRenderer: LitRenderer,
                                          termNameRenderer: TermNameRenderer,
                                          patWildcardRenderer: PatWildcardRenderer,
                                          patVarRenderer: PatVarRenderer,
-                                         patExtractRenderer: PatExtractRenderer,
                                          patInterpolateRenderer: PatInterpolateRenderer)
                                         (implicit javaWriter: JavaWriter) extends PatRenderer {
 
@@ -23,7 +22,6 @@ private[renderers] class PatRendererImpl(litRenderer: LitRenderer,
     case patternWildcard: Pat.Wildcard => patWildcardRenderer.render(patternWildcard)
     case patternVar: Pat.Var => patVarRenderer.render(patternVar)
     case patternAlternative: Alternative => // TODO
-    case patternExtract: Pat.Extract => patExtractRenderer.render(patternExtract)
     case patternInterpolate: Pat.Interpolate => patInterpolateRenderer.render(patternInterpolate)
     case patternTyped: Pat.Typed => // TODO
     case _ => writeComment(s"UNSUPPORTED: $pat")

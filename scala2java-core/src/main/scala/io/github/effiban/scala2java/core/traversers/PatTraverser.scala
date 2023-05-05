@@ -17,7 +17,6 @@ private[traversers] class PatTraverserImpl(litRenderer: LitRenderer,
                                            alternativeTraverser: => AlternativeTraverser,
                                            patTupleTraverser: PatTupleTraverser,
                                            patExtractTraverser: PatExtractTraverser,
-                                           patExtractRenderer: PatExtractRenderer,
                                            patExtractInfixTraverser: PatExtractInfixTraverser,
                                            patInterpolateTraverser: PatInterpolateTraverser,
                                            patInterpolateRenderer: PatInterpolateRenderer,
@@ -47,10 +46,10 @@ private[traversers] class PatTraverserImpl(litRenderer: LitRenderer,
       writeComment(s"UNSUPPORTED: $traversedTuple")
     case patternExtract: Pat.Extract =>
       val traversedPatExtract = patExtractTraverser.traverse(patternExtract)
-      patExtractRenderer.render(traversedPatExtract)
+      writeComment(s"UNSUPPORTED: $traversedPatExtract")
     case patternExtractInfix: Pat.ExtractInfix =>
       val traversedPatExtract = patExtractInfixTraverser.traverse(patternExtractInfix)
-      patExtractRenderer.render(traversedPatExtract)
+      writeComment(s"UNSUPPORTED: $traversedPatExtract")
     case patternInterpolate: Pat.Interpolate =>
       val traversedPatInterpolator = patInterpolateTraverser.traverse(patternInterpolate)
       patInterpolateRenderer.render(traversedPatInterpolator)
