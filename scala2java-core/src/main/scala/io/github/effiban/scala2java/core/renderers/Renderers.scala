@@ -35,10 +35,13 @@ class Renderers(implicit javaWriter: JavaWriter) {
     termNameRenderer,
     patWildcardRenderer,
     patVarRenderer,
-    alternativeRenderer
+    alternativeRenderer,
+    patTypedRenderer
   )
 
   val patVarRenderer: PatVarRenderer = new PatVarRendererImpl(termNameRenderer)
+
+  lazy val patTypedRenderer: PatTypedRenderer = new PatTypedRendererImpl(typeRenderer, patRenderer)
 
   val patWildcardRenderer: PatWildcardRenderer = new PatWildcardRendererImpl()
 
