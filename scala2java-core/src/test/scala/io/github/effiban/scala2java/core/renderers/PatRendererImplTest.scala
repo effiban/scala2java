@@ -13,7 +13,6 @@ class PatRendererImplTest extends UnitTestSuite {
   private val patWildcardRenderer = mock[PatWildcardRenderer]
   private val patSeqWildcardRenderer = mock[PatSeqWildcardRenderer]
   private val patVarRenderer = mock[PatVarRenderer]
-  private val patTupleRenderer = mock[PatTupleRenderer]
   private val patExtractRenderer = mock[PatExtractRenderer]
   private val patInterpolateRenderer = mock[PatInterpolateRenderer]
 
@@ -23,7 +22,6 @@ class PatRendererImplTest extends UnitTestSuite {
     patWildcardRenderer,
     patSeqWildcardRenderer,
     patVarRenderer,
-    patTupleRenderer,
     patExtractRenderer,
     patInterpolateRenderer
   )
@@ -57,12 +55,6 @@ class PatRendererImplTest extends UnitTestSuite {
 
   test("render Alternative") {
     // TODO
-  }
-
-  test("render Pat.Tuple") {
-    val tuple = Pat.Tuple(List(Lit.String("myName"), Lit.Int(2), Lit.Boolean(true)))
-    patRenderer.render(tuple)
-    verify(patTupleRenderer).render(eqTree(tuple))
   }
 
   test("render Pat.Extract") {

@@ -12,7 +12,6 @@ private[renderers] class PatRendererImpl(litRenderer: LitRenderer,
                                          patWildcardRenderer: PatWildcardRenderer,
                                          patSeqWildcardRenderer: PatSeqWildcardRenderer,
                                          patVarRenderer: PatVarRenderer,
-                                         patTupleRenderer: PatTupleRenderer,
                                          patExtractRenderer: PatExtractRenderer,
                                          patInterpolateRenderer: PatInterpolateRenderer)
                                         (implicit javaWriter: JavaWriter) extends PatRenderer {
@@ -26,7 +25,6 @@ private[renderers] class PatRendererImpl(litRenderer: LitRenderer,
     case patternSeqWildcard: Pat.SeqWildcard => patSeqWildcardRenderer.render(patternSeqWildcard)
     case patternVar: Pat.Var => patVarRenderer.render(patternVar)
     case patternAlternative: Alternative => // TODO
-    case patternTuple: Pat.Tuple => patTupleRenderer.render(patternTuple)
     case patternExtract: Pat.Extract => patExtractRenderer.render(patternExtract)
     case patternInterpolate: Pat.Interpolate => patInterpolateRenderer.render(patternInterpolate)
     case patternTyped: Pat.Typed => // TODO
