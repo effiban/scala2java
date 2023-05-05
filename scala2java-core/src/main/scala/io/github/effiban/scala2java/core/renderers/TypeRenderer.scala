@@ -14,6 +14,7 @@ private[renderers] class TypeRendererImpl(typeRefRenderer: => TypeRefRenderer,
                                           typeExistentialRenderer: => TypeExistentialRenderer,
                                           typeAnnotateRenderer: => TypeAnnotateRenderer,
                                           typeAnonymousParamRenderer: TypeAnonymousParamRenderer,
+                                          typeWildcardRenderer: => TypeWildcardRenderer,
                                           typeVarRenderer: TypeVarRenderer)
                                          (implicit javaWriter: JavaWriter) extends TypeRenderer {
 
@@ -28,7 +29,7 @@ private[renderers] class TypeRendererImpl(typeRefRenderer: => TypeRefRenderer,
     case existentialType: Type.Existential => typeExistentialRenderer.render(existentialType)
     case typeAnnotation: Type.Annotate => typeAnnotateRenderer.render(typeAnnotation)
     case anonymousParamType: Type.AnonymousParam => typeAnonymousParamRenderer.render(anonymousParamType)
-    case wildcardType: Type.Wildcard => // TODO
+    case wildcardType: Type.Wildcard => typeWildcardRenderer.render(wildcardType)
     case byNameType: Type.ByName => // TODO
     case repeatedType: Type.Repeated => // TODO
     case typeVar: Type.Var => typeVarRenderer.render(typeVar)
