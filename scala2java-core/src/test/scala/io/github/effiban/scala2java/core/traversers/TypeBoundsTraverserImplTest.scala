@@ -1,14 +1,17 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
+import io.github.effiban.scala2java.core.testtrees.TypeBounds
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.Type
+import scala.meta.{Type, XtensionQuasiquoteType}
 
 class TypeBoundsTraverserImplTest extends UnitTestSuite {
-  private val TypeT = Type.Name("T")
-  private val TypeU = Type.Name("U")
+  private val TypeT = t"T"
+  private val TypeU = t"U"
+
+  private val TypeV = t"V"
+  private val TypeW = t"W"
 
   private val typeTraverser = mock[TypeTraverser]
 
@@ -16,48 +19,41 @@ class TypeBoundsTraverserImplTest extends UnitTestSuite {
 
   test("traverse() when has higher bound only") {
     val typeBounds = Type.Bounds(lo = None, hi = Some(TypeT))
+    val traversedTypeBounds = Type.Bounds(lo = None, hi = Some(TypeV))
 
-    doWrite("T").when(typeTraverser).traverse(eqTree(TypeT))
+    doReturn(TypeV).when(typeTraverser).traverse(eqTree(TypeT))
 
-    typeBoundsTraverser.traverse(typeBounds)
-
-    outputWriter.toString shouldBe " extends T"
+    typeBoundsTraverser.traverse(typeBounds).structure shouldBe traversedTypeBounds.structure
   }
 
   test("traverse() when has lower non-Null bound only") {
     val typeBounds = Type.Bounds(lo = Some(TypeT), hi = None)
+    val traversedTypeBounds = Type.Bounds(lo = Some(TypeV), hi = None)
 
-    doWrite("T").when(typeTraverser).traverse(eqTree(TypeT))
+    doReturn(TypeV).when(typeTraverser).traverse(eqTree(TypeT))
 
-    typeBoundsTraverser.traverse(typeBounds)
-
-    outputWriter.toString shouldBe " super T"
+    typeBoundsTraverser.traverse(typeBounds).structure shouldBe traversedTypeBounds.structure
   }
 
   test("traverse() when has lower Null bound only") {
     val typeBounds = Type.Bounds(lo = Some(Type.Name("Null")), hi = None)
 
-    typeBoundsTraverser.traverse(typeBounds)
-
-    outputWriter.toString shouldBe ""
+    typeBoundsTraverser.traverse(typeBounds).structure shouldBe TypeBounds.Empty.structure
   }
 
   test("traverse() when has no bounds") {
     val typeBounds = Type.Bounds(lo = None, hi = None)
 
-    typeBoundsTraverser.traverse(typeBounds)
-
-    outputWriter.toString shouldBe ""
+    typeBoundsTraverser.traverse(typeBounds).structure shouldBe TypeBounds.Empty.structure
   }
 
   test("traverse() when has both bounds") {
     val typeBounds = Type.Bounds(lo = Some(TypeT), hi = Some(TypeU))
+    val traversedTypeBounds = Type.Bounds(lo = Some(TypeV), hi = Some(TypeW))
 
-    doWrite("T").when(typeTraverser).traverse(eqTree(TypeT))
-    doWrite("U").when(typeTraverser).traverse(eqTree(TypeU))
+    doReturn(TypeV).when(typeTraverser).traverse(eqTree(TypeT))
+    doReturn(TypeW).when(typeTraverser).traverse(eqTree(TypeU))
 
-    typeBoundsTraverser.traverse(typeBounds)
-
-    outputWriter.toString shouldBe "/*  >: T <: U */"
+    typeBoundsTraverser.traverse(typeBounds).structure shouldBe traversedTypeBounds.structure
   }
 }

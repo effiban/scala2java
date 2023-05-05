@@ -1,12 +1,10 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.core.transformers.FunctionTypeTransformer
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.Type
+import scala.meta.XtensionQuasiquoteType
 
 class TypeFunctionTraverserImplTest extends UnitTestSuite {
 
@@ -15,38 +13,14 @@ class TypeFunctionTraverserImplTest extends UnitTestSuite {
 
   private val typeFunctionTraverser = new TypeFunctionTraverserImpl(typeTraverser, functionTypeTransformer)
 
-  test("traverse() when corresponding function type is a native Java type") {
-    val inputType = TypeNames.Int
-    val resultType = TypeNames.String
+  test("traverse()") {
+    val functionType = t"T1 => U1"
+    val expectedTransformedFunctionType = t"Function[T1, U1]"
+    val expectedTraversedFunctionType = t"Function[T2, U2]"
 
-    val scalaFunctionType = Type.Function(params = List(inputType), res = resultType)
-    val expectedJavaFunctionType = Type.Apply(Type.Name("Function"), List(inputType, resultType))
+    when(functionTypeTransformer.transform(eqTree(functionType))).thenReturn(expectedTransformedFunctionType)
+    doReturn(expectedTraversedFunctionType).when(typeTraverser).traverse(eqTree(expectedTransformedFunctionType))
 
-    when(functionTypeTransformer.transform(eqTree(scalaFunctionType))).thenReturn(expectedJavaFunctionType)
-
-    doWrite("Function<Int, String>").when(typeTraverser).traverse(eqTree(expectedJavaFunctionType))
-
-    typeFunctionTraverser.traverse(scalaFunctionType)
-
-    outputWriter.toString shouldBe "Function<Int, String>"
-  }
-
-  test("traverse() when corresponding function type is a JOOL library type") {
-    val inType1 = Type.Name("T1")
-    val inType2 = Type.Name("T2")
-    val inType3 = Type.Name("T3")
-    val inParams = List(inType1, inType2, inType3)
-    val resultType = TypeNames.String
-
-    val scalaFunctionType = Type.Function(params = inParams, res = resultType)
-    val expectedJavaFunctionType = Type.Apply(Type.Name("Function3"), inParams :+ resultType)
-
-    when(functionTypeTransformer.transform(eqTree(scalaFunctionType))).thenReturn(expectedJavaFunctionType)
-
-    doWrite("Function3<T1, T2, T3, String>").when(typeTraverser).traverse(eqTree(expectedJavaFunctionType))
-
-    typeFunctionTraverser.traverse(scalaFunctionType)
-
-    outputWriter.toString shouldBe "Function3<T1, T2, T3, String>"
+    typeFunctionTraverser.traverse(functionType).structure shouldBe expectedTraversedFunctionType.structure
   }
 }

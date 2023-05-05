@@ -1,49 +1,55 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
-import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
+import io.github.effiban.scala2java.core.testtrees.TypeNames.ScalaArray
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.Type
+import scala.meta.{Type, XtensionQuasiquoteType}
 
 class TypeApplyTraverserImplTest extends UnitTestSuite {
 
   private val typeTraverser = mock[TypeTraverser]
-  private val typeListTraverser = mock[TypeListTraverser]
 
-  private val typeApplyTraverser = new TypeApplyTraverserImpl(typeTraverser, typeListTraverser)
+  private val typeApplyTraverser = new TypeApplyTraverserImpl(typeTraverser)
 
-  test("traverse() a 'Map'") {
-    val tpe = TypeNames.Map
-    val args = List(TypeNames.Int, TypeNames.String)
+  test("traverse() an arbitrary type") {
+    val tpe = t"X"
+    val traversedType = t"Y"
 
-    val typeApply = Type.Apply(tpe = tpe, args = args)
+    val typeArg1 = t"T1"
+    val typeArg2 = t"T2"
+    val typeArgs = List(typeArg1, typeArg2)
 
-    doWrite("Map").when(typeTraverser).traverse(eqTree(tpe))
-    doWrite("<Integer, String>").when(typeListTraverser).traverse(eqTreeList(args))
+    val traversedTypeArg1 = t"U1"
+    val traversedTypeArg2 = t"U2"
+    val traversedTypeArgs = List(traversedTypeArg1, traversedTypeArg2)
 
-    typeApplyTraverser.traverse(typeApply)
+    val typeApply = Type.Apply(tpe = tpe, args = typeArgs)
+    val traversedTypeApply = Type.Apply(tpe = traversedType, args = traversedTypeArgs)
 
-    outputWriter.toString shouldBe "Map<Integer, String>"
+    doReturn(traversedType).when(typeTraverser).traverse(eqTree(tpe))
+    doReturn(traversedTypeArg1).when(typeTraverser).traverse(eqTree(typeArg1))
+    doReturn(traversedTypeArg2).when(typeTraverser).traverse(eqTree(typeArg2))
+
+    typeApplyTraverser.traverse(typeApply).structure shouldBe traversedTypeApply.structure
   }
 
   test("traverse() a valid 'Array'") {
-    val tpe = TypeNames.ScalaArray
-    val args = List(TypeNames.String)
+    val tpe = ScalaArray
+    val typeArg = t"T"
+    val traversedTypeArg = t"U"
 
-    val typeApply = Type.Apply(tpe = tpe, args = args)
+    val typeApply = Type.Apply(tpe = tpe, args = List(typeArg))
+    val traversedTypeApply = Type.Apply(tpe = tpe, args = List(traversedTypeArg))
 
-    doWrite("String").when(typeTraverser).traverse(eqTree(TypeNames.String))
+    doReturn(traversedTypeArg).when(typeTraverser).traverse(eqTree(typeArg))
 
-    typeApplyTraverser.traverse(typeApply)
-
-    outputWriter.toString shouldBe "String[]"
+    typeApplyTraverser.traverse(typeApply).structure shouldBe traversedTypeApply.structure
   }
 
   test("traverse() an 'Array' with 2 type args should throw an exception") {
-    val tpe = TypeNames.ScalaArray
+    val tpe = ScalaArray
     val args = List(TypeNames.String, TypeNames.Int)
 
     val typeApply = Type.Apply(tpe = tpe, args = args)

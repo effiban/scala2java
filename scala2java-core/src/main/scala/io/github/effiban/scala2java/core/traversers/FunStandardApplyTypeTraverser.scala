@@ -1,13 +1,15 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.TermSelectContext
+import io.github.effiban.scala2java.core.renderers.TypeListRenderer
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Term
 import scala.meta.Term.ApplyType
 
 private[traversers] class FunStandardApplyTypeTraverser(funTermSelectTraverser: => FunTermSelectTraverser,
-                                                        typeListTraverser: => TypeListTraverser,
+                                                        typeTraverser: => TypeTraverser,
+                                                        typeListRenderer: => TypeListRenderer,
                                                         unqualifiedTermTraverser: => TermTraverser)
                                                        (implicit javaWriter: JavaWriter) extends StandardApplyTypeTraverser {
 
@@ -23,7 +25,8 @@ private[traversers] class FunStandardApplyTypeTraverser(funTermSelectTraverser: 
     // In Java a type can only be applied to a qualified name, so the best we can do is guess the qualifier in a comment
     writeComment("this?")
     writeQualifierSeparator()
-    typeListTraverser.traverse(termApplyType.targs)
+    val traversedTypeArgs = termApplyType.targs.map(typeTraverser.traverse)
+    typeListRenderer.render(traversedTypeArgs)
     unqualifiedTermTraverser.traverse(term)
   }
 }

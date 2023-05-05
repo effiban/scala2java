@@ -1,38 +1,29 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.entities.EnclosingDelimiter.SquareBracket
 import io.github.effiban.scala2java.core.entities.TypeNameValues
-import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Type
 
-trait TypeApplyTraverser extends ScalaTreeTraverser[Type.Apply]
+trait TypeApplyTraverser extends ScalaTreeTraverser1[Type.Apply]
 
-private[traversers] class TypeApplyTraverserImpl(typeTraverser: => TypeTraverser,
-                                                 typeListTraverser: => TypeListTraverser)
-                                                (implicit javaWriter: JavaWriter)
-  extends TypeApplyTraverser {
-
-  import javaWriter._
+private[traversers] class TypeApplyTraverserImpl(typeTraverser: => TypeTraverser) extends TypeApplyTraverser {
 
   // type definition with generic args, e.g. F[T]
-  override def traverse(typeApply: Type.Apply): Unit = {
+  override def traverse(typeApply: Type.Apply): Type.Apply = {
     typeApply.tpe match {
-      case Type.Name(TypeNameValues.ScalaArray) => traverseArrayType(typeApply.args)
+      case Type.Name(TypeNameValues.ScalaArray) => traverseArrayType(typeApply)
       case _ =>
-        typeTraverser.traverse(typeApply.tpe)
-        typeListTraverser.traverse(typeApply.args)
+        val traversedType = typeTraverser.traverse(typeApply.tpe)
+        val traversedArgs = typeApply.args.map(typeTraverser.traverse)
+        Type.Apply(traversedType, traversedArgs)
     }
   }
 
-  private def traverseArrayType(args: List[Type]): Unit = {
-    args match {
+  private def traverseArrayType(arrayTypeApply: Type.Apply): Type.Apply = {
+    arrayTypeApply.args match {
       case Nil => throw new IllegalStateException(s"A Type.Apply must have at least one type argument")
-      case arg :: Nil =>
-        typeTraverser.traverse(arg)
-        writeStartDelimiter(SquareBracket)
-        writeEndDelimiter(SquareBracket)
-      case _ => throw new IllegalStateException(s"An Array type must have one type argument, but ${args.length} found")
+      case arg :: Nil => arrayTypeApply.copy(args = List(typeTraverser.traverse(arg)))
+      case args => throw new IllegalStateException(s"An Array type must have one type argument, but ${args.length} found")
     }
   }
 }

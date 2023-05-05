@@ -10,11 +10,13 @@ class TypeRefTraverserImplTest extends UnitTestSuite {
   private val typeNameTraverser = mock[TypeNameTraverser]
   private val typeSelectTraverser = mock[TypeSelectTraverser]
   private val typeSingletonTraverser = mock[TypeSingletonTraverser]
+  private val typeProjectTraverser = mock[TypeProjectTraverser]
 
   private val typeRefTraverser = new TypeRefTraverserImpl(
     typeNameTraverser,
     typeSelectTraverser,
-    typeSingletonTraverser
+    typeSingletonTraverser,
+    typeProjectTraverser
   )
 
   test("traverse Type.Name") {
@@ -35,12 +37,6 @@ class TypeRefTraverserImplTest extends UnitTestSuite {
     typeRefTraverser.traverse(typeSelect).structure shouldBe traversedTypeSelect.structure
   }
 
-  test("traverse Type.Project") {
-    val typeProject = Type.Project(Type.Name("MyType"), Type.Name("MyInnerType"))
-
-    typeRefTraverser.traverse(typeProject).structure shouldBe typeProject.structure
-  }
-
   test("traverse Type.Singleton") {
     val typeSingleton = Type.Singleton(Term.Name("myObj"))
     val traversedTypeSingleton = Type.Singleton(Term.Name("myTraversedObj"))
@@ -48,5 +44,14 @@ class TypeRefTraverserImplTest extends UnitTestSuite {
     doAnswer(traversedTypeSingleton).when(typeSingletonTraverser).traverse(eqTree(typeSingleton))
 
     typeRefTraverser.traverse(typeSingleton).structure shouldBe traversedTypeSingleton.structure
+  }
+
+  test("traverse Type.Project") {
+    val typeProject = t"MyType#MyInnerType"
+    val traversedTypeProject = t"MyTraversedType#MyInnerType"
+
+    doAnswer(traversedTypeProject).when(typeProjectTraverser).traverse(eqTree(typeProject))
+
+    typeRefTraverser.traverse(typeProject).structure shouldBe traversedTypeProject.structure
   }
 }

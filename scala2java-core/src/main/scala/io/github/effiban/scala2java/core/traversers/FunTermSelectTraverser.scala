@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.TermSelectContext
 import io.github.effiban.scala2java.core.entities.EnclosingDelimiter.Parentheses
-import io.github.effiban.scala2java.core.renderers.TermNameRenderer
+import io.github.effiban.scala2java.core.renderers.{TermNameRenderer, TypeListRenderer}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Term
@@ -13,7 +13,8 @@ trait FunTermSelectTraverser {
 
 private[traversers] class FunTermSelectTraverserImpl(qualifierTraverser: => TermTraverser,
                                                      termNameRenderer: TermNameRenderer,
-                                                     typeListTraverser: => TypeListTraverser)
+                                                     typeTraverser: => TypeTraverser,
+                                                     typeListRenderer: => TypeListRenderer)
                                                     (implicit javaWriter: JavaWriter) extends FunTermSelectTraverser {
 
   import javaWriter._
@@ -22,7 +23,8 @@ private[traversers] class FunTermSelectTraverserImpl(qualifierTraverser: => Term
   override def traverse(select: Term.Select, context: TermSelectContext = TermSelectContext()): Unit = {
     traverseQualifier(select.qual)
     writeQualifierSeparator(select.qual)
-    typeListTraverser.traverse(context.appliedTypeArgs)
+    val traversedTypeArgs = context.appliedTypeArgs.map(typeTraverser.traverse)
+    typeListRenderer.render(traversedTypeArgs)
     termNameRenderer.render(select.name)
   }
 

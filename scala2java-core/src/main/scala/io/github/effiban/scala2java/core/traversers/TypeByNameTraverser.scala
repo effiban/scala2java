@@ -4,14 +4,14 @@ import io.github.effiban.scala2java.core.transformers.TypeByNameToSupplierTypeTr
 
 import scala.meta.Type
 
-trait TypeByNameTraverser extends ScalaTreeTraverser[Type.ByName]
+trait TypeByNameTraverser extends ScalaTreeTraverser2[Type.ByName, Type.Apply]
 
 private[traversers] class TypeByNameTraverserImpl(typeApplyTraverser: => TypeApplyTraverser,
                                                   typeByNameToSupplierTypeTransformer: TypeByNameToSupplierTypeTransformer)
   extends TypeByNameTraverser {
 
   // Type by name, e.g.: =>T in f(x: => T)
-  override def traverse(typeByName: Type.ByName): Unit = {
+  override def traverse(typeByName: Type.ByName): Type.Apply = {
     typeApplyTraverser.traverse(typeByNameToSupplierTypeTransformer.transform(typeByName))
   }
 }

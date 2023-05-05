@@ -1,44 +1,31 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.{Decl, Term, Type}
+import scala.meta.XtensionQuasiquoteType
 
 class TypeRefineTraverserImplTest extends UnitTestSuite {
-
-  private val Statements = List(
-    Decl.Def(
-      mods = Nil,
-      name = Term.Name("fun"),
-      tparams = Nil,
-      paramss = List(List(Term.Param(mods = Nil, name = Term.Name("param"), decltpe = None, default = None))),
-      decltpe = TypeNames.Unit
-    )
-  )
 
   private val typeTraverser = mock[TypeTraverser]
 
   private val typeRefineTraverser = new TypeRefineTraverserImpl(typeTraverser)
 
   test("traverse when has type + stats") {
-    val tpe = Type.Name("A")
-    val refinedType = Type.Refine(tpe = Some(tpe), stats = Statements)
+    val tpe = t"A"
+    val refinedType = t"A {def fun(param: Int): Unit}"
 
-    doWrite("A").when(typeTraverser).traverse(eqTree(tpe))
+    val traversedType = t"B"
+    val traversedRefinedType = t"B {def fun(param: Int): Unit}"
 
-    typeRefineTraverser.traverse(refinedType)
+    doReturn(traversedType).when(typeTraverser).traverse(eqTree(tpe))
 
-    outputWriter.toString shouldBe "A/* List(def fun(param): Unit) */"
+    typeRefineTraverser.traverse(refinedType).structure shouldBe traversedRefinedType.structure
   }
 
   test("traverse when has stats only") {
-    val refinedType = Type.Refine(tpe = None, stats = Statements)
+    val refinedType = t"{def fun(param: Int): Unit}"
 
-    typeRefineTraverser.traverse(refinedType)
-
-    outputWriter.toString shouldBe "/* List(def fun(param): Unit) */"
+    typeRefineTraverser.traverse(refinedType).structure shouldBe refinedType.structure
   }
 }

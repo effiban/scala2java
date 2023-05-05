@@ -1,18 +1,15 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.TypeRenderer
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.testtrees.{TypeBounds, TypeNames}
+import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.Mod.Annot
 import scala.meta.Type.Bounds
-import scala.meta.{Decl, Init, Mod, Name, Pat, Term, Type, XtensionQuasiquoteType}
+import scala.meta.{Mod, Type, XtensionQuasiquoteType}
 
 class TypeTraverserImplTest extends UnitTestSuite {
 
   private val typeRefTraverser = mock[TypeRefTraverser]
-  private val typeProjectTraverser = mock[TypeProjectTraverser]
   private val typeApplyTraverser = mock[TypeApplyTraverser]
   private val typeApplyInfixTraverser = mock[TypeApplyInfixTraverser]
   private val typeFunctionTraverser = mock[TypeFunctionTraverser]
@@ -24,11 +21,9 @@ class TypeTraverserImplTest extends UnitTestSuite {
   private val typeWildcardTraverser = mock[TypeWildcardTraverser]
   private val typeByNameTraverser = mock[TypeByNameTraverser]
   private val typeRepeatedTraverser = mock[TypeRepeatedTraverser]
-  private val typeRenderer = mock[TypeRenderer]
 
   private val typeTraverser = new TypeTraverserImpl(
     typeRefTraverser,
-    typeProjectTraverser,
     typeApplyTraverser,
     typeApplyInfixTraverser,
     typeFunctionTraverser,
@@ -39,129 +34,107 @@ class TypeTraverserImplTest extends UnitTestSuite {
     typeAnnotateTraverser,
     typeWildcardTraverser,
     typeByNameTraverser,
-    typeRepeatedTraverser,
-    typeRenderer
+    typeRepeatedTraverser
   )
 
   test("traverse Type.Name") {
     val typeName = Type.Name("T")
     val traversedTypeName = Type.Name("U")
-
     doReturn(traversedTypeName).when(typeRefTraverser).traverse(eqTree(typeName))
-
-    typeTraverser.traverse(typeName)
-
-    verify(typeRenderer).render(eqTree(traversedTypeName))
+    typeTraverser.traverse(typeName).structure shouldBe traversedTypeName.structure
   }
 
   test("traverse Type.Project") {
     val typeProject = t"A#B"
-    typeTraverser.traverse(typeProject)
-    verify(typeProjectTraverser).traverse(eqTree(typeProject))
+    val traversedTypeProject = t"C#D"
+    doReturn(traversedTypeProject).when(typeRefTraverser).traverse(eqTree(typeProject))
+    typeTraverser.traverse(typeProject).structure shouldBe traversedTypeProject.structure
   }
 
   test("traverse Type.Apply") {
-    val typeApply = Type.Apply(tpe = Type.Name("Map"), args = List(Type.Name("K"), Type.Name("V")))
-    typeTraverser.traverse(typeApply)
-    verify(typeApplyTraverser).traverse(eqTree(typeApply))
+    val typeApply = t"Map[K, V]"
+    val traversedTypeApply = t"Map[U, W]"
+    doReturn(traversedTypeApply).when(typeApplyTraverser).traverse(eqTree(typeApply))
+    typeTraverser.traverse(typeApply).structure shouldBe traversedTypeApply.structure
   }
 
   test("traverse Type.ApplyInfix") {
     val typeApplyInfix = t"K Map V"
-    val traversedTypeApplyInfix = t"U Map W"
-
-    doReturn(traversedTypeApplyInfix).when(typeApplyInfixTraverser).traverse(eqTree(typeApplyInfix))
-
-    typeTraverser.traverse(typeApplyInfix)
-
-    verify(typeRenderer).render(eqTree(traversedTypeApplyInfix))
+    doReturn(typeApplyInfix).when(typeApplyInfixTraverser).traverse(eqTree(typeApplyInfix))
+    typeTraverser.traverse(typeApplyInfix).structure shouldBe typeApplyInfix.structure
   }
 
   test("traverse Type.Function") {
-    val typeFunction = Type.Function(params = List(TypeNames.Int, TypeNames.String), res = TypeNames.String)
-    typeTraverser.traverse(typeFunction)
-    verify(typeFunctionTraverser).traverse(eqTree(typeFunction))
+    val typeFunction = t"(Int, String) => Int"
+    val expectedType = t"BiFunction[Int, String, Int]"
+    doReturn(expectedType).when(typeFunctionTraverser).traverse(eqTree(typeFunction))
+    typeTraverser.traverse(typeFunction).structure shouldBe expectedType.structure
   }
 
   test("traverse Type.Tuple") {
-    val typeTuple = Type.Tuple(List(TypeNames.Int, TypeNames.String))
-    typeTraverser.traverse(typeTuple)
-    verify(typeTupleTraverser).traverse(eqTree(typeTuple))
+    val typeTuple = t"(Int, String)"
+    val expectedTypeApply = t"Tuple2[Int, String]"
+    doReturn(expectedTypeApply).when(typeTupleTraverser).traverse(eqTree(typeTuple))
+    typeTraverser.traverse(typeTuple).structure shouldBe expectedTypeApply.structure
   }
 
   test("traverse Type.With") {
-    val typeWith = Type.With(Type.Name("MyType"), Type.Name("Comparable"))
-    typeTraverser.traverse(typeWith)
-    verify(typeWithTraverser).traverse(eqTree(typeWith))
+    val typeWith = t"MyType with Comparable"
+    val traversedTypeWith = t"MyTraversedType with Comparable"
+    doReturn(traversedTypeWith).when(typeWithTraverser).traverse(eqTree(typeWith))
+    typeTraverser.traverse(typeWith).structure shouldBe traversedTypeWith.structure
   }
 
   test("traverse Type.Refine") {
-    val typeRefine = Type.Refine(
-      tpe = Some(Type.Name("MyType")),
-      stats = List(
-        Decl.Val(
-          mods = Nil,
-          pats = List(Pat.Var(Term.Name("X"))),
-          decltpe = TypeNames.Int
-        )
-      )
-    )
-    typeTraverser.traverse(typeRefine)
-    verify(typeRefineTraverser).traverse(eqTree(typeRefine))
+    val typeRefine = t"MyType { val x: Int }"
+    val traversedTypeRefine = t"MyTraversedType { val x: Int }"
+    doReturn(traversedTypeRefine).when(typeRefineTraverser).traverse(eqTree(typeRefine))
+    typeTraverser.traverse(typeRefine).structure shouldBe traversedTypeRefine.structure
   }
 
   test("traverse Type.Existential") {
-    val typeExistential = Type.Existential(
-      tpe = Type.Name("MyType"),
-      stats = List(
-        Decl.Val(
-          mods = Nil,
-          pats = List(Pat.Var(Term.Name("X"))),
-          decltpe = TypeNames.Int
-        )
-      )
-    )
-    typeTraverser.traverse(typeExistential)
-    verify(typeExistentialTraverser).traverse(eqTree(typeExistential))
+    val typeExistential = t"MyType forSome { val x: Int}"
+    val traversedTypeExistential = t"MyTraversedType forSome { val x: Int}"
+    doReturn(traversedTypeExistential).when(typeExistentialTraverser).traverse(eqTree(typeExistential))
+    typeTraverser.traverse(typeExistential).structure shouldBe traversedTypeExistential.structure
   }
 
   test("traverse Type.Annotate") {
-    val typeAnnotate = Type.Annotate(
-      tpe = Type.Name("MyType"),
-      annots = List(Annot(Init(tpe = Type.Name("MyAnnot1"), name = Name.Anonymous(), argss = List())))
-    )
-    typeTraverser.traverse(typeAnnotate)
-    verify(typeAnnotateTraverser).traverse(eqTree(typeAnnotate))
-  }
-
-  test("traverse Type.AnonymousParam") {
-    val typeAnonymousParam = Type.AnonymousParam(Some(Mod.Contravariant()))
-    typeTraverser.traverse(typeAnonymousParam)
-    verify(typeRenderer).render(eqTree(typeAnonymousParam))
+    val typeAnnotate = t"MyType @MyAnnot1"
+    val traversedTypeAnnotate = t"MyTraversedType @MyAnnot1"
+    doReturn(traversedTypeAnnotate).when(typeAnnotateTraverser).traverse(eqTree(typeAnnotate))
+    typeTraverser.traverse(typeAnnotate).structure shouldBe traversedTypeAnnotate.structure
   }
 
   test("traverse Type.Wildcard") {
-    val typeWildcard = Type.Wildcard(TypeBounds.Empty)
-    typeTraverser.traverse(typeWildcard)
-    verify(typeWildcardTraverser).traverse(eqTree(typeWildcard))
+    val typeWildcard = Type.Wildcard(Type.Bounds(lo = None, hi = Some(t"MyType")))
+    val traversedTypeWildcard = Type.Wildcard(Type.Bounds(lo = None, hi = Some(t"MyTraversedType")))
+    doReturn(traversedTypeWildcard).when(typeWildcardTraverser).traverse(eqTree(typeWildcard))
+    typeTraverser.traverse(typeWildcard).structure shouldBe traversedTypeWildcard.structure
   }
 
   test("traverse Type.ByName") {
-    val typeByName = Type.ByName(TypeNames.String)
-    typeTraverser.traverse(typeByName)
-    verify(typeByNameTraverser).traverse(eqTree(typeByName))
+    val typeByName = t"=> Int"
+    val expectedTypeApply = t"Supplier[Int]"
+    doReturn(expectedTypeApply).when(typeByNameTraverser).traverse(eqTree(typeByName))
+    typeTraverser.traverse(typeByName).structure shouldBe expectedTypeApply.structure
   }
 
   test("traverse Type.Repeated") {
-    val typeRepeated = Type.Repeated(TypeNames.String)
-    typeTraverser.traverse(typeRepeated)
-    verify(typeRepeatedTraverser).traverse(eqTree(typeRepeated))
+    val typeRepeated = Type.Repeated(TypeNames.Double)
+    val traversedTypeRepeated = Type.Repeated(t"double")
+    doReturn(traversedTypeRepeated).when(typeRepeatedTraverser).traverse(eqTree(typeRepeated))
+    typeTraverser.traverse(typeRepeated).structure shouldBe traversedTypeRepeated.structure
   }
 
   test("traverse Type.Var") {
     val typeVar = Type.Var(Type.Name("x"))
-    typeTraverser.traverse(typeVar)
-    verify(typeRenderer).render(eqTree(typeVar))
+    typeTraverser.traverse(typeVar).structure shouldBe typeVar.structure
+  }
+
+  test("traverse Type.AnonymousParam") {
+    val typeAnonymousParam = Type.AnonymousParam(Some(Mod.Contravariant()))
+    typeTraverser.traverse(typeAnonymousParam).structure shouldBe typeAnonymousParam.structure
   }
 
   private def typeParamOf(name: String) = {

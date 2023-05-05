@@ -3,7 +3,9 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.{ArgumentListContext, ArrayInitializerSizeContext, ArrayInitializerValuesContext}
 import io.github.effiban.scala2java.core.entities.EnclosingDelimiter.{CurlyBrace, SquareBracket}
 import io.github.effiban.scala2java.core.entities.JavaKeyword.New
-import io.github.effiban.scala2java.core.entities.{JavaKeyword, ListTraversalOptions, TypeNameValues}
+import io.github.effiban.scala2java.core.entities.TypeNameValues.ScalaAny
+import io.github.effiban.scala2java.core.entities.{JavaKeyword, ListTraversalOptions}
+import io.github.effiban.scala2java.core.renderers.TypeRenderer
 import io.github.effiban.scala2java.core.typeinference.{CompositeCollectiveTypeInferrer, TermTypeInferrer}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
@@ -16,6 +18,7 @@ trait ArrayInitializerTraverser {
 }
 
 private[traversers] class ArrayInitializerTraverserImpl(typeTraverser: => TypeTraverser,
+                                                        typeRenderer: => TypeRenderer,
                                                         expressionTermTraverser: => TermTraverser,
                                                         termArgumentTraverser: => ArgumentTraverser[Term],
                                                         argumentListTraverser: => ArgumentListTraverser,
@@ -31,7 +34,8 @@ private[traversers] class ArrayInitializerTraverserImpl(typeTraverser: => TypeTr
     val tpe = resolveTypeWithValues(maybeType, values)
     writeKeyword(New)
     write(" ")
-    typeTraverser.traverse(tpe)
+    val traversedType = typeTraverser.traverse(tpe)
+    typeRenderer.render(traversedType)
     writeStartDelimiter(SquareBracket)
     writeEndDelimiter(SquareBracket)
     write(" ")
@@ -47,7 +51,8 @@ private[traversers] class ArrayInitializerTraverserImpl(typeTraverser: => TypeTr
 
     writeKeyword(JavaKeyword.New)
     write(" ")
-    typeTraverser.traverse(tpe)
+    val traversedType = typeTraverser.traverse(tpe)
+    typeRenderer.render(traversedType)
     writeStartDelimiter(SquareBracket)
     expressionTermTraverser.traverse(size)
     writeEndDelimiter(SquareBracket)
@@ -56,7 +61,7 @@ private[traversers] class ArrayInitializerTraverserImpl(typeTraverser: => TypeTr
   private def resolveTypeWithValues(maybeType: Option[Type] = None, values: List[Term] = Nil) = {
     (maybeType, values) match {
       case (Some(tpe), _) => tpe
-      case (None, Nil) => Type.Name(TypeNameValues.ScalaAny)
+      case (None, Nil) => Type.Name(ScalaAny)
       case (None, values) => compositeCollectiveTypeInferrer.infer(values.map(termTypeInferrer.infer))
     }
   }

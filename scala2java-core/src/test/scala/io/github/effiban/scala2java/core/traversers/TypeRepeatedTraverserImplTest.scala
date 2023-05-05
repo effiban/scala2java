@@ -1,11 +1,9 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.Type
+import scala.meta.XtensionQuasiquoteType
 
 class TypeRepeatedTraverserImplTest extends UnitTestSuite {
 
@@ -14,12 +12,14 @@ class TypeRepeatedTraverserImplTest extends UnitTestSuite {
   val typeRepeatedTraverser = new TypeRepeatedTraverserImpl(typeTraverser)
 
   test("traverse()") {
-    val repeatedType = Type.Repeated(TypeNames.String)
+    val tpe = t"T"
+    val traversedType = t"U"
 
-    doWrite("String").when(typeTraverser).traverse(eqTree(TypeNames.String))
+    val repeatedType = t"T*"
+    val traversedRepeatedType = t"U*"
 
-    typeRepeatedTraverser.traverse(repeatedType)
+    doReturn(traversedType).when(typeTraverser).traverse(eqTree(tpe))
 
-    outputWriter.toString shouldBe "String..."
+    typeRepeatedTraverser.traverse(repeatedType).structure shouldBe traversedRepeatedType.structure
   }
 }

@@ -4,16 +4,17 @@ import io.github.effiban.scala2java.core.contexts.{ArgumentListContext, ArrayIni
 import io.github.effiban.scala2java.core.entities.EnclosingDelimiter.CurlyBrace
 import io.github.effiban.scala2java.core.entities.ListTraversalOptions
 import io.github.effiban.scala2java.core.matchers.ArgumentListContextMatcher.eqArgumentListContext
+import io.github.effiban.scala2java.core.renderers.TypeRenderer
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.testtrees.TypeNames
+import io.github.effiban.scala2java.core.testtrees.TypeNames.{JavaObject, ScalaAny}
 import io.github.effiban.scala2java.core.typeinference.{CompositeCollectiveTypeInferrer, TermTypeInferrer}
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.{eqOptionTreeList, eqTreeList}
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchersSugar.eqTo
 
-import scala.meta.{Lit, Term}
+import scala.meta.{Lit, Term, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 class ArrayInitializerTraverserImplTest extends UnitTestSuite {
 
@@ -21,6 +22,7 @@ class ArrayInitializerTraverserImplTest extends UnitTestSuite {
   private val ExpectedArgListContext = ArgumentListContext(options = ExpectedListTraversalOptions)
 
   private val typeTraverser = mock[TypeTraverser]
+  private val typeRenderer = mock[TypeRenderer]
   private val expressionTermTraverser = mock[ExpressionTermTraverser]
   private val termArgumentTraverser = mock[ArgumentTraverser[Term]]
   private val argumentListTraverser = mock[ArgumentListTraverser]
@@ -29,6 +31,7 @@ class ArrayInitializerTraverserImplTest extends UnitTestSuite {
 
   private val arrayInitializerTraverser = new ArrayInitializerTraverserImpl(
     typeTraverser,
+    typeRenderer,
     expressionTermTraverser,
     termArgumentTraverser,
     argumentListTraverser,
@@ -37,12 +40,14 @@ class ArrayInitializerTraverserImplTest extends UnitTestSuite {
   )
 
   test("traverseWithValues() when has type and values") {
-    val tpe = TypeNames.String
-    val values = List(Lit.String("a"), Lit.String("b"))
+    val tpe = t"T"
+    val traversedType = t"U"
+    val values = List(q"val1", q"val2")
     val context = ArrayInitializerValuesContext(maybeType = Some(tpe), values = values)
 
-    doWrite("String").when(typeTraverser).traverse(eqTree(tpe))
-    doWrite("""{ "a", "b" }""").when(argumentListTraverser).traverse(
+    doReturn(traversedType).when(typeTraverser).traverse(eqTree(tpe))
+    doWrite("U").when(typeRenderer).render(eqTree(traversedType))
+    doWrite("{ val1, val2 }").when(argumentListTraverser).traverse(
       eqTreeList(values),
       eqTo(termArgumentTraverser),
       eqArgumentListContext(ExpectedArgListContext)
@@ -50,14 +55,16 @@ class ArrayInitializerTraverserImplTest extends UnitTestSuite {
 
     arrayInitializerTraverser.traverseWithValues(context)
 
-    outputWriter.toString shouldBe """new String[] { "a", "b" }"""
+    outputWriter.toString shouldBe "new U[] { val1, val2 }"
   }
 
   test("traverseWithValues() when has type and no values") {
-    val tpe = TypeNames.String
+    val tpe = t"T"
+    val traversedType = t"U"
     val context = ArrayInitializerValuesContext(maybeType = Some(tpe))
 
-    doWrite("String").when(typeTraverser).traverse(eqTree(tpe))
+    doReturn(traversedType).when(typeTraverser).traverse(eqTree(tpe))
+    doWrite("U").when(typeRenderer).render(eqTree(traversedType))
     doWrite("""{}""").when(argumentListTraverser).traverse(
       ArgumentMatchers.eq(Nil),
       eqTo(termArgumentTraverser),
@@ -66,18 +73,21 @@ class ArrayInitializerTraverserImplTest extends UnitTestSuite {
 
     arrayInitializerTraverser.traverseWithValues(context)
 
-    outputWriter.toString shouldBe "new String[] {}"
+    outputWriter.toString shouldBe "new U[] {}"
   }
 
   test("traverseWithValues() when has no type but has values") {
-    val values = List(Lit.String("a"), Lit.String("b"))
-    val maybeTypes = List(Some(TypeNames.String), Some(TypeNames.String))
+    val tpe = t"T"
+    val traversedType = t"U"
+    val values = List(q"val1", q"val2")
+    val maybeTypes = List(Some(tpe), Some(tpe))
     val context = ArrayInitializerValuesContext(values = values)
 
-    values.foreach(value => when(termTypeInferrer.infer(value)).thenReturn(Some(TypeNames.String)))
-    when(compositeCollectiveTypeInferrer.infer(eqOptionTreeList(maybeTypes))).thenReturn(TypeNames.String)
-    doWrite("String").when(typeTraverser).traverse(eqTree(TypeNames.String))
-    doWrite("""{ "a", "b" }""").when(argumentListTraverser).traverse(
+    values.foreach(value => when(termTypeInferrer.infer(value)).thenReturn(Some(tpe)))
+    when(compositeCollectiveTypeInferrer.infer(eqOptionTreeList(maybeTypes))).thenReturn(tpe)
+    doReturn(traversedType).when(typeTraverser).traverse(eqTree(tpe))
+    doWrite("U").when(typeRenderer).render(eqTree(traversedType))
+    doWrite("{ val1, val2 }").when(argumentListTraverser).traverse(
       eqTreeList(values),
       eqTo(termArgumentTraverser),
       eqArgumentListContext(ExpectedArgListContext)
@@ -85,11 +95,12 @@ class ArrayInitializerTraverserImplTest extends UnitTestSuite {
 
     arrayInitializerTraverser.traverseWithValues(context)
 
-    outputWriter.toString shouldBe """new String[] { "a", "b" }"""
+    outputWriter.toString shouldBe "new U[] { val1, val2 }"
   }
 
   test("traverseWithValues() when has an empty context should use the type 'Any'") {
-    doWrite("Object").when(typeTraverser).traverse(eqTree(TypeNames.ScalaAny))
+    doReturn(JavaObject).when(typeTraverser).traverse(eqTree(ScalaAny))
+    doWrite("Object").when(typeRenderer).render(eqTree(JavaObject))
     doWrite("""{}""").when(argumentListTraverser).traverse(
       eqTreeList(Nil),
       eqTo(termArgumentTraverser),
@@ -102,21 +113,25 @@ class ArrayInitializerTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverseWithSize() when has non-default type and non-default size") {
+    val tpe = t"T"
+    val traversedType = t"U"
     val size = Lit.Int(3)
-    val context = ArrayInitializerSizeContext(tpe = TypeNames.String, size = size)
+    val context = ArrayInitializerSizeContext(tpe = tpe, size = size)
 
-    doWrite("String").when(typeTraverser).traverse(eqTree(TypeNames.String))
+    doReturn(traversedType).when(typeTraverser).traverse(eqTree(tpe))
+    doWrite("U").when(typeRenderer).render(eqTree(traversedType))
     doWrite("3").when(expressionTermTraverser).traverse(eqTree(size))
 
     arrayInitializerTraverser.traverseWithSize(context)
 
-    outputWriter.toString shouldBe "new String[3]"
+    outputWriter.toString shouldBe "new U[3]"
   }
 
   test("traverseWithSize() when has the defaults for both type and size") {
     val size = Lit.Int(0)
 
-    doWrite("Object").when(typeTraverser).traverse(eqTree(TypeNames.ScalaAny))
+    doReturn(JavaObject).when(typeTraverser).traverse(eqTree(ScalaAny))
+    doWrite("Object").when(typeRenderer).render(eqTree(JavaObject))
     doWrite("0").when(expressionTermTraverser).traverse(eqTree(size))
 
     arrayInitializerTraverser.traverseWithSize(ArrayInitializerSizeContext())
