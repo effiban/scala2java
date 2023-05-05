@@ -22,7 +22,6 @@ class PatTraverserImplTest extends UnitTestSuite {
   private val patExtractTraverser = mock[PatExtractTraverser]
   private val patExtractInfixTraverser = mock[PatExtractInfixTraverser]
   private val patInterpolateTraverser = mock[PatInterpolateTraverser]
-  private val patInterpolateRenderer = mock[PatInterpolateRenderer]
   private val patTypedTraverser = mock[PatTypedTraverser]
 
   val patTraverser = new PatTraverserImpl(
@@ -37,7 +36,6 @@ class PatTraverserImplTest extends UnitTestSuite {
     patExtractTraverser,
     patExtractInfixTraverser,
     patInterpolateTraverser,
-    patInterpolateRenderer,
     patTypedTraverser)
 
 
@@ -106,7 +104,6 @@ class PatTraverserImplTest extends UnitTestSuite {
     )
     doReturn(patInterpolate).when(patInterpolateTraverser).traverse(eqTree(patInterpolate))
     patTraverser.traverse(patInterpolate)
-    verify(patInterpolateRenderer).render(eqTree(patInterpolate))
   }
 
   test("traverse Pat.Typed") {
