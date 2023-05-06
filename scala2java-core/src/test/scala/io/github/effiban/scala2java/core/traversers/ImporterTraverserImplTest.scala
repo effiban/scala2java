@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.DefaultTermRefRenderer
+import io.github.effiban.scala2java.core.renderers.{DefaultTermRefRenderer, ImporteeRenderer}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -11,12 +11,12 @@ class ImporterTraverserImplTest extends UnitTestSuite {
 
   private val defaultTermRefTraverser = mock[DefaultTermRefTraverser]
   private val defaultTermRefRenderer = mock[DefaultTermRefRenderer]
-  private val importeeTraverser = mock[ImporteeTraverser]
+  private val importeeRenderer = mock[ImporteeRenderer]
 
   private val importerTraverser = new ImporterTraverserImpl(
     defaultTermRefTraverser,
     defaultTermRefRenderer,
-    importeeTraverser
+    importeeRenderer
   )
 
 
@@ -32,7 +32,7 @@ class ImporterTraverserImplTest extends UnitTestSuite {
 
     doReturn(traversedTermRef).when(defaultTermRefTraverser).traverse(eqTree(termRef))
     doWrite("mytraversedpackage").when(defaultTermRefRenderer).render(eqTree(traversedTermRef))
-    doWrite("myclass").when(importeeTraverser).traverse(eqTree(importee))
+    doWrite("myclass").when(importeeRenderer).render(eqTree(importee))
 
     importerTraverser.traverse(importer)
 
@@ -54,8 +54,8 @@ class ImporterTraverserImplTest extends UnitTestSuite {
 
     doReturn(traversedTermRef).when(defaultTermRefTraverser).traverse(eqTree(termRef))
     doWrite("mytraversedpackage").when(defaultTermRefRenderer).render(eqTree(traversedTermRef))
-    doWrite("myclass1").when(importeeTraverser).traverse(eqTree(importee1))
-    doWrite("myclass2").when(importeeTraverser).traverse(eqTree(importee2))
+    doWrite("myclass1").when(importeeRenderer).render(eqTree(importee1))
+    doWrite("myclass2").when(importeeRenderer).render(eqTree(importee2))
 
     importerTraverser.traverse(importer)
 

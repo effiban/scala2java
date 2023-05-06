@@ -20,9 +20,11 @@ class Renderers(implicit javaWriter: JavaWriter) {
     termNameRenderer
   )
 
+  lazy val importeeRenderer: ImporteeRenderer = new ImporteeRendererImpl(nameIndeterminateRenderer)
+
   val litRenderer: LitRenderer = new LitRendererImpl()
 
-  val nameIndeterminateRenderer: NameIndeterminateRenderer = new NameIndeterminateRendererImpl()
+  lazy val nameIndeterminateRenderer: NameIndeterminateRenderer = new NameIndeterminateRendererImpl()
 
   val nameRenderer: NameRenderer = new NameRendererImpl(
     nameIndeterminateRenderer,
