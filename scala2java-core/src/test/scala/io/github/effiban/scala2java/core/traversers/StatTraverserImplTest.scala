@@ -1,20 +1,24 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.StatContext
+import io.github.effiban.scala2java.core.matchers.StatContextMatcher.eqStatContext
+import io.github.effiban.scala2java.core.renderers.ImportRenderer
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.spi.entities.JavaScope
+import io.github.effiban.scala2java.spi.entities.JavaScope.Package
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchers
 
 import scala.meta.Ctor.Primary
-import scala.meta.{Decl, Defn, Import, Importee, Importer, Lit, Name, Pat, Pkg, Self, Template, Term, Type}
+import scala.meta.{Decl, Defn, Lit, Name, Pat, Pkg, Self, Template, Term, Type, XtensionQuasiquoteTerm}
 
 class StatTraverserImplTest extends UnitTestSuite {
 
   private val statTermTraverser = mock[TermTraverser]
   private val importTraverser = mock[ImportTraverser]
+  private val importRenderer = mock[ImportRenderer]
   private val pkgTraverser = mock[PkgTraverser]
   private val defnTraverser = mock[DefnTraverser]
   private val declTraverser = mock[DeclTraverser]
@@ -22,6 +26,7 @@ class StatTraverserImplTest extends UnitTestSuite {
   private val statTraverser = new StatTraverserImpl(
     statTermTraverser,
     importTraverser,
+    importRenderer,
     pkgTraverser,
     defnTraverser,
     declTraverser
@@ -39,25 +44,25 @@ class StatTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe "myName"
   }
 
-  test("traverse Import") {
-    val `import` = Import(
-      List(
-        Importer(
-          ref = Term.Name("somepackage"),
-          importees = List(Importee.Name(Name.Indeterminate("SomeClass"))))
-      )
-    )
+  test("traverse Import when traverser returns an import") {
+    val `import` = q"import somepackage1.SomeClass1"
+    val traversedImport = q"import somepackage2.SomeClass2"
 
-    doWrite(
-      """import somepackage.SomeClass;
-        |""".stripMargin)
-      .when(importTraverser).traverse(eqTree(`import`), ArgumentMatchers.eq(StatContext(JavaScope.Package)))
+    doReturn(Some(traversedImport)).when(importTraverser).traverse(eqTree(`import`))
 
-    statTraverser.traverse(`import`, StatContext(JavaScope.Package))
+    statTraverser.traverse(`import`, StatContext(Package))
 
-    outputWriter.toString shouldBe
-      """import somepackage.SomeClass;
-        |""".stripMargin
+    verify(importRenderer).render(eqTree(traversedImport), eqStatContext(StatContext(Package)))
+  }
+
+  test("traverse Import when traverser returns None") {
+    val `import` = q"import somepackage1.SomeClass1"
+
+    doReturn(None).when(importTraverser).traverse(eqTree(`import`))
+
+    statTraverser.traverse(`import`, StatContext(Package))
+
+    verifyNoMoreInteractions(importRenderer)
   }
 
   test("traverse Pkg") {

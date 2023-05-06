@@ -1,22 +1,19 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.StatContext
-import io.github.effiban.scala2java.core.renderers.ImportRenderer
 import io.github.effiban.scala2java.spi.predicates.ImporterExcludedPredicate
 import io.github.effiban.scala2java.spi.transformers.ImporterTransformer
 
 import scala.meta.{Import, Importer}
 
 trait ImportTraverser {
-  def traverse(`import`: Import, context: StatContext = StatContext()): Unit
+  def traverse(`import`: Import): Option[Import]
 }
 
 private[traversers] class ImportTraverserImpl(importerTraverser: => ImporterTraverser,
                                               importerExcludedPredicate: ImporterExcludedPredicate,
-                                              importerTransformer: ImporterTransformer,
-                                              importRenderer: => ImportRenderer) extends ImportTraverser {
+                                              importerTransformer: ImporterTransformer) extends ImportTraverser {
 
-  override def traverse(`import`: Import, context: StatContext = StatContext()): Unit = {
+  override def traverse(`import`: Import): Option[Import] = {
     val traversedImporters = `import`.importers match {
       case Nil => throw new IllegalStateException("Invalid import with no inner importers")
       case importers => importers.flatMap(flattenImportees)
@@ -25,9 +22,9 @@ private[traversers] class ImportTraverserImpl(importerTraverser: => ImporterTrav
         .distinctBy(_.structure)
         .map(importerTraverser.traverse)
     }
-    if (traversedImporters.nonEmpty) {
-      importRenderer.render(Import(traversedImporters), context)
-    }
+    Option(traversedImporters)
+      .filter(_.nonEmpty)
+      .map(Import(_))
   }
 
   private def flattenImportees(importer: Importer): List[Importer] = {
