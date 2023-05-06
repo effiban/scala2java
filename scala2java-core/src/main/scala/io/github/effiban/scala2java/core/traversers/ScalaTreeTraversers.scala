@@ -314,13 +314,11 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val ifTraverser: IfTraverser = new IfTraverserImpl(expressionTermTraverser, blockTraverser)
 
-  private lazy val importerTraverser: ImporterTraverser = new ImporterTraverserImpl(
-    defaultTermRefTraverser,
-    importerRenderer
-  )
+  private lazy val importerTraverser: ImporterTraverser = new ImporterTraverserImpl(defaultTermRefTraverser)
 
   private lazy val importTraverser: ImportTraverser = new ImportTraverserImpl(
     importerTraverser,
+    importerRenderer,
     new CompositeImporterExcludedPredicate(CoreImporterExcludedPredicate),
     new CompositeImporterTransformer
   )

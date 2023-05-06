@@ -1,6 +1,5 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.ImporterRenderer
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
@@ -9,12 +8,8 @@ import scala.meta.{XtensionQuasiquoteImporter, XtensionQuasiquoteTerm}
 class ImporterTraverserImplTest extends UnitTestSuite {
 
   private val defaultTermRefTraverser = mock[DefaultTermRefTraverser]
-  private val importerRenderer = mock[ImporterRenderer]
 
-  private val importerTraverser = new ImporterTraverserImpl(
-    defaultTermRefTraverser,
-    importerRenderer
-  )
+  private val importerTraverser = new ImporterTraverserImpl(defaultTermRefTraverser)
 
 
   test("traverse") {
@@ -25,8 +20,6 @@ class ImporterTraverserImplTest extends UnitTestSuite {
 
     doReturn(traversedTermRef).when(defaultTermRefTraverser).traverse(eqTree(termRef))
 
-    importerTraverser.traverse(importer)
-
-    verify(importerRenderer).render(eqTree(traversedImporter))
+    importerTraverser.traverse(importer).structure shouldBe traversedImporter.structure
   }
 }

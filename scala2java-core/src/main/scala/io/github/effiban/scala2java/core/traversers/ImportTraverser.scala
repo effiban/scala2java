@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.StatContext
+import io.github.effiban.scala2java.core.renderers.ImporterRenderer
 import io.github.effiban.scala2java.core.writers.JavaWriter
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.spi.predicates.ImporterExcludedPredicate
@@ -13,6 +14,7 @@ trait ImportTraverser {
 }
 
 private[traversers] class ImportTraverserImpl(importerTraverser: => ImporterTraverser,
+                                              importerRenderer: => ImporterRenderer,
                                               importerExcludedPredicate: ImporterExcludedPredicate,
                                               importerTransformer: ImporterTransformer)
                                              (implicit javaWriter: JavaWriter) extends ImportTraverser {
@@ -35,7 +37,10 @@ private[traversers] class ImportTraverserImpl(importerTraverser: => ImporterTrav
         .filterNot(importerExcludedPredicate)
         .map(importerTransformer.transform)
         .distinctBy(_.structure)
-        .foreach(importerTraverser.traverse)
+        .foreach( importer => {
+          val traversedImporter = importerTraverser.traverse(importer)
+          importerRenderer.render(traversedImporter)
+        })
     }
   }
 

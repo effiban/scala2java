@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.StatContext
+import io.github.effiban.scala2java.core.renderers.ImporterRenderer
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.spi.entities.JavaScope
@@ -16,11 +17,13 @@ class ImportTraverserImplTest extends UnitTestSuite {
   private val PackageStatContext = StatContext(JavaScope.Package)
 
   private val importerTraverser = mock[ImporterTraverser]
+  private val importerRenderer = mock[ImporterRenderer]
   private val importerExcludedPredicate = mock[ImporterExcludedPredicate]
   private val importerTransformer = mock[ImporterTransformer]
 
   private val importTraverser = new ImportTraverserImpl(
     importerTraverser,
+    importerRenderer,
     importerExcludedPredicate,
     importerTransformer
   )
@@ -30,23 +33,28 @@ class ImportTraverserImplTest extends UnitTestSuite {
     val importer2 = importer"mypackage2.myclass2"
     val allImporters = List(importer1, importer2)
 
+    val traversedImporter1 = importer"mypackage11.myclass11"
+    val traversedImporter2 = importer"mypackage22.myclass22"
+
     when(importerExcludedPredicate.apply(any[Importer])).thenReturn(false)
     when(importerTransformer.transform(any[Importer])).thenAnswer((importer: Importer) => importer)
 
+    doReturn(traversedImporter1).when(importerTraverser).traverse(eqTree(importer1))
+    doReturn(traversedImporter2).when(importerTraverser).traverse(eqTree(importer2))
     doWrite(
-      """import mypackage1.myclass1;
+      """import mypackage11.myclass11;
         |""".stripMargin)
-      .when(importerTraverser).traverse(eqTree(importer1))
+      .when(importerRenderer).render(eqTree(traversedImporter1))
     doWrite(
-      """import mypackage2.myclass2;
+      """import mypackage22.myclass22;
         |""".stripMargin)
-      .when(importerTraverser).traverse(eqTree(importer2))
+      .when(importerRenderer).render(eqTree(traversedImporter2))
 
     importTraverser.traverse(`import` = Import(allImporters), context = PackageStatContext)
 
     outputWriter.toString shouldBe
-      """import mypackage1.myclass1;
-        |import mypackage2.myclass2;
+      """import mypackage11.myclass11;
+        |import mypackage22.myclass22;
         |""".stripMargin
 
     Seq(importer1, importer2)
@@ -64,33 +72,43 @@ class ImportTraverserImplTest extends UnitTestSuite {
     val flattenedImporter4 = importer"mypackage2.myclass4"
     val allFlattenedImporters = List(flattenedImporter1, flattenedImporter2, flattenedImporter3, flattenedImporter4)
 
+    val traversedFlattenedImporter1 = importer"mypackage11.myclass11"
+    val traversedFlattenedImporter2 = importer"mypackage11.myclass22"
+    val traversedFlattenedImporter3 = importer"mypackage22.myclass33"
+    val traversedFlattenedImporter4 = importer"mypackage22.myclass44"
+
     when(importerExcludedPredicate.apply(any[Importer])).thenReturn(false)
     when(importerTransformer.transform(any[Importer])).thenAnswer((importer: Importer) => importer)
 
+    doReturn(traversedFlattenedImporter1).when(importerTraverser).traverse(eqTree(flattenedImporter1))
+    doReturn(traversedFlattenedImporter2).when(importerTraverser).traverse(eqTree(flattenedImporter2))
+    doReturn(traversedFlattenedImporter3).when(importerTraverser).traverse(eqTree(flattenedImporter3))
+    doReturn(traversedFlattenedImporter4).when(importerTraverser).traverse(eqTree(flattenedImporter4))
+
     doWrite(
-      """import mypackage1.myclass1;
+      """import mypackage11.myclass11;
         |""".stripMargin)
-      .when(importerTraverser).traverse(eqTree(flattenedImporter1))
+      .when(importerRenderer).render(eqTree(traversedFlattenedImporter1))
     doWrite(
-      """import mypackage1.myclass2;
+      """import mypackage11.myclass22;
         |""".stripMargin)
-      .when(importerTraverser).traverse(eqTree(flattenedImporter2))
+      .when(importerRenderer).render(eqTree(traversedFlattenedImporter2))
     doWrite(
-      """import mypackage2.myclass3;
+      """import mypackage22.myclass33;
         |""".stripMargin)
-      .when(importerTraverser).traverse(eqTree(flattenedImporter3))
+      .when(importerRenderer).render(eqTree(traversedFlattenedImporter3))
     doWrite(
-      """import mypackage2.myclass4;
+      """import mypackage22.myclass44;
         |""".stripMargin)
-      .when(importerTraverser).traverse(eqTree(flattenedImporter4))
+      .when(importerRenderer).render(eqTree(traversedFlattenedImporter4))
 
     importTraverser.traverse(`import` = Import(allImporters), context = PackageStatContext)
 
     outputWriter.toString shouldBe
-      """import mypackage1.myclass1;
-        |import mypackage1.myclass2;
-        |import mypackage2.myclass3;
-        |import mypackage2.myclass4;
+      """import mypackage11.myclass11;
+        |import mypackage11.myclass22;
+        |import mypackage22.myclass33;
+        |import mypackage22.myclass44;
         |""".stripMargin
 
     allFlattenedImporters.foreach(importer => verify(importerExcludedPredicate).apply(eqTree(importer)))
@@ -101,6 +119,8 @@ class ImportTraverserImplTest extends UnitTestSuite {
     val excludedImporter2 = importer"excluded2.myclass2"
     val includedImporter1 = importer"included1.myclass1"
     val includedImporter2 = importer"included2.myclass2"
+    val traversedIncludedImporter1 = importer"included11.myclass11"
+    val traversedIncludedImporter2 = importer"included22.myclass22"
     val allImporters = List(excludedImporter1, includedImporter1, excludedImporter2, includedImporter2)
 
     when(importerExcludedPredicate.apply(any[Importer])).thenAnswer((importer: Importer) =>
@@ -108,21 +128,22 @@ class ImportTraverserImplTest extends UnitTestSuite {
     )
     when(importerTransformer.transform(any[Importer])).thenAnswer((importer: Importer) => importer)
 
-
+    doReturn(traversedIncludedImporter1).when(importerTraverser).traverse(eqTree(includedImporter1))
+    doReturn(traversedIncludedImporter2).when(importerTraverser).traverse(eqTree(includedImporter2))
     doWrite(
-      """import included1.myclass1;
+      """import included11.myclass11;
         |""".stripMargin)
-      .when(importerTraverser).traverse(eqTree(includedImporter1))
+      .when(importerRenderer).render(eqTree(traversedIncludedImporter1))
     doWrite(
-      """import included2.myclass2;
+      """import included22.myclass22;
         |""".stripMargin)
-      .when(importerTraverser).traverse(eqTree(includedImporter2))
+      .when(importerRenderer).render(eqTree(traversedIncludedImporter2))
 
     importTraverser.traverse(`import` = Import(allImporters), context = PackageStatContext)
 
     outputWriter.toString shouldBe
-      """import included1.myclass1;
-        |import included2.myclass2;
+      """import included11.myclass11;
+        |import included22.myclass22;
         |""".stripMargin
   }
 
@@ -135,6 +156,8 @@ class ImportTraverserImplTest extends UnitTestSuite {
     val excludedFlattenedImporter1 = importer"mypackage1.excluded1"
     val includedFlattenedImporter2 = importer"mypackage2.included2"
     val excludedFlattenedImporter2 = importer"mypackage2.excluded2"
+    val traversedIncludedFlattenedImporter1 = importer"mypackage11.included11"
+    val traversedIncludedFlattenedImporter2 = importer"mypackage22.included22"
     val allFlattenedImporters = List(
       includedFlattenedImporter1,
       excludedFlattenedImporter1,
@@ -147,20 +170,22 @@ class ImportTraverserImplTest extends UnitTestSuite {
     )
     when(importerTransformer.transform(any[Importer])).thenAnswer((importer: Importer) => importer)
 
+    doReturn(traversedIncludedFlattenedImporter1).when(importerTraverser).traverse(eqTree(includedFlattenedImporter1))
+    doReturn(traversedIncludedFlattenedImporter2).when(importerTraverser).traverse(eqTree(includedFlattenedImporter2))
     doWrite(
-      """import mypackage1.included1;
+      """import mypackage11.included11;
         |""".stripMargin)
-      .when(importerTraverser).traverse(eqTree(includedFlattenedImporter1))
+      .when(importerRenderer).render(eqTree(traversedIncludedFlattenedImporter1))
     doWrite(
-      """import mypackage2.included2;
+      """import mypackage22.included22;
         |""".stripMargin)
-      .when(importerTraverser).traverse(eqTree(includedFlattenedImporter2))
+      .when(importerRenderer).render(eqTree(traversedIncludedFlattenedImporter2))
 
     importTraverser.traverse(`import` = Import(allImporters), context = PackageStatContext)
 
     outputWriter.toString shouldBe
-      """import mypackage1.included1;
-        |import mypackage2.included2;
+      """import mypackage11.included11;
+        |import mypackage22.included22;
         |""".stripMargin
 
     allFlattenedImporters.foreach(importer => verify(importerExcludedPredicate).apply(eqTree(importer)))
@@ -169,8 +194,10 @@ class ImportTraverserImplTest extends UnitTestSuite {
   test("traverse() in package scope when importers should be transformed") {
     val importer1A = importer"package1A.myclass1A"
     val importer1B = importer"package1B.myclass1B"
-    val importer2A = importer"included2A.myclass2A"
-    val importer2B = importer"included2B.myclass2B"
+    val importer2A = importer"package2A.myclass2A"
+    val importer2B = importer"package2B.myclass2B"
+    val traversedImporter1B = importer"package11B.myclass11B"
+    val traversedImporter2B = importer"package22B.myclass22B"
     val inputImporters = List(
       importer1A,
       importer2A
@@ -183,20 +210,23 @@ class ImportTraverserImplTest extends UnitTestSuite {
       }
     )
 
+    doReturn(traversedImporter1B).when(importerTraverser).traverse(eqTree(importer1B))
+    doReturn(traversedImporter2B).when(importerTraverser).traverse(eqTree(importer2B))
+
     doWrite(
-      """import package1B.myclass1B;
+      """import package11B.myclass11B;
         |""".stripMargin)
-      .when(importerTraverser).traverse(eqTree(importer1B))
+      .when(importerRenderer).render(eqTree(traversedImporter1B))
     doWrite(
-      """import package2B.myclass2B;
+      """import package22B.myclass22B;
         |""".stripMargin)
-      .when(importerTraverser).traverse(eqTree(importer2B))
+      .when(importerRenderer).render(eqTree(traversedImporter2B))
 
     importTraverser.traverse(`import` = Import(inputImporters), context = PackageStatContext)
 
     outputWriter.toString shouldBe
-      """import package1B.myclass1B;
-        |import package2B.myclass2B;
+      """import package11B.myclass11B;
+        |import package22B.myclass22B;
         |""".stripMargin
   }
 
@@ -206,6 +236,9 @@ class ImportTraverserImplTest extends UnitTestSuite {
     val importer2 = importer"package2.myclass2"
     val importer3A = importer"package3.myclass3"
     val importer3B = importer"package3.myclass3"
+    val traversedImporter1 = importer"package11.myclass11"
+    val traversedImporter2 = importer"package22.myclass22"
+    val traversedImporter3 = importer"package33.myclass33"
     val inputImporters = List(
       importer1A,
       importer1B,
@@ -216,25 +249,28 @@ class ImportTraverserImplTest extends UnitTestSuite {
 
     when(importerTransformer.transform(any[Importer])).thenAnswer((importer: Importer) => importer)
 
+    doReturn(traversedImporter1).when(importerTraverser).traverse(eqTree(importer1A))
+    doReturn(traversedImporter2).when(importerTraverser).traverse(eqTree(importer2))
+    doReturn(traversedImporter3).when(importerTraverser).traverse(eqTree(importer3A))
     doWrite(
-      """import package1.myclass1;
+      """import package11.myclass11;
         |""".stripMargin)
-      .when(importerTraverser).traverse(eqTree(importer1A))
+      .when(importerRenderer).render(eqTree(traversedImporter1))
     doWrite(
-      """import package2.myclass2;
+      """import package22.myclass22;
         |""".stripMargin)
-      .when(importerTraverser).traverse(eqTree(importer2))
+      .when(importerRenderer).render(eqTree(traversedImporter2))
     doWrite(
-      """import package3.myclass3;
+      """import package33.myclass33;
         |""".stripMargin)
-      .when(importerTraverser).traverse(eqTree(importer3A))
+      .when(importerRenderer).render(eqTree(traversedImporter3))
 
     importTraverser.traverse(`import` = Import(inputImporters), context = PackageStatContext)
 
     outputWriter.toString shouldBe
-      """import package1.myclass1;
-        |import package2.myclass2;
-        |import package3.myclass3;
+      """import package11.myclass11;
+        |import package22.myclass22;
+        |import package33.myclass33;
         |""".stripMargin
 
     verify(importerTraverser, times(3)).traverse(any[Importer])
