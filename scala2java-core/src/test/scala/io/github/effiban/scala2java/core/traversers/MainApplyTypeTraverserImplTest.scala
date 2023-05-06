@@ -2,7 +2,6 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TermNames.ScalaClassOf
-import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.{Term, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
@@ -20,11 +19,11 @@ class MainApplyTypeTraverserImplTest extends UnitTestSuite {
 
   test("traverse() when function is 'classOf' should call the dedicated traverser") {
     val typeName = t"T"
-    val termApplyType = Term.ApplyType(fun = ScalaClassOf, targs = List(typeName))
+    val classOfType = Term.ApplyType(fun = ScalaClassOf, targs = List(typeName))
 
-    mainApplyTypeTraverser.traverse(termApplyType)
+    mainApplyTypeTraverser.traverse(classOfType)
 
-    verify(classOfTraverser).traverse(eqTreeList(List(typeName)))
+    verify(classOfTraverser).traverse(eqTree(classOfType))
   }
 
   test("traverse() when function is 'foo', should call the standard traverser") {

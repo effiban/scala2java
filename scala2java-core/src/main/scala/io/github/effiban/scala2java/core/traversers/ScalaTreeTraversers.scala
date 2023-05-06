@@ -106,7 +106,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     new CompositeClassTransformer(),
   )
 
-  private lazy val classOfTraverser: ClassOfTraverser = new ClassOfTraverserImpl(typeTraverser, typeRenderer)
+  private lazy val classOfTraverser: ClassOfTraverser = new ClassOfTraverserImpl(typeTraverser, classOfRenderer)
 
   private lazy val compositeInvocationArgTraverser: InvocationArgTraverser[Term] = new CompositeInvocationArgTraverser(
     assignInvocationArgTraverser,

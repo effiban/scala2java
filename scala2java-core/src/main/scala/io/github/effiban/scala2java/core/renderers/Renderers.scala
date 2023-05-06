@@ -8,6 +8,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   val argumentListRenderer: ArgumentListRenderer = new ArgumentListRendererImpl()
 
+  lazy val classOfRenderer: ClassOfRenderer = new ClassOfRendererImpl(typeRenderer)
+
   lazy val defaultTermRefRenderer: DefaultTermRefRenderer = new DefaultTermRefRendererImpl(
     thisRenderer,
     superRenderer,

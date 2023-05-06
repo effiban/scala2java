@@ -1,40 +1,30 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.TypeRenderer
+import io.github.effiban.scala2java.core.renderers.ClassOfRenderer
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.XtensionQuasiquoteType
+import scala.meta.{XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 class ClassOfTraverserImplTest extends UnitTestSuite {
 
   private val typeTraverser = mock[TypeTraverser]
-  private val typeRenderer = mock[TypeRenderer]
+  private val classOfRenderer = mock[ClassOfRenderer]
 
-  private val classOfTraverser = new ClassOfTraverserImpl(typeTraverser, typeRenderer)
+  private val classOfTraverser = new ClassOfTraverserImpl(typeTraverser, classOfRenderer)
 
-  test("traverse() when there is one type should output the Java equivalent") {
+  test("traverse() when there is one type") {
     val typeName = t"T"
+    val classOf = q"classOf[T]"
     val traversedTypeName = t"U"
+    val traversedClassOf = q"classOf[U]"
 
     doReturn(traversedTypeName).when(typeTraverser).traverse(eqTree(typeName))
-    doWrite("U").when(typeRenderer).render(eqTree(traversedTypeName))
+    doWrite("U.class").when(classOfRenderer).render(eqTree(traversedClassOf))
 
-    classOfTraverser.traverse(List(typeName))
+    classOfTraverser.traverse(classOf)
 
     outputWriter.toString shouldBe "U.class"
-  }
-
-  test("traverse() when there are no types should output an error comment") {
-    classOfTraverser.traverse(Nil)
-
-    outputWriter.toString shouldBe "UNPARSEABLE 'classOf' with types: (none)"
-  }
-
-  test("traverse() when there are two types should output an error comment") {
-    classOfTraverser.traverse(List(t"T", t"U"))
-
-    outputWriter.toString shouldBe "UNPARSEABLE 'classOf' with types: T, U"
   }
 }
