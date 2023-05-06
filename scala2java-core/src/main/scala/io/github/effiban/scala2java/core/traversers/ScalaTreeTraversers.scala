@@ -316,8 +316,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val importerTraverser: ImporterTraverser = new ImporterTraverserImpl(
     defaultTermRefTraverser,
-    defaultTermRefRenderer,
-    importeeRenderer
+    importerRenderer
   )
 
   private lazy val importTraverser: ImportTraverser = new ImportTraverserImpl(
