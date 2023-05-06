@@ -1,19 +1,18 @@
-package io.github.effiban.scala2java.core.traversers
+package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.renderers.NameIndeterminateRenderer
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.{Importee, Name}
 
-trait ImporteeTraverser extends ScalaTreeTraverser[Importee]
+trait ImporteeRenderer extends JavaTreeRenderer[Importee]
 
-private[traversers] class ImporteeTraverserImpl(nameIndeterminateRenderer: NameIndeterminateRenderer)
-                                               (implicit javaWriter: JavaWriter) extends ImporteeTraverser {
+private[renderers] class ImporteeRendererImpl(nameIndeterminateRenderer: NameIndeterminateRenderer)
+                                             (implicit javaWriter: JavaWriter) extends ImporteeRenderer {
 
   import javaWriter._
 
   // A single imported element within an Importer (can be one name, wildcard etc. see below)
-  override def traverse(importee: Importee): Unit = {
+  override def render(importee: Importee): Unit = {
     importee match {
       case Importee.Name(name: Name.Indeterminate) =>
         nameIndeterminateRenderer.render(name)

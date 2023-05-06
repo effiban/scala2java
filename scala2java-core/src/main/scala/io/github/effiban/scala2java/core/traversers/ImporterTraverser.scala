@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.DefaultTermRefRenderer
+import io.github.effiban.scala2java.core.renderers.{DefaultTermRefRenderer, ImporteeRenderer}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Importer
@@ -9,7 +9,7 @@ trait ImporterTraverser extends ScalaTreeTraverser[Importer]
 
 private[traversers] class ImporterTraverserImpl(termRefTraverser: => DefaultTermRefTraverser,
                                                 termRefRenderer: => DefaultTermRefRenderer,
-                                                importeeTraverser: => ImporteeTraverser)
+                                                importeeRenderer: ImporteeRenderer)
                                                (implicit javaWriter: JavaWriter) extends ImporterTraverser {
 
   import javaWriter._
@@ -21,7 +21,7 @@ private[traversers] class ImporterTraverserImpl(termRefTraverser: => DefaultTerm
       val traversedImporterRef = termRefTraverser.traverse(importer.ref)
       termRefRenderer.render(traversedImporterRef)
       writeQualifierSeparator()
-      importeeTraverser.traverse(importee)
+      importeeRenderer.render(importee)
       writeStatementEnd()
     })
   }
