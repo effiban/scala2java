@@ -15,6 +15,11 @@ class Renderers(implicit javaWriter: JavaWriter) {
     defaultTermSelectRenderer
   )
 
+  lazy val defaultTermRenderer: DefaultTermRenderer = new DefaultTermRendererImpl(
+    defaultTermRefRenderer,
+    litRenderer
+  )
+
   lazy val defaultTermSelectRenderer: DefaultTermSelectRenderer = new DefaultTermSelectRendererImpl(
     defaultTermRefRenderer,
     termNameRenderer
