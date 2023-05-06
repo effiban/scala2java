@@ -1,67 +1,32 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.{DefaultTermRefRenderer, ImporteeRenderer}
-import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
+import io.github.effiban.scala2java.core.renderers.ImporterRenderer
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.{Importee, Importer, Name, Term, XtensionQuasiquoteTerm}
+import scala.meta.{XtensionQuasiquoteImporter, XtensionQuasiquoteTerm}
 
 class ImporterTraverserImplTest extends UnitTestSuite {
 
   private val defaultTermRefTraverser = mock[DefaultTermRefTraverser]
-  private val defaultTermRefRenderer = mock[DefaultTermRefRenderer]
-  private val importeeRenderer = mock[ImporteeRenderer]
+  private val importerRenderer = mock[ImporterRenderer]
 
   private val importerTraverser = new ImporterTraverserImpl(
     defaultTermRefTraverser,
-    defaultTermRefRenderer,
-    importeeRenderer
+    importerRenderer
   )
 
 
-  test("traverse when there is one importee") {
+  test("traverse") {
     val termRef = q"mypackage"
     val traversedTermRef = q"mytraversedpackage"
-    val importee = Importee.Name(Name.Indeterminate("myclass"))
-
-    val importer = Importer(
-      ref = termRef,
-      importees = List(importee)
-    )
+    val importer = importer"mypackage.MyClass"
+    val traversedImporter = importer"mytraversedpackage.MyClass"
 
     doReturn(traversedTermRef).when(defaultTermRefTraverser).traverse(eqTree(termRef))
-    doWrite("mytraversedpackage").when(defaultTermRefRenderer).render(eqTree(traversedTermRef))
-    doWrite("myclass").when(importeeRenderer).render(eqTree(importee))
 
     importerTraverser.traverse(importer)
 
-    outputWriter.toString shouldBe
-      """import mytraversedpackage.myclass;
-        |""".stripMargin
-  }
-
-  test("traverse when there are two importees") {
-    val termRef = q"mypackage"
-    val traversedTermRef = q"mytraversedpackage"
-    val importee1 = Importee.Name(Name.Indeterminate("myclass1"))
-    val importee2 = Importee.Name(Name.Indeterminate("myclass2"))
-
-    val importer = Importer(
-      ref = Term.Name("mypackage"),
-      importees = List(importee1, importee2)
-    )
-
-    doReturn(traversedTermRef).when(defaultTermRefTraverser).traverse(eqTree(termRef))
-    doWrite("mytraversedpackage").when(defaultTermRefRenderer).render(eqTree(traversedTermRef))
-    doWrite("myclass1").when(importeeRenderer).render(eqTree(importee1))
-    doWrite("myclass2").when(importeeRenderer).render(eqTree(importee2))
-
-    importerTraverser.traverse(importer)
-
-    outputWriter.toString shouldBe
-      """import mytraversedpackage.myclass1;
-        |import mytraversedpackage.myclass2;
-        |""".stripMargin
+    verify(importerRenderer).render(eqTree(traversedImporter))
   }
 }

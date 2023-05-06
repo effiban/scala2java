@@ -22,6 +22,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   lazy val importeeRenderer: ImporteeRenderer = new ImporteeRendererImpl(nameIndeterminateRenderer)
 
+  lazy val importerRenderer: ImporterRenderer = new ImporterRendererImpl(defaultTermRefRenderer, importeeRenderer)
+
   val litRenderer: LitRenderer = new LitRendererImpl()
 
   lazy val nameIndeterminateRenderer: NameIndeterminateRenderer = new NameIndeterminateRendererImpl()
