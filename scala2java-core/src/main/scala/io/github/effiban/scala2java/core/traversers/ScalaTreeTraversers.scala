@@ -318,9 +318,9 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val importTraverser: ImportTraverser = new ImportTraverserImpl(
     importerTraverser,
-    importerRenderer,
     new CompositeImporterExcludedPredicate(CoreImporterExcludedPredicate),
-    new CompositeImporterTransformer
+    new CompositeImporterTransformer,
+    importRenderer
   )
 
   private lazy val initArgTraverserFactory: InitArgTraverserFactory = new InitArgTraverserFactoryImpl(initTraverser)
