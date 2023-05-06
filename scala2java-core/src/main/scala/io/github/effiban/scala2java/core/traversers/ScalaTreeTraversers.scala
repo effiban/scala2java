@@ -94,6 +94,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val caseTraverser: CaseTraverser = new CaseTraverserImpl(
     patTraverser,
+    patRenderer,
     expressionTermTraverser
   )
 
@@ -140,14 +141,16 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     modListTraverser,
     typeTraverser,
     typeRenderer,
-    patListTraverser
+    patTraverser,
+    patListRenderer
   )
 
   private lazy val declVarTraverser: DeclVarTraverser = new DeclVarTraverserImpl(
     modListTraverser,
     typeTraverser,
     typeRenderer,
-    patListTraverser
+    patTraverser,
+    patListRenderer
   )
 
   private lazy val defaultInvocationArgTraverser: InvocationArgTraverser[Term] = new DefaultInvocationArgTraverser(
@@ -246,7 +249,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   private lazy val defnValTraverser: DefnValTraverser = new DefnValTraverserImpl(
     modListTraverser,
     defnValOrVarTypeTraverser,
-    patListTraverser,
+    patTraverser,
+    patListRenderer,
     expressionTermTraverser,
     declVarTraverser,
     new CompositeDefnValToDeclVarTransformer,
@@ -256,7 +260,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   private lazy val defnVarTraverser: DefnVarTraverser = new DefnVarTraverserImpl(
     modListTraverser,
     defnValOrVarTypeTraverser,
-    patListTraverser,
+    patTraverser,
+    patListRenderer,
     expressionTermTraverser
   )
 
@@ -363,17 +368,8 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
 
   private lazy val partialFunctionTraverser: PartialFunctionTraverser = new PartialFunctionTraverserImpl(termFunctionTraverser)
 
-  private lazy val patListTraverser: PatListTraverser = new PatListTraverserImpl(
-    argumentListTraverser,
-    new SimpleArgumentTraverser(patTraverser)
-  )
-
   private lazy val patTraverser: PatTraverser = new PatTraverserImpl(
-    litRenderer,
-    termNameRenderer,
-    patWildcardRenderer,
     PatSeqWildcardTraverser,
-    patVarRenderer,
     BindTraverser,
     alternativeTraverser,
     PatTupleTraverser,
@@ -383,11 +379,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     patTypedTraverser
   )
 
-  private lazy val patTypedTraverser: PatTypedTraverser = new PatTypedTraverserImpl(
-    typeTraverser,
-    typeRenderer,
-    patTraverser
-  )
+  private lazy val patTypedTraverser: PatTypedTraverser = new PatTypedTraverserImpl(patTraverser, typeTraverser)
 
   private lazy val permittedSubTypeNameListTraverser = new PermittedSubTypeNameListTraverserImpl(argumentListTraverser)
 

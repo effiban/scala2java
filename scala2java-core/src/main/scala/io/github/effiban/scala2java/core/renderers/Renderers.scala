@@ -30,6 +30,11 @@ class Renderers(implicit javaWriter: JavaWriter) {
     typeNameRenderer
   )
 
+  lazy val patListRenderer: PatListRenderer = new PatListRendererImpl(
+    argumentListRenderer,
+    new SimpleArgumentRenderer(patRenderer)
+  )
+
   lazy val patRenderer: PatRenderer = new PatRendererImpl(
     litRenderer,
     termNameRenderer,

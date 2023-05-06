@@ -2,6 +2,7 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{ModifiersContext, StatContext}
 import io.github.effiban.scala2java.core.entities.JavaTreeType
+import io.github.effiban.scala2java.core.renderers.PatListRenderer
 import io.github.effiban.scala2java.core.writers.JavaWriter
 import io.github.effiban.scala2java.spi.transformers.{DefnValToDeclVarTransformer, DefnValTransformer}
 
@@ -13,7 +14,8 @@ trait DefnValTraverser {
 
 private[traversers] class DefnValTraverserImpl(modListTraverser: => ModListTraverser,
                                                defnValOrVarTypeTraverser: => DefnValOrVarTypeTraverser,
-                                               patListTraverser: => PatListTraverser,
+                                               patTraverser: => PatTraverser,
+                                               patListRenderer: => PatListRenderer,
                                                expressionTermTraverser: => TermTraverser,
                                                declVarTraverser: => DeclVarTraverser,
                                                defnValToDeclVarTransformer: DefnValToDeclVarTransformer,
@@ -37,7 +39,8 @@ private[traversers] class DefnValTraverserImpl(modListTraverser: => ModListTrave
     defnValOrVarTypeTraverser.traverse(valDef.decltpe, Some(valDef.rhs), context)
     write(" ")
     //TODO verify for non-simple case
-    patListTraverser.traverse(valDef.pats)
+    val traversedPats = valDef.pats.map(patTraverser.traverse)
+    patListRenderer.render(traversedPats)
     write(" = ")
     expressionTermTraverser.traverse(valDef.rhs)
   }

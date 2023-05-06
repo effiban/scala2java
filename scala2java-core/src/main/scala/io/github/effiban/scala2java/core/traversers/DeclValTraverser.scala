@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{ModifiersContext, StatContext}
 import io.github.effiban.scala2java.core.entities.JavaTreeType
-import io.github.effiban.scala2java.core.renderers.TypeRenderer
+import io.github.effiban.scala2java.core.renderers.{PatListRenderer, TypeRenderer}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Decl
@@ -14,7 +14,8 @@ trait DeclValTraverser {
 private[traversers] class DeclValTraverserImpl(modListTraverser: => ModListTraverser,
                                                typeTraverser: => TypeTraverser,
                                                typeRenderer: => TypeRenderer,
-                                               patListTraverser: => PatListTraverser)
+                                               patTraverser: => PatTraverser,
+                                               patListRenderer: => PatListRenderer)
                                               (implicit javaWriter: JavaWriter) extends DeclValTraverser {
 
   import javaWriter._
@@ -26,6 +27,7 @@ private[traversers] class DeclValTraverserImpl(modListTraverser: => ModListTrave
     typeRenderer.render(traversedType)
     write(" ")
     //TODO - verify when not simple case
-    patListTraverser.traverse(valDecl.pats)
+    val traversedPats = valDecl.pats.map(patTraverser.traverse)
+    patListRenderer.render(traversedPats)
   }
 }

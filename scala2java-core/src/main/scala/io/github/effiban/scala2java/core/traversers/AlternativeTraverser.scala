@@ -1,19 +1,15 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.writers.JavaWriter
-
 import scala.meta.Pat.Alternative
 
-trait AlternativeTraverser extends ScalaTreeTraverser[Alternative]
+trait AlternativeTraverser extends ScalaTreeTraverser1[Alternative]
 
-private[traversers] class AlternativeTraverserImpl(patTraverser: => PatTraverser)
-                                                  (implicit javaWriter: JavaWriter) extends AlternativeTraverser {
-  import javaWriter._
+private[traversers] class AlternativeTraverserImpl(patTraverser: => PatTraverser) extends AlternativeTraverser {
 
   // Pattern match alternative, e.g. 2 | 3. In Java - separated by comma
-  override def traverse(patternAlternative: Alternative): Unit = {
-    patTraverser.traverse(patternAlternative.lhs)
-    write(", ")
-    patTraverser.traverse(patternAlternative.rhs)
+  override def traverse(patternAlternative: Alternative): Alternative = {
+    val traversedLhs = patTraverser.traverse(patternAlternative.lhs)
+    val traversedRhs = patTraverser.traverse(patternAlternative.rhs)
+    Alternative(traversedLhs, traversedRhs)
   }
 }

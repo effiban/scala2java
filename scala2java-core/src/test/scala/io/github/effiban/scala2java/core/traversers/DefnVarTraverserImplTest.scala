@@ -3,6 +3,7 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.{ModifiersContext, StatContext}
 import io.github.effiban.scala2java.core.entities.JavaTreeType
 import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
+import io.github.effiban.scala2java.core.renderers.PatListRenderer
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
@@ -12,7 +13,7 @@ import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.{eqSome
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchers
 
-import scala.meta.{Defn, Init, Lit, Mod, Name, Pat, Term, Type}
+import scala.meta.{Defn, Init, Lit, Mod, Name, Type, XtensionQuasiquoteCaseOrPattern}
 
 class DefnVarTraverserImplTest extends UnitTestSuite {
 
@@ -22,18 +23,21 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
     )
   )
   private val IntType = TypeNames.Int
-  private val MyVarPat = Pat.Var(Term.Name("myVar"))
+  private val MyVarPat = p"myVar"
+  private val MyTraversedVarPat = p"myTraversedVar"
   private val Rhs = Lit.Int(3)
 
   private val modListTraverser = mock[ModListTraverser]
   private val defnValOrVarTypeTraverser = mock[DefnValOrVarTypeTraverser]
-  private val patListTraverser = mock[PatListTraverser]
+  private val patTraverser = mock[PatTraverser]
+  private val patListRenderer = mock[PatListRenderer]
   private val expressionTermTraverser = mock[ExpressionTermTraverser]
 
   private val defnVarTraverser = new DefnVarTraverserImpl(
     modListTraverser,
     defnValOrVarTypeTraverser,
-    patListTraverser,
+    patTraverser,
+    patListRenderer,
     expressionTermTraverser)
 
 
@@ -57,14 +61,15 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
       eqSomeTree(Rhs),
       ArgumentMatchers.eq(StatContext(javaScope))
     )
-    doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
+    doReturn(MyTraversedVarPat).when(patTraverser).traverse(eqTree(MyVarPat))
+    doWrite("myTraversedVar").when(patListRenderer).render(eqTreeList(List(MyTraversedVarPat)))
     doWrite("3").when(expressionTermTraverser).traverse(eqTree(Rhs))
 
     defnVarTraverser.traverse(defnVar, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """@MyAnnotation
-        |private int myVar = 3""".stripMargin
+        |private int myTraversedVar = 3""".stripMargin
   }
 
   test("traverse() when it is a class member - typed without value") {
@@ -87,13 +92,14 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
       ArgumentMatchers.eq(None),
       ArgumentMatchers.eq(StatContext(javaScope))
     )
-    doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
+    doReturn(MyTraversedVarPat).when(patTraverser).traverse(eqTree(MyVarPat))
+    doWrite("myTraversedVar").when(patListRenderer).render(eqTreeList(List(MyTraversedVarPat)))
 
     defnVarTraverser.traverse(defnVar, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """@MyAnnotation
-        |private int myVar""".stripMargin
+        |private int myTraversedVar""".stripMargin
   }
 
   test("traverse() when it is a class member - untyped with value") {
@@ -116,14 +122,15 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
       eqSomeTree(Rhs),
       ArgumentMatchers.eq(StatContext(javaScope))
     )
-    doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
+    doReturn(MyTraversedVarPat).when(patTraverser).traverse(eqTree(MyVarPat))
+    doWrite("myTraversedVar").when(patListRenderer).render(eqTreeList(List(MyTraversedVarPat)))
     doWrite("3").when(expressionTermTraverser).traverse(eqTree(Rhs))
 
     defnVarTraverser.traverse(defnVar, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """@MyAnnotation
-        |private int myVar = 3""".stripMargin
+        |private int myTraversedVar = 3""".stripMargin
   }
 
   test("traverse() when it is an interface member - typed with value") {
@@ -146,14 +153,15 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
       eqSomeTree(Rhs),
       ArgumentMatchers.eq(StatContext(javaScope))
     )
-    doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
+    doReturn(MyTraversedVarPat).when(patTraverser).traverse(eqTree(MyVarPat))
+    doWrite("myTraversedVar").when(patListRenderer).render(eqTreeList(List(MyTraversedVarPat)))
     doWrite("3").when(expressionTermTraverser).traverse(eqTree(Rhs))
 
     defnVarTraverser.traverse(defnVar, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """@MyAnnotation
-        |int myVar = 3""".stripMargin
+        |int myTraversedVar = 3""".stripMargin
   }
 
   test("traverse() when it is an interface member - typed without value") {
@@ -176,13 +184,14 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
       ArgumentMatchers.eq(None),
       ArgumentMatchers.eq(StatContext(javaScope))
     )
-    doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
+    doReturn(MyTraversedVarPat).when(patTraverser).traverse(eqTree(MyVarPat))
+    doWrite("myTraversedVar").when(patListRenderer).render(eqTreeList(List(MyTraversedVarPat)))
 
     defnVarTraverser.traverse(defnVar, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """@MyAnnotation
-        |int myVar""".stripMargin
+        |int myTraversedVar""".stripMargin
   }
 
   test("traverse() when it is an interface member - untyped with value") {
@@ -205,14 +214,15 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
       eqSomeTree(Rhs),
       ArgumentMatchers.eq(StatContext(javaScope))
     )
-    doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
+    doReturn(MyTraversedVarPat).when(patTraverser).traverse(eqTree(MyVarPat))
+    doWrite("myTraversedVar").when(patListRenderer).render(eqTreeList(List(MyTraversedVarPat)))
     doWrite("3").when(expressionTermTraverser).traverse(eqTree(Rhs))
 
     defnVarTraverser.traverse(defnVar, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """@MyAnnotation
-        |int myVar = 3""".stripMargin
+        |int myTraversedVar = 3""".stripMargin
   }
 
   test("traverse() when it is a local variable - typed with value") {
@@ -235,14 +245,15 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
       eqSomeTree(Rhs),
       ArgumentMatchers.eq(StatContext(javaScope))
     )
-    doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
+    doReturn(MyTraversedVarPat).when(patTraverser).traverse(eqTree(MyVarPat))
+    doWrite("myTraversedVar").when(patListRenderer).render(eqTreeList(List(MyTraversedVarPat)))
     doWrite("3").when(expressionTermTraverser).traverse(eqTree(Rhs))
 
     defnVarTraverser.traverse(defnVar, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """@MyAnnotation
-        |int myVar = 3""".stripMargin
+        |int myTraversedVar = 3""".stripMargin
   }
 
   test("traverse() when it is a local variable - typed without value") {
@@ -265,13 +276,14 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
       ArgumentMatchers.eq(None),
       ArgumentMatchers.eq(StatContext(javaScope))
     )
-    doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
+    doReturn(MyTraversedVarPat).when(patTraverser).traverse(eqTree(MyVarPat))
+    doWrite("myTraversedVar").when(patListRenderer).render(eqTreeList(List(MyTraversedVarPat)))
 
     defnVarTraverser.traverse(defnVar, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """@MyAnnotation
-        |int myVar""".stripMargin
+        |int myTraversedVar""".stripMargin
   }
 
   test("traverse() when it is a local variable - untyped with value") {
@@ -294,14 +306,15 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
       eqSomeTree(Rhs),
       ArgumentMatchers.eq(StatContext(javaScope))
     )
-    doWrite("myVar").when(patListTraverser).traverse(eqTreeList(List(MyVarPat)))
+    doReturn(MyTraversedVarPat).when(patTraverser).traverse(eqTree(MyVarPat))
+    doWrite("myTraversedVar").when(patListRenderer).render(eqTreeList(List(MyTraversedVarPat)))
     doWrite("3").when(expressionTermTraverser).traverse(eqTree(Rhs))
 
     defnVarTraverser.traverse(defnVar, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """@MyAnnotation
-        |var myVar = 3""".stripMargin
+        |var myTraversedVar = 3""".stripMargin
   }
 
   private def eqExpectedModifiers(defnVar: Defn.Var, javaScope: JavaScope) = {

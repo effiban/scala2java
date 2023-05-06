@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.renderers.PatRenderer
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.{Case, Pat}
@@ -7,6 +8,7 @@ import scala.meta.{Case, Pat}
 trait CaseTraverser extends ScalaTreeTraverser[Case]
 
 private[traversers] class CaseTraverserImpl(patTraverser: => PatTraverser,
+                                            patRenderer: => PatRenderer,
                                             expressionTermTraverser: => TermTraverser)
                                            (implicit javaWriter: JavaWriter) extends CaseTraverser {
 
@@ -29,7 +31,8 @@ private[traversers] class CaseTraverserImpl(patTraverser: => PatTraverser,
       case _ : Pat.Wildcard => write("default")
       case aPat =>
         write("case ")
-        patTraverser.traverse(aPat)
+        val traversedPat = patTraverser.traverse(aPat)
+        patRenderer.render(traversedPat)
     }
   }
 }
