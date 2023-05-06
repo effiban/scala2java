@@ -319,8 +319,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   private lazy val importTraverser: ImportTraverser = new ImportTraverserImpl(
     importerTraverser,
     new CompositeImporterExcludedPredicate(CoreImporterExcludedPredicate),
-    new CompositeImporterTransformer,
-    importRenderer
+    new CompositeImporterTransformer
   )
 
   private lazy val initArgTraverserFactory: InitArgTraverserFactory = new InitArgTraverserFactoryImpl(initTraverser)
@@ -415,6 +414,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   private lazy val statTraverser: StatTraverser = new StatTraverserImpl(
     statTermTraverser,
     importTraverser,
+    importRenderer,
     pkgTraverser,
     defnTraverser,
     declTraverser
