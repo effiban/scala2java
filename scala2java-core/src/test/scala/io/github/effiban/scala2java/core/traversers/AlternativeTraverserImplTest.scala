@@ -1,10 +1,9 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.{Lit, Pat}
+import scala.meta.XtensionQuasiquoteCaseOrPattern
 
 class AlternativeTraverserImplTest extends UnitTestSuite {
 
@@ -13,14 +12,17 @@ class AlternativeTraverserImplTest extends UnitTestSuite {
   private val alternativeTraverser = new AlternativeTraverserImpl(patTraverser)
 
   test("traverse") {
-    val lhs = Lit.Int(3)
-    val rhs = Lit.Int(4)
+    val lhs = p"x"
+    val rhs = p"y"
+    val alternative = p"x | y"
 
-    doWrite("3").when(patTraverser).traverse(eqTree(lhs))
-    doWrite("4").when(patTraverser).traverse(eqTree(rhs))
+    val traversedLhs = p"xx"
+    val traversedRhs = p"yy"
+    val traversedAlternative = p"xx | yy"
 
-    alternativeTraverser.traverse(Pat.Alternative(lhs, rhs))
+    doReturn(traversedLhs).when(patTraverser).traverse(eqTree(lhs))
+    doReturn(traversedRhs).when(patTraverser).traverse(eqTree(rhs))
 
-    outputWriter.toString shouldBe "3, 4"
+    alternativeTraverser.traverse(alternative).structure shouldBe traversedAlternative.structure
   }
 }

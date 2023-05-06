@@ -3,6 +3,7 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.{ModifiersContext, StatContext}
 import io.github.effiban.scala2java.core.entities.JavaTreeType
 import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
+import io.github.effiban.scala2java.core.renderers.PatListRenderer
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.spi.entities.JavaScope
@@ -18,7 +19,8 @@ class DefnValTraverserImplTest extends UnitTestSuite {
 
   private val modListTraverser = mock[ModListTraverser]
   private val defnValOrVarTypeTraverser = mock[DefnValOrVarTypeTraverser]
-  private val patListTraverser = mock[PatListTraverser]
+  private val patTraverser = mock[PatTraverser]
+  private val patListRenderer = mock[PatListRenderer]
   private val expressionTermTraverser = mock[ExpressionTermTraverser]
   private val declVarTraverser = mock[DeclVarTraverser]
   private val defnValToDeclVarTransformer = mock[DefnValToDeclVarTransformer]
@@ -27,7 +29,8 @@ class DefnValTraverserImplTest extends UnitTestSuite {
   private val defnValTraverser = new DefnValTraverserImpl(
     modListTraverser,
     defnValOrVarTypeTraverser,
-    patListTraverser,
+    patTraverser,
+    patListRenderer,
     expressionTermTraverser,
     declVarTraverser,
     defnValToDeclVarTransformer,
@@ -64,14 +67,15 @@ class DefnValTraverserImplTest extends UnitTestSuite {
       .when(modListTraverser).traverse(eqExpectedModifiers(defnVal2, javaScope), annotsOnSameLine = ArgumentMatchers.eq(false))
     doWrite("int")
       .when(defnValOrVarTypeTraverser).traverse(eqSomeTree(t"Int"), eqSomeTree(q"3"), ArgumentMatchers.eq(StatContext(javaScope)))
-    doWrite("myVal2").when(patListTraverser).traverse(eqTreeList(List(p"myVal2")))
+    doReturn(p"myTraversedVal2").when(patTraverser).traverse(eqTree(p"myVal2"))
+    doWrite("myTraversedVal2").when(patListRenderer).render(eqTreeList(List(p"myTraversedVal2")))
     doWrite("3").when(expressionTermTraverser).traverse(eqTree(q"3"))
 
     defnValTraverser.traverse(defnVal, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """@MyAnnotation
-        |private final int myVal2 = 3""".stripMargin
+        |private final int myTraversedVal2 = 3""".stripMargin
   }
 
   test("traverse() when transformed to another Defn.Val, and it is a class member - untyped") {
@@ -88,14 +92,15 @@ class DefnValTraverserImplTest extends UnitTestSuite {
       .when(modListTraverser).traverse(eqExpectedModifiers(defnVal2, javaScope), annotsOnSameLine = ArgumentMatchers.eq(false))
     doWrite("int")
       .when(defnValOrVarTypeTraverser).traverse(ArgumentMatchers.eq(None), eqSomeTree(q"3"), ArgumentMatchers.eq(StatContext(javaScope)))
-    doWrite("myVal2").when(patListTraverser).traverse(eqTreeList(List(p"myVal2")))
+    doReturn(p"myTraversedVal2").when(patTraverser).traverse(eqTree(p"myVal2"))
+    doWrite("myTraversedVal2").when(patListRenderer).render(eqTreeList(List(p"myTraversedVal2")))
     doWrite("3").when(expressionTermTraverser).traverse(eqTree(q"3"))
 
     defnValTraverser.traverse(defnVal, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """@MyAnnotation
-        |private final int myVal2 = 3""".stripMargin
+        |private final int myTraversedVal2 = 3""".stripMargin
   }
 
   test("traverse() when transformed to another Defn.Val, and it is an interface member - typed") {
@@ -112,14 +117,15 @@ class DefnValTraverserImplTest extends UnitTestSuite {
       .when(modListTraverser).traverse(eqExpectedModifiers(defnVal2, javaScope), annotsOnSameLine = ArgumentMatchers.eq(false))
     doWrite("int")
       .when(defnValOrVarTypeTraverser).traverse(eqSomeTree(t"Int"), eqSomeTree(q"3"), ArgumentMatchers.eq(StatContext(javaScope)))
-    doWrite("myVal2").when(patListTraverser).traverse(eqTreeList(List(p"myVal2")))
+    doReturn(p"myTraversedVal2").when(patTraverser).traverse(eqTree(p"myVal2"))
+    doWrite("myTraversedVal2").when(patListRenderer).render(eqTreeList(List(p"myTraversedVal2")))
     doWrite("3").when(expressionTermTraverser).traverse(eqTree(q"3"))
 
     defnValTraverser.traverse(defnVal, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """@MyAnnotation
-        |int myVal2 = 3""".stripMargin
+        |int myTraversedVal2 = 3""".stripMargin
   }
 
   test("traverse() when transformed to another Defn.Val, and it is an interface member - untyped") {
@@ -136,14 +142,15 @@ class DefnValTraverserImplTest extends UnitTestSuite {
       .when(modListTraverser).traverse(eqExpectedModifiers(defnVal2, javaScope), annotsOnSameLine = ArgumentMatchers.eq(false))
     doWrite("int")
       .when(defnValOrVarTypeTraverser).traverse(ArgumentMatchers.eq(None), eqSomeTree(q"3"), ArgumentMatchers.eq(StatContext(javaScope)))
-    doWrite("myVal2").when(patListTraverser).traverse(eqTreeList(List(p"myVal2")))
+    doReturn(p"myTraversedVal2").when(patTraverser).traverse(eqTree(p"myVal2"))
+    doWrite("myTraversedVal2").when(patListRenderer).render(eqTreeList(List(p"myTraversedVal2")))
     doWrite("3").when(expressionTermTraverser).traverse(eqTree(q"3"))
 
     defnValTraverser.traverse(defnVal, StatContext(javaScope))
 
     outputWriter.toString shouldBe
       """@MyAnnotation
-        |int myVal2 = 3""".stripMargin
+        |int myTraversedVal2 = 3""".stripMargin
   }
 
   private def eqExpectedModifiers(defnVal: Defn.Val, javaScope: JavaScope) = {

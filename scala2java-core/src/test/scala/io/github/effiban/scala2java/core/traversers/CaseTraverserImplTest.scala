@@ -1,28 +1,33 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.renderers.PatRenderer
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.{Case, Lit, Pat}
+import scala.meta.{Case, Pat, XtensionQuasiquoteTerm}
 
 class CaseTraverserImplTest extends UnitTestSuite {
 
-  private val StringPat = Lit.String("value1")
-  private val Cond = Lit.String("value2")
-  private val Body: Lit.Int = Lit.Int(3)
+  private val StringPat = q"""value1A"""
+  private val TraversedStringPat = q"""value1B"""
+  private val Cond = q"""value2"""
+  private val Body = q"3"
 
   private val patTraverser = mock[PatTraverser]
+  private val patRenderer = mock[PatRenderer]
   private val expressionTermTraverser = mock[ExpressionTermTraverser]
 
   private val caseTraverser = new CaseTraverserImpl(
     patTraverser,
+    patRenderer,
     expressionTermTraverser
   )
 
 
   test("traverse() non-default without condition") {
-    doWrite(""""value1"""").when(patTraverser).traverse(eqTree(StringPat))
+    doReturn(TraversedStringPat).when(patTraverser).traverse(eqTree(StringPat))
+    doWrite(""""value1B"""").when(patRenderer).render(eqTree(TraversedStringPat))
     doWrite("3").when(expressionTermTraverser).traverse(eqTree(Body))
 
     caseTraverser.traverse(
@@ -33,7 +38,7 @@ class CaseTraverserImplTest extends UnitTestSuite {
     )
 
     outputWriter.toString shouldBe
-      """case "value1" -> 3;
+      """case "value1B" -> 3;
         |""".stripMargin
   }
 
@@ -53,7 +58,8 @@ class CaseTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() with condition") {
-    doWrite(""""value1"""").when(patTraverser).traverse(eqTree(StringPat))
+    doReturn(TraversedStringPat).when(patTraverser).traverse(eqTree(StringPat))
+    doWrite(""""value1B"""").when(patRenderer).render(eqTree(TraversedStringPat))
     doWrite("x > 2").when(expressionTermTraverser).traverse(eqTree(Cond))
     doWrite("3").when(expressionTermTraverser).traverse(eqTree(Body))
 
@@ -65,7 +71,7 @@ class CaseTraverserImplTest extends UnitTestSuite {
     )
 
     outputWriter.toString shouldBe
-      """case "value1" && x > 2 -> 3;
+      """case "value1B" && x > 2 -> 3;
         |""".stripMargin
   }
 }
