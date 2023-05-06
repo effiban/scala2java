@@ -3,7 +3,7 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.{BlockContext, TryContext}
 import io.github.effiban.scala2java.core.entities.Decision.{No, Uncertain}
 import io.github.effiban.scala2java.core.matchers.BlockContextMatcher.eqBlockContext
-import io.github.effiban.scala2java.core.renderers.{DefaultTermRefRenderer, LitRenderer}
+import io.github.effiban.scala2java.core.renderers.DefaultTermRenderer
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TermNames.Plus
 import io.github.effiban.scala2java.core.testtrees.TypeNames
@@ -18,7 +18,6 @@ import scala.meta.{Case, Init, Lit, Name, Pat, Self, Template, Term, Type, Xtens
 class DefaultTermTraverserTest extends UnitTestSuite {
 
   private val defaultTermRefTraverser = mock[DefaultTermRefTraverser]
-  private val defaultTermRefRenderer = mock[DefaultTermRefRenderer]
   private val termApplyTraverser = mock[TermApplyTraverser]
   private val defaultMainApplyTypeTraverser = mock[MainApplyTypeTraverser]
   private val termApplyInfixTraverser = mock[TermApplyInfixTraverser]
@@ -46,12 +45,11 @@ class DefaultTermTraverserTest extends UnitTestSuite {
   private val etaTraverser = mock[EtaTraverser]
   private val termRepeatedTraverser = mock[TermRepeatedTraverser]
   private val termInterpolateTraverser = mock[TermInterpolateTraverser]
-  private val litRenderer = mock[LitRenderer]
+  private val defaultTermRenderer = mock[DefaultTermRenderer]
 
 
   private val defaultTermTraverser = new DefaultTermTraverser(
     defaultTermRefTraverser,
-    defaultTermRefRenderer,
     termApplyTraverser,
     defaultMainApplyTypeTraverser,
     termApplyInfixTraverser,
@@ -79,7 +77,7 @@ class DefaultTermTraverserTest extends UnitTestSuite {
     etaTraverser,
     termRepeatedTraverser,
     termInterpolateTraverser,
-    litRenderer
+    defaultTermRenderer
   )
 
   test("traverse() for Term.Name") {
@@ -89,7 +87,7 @@ class DefaultTermTraverserTest extends UnitTestSuite {
 
     defaultTermTraverser.traverse(termName)
 
-    verify(defaultTermRefRenderer).render(eqTree(traversedTermName))
+    verify(defaultTermRenderer).render(eqTree(traversedTermName))
   }
 
   test("traverse() for Term.Apply") {
@@ -350,6 +348,6 @@ class DefaultTermTraverserTest extends UnitTestSuite {
   test("traverse() for Lit.Int") {
     val lit = Lit.Int(3)
     defaultTermTraverser.traverse(lit)
-    verify(litRenderer).render(eqTree(lit))
+    verify(defaultTermRenderer).render(eqTree(lit))
   }
 }
