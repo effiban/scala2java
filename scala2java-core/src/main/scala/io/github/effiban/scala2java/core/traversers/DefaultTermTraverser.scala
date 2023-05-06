@@ -1,13 +1,12 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.{DefaultTermRefRenderer, LitRenderer}
+import io.github.effiban.scala2java.core.renderers.DefaultTermRenderer
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Term.{AnonymousFunction, ApplyType, Ascribe, Assign, Block, Do, Eta, For, ForYield, If, New, NewAnonymous, Return, Throw, Try, TryWithHandler, While}
 import scala.meta.{Lit, Term}
 
 private[traversers] class DefaultTermTraverser(defaultTermRefTraverser: => DefaultTermRefTraverser,
-                                               defaultTermRefRenderer: => DefaultTermRefRenderer,
                                                termApplyTraverser: => TermApplyTraverser,
                                                defaultMainApplyTypeTraverser: => MainApplyTypeTraverser,
                                                termApplyInfixTraverser: => TermApplyInfixTraverser,
@@ -35,7 +34,7 @@ private[traversers] class DefaultTermTraverser(defaultTermRefTraverser: => Defau
                                                etaTraverser: => EtaTraverser,
                                                termRepeatedTraverser: => TermRepeatedTraverser,
                                                termInterpolateTraverser: => TermInterpolateTraverser,
-                                               litRenderer: LitRenderer)
+                                               defaultTermRenderer: => DefaultTermRenderer)
                                               (implicit javaWriter: JavaWriter) extends TermTraverser {
 
   import javaWriter._
@@ -43,7 +42,7 @@ private[traversers] class DefaultTermTraverser(defaultTermRefTraverser: => Defau
   override def traverse(term: Term): Unit = term match {
     case termRef: Term.Ref =>
       val traversedTermRef = defaultTermRefTraverser.traverse(termRef)
-      defaultTermRefRenderer.render(traversedTermRef)
+      defaultTermRenderer.render(traversedTermRef)
     case apply: Term.Apply => termApplyTraverser.traverse(apply)
     case applyType: ApplyType => defaultMainApplyTypeTraverser.traverse(applyType)
     case applyInfix: Term.ApplyInfix => termApplyInfixTraverser.traverse(applyInfix)
@@ -72,7 +71,7 @@ private[traversers] class DefaultTermTraverser(defaultTermRefTraverser: => Defau
     case termRepeated: Term.Repeated => termRepeatedTraverser.traverse(termRepeated)
     case interpolate: Term.Interpolate => termInterpolateTraverser.traverse(interpolate)
     case literal: Lit =>
-      litRenderer.render(literal)
+      defaultTermRenderer.render(literal)
     case _ => writeComment(s"UNSUPPORTED: $term")
   }
 }
