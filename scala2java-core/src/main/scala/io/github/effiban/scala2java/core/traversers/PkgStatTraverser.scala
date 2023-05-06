@@ -2,7 +2,6 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{ClassOrTraitContext, StatContext}
 import io.github.effiban.scala2java.core.entities.SealedHierarchies
-import io.github.effiban.scala2java.core.writers.JavaWriter
 import io.github.effiban.scala2java.spi.entities.JavaScope
 
 import scala.meta.{Defn, Member, Name, Stat}
@@ -14,8 +13,7 @@ trait PkgStatTraverser {
 private[traversers] class PkgStatTraverserImpl(classTraverser: => ClassTraverser,
                                                traitTraverser: => TraitTraverser,
                                                objectTraverser: => ObjectTraverser,
-                                               statTraverser: => StatTraverser)
-                                              (implicit javaWriter: JavaWriter) extends PkgStatTraverser {
+                                               statTraverser: => StatTraverser) extends PkgStatTraverser {
 
   override def traverse(stat: Stat, sealedHierarchies: SealedHierarchies): Unit = {
     stat match {
