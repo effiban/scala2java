@@ -13,7 +13,7 @@ private[traversers] class MainApplyTypeTraverserImpl(classOfTraverser: => ClassO
 
   // parametrized type application, e.g.: classOf[X], identity[X]
   override def traverse(termApplyType: ApplyType): Unit = termApplyType.fun match {
-    case Term.Name(ScalaClassOf) => classOfTraverser.traverse(termApplyType.targs)
+    case Term.Name(ScalaClassOf) => classOfTraverser.traverse(termApplyType)
     case _ => standardApplyTypeTraverser.traverse(termApplyType)
   }
 }
