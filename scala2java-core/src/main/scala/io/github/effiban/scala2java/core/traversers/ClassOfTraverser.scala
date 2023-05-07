@@ -1,20 +1,14 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.ClassOfRenderer
-
 import scala.meta.Term
 
 // A traverser for the special expression 'classOf[T]'
-trait ClassOfTraverser {
-  def traverse(classOf: Term.ApplyType): Unit
-}
+trait ClassOfTraverser extends ScalaTreeTraverser1[Term.ApplyType]
 
-private[traversers] class ClassOfTraverserImpl(typeTraverser: => TypeTraverser,
-                                               classOfRenderer: => ClassOfRenderer) extends ClassOfTraverser {
+private[traversers] class ClassOfTraverserImpl(typeTraverser: => TypeTraverser) extends ClassOfTraverser {
 
-  override def traverse(classOfType: Term.ApplyType): Unit = {
+  override def traverse(classOfType: Term.ApplyType): Term.ApplyType = {
     val traversedTargs = classOfType.targs.map(typeTraverser.traverse)
-    val traversedClassOfType = classOfType.copy(targs = traversedTargs)
-    classOfRenderer.render(traversedClassOfType)
+    classOfType.copy(targs = traversedTargs)
   }
 }
