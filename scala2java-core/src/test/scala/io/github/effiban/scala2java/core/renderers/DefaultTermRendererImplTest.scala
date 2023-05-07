@@ -8,14 +8,16 @@ import scala.meta.XtensionQuasiquoteTerm
 class DefaultTermRendererImplTest extends UnitTestSuite {
 
   private val defaultTermRefRenderer = mock[DefaultTermRefRenderer]
+  private val applyTypeRenderer = mock[ApplyTypeRenderer]
   private val litRenderer = mock[LitRenderer]
 
   private val defaultTermRenderer = new DefaultTermRendererImpl(
     defaultTermRefRenderer,
+    applyTypeRenderer,
     litRenderer
   )
 
-  test("render termName") {
+  test("render Term.Name") {
     val termName = q"x"
 
     defaultTermRenderer.render(termName)
@@ -23,7 +25,15 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
     verify(defaultTermRefRenderer).render(eqTree(termName))
   }
 
-  test("render lit") {
+  test("render Term.ApplyType") {
+    val applyType = q"a[T]"
+
+    defaultTermRenderer.render(applyType)
+
+    verify(applyTypeRenderer).render(eqTree(applyType))
+  }
+
+  test("render Lit") {
     val lit = q"3"
 
     defaultTermRenderer.render(lit)

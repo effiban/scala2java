@@ -12,7 +12,7 @@ class ClassOfRendererImplTest extends UnitTestSuite {
 
   private val classOfRenderer = new ClassOfRendererImpl(typeRenderer)
 
-  test("traverse() when there is one type should output the Java equivalent") {
+  test("render() when there is one type should output the Java equivalent") {
     val typeName = t"T"
     val classOf = q"classOf[T]"
 
@@ -23,7 +23,7 @@ class ClassOfRendererImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe "T.class"
   }
 
-  test("traverse() when there are two types should output an error comment") {
+  test("render() when there are two types should output an error comment") {
     classOfRenderer.render(q"classOf[T, U]")
 
     outputWriter.toString shouldBe "UNPARSEABLE 'classOf' with types: T, U"
