@@ -1,8 +1,5 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.ArgumentListContext
-import io.github.effiban.scala2java.core.entities.EnclosingDelimiter.Parentheses
-import io.github.effiban.scala2java.core.entities.ListTraversalOptions
 import io.github.effiban.scala2java.core.renderers.TermNameRenderer
 import io.github.effiban.scala2java.core.writers.JavaWriter
 import io.github.effiban.scala2java.spi.transformers.TermApplyInfixToTermApplyTransformer
@@ -14,8 +11,6 @@ trait TermApplyInfixTraverser extends ScalaTreeTraverser[Term.ApplyInfix]
 private[traversers] class TermApplyInfixTraverserImpl(expressionTermTraverser: => TermTraverser,
                                                       termApplyTraverser: => TermApplyTraverser,
                                                       termNameRenderer: TermNameRenderer,
-                                                      argumentListTraverser: => ArgumentListTraverser,
-                                                      invocationArgTraverser: => ArgumentTraverser[Term],
                                                       termApplyInfixToTermApplyTransformer: TermApplyInfixToTermApplyTransformer)
                                                      (implicit javaWriter: JavaWriter) extends TermApplyInfixTraverser {
 
@@ -31,23 +26,18 @@ private[traversers] class TermApplyInfixTraverserImpl(expressionTermTraverser: =
   }
 
   private def traverseAsInfix(termApplyInfix: Term.ApplyInfix): Unit = {
-    expressionTermTraverser.traverse(termApplyInfix.lhs)
-    write(" ")
-    termNameRenderer.render(termApplyInfix.op)
-    write(" ")
     //TODO handle type args
     termApplyInfix.args match {
       case Nil => throw new IllegalStateException("An Term.ApplyInfix must have at least one RHS arg")
-      case arg :: Nil => expressionTermTraverser.traverse(arg)
-      case args =>
-        //TODO - fix (should transform to Term.Apply, cannot use infix notation in Java with multiple RHS args)
-        val options = ListTraversalOptions(onSameLine = true, maybeEnclosingDelimiter = Some(Parentheses))
-        val argListContext = ArgumentListContext(maybeParent = Some(termApplyInfix), options = options, argNameAsComment = true)
-        argumentListTraverser.traverse(
-          args = args,
-          argTraverser = invocationArgTraverser,
-          context = argListContext
-        )
+      case arg :: Nil =>
+        expressionTermTraverser.traverse(termApplyInfix.lhs)
+        write(" ")
+        termNameRenderer.render(termApplyInfix.op)
+        write(" ")
+        expressionTermTraverser.traverse(arg)
+      case _ =>
+        // If the infix was classified above as a Java-style infix, but has multiple RHS args - there is no Java equivalent
+        write(s"UNSUPPORTED: $termApplyInfix")
     }
   }
 }

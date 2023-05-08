@@ -14,16 +14,12 @@ class TermApplyInfixTraverserImplTest extends UnitTestSuite {
   private val expressionTermTraverser = mock[ExpressionTermTraverser]
   private val termApplyTraverser = mock[TermApplyTraverser]
   private val termNameRenderer = mock[TermNameRenderer]
-  private val argumentListTraverser = mock[ArgumentListTraverser]
-  private val invocationArgTraverser = mock[ArgumentTraverser[Term]]
   private val termApplyInfixToTermApplyTransformer = mock[TermApplyInfixToTermApplyTransformer]
 
   private val termApplyInfixTraverser = new TermApplyInfixTraverserImpl(
     expressionTermTraverser,
     termApplyTraverser,
     termNameRenderer,
-    argumentListTraverser,
-    invocationArgTraverser,
     termApplyInfixToTermApplyTransformer)
 
 
