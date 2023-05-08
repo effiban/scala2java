@@ -5,9 +5,7 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 import scala.meta.Term
 
 // A Renderer for the special expression 'classOf[T]'
-trait ClassOfRenderer {
-  def render(classOf: Term.ApplyType): Unit
-}
+trait ClassOfRenderer extends JavaTreeRenderer[Term.ApplyType]
 
 private[renderers] class ClassOfRendererImpl(typeRenderer: => TypeRenderer)
                                             (implicit javaWriter: JavaWriter) extends ClassOfRenderer {

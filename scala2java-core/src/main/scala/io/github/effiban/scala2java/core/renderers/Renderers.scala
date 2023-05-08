@@ -6,6 +6,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   lazy val alternativeRenderer: AlternativeRenderer = new AlternativeRendererImpl(patRenderer)
 
+  lazy val applyTypeRenderer: ApplyTypeRenderer = new ApplyTypeRendererImpl(classOfRenderer)
+
   val argumentListRenderer: ArgumentListRenderer = new ArgumentListRendererImpl()
 
   lazy val classOfRenderer: ClassOfRenderer = new ClassOfRendererImpl(typeRenderer)
@@ -19,6 +21,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   lazy val defaultTermRenderer: DefaultTermRenderer = new DefaultTermRendererImpl(
     defaultTermRefRenderer,
+    applyTypeRenderer,
     litRenderer
   )
 
