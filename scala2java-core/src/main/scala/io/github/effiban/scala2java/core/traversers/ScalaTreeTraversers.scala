@@ -470,8 +470,6 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     expressionTermTraverser,
     termApplyTraverser,
     termNameRenderer,
-    argumentListTraverser,
-    compositeInvocationArgTraverser,
     new CompositeTermApplyInfixToTermApplyTransformer(CoreTermApplyInfixToTermApplyTransformer)
   )
 
