@@ -6,7 +6,7 @@ import scala.meta.Term.Do
 
 trait DoTraverser extends ScalaTreeTraverser[Do]
 
-private[traversers] class DoTraverserImpl(expressionTermTraverser: => TermTraverser,
+private[traversers] class DoTraverserImpl(expressionTermTraverser: => ExpressionTermTraverser,
                                           blockTraverser: => BlockTraverser)
                                          (implicit javaWriter: JavaWriter) extends DoTraverser {
 

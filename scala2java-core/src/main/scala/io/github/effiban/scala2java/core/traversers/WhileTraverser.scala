@@ -6,7 +6,7 @@ import scala.meta.Term.While
 
 trait WhileTraverser extends ScalaTreeTraverser[While]
 
-private[traversers] class WhileTraverserImpl(expressionTermTraverser: => TermTraverser,
+private[traversers] class WhileTraverserImpl(expressionTermTraverser: => ExpressionTermTraverser,
                                              blockTraverser: => BlockTraverser)
                                             (implicit javaWriter: JavaWriter) extends WhileTraverser {
 

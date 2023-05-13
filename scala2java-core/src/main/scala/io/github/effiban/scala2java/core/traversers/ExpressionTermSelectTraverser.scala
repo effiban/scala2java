@@ -14,7 +14,7 @@ trait ExpressionTermSelectTraverser {
   def traverse(termSelect: Term.Select, context: TermSelectContext = TermSelectContext()): Unit
 }
 
-private[traversers] class ExpressionTermSelectTraverserImpl(qualifierTraverser: => TermTraverser,
+private[traversers] class ExpressionTermSelectTraverserImpl(qualifierTraverser: => ExpressionTermTraverser,
                                                             transformedTermTraverser: => TermTraverser,
                                                             termNameRenderer: TermNameRenderer,
                                                             typeTraverser: => TypeTraverser,

@@ -13,7 +13,7 @@ trait IfTraverser {
   def traverseAsTertiaryOp(`if`: If): Unit
 }
 
-private[traversers] class IfTraverserImpl(expressionTermTraverser: => TermTraverser,
+private[traversers] class IfTraverserImpl(expressionTermTraverser: => ExpressionTermTraverser,
                                           blockTraverser: => BlockTraverser)
                                          (implicit javaWriter: JavaWriter) extends IfTraverser {
 

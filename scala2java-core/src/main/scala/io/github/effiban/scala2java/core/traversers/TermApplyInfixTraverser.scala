@@ -8,7 +8,7 @@ import scala.meta.Term
 
 trait TermApplyInfixTraverser extends ScalaTreeTraverser[Term.ApplyInfix]
 
-private[traversers] class TermApplyInfixTraverserImpl(expressionTermTraverser: => TermTraverser,
+private[traversers] class TermApplyInfixTraverserImpl(expressionTermTraverser: => ExpressionTermTraverser,
                                                       termApplyTraverser: => TermApplyTraverser,
                                                       termNameRenderer: TermNameRenderer,
                                                       termApplyInfixToTermApplyTransformer: TermApplyInfixToTermApplyTransformer)

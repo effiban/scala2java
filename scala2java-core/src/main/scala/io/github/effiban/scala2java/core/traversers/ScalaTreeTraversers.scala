@@ -167,7 +167,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
     termApplyTypeFunTraverser
   )
 
-  private lazy val defaultTermTraverser: TermTraverser = new DefaultTermTraverser(
+  private lazy val defaultTermTraverser: DefaultTermTraverser = new DefaultTermTraverserImpl(
     defaultTermRefTraverser,
     termApplyTraverser,
     funMainApplyTypeTraverser,
@@ -273,7 +273,7 @@ class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: Ex
   private val expressionMainApplyTypeTraverser: MainApplyTypeTraverser =
     mainApplyTypeTraverser(new EvaluatedStandardApplyTypeTraverser(termApplyTraverser))
 
-  private lazy val expressionTermTraverser: TermTraverser = new ExpressionTermTraverser(
+  private lazy val expressionTermTraverser: ExpressionTermTraverser = new ExpressionTermTraverserImpl(
     ifTraverser,
     statTraverser,
     termApplyTraverser,

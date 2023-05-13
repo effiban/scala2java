@@ -7,7 +7,7 @@ import scala.meta.Term.ApplyUnary
 trait ApplyUnaryTraverser extends ScalaTreeTraverser[ApplyUnary]
 
 private[traversers] class ApplyUnaryTraverserImpl(termNameRenderer: TermNameRenderer,
-                                                  expressionTermTraverser: => TermTraverser) extends ApplyUnaryTraverser {
+                                                  expressionTermTraverser: => ExpressionTermTraverser) extends ApplyUnaryTraverser {
 
   override def traverse(applyUnary: ApplyUnary): Unit = {
     termNameRenderer.render(applyUnary.op)

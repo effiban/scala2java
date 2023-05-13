@@ -9,7 +9,7 @@ trait CaseTraverser extends ScalaTreeTraverser[Case]
 
 private[traversers] class CaseTraverserImpl(patTraverser: => PatTraverser,
                                             patRenderer: => PatRenderer,
-                                            expressionTermTraverser: => TermTraverser)
+                                            expressionTermTraverser: => ExpressionTermTraverser)
                                            (implicit javaWriter: JavaWriter) extends CaseTraverser {
 
   import javaWriter._
