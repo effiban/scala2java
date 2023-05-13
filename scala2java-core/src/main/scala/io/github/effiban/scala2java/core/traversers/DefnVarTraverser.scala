@@ -15,7 +15,7 @@ private[traversers] class DefnVarTraverserImpl(modListTraverser: => ModListTrave
                                                defnValOrVarTypeTraverser: => DefnValOrVarTypeTraverser,
                                                patTraverser: => PatTraverser,
                                                patListRenderer: => PatListRenderer,
-                                               expressionTermTraverser: => TermTraverser)
+                                               expressionTermTraverser: => ExpressionTermTraverser)
                                               (implicit javaWriter: JavaWriter) extends DefnVarTraverser {
 
   import javaWriter._

@@ -10,7 +10,7 @@ trait AscribeTraverser extends ScalaTreeTraverser[Ascribe]
 
 private[traversers] class AscribeTraverserImpl(typeTraverser: => TypeTraverser,
                                                typeRenderer: => TypeRenderer,
-                                               expressionTermTraverser: => TermTraverser)
+                                               expressionTermTraverser: => ExpressionTermTraverser)
                                               (implicit javaWriter: JavaWriter) extends AscribeTraverser {
 
   import javaWriter._

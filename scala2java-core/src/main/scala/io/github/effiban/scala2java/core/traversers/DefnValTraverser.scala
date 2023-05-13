@@ -16,7 +16,7 @@ private[traversers] class DefnValTraverserImpl(modListTraverser: => ModListTrave
                                                defnValOrVarTypeTraverser: => DefnValOrVarTypeTraverser,
                                                patTraverser: => PatTraverser,
                                                patListRenderer: => PatListRenderer,
-                                               expressionTermTraverser: => TermTraverser,
+                                               expressionTermTraverser: => ExpressionTermTraverser,
                                                declVarTraverser: => DeclVarTraverser,
                                                defnValToDeclVarTransformer: DefnValToDeclVarTransformer,
                                                defnValTransformer: DefnValTransformer)

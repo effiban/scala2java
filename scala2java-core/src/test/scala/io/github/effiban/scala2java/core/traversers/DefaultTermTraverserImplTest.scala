@@ -15,7 +15,7 @@ import scala.meta.Mod.Annot
 import scala.meta.Term.{Apply, ApplyInfix, ApplyType, Assign, Block, Eta, For, ForYield, If, NewAnonymous}
 import scala.meta.{Case, Init, Lit, Name, Pat, Self, Template, Term, Type, XtensionQuasiquoteTerm}
 
-class DefaultTermTraverserTest extends UnitTestSuite {
+class DefaultTermTraverserImplTest extends UnitTestSuite {
 
   private val defaultTermRefTraverser = mock[DefaultTermRefTraverser]
   private val termApplyTraverser = mock[TermApplyTraverser]
@@ -48,7 +48,7 @@ class DefaultTermTraverserTest extends UnitTestSuite {
   private val defaultTermRenderer = mock[DefaultTermRenderer]
 
 
-  private val defaultTermTraverser = new DefaultTermTraverser(
+  private val defaultTermTraverser = new DefaultTermTraverserImpl(
     defaultTermRefTraverser,
     termApplyTraverser,
     defaultMainApplyTypeTraverser,

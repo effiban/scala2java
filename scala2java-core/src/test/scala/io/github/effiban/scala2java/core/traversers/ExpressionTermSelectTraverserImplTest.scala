@@ -26,7 +26,7 @@ class ExpressionTermSelectTraverserImplTest extends UnitTestSuite {
   private val ScalaSelectWithTermName = Term.Select(qual = MyInstance, name = MyMethod)
   private val JavaSelectWithTermName = Term.Select(qual = MyJavaClass, name = MyJavaMethod)
 
-  private val qualifierTraverser = mock[TermTraverser]
+  private val qualifierTraverser = mock[ExpressionTermTraverser]
   private val transformedTermTraverser = mock[TermTraverser]
   private val termNameRenderer = mock[TermNameRenderer]
   private val typeTraverser = mock[TypeTraverser]

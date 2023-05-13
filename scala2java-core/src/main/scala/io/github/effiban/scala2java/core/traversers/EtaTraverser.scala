@@ -7,7 +7,7 @@ import scala.meta.Term.Eta
 
 trait EtaTraverser extends ScalaTreeTraverser[Eta]
 
-private[traversers] class EtaTraverserImpl(expressionTermTraverser: => TermTraverser)
+private[traversers] class EtaTraverserImpl(expressionTermTraverser: => ExpressionTermTraverser)
                                           (implicit javaWriter: JavaWriter) extends EtaTraverser {
 
   import javaWriter._
