@@ -6,5 +6,7 @@ class Desugarers() {
 
   val sourceDesugarer: SameTypeDesugarer[Source] = new DefaultSameTypeDesugarer[Source](treeDesugarer)
 
-  private lazy val treeDesugarer: TreeDesugarer = new TreeDesugarerImpl()
+  private lazy val statDesugarer: StatDesugarer = new StatDesugarerImpl()
+
+  private lazy val treeDesugarer: TreeDesugarer = new TreeDesugarerImpl(statDesugarer)
 }
