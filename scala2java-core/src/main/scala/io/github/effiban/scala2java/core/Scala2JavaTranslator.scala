@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core
 
 import io.github.effiban.scala2java.core.collectors.MainClassInitCollector
+import io.github.effiban.scala2java.core.desugarers.Desugarers
 import io.github.effiban.scala2java.core.extensions.{ExtensionRegistry, ExtensionRegistryBuilder}
 import io.github.effiban.scala2java.core.resolvers.JavaFileResolverImpl
 import io.github.effiban.scala2java.core.transformers.CompositeFileNameTransformer
@@ -30,7 +31,8 @@ object Scala2JavaTranslator {
     }
 
     try {
-      new ScalaTreeTraversers().sourceTraverser.traverse(sourceTree)
+      val desugaredSource = new Desugarers().sourceDesugarer.desugar(sourceTree)
+      new ScalaTreeTraversers().sourceTraverser.traverse(desugaredSource)
     } finally {
       javaWriter.close()
     }
