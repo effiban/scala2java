@@ -8,8 +8,9 @@ import scala.meta.XtensionQuasiquoteTerm
 class StatDesugarerImplTest extends UnitTestSuite {
 
   private val defnDesugarer = mock[DefnDesugarer]
+  private val declDesugarer = mock[DeclDesugarer]
 
-  private val statDesugarer = new StatDesugarerImpl(defnDesugarer)
+  private val statDesugarer = new StatDesugarerImpl(defnDesugarer, declDesugarer)
 
   test("desugar Defn") {
     val defn = q"val x = calc"
@@ -18,6 +19,15 @@ class StatDesugarerImplTest extends UnitTestSuite {
     doReturn(desugaredDefn).when(defnDesugarer).desugar(eqTree(defn))
 
     statDesugarer.desugar(defn).structure shouldBe desugaredDefn.structure
+  }
+
+  test("desugar Decl") {
+    val decl = q"def foo(x: Int = calc): Unit"
+    val desugaredDecl = q"def foo(x: Int = calc()): Unit"
+
+    doReturn(desugaredDecl).when(declDesugarer).desugar(eqTree(decl))
+
+    statDesugarer.desugar(decl).structure shouldBe desugaredDecl.structure
   }
 
   test("desugar Import") {
