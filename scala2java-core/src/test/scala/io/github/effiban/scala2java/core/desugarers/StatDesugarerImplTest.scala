@@ -9,8 +9,13 @@ class StatDesugarerImplTest extends UnitTestSuite {
 
   private val defnDesugarer = mock[DefnDesugarer]
   private val declDesugarer = mock[DeclDesugarer]
+  private val evaluatedTermDesugarer = mock[EvaluatedTermDesugarer]
 
-  private val statDesugarer = new StatDesugarerImpl(defnDesugarer, declDesugarer)
+  private val statDesugarer = new StatDesugarerImpl(
+    defnDesugarer,
+    declDesugarer,
+    evaluatedTermDesugarer
+  )
 
   test("desugar Defn") {
     val defn = q"val x = calc"
@@ -28,6 +33,15 @@ class StatDesugarerImplTest extends UnitTestSuite {
     doReturn(desugaredDecl).when(declDesugarer).desugar(eqTree(decl))
 
     statDesugarer.desugar(decl).structure shouldBe desugaredDecl.structure
+  }
+
+  test("desugar Term") {
+    val term = q"func"
+    val desugaredTerm = q"func()"
+
+    doReturn(desugaredTerm).when(evaluatedTermDesugarer).desugar(term)
+
+    statDesugarer.desugar(term).structure shouldBe desugaredTerm.structure
   }
 
   test("desugar Import") {

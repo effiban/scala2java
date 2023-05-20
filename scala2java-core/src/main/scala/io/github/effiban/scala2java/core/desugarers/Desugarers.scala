@@ -8,9 +8,15 @@ class Desugarers() {
 
   private lazy val defnDesugarer: DefnDesugarer = new DefnDesugarerImpl()
 
+  private lazy val evaluatedTermDesugarer: EvaluatedTermDesugarer = new EvaluatedTermDesugarerImpl(treeDesugarer)
+
   val sourceDesugarer: SameTypeDesugarer[Source] = new DefaultSameTypeDesugarer[Source](treeDesugarer)
 
-  private lazy val statDesugarer: StatDesugarer = new StatDesugarerImpl(defnDesugarer, declDesugarer)
+  private lazy val statDesugarer: StatDesugarer = new StatDesugarerImpl(
+    defnDesugarer,
+    declDesugarer,
+    evaluatedTermDesugarer
+  )
 
   private lazy val treeDesugarer: TreeDesugarer = new TreeDesugarerImpl(statDesugarer)
 }
