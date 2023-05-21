@@ -3,7 +3,7 @@ package io.github.effiban.scala2java.core.desugarers
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.{XtensionQuasiquoteTerm, XtensionQuasiquoteTermParam, XtensionQuasiquoteType}
+import scala.meta.{XtensionQuasiquoteCaseOrPattern, XtensionQuasiquoteTerm, XtensionQuasiquoteTermParam, XtensionQuasiquoteType}
 
 class TreeDesugarerImplTest extends UnitTestSuite {
 
@@ -28,6 +28,12 @@ class TreeDesugarerImplTest extends UnitTestSuite {
     doReturn(desugaredTermParam).when(termParamDesugarer).desugar(eqTree(termParam))
 
     treeDesugarer.desugar(termParam).structure shouldBe desugaredTermParam.structure
+  }
+
+  test("desugar Pat") {
+    val pat = p"x"
+
+    treeDesugarer.desugar(pat).structure shouldBe pat.structure
   }
 
   test("desugar Type") {
