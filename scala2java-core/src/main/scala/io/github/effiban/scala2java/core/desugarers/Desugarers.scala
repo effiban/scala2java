@@ -15,7 +15,8 @@ class Desugarers() {
   private lazy val statDesugarer: StatDesugarer = new StatDesugarerImpl(
     defnDesugarer,
     declDesugarer,
-    evaluatedTermDesugarer
+    evaluatedTermDesugarer,
+    treeDesugarer
   )
 
   private lazy val termParamDesugarer: TermParamDesugarer = new TermParamDesugarerImpl(evaluatedTermDesugarer)
