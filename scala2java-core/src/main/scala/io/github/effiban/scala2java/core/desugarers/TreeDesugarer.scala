@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.desugarers
 
-import scala.meta.{Stat, Term, Transformer, Tree}
+import scala.meta.{Pat, Stat, Term, Transformer, Tree, Type}
 
 trait TreeDesugarer extends SameTypeDesugarer[Tree]
 
@@ -15,6 +15,7 @@ private[desugarers] class TreeDesugarerImpl(statDesugarer: => StatDesugarer,
       aTree match {
         case stat: Stat => statDesugarer.desugar(stat)
         case termParam: Term.Param => termParamDesugarer.desugar(termParam)
+        case _: Pat | _: Type => aTree
         case aTree => super.apply(aTree)
       }
   }
