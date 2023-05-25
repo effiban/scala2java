@@ -6,7 +6,9 @@ class Desugarers() {
 
   private lazy val declDesugarer: DeclDesugarer = new DeclDesugarerImpl()
 
-  private lazy val defnDesugarer: DefnDesugarer = new DefnDesugarerImpl(treeDesugarer)
+  private lazy val defnDesugarer: DefnDesugarer = new DefnDesugarerImpl(defnDefDesugarer, treeDesugarer)
+
+  private lazy val defnDefDesugarer: DefnDefDesugarer = new DefnDefDesugarerImpl(termParamDesugarer, evaluatedTermDesugarer)
 
   private lazy val evaluatedTermDesugarer: EvaluatedTermDesugarer = new EvaluatedTermDesugarerImpl(treeDesugarer)
 
