@@ -9,9 +9,14 @@ import scala.meta.{Tree, XtensionQuasiquoteTerm}
 class DefnDesugarerImplTest extends UnitTestSuite {
 
   private val defnDefDesugarer = mock[DefnDefDesugarer]
+  private val defnObjectDesugarer = mock[DefnObjectDesugarer]
   private val treeDesugarer = mock[TreeDesugarer]
 
-  private val defnDesugarer = new DefnDesugarerImpl(defnDefDesugarer, treeDesugarer)
+  private val defnDesugarer = new DefnDesugarerImpl(
+    defnDefDesugarer,
+    defnObjectDesugarer,
+    treeDesugarer
+  )
 
   test("desugar Defn.Def") {
     val defnDef =
@@ -32,6 +37,26 @@ class DefnDesugarerImplTest extends UnitTestSuite {
 
     defnDesugarer.desugar(defnDef).structure shouldBe desugaredDefnDef.structure
 
+  }
+
+  test("desugar Defn.Object") {
+    val defnObject =
+      q"""
+      object myObj {
+         val x: Int = func
+      }
+      """
+
+    val desugaredDefnObject =
+      q"""
+      object myObj {
+          val x: Int = func()
+      }
+      """
+
+    doReturn(desugaredDefnObject).when(defnObjectDesugarer).desugar(eqTree(defnObject))
+
+    defnDesugarer.desugar(defnObject).structure shouldBe desugaredDefnObject.structure
   }
 
   test("desugar Defn.Val") {

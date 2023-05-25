@@ -1,14 +1,19 @@
 package io.github.effiban.scala2java.core.desugarers
 
-import scala.meta.Source
+import scala.meta.{Source, Template}
 
 class Desugarers() {
 
   private lazy val declDesugarer: DeclDesugarer = new DeclDesugarerImpl()
 
-  private lazy val defnDesugarer: DefnDesugarer = new DefnDesugarerImpl(defnDefDesugarer, treeDesugarer)
-
   private lazy val defnDefDesugarer: DefnDefDesugarer = new DefnDefDesugarerImpl(termParamDesugarer, evaluatedTermDesugarer)
+
+  private lazy val defnDesugarer: DefnDesugarer = new DefnDesugarerImpl(
+    defnDefDesugarer,
+    defnObjectDesugarer,
+    treeDesugarer)
+
+  private lazy val defnObjectDesugarer: DefnObjectDesugarer = new DefnObjectDesugarerImpl(templateDesugarer)
 
   private lazy val evaluatedTermDesugarer: EvaluatedTermDesugarer = new EvaluatedTermDesugarerImpl(treeDesugarer)
 
@@ -20,6 +25,8 @@ class Desugarers() {
     evaluatedTermDesugarer,
     treeDesugarer
   )
+
+  private lazy val templateDesugarer: SameTypeDesugarer[Template] = new DefaultSameTypeDesugarer[Template](treeDesugarer)
 
   private lazy val termParamDesugarer: TermParamDesugarer = new TermParamDesugarerImpl(evaluatedTermDesugarer)
 
