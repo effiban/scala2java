@@ -4,7 +4,9 @@ import scala.meta.{Source, Template}
 
 class Desugarers() {
 
-  private lazy val declDesugarer: DeclDesugarer = new DeclDesugarerImpl()
+  private lazy val declDefDesugarer: DeclDefDesugarer = new DeclDefDesugarerImpl(termParamDesugarer)
+
+  private lazy val declDesugarer: DeclDesugarer = new DeclDesugarerImpl(declDefDesugarer)
 
   private lazy val defnDefDesugarer: DefnDefDesugarer = new DefnDefDesugarerImpl(termParamDesugarer, evaluatedTermDesugarer)
 
