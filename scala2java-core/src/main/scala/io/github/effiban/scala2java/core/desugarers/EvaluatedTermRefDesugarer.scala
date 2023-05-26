@@ -6,6 +6,7 @@ trait EvaluatedTermRefDesugarer extends DifferentTypeDesugarer[Term.Ref, Term]
 
 private[desugarers] class EvaluatedTermRefDesugarerImpl(evaluatedTermNameDesugarer: => EvaluatedTermNameDesugarer,
                                                         evaluatedTermSelectDesugarer: => EvaluatedTermSelectDesugarer,
+                                                        applyUnaryDesugarer: => ApplyUnaryDesugarer,
                                                         treeDesugarer: => TreeDesugarer) extends EvaluatedTermRefDesugarer {
   override def desugar(termRef: Term.Ref): Term = DesugaringTransformer(termRef) match {
     case desugaredTerm: Term => desugaredTerm
@@ -20,7 +21,7 @@ private[desugarers] class EvaluatedTermRefDesugarerImpl(evaluatedTermNameDesugar
         case termSelect: Term.Select => evaluatedTermSelectDesugarer.desugar(termSelect)
         case termThis: Term.This => termThis // TODO
         case termSuper: Term.Super => termSuper // TODO
-        case applyUnary: Term.ApplyUnary => applyUnary // TODO
+        case applyUnary: Term.ApplyUnary => applyUnaryDesugarer.desugar(applyUnary)
         case otherTermRef: Term.Ref => super.apply(otherTermRef)
         case nonTermRef => treeDesugarer.desugar(nonTermRef)
       }
