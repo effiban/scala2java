@@ -26,7 +26,12 @@ class Desugarers(implicit predicates: Predicates,
 
   private lazy val defnObjectDesugarer: DefnObjectDesugarer = new DefnObjectDesugarerImpl(templateDesugarer)
 
-  private lazy val evaluatedTermDesugarer: EvaluatedTermDesugarer = new EvaluatedTermDesugarerImpl(evaluatedTermRefDesugarer, treeDesugarer)
+  private lazy val evaluatedTermApplyTypeDesugarer: EvaluatedTermApplyTypeDesugarer = new EvaluatedTermApplyTypeDesugarerImpl()
+
+  private lazy val evaluatedTermDesugarer: EvaluatedTermDesugarer = new EvaluatedTermDesugarerImpl(
+    evaluatedTermRefDesugarer,
+    evaluatedTermApplyTypeDesugarer,
+    treeDesugarer)
 
   private lazy val evaluatedTermNameDesugarer: EvaluatedTermNameDesugarer = new EvaluatedTermNameDesugarerImpl(
     compositeTermNameSupportsNoArgInvocation
