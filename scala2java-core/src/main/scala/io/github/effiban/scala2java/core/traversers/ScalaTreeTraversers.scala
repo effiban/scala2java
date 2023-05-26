@@ -284,7 +284,7 @@ class ScalaTreeTraversers(implicit predicates: Predicates,
   )
 
   private lazy val expressionTermRefTraverser: TermRefTraverser = expressionTermRefTraverser(
-    termNameTraverser(expressionTermTraverser, evaluatedInternalTermNameTransformer),
+    termNameTraverser(expressionTermTraverser),
     expressionTermSelectTraverser
   )
 
@@ -426,7 +426,7 @@ class ScalaTreeTraversers(implicit predicates: Predicates,
    */
   private lazy val statTermTraverser: TermTraverser = new FunOverridingTermTraverser(
     expressionTermRefTraverser(
-      termNameTraverser(statTermTraverser, evaluatedInternalTermNameTransformer),
+      termNameTraverser(statTermTraverser),
       expressionTermSelectTraverser(statTermTraverser, evaluatedInternalTermSelectTransformer)
     ),
     expressionMainApplyTypeTraverser,
@@ -515,19 +515,17 @@ class ScalaTreeTraversers(implicit predicates: Predicates,
 
   private lazy val termMatchTraverser: TermMatchTraverser = new TermMatchTraverserImpl(expressionTermTraverser, caseTraverser)
 
-  private def termNameTraverser(termTraverser: => TermTraverser,
-                                termNameTransformer: => InternalTermNameTransformer): TermNameTraverser = {
+  private def termNameTraverser(termTraverser: => TermTraverser): TermNameTraverser = {
     new TermNameTraverserImpl(
-      termNameWithoutRenderTraverser(termTraverser, termNameTransformer),
+      termNameWithoutRenderTraverser(termTraverser),
       termNameRenderer
     )
   }
 
-  private def termNameWithoutRenderTraverser(termTraverser: => TermTraverser,
-                                             termNameTransformer: => InternalTermNameTransformer): TermNameWithoutRenderTraverser =
+  private def termNameWithoutRenderTraverser(termTraverser: => TermTraverser): TermNameWithoutRenderTraverser =
     new TermNameWithoutRenderTraverserImpl(
       termTraverser,
-      termNameTransformer,
+      new CompositeTermNameTransformer(CoreTermNameTransformer),
     )
 
   private lazy val termParamArgTraverserFactory: TermParamArgTraverserFactory = new TermParamArgTraverserFactoryImpl(termParamTraverser)
