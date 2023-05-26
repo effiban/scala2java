@@ -3,10 +3,10 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.TermSelectContext
 import io.github.effiban.scala2java.core.entities.EnclosingDelimiter.Parentheses
 import io.github.effiban.scala2java.core.renderers.{TermNameRenderer, TypeListRenderer}
-import io.github.effiban.scala2java.core.transformers.InternalTermSelectTransformer
 import io.github.effiban.scala2java.core.typeinference.QualifierTypeInferrer
 import io.github.effiban.scala2java.core.writers.JavaWriter
 import io.github.effiban.scala2java.spi.contexts.TermSelectTransformationContext
+import io.github.effiban.scala2java.spi.transformers.TermSelectTransformer
 
 import scala.meta.Term
 
@@ -20,18 +20,19 @@ private[traversers] class ExpressionTermSelectTraverserImpl(qualifierTraverser: 
                                                             typeTraverser: => TypeTraverser,
                                                             typeListRenderer: => TypeListRenderer,
                                                             qualifierTypeInferrer: => QualifierTypeInferrer,
-                                                            termSelectTransformer: InternalTermSelectTransformer)
+                                                            termSelectTransformer: TermSelectTransformer)
                                                            (implicit javaWriter: JavaWriter) extends ExpressionTermSelectTraverser {
 
   import javaWriter._
 
-  // qualified name in the context of an evaluated expression, that might need to be desugared or otherwise transformed into a Java equivalent
+  // qualified name in the context of an evaluated expression, that might need to be transformed into a Java equivalent
   override def traverse(select: Term.Select, context: TermSelectContext = TermSelectContext()): Unit = {
     val maybeQualType = qualifierTypeInferrer.infer(select)
     val transformedTerm = termSelectTransformer.transform(select, TermSelectTransformationContext(maybeQualType))
     transformedTerm match {
-        case transformedSelect: Term.Select => traverseAsSelect(transformedSelect, context)
-        case term => transformedTermTraverser.traverse(term)
+        case Some(transformedSelect: Term.Select) => traverseAsSelect(transformedSelect, context)
+        case Some(term) => transformedTermTraverser.traverse(term)
+        case None => traverseAsSelect(select, context)
     }
   }
 
