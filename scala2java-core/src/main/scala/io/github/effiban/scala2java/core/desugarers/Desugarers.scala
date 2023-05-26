@@ -31,9 +31,12 @@ class Desugarers(implicit predicates: Predicates) {
     treeDesugarer
   )
 
+  private lazy val pkgDesugarer: PkgDesugarer = new PkgDesugarerImpl(statDesugarer)
+
   val sourceDesugarer: SameTypeDesugarer[Source] = new DefaultSameTypeDesugarer[Source](treeDesugarer)
 
   private lazy val statDesugarer: StatDesugarer = new StatDesugarerImpl(
+    pkgDesugarer,
     defnDesugarer,
     declDesugarer,
     evaluatedTermDesugarer,

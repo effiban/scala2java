@@ -8,17 +8,43 @@ import scala.meta.{Tree, XtensionQuasiquoteTerm}
 
 class StatDesugarerImplTest extends UnitTestSuite {
 
+  private val pkgDesugarer = mock[PkgDesugarer]
   private val defnDesugarer = mock[DefnDesugarer]
   private val declDesugarer = mock[DeclDesugarer]
   private val evaluatedTermDesugarer = mock[EvaluatedTermDesugarer]
   private val treeDesugarer = mock[TreeDesugarer]
 
   private val statDesugarer = new StatDesugarerImpl(
+    pkgDesugarer,
     defnDesugarer,
     declDesugarer,
     evaluatedTermDesugarer,
     treeDesugarer
   )
+
+  test("desugar Pkg") {
+    val pkg =
+      q"""
+      package a.b {
+        object C {
+          val x = func
+        }
+      }
+      """
+
+    val desugaredPkg =
+      q"""
+      package a.b {
+        object C {
+          val x = func()
+        }
+      }
+      """
+
+    doReturn(desugaredPkg).when(pkgDesugarer).desugar(eqTree(pkg))
+
+    statDesugarer.desugar(pkg).structure shouldBe desugaredPkg.structure
+  }
 
   test("desugar Defn") {
     val defn = q"val x = calc"
@@ -77,11 +103,5 @@ class StatDesugarerImplTest extends UnitTestSuite {
     val `import` = q"import a.b.c"
 
     statDesugarer.desugar(`import`).structure shouldBe `import`.structure
-  }
-
-  test("desugar Pkg") {
-    val pkg = q"package a.b.c"
-
-    statDesugarer.desugar(pkg).structure shouldBe pkg.structure
   }
 }
