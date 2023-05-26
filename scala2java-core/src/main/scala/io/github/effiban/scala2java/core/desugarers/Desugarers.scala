@@ -26,11 +26,9 @@ class Desugarers(implicit predicates: Predicates,
 
   private lazy val defnObjectDesugarer: DefnObjectDesugarer = new DefnObjectDesugarerImpl(templateDesugarer)
 
-  private lazy val evaluatedTermApplyTypeDesugarer: EvaluatedTermApplyTypeDesugarer = new EvaluatedTermApplyTypeDesugarerImpl()
-
   private lazy val evaluatedTermDesugarer: EvaluatedTermDesugarer = new EvaluatedTermDesugarerImpl(
     evaluatedTermRefDesugarer,
-    evaluatedTermApplyTypeDesugarer,
+    termApplyTypeDesugarer,
     treeDesugarer)
 
   private lazy val evaluatedTermNameDesugarer: EvaluatedTermNameDesugarer = new EvaluatedTermNameDesugarerImpl(
@@ -44,12 +42,12 @@ class Desugarers(implicit predicates: Predicates,
     treeDesugarer
   )
 
-  private lazy val evaluatedTermSelectByQualifierDesugarer = new EvaluatedTermSelectByQualifierDesugarerImpl(evaluatedTermDesugarer)
+  private lazy val evaluatedTermSelectQualDesugarer = new EvaluatedTermSelectQualDesugarerImpl(evaluatedTermDesugarer)
 
   private lazy val evaluatedTermSelectDesugarer: EvaluatedTermSelectDesugarer = new EvaluatedTermSelectDesugarerImpl(
     qualifierTypeInferrer,
     compositeTermSelectSupportsNoArgInvocation,
-    evaluatedTermSelectByQualifierDesugarer
+    evaluatedTermSelectQualDesugarer
   )
 
   private lazy val pkgDesugarer: PkgDesugarer = new PkgDesugarerImpl(statDesugarer)
@@ -65,6 +63,8 @@ class Desugarers(implicit predicates: Predicates,
   )
 
   private lazy val templateDesugarer: SameTypeDesugarer[Template] = new DefaultSameTypeDesugarer[Template](treeDesugarer)
+
+  private lazy val termApplyTypeDesugarer: TermApplyTypeDesugarer = new TermApplyTypeDesugarerImpl()
 
   private lazy val termParamDesugarer: TermParamDesugarer = new TermParamDesugarerImpl(evaluatedTermDesugarer)
 
