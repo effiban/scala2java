@@ -159,19 +159,10 @@ class ScalaTreeTraversers(implicit predicates: Predicates,
     new CompositeInvocationArgByNamePredicate(CoreInvocationArgByNamePredicate)
   )
 
-  private lazy val funMainApplyTypeTraverser: MainApplyTypeTraverser = mainApplyTypeTraverser(funStandardApplyTypeTraverser)
-
-  private lazy val funStandardApplyTypeTraverser: StandardApplyTypeTraverser = new FunStandardApplyTypeTraverser(
-    funTermSelectTraverser,
-    typeTraverser,
-    typeListRenderer,
-    termApplyTypeFunTraverser
-  )
-
   private lazy val defaultTermTraverser: DefaultTermTraverser = new DefaultTermTraverserImpl(
     defaultTermRefTraverser,
     termApplyTraverser,
-    funMainApplyTypeTraverser,
+    mainApplyTypeTraverser,
     termApplyInfixTraverser,
     assignTraverser,
     returnTraverser,
@@ -271,15 +262,12 @@ class ScalaTreeTraversers(implicit predicates: Predicates,
 
   private lazy val etaTraverser: EtaTraverser = new EtaTraverserImpl(expressionTermTraverser)
 
-  private val expressionMainApplyTypeTraverser: MainApplyTypeTraverser =
-    mainApplyTypeTraverser(new EvaluatedStandardApplyTypeTraverser(termApplyTraverser))
-
   private lazy val expressionTermTraverser: ExpressionTermTraverser = new ExpressionTermTraverserImpl(
     ifTraverser,
     statTraverser,
     termApplyTraverser,
     expressionTermRefTraverser,
-    expressionMainApplyTypeTraverser,
+    mainApplyTypeTraverser,
     defaultTermTraverser
   )
 
@@ -335,7 +323,7 @@ class ScalaTreeTraversers(implicit predicates: Predicates,
     compositeInvocationArgTraverser
   )
 
-  private def mainApplyTypeTraverser(standardApplyTypeTraverser: StandardApplyTypeTraverser): MainApplyTypeTraverser =
+  private lazy val mainApplyTypeTraverser: MainApplyTypeTraverser =
     new MainApplyTypeTraverserImpl(
       classOfTraverser,
       classOfRenderer,
@@ -428,8 +416,15 @@ class ScalaTreeTraversers(implicit predicates: Predicates,
       termNameTraverser(statTermTraverser),
       expressionTermSelectTraverser(statTermTraverser)
     ),
-    expressionMainApplyTypeTraverser,
+    mainApplyTypeTraverser,
     defaultTermTraverser
+  )
+
+  private lazy val standardApplyTypeTraverser: StandardApplyTypeTraverser = new StandardApplyTypeTraverserImpl(
+    funTermSelectTraverser,
+    typeTraverser,
+    typeListRenderer,
+    termApplyTypeFunTraverser
   )
 
   private lazy val superTraverser: SuperTraverser = new SuperTraverserImpl(nameTraverser)
@@ -489,7 +484,7 @@ class ScalaTreeTraversers(implicit predicates: Predicates,
    */
   private lazy val termApplyFunTraverser: TermTraverser = new FunOverridingTermTraverser(
     funTermRefTraverser,
-    funMainApplyTypeTraverser,
+    mainApplyTypeTraverser,
     expressionTermTraverser
   )
 
@@ -499,7 +494,7 @@ class ScalaTreeTraversers(implicit predicates: Predicates,
    */
   private lazy val termApplyTypeFunTraverser: TermTraverser = new FunOverridingTermTraverser(
     funTermRefTraverser,
-    expressionMainApplyTypeTraverser,
+    mainApplyTypeTraverser,
     expressionTermTraverser
   )
 
