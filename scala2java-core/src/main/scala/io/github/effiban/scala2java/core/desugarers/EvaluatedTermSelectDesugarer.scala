@@ -10,7 +10,7 @@ trait EvaluatedTermSelectDesugarer extends DifferentTypeDesugarer[Term.Select, T
 
 private[desugarers] class EvaluatedTermSelectDesugarerImpl(qualifierTypeInferrer: QualifierTypeInferrer,
                                                            termSelectSupportsNoArgInvocation: TermSelectSupportsNoArgInvocation,
-                                                           evaluatedTermSelectByQualifierDesugarer: => EvaluatedTermSelectByQualifierDesugarer)
+                                                           evaluatedTermSelectQualDesugarer: => EvaluatedTermSelectQualDesugarer)
   extends EvaluatedTermSelectDesugarer {
 
   override def desugar(termSelect: Term.Select): Term = {
@@ -19,7 +19,7 @@ private[desugarers] class EvaluatedTermSelectDesugarerImpl(qualifierTypeInferrer
     if (termSelectSupportsNoArgInvocation(termSelect, context)) {
       Term.Apply(termSelect, Nil)
     } else {
-      evaluatedTermSelectByQualifierDesugarer.desugar(termSelect)
+      evaluatedTermSelectQualDesugarer.desugar(termSelect)
     }
   }
 }

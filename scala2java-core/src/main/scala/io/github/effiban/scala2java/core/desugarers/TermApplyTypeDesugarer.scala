@@ -4,9 +4,9 @@ import io.github.effiban.scala2java.core.entities.TermNameValues.ScalaClassOf
 
 import scala.meta.Term
 
-trait EvaluatedTermApplyTypeDesugarer extends DifferentTypeDesugarer[Term.ApplyType, Term]
+trait TermApplyTypeDesugarer extends DifferentTypeDesugarer[Term.ApplyType, Term]
 
-private[desugarers] class EvaluatedTermApplyTypeDesugarerImpl() extends EvaluatedTermApplyTypeDesugarer {
+private[desugarers] class TermApplyTypeDesugarerImpl() extends TermApplyTypeDesugarer {
 
   override def desugar(termApplyType: Term.ApplyType): Term = termApplyType.fun match {
       case Term.Name(ScalaClassOf) => termApplyType

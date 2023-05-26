@@ -6,7 +6,7 @@ import scala.meta.{Term, Transformer, Tree}
 trait EvaluatedTermDesugarer extends SameTypeDesugarer[Term]
 
 private[desugarers] class EvaluatedTermDesugarerImpl(evaluatedTermRefDesugarer: => EvaluatedTermRefDesugarer,
-                                                     evaluatedTermApplyTypeDesugarer: => EvaluatedTermApplyTypeDesugarer,
+                                                     termApplyTypeDesugarer: => TermApplyTypeDesugarer,
                                                      treeDesugarer: => TreeDesugarer) extends EvaluatedTermDesugarer {
 
   def desugar(term: Term): Term = DesugaringTransformer(term) match {
@@ -20,7 +20,7 @@ private[desugarers] class EvaluatedTermDesugarerImpl(evaluatedTermRefDesugarer: 
       aTree match {
         case termRef: Term.Ref => evaluatedTermRefDesugarer.desugar(termRef)
         case apply: Term.Apply => apply // TODO
-        case applyType: ApplyType => evaluatedTermApplyTypeDesugarer.desugar(applyType)
+        case applyType: ApplyType => termApplyTypeDesugarer.desugar(applyType)
         case applyInfix: Term.ApplyInfix => applyInfix // TODO
         case assign: Assign => assign // TODO
         case eta: Eta => eta // TODO

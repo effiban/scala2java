@@ -5,10 +5,10 @@ import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.XtensionQuasiquoteTerm
 
-class EvaluatedTermSelectByQualifierDesugarerImplTest extends UnitTestSuite {
+class EvaluatedTermSelectQualDesugarerImplTest extends UnitTestSuite {
 
   private val evaluatedTermDesugarer = mock[EvaluatedTermDesugarer]
-  private val evaluatedTermSelectByQualifierDesugarer = new EvaluatedTermSelectByQualifierDesugarerImpl(evaluatedTermDesugarer)
+  private val evaluatedTermSelectQualDesugarer = new EvaluatedTermSelectQualDesugarerImpl(evaluatedTermDesugarer)
 
   test("desugar") {
     val qual = q"func"
@@ -19,7 +19,7 @@ class EvaluatedTermSelectByQualifierDesugarerImplTest extends UnitTestSuite {
 
     doReturn(desugaredQual).when(evaluatedTermDesugarer).desugar(eqTree(qual))
 
-    evaluatedTermSelectByQualifierDesugarer.desugar(termSelect).structure shouldBe desugaredTermSelect.structure
+    evaluatedTermSelectQualDesugarer.desugar(termSelect).structure shouldBe desugaredTermSelect.structure
 
   }
 
