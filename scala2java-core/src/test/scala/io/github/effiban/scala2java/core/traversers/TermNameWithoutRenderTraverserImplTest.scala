@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.transformers.InternalTermNameTransformer
+import io.github.effiban.scala2java.spi.transformers.TermNameTransformer
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.XtensionQuasiquoteTerm
@@ -9,7 +9,7 @@ import scala.meta.XtensionQuasiquoteTerm
 class TermNameWithoutRenderTraverserImplTest extends UnitTestSuite {
 
   private val termTraverser = mock[TermTraverser]
-  private val termNameTransformer = mock[InternalTermNameTransformer]
+  private val termNameTransformer = mock[TermNameTransformer]
 
   private val termNameWithoutRenderTraverser = new TermNameWithoutRenderTraverserImpl(
     termTraverser,
@@ -20,7 +20,7 @@ class TermNameWithoutRenderTraverserImplTest extends UnitTestSuite {
     val inputTermName = q"in"
     val outputTermName = q"out"
 
-    when(termNameTransformer.transform(eqTree(inputTermName))).thenReturn(outputTermName)
+    when(termNameTransformer.transform(eqTree(inputTermName))).thenReturn(Some(outputTermName))
 
     termNameWithoutRenderTraverser.traverse(inputTermName).value.structure shouldBe outputTermName.structure
   }
@@ -29,10 +29,18 @@ class TermNameWithoutRenderTraverserImplTest extends UnitTestSuite {
     val termName = q"in"
     val termSelect = q"a.in"
 
-    when(termNameTransformer.transform(eqTree(termName))).thenReturn(termSelect)
+    when(termNameTransformer.transform(eqTree(termName))).thenReturn(Some(termSelect))
 
     termNameWithoutRenderTraverser.traverse(termName) shouldBe None
 
     verify(termTraverser).traverse(eqTree(termSelect))
+  }
+
+  test("traverse when transformer returns None should return the input Term.Name") {
+    val termName = q"in"
+
+    when(termNameTransformer.transform(eqTree(termName))).thenReturn(None)
+
+    termNameWithoutRenderTraverser.traverse(termName).value.structure shouldBe termName.structure
   }
 }
