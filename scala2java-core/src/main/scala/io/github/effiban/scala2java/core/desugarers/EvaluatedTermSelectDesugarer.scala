@@ -9,12 +9,17 @@ import scala.meta.Term
 trait EvaluatedTermSelectDesugarer extends DifferentTypeDesugarer[Term.Select, Term]
 
 private[desugarers] class EvaluatedTermSelectDesugarerImpl(qualifierTypeInferrer: QualifierTypeInferrer,
-                                                           termSelectSupportsNoArgInvocation: TermSelectSupportsNoArgInvocation)
+                                                           termSelectSupportsNoArgInvocation: TermSelectSupportsNoArgInvocation,
+                                                           evaluatedTermSelectByQualifierDesugarer: => EvaluatedTermSelectByQualifierDesugarer)
   extends EvaluatedTermSelectDesugarer {
 
   override def desugar(termSelect: Term.Select): Term = {
     val maybeQualType = qualifierTypeInferrer.infer(termSelect)
     val context = TermSelectInferenceContext(maybeQualType)
-    if (termSelectSupportsNoArgInvocation(termSelect, context)) Term.Apply(termSelect, Nil) else termSelect
+    if (termSelectSupportsNoArgInvocation(termSelect, context)) {
+      Term.Apply(termSelect, Nil)
+    } else {
+      evaluatedTermSelectByQualifierDesugarer.desugar(termSelect)
+    }
   }
 }

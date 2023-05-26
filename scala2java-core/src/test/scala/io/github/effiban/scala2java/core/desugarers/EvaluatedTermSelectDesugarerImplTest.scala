@@ -13,10 +13,14 @@ class EvaluatedTermSelectDesugarerImplTest extends UnitTestSuite {
 
   private val qualifierTypeInferrer = mock[QualifierTypeInferrer]
   private val termSelectSupportsNoArgInvocation = mock[TermSelectSupportsNoArgInvocation]
+  private val evaluatedTermSelectByQualifierDesugarer = mock[EvaluatedTermSelectByQualifierDesugarer]
 
-  private val evaluatedTermSelectDesugarer = new EvaluatedTermSelectDesugarerImpl(qualifierTypeInferrer, termSelectSupportsNoArgInvocation)
+  private val evaluatedTermSelectDesugarer = new EvaluatedTermSelectDesugarerImpl(
+    qualifierTypeInferrer,
+    termSelectSupportsNoArgInvocation,
+    evaluatedTermSelectByQualifierDesugarer)
 
-  test("desugar when supports no-arg invocation - should return a desugared Term.Apply") {
+  test("desugar when supports no-arg invocation - should return a corresponding Term.Apply") {
     val qualType = t"A"
     val context = TermSelectInferenceContext(Some(qualType))
     val termSelect = q"a.func"
@@ -29,15 +33,17 @@ class EvaluatedTermSelectDesugarerImplTest extends UnitTestSuite {
 
   }
 
-  test("desugar when does not support no-arg invocation - should return unchanged") {
+  test("desugar when does not support no-arg invocation - should return the desugared qualifier with name unchanged") {
     val qualType = t"A"
     val context = TermSelectInferenceContext(Some(qualType))
-    val termSelect = q"a.func"
+    val termSelect = q"(func).x"
+    val desugaredTermSelect = q"(func()).x"
 
     when(qualifierTypeInferrer.infer(eqTree(termSelect))).thenReturn(Some(qualType))
     when(termSelectSupportsNoArgInvocation(eqTree(termSelect), eqTermSelectInferenceContext(context))).thenReturn(false)
+    doReturn(desugaredTermSelect).when(evaluatedTermSelectByQualifierDesugarer).desugar(eqTree(termSelect))
 
-    evaluatedTermSelectDesugarer.desugar(termSelect).structure shouldBe termSelect.structure
+    evaluatedTermSelectDesugarer.desugar(termSelect).structure shouldBe desugaredTermSelect.structure
 
   }
 }

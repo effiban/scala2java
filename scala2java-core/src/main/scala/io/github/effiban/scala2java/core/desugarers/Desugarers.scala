@@ -39,9 +39,12 @@ class Desugarers(implicit predicates: Predicates,
     treeDesugarer
   )
 
+  private lazy val evaluatedTermSelectByQualifierDesugarer = new EvaluatedTermSelectByQualifierDesugarerImpl(evaluatedTermDesugarer)
+
   private lazy val evaluatedTermSelectDesugarer: EvaluatedTermSelectDesugarer = new EvaluatedTermSelectDesugarerImpl(
     qualifierTypeInferrer,
-    compositeTermSelectSupportsNoArgInvocation
+    compositeTermSelectSupportsNoArgInvocation,
+    evaluatedTermSelectByQualifierDesugarer
   )
 
   private lazy val pkgDesugarer: PkgDesugarer = new PkgDesugarerImpl(statDesugarer)
