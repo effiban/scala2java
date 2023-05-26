@@ -1,8 +1,11 @@
 package io.github.effiban.scala2java.core.desugarers
 
+import io.github.effiban.scala2java.core.predicates.Predicates
+
 import scala.meta.{Source, Template}
 
-class Desugarers() {
+class Desugarers(implicit predicates: Predicates) {
+  import predicates._
 
   private lazy val declDefDesugarer: DeclDefDesugarer = new DeclDefDesugarerImpl(termParamDesugarer)
 
@@ -19,7 +22,14 @@ class Desugarers() {
 
   private lazy val evaluatedTermDesugarer: EvaluatedTermDesugarer = new EvaluatedTermDesugarerImpl(evaluatedTermRefDesugarer, treeDesugarer)
 
-  private lazy val evaluatedTermRefDesugarer: EvaluatedTermRefDesugarer = new EvaluatedTermRefDesugarerImpl(treeDesugarer)
+  private lazy val evaluatedTermNameDesugarer: EvaluatedTermNameDesugarer = new EvaluatedTermNameDesugarerImpl(
+    compositeTermNameSupportsNoArgInvocation
+  )
+
+  private lazy val evaluatedTermRefDesugarer: EvaluatedTermRefDesugarer = new EvaluatedTermRefDesugarerImpl(
+    evaluatedTermNameDesugarer,
+    treeDesugarer
+  )
 
   val sourceDesugarer: SameTypeDesugarer[Source] = new DefaultSameTypeDesugarer[Source](treeDesugarer)
 

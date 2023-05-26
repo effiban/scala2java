@@ -4,7 +4,8 @@ import scala.meta.{Term, Transformer, Tree}
 
 trait EvaluatedTermRefDesugarer extends DifferentTypeDesugarer[Term.Ref, Term]
 
-private[desugarers] class EvaluatedTermRefDesugarerImpl(treeDesugarer: => TreeDesugarer) extends EvaluatedTermRefDesugarer {
+private[desugarers] class EvaluatedTermRefDesugarerImpl(evaluatedTermNameDesugarer: => EvaluatedTermNameDesugarer,
+                                                        treeDesugarer: => TreeDesugarer) extends EvaluatedTermRefDesugarer {
   override def desugar(termRef: Term.Ref): Term = DesugaringTransformer(termRef) match {
     case desugaredTerm: Term => desugaredTerm
     case desugared => throw new IllegalStateException(s"The inner transformer should return a Term, but it returned: $desugared")
@@ -14,10 +15,11 @@ private[desugarers] class EvaluatedTermRefDesugarerImpl(treeDesugarer: => TreeDe
 
     override def apply(aTree: Tree): Tree =
       aTree match {
-        case termName: Term.Name => termName // TODO
+        case termName: Term.Name => evaluatedTermNameDesugarer.desugar(termName)
         case termSelect: Term.Select => termSelect // TODO
         case termThis: Term.This => termThis // TODO
         case termSuper: Term.Super => termSuper // TODO
+        case applyUnary: Term.ApplyUnary => applyUnary // TODO
         case otherTermRef: Term.Ref => super.apply(otherTermRef)
         case nonTermRef => treeDesugarer.desugar(nonTermRef)
       }

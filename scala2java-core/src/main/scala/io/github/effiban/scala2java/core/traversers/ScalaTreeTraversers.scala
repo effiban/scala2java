@@ -15,14 +15,15 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 import scala.meta.Term
 import scala.meta.Term.Assign
 
-class ScalaTreeTraversers(implicit javaWriter: JavaWriter, extensionRegistry: ExtensionRegistry) {
+class ScalaTreeTraversers(implicit predicates: Predicates,
+                          javaWriter: JavaWriter,
+                          extensionRegistry: ExtensionRegistry) {
 
   private implicit lazy val typeInferrers: TypeInferrers = new TypeInferrers(factories, predicates)
   private implicit lazy val classifiers: Classifiers = new Classifiers(typeInferrers)
   private implicit lazy val transformers: Transformers = new Transformers(typeInferrers, predicates)
   private implicit lazy val factories: Factories = new Factories(typeInferrers)
   private lazy val resolvers = new Resolvers()
-  private lazy val predicates = new Predicates()
   private lazy val renderers = new Renderers()
 
   import factories._

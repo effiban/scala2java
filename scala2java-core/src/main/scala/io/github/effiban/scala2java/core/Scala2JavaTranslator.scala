@@ -3,6 +3,7 @@ package io.github.effiban.scala2java.core
 import io.github.effiban.scala2java.core.collectors.MainClassInitCollector
 import io.github.effiban.scala2java.core.desugarers.Desugarers
 import io.github.effiban.scala2java.core.extensions.{ExtensionRegistry, ExtensionRegistryBuilder}
+import io.github.effiban.scala2java.core.predicates.Predicates
 import io.github.effiban.scala2java.core.resolvers.JavaFileResolverImpl
 import io.github.effiban.scala2java.core.transformers.CompositeFileNameTransformer
 import io.github.effiban.scala2java.core.traversers.ScalaTreeTraversers
@@ -31,6 +32,7 @@ object Scala2JavaTranslator {
     }
 
     try {
+      implicit val predicates: Predicates = new Predicates()
       val desugaredSource = new Desugarers().sourceDesugarer.desugar(sourceTree)
       new ScalaTreeTraversers().sourceTraverser.traverse(desugaredSource)
     } finally {
