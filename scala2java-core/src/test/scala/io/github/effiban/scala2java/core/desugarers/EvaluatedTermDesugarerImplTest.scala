@@ -8,9 +8,14 @@ import scala.meta.{XtensionQuasiquoteInit, XtensionQuasiquoteTerm}
 class EvaluatedTermDesugarerImplTest extends UnitTestSuite {
 
   private val evaluatedTermRefDesugarer = mock[EvaluatedTermRefDesugarer]
+  private val evaluatedTermApplyTypeDesugarer = mock[EvaluatedTermApplyTypeDesugarer]
   private val treeDesugarer = mock[TreeDesugarer]
 
-  private val evaluatedTermDesugarer = new EvaluatedTermDesugarerImpl(evaluatedTermRefDesugarer, treeDesugarer)
+  private val evaluatedTermDesugarer = new EvaluatedTermDesugarerImpl(
+    evaluatedTermRefDesugarer,
+    evaluatedTermApplyTypeDesugarer,
+    treeDesugarer
+  )
 
   test("desugar Term.Name") {
     val termName = q"func"
@@ -19,6 +24,15 @@ class EvaluatedTermDesugarerImplTest extends UnitTestSuite {
     doReturn(termApply).when(evaluatedTermRefDesugarer).desugar(eqTree(termName))
 
     evaluatedTermDesugarer.desugar(termName).structure shouldBe termApply.structure
+  }
+
+  test("desugar Term.ApplyType") {
+    val termApplyType = q"func[Int]"
+    val termApply = q"func[Int]()"
+
+    doReturn(termApply).when(evaluatedTermApplyTypeDesugarer).desugar(eqTree(termApplyType))
+
+    evaluatedTermDesugarer.desugar(termApplyType).structure shouldBe termApply.structure
   }
 
   test("desugar New") {
