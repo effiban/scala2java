@@ -7,8 +7,11 @@ import scala.meta.{Source, Template}
 
 class Desugarers(implicit predicates: Predicates,
                  typeInferrers: TypeInferrers) {
+
   import predicates._
   import typeInferrers._
+
+  private lazy val applyUnaryDesugarer: ApplyUnaryDesugarer = new ApplyUnaryDesugarerImpl(evaluatedTermDesugarer)
 
   private lazy val declDefDesugarer: DeclDefDesugarer = new DeclDefDesugarerImpl(termParamDesugarer)
 
@@ -32,6 +35,7 @@ class Desugarers(implicit predicates: Predicates,
   private lazy val evaluatedTermRefDesugarer: EvaluatedTermRefDesugarer = new EvaluatedTermRefDesugarerImpl(
     evaluatedTermNameDesugarer,
     evaluatedTermSelectDesugarer,
+    applyUnaryDesugarer,
     treeDesugarer
   )
 
