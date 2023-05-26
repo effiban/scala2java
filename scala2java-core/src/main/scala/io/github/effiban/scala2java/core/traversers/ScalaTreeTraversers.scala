@@ -289,8 +289,7 @@ class ScalaTreeTraversers(implicit predicates: Predicates,
   )
 
   private lazy val expressionTermSelectTraverser: ExpressionTermSelectTraverser = expressionTermSelectTraverser(
-    expressionTermTraverser,
-    evaluatedInternalTermSelectTransformer
+    expressionTermTraverser
   )
 
   private lazy val finallyTraverser: FinallyTraverser = new FinallyTraverserImpl(blockTraverser)
@@ -427,7 +426,7 @@ class ScalaTreeTraversers(implicit predicates: Predicates,
   private lazy val statTermTraverser: TermTraverser = new FunOverridingTermTraverser(
     expressionTermRefTraverser(
       termNameTraverser(statTermTraverser),
-      expressionTermSelectTraverser(statTermTraverser, evaluatedInternalTermSelectTransformer)
+      expressionTermSelectTraverser(statTermTraverser)
     ),
     expressionMainApplyTypeTraverser,
     defaultTermTraverser
@@ -558,8 +557,7 @@ class ScalaTreeTraversers(implicit predicates: Predicates,
 
   private lazy val termRepeatedTraverser: TermRepeatedTraverser = new TermRepeatedTraverserImpl(expressionTermTraverser)
 
-  private def expressionTermSelectTraverser(transformedTermTraverser: => TermTraverser,
-                                            internalTermSelectTransformer: => InternalTermSelectTransformer): ExpressionTermSelectTraverser =
+  private def expressionTermSelectTraverser(transformedTermTraverser: => TermTraverser): ExpressionTermSelectTraverser =
     new ExpressionTermSelectTraverserImpl(
       qualifierTraverser = expressionTermTraverser,
       transformedTermTraverser = transformedTermTraverser,
@@ -567,7 +565,7 @@ class ScalaTreeTraversers(implicit predicates: Predicates,
       typeTraverser,
       typeListRenderer,
       qualifierTypeInferrer,
-      internalTermSelectTransformer
+      new CompositeTermSelectTransformer(CoreTermSelectTransformer)
     )
 
   private lazy val termTupleTraverser: TermTupleTraverser = new TermTupleTraverserImpl(

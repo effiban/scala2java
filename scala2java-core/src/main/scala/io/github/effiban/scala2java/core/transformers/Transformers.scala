@@ -16,15 +16,6 @@ class Transformers(typeInferrers: => TypeInferrers,
     termSelectTermFunctionTransformer
   )
 
-  lazy val defaultInternalTermSelectTransformer: InternalTermSelectTransformer = new DefaultInternalTermSelectTransformer(
-    new CompositeTermSelectTransformer(CoreTermSelectTransformer)
-  )
-
-  lazy val evaluatedInternalTermSelectTransformer: EvaluatedInternalTermSelectTransformer = new EvaluatedInternalTermSelectTransformer(
-    defaultInternalTermSelectTransformer,
-    predicates.compositeTermSelectSupportsNoArgInvocation
-  )
-
   lazy val internalTermApplyTransformer: InternalTermApplyTransformer = new InternalTermApplyTransformerImpl(
     new CompositeTermApplyTransformer(coreTermApplyTransformer),
     predicates.compositeTermNameHasApplyMethod

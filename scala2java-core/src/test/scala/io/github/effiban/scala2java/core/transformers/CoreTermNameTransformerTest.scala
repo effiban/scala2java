@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.transformers
 
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TermNames
-import io.github.effiban.scala2java.core.testtrees.TermNames.{Empty, ScalaNil, ScalaNone, ScalaOption}
+import io.github.effiban.scala2java.core.testtrees.TermNames._
 import io.github.effiban.scala2java.core.transformers.CoreTermNameTransformer.transform
 
 import scala.meta.{Term, XtensionQuasiquoteTerm}
@@ -11,8 +11,8 @@ class CoreTermNameTransformerTest extends UnitTestSuite {
 
   private final val MappedScenarios = Table(
     ("Term Name", "Expected Term"),
-    (ScalaNone, Term.Select(ScalaOption, Empty)),
-    (ScalaNil, Term.Select(TermNames.List, Empty))
+    (ScalaNone, Term.Apply(Term.Select(JavaOptional, JavaAbsent), Nil)),
+    (ScalaNil, Term.Apply(Term.Select(TermNames.List, JavaOf), Nil))
   )
 
   private final val UnmappedScenarios = Table(
