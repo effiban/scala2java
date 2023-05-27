@@ -23,13 +23,6 @@ trait ExtendedPredicates {
   def importerExcludedPredicate(): ImporterExcludedPredicate = ImporterExcludedPredicate.None
 
 
-  /** Override this method if you need to indicate that an invocation argument is be passed by-name
-   *
-   * @return if overriden - a predicate which determines whether a given invocation argument is passed by-name
-   *         otherwise - the default predicate which always returns `false`, meaning passed by-value<br>
-   */
-  def invocationArgByNamePredicate(): InvocationArgByNamePredicate = InvocationArgByNamePredicate.Default
-
   /** Override this method if you need to exclude [[scala.meta.Init]]-s (parents) of a class/trait/object in the corresponding Java type.<br>
    *
    * @return if overriden - a predicate which determines whether to exclude a [[scala.meta.Init]]<br>

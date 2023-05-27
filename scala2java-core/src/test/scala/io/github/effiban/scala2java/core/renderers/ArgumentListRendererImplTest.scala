@@ -22,7 +22,7 @@ class ArgumentListRendererImplTest extends UnitTestSuite {
 
 
   test("render() when one arg, multi-line and no wrapping delimiter") {
-    doWrite("arg1").when(argumentRenderer).render(eqTree(arg1), eqArgumentContext(ArgumentContext(index = 0)))
+    doWrite("arg1").when(argumentRenderer).render(eqTree(arg1), eqArgumentContext(ArgumentContext()))
 
     argumentListRenderer.render(args = List(arg1), argRenderer = argumentRenderer)
 
@@ -30,8 +30,8 @@ class ArgumentListRendererImplTest extends UnitTestSuite {
   }
 
   test("render() when two args, multi-line and no wrapping delimiter") {
-    doWrite("arg1").when(argumentRenderer).render(eqTree(arg1), eqArgumentContext(ArgumentContext(index = 0)))
-    doWrite("arg2").when(argumentRenderer).render(eqTree(arg2), eqArgumentContext(ArgumentContext(index = 1)))
+    doWrite("arg1").when(argumentRenderer).render(eqTree(arg1), eqArgumentContext(ArgumentContext()))
+    doWrite("arg2").when(argumentRenderer).render(eqTree(arg2), eqArgumentContext(ArgumentContext()))
 
     argumentListRenderer.render(args = List(arg1, arg2), argRenderer = argumentRenderer)
 
@@ -39,9 +39,9 @@ class ArgumentListRendererImplTest extends UnitTestSuite {
   }
 
   test("render() when three args, multi-line and no wrapping delimiter") {
-    doWrite("arg1").when(argumentRenderer).render(eqTree(arg1), eqArgumentContext(ArgumentContext(index = 0)))
-    doWrite("arg2").when(argumentRenderer).render(eqTree(arg2), eqArgumentContext(ArgumentContext(index = 1)))
-    doWrite("arg3").when(argumentRenderer).render(eqTree(arg3), eqArgumentContext(ArgumentContext(index = 2)))
+    doWrite("arg1").when(argumentRenderer).render(eqTree(arg1), eqArgumentContext(ArgumentContext()))
+    doWrite("arg2").when(argumentRenderer).render(eqTree(arg2), eqArgumentContext(ArgumentContext()))
+    doWrite("arg3").when(argumentRenderer).render(eqTree(arg3), eqArgumentContext(ArgumentContext()))
 
     argumentListRenderer.render(
       args = List(arg1, arg2, arg3),
@@ -55,7 +55,7 @@ class ArgumentListRendererImplTest extends UnitTestSuite {
   }
 
   test("render() when one arg, single-line and no wrapping delimiter") {
-    doWrite("arg1").when(argumentRenderer).render(eqTree(arg1), eqArgumentContext(ArgumentContext(index = 0)))
+    doWrite("arg1").when(argumentRenderer).render(eqTree(arg1), eqArgumentContext(ArgumentContext()))
 
     argumentListRenderer.render(
       args = List(arg1),
@@ -67,8 +67,8 @@ class ArgumentListRendererImplTest extends UnitTestSuite {
   }
 
   test("render() when two args, single-line and no wrapping delimiter") {
-    doWrite("arg1").when(argumentRenderer).render(eqTree(arg1), eqArgumentContext(ArgumentContext(index = 0)))
-    doWrite("arg2").when(argumentRenderer).render(eqTree(arg2), eqArgumentContext(ArgumentContext(index = 1)))
+    doWrite("arg1").when(argumentRenderer).render(eqTree(arg1), eqArgumentContext(ArgumentContext()))
+    doWrite("arg2").when(argumentRenderer).render(eqTree(arg2), eqArgumentContext(ArgumentContext()))
 
     argumentListRenderer.render(
       args = List(arg1, arg2),
@@ -80,9 +80,9 @@ class ArgumentListRendererImplTest extends UnitTestSuite {
   }
 
   test("render() when three args, single-line and no wrapping delimiter") {
-    doWrite("arg1").when(argumentRenderer).render(eqTree(arg1), eqArgumentContext(ArgumentContext(index = 0)))
-    doWrite("arg2").when(argumentRenderer).render(eqTree(arg2), eqArgumentContext(ArgumentContext(index = 1)))
-    doWrite("arg3").when(argumentRenderer).render(eqTree(arg3), eqArgumentContext(ArgumentContext(index = 2)))
+    doWrite("arg1").when(argumentRenderer).render(eqTree(arg1), eqArgumentContext(ArgumentContext()))
+    doWrite("arg2").when(argumentRenderer).render(eqTree(arg2), eqArgumentContext(ArgumentContext()))
+    doWrite("arg3").when(argumentRenderer).render(eqTree(arg3), eqArgumentContext(ArgumentContext()))
 
     argumentListRenderer.render(
       args = List(arg1, arg2, arg3),
@@ -122,7 +122,7 @@ class ArgumentListRendererImplTest extends UnitTestSuite {
   }
 
   test("render() when one arg, single-line and parentheses") {
-    doWrite("arg1").when(argumentRenderer).render(eqTree(arg1), eqArgumentContext(ArgumentContext(index = 0)))
+    doWrite("arg1").when(argumentRenderer).render(eqTree(arg1), eqArgumentContext(ArgumentContext()))
 
     argumentListRenderer.render(
       args = List(arg1),
@@ -134,8 +134,8 @@ class ArgumentListRendererImplTest extends UnitTestSuite {
   }
 
   test("render() when two args, single-line and parentheses") {
-    doWrite("arg1").when(argumentRenderer).render(eqTree(arg1), eqArgumentContext(ArgumentContext(index = 0)))
-    doWrite("arg2").when(argumentRenderer).render(eqTree(arg2), eqArgumentContext(ArgumentContext(index = 1)))
+    doWrite("arg1").when(argumentRenderer).render(eqTree(arg1), eqArgumentContext(ArgumentContext()))
+    doWrite("arg2").when(argumentRenderer).render(eqTree(arg2), eqArgumentContext(ArgumentContext()))
 
     argumentListRenderer.render(
       args = List(arg1, arg2),
@@ -147,9 +147,9 @@ class ArgumentListRendererImplTest extends UnitTestSuite {
   }
 
   test("render() when three args, single-line and parentheses") {
-    doWrite("arg1").when(argumentRenderer).render(eqTree(arg1), eqArgumentContext(ArgumentContext(index = 0)))
-    doWrite("arg2").when(argumentRenderer).render(eqTree(arg2), eqArgumentContext(ArgumentContext(index = 1)))
-    doWrite("arg3").when(argumentRenderer).render(eqTree(arg3), eqArgumentContext(ArgumentContext(index = 2)))
+    doWrite("arg1").when(argumentRenderer).render(eqTree(arg1), eqArgumentContext(ArgumentContext()))
+    doWrite("arg2").when(argumentRenderer).render(eqTree(arg2), eqArgumentContext(ArgumentContext()))
+    doWrite("arg3").when(argumentRenderer).render(eqTree(arg3), eqArgumentContext(ArgumentContext()))
 
     argumentListRenderer.render(
       args = List(arg1, arg2, arg3),
@@ -166,14 +166,13 @@ class ArgumentListRendererImplTest extends UnitTestSuite {
     doWrite("arg1")
       .when(argumentRenderer).render(
       eqTree(arg1),
-      eqArgumentContext(ArgumentContext(maybeParent = Some(methodInvocation), index = 0))
+      eqArgumentContext(ArgumentContext())
     )
 
     argumentListRenderer.render(
       args = List(arg1),
       argRenderer = argumentRenderer,
       ArgumentListContext(
-        maybeParent = Some(methodInvocation),
         options = ListTraversalOptions(onSameLine = true, maybeEnclosingDelimiter = Some(Parentheses))
       )
     )
@@ -185,7 +184,7 @@ class ArgumentListRendererImplTest extends UnitTestSuite {
     doWrite("arg1")
       .when(argumentRenderer).render(
       eqTree(arg1),
-      eqArgumentContext(ArgumentContext(index = 0, argNameAsComment = true))
+      eqArgumentContext(ArgumentContext(argNameAsComment = true))
     )
 
     argumentListRenderer.render(

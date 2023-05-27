@@ -51,7 +51,6 @@ class TermApplyTraverserImplTest extends UnitTestSuite {
     val expectedTransformationContext = TermApplyTransformationContext(maybeParentType = Some(t"MyParent"))
 
     val expectedArgListContext = ArgumentListContext(
-      maybeParent = Some(transformedTermApply),
       options = ListTraversalOptions(maybeEnclosingDelimiter = Some(Parentheses), traverseEmpty = true),
       argNameAsComment = true
     )

@@ -23,19 +23,6 @@ class ExtendedPredicatesTest extends UnitTestSuite {
     extensionRegistry.importerExcludedPredicates shouldBe importerExcludedPredicates
   }
 
-  test("invocationArgByNamePredicates") {
-    val invocationArgByNamePredicate1 = mock[InvocationArgByNamePredicate]
-    val invocationArgByNamePredicate2 = mock[InvocationArgByNamePredicate]
-    val invocationArgByNamePredicates = List(invocationArgByNamePredicate1, invocationArgByNamePredicate2)
-
-    when(extension1.invocationArgByNamePredicate()).thenReturn(invocationArgByNamePredicate1)
-    when(extension2.invocationArgByNamePredicate()).thenReturn(invocationArgByNamePredicate2)
-
-    val extensionRegistry = ExtensionRegistry(extensions)
-
-    extensionRegistry.invocationArgByNamePredicates shouldBe invocationArgByNamePredicates
-  }
-
   test("templateInitExcludedPredicates") {
     val templateInitExcludedPredicate1 = mock[TemplateInitExcludedPredicate]
     val templateInitExcludedPredicate2 = mock[TemplateInitExcludedPredicate]

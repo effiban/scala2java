@@ -127,19 +127,21 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
     termApplyTransformer.transform(scalaTermApply, DummyContext).structure shouldBe expectedJavaTermApply.structure
   }
 
-  test("transform 'Try.apply(1)' should return 'Try.ofSupplier(1)'") {
-    val args = List(q"1")
-    val scalaTermApply = Term.Apply(Term.Select(Try, Apply), args)
-    val expectedJavaTermApply = Term.Apply(Term.Select(Try, JavaOfSupplier), args)
+  test("transform 'Try.apply(1)' should return 'Try.ofSupplier(() => 1)'") {
+    val scalaArgs = List(q"1")
+    val expectedJavaArgs = List(q"() => 1")
+    val scalaTermApply = Term.Apply(Term.Select(Try, Apply), scalaArgs)
+    val expectedJavaTermApply = Term.Apply(Term.Select(Try, JavaOfSupplier), expectedJavaArgs)
 
     termApplyTransformer.transform(scalaTermApply, DummyContext).structure shouldBe expectedJavaTermApply.structure
   }
 
-  test("transform 'Try.apply[Int](1)' should return 'Try.ofSupplier[Int](1)'") {
-    val args = List(q"1")
+  test("transform 'Try.apply[Int](1)' should return 'Try.ofSupplier[Int](() => 1)'") {
+    val scalaArgs = List(q"1")
+    val expectedJavaArgs = List(q"() => 1")
     val typeArgs = List(TypeNames.Int)
-    val scalaTermApply = Term.Apply(Term.ApplyType(Term.Select(Try, Apply), typeArgs), args)
-    val expectedJavaTermApply = Term.Apply(Term.ApplyType(Term.Select(Try, JavaOfSupplier), typeArgs), args)
+    val scalaTermApply = Term.Apply(Term.ApplyType(Term.Select(Try, Apply), typeArgs), scalaArgs)
+    val expectedJavaTermApply = Term.Apply(Term.ApplyType(Term.Select(Try, JavaOfSupplier), typeArgs), expectedJavaArgs)
 
     termApplyTransformer.transform(scalaTermApply, DummyContext).structure shouldBe expectedJavaTermApply.structure
   }
@@ -178,19 +180,21 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
     termApplyTransformer.transform(scalaTermApply, DummyContext).structure shouldBe expectedJavaTermApply.structure
   }
 
-  test("transform 'Future.apply(1)' should return 'CompletableFuture.supplyAsync(1)'") {
-    val args = List(q"1")
-    val scalaTermApply = Term.Apply(Term.Select(TermNames.Future, Apply), args)
-    val expectedJavaTermApply = Term.Apply(Term.Select(JavaCompletableFuture, JavaSupplyAsync), args)
+  test("transform 'Future.apply(1)' should return 'CompletableFuture.supplyAsync(() => 1)'") {
+    val scalaArgs = List(q"1")
+    val expectedJavaArgs = List(q"() => 1")
+    val scalaTermApply = Term.Apply(Term.Select(TermNames.Future, Apply), scalaArgs)
+    val expectedJavaTermApply = Term.Apply(Term.Select(JavaCompletableFuture, JavaSupplyAsync), expectedJavaArgs)
 
     termApplyTransformer.transform(scalaTermApply, DummyContext).structure shouldBe expectedJavaTermApply.structure
   }
 
-  test("transform 'Future.apply[Int](1)' should return 'CompletableFuture.supplyAsync[Int](1)'") {
-    val args = List(q"1")
+  test("transform 'Future.apply[Int](1)' should return 'CompletableFuture.supplyAsync[Int](() => 1)'") {
+    val scalaArgs = List(q"1")
+    val expectedJavaArgs = List(q"() => 1")
     val typeArgs = List(TypeNames.Int)
-    val scalaTermApply = Term.Apply(Term.ApplyType(Term.Select(TermNames.Future, Apply), typeArgs), args)
-    val expectedJavaTermApply = Term.Apply(Term.ApplyType(Term.Select(JavaCompletableFuture, JavaSupplyAsync), typeArgs), args)
+    val scalaTermApply = Term.Apply(Term.ApplyType(Term.Select(TermNames.Future, Apply), typeArgs), scalaArgs)
+    val expectedJavaTermApply = Term.Apply(Term.ApplyType(Term.Select(JavaCompletableFuture, JavaSupplyAsync), typeArgs), expectedJavaArgs)
 
     termApplyTransformer.transform(scalaTermApply, DummyContext).structure shouldBe expectedJavaTermApply.structure
   }
