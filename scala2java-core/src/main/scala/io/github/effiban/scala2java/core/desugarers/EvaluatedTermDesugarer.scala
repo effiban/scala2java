@@ -8,6 +8,7 @@ trait EvaluatedTermDesugarer extends SameTypeDesugarer[Term]
 private[desugarers] class EvaluatedTermDesugarerImpl(evaluatedTermRefDesugarer: => EvaluatedTermRefDesugarer,
                                                      termApplyDesugarer: => TermApplyDesugarer,
                                                      termApplyTypeDesugarer: => TermApplyTypeDesugarer,
+                                                     termApplyInfixDesugarer: => TermApplyInfixDesugarer,
                                                      treeDesugarer: => TreeDesugarer) extends EvaluatedTermDesugarer {
 
   def desugar(term: Term): Term = DesugaringTransformer(term) match {
@@ -22,7 +23,7 @@ private[desugarers] class EvaluatedTermDesugarerImpl(evaluatedTermRefDesugarer: 
         case termRef: Term.Ref => evaluatedTermRefDesugarer.desugar(termRef)
         case apply: Term.Apply => termApplyDesugarer.desugar(apply)
         case applyType: ApplyType => termApplyTypeDesugarer.desugar(applyType)
-        case applyInfix: Term.ApplyInfix => applyInfix // TODO
+        case applyInfix: Term.ApplyInfix => termApplyInfixDesugarer.desugar(applyInfix)
         case assign: Assign => assign // TODO
         case eta: Eta => eta // TODO
         case interpolate: Term.Interpolate => interpolate // TODO

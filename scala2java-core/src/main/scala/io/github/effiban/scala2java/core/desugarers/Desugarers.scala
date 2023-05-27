@@ -30,6 +30,7 @@ class Desugarers(implicit predicates: Predicates,
     evaluatedTermRefDesugarer,
     termApplyDesugarer,
     termApplyTypeDesugarer,
+    termApplyInfixDesugarer,
     treeDesugarer)
 
   private lazy val evaluatedTermNameDesugarer: EvaluatedTermNameDesugarer = new EvaluatedTermNameDesugarerImpl(
@@ -73,6 +74,8 @@ class Desugarers(implicit predicates: Predicates,
     termApplyTypeFunDesugarer,
     evaluatedTermDesugarer
   )
+
+  private lazy val termApplyInfixDesugarer: TermApplyInfixDesugarer = new TermApplyInfixDesugarerImpl(evaluatedTermDesugarer)
 
   private lazy val termApplyTypeFunDesugarer: TermApplyTypeFunDesugarer = new TermApplyTypeFunDesugarerImpl(
     evaluatedTermSelectQualDesugarer,
