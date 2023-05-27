@@ -30,7 +30,6 @@ private[semantic] class EvaluatedTermDesugarerImpl(evaluatedTermRefDesugarer: =>
         case applyInfix: Term.ApplyInfix => termApplyInfixDesugarer.desugar(applyInfix)
         case assign: Assign => assignDesugarer.desugar(assign)
         case eta: Eta => etaDesugarer.desugar(eta)
-        case interpolate: Term.Interpolate => interpolate // TODO
         case otherTerm: Term => super.apply(otherTerm)
         case nonTerm: Tree => treeDesugarer.desugar(nonTerm)
       }
