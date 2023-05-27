@@ -2,6 +2,7 @@ package io.github.effiban.scala2java.core
 
 import io.github.effiban.scala2java.core.collectors.MainClassInitCollector
 import io.github.effiban.scala2java.core.desugarers.semantic.SemanticDesugarers
+import io.github.effiban.scala2java.core.desugarers.syntactic.SourceDesugarer
 import io.github.effiban.scala2java.core.extensions.{ExtensionRegistry, ExtensionRegistryBuilder}
 import io.github.effiban.scala2java.core.factories.Factories
 import io.github.effiban.scala2java.core.predicates.Predicates
@@ -34,10 +35,11 @@ object Scala2JavaTranslator {
     }
 
     try {
+      val syntacticDesugaredSource = SourceDesugarer.desugar(sourceTree)
       implicit val predicates: Predicates = new Predicates()
       implicit lazy val factories: Factories = new Factories(typeInferrers)
       implicit lazy val typeInferrers: TypeInferrers = new TypeInferrers(factories, predicates)
-      val semanticDesugaredSource = new SemanticDesugarers().sourceDesugarer.desugar(sourceTree)
+      val semanticDesugaredSource = new SemanticDesugarers().sourceDesugarer.desugar(syntacticDesugaredSource)
       new ScalaTreeTraversers().sourceTraverser.traverse(semanticDesugaredSource)
     } finally {
       javaWriter.close()
