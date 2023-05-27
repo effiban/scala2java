@@ -9,6 +9,7 @@ private[desugarers] class EvaluatedTermDesugarerImpl(evaluatedTermRefDesugarer: 
                                                      termApplyDesugarer: => TermApplyDesugarer,
                                                      termApplyTypeDesugarer: => TermApplyTypeDesugarer,
                                                      termApplyInfixDesugarer: => TermApplyInfixDesugarer,
+                                                     assignDesugarer: => AssignDesugarer,
                                                      treeDesugarer: => TreeDesugarer) extends EvaluatedTermDesugarer {
 
   def desugar(term: Term): Term = DesugaringTransformer(term) match {
@@ -24,7 +25,7 @@ private[desugarers] class EvaluatedTermDesugarerImpl(evaluatedTermRefDesugarer: 
         case apply: Term.Apply => termApplyDesugarer.desugar(apply)
         case applyType: ApplyType => termApplyTypeDesugarer.desugar(applyType)
         case applyInfix: Term.ApplyInfix => termApplyInfixDesugarer.desugar(applyInfix)
-        case assign: Assign => assign // TODO
+        case assign: Assign => assignDesugarer.desugar(assign)
         case eta: Eta => eta // TODO
         case interpolate: Term.Interpolate => interpolate // TODO
         case otherTerm: Term => super.apply(otherTerm)
