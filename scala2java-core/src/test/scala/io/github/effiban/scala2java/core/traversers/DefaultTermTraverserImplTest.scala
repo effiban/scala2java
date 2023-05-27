@@ -44,7 +44,6 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
   private val termPlaceholderTraverser = mock[TermPlaceholderTraverser]
   private val etaTraverser = mock[EtaTraverser]
   private val termRepeatedTraverser = mock[TermRepeatedTraverser]
-  private val termInterpolateTraverser = mock[TermInterpolateTraverser]
   private val defaultTermRenderer = mock[DefaultTermRenderer]
 
 
@@ -76,7 +75,6 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
     termPlaceholderTraverser,
     etaTraverser,
     termRepeatedTraverser,
-    termInterpolateTraverser,
     defaultTermRenderer
   )
 
@@ -333,16 +331,6 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
     val termRepeated = Term.Repeated(Term.Name("x"))
     defaultTermTraverser.traverse(termRepeated)
     verify(termRepeatedTraverser).traverse(eqTree(termRepeated))
-  }
-
-  test("traverse() for Term.Interpolate") {
-    val interpolate = Term.Interpolate(
-      prefix = Term.Name("s"),
-      parts = List(Lit.String("start-"), Lit.String("-end")),
-      args = List(Term.Name("myVal"))
-    )
-    defaultTermTraverser.traverse(interpolate)
-    verify(termInterpolateTraverser).traverse(eqTree(interpolate))
   }
 
   test("traverse() for Lit.Int") {
