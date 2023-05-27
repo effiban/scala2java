@@ -14,12 +14,13 @@ private[desugarers] class EvaluatedTermSelectDesugarerImpl(qualifierTypeInferrer
   extends EvaluatedTermSelectDesugarer {
 
   override def desugar(termSelect: Term.Select): Term = {
-    val maybeQualType = qualifierTypeInferrer.infer(termSelect)
+    val desugaredTermSelect = evaluatedTermSelectQualDesugarer.desugar(termSelect)
+    val maybeQualType = qualifierTypeInferrer.infer(desugaredTermSelect)
     val context = TermSelectInferenceContext(maybeQualType)
-    if (termSelectSupportsNoArgInvocation(termSelect, context)) {
-      Term.Apply(termSelect, Nil)
+    if (termSelectSupportsNoArgInvocation(desugaredTermSelect, context)) {
+      Term.Apply(desugaredTermSelect, Nil)
     } else {
-      evaluatedTermSelectQualDesugarer.desugar(termSelect)
+      desugaredTermSelect
     }
   }
 }
