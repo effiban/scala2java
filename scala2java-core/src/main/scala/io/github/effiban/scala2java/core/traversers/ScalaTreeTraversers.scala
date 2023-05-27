@@ -290,12 +290,6 @@ class ScalaTreeTraversers(implicit factories: Factories,
     typeListRenderer
   )
 
-  private lazy val funTermRefTraverser: FunTermRefTraverser = new FunTermRefTraverser(
-    funTermSelectTraverser,
-    defaultTermRefTraverser,
-    defaultTermRefRenderer
-  )
-
   private lazy val ifTraverser: IfTraverser = new IfTraverserImpl(expressionTermTraverser, blockTraverser)
 
   private lazy val importerTraverser: ImporterTraverser = new ImporterTraverserImpl(defaultTermRefTraverser)
@@ -420,7 +414,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
     funTermSelectTraverser,
     typeTraverser,
     typeListRenderer,
-    termApplyTypeFunTraverser
+    expressionTermTraverser
   )
 
   private lazy val superTraverser: SuperTraverser = new SuperTraverserImpl(nameTraverser)
@@ -465,31 +459,13 @@ class ScalaTreeTraversers(implicit factories: Factories,
   )
 
   private lazy val termApplyTraverser: TermApplyTraverser = new TermApplyTraverserImpl(
-    termApplyFunTraverser,
+    expressionTermTraverser,
     arrayInitializerTraverser,
     argumentListTraverser,
     compositeInvocationArgTraverser,
     termApplyTransformationContextFactory,
     ArrayInitializerContextResolver,
     internalTermApplyTransformer
-  )
-
-  /** When the 'fun' term (function name) within a Term.Apply is a Term.Ref or Term.ApplyType -
-   * we need to apply the 'fun' traversal, to make sure no desugaring to Term.Apply is performed (which would cause an infinite recursion).
-   * In other cases, it should be traversed as an evaluated expression
-   */
-  private lazy val termApplyFunTraverser: TermTraverser = new FunOverridingTermTraverser(
-    funTermRefTraverser,
-    expressionTermTraverser
-  )
-
-  /** When the 'fun' term (function name) within a Term.ApplyType, is a Term.Ref -
-   * we need to apply the 'fun' traversal, to make sure no desugaring to Term.Apply is performed (which would cause an infinite recursion).
-   * In other cases, it should be traversed as an evaluated expression
-   */
-  private lazy val termApplyTypeFunTraverser: TermTraverser = new FunOverridingTermTraverser(
-    funTermRefTraverser,
-    expressionTermTraverser
   )
 
   private lazy val termFunctionTraverser: TermFunctionTraverser = new TermFunctionTraverserImpl(
