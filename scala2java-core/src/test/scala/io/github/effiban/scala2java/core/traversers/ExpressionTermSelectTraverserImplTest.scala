@@ -26,8 +26,7 @@ class ExpressionTermSelectTraverserImplTest extends UnitTestSuite {
   private val ScalaSelectWithTermName = Term.Select(qual = MyInstance, name = MyMethod)
   private val JavaSelectWithTermName = Term.Select(qual = MyJavaClass, name = MyJavaMethod)
 
-  private val qualifierTraverser = mock[ExpressionTermTraverser]
-  private val transformedTermTraverser = mock[TermTraverser]
+  private val expressionTermTraverser = mock[ExpressionTermTraverser]
   private val termNameRenderer = mock[TermNameRenderer]
   private val typeTraverser = mock[TypeTraverser]
   private val typeListRenderer = mock[TypeListRenderer]
@@ -35,8 +34,7 @@ class ExpressionTermSelectTraverserImplTest extends UnitTestSuite {
   private val termSelectTransformer = mock[TermSelectTransformer]
 
   private val termSelectTraverser = new ExpressionTermSelectTraverserImpl(
-    qualifierTraverser,
-    transformedTermTraverser,
+    expressionTermTraverser,
     termNameRenderer,
     typeTraverser,
     typeListRenderer,
@@ -54,7 +52,7 @@ class ExpressionTermSelectTraverserImplTest extends UnitTestSuite {
     when(termSelectTransformer.transform(eqTree(ScalaSelectWithTermName), eqTermSelectTransformationContext(expectedTransformationContext)))
       .thenReturn(Some(JavaSelectWithTermName))
 
-    doWrite("MyJavaClass").when(qualifierTraverser).traverse(eqTree(MyJavaClass))
+    doWrite("MyJavaClass").when(expressionTermTraverser).traverse(eqTree(MyJavaClass))
     doWrite("myJavaMethod").when(termNameRenderer).render(eqTree(MyJavaMethod))
     doReturn(t"int").when(typeTraverser).traverse(eqTree(typeArg))
     doWrite("<Integer>").when(typeListRenderer).render(eqTreeList(List(t"int")))
@@ -74,7 +72,7 @@ class ExpressionTermSelectTraverserImplTest extends UnitTestSuite {
     when(termSelectTransformer.transform(eqTree(ScalaSelectWithTermName), eqTermSelectTransformationContext(expectedTransformationContext)))
       .thenReturn(None)
 
-    doWrite("MyInstance").when(qualifierTraverser).traverse(eqTree(MyInstance))
+    doWrite("MyInstance").when(expressionTermTraverser).traverse(eqTree(MyInstance))
     doWrite("myMethod").when(termNameRenderer).render(eqTree(MyMethod))
     doReturn(t"int").when(typeTraverser).traverse(eqTree(typeArg))
     doWrite("<Integer>").when(typeListRenderer).render(eqTreeList(List(t"int")))
@@ -94,7 +92,7 @@ class ExpressionTermSelectTraverserImplTest extends UnitTestSuite {
     when(termSelectTransformer.transform(eqTree(ScalaSelectWithTermName), eqTermSelectTransformationContext(expectedTransformationContext)))
       .thenReturn(Some(JavaSelectWithTermName))
 
-    doWrite("MyJavaClass").when(qualifierTraverser).traverse(eqTree(MyJavaClass))
+    doWrite("MyJavaClass").when(expressionTermTraverser).traverse(eqTree(MyJavaClass))
     doWrite("myJavaMethod").when(termNameRenderer).render(eqTree(MyJavaMethod))
     doReturn(t"int").when(typeTraverser).traverse(eqTree(typeArg))
     doWrite("<Integer>").when(typeListRenderer).render(eqTreeList(List(t"int")))
@@ -109,7 +107,7 @@ class ExpressionTermSelectTraverserImplTest extends UnitTestSuite {
     when(termSelectTransformer.transform(eqTree(ScalaSelectWithTermName), eqTermSelectTransformationContext(TermSelectTransformationContext())))
       .thenReturn(Some(JavaSelectWithTermName))
 
-    doWrite("MyJavaClass").when(qualifierTraverser).traverse(eqTree(MyJavaClass))
+    doWrite("MyJavaClass").when(expressionTermTraverser).traverse(eqTree(MyJavaClass))
     doWrite("myJavaMethod").when(termNameRenderer).render(eqTree(MyJavaMethod))
     termSelectTraverser.traverse(ScalaSelectWithTermName)
 
@@ -125,7 +123,7 @@ class ExpressionTermSelectTraverserImplTest extends UnitTestSuite {
     when(termSelectTransformer.transform(eqTree(scalaSelect), eqTermSelectTransformationContext(TermSelectTransformationContext())))
       .thenReturn(Some(javaSelect))
 
-    doWrite("() -> 1").when(qualifierTraverser).traverse(eqTree(termFunction))
+    doWrite("() -> 1").when(expressionTermTraverser).traverse(eqTree(termFunction))
     doWrite("get").when(termNameRenderer).render(eqTree(MyJavaMethod))
     termSelectTraverser.traverse(scalaSelect)
 
@@ -142,7 +140,7 @@ class ExpressionTermSelectTraverserImplTest extends UnitTestSuite {
     when(termSelectTransformer.transform(eqTree(inputTermSelect), eqTermSelectTransformationContext(TermSelectTransformationContext())))
       .thenReturn(Some(outputTermSelect))
 
-    doWrite("(Supplier<Integer>)() -> 1").when(qualifierTraverser).traverse(eqTree(ascribedTermFunction))
+    doWrite("(Supplier<Integer>)() -> 1").when(expressionTermTraverser).traverse(eqTree(ascribedTermFunction))
     doWrite("get").when(termNameRenderer).render(eqTree(MyJavaMethod))
 
     termSelectTraverser.traverse(inputTermSelect)
@@ -163,7 +161,7 @@ class ExpressionTermSelectTraverserImplTest extends UnitTestSuite {
     when(termSelectTransformer.transform(eqTree(scalaSelect), eqTermSelectTransformationContext(TermSelectTransformationContext())))
       .thenReturn(Some(javaSelect))
 
-    doWrite("MyJavaClass.myJavaMethod(arg1)").when(qualifierTraverser).traverse(eqTree(javaQual))
+    doWrite("MyJavaClass.myJavaMethod(arg1)").when(expressionTermTraverser).traverse(eqTree(javaQual))
     doWrite("myJavaMethod2").when(termNameRenderer).render(eqTree(MyJavaMethod2))
     termSelectTraverser.traverse(scalaSelect)
 
@@ -184,6 +182,6 @@ class ExpressionTermSelectTraverserImplTest extends UnitTestSuite {
 
     termSelectTraverser.traverse(ScalaSelectWithTermName, context)
 
-    verify(transformedTermTraverser).traverse(eqTree(expectedTerm))
+    verify(expressionTermTraverser).traverse(eqTree(expectedTerm))
   }
 }

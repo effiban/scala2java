@@ -8,7 +8,7 @@ trait TermNameWithoutRenderTraverser {
   def traverse(termName: Term.Name): Option[Term.Name]
 }
 
-private[traversers] class TermNameWithoutRenderTraverserImpl(termTraverser: => TermTraverser,
+private[traversers] class TermNameWithoutRenderTraverserImpl(expressionTermTraverser: => ExpressionTermTraverser,
                                                              termNameTransformer: => TermNameTransformer)
   extends TermNameWithoutRenderTraverser {
 
@@ -16,7 +16,7 @@ private[traversers] class TermNameWithoutRenderTraverserImpl(termTraverser: => T
     termNameTransformer.transform(termName) match {
       case Some(name: Term.Name) => Some(name)
       case Some(term: Term) =>
-        termTraverser.traverse(term)
+        expressionTermTraverser.traverse(term)
         None
       case None => Some(termName)
     }

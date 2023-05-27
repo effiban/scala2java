@@ -8,11 +8,11 @@ import scala.meta.XtensionQuasiquoteTerm
 
 class TermNameWithoutRenderTraverserImplTest extends UnitTestSuite {
 
-  private val termTraverser = mock[TermTraverser]
+  private val expressionTermTraverser = mock[ExpressionTermTraverser]
   private val termNameTransformer = mock[TermNameTransformer]
 
   private val termNameWithoutRenderTraverser = new TermNameWithoutRenderTraverserImpl(
-    termTraverser,
+    expressionTermTraverser,
     termNameTransformer,
   )
 
@@ -33,7 +33,7 @@ class TermNameWithoutRenderTraverserImplTest extends UnitTestSuite {
 
     termNameWithoutRenderTraverser.traverse(termName) shouldBe None
 
-    verify(termTraverser).traverse(eqTree(termSelect))
+    verify(expressionTermTraverser).traverse(eqTree(termSelect))
   }
 
   test("traverse when transformer returns None should return the input Term.Name") {

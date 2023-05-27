@@ -14,8 +14,7 @@ trait ExpressionTermSelectTraverser {
   def traverse(termSelect: Term.Select, context: TermSelectContext = TermSelectContext()): Unit
 }
 
-private[traversers] class ExpressionTermSelectTraverserImpl(qualifierTraverser: => ExpressionTermTraverser,
-                                                            transformedTermTraverser: => TermTraverser,
+private[traversers] class ExpressionTermSelectTraverserImpl(expressionTermTraverser: => ExpressionTermTraverser,
                                                             termNameRenderer: TermNameRenderer,
                                                             typeTraverser: => TypeTraverser,
                                                             typeListRenderer: => TypeListRenderer,
@@ -31,7 +30,7 @@ private[traversers] class ExpressionTermSelectTraverserImpl(qualifierTraverser: 
     val transformedTerm = termSelectTransformer.transform(select, TermSelectTransformationContext(maybeQualType))
     transformedTerm match {
         case Some(transformedSelect: Term.Select) => traverseAsSelect(transformedSelect, context)
-        case Some(term) => transformedTermTraverser.traverse(term)
+        case Some(term) => expressionTermTraverser.traverse(term)
         case None => traverseAsSelect(select, context)
     }
   }
@@ -47,13 +46,13 @@ private[traversers] class ExpressionTermSelectTraverserImpl(qualifierTraverser: 
   private def traverseQualifier(qualifier: Term): Unit = {
     qualifier match {
       case qual@(_: Term.Function | Term.Ascribe(_: Term.Function,_)) => traverseInsideParens(qual)
-      case qual => qualifierTraverser.traverse(qual)
+      case qual => expressionTermTraverser.traverse(qual)
     }
   }
 
   private def traverseInsideParens(qual: Term): Unit = {
     writeArgumentsStart(Parentheses)
-    qualifierTraverser.traverse(qual)
+    expressionTermTraverser.traverse(qual)
     writeArgumentsEnd(Parentheses)
   }
 
