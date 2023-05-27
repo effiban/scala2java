@@ -186,7 +186,6 @@ class ScalaTreeTraversers(implicit factories: Factories,
     termPlaceholderTraverser,
     etaTraverser,
     termRepeatedTraverser,
-    termInterpolateTraverser,
     defaultTermRenderer
   )
 
@@ -503,8 +502,6 @@ class ScalaTreeTraversers(implicit factories: Factories,
     statTraverser,
     blockTraverser
   )
-
-  private lazy val termInterpolateTraverser: TermInterpolateTraverser = new TermInterpolateTraverserImpl(TermInterpolateTransformer, termApplyTraverser)
 
   private lazy val termMatchTraverser: TermMatchTraverser = new TermMatchTraverserImpl(expressionTermTraverser, caseTraverser)
 

@@ -35,7 +35,6 @@ private[traversers] class DefaultTermTraverserImpl(defaultTermRefTraverser: => D
                                                    termPlaceholderTraverser: => TermPlaceholderTraverser,
                                                    etaTraverser: => EtaTraverser,
                                                    termRepeatedTraverser: => TermRepeatedTraverser,
-                                                   termInterpolateTraverser: => TermInterpolateTraverser,
                                                    defaultTermRenderer: => DefaultTermRenderer)
                                                   (implicit javaWriter: JavaWriter) extends DefaultTermTraverser {
 
@@ -71,7 +70,6 @@ private[traversers] class DefaultTermTraverserImpl(defaultTermRefTraverser: => D
     case termPlaceholder: Term.Placeholder => termPlaceholderTraverser.traverse(termPlaceholder)
     case eta: Eta => etaTraverser.traverse(eta)
     case termRepeated: Term.Repeated => termRepeatedTraverser.traverse(termRepeated)
-    case interpolate: Term.Interpolate => termInterpolateTraverser.traverse(interpolate)
     case literal: Lit =>
       defaultTermRenderer.render(literal)
     case _ => writeComment(s"UNSUPPORTED: $term")
