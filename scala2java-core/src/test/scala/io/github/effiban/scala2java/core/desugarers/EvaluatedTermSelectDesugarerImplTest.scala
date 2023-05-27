@@ -21,27 +21,29 @@ class EvaluatedTermSelectDesugarerImplTest extends UnitTestSuite {
     evaluatedTermSelectQualDesugarer)
 
   test("desugar when supports no-arg invocation - should return a corresponding Term.Apply") {
+    val termSelect = q"(func(func2)).func3"
+    val desugaredTermSelect = q"(func(func2())).func3"
     val qualType = t"A"
     val context = TermSelectInferenceContext(Some(qualType))
-    val termSelect = q"a.func"
-    val termApply = q"a.func()"
+    val termApply = q"(func(func2())).func3()"
 
-    when(qualifierTypeInferrer.infer(eqTree(termSelect))).thenReturn(Some(qualType))
-    when(termSelectSupportsNoArgInvocation(eqTree(termSelect), eqTermSelectInferenceContext(context))).thenReturn(true)
+    doReturn(desugaredTermSelect).when(evaluatedTermSelectQualDesugarer).desugar(eqTree(termSelect))
+    when(qualifierTypeInferrer.infer(eqTree(desugaredTermSelect))).thenReturn(Some(qualType))
+    when(termSelectSupportsNoArgInvocation(eqTree(desugaredTermSelect), eqTermSelectInferenceContext(context))).thenReturn(true)
 
     evaluatedTermSelectDesugarer.desugar(termSelect).structure shouldBe termApply.structure
 
   }
 
   test("desugar when does not support no-arg invocation - should return the desugared qualifier with name unchanged") {
+    val termSelect = q"(func(func2)).x"
+    val desugaredTermSelect = q"(func(func2())).x"
     val qualType = t"A"
     val context = TermSelectInferenceContext(Some(qualType))
-    val termSelect = q"(func).x"
-    val desugaredTermSelect = q"(func()).x"
 
-    when(qualifierTypeInferrer.infer(eqTree(termSelect))).thenReturn(Some(qualType))
-    when(termSelectSupportsNoArgInvocation(eqTree(termSelect), eqTermSelectInferenceContext(context))).thenReturn(false)
     doReturn(desugaredTermSelect).when(evaluatedTermSelectQualDesugarer).desugar(eqTree(termSelect))
+    when(qualifierTypeInferrer.infer(eqTree(desugaredTermSelect))).thenReturn(Some(qualType))
+    when(termSelectSupportsNoArgInvocation(eqTree(desugaredTermSelect), eqTermSelectInferenceContext(context))).thenReturn(false)
 
     evaluatedTermSelectDesugarer.desugar(termSelect).structure shouldBe desugaredTermSelect.structure
 
