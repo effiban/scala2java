@@ -11,18 +11,18 @@ import scala.meta.{Lit, Term}
 class CompositeInvocationArgTraverserTest extends UnitTestSuite {
 
   private val assignInvocationArgTraverser = mock[InvocationArgTraverser[Assign]]
-  private val defaultInvocationArgTraverser = mock[InvocationArgTraverser[Term]]
+  private val expressionTermTraverser = mock[ExpressionTermTraverser]
 
   private val compositeInvocationArgTraverser = new CompositeInvocationArgTraverser(
     assignInvocationArgTraverser,
-    defaultInvocationArgTraverser
+    expressionTermTraverser
   )
 
   test("traverse when arg is an Assign") {
     val lhs = Term.Name("x")
     val rhs = Lit.Int(1)
     val assign = Term.Assign(lhs, rhs)
-    val context = ArgumentContext(index = 0)
+    val context = ArgumentContext()
 
     compositeInvocationArgTraverser.traverse(assign, context)
 
@@ -31,11 +31,11 @@ class CompositeInvocationArgTraverserTest extends UnitTestSuite {
 
   test("traverse when arg is a Lit") {
     val arg = Lit.Int(1)
-    val context = ArgumentContext(index = 0)
+    val context = ArgumentContext()
 
     compositeInvocationArgTraverser.traverse(arg, context)
 
-    verify(defaultInvocationArgTraverser).traverse(eqTree(arg), eqArgumentContext(context))
+    verify(expressionTermTraverser).traverse(eqTree(arg))
   }
 
 }

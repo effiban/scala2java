@@ -32,7 +32,7 @@ private[traversers] class TermApplyTraverserImpl(termApplyFunTraverser: => TermT
     val transformedTermApply = termApplyTransformer.transform(termApply, transformationContext)
     termApplyFunTraverser.traverse(transformedTermApply.fun)
     val options = ListTraversalOptions(maybeEnclosingDelimiter = Some(Parentheses), traverseEmpty = true)
-    val argListContext = ArgumentListContext(maybeParent = Some(transformedTermApply), options = options, argNameAsComment = true)
+    val argListContext = ArgumentListContext(options = options, argNameAsComment = true)
     argumentListTraverser.traverse(
       args = transformedTermApply.args,
       argTraverser = invocationArgTraverser,

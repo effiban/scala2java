@@ -6,8 +6,6 @@ private[extensions] trait ExtendedPredicates { this: ExtensionContainer =>
 
   val importerExcludedPredicates: List[ImporterExcludedPredicate] = extensions.map(_.importerExcludedPredicate())
 
-  val invocationArgByNamePredicates: List[InvocationArgByNamePredicate] = extensions.map(_.invocationArgByNamePredicate())
-
   val templateInitExcludedPredicates: List[TemplateInitExcludedPredicate] = extensions.map(_.templateInitExcludedPredicate())
 
   val termNameHasApplyMethods: List[TermNameHasApplyMethod] = extensions.map(_.termNameHasApplyMethod())

@@ -6,12 +6,13 @@ import scala.meta.Term
 import scala.meta.Term.Assign
 
 private[traversers] class CompositeInvocationArgTraverser(assignInvocationArgTraverser: => ArgumentTraverser[Assign],
-                                                          defaultInvocationArgTraverser: => ArgumentTraverser[Term]) extends InvocationArgTraverser[Term] {
+                                                          expressionTermTraverser: => ExpressionTermTraverser)
+  extends InvocationArgTraverser[Term] {
 
   override def traverse(arg: Term, context: ArgumentContext): Unit = {
     arg match {
       case assign: Assign => assignInvocationArgTraverser.traverse(assign, context)
-      case term => defaultInvocationArgTraverser.traverse(term, context)
+      case term => expressionTermTraverser.traverse(term)
     }
   }
 }

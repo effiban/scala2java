@@ -25,8 +25,6 @@ class ArgumentListTraverserImpl(implicit javaWriter: JavaWriter) extends Argumen
       maybeEnclosingDelimiter.foreach(writeArgumentsStart)
       args.zipWithIndex.foreach { case (tree, idx) =>
         val argContext = ArgumentContext(
-          maybeParent = context.maybeParent,
-          index = idx,
           argNameAsComment = context.argNameAsComment
         )
 

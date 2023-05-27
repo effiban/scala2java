@@ -62,7 +62,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val assignInvocationArgTraverser: InvocationArgTraverser[Assign] = new AssignInvocationArgTraverser(
     assignLHSTraverser,
-    defaultInvocationArgTraverser
+    expressionTermTraverser
   )
 
   private lazy val assignLHSTraverser: AssignLHSTraverser = new AssignLHSTraverserImpl(expressionTermTraverser)
@@ -110,7 +110,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val compositeInvocationArgTraverser: InvocationArgTraverser[Term] = new CompositeInvocationArgTraverser(
     assignInvocationArgTraverser,
-    defaultInvocationArgTraverser
+    expressionTermTraverser
   )
 
   private lazy val ctorPrimaryTraverser: CtorPrimaryTraverser = new CtorPrimaryTraverserImpl(CtorPrimaryTransformer, defnDefTraverser)
@@ -151,11 +151,6 @@ class ScalaTreeTraversers(implicit factories: Factories,
     typeRenderer,
     patTraverser,
     patListRenderer
-  )
-
-  private lazy val defaultInvocationArgTraverser: InvocationArgTraverser[Term] = new DefaultInvocationArgTraverser(
-    expressionTermTraverser,
-    new CompositeInvocationArgByNamePredicate(CoreInvocationArgByNamePredicate)
   )
 
   private lazy val defaultTermTraverser: DefaultTermTraverser = new DefaultTermTraverserImpl(

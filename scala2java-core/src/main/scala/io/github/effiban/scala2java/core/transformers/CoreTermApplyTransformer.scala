@@ -31,12 +31,18 @@ private[transformers] class CoreTermApplyTransformer(termNameClassifier: TermNam
 
   private def transformUntypedByQualifiedName(termSelect: Term.Select, args: List[Term]) = {
     transformByQualifiedName(termSelect)
-      .map(transformedSelect => Term.Apply(transformedSelect, args))
+      .map(transformedSelect => {
+        val transformedArgs = transformArgs(transformedSelect, args)
+        Term.Apply(transformedSelect, transformedArgs)
+      })
   }
 
   private def transformTypedByQualifiedName(termSelect: Term.Select, targs: List[Type], args: List[Term]) = {
     transformByQualifiedName(termSelect)
-      .map(transformedSelect => Term.Apply(Term.ApplyType(transformedSelect, targs), args))
+      .map(transformedSelect => {
+        val transformedArgs = transformArgs(transformedSelect, args)
+        Term.Apply(Term.ApplyType(transformedSelect, targs), transformedArgs)
+      })
   }
 
   // Transform a method name which is a Scala-specific qualified name, into an equivalent in Java
@@ -103,6 +109,15 @@ private[transformers] class CoreTermApplyTransformer(termNameClassifier: TermNam
         Some(termSelect.copy(name = q"subList"), List(q"0", arg))
       case (Some(parentType), q"length", Nil) if typeClassifier.isJavaListLike(parentType) => Some(termSelect.copy(name = q"size"), Nil)
       case _ => None
+    }
+  }
+
+  private def transformArgs(transformedTermSelect: Term, args: List[Term]): List[Term] = {
+    (transformedTermSelect, args) match {
+      case (Term.Select(Term.Name(Try), Term.Name(JavaOfSupplier)) |
+           Term.Select(Term.Name(JavaCompletableFuture), Term.Name(JavaSupplyAsync)), arg :: Nil) =>
+        List(Term.Function(Nil, arg))
+      case (_, theArgs) => theArgs
     }
   }
 }
