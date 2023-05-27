@@ -6,13 +6,11 @@ import scala.meta.Term
 
 trait TermApplyTypeDesugarer extends DifferentTypeDesugarer[Term.ApplyType, Term]
 
-private[desugarers] class TermApplyTypeDesugarerImpl(termApplyTypeFunDesugarer: => TermApplyTypeFunDesugarer)
+private[desugarers] class TermApplyTypeDesugarerImpl(termApplyDesugarer: => TermApplyDesugarer)
   extends TermApplyTypeDesugarer {
 
   override def desugar(termApplyType: Term.ApplyType): Term = termApplyType.fun match {
     case Term.Name(ScalaClassOf) => termApplyType
-    case _ =>
-      val desugaredTermApplyType = termApplyTypeFunDesugarer.desugar(termApplyType)
-      Term.Apply(desugaredTermApplyType, Nil)
+    case _ => termApplyDesugarer.desugar(Term.Apply(termApplyType, Nil))
   }
 }

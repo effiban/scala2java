@@ -33,6 +33,7 @@ class DefnDefDesugarerImplTest extends UnitTestSuite {
       case Some(q"func") => termParam.copy(default = Some(q"func()"))
       case Some(q"func2") => termParam.copy(default = Some(q"func2()"))
       case Some(q"func3") => termParam.copy(default = Some(q"func3()"))
+      case _ => termParam
     }).when(termParamDesugarer).desugar(any[Term.Param])
 
     doReturn(desugaredDefnDef.body).when(evaluatedTermDesugarer).desugar(eqTree(defnDef.body))

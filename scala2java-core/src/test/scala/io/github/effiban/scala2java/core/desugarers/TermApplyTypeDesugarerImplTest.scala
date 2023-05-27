@@ -7,9 +7,9 @@ import scala.meta.XtensionQuasiquoteTerm
 
 class TermApplyTypeDesugarerImplTest extends UnitTestSuite {
 
-  private val termApplyTypeFunDesugarer = mock[TermApplyTypeFunDesugarer]
+  private val termApplyDesugarer = mock[TermApplyDesugarer]
 
-  private val termApplyTypeDesugarer = new TermApplyTypeDesugarerImpl(termApplyTypeFunDesugarer)
+  private val termApplyTypeDesugarer = new TermApplyTypeDesugarerImpl(termApplyDesugarer)
 
   test("desugar classOf[T] should return unchanged") {
     val classOfT = q"classOf[T]"
@@ -17,13 +17,13 @@ class TermApplyTypeDesugarerImplTest extends UnitTestSuite {
     termApplyTypeDesugarer.desugar(classOfT).structure shouldBe classOfT.structure
   }
 
-  test("desugar regular Term.ApplyType should return a Term.Apply with the 'fun' part desugared") {
+  test("desugar regular Term.ApplyType should return a corresponding desugared Term.Apply") {
     val termApplyType = q"func(func2)[Int]"
-    val desugaredFunApplyType = q"func(func2())[Int]"
-    val termApply = q"func(func2())[Int]()"
+    val termApply = q"func(func2)[Int]()"
+    val desugaredTermApply = q"func(func2())[Int]()"
 
-    doReturn(desugaredFunApplyType).when(termApplyTypeFunDesugarer).desugar(eqTree(termApplyType))
+    doReturn(desugaredTermApply).when(termApplyDesugarer).desugar(eqTree(termApply))
 
-    termApplyTypeDesugarer.desugar(termApplyType).structure shouldBe termApply.structure
+    termApplyTypeDesugarer.desugar(termApplyType).structure shouldBe desugaredTermApply.structure
   }
 }
