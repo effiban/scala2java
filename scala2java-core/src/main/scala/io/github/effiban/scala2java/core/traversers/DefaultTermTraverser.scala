@@ -10,7 +10,7 @@ trait DefaultTermTraverser extends TermTraverser
 
 private[traversers] class DefaultTermTraverserImpl(defaultTermRefTraverser: => DefaultTermRefTraverser,
                                                    termApplyTraverser: => TermApplyTraverser,
-                                                   defaultMainApplyTypeTraverser: => MainApplyTypeTraverser,
+                                                   mainApplyTypeTraverser: => MainApplyTypeTraverser,
                                                    termApplyInfixTraverser: => TermApplyInfixTraverser,
                                                    assignTraverser: => AssignTraverser,
                                                    returnTraverser: => ReturnTraverser,
@@ -45,7 +45,7 @@ private[traversers] class DefaultTermTraverserImpl(defaultTermRefTraverser: => D
       val traversedTermRef = defaultTermRefTraverser.traverse(termRef)
       defaultTermRenderer.render(traversedTermRef)
     case apply: Term.Apply => termApplyTraverser.traverse(apply)
-    case applyType: ApplyType => defaultMainApplyTypeTraverser.traverse(applyType)
+    case applyType: ApplyType => mainApplyTypeTraverser.traverse(applyType)
     case applyInfix: Term.ApplyInfix => termApplyInfixTraverser.traverse(applyInfix)
     case assign: Assign => assignTraverser.traverse(assign)
     case `return`: Return => returnTraverser.traverse(`return`)

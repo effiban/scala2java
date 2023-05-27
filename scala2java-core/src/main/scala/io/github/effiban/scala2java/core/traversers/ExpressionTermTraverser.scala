@@ -15,13 +15,11 @@ private[traversers] class ExpressionTermTraverserImpl(ifTraverser: => IfTraverse
                                                       statTraverser: => StatTraverser,
                                                       termApplyTraverser: => TermApplyTraverser,
                                                       expressionTermRefTraverser: => TermRefTraverser,
-                                                      expressionMainApplyTypeTraverser: MainApplyTypeTraverser,
                                                       defaultTermTraverser: => DefaultTermTraverser) extends ExpressionTermTraverser {
 
   override def traverse(expression: Term): Unit = {
     expression match {
       case ref: Term.Ref => expressionTermRefTraverser.traverse(ref)
-      case applyType: Term.ApplyType => expressionMainApplyTypeTraverser.traverse(applyType)
       case `if`: If => ifTraverser.traverseAsTertiaryOp(`if`)
       case block: Block => traverseBlock(block)
       case aTerm => defaultTermTraverser.traverse(aTerm)

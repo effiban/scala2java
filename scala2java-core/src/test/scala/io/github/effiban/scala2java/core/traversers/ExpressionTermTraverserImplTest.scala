@@ -14,7 +14,6 @@ class ExpressionTermTraverserImplTest extends UnitTestSuite {
   private val statTraverser = mock[StatTraverser]
   private val termApplyTraverser = mock[TermApplyTraverser]
   private val expressionTermRefTraverser = mock[ExpressionTermRefTraverser]
-  private val expressionMainApplyTypeTraverser = mock[MainApplyTypeTraverser]
   private val defaultTermTraverser = mock[DefaultTermTraverser]
 
   private val expressionTraverser = new ExpressionTermTraverserImpl(
@@ -22,7 +21,6 @@ class ExpressionTermTraverserImplTest extends UnitTestSuite {
     statTraverser,
     termApplyTraverser,
     expressionTermRefTraverser,
-    expressionMainApplyTypeTraverser,
     defaultTermTraverser
   )
 
@@ -34,14 +32,6 @@ class ExpressionTermTraverserImplTest extends UnitTestSuite {
     expressionTraverser.traverse(expression)
 
     outputWriter.toString shouldBe "abc"
-  }
-
-  test("traverse() for Term.ApplyType") {
-    val expression = q"abc[Int]"
-
-    expressionTraverser.traverse(expression)
-
-    verify(expressionMainApplyTypeTraverser).traverse(eqTree(expression))
   }
 
   test("traverse() for If") {

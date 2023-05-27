@@ -265,7 +265,6 @@ class ScalaTreeTraversers(implicit factories: Factories,
     statTraverser,
     termApplyTraverser,
     expressionTermRefTraverser,
-    mainApplyTypeTraverser,
     defaultTermTraverser
   )
 
