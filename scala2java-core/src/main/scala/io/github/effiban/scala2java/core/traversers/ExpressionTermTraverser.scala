@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
-import scala.meta.Term
 import scala.meta.Term.{Block, If}
+import scala.meta.{Term, XtensionQuasiquoteTerm}
 
 /** Traverser for terms appearing in the context of an evaluated expression, such as:
  *   - RHS of an assigment
@@ -34,7 +34,7 @@ private[traversers] class ExpressionTermTraverserImpl(ifTraverser: => IfTraverse
       // When it has one statement - unwrapping it to the statement
       case Block(List(stat)) => statTraverser.traverse(stat)
       // When it has more than one statement - wrapping it with a zero-arg lambda which is immediately invoked
-      case block: Block => termApplyTraverser.traverse(Term.Apply(Term.Function(Nil, block), Nil))
+      case block: Block => termApplyTraverser.traverse(Term.Apply(Term.Select(Term.Function(Nil, block), q"apply"), Nil))
     }
   }
 }
