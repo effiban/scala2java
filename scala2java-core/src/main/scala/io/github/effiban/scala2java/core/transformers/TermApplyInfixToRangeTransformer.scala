@@ -3,8 +3,7 @@ package io.github.effiban.scala2java.core.transformers
 import io.github.effiban.scala2java.core.entities.TermNameValues.{ScalaTo, ScalaUntil}
 import io.github.effiban.scala2java.spi.transformers.TermApplyInfixToTermApplyTransformer
 
-import scala.meta.Term
-import scala.meta.Term.Select
+import scala.meta.{Term, XtensionQuasiquoteTerm}
 
 object TermApplyInfixToRangeTransformer extends TermApplyInfixToTermApplyTransformer {
 
@@ -20,10 +19,10 @@ object TermApplyInfixToRangeTransformer extends TermApplyInfixToTermApplyTransfo
   }
 
   private def inclusiveRangeOf(start: Term, end: Term) =
-    Term.Apply(fun = Select(Term.Name("Range"), Term.Name("inclusive")), args = List(start, end))
+    Term.Apply(fun = q"Range.inclusive", args = List(start, end))
 
   private def exclusiveRangeOf(start: Term, end: Term) =
-    Term.Apply(fun = Term.Name("Range"), args = List(start, end))
+    Term.Apply(fun = q"Range.apply", args = List(start, end))
 
   private def handleInvalidRHS(termApplyInfix: Term.ApplyInfix): Term.Apply = {
     throw new IllegalStateException(s"A range must have exactly one RHS term, but ${termApplyInfix.args.length} found in: $termApplyInfix")

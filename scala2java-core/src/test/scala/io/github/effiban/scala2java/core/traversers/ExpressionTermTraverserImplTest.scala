@@ -86,7 +86,7 @@ class ExpressionTermTraverserImplTest extends UnitTestSuite {
       q"""(() => {
         val x = 3
         x + 1
-      })()
+      }).apply()
       """
 
     doWrite(

@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.transformers
 
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.testtrees.TermNames.{Plus, ScalaInclusive, ScalaRange, ScalaTo, ScalaUntil}
+import io.github.effiban.scala2java.core.testtrees.TermNames.{Apply, Plus, ScalaInclusive, ScalaRange, ScalaTo, ScalaUntil}
 
 import scala.meta.{Lit, Term}
 
@@ -45,7 +45,7 @@ class TermApplyInfixToRangeTransformerTest extends UnitTestSuite {
     )
 
     val expectedTermApply = Term.Apply(
-      fun = ScalaRange,
+      fun = Term.Select(ScalaRange, Apply),
       args = List(Lit.Int(0), Lit.Int(10))
     )
 
