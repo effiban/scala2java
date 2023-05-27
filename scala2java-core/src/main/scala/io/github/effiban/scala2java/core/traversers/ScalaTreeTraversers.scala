@@ -268,13 +268,21 @@ class ScalaTreeTraversers(implicit factories: Factories,
     defaultTermTraverser
   )
 
-  private lazy val expressionTermRefTraverser: TermRefTraverser = expressionTermRefTraverser(
-    termNameTraverser(expressionTermTraverser),
-    expressionTermSelectTraverser
+  private lazy val expressionTermRefTraverser: ExpressionTermRefTraverser = new ExpressionTermRefTraverserImpl(
+    termNameTraverser,
+    expressionTermSelectTraverser,
+    applyUnaryTraverser,
+    defaultTermRefTraverser,
+    defaultTermRefRenderer
   )
 
-  private lazy val expressionTermSelectTraverser: ExpressionTermSelectTraverser = expressionTermSelectTraverser(
-    expressionTermTraverser
+  private lazy val expressionTermSelectTraverser: ExpressionTermSelectTraverser = new ExpressionTermSelectTraverserImpl(
+    expressionTermTraverser,
+    termNameRenderer,
+    typeTraverser,
+    typeListRenderer,
+    qualifierTypeInferrer,
+    new CompositeTermSelectTransformer(CoreTermSelectTransformer)
   )
 
   private lazy val finallyTraverser: FinallyTraverser = new FinallyTraverserImpl(blockTraverser)
@@ -390,6 +398,11 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   lazy val sourceTraverser: SourceTraverser = new SourceTraverserImpl(statTraverser)
 
+  private lazy val statTermTraverser: StatTermTraverser = new StatTermTraverserImpl(
+    expressionTermRefTraverser,
+    defaultTermTraverser
+  )
+
   private lazy val statTraverser: StatTraverser = new StatTraverserImpl(
     statTermTraverser,
     importTraverser,
@@ -397,17 +410,6 @@ class ScalaTreeTraversers(implicit factories: Factories,
     pkgTraverser,
     defnTraverser,
     declTraverser
-  )
-
-  /** When a Stat is a Term.Ref or Term.ApplyType, we need to allow for a possible desugaring into a Term.Apply.
-   * Otherwise, the default traversal should be applied.
-   */
-  private lazy val statTermTraverser: TermTraverser = new FunOverridingTermTraverser(
-    expressionTermRefTraverser(
-      termNameTraverser(statTermTraverser),
-      expressionTermSelectTraverser(statTermTraverser)
-    ),
-    defaultTermTraverser
   )
 
   private lazy val standardApplyTypeTraverser: StandardApplyTypeTraverser = new StandardApplyTypeTraverserImpl(
@@ -477,18 +479,15 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val termMatchTraverser: TermMatchTraverser = new TermMatchTraverserImpl(expressionTermTraverser, caseTraverser)
 
-  private def termNameTraverser(termTraverser: => TermTraverser): TermNameTraverser = {
-    new TermNameTraverserImpl(
-      termNameWithoutRenderTraverser(termTraverser),
-      termNameRenderer
-    )
-  }
+  private lazy val termNameTraverser: TermNameTraverser = new TermNameTraverserImpl(
+    termNameWithoutRenderTraverser,
+    termNameRenderer
+  )
 
-  private def termNameWithoutRenderTraverser(termTraverser: => TermTraverser): TermNameWithoutRenderTraverser =
-    new TermNameWithoutRenderTraverserImpl(
-      termTraverser,
-      new CompositeTermNameTransformer(CoreTermNameTransformer),
-    )
+  private lazy val termNameWithoutRenderTraverser: TermNameWithoutRenderTraverser = new TermNameWithoutRenderTraverserImpl(
+    expressionTermTraverser,
+    new CompositeTermNameTransformer(CoreTermNameTransformer),
+  )
 
   private lazy val termParamArgTraverserFactory: TermParamArgTraverserFactory = new TermParamArgTraverserFactoryImpl(termParamTraverser)
 
@@ -507,29 +506,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val termPlaceholderTraverser: TermPlaceholderTraverser = new TermPlaceholderTraverserImpl(termPlaceholderRenderer)
 
-  private def expressionTermRefTraverser(termNameTraverser: => TermNameTraverser,
-                                         termSelectTraverser: => ExpressionTermSelectTraverser): TermRefTraverser = {
-    new ExpressionTermRefTraverser(
-      termNameTraverser,
-      termSelectTraverser,
-      applyUnaryTraverser,
-      defaultTermRefTraverser,
-      defaultTermRefRenderer
-    )
-  }
-
   private lazy val termRepeatedTraverser: TermRepeatedTraverser = new TermRepeatedTraverserImpl(expressionTermTraverser)
-
-  private def expressionTermSelectTraverser(transformedTermTraverser: => TermTraverser): ExpressionTermSelectTraverser =
-    new ExpressionTermSelectTraverserImpl(
-      qualifierTraverser = expressionTermTraverser,
-      transformedTermTraverser = transformedTermTraverser,
-      termNameRenderer,
-      typeTraverser,
-      typeListRenderer,
-      qualifierTypeInferrer,
-      new CompositeTermSelectTransformer(CoreTermSelectTransformer)
-    )
 
   private lazy val termTupleTraverser: TermTupleTraverser = new TermTupleTraverserImpl(
     termApplyTraverser,

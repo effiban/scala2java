@@ -9,7 +9,7 @@ import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import scala.meta.Term.{ApplyUnary, Super, This}
 import scala.meta.{Name, Term}
 
-class ExpressionTermRefTraverserTest extends UnitTestSuite {
+class ExpressionTermRefTraverserImplTest extends UnitTestSuite {
 
   private val termNameTraverser = mock[TermNameTraverser]
   private val termSelectTraverser = mock[ExpressionTermSelectTraverser]
@@ -17,7 +17,7 @@ class ExpressionTermRefTraverserTest extends UnitTestSuite {
   private val defaultTermRefTraverser = mock[DefaultTermRefTraverser]
   private val defaultTermRefRenderer = mock[DefaultTermRefRenderer]
 
-  private val expressionTermRefTraverser = new ExpressionTermRefTraverser(
+  private val expressionTermRefTraverser = new ExpressionTermRefTraverserImpl(
     termNameTraverser,
     termSelectTraverser,
     applyUnaryTraverser,
