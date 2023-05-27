@@ -413,7 +413,6 @@ class ScalaTreeTraversers(implicit factories: Factories,
       termNameTraverser(statTermTraverser),
       expressionTermSelectTraverser(statTermTraverser)
     ),
-    mainApplyTypeTraverser,
     defaultTermTraverser
   )
 
@@ -481,7 +480,6 @@ class ScalaTreeTraversers(implicit factories: Factories,
    */
   private lazy val termApplyFunTraverser: TermTraverser = new FunOverridingTermTraverser(
     funTermRefTraverser,
-    mainApplyTypeTraverser,
     expressionTermTraverser
   )
 
@@ -491,7 +489,6 @@ class ScalaTreeTraversers(implicit factories: Factories,
    */
   private lazy val termApplyTypeFunTraverser: TermTraverser = new FunOverridingTermTraverser(
     funTermRefTraverser,
-    mainApplyTypeTraverser,
     expressionTermTraverser
   )
 

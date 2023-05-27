@@ -8,12 +8,10 @@ import scala.meta.XtensionQuasiquoteTerm
 class FunOverridingTermTraverserTest extends UnitTestSuite {
 
   private val termRefTraverser = mock[TermRefTraverser]
-  private val mainApplyTypeTraverser = mock[MainApplyTypeTraverser]
   private val termTraverser = mock[TermTraverser]
 
   private val funOverridingTermTraverser = new FunOverridingTermTraverser(
     termRefTraverser,
-    mainApplyTypeTraverser,
     termTraverser)
 
   test("traverse() when fun is a Term.Name should call the overriding TermRefTraverser") {
@@ -32,12 +30,12 @@ class FunOverridingTermTraverserTest extends UnitTestSuite {
     verify(termRefTraverser).traverse(eqTree(fun))
   }
 
-  test("traverse() when fun is a Term.ApplyType should call the overriding MainApplyTypeTraverser") {
+  test("traverse() when fun is a Term.ApplyType should call the TermTraverser") {
     val fun = q"a[Int]"
 
     funOverridingTermTraverser.traverse(fun)
 
-    verify(mainApplyTypeTraverser).traverse(eqTree(fun))
+    verify(termTraverser).traverse(eqTree(fun))
   }
 
   test("traverse() when fun is a Term.Apply should call the TermTraverser") {
