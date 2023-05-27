@@ -12,6 +12,7 @@ class EvaluatedTermDesugarerImplTest extends UnitTestSuite {
   private val termApplyTypeDesugarer = mock[TermApplyTypeDesugarer]
   private val termApplyInfixDesugarer = mock[TermApplyInfixDesugarer]
   private val assignDesugarer = mock[AssignDesugarer]
+  private val etaDesugarer = mock[EtaDesugarer]
   private val treeDesugarer = mock[TreeDesugarer]
 
   private val evaluatedTermDesugarer = new EvaluatedTermDesugarerImpl(
@@ -20,6 +21,7 @@ class EvaluatedTermDesugarerImplTest extends UnitTestSuite {
     termApplyTypeDesugarer,
     termApplyInfixDesugarer,
     assignDesugarer,
+    etaDesugarer,
     treeDesugarer
   )
 
@@ -66,6 +68,15 @@ class EvaluatedTermDesugarerImplTest extends UnitTestSuite {
     doReturn(desugaredAssign).when(assignDesugarer).desugar(eqTree(assign))
 
     evaluatedTermDesugarer.desugar(assign).structure shouldBe desugaredAssign.structure
+  }
+
+  test("desugar Eta") {
+    val eta = q"func(func2) _"
+    val desugaredEta = q"func(func2()) _"
+
+    doReturn(desugaredEta).when(etaDesugarer).desugar(eqTree(eta))
+
+    evaluatedTermDesugarer.desugar(eta).structure shouldBe desugaredEta.structure
   }
 
   test("desugar New") {
