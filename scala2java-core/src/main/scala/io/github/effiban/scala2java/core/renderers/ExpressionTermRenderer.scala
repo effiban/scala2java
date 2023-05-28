@@ -11,11 +11,12 @@ import scala.meta.Term.{Block, If}
 
 trait ExpressionTermRenderer extends TermRenderer
 
-private[renderers] class ExpressionTermRendererImpl(defaultTermRenderer: => DefaultTermRenderer) extends ExpressionTermRenderer {
+private[renderers] class ExpressionTermRendererImpl(expressionTermRefRenderer: => ExpressionTermRefRenderer,
+                                                    defaultTermRenderer: => DefaultTermRenderer) extends ExpressionTermRenderer {
 
   override def render(expression: Term): Unit = {
     expression match {
-      case ref: Term.Ref => // TODO
+      case ref: Term.Ref => expressionTermRefRenderer.render(ref)
       case `if`: If => // TODO
       case block: Block => // TODO
       case aTerm => defaultTermRenderer.render(aTerm)
