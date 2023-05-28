@@ -14,7 +14,7 @@ trait ExpressionTermTraverser extends TermTraverser
 private[traversers] class ExpressionTermTraverserImpl(ifTraverser: => IfTraverser,
                                                       statTraverser: => StatTraverser,
                                                       termApplyTraverser: => TermApplyTraverser,
-                                                      expressionTermRefTraverser: => TermRefTraverser,
+                                                      expressionTermRefTraverser: => ExpressionTermRefTraverser,
                                                       defaultTermTraverser: => DefaultTermTraverser) extends ExpressionTermTraverser {
 
   override def traverse(expression: Term): Unit = {
