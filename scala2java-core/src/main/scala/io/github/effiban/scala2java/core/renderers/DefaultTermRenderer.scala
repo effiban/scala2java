@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
-import scala.meta.Term.{AnonymousFunction, ApplyType, Ascribe, Assign, Block, Do, Eta, For, ForYield, If, New, NewAnonymous, Return, Throw, Try, TryWithHandler, While}
+import scala.meta.Term.{AnonymousFunction, ApplyType, Ascribe, Assign, Block, Do, Eta, If, New, NewAnonymous, Return, Throw, Try, TryWithHandler, While}
 import scala.meta.{Lit, Term}
 
 trait DefaultTermRenderer extends TermRenderer
@@ -35,14 +35,11 @@ private[renderers] class DefaultTermRendererImpl(defaultTermRefRenderer: => Defa
     case anonFunction: AnonymousFunction => //TODO
     case `while`: While => //TODO
     case `do`: Do => //TODO
-    case `for`: For => //TODO
-    case forYield: ForYield => //TODO
     case `new`: New => //TODO
     case newAnonymous: NewAnonymous => //TODO
     case termPlaceholder: Term.Placeholder => //TODO
     case eta: Eta => //TODO
     case termRepeated: Term.Repeated => //TODO
-    case interpolate: Term.Interpolate => //TODO
     case literal: Lit => litRenderer.render(literal)
     case _ => writeComment(s"UNSUPPORTED: $term")
   }

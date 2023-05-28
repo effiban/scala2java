@@ -30,6 +30,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
     termNameRenderer
   )
 
+  lazy val expressionTermRenderer: ExpressionTermRenderer = new ExpressionTermRendererImpl(defaultTermRenderer)
+
   lazy val importeeRenderer: ImporteeRenderer = new ImporteeRendererImpl(nameIndeterminateRenderer)
 
   lazy val importRenderer: ImportRenderer = new ImportRendererImpl(importerRenderer)
