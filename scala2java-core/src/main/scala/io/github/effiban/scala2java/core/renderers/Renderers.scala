@@ -35,7 +35,16 @@ class Renderers(implicit javaWriter: JavaWriter) {
     defaultTermRenderer
   )
 
-  lazy val expressionTermRefRenderer: ExpressionTermRefRenderer = new ExpressionTermRefRendererImpl(defaultTermRefRenderer)
+  lazy val expressionTermRefRenderer: ExpressionTermRefRenderer = new ExpressionTermRefRendererImpl(
+    expressionTermSelectRenderer,
+    defaultTermRefRenderer
+  )
+
+  lazy val expressionTermSelectRenderer: ExpressionTermSelectRenderer = new ExpressionTermSelectRendererImpl(
+    expressionTermRenderer,
+    typeListRenderer,
+    termNameRenderer
+  )
 
   lazy val importeeRenderer: ImporteeRenderer = new ImporteeRendererImpl(nameIndeterminateRenderer)
 
