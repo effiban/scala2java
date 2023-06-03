@@ -8,6 +8,7 @@ import scala.meta.{Lit, Term}
 trait DefaultTermRenderer extends TermRenderer
 
 private[renderers] class DefaultTermRendererImpl(defaultTermRefRenderer: => DefaultTermRefRenderer,
+                                                 applyRenderer: => TermApplyRenderer,
                                                  applyTypeRenderer: => ApplyTypeRenderer,
                                                  blockRenderer: => BlockRenderer,
                                                  ifRenderer: => IfRenderer,
@@ -18,7 +19,7 @@ private[renderers] class DefaultTermRendererImpl(defaultTermRefRenderer: => Defa
 
   override def render(term: Term): Unit = term match {
     case termRef: Term.Ref => defaultTermRefRenderer.render(termRef)
-    case apply: Term.Apply => //TODO
+    case apply: Term.Apply => applyRenderer.render(apply)
     case applyType: ApplyType => applyTypeRenderer.render(applyType)
     case applyInfix: Term.ApplyInfix => //TODO
     case assign: Assign => //TODO
