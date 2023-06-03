@@ -1,9 +1,10 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.BlockRenderContext
+import io.github.effiban.scala2java.core.contexts.{BlockRenderContext, IfRenderContext}
 import io.github.effiban.scala2java.core.matchers.BlockRenderContextMatcher.eqBlockRenderContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
+import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.XtensionQuasiquoteTerm
 
@@ -12,12 +13,14 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
   private val defaultTermRefRenderer = mock[DefaultTermRefRenderer]
   private val applyTypeRenderer = mock[ApplyTypeRenderer]
   private val blockRenderer = mock[BlockRenderer]
+  private val ifRenderer = mock[IfRenderer]
   private val litRenderer = mock[LitRenderer]
 
   private val defaultTermRenderer = new DefaultTermRendererImpl(
     defaultTermRefRenderer,
     applyTypeRenderer,
     blockRenderer,
+    ifRenderer,
     litRenderer
   )
 
@@ -50,6 +53,21 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
     defaultTermRenderer.render(block)
 
     verify(blockRenderer).render(eqTree(block), eqBlockRenderContext(BlockRenderContext()))
+  }
+
+  test("render If") {
+    val termIf =
+      q"""
+      if (cond) {
+        doSomething()
+      } else {
+        doSomethingElse()
+      }
+      """
+
+    defaultTermRenderer.render(termIf)
+
+    verify(ifRenderer).render(eqTree(termIf), eqTo(IfRenderContext()))
   }
 
   test("render Lit") {
