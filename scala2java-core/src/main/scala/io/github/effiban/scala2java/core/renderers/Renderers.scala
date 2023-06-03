@@ -16,6 +16,12 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   val argumentListRenderer: ArgumentListRenderer = new ArgumentListRendererImpl()
 
+  lazy val arrayInitializerRenderer: ArrayInitializerRenderer = new ArrayInitializerRendererImpl(
+    typeRenderer,
+    expressionTermRenderer,
+    new SimpleArgumentRenderer(expressionTermRenderer),
+    argumentListRenderer)
+
   lazy val assignInvocationArgRenderer: InvocationArgRenderer[Assign] = new AssignInvocationArgRenderer(
     assignLHSRenderer,
     expressionTermRenderer

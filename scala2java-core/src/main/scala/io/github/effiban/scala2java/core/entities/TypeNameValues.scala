@@ -25,6 +25,7 @@ object TypeNameValues {
   final val ScalaVector = "Vector"
   final val ScalaUnit = "Unit"
 
+  final val JavaObject = "Object"
   final val JavaBiConsumer = "BiConsumer"
   final val JavaBiFunction = "BiFunction"
   final val JavaCompletableFuture = "CompletableFuture"
