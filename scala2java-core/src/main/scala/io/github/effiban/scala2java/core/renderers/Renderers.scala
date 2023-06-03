@@ -13,6 +13,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   val argumentListRenderer: ArgumentListRenderer = new ArgumentListRendererImpl()
 
+  lazy val assignLHSRenderer: AssignLHSRenderer = new AssignLHSRendererImpl(expressionTermRenderer)
+
   lazy val blockTermRenderer: BlockTermRenderer = new BlockTermRendererImpl(
     expressionTermRefRenderer,
     defaultTermRenderer,

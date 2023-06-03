@@ -28,4 +28,5 @@ class AssignLHSTraverserImplTest extends UnitTestSuite {
     assignLHSTraverser.traverse(lhs, asComment = true)
 
     outputWriter.toString shouldBe "/* myVal = */"
-  }}
+  }
+}
