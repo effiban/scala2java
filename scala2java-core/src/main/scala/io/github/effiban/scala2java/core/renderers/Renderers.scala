@@ -3,6 +3,8 @@ package io.github.effiban.scala2java.core.renderers
 import io.github.effiban.scala2java.core.classifiers.JavaStatClassifier
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
+import scala.meta.Term.Assign
+
 class Renderers(implicit javaWriter: JavaWriter) {
 
   lazy val alternativeRenderer: AlternativeRenderer = new AlternativeRendererImpl(patRenderer)
@@ -12,6 +14,11 @@ class Renderers(implicit javaWriter: JavaWriter) {
   lazy val applyUnaryRenderer: ApplyUnaryRenderer = new ApplyUnaryRendererImpl(termNameRenderer, expressionTermRenderer)
 
   val argumentListRenderer: ArgumentListRenderer = new ArgumentListRendererImpl()
+
+  lazy val assignInvocationArgRenderer: InvocationArgRenderer[Assign] = new AssignInvocationArgRenderer(
+    assignLHSRenderer,
+    expressionTermRenderer
+  )
 
   lazy val assignLHSRenderer: AssignLHSRenderer = new AssignLHSRendererImpl(expressionTermRenderer)
 
