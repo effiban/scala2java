@@ -14,6 +14,7 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
   private val termApplyRenderer = mock[TermApplyRenderer]
   private val applyTypeRenderer = mock[ApplyTypeRenderer]
   private val applyInfixRenderer = mock[TermApplyInfixRenderer]
+  private val assignRenderer = mock[AssignRenderer]
   private val blockRenderer = mock[BlockRenderer]
   private val ifRenderer = mock[IfRenderer]
   private val litRenderer = mock[LitRenderer]
@@ -23,6 +24,7 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
     termApplyRenderer,
     applyTypeRenderer,
     applyInfixRenderer,
+    assignRenderer,
     blockRenderer,
     ifRenderer,
     litRenderer
@@ -58,6 +60,14 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
     defaultTermRenderer.render(applyInfix)
 
     verify(applyInfixRenderer).render(eqTree(applyInfix))
+  }
+
+  test("render Term.Assign") {
+    val assign = q"a = 3"
+
+    defaultTermRenderer.render(assign)
+
+    verify(assignRenderer).render(eqTree(assign))
   }
 
   test("render Block") {
