@@ -9,6 +9,7 @@ trait DefaultTermRenderer extends TermRenderer
 
 private[renderers] class DefaultTermRendererImpl(defaultTermRefRenderer: => DefaultTermRefRenderer,
                                                  applyTypeRenderer: => ApplyTypeRenderer,
+                                                 blockRenderer: => BlockRenderer,
                                                  litRenderer: LitRenderer)
                                                 (implicit javaWriter: JavaWriter) extends DefaultTermRenderer {
 
@@ -25,7 +26,7 @@ private[renderers] class DefaultTermRendererImpl(defaultTermRefRenderer: => Defa
     case ascribe: Ascribe => //TODO
     case annotate: Term.Annotate => //TODO
     case tuple: Term.Tuple => //TODO
-    case block: Block => //TODO
+    case block: Block => blockRenderer.render(block)
     case `if`: If => //TODO
     case `match`: Term.Match => //TODO
     case `try`: Try => //TODO
