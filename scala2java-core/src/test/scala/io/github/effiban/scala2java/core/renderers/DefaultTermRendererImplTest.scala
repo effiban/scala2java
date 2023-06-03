@@ -11,6 +11,7 @@ import scala.meta.XtensionQuasiquoteTerm
 class DefaultTermRendererImplTest extends UnitTestSuite {
 
   private val defaultTermRefRenderer = mock[DefaultTermRefRenderer]
+  private val termApplyRenderer = mock[TermApplyRenderer]
   private val applyTypeRenderer = mock[ApplyTypeRenderer]
   private val blockRenderer = mock[BlockRenderer]
   private val ifRenderer = mock[IfRenderer]
@@ -18,6 +19,7 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
 
   private val defaultTermRenderer = new DefaultTermRendererImpl(
     defaultTermRefRenderer,
+    termApplyRenderer,
     applyTypeRenderer,
     blockRenderer,
     ifRenderer,
@@ -30,6 +32,14 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
     defaultTermRenderer.render(termName)
 
     verify(defaultTermRefRenderer).render(eqTree(termName))
+  }
+
+  test("render Term.Apply") {
+    val termApply = q"a(x, y)"
+
+    defaultTermRenderer.render(termApply)
+
+    verify(termApplyRenderer).render(eqTree(termApply))
   }
 
   test("render Term.ApplyType") {

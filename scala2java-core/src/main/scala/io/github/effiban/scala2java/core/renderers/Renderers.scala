@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.classifiers.JavaStatClassifier
+import io.github.effiban.scala2java.core.resolvers.ArrayInitializerRenderContextResolver
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Term
@@ -53,6 +54,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   lazy val defaultTermRenderer: DefaultTermRenderer = new DefaultTermRendererImpl(
     defaultTermRefRenderer,
+    termApplyRenderer,
     applyTypeRenderer,
     blockRenderer,
     ifRenderer,
@@ -133,6 +135,13 @@ class Renderers(implicit javaWriter: JavaWriter) {
   val selfRenderer: SelfRenderer = new SelfRendererImpl()
 
   val superRenderer: SuperRenderer = new SuperRendererImpl(nameRenderer)
+
+  lazy val termApplyRenderer: TermApplyRenderer = new TermApplyRendererImpl(
+    expressionTermRenderer,
+    arrayInitializerRenderer,
+    argumentListRenderer,
+    compositeInvocationArgRenderer,
+    ArrayInitializerRenderContextResolver)
 
   lazy val termNameRenderer: TermNameRenderer = new TermNameRendererImpl()
 
