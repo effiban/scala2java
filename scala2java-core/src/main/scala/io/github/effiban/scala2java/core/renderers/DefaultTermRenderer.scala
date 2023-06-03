@@ -10,6 +10,7 @@ trait DefaultTermRenderer extends TermRenderer
 private[renderers] class DefaultTermRendererImpl(defaultTermRefRenderer: => DefaultTermRefRenderer,
                                                  applyRenderer: => TermApplyRenderer,
                                                  applyTypeRenderer: => ApplyTypeRenderer,
+                                                 applyInfixRenderer: => TermApplyInfixRenderer,
                                                  blockRenderer: => BlockRenderer,
                                                  ifRenderer: => IfRenderer,
                                                  litRenderer: LitRenderer)
@@ -21,7 +22,7 @@ private[renderers] class DefaultTermRendererImpl(defaultTermRefRenderer: => Defa
     case termRef: Term.Ref => defaultTermRefRenderer.render(termRef)
     case apply: Term.Apply => applyRenderer.render(apply)
     case applyType: ApplyType => applyTypeRenderer.render(applyType)
-    case applyInfix: Term.ApplyInfix => //TODO
+    case applyInfix: Term.ApplyInfix => applyInfixRenderer.render(applyInfix)
     case assign: Assign => //TODO
     case `return`: Return => //TODO
     case `throw`: Throw => //TODO

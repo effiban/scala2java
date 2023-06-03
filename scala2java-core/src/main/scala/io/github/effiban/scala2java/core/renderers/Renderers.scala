@@ -56,6 +56,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
     defaultTermRefRenderer,
     termApplyRenderer,
     applyTypeRenderer,
+    termApplyInfixRenderer,
     blockRenderer,
     ifRenderer,
     litRenderer
@@ -136,12 +137,18 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   val superRenderer: SuperRenderer = new SuperRendererImpl(nameRenderer)
 
+  lazy val termApplyInfixRenderer: TermApplyInfixRenderer = new TermApplyInfixRendererImpl(
+    expressionTermRenderer,
+    termNameRenderer
+  )
+
   lazy val termApplyRenderer: TermApplyRenderer = new TermApplyRendererImpl(
     expressionTermRenderer,
     arrayInitializerRenderer,
     argumentListRenderer,
     compositeInvocationArgRenderer,
-    ArrayInitializerRenderContextResolver)
+    ArrayInitializerRenderContextResolver
+  )
 
   lazy val termNameRenderer: TermNameRenderer = new TermNameRendererImpl()
 
