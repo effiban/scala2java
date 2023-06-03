@@ -3,6 +3,7 @@ package io.github.effiban.scala2java.core.renderers
 import io.github.effiban.scala2java.core.classifiers.JavaStatClassifier
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
+import scala.meta.Term
 import scala.meta.Term.Assign
 
 class Renderers(implicit javaWriter: JavaWriter) {
@@ -29,6 +30,11 @@ class Renderers(implicit javaWriter: JavaWriter) {
   )
 
   lazy val classOfRenderer: ClassOfRenderer = new ClassOfRendererImpl(typeRenderer)
+
+  lazy val compositeInvocationArgRenderer: InvocationArgRenderer[Term] = new CompositeInvocationArgRenderer(
+    assignInvocationArgRenderer,
+    expressionTermRenderer
+  )
 
   lazy val defaultTermRefRenderer: DefaultTermRefRenderer = new DefaultTermRefRendererImpl(
     thisRenderer,
