@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.renderers
 
 import scala.meta.Term
-import scala.meta.Term.{Block, If}
+import scala.meta.Term.If
 
 /** Renderer for terms appearing in the context of an evaluated expression, such as:
  *   - RHS of an assigment
@@ -18,7 +18,6 @@ private[renderers] class ExpressionTermRendererImpl(expressionTermRefRenderer: =
     expression match {
       case ref: Term.Ref => expressionTermRefRenderer.render(ref)
       case `if`: If => // TODO
-      case block: Block => // TODO
       case aTerm => defaultTermRenderer.render(aTerm)
     }
   }
