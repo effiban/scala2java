@@ -11,6 +11,7 @@ private[renderers] class DefaultTermRendererImpl(defaultTermRefRenderer: => Defa
                                                  applyRenderer: => TermApplyRenderer,
                                                  applyTypeRenderer: => ApplyTypeRenderer,
                                                  applyInfixRenderer: => TermApplyInfixRenderer,
+                                                 assignRenderer: => AssignRenderer,
                                                  blockRenderer: => BlockRenderer,
                                                  ifRenderer: => IfRenderer,
                                                  litRenderer: LitRenderer)
@@ -23,7 +24,7 @@ private[renderers] class DefaultTermRendererImpl(defaultTermRefRenderer: => Defa
     case apply: Term.Apply => applyRenderer.render(apply)
     case applyType: ApplyType => applyTypeRenderer.render(applyType)
     case applyInfix: Term.ApplyInfix => applyInfixRenderer.render(applyInfix)
-    case assign: Assign => //TODO
+    case assign: Assign => assignRenderer.render(assign)
     case `return`: Return => //TODO
     case `throw`: Throw => //TODO
     case ascribe: Ascribe => //TODO

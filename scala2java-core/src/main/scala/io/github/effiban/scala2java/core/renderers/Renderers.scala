@@ -30,6 +30,11 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   lazy val assignLHSRenderer: AssignLHSRenderer = new AssignLHSRendererImpl(expressionTermRenderer)
 
+  lazy val assignRenderer: AssignRenderer = new AssignRendererImpl(
+    assignLHSRenderer,
+    expressionTermRenderer
+  )
+
   lazy val blockRenderer: BlockRenderer = new BlockRendererImpl(blockTermRenderer, initRenderer)
 
   lazy val blockTermRenderer: BlockTermRenderer = new BlockTermRendererImpl(
@@ -57,6 +62,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
     termApplyRenderer,
     applyTypeRenderer,
     termApplyInfixRenderer,
+    assignRenderer,
     blockRenderer,
     ifRenderer,
     litRenderer
