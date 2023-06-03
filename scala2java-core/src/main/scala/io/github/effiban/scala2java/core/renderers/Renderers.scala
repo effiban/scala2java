@@ -49,6 +49,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
     defaultTermRefRenderer,
     applyTypeRenderer,
     blockRenderer,
+    ifRenderer,
     litRenderer
   )
 
@@ -59,6 +60,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   lazy val expressionTermRenderer: ExpressionTermRenderer = new ExpressionTermRendererImpl(
     expressionTermRefRenderer,
+    ifRenderer,
     defaultTermRenderer
   )
 
@@ -72,6 +74,12 @@ class Renderers(implicit javaWriter: JavaWriter) {
     expressionTermRenderer,
     typeListRenderer,
     termNameRenderer
+  )
+
+  lazy val ifRenderer: IfRenderer = new IfRendererImpl(
+    expressionTermRenderer,
+    blockRenderer,
+    defaultTermRenderer
   )
 
   lazy val importeeRenderer: ImporteeRenderer = new ImporteeRendererImpl(nameIndeterminateRenderer)

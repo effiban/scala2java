@@ -12,12 +12,13 @@ import scala.meta.Term.If
 trait ExpressionTermRenderer extends TermRenderer
 
 private[renderers] class ExpressionTermRendererImpl(expressionTermRefRenderer: => ExpressionTermRefRenderer,
+                                                    ifRenderer: => IfRenderer,
                                                     defaultTermRenderer: => DefaultTermRenderer) extends ExpressionTermRenderer {
 
   override def render(expression: Term): Unit = {
     expression match {
       case ref: Term.Ref => expressionTermRefRenderer.render(ref)
-      case `if`: If => // TODO
+      case `if`: If => ifRenderer.renderAsTertiaryOp(`if`)
       case aTerm => defaultTermRenderer.render(aTerm)
     }
   }

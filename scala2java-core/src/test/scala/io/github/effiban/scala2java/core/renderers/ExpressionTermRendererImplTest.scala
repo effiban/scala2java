@@ -8,10 +8,12 @@ import scala.meta.XtensionQuasiquoteTerm
 class ExpressionTermRendererImplTest extends UnitTestSuite {
 
   private val expressionTermRefRenderer = mock[ExpressionTermRefRenderer]
+  private val ifRenderer = mock[IfRenderer]
   private val defaultTermRenderer = mock[DefaultTermRenderer]
 
   private val expressionTermRenderer = new ExpressionTermRendererImpl(
     expressionTermRefRenderer,
+    ifRenderer,
     defaultTermRenderer
   )
 
@@ -43,6 +45,20 @@ class ExpressionTermRendererImplTest extends UnitTestSuite {
     val applyUnary = q"!x"
     expressionTermRenderer.render(applyUnary)
     verify(expressionTermRefRenderer).render(eqTree(applyUnary))
+  }
+
+  test("render() for Term.If should call IfRenderer.renderAsTertiaryOp()") {
+    val termIf =
+      q"""
+      if (cond) {
+        doSomething()
+      } else {
+        doSomethingElse()
+      }
+      """
+
+    expressionTermRenderer.render(termIf)
+    verify(ifRenderer).renderAsTertiaryOp(eqTree(termIf))
   }
 
   test("render() for Term.Apply should call default renderer") {
