@@ -15,6 +15,7 @@ private[renderers] class DefaultTermRendererImpl(defaultTermRefRenderer: => Defa
                                                  returnRenderer: => ReturnRenderer,
                                                  throwRenderer: => ThrowRenderer,
                                                  ascribeRenderer: => AscribeRenderer,
+                                                 termAnnotateRenderer: => TermAnnotateRenderer,
                                                  blockRenderer: => BlockRenderer,
                                                  ifRenderer: => IfRenderer,
                                                  litRenderer: LitRenderer)
@@ -31,7 +32,7 @@ private[renderers] class DefaultTermRendererImpl(defaultTermRefRenderer: => Defa
     case `return`: Return => returnRenderer.render(`return`)
     case `throw`: Throw => throwRenderer.render(`throw`)
     case ascribe: Ascribe => ascribeRenderer.render(ascribe)
-    case annotate: Term.Annotate => //TODO
+    case annotate: Term.Annotate => termAnnotateRenderer.render(annotate)
     case tuple: Term.Tuple => //TODO
     case block: Block => blockRenderer.render(block)
     case `if`: If => ifRenderer.render(`if`)

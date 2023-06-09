@@ -18,6 +18,7 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
   private val returnRenderer = mock[ReturnRenderer]
   private val throwRenderer = mock[ThrowRenderer]
   private val ascribeRenderer = mock[AscribeRenderer]
+  private val termAnnotateRenderer = mock[TermAnnotateRenderer]
   private val blockRenderer = mock[BlockRenderer]
   private val ifRenderer = mock[IfRenderer]
   private val litRenderer = mock[LitRenderer]
@@ -31,6 +32,7 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
     returnRenderer,
     throwRenderer,
     ascribeRenderer,
+    termAnnotateRenderer,
     blockRenderer,
     ifRenderer,
     litRenderer
@@ -92,6 +94,12 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
     val ascribe = q"x: Int"
     defaultTermRenderer.render(ascribe)
     verify(ascribeRenderer).render(eqTree(ascribe))
+  }
+
+  test("render Term.Annotate") {
+    val termAnnotate = q"(x: @MyAnnotation)"
+    defaultTermRenderer.render(termAnnotate)
+    verify(termAnnotateRenderer).render(eqTree(termAnnotate))
   }
 
   test("render Block") {
