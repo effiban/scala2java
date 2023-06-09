@@ -63,6 +63,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
     applyTypeRenderer,
     termApplyInfixRenderer,
     assignRenderer,
+    returnRenderer,
     blockRenderer,
     ifRenderer,
     litRenderer
@@ -138,6 +139,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
   lazy val patTypedRenderer: PatTypedRenderer = new PatTypedRendererImpl(typeRenderer, patRenderer)
 
   val patWildcardRenderer: PatWildcardRenderer = new PatWildcardRendererImpl()
+
+  val returnRenderer: ReturnRenderer = new ReturnRendererImpl(expressionTermRenderer)
 
   val selfRenderer: SelfRenderer = new SelfRendererImpl()
 
