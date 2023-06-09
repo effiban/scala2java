@@ -11,6 +11,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   lazy val alternativeRenderer: AlternativeRenderer = new AlternativeRendererImpl(patRenderer)
 
+  lazy val annotRenderer: AnnotRenderer = new AnnotRendererImpl(initRenderer)
+
   lazy val applyTypeRenderer: ApplyTypeRenderer = new ApplyTypeRendererImpl(classOfRenderer)
 
   lazy val applyUnaryRenderer: ApplyUnaryRenderer = new ApplyUnaryRendererImpl(termNameRenderer, expressionTermRenderer)
