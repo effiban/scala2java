@@ -21,6 +21,7 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
   private val termAnnotateRenderer = mock[TermAnnotateRenderer]
   private val blockRenderer = mock[BlockRenderer]
   private val ifRenderer = mock[IfRenderer]
+  private val matchRenderer = mock[TermMatchRenderer]
   private val litRenderer = mock[LitRenderer]
 
   private val defaultTermRenderer = new DefaultTermRendererImpl(
@@ -35,6 +36,7 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
     termAnnotateRenderer,
     blockRenderer,
     ifRenderer,
+    matchRenderer,
     litRenderer
   )
 
@@ -130,6 +132,21 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
     defaultTermRenderer.render(termIf)
 
     verify(ifRenderer).render(eqTree(termIf), eqTo(IfRenderContext()))
+  }
+
+  test("render Match") {
+    val `match` =
+      q"""
+      x match {
+        case 1 => doOne()
+        case 2 => doTwo()
+        default => doNothing()
+      }
+      """
+
+    defaultTermRenderer.render(`match`)
+
+    verify(matchRenderer).render(eqTree(`match`))
   }
 
   test("render Lit") {
