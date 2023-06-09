@@ -80,6 +80,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
     termAnnotateRenderer,
     blockRenderer,
     ifRenderer,
+    termMatchRenderer,
     litRenderer
   )
 
@@ -174,6 +175,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
     compositeInvocationArgRenderer,
     ArrayInitializerRenderContextResolver
   )
+
+  lazy val termMatchRenderer: TermMatchRenderer = new TermMatchRendererImpl(expressionTermRenderer, caseRenderer)
 
   lazy val termNameRenderer: TermNameRenderer = new TermNameRendererImpl()
 
