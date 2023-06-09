@@ -123,7 +123,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
     typeTraverser,
     typeRenderer,
     termNameRenderer,
-    termParamListTraverser,
+    termParamListTraverser
   )
 
   private lazy val declTraverser: DeclTraverser = new DeclTraverserImpl(

@@ -23,6 +23,11 @@ class Renderers(implicit javaWriter: JavaWriter) {
     new SimpleArgumentRenderer(expressionTermRenderer),
     argumentListRenderer)
 
+  lazy val ascribeRenderer: AscribeRenderer = new AscribeRendererImpl(
+    typeRenderer,
+    expressionTermRenderer
+  )
+
   lazy val assignInvocationArgRenderer: InvocationArgRenderer[Assign] = new AssignInvocationArgRenderer(
     assignLHSRenderer,
     expressionTermRenderer
@@ -65,6 +70,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
     assignRenderer,
     returnRenderer,
     throwRenderer,
+    ascribeRenderer,
     blockRenderer,
     ifRenderer,
     litRenderer

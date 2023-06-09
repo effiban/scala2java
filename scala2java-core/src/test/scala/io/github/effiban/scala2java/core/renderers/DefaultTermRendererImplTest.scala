@@ -17,6 +17,7 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
   private val assignRenderer = mock[AssignRenderer]
   private val returnRenderer = mock[ReturnRenderer]
   private val throwRenderer = mock[ThrowRenderer]
+  private val ascribeRenderer = mock[AscribeRenderer]
   private val blockRenderer = mock[BlockRenderer]
   private val ifRenderer = mock[IfRenderer]
   private val litRenderer = mock[LitRenderer]
@@ -29,6 +30,7 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
     assignRenderer,
     returnRenderer,
     throwRenderer,
+    ascribeRenderer,
     blockRenderer,
     ifRenderer,
     litRenderer
@@ -84,6 +86,12 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
     val `throw` = q"throw new IllegalStateExcpetion()"
     defaultTermRenderer.render(`throw`)
     verify(throwRenderer).render(eqTree(`throw`))
+  }
+
+  test("render Ascribe") {
+    val ascribe = q"x: Int"
+    defaultTermRenderer.render(ascribe)
+    verify(ascribeRenderer).render(eqTree(ascribe))
   }
 
   test("render Block") {
