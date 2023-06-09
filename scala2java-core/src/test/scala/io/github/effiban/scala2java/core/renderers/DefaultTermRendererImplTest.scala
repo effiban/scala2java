@@ -23,6 +23,7 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
   private val ifRenderer = mock[IfRenderer]
   private val matchRenderer = mock[TermMatchRenderer]
   private val tryRenderer = mock[TryRenderer]
+  private val tryWithHandlerRenderer = mock[TryWithHandlerRenderer]
   private val litRenderer = mock[LitRenderer]
 
   private val defaultTermRenderer = new DefaultTermRendererImpl(
@@ -39,6 +40,7 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
     ifRenderer,
     matchRenderer,
     tryRenderer,
+    tryWithHandlerRenderer,
     litRenderer
   )
 
@@ -164,6 +166,19 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
     defaultTermRenderer.render(termTry)
 
     verify(tryRenderer).render(eqTree(termTry), eqTo(TryRenderContext()))
+  }
+
+  test("render TryWithHandler") {
+    val tryWithHandler =
+      q"""
+      try {
+        doSomething()
+      } catch(catchHandler)
+      """
+
+    defaultTermRenderer.render(tryWithHandler)
+
+    verify(tryWithHandlerRenderer).render(eqTree(tryWithHandler), eqTo(TryRenderContext()))
   }
 
   test("render Lit") {
