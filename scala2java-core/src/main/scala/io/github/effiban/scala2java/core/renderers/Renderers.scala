@@ -56,6 +56,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   lazy val catchArgumentRenderer: CatchArgumentRenderer = new CatchArgumentRendererImpl(patRenderer)
 
+  lazy val catchHandlerRenderer: CatchHandlerRenderer = new CatchHandlerRendererImpl(catchArgumentRenderer, blockRenderer)
+
   lazy val classOfRenderer: ClassOfRenderer = new ClassOfRendererImpl(typeRenderer)
 
   lazy val compositeInvocationArgRenderer: InvocationArgRenderer[Term] = new CompositeInvocationArgRenderer(
