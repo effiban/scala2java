@@ -75,6 +75,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
     returnRenderer,
     throwRenderer,
     ascribeRenderer,
+    termAnnotateRenderer,
     blockRenderer,
     ifRenderer,
     litRenderer
@@ -156,6 +157,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
   val selfRenderer: SelfRenderer = new SelfRendererImpl()
 
   val superRenderer: SuperRenderer = new SuperRendererImpl(nameRenderer)
+
+  lazy val termAnnotateRenderer: TermAnnotateRenderer = new TermAnnotateRendererImpl(annotListRenderer, expressionTermRenderer)
 
   lazy val termApplyInfixRenderer: TermApplyInfixRenderer = new TermApplyInfixRendererImpl(
     expressionTermRenderer,
