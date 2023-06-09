@@ -98,7 +98,11 @@ class ScalaTreeTraversers(implicit factories: Factories,
     expressionTermTraverser
   )
 
-  private lazy val catchHandlerTraverser: CatchHandlerTraverser = new CatchHandlerTraverserImpl(termParamListTraverser, blockTraverser)
+  private lazy val catchHandlerTraverser: CatchHandlerTraverser = new CatchHandlerTraverserImpl(
+    CatchArgumentTraverser,
+    catchArgumentRenderer,
+    blockTraverser
+  )
 
   private lazy val classTraverser: ClassTraverser = new ClassTraverserImpl(
     caseClassTraverser,
@@ -523,8 +527,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
   private lazy val tryTraverser: TryTraverser = new TryTraverserImpl(
     blockTraverser,
     catchHandlerTraverser,
-    finallyTraverser,
-    PatToTermParamTransformer
+    finallyTraverser
   )
 
   private lazy val tryWithHandlerTraverser: TryWithHandlerTraverser = new TryWithHandlerTraverserImpl(blockTraverser, finallyTraverser)

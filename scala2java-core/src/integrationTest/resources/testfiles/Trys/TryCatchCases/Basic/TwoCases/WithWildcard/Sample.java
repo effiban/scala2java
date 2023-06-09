@@ -13,10 +13,10 @@ public class Sample {
         try {
             doSomething();
         }
-        catch (final IllegalStateException e) {
+        catch (IllegalStateException e) {
             handleIllegalState(e);
         }
-        catch (final Throwable __) {
+        catch (Throwable __) {
             handleError();
         }
     }
