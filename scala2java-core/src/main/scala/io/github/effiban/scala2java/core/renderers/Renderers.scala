@@ -48,6 +48,9 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   lazy val blockTermRenderer: BlockTermRenderer = new BlockTermRendererImpl(
     expressionTermRefRenderer,
+    ifRenderer,
+    tryRenderer,
+    tryWithHandlerRenderer,
     defaultTermRenderer,
     JavaStatClassifier
   )
