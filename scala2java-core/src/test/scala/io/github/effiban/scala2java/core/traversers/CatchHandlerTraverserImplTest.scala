@@ -1,33 +1,38 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.{BlockContext, StatContext}
+import io.github.effiban.scala2java.core.contexts.{BlockContext, CatchHandlerContext}
+import io.github.effiban.scala2java.core.entities.Decision.Yes
 import io.github.effiban.scala2java.core.matchers.BlockContextMatcher.eqBlockContext
+import io.github.effiban.scala2java.core.renderers.CatchArgumentRenderer
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
-import org.mockito.ArgumentMatchers
 
-import scala.meta.{Name, Term, Type}
+import scala.meta.{Case, Term, XtensionQuasiquoteCaseOrPattern}
 
 class CatchHandlerTraverserImplTest extends UnitTestSuite {
 
-  private val Param = termParam(Term.Name("e"), Type.Name("RuntimeException"))
+  private val CatchArg = p"e"
+  private val TraversedCatchArg = p"e: RuntimeException"
+  private val RenderedCatchArg = "(RuntimeException e)"
   private val LogStatement = Term.Apply(Term.Select(Term.Name("log"), Term.Name("error")), List(Term.Name("e")))
   private val GetMsgStatement = Term.Apply(Term.Select(Term.Name("e"), Term.Name("getMessage")), Nil)
 
-  private val termParamListTraverser = mock[TermParamListTraverser]
+  private val catchArgumentTraverser = mock[CatchArgumentTraverser]
+  private val catchArgumentRenderer = mock[CatchArgumentRenderer]
   private val blockTraverser = mock[BlockTraverser]
 
-  private val catchHandlerTraverser = new CatchHandlerTraverserImpl(termParamListTraverser, blockTraverser)
+  private val catchHandlerTraverser = new CatchHandlerTraverserImpl(
+    catchArgumentTraverser,
+    catchArgumentRenderer,
+    blockTraverser
+  )
 
   test("traverse() when shouldReturnValue=No") {
-    doWrite("(RuntimeException e)")
-      .when(termParamListTraverser).traverse(
-      eqTreeList(List(Param)),
-      context = ArgumentMatchers.eq(StatContext()),
-      onSameLine = ArgumentMatchers.eq(true)
-    )
+    val CatchCase = Case(pat = CatchArg, cond = None, body = LogStatement)
+
+    doReturn(TraversedCatchArg).when(catchArgumentTraverser).traverse(eqTree(CatchArg))
+    doWrite(RenderedCatchArg).when(catchArgumentRenderer).render(eqTree(TraversedCatchArg))
 
     doWrite(
       """ {
@@ -39,7 +44,7 @@ class CatchHandlerTraverserImplTest extends UnitTestSuite {
       context = eqBlockContext(BlockContext())
     )
 
-    catchHandlerTraverser.traverse(Param, LogStatement)
+    catchHandlerTraverser.traverse(CatchCase)
 
     outputWriter.toString shouldBe
       """catch (RuntimeException e) {
@@ -49,12 +54,10 @@ class CatchHandlerTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() when shouldReturnValue=Yes") {
-    doWrite("(RuntimeException e)")
-      .when(termParamListTraverser).traverse(
-      eqTreeList(List(Param)),
-      context = ArgumentMatchers.eq(StatContext()),
-      onSameLine = ArgumentMatchers.eq(true)
-    )
+    val CatchCase = Case(pat = CatchArg, cond = None, body = GetMsgStatement)
+
+    doReturn(TraversedCatchArg).when(catchArgumentTraverser).traverse(eqTree(CatchArg))
+    doWrite(RenderedCatchArg).when(catchArgumentRenderer).render(eqTree(TraversedCatchArg))
 
     doWrite(
       """ {
@@ -63,19 +66,15 @@ class CatchHandlerTraverserImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(blockTraverser).traverse(
       stat = eqTree(GetMsgStatement),
-      context = eqBlockContext(BlockContext())
+      context = eqBlockContext(BlockContext(shouldReturnValue = Yes))
     )
 
-    catchHandlerTraverser.traverse(Param, GetMsgStatement)
+    catchHandlerTraverser.traverse(CatchCase, context = CatchHandlerContext(shouldReturnValue = Yes))
 
     outputWriter.toString shouldBe
       """catch (RuntimeException e) {
         |  return e.getMessage();
         |}
         |""".stripMargin
-  }
-
-  private def termParam(name: Name, decltpe: Type): Term.Param = {
-    Term.Param(mods = Nil, name = name, decltpe = Some(decltpe), default = None)
   }
 }

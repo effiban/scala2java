@@ -13,7 +13,7 @@ public class Sample {
         try {
             doSomething();
         }
-        catch (final Throwable e) {
+        catch (Throwable e) {
             handleError();
         }
         finally {

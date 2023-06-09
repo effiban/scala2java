@@ -13,10 +13,10 @@ public class Sample {
         try {
             return "ok";
         }
-        catch (final IllegalStateException e) {
+        catch (IllegalStateException e) {
             return "illegal state";
         }
-        catch (final IllegalArgumentException e) {
+        catch (IllegalArgumentException e) {
             return "illegal argument";
         }
     }
