@@ -52,6 +52,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
     JavaStatClassifier
   )
 
+  lazy val caseRenderer: CaseRenderer = new CaseRendererImpl(patRenderer, expressionTermRenderer)
+
   lazy val classOfRenderer: ClassOfRenderer = new ClassOfRendererImpl(typeRenderer)
 
   lazy val compositeInvocationArgRenderer: InvocationArgRenderer[Term] = new CompositeInvocationArgRenderer(
