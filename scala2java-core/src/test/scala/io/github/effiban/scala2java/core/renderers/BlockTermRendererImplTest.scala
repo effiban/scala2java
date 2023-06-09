@@ -1,9 +1,11 @@
 package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.classifiers.JavaStatClassifier
+import io.github.effiban.scala2java.core.contexts.{IfRenderContext, TryRenderContext}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
+import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.XtensionQuasiquoteTerm
 
@@ -11,10 +13,16 @@ class BlockTermRendererImplTest extends UnitTestSuite {
 
   private val expressionTermRefRenderer = mock[ExpressionTermRefRenderer]
   private val defaultTermRenderer = mock[DefaultTermRenderer]
+  private val ifRenderer = mock[IfRenderer]
+  private val tryRenderer = mock[TryRenderer]
+  private val tryWithHandlerRenderer = mock[TryWithHandlerRenderer]
   private val javaStatClassifier = mock[JavaStatClassifier]
 
   private val blockTermRenderer = new BlockTermRendererImpl(
     expressionTermRefRenderer,
+    ifRenderer,
+    tryRenderer,
+    tryWithHandlerRenderer,
     defaultTermRenderer,
     javaStatClassifier
   )
@@ -90,6 +98,19 @@ class BlockTermRendererImplTest extends UnitTestSuite {
         |""".stripMargin
   }
 
+  test("renderLast() Term.Name when has uncertain return") {
+    val termName = q"x"
+
+    doWrite("x").when(expressionTermRefRenderer).render(eqTree(termName))
+    when(javaStatClassifier.requiresEndDelimiter(eqTree(termName))).thenReturn(true)
+
+    blockTermRenderer.renderLast(termName, uncertainReturn = true)
+
+    outputWriter.toString shouldBe
+      """/* return? */x;
+        |""".stripMargin
+  }
+
   test("renderLast() Term.Apply with no uncertain return") {
     val termApply = q"func(2)"
 
@@ -106,44 +127,166 @@ class BlockTermRendererImplTest extends UnitTestSuite {
   test("renderLast() Term.If with no uncertain return") {
     val termIf =
       q"""
-    if (cond) {
-      doSomething()
-    } else {
-      doSomethingElse()
-    }
-    """
+      if (cond) {
+        doSomething()
+      } else {
+        doSomethingElse()
+      }
+      """
 
     doWrite(
       """|if (cond) {
-         |  doSomething()
+         |  doSomething();
          |} else {
-         |  doSomethingElse()
+         |  doSomethingElse();
          |}""".stripMargin)
-      .when(defaultTermRenderer).render(eqTree(termIf))
+      .when(ifRenderer).render(eqTree(termIf), eqTo(IfRenderContext()))
 
-    when(javaStatClassifier.requiresEndDelimiter(eqTree(termIf))).thenReturn(false)
-
-    blockTermRenderer.render(termIf)
+    blockTermRenderer.renderLast(termIf)
 
     outputWriter.toString shouldBe
       """|if (cond) {
-         |  doSomething()
+         |  doSomething();
          |} else {
-         |  doSomethingElse()
+         |  doSomethingElse();
          |}""".stripMargin
 
   }
 
-  test("renderLast() Term.Name when has uncertain return") {
-    val termName = q"x"
+  test("renderLast() Term.If when has uncertain return") {
+    val termIf =
+      q"""
+      if (cond) {
+        doSomething()
+      } else {
+        doSomethingElse()
+      }
+      """
 
-    doWrite("x").when(expressionTermRefRenderer).render(eqTree(termName))
-    when(javaStatClassifier.requiresEndDelimiter(eqTree(termName))).thenReturn(true)
+    doWrite(
+      """|if (cond) {
+         |  /* return? */doSomething();
+         |} else {
+         |  /* return? */doSomethingElse();
+         |}""".stripMargin)
+      .when(ifRenderer).render(eqTree(termIf), eqTo(IfRenderContext(uncertainReturn = true)))
 
-    blockTermRenderer.renderLast(termName, uncertainReturn = true)
+    blockTermRenderer.renderLast(termIf, uncertainReturn = true)
 
     outputWriter.toString shouldBe
-      """/* return? */x;
-        |""".stripMargin
+      """|if (cond) {
+         |  /* return? */doSomething();
+         |} else {
+         |  /* return? */doSomethingElse();
+         |}""".stripMargin
+
+  }
+
+  test("renderLast() Term.Try with no uncertain return") {
+    val termTry =
+      q"""
+      try {
+        doSomething()
+      } catch {
+        case e: Throwable => doSomethingElse()
+      }
+      """
+
+    doWrite(
+      """|try {
+         |  doSomething();
+         |} catch (Throwable e) {
+         |  doSomethingElse();
+         |}""".stripMargin)
+      .when(tryRenderer).render(eqTree(termTry), eqTo(TryRenderContext()))
+
+    blockTermRenderer.renderLast(termTry)
+
+    outputWriter.toString shouldBe
+      """|try {
+         |  doSomething();
+         |} catch (Throwable e) {
+         |  doSomethingElse();
+         |}""".stripMargin
+  }
+
+  test("renderLast() Term.Try when has uncertain return") {
+    val termTry =
+      q"""
+      try {
+        doSomething()
+      } catch {
+        case e: Throwable => doSomethingElse()
+      }
+      """
+
+    doWrite(
+      """|try {
+         |  /* return? */doSomething();
+         |} catch (Throwable e) {
+         |  /* return? */doSomethingElse();
+         |}""".stripMargin)
+      .when(tryRenderer).render(eqTree(termTry), eqTo(TryRenderContext(uncertainReturn = true)))
+
+    blockTermRenderer.renderLast(termTry, uncertainReturn = true)
+
+    outputWriter.toString shouldBe
+      """|try {
+         |  /* return? */doSomething();
+         |} catch (Throwable e) {
+         |  /* return? */doSomethingElse();
+         |}""".stripMargin
+  }
+
+  test("renderLast() TryWithHandler with no uncertain return") {
+    val tryWithHandler =
+      q"""
+      try {
+        doSomething()
+      } catch(someCatchHandler)
+      """
+
+    doWrite(
+      """|try {
+         |  doSomething();
+         |}
+         |/* UNPARSEABLE catch handler: someCatchHandler */
+         |""".stripMargin)
+      .when(tryWithHandlerRenderer).render(eqTree(tryWithHandler), eqTo(TryRenderContext()))
+
+    blockTermRenderer.renderLast(tryWithHandler)
+
+    outputWriter.toString shouldBe
+      """|try {
+         |  doSomething();
+         |}
+         |/* UNPARSEABLE catch handler: someCatchHandler */
+         |""".stripMargin
+  }
+
+  test("renderLast() TryWithHandler when has uncertain return") {
+    val tryWithHandler =
+      q"""
+      try {
+        doSomething()
+      } catch(someCatchHandler)
+      """
+
+    doWrite(
+      """|try {
+         |  /* return? */doSomething();
+         |}
+         |/* UNPARSEABLE catch handler: someCatchHandler */
+         |""".stripMargin)
+      .when(tryWithHandlerRenderer).render(eqTree(tryWithHandler), eqTo(TryRenderContext(uncertainReturn = true)))
+
+    blockTermRenderer.renderLast(tryWithHandler, uncertainReturn = true)
+
+    outputWriter.toString shouldBe
+      """|try {
+         |  /* return? */doSomething();
+         |}
+         |/* UNPARSEABLE catch handler: someCatchHandler */
+         |""".stripMargin
   }
 }
