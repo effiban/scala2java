@@ -111,6 +111,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
     termNameRenderer
   )
 
+  lazy val finallyRenderer: FinallyRenderer = new FinallyRendererImpl(blockRenderer)
+
   lazy val ifRenderer: IfRenderer = new IfRendererImpl(
     expressionTermRenderer,
     blockRenderer,
