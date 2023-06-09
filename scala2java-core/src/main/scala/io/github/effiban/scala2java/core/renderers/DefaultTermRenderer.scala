@@ -19,6 +19,7 @@ private[renderers] class DefaultTermRendererImpl(defaultTermRefRenderer: => Defa
                                                  blockRenderer: => BlockRenderer,
                                                  ifRenderer: => IfRenderer,
                                                  matchRenderer: => TermMatchRenderer,
+                                                 tryRenderer: => TryRenderer,
                                                  litRenderer: LitRenderer)
                                                 (implicit javaWriter: JavaWriter) extends DefaultTermRenderer {
 
@@ -37,7 +38,7 @@ private[renderers] class DefaultTermRendererImpl(defaultTermRefRenderer: => Defa
     case block: Block => blockRenderer.render(block)
     case `if`: If => ifRenderer.render(`if`)
     case `match`: Term.Match => matchRenderer.render(`match`)
-    case `try`: Try => //TODO
+    case `try`: Try => tryRenderer.render(`try`)
     case tryWithHandler: TryWithHandler => //TODO
     case `function`: Term.Function => //TODO
     case partialFunction: Term.PartialFunction => //TODO

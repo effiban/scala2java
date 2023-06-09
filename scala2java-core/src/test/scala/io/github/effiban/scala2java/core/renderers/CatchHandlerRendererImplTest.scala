@@ -1,7 +1,6 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.{BlockRenderContext, CatchHandlerContext}
-import io.github.effiban.scala2java.core.entities.Decision.Yes
+import io.github.effiban.scala2java.core.contexts.{BlockRenderContext, CatchHandlerRenderContext}
 import io.github.effiban.scala2java.core.matchers.BlockRenderContextMatcher.eqBlockRenderContext
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
@@ -50,7 +49,7 @@ class CatchHandlerRendererImplTest extends UnitTestSuite {
       context = eqBlockRenderContext(BlockRenderContext())
     )
 
-    catchHandlerRenderer.render(CatchCase, context = CatchHandlerContext(shouldReturnValue = Yes))
+    catchHandlerRenderer.render(CatchCase)
 
     outputWriter.toString shouldBe
       """catch (RuntimeException e) {
@@ -71,10 +70,10 @@ class CatchHandlerRendererImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(blockRenderer).render(
       block = eqTree(BlockOfUncertainReturnStatement),
-      context = eqBlockRenderContext(BlockRenderContext())
+      context = eqBlockRenderContext(BlockRenderContext(uncertainReturn = true))
     )
 
-    catchHandlerRenderer.render(CatchCase)
+    catchHandlerRenderer.render(CatchCase, context = CatchHandlerRenderContext(uncertainReturn = true))
 
     outputWriter.toString shouldBe
       """catch (RuntimeException e) {

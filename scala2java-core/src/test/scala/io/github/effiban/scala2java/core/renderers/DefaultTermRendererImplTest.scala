@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.{BlockRenderContext, IfRenderContext}
+import io.github.effiban.scala2java.core.contexts.{BlockRenderContext, IfRenderContext, TryRenderContext}
 import io.github.effiban.scala2java.core.matchers.BlockRenderContextMatcher.eqBlockRenderContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -22,6 +22,7 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
   private val blockRenderer = mock[BlockRenderer]
   private val ifRenderer = mock[IfRenderer]
   private val matchRenderer = mock[TermMatchRenderer]
+  private val tryRenderer = mock[TryRenderer]
   private val litRenderer = mock[LitRenderer]
 
   private val defaultTermRenderer = new DefaultTermRendererImpl(
@@ -37,6 +38,7 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
     blockRenderer,
     ifRenderer,
     matchRenderer,
+    tryRenderer,
     litRenderer
   )
 
@@ -147,6 +149,21 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
     defaultTermRenderer.render(`match`)
 
     verify(matchRenderer).render(eqTree(`match`))
+  }
+
+  test("render Term.Try") {
+    val termTry =
+      q"""
+      try {
+        doSomething()
+      } catch {
+        case e: IllegalStateException => recover()
+      }
+      """
+
+    defaultTermRenderer.render(termTry)
+
+    verify(tryRenderer).render(eqTree(termTry), eqTo(TryRenderContext()))
   }
 
   test("render Lit") {
