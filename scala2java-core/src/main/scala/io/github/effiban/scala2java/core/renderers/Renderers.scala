@@ -64,6 +64,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
     termApplyInfixRenderer,
     assignRenderer,
     returnRenderer,
+    throwRenderer,
     blockRenderer,
     ifRenderer,
     litRenderer
@@ -140,7 +141,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   val patWildcardRenderer: PatWildcardRenderer = new PatWildcardRendererImpl()
 
-  val returnRenderer: ReturnRenderer = new ReturnRendererImpl(expressionTermRenderer)
+  lazy val returnRenderer: ReturnRenderer = new ReturnRendererImpl(expressionTermRenderer)
 
   val selfRenderer: SelfRenderer = new SelfRendererImpl()
 
@@ -164,6 +165,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
   val termPlaceholderRenderer: TermPlaceholderRenderer = new TermPlaceholderRendererImpl()
 
   val thisRenderer: ThisRenderer = new ThisRendererImpl(nameRenderer)
+
+  lazy val throwRenderer: ThrowRenderer = new ThrowRendererImpl(expressionTermRenderer)
 
   lazy val typeAnnotateRenderer: TypeAnnotateRenderer = new TypeAnnotateRendererImpl(typeRenderer)
 
