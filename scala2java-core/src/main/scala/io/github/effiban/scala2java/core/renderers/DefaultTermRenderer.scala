@@ -33,7 +33,6 @@ private[renderers] class DefaultTermRendererImpl(defaultTermRefRenderer: => Defa
     case `throw`: Throw => throwRenderer.render(`throw`)
     case ascribe: Ascribe => ascribeRenderer.render(ascribe)
     case annotate: Term.Annotate => termAnnotateRenderer.render(annotate)
-    case tuple: Term.Tuple => //TODO
     case block: Block => blockRenderer.render(block)
     case `if`: If => ifRenderer.render(`if`)
     case `match`: Term.Match => //TODO
