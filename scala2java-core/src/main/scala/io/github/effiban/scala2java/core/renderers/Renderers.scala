@@ -85,6 +85,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
     blockRenderer,
     ifRenderer,
     termMatchRenderer,
+    tryRenderer,
     litRenderer
   )
 
@@ -191,6 +192,12 @@ class Renderers(implicit javaWriter: JavaWriter) {
   val thisRenderer: ThisRenderer = new ThisRendererImpl(nameRenderer)
 
   lazy val throwRenderer: ThrowRenderer = new ThrowRendererImpl(expressionTermRenderer)
+
+  lazy val tryRenderer: TryRenderer = new TryRendererImpl(
+    blockRenderer,
+    catchHandlerRenderer,
+    finallyRenderer
+  )
 
   lazy val typeAnnotateRenderer: TypeAnnotateRenderer = new TypeAnnotateRendererImpl(typeRenderer)
 
