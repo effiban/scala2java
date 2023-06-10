@@ -7,6 +7,7 @@ import io.github.effiban.scala2java.core.matchers.ArgumentListContextMatcher.eqA
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import org.mockito.ArgumentMatchersSugar.eqTo
+import org.mockito.captor.ArgCaptor
 
 import scala.meta.{Type, XtensionQuasiquoteType}
 
@@ -20,6 +21,8 @@ class TypeListRendererImplTest extends UnitTestSuite {
   private val argumentListRenderer = mock[ArgumentListRenderer]
   private val typeArgRenderer = mock[ArgumentRenderer[Type]]
 
+  private val argRendererProviderCaptor = ArgCaptor[Int => ArgumentRenderer[Type]]
+
   private val typeListRenderer = new TypeListRendererImpl(
     argumentListRenderer,
     typeArgRenderer
@@ -31,9 +34,11 @@ class TypeListRendererImplTest extends UnitTestSuite {
 
     verify(argumentListRenderer).render(
       args = eqTo(Nil),
-      argRenderer = eqTo(typeArgRenderer),
+      argRendererProvider = argRendererProviderCaptor.capture,
       context = eqArgumentListContext(ArgumentListContext(options = ExpectedTraversalOptions))
     )
+
+    argRendererProviderCaptor.value(0) shouldBe typeArgRenderer
   }
 
   test("traverse() when one type") {
@@ -43,9 +48,11 @@ class TypeListRendererImplTest extends UnitTestSuite {
 
     verify(argumentListRenderer).render(
       args = eqTreeList(List(tpe)),
-      argRenderer = eqTo(typeArgRenderer),
+      argRendererProvider = argRendererProviderCaptor.capture,
       context = eqArgumentListContext(ArgumentListContext(options = ExpectedTraversalOptions))
     )
+
+    argRendererProviderCaptor.value(0) shouldBe typeArgRenderer
   }
 
   test("traverse() when two types") {
@@ -56,9 +63,10 @@ class TypeListRendererImplTest extends UnitTestSuite {
 
     verify(argumentListRenderer).render(
       args = eqTreeList(List(type1, type2)),
-      argRenderer = eqTo(typeArgRenderer),
+      argRendererProvider = argRendererProviderCaptor.capture,
       context = eqArgumentListContext(ArgumentListContext(options = ExpectedTraversalOptions))
     )
-  }
 
+    argRendererProviderCaptor.value(0) shouldBe typeArgRenderer
+  }
 }

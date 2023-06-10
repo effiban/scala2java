@@ -9,7 +9,8 @@ import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames.JavaObject
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
-import org.mockito.ArgumentMatchersSugar.eqTo
+import org.mockito.ArgumentMatchersSugar.{any, eqTo}
+import org.mockito.captor.ArgCaptor
 
 import scala.meta.{Term, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
@@ -21,6 +22,8 @@ class ArrayInitializerRendererImplTest extends UnitTestSuite {
   private val expressionTermRenderer = mock[ExpressionTermRenderer]
   private val termArgumentRenderer = mock[ArgumentRenderer[Term]]
   private val argumentListRenderer = mock[ArgumentListRenderer]
+
+  private val argRendererProviderCaptor = ArgCaptor[Int => ArgumentRenderer[Term]]
 
   private val arrayInitializerRenderer = new ArrayInitializerRendererImpl(
     typeRenderer,
@@ -37,13 +40,21 @@ class ArrayInitializerRendererImplTest extends UnitTestSuite {
     doWrite("T").when(typeRenderer).render(eqTree(tpe))
     doWrite("{ val1, val2 }").when(argumentListRenderer).render(
       eqTreeList(values),
-      eqTo(termArgumentRenderer),
+      any[Int => ArgumentRenderer[Term]],
       eqArgumentListContext(ExpectedArgListContext)
     )
 
     arrayInitializerRenderer.renderWithValues(context)
 
     outputWriter.toString shouldBe "new T[] { val1, val2 }"
+
+    verify(argumentListRenderer).render(
+      eqTreeList(values),
+      argRendererProviderCaptor.capture,
+      eqArgumentListContext(ExpectedArgListContext)
+    )
+
+    argRendererProviderCaptor.value(0) shouldBe termArgumentRenderer
   }
 
   test("renderWithValues() when has type and no values") {
@@ -53,13 +64,21 @@ class ArrayInitializerRendererImplTest extends UnitTestSuite {
     doWrite("T").when(typeRenderer).render(eqTree(tpe))
     doWrite("""{}""").when(argumentListRenderer).render(
       eqTo(Nil),
-      eqTo(termArgumentRenderer),
+      any[Int => ArgumentRenderer[Term]],
       eqArgumentListContext(ExpectedArgListContext)
     )
 
     arrayInitializerRenderer.renderWithValues(context)
 
     outputWriter.toString shouldBe "new T[] {}"
+
+    verify(argumentListRenderer).render(
+      eqTo(Nil),
+      argRendererProviderCaptor.capture,
+      eqArgumentListContext(ExpectedArgListContext)
+    )
+
+    argRendererProviderCaptor.value(0) shouldBe termArgumentRenderer
   }
 
   test("renderWithValues() when has no type but has values should use the Java type 'Object'") {
@@ -69,26 +88,42 @@ class ArrayInitializerRendererImplTest extends UnitTestSuite {
     doWrite("Object").when(typeRenderer).render(eqTree(JavaObject))
     doWrite("{ val1, val2 }").when(argumentListRenderer).render(
       eqTreeList(values),
-      eqTo(termArgumentRenderer),
+      any[Int => ArgumentRenderer[Term]],
       eqArgumentListContext(ExpectedArgListContext)
     )
 
     arrayInitializerRenderer.renderWithValues(context)
 
     outputWriter.toString shouldBe "new Object[] { val1, val2 }"
+
+    verify(argumentListRenderer).render(
+      eqTreeList(values),
+      argRendererProviderCaptor.capture,
+      eqArgumentListContext(ExpectedArgListContext)
+    )
+
+    argRendererProviderCaptor.value(0) shouldBe termArgumentRenderer
   }
 
   test("renderWithValues() when has an empty context should use the Java type 'Object'") {
     doWrite("Object").when(typeRenderer).render(eqTree(JavaObject))
     doWrite("""{}""").when(argumentListRenderer).render(
       eqTreeList(Nil),
-      eqTo(termArgumentRenderer),
+      any[Int => ArgumentRenderer[Term]],
       eqArgumentListContext(ExpectedArgListContext)
     )
 
     arrayInitializerRenderer.renderWithValues(ArrayInitializerValuesRenderContext())
 
     outputWriter.toString shouldBe "new Object[] {}"
+
+    verify(argumentListRenderer).render(
+      eqTreeList(Nil),
+      argRendererProviderCaptor.capture,
+      eqArgumentListContext(ExpectedArgListContext)
+    )
+
+    argRendererProviderCaptor.value(0) shouldBe termArgumentRenderer
   }
 
   test("renderWithSize() when has non-default type and non-default size") {

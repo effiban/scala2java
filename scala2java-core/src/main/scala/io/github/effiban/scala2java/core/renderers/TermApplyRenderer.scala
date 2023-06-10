@@ -29,7 +29,7 @@ private[renderers] class TermApplyRendererImpl(expressionTermRenderer: => Expres
     val argListContext = ArgumentListContext(options = options, argNameAsComment = true)
     argumentListRenderer.render(
       args = termApply.args,
-      argRenderer = invocationArgRenderer,
+      argRendererProvider = _ => invocationArgRenderer,
       context = argListContext
     )
   }
