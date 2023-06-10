@@ -9,7 +9,7 @@ import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import org.mockito.ArgumentMatchersSugar.eqTo
 
-import scala.meta.XtensionQuasiquoteMod
+import scala.meta.{Mod, Name, XtensionQuasiquoteMod}
 
 class ModListRendererImplTest extends UnitTestSuite {
 
@@ -24,13 +24,14 @@ class ModListRendererImplTest extends UnitTestSuite {
   }
 
   test("render when has annotations only and not on same line") {
-    val context = ModifiersRenderContext(annots = List(mod"@MyAnnot1", mod"@MyAnnot2"))
+    val annots = List(mod"@MyAnnot1", mod"@MyAnnot2")
+    val context = ModifiersRenderContext(scalaMods = annots)
 
     doWrite(
       """@MyAnnot1
         |@MyAnnot2
         |""".stripMargin)
-      .when(annotListRenderer).render(eqTreeList(context.annots), onSameLine = eqTo(false))
+      .when(annotListRenderer).render(eqTreeList(annots), onSameLine = eqTo(false))
 
     modListRenderer.render(context)
 
@@ -41,26 +42,31 @@ class ModListRendererImplTest extends UnitTestSuite {
   }
 
   test("render when has annotations only and on same line") {
-    val context = ModifiersRenderContext(annots = List(mod"@MyAnnot1", mod"@MyAnnot2"), annotsOnSameLine = true)
+    val annots = List(mod"@MyAnnot1", mod"@MyAnnot2")
+    val context = ModifiersRenderContext(scalaMods = annots, annotsOnSameLine = true)
 
     doWrite("@MyAnnot1 @MyAnnot2")
-      .when(annotListRenderer).render(eqTreeList(context.annots), onSameLine = eqTo(true))
+      .when(annotListRenderer).render(eqTreeList(annots), onSameLine = eqTo(true))
 
     modListRenderer.render(context)
 
     outputWriter.toString shouldBe "@MyAnnot1 @MyAnnot2"
   }
 
-  test("render when hasImplicit = true and nothing else") {
-    val context = ModifiersRenderContext(hasImplicit = true)
+  test("render when `implicit` and nothing else") {
+    val scalaMods = List(mod"implicit")
+    val context = ModifiersRenderContext(scalaMods = scalaMods)
 
     modListRenderer.render(context)
 
     outputWriter.toString shouldBe "/* implicit */"
   }
 
-  test("render when has Java modifiers only and out of order") {
-    val context = ModifiersRenderContext(javaModifiers = List(Static, Private, Final))
+  test("render when has non-annotation modifiers only, and out of order") {
+    val context = ModifiersRenderContext(
+      scalaMods = List(Mod.Private(Name.Anonymous())),
+      javaModifiers = List(Static, Private, Final)
+    )
 
     modListRenderer.render(context)
 
@@ -68,19 +74,27 @@ class ModListRendererImplTest extends UnitTestSuite {
   }
 
   test("render when has everything") {
+    val annots = List(mod"@MyAnnot1", mod"@MyAnnot2")
+    val scalaMods = annots :+ mod"private" :+ mod"implicit"
+    val javaModifiers = List(Static, Final, Private)
     val context = ModifiersRenderContext(
-      annots = List(mod"@MyAnnot1", mod"@MyAnnot2"),
+      scalaMods = scalaMods,
       annotsOnSameLine = true,
-      hasImplicit = true,
-      javaModifiers = List(Static, Final, Private)
+      javaModifiers = javaModifiers
     )
 
-    doWrite("@MyAnnot1 @MyAnnot2")
-      .when(annotListRenderer).render(eqTreeList(context.annots), onSameLine = eqTo(true))
+    doWrite(
+      """@MyAnnot1
+        |@MyAnnot2
+        |""".stripMargin)
+      .when(annotListRenderer).render(eqTreeList(annots), onSameLine = eqTo(true))
 
     modListRenderer.render(context)
 
-    outputWriter.toString shouldBe "@MyAnnot1 @MyAnnot2/* implicit */private static final "
+    outputWriter.toString shouldBe
+      """@MyAnnot1
+        |@MyAnnot2
+        |/* implicit */private static final """.stripMargin
   }
 
   private object TestJavaModifierOrdering extends JavaModifierOrdering {

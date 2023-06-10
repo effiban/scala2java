@@ -4,6 +4,8 @@ import io.github.effiban.scala2java.core.contexts.ModifiersRenderContext
 import io.github.effiban.scala2java.core.orderings.JavaModifierOrdering
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
+import scala.meta.Mod.{Annot, Implicit}
+
 trait ModListRenderer {
   def render(context: ModifiersRenderContext): Unit
 }
@@ -15,13 +17,14 @@ class ModListRendererImpl(annotListRenderer: => AnnotListRenderer,
   import javaWriter._
 
   override def render(context: ModifiersRenderContext): Unit = {
-    annotListRenderer.render(context.annots, onSameLine = context.annotsOnSameLine)
+    val annots = context.scalaMods.collect { case annot: Annot => annot }
+    annotListRenderer.render(annots, onSameLine = context.annotsOnSameLine)
     renderImplicitIfNeeded(context)
     renderModifiers(context)
   }
 
   private def renderImplicitIfNeeded(context: ModifiersRenderContext): Unit = {
-    if (context.hasImplicit) {
+    context.scalaMods.collectFirst { case anImplicit: Implicit => anImplicit }.foreach { _ =>
       writeComment("implicit")
     }
   }
