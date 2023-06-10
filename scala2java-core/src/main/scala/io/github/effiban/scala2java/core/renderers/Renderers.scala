@@ -194,6 +194,12 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   lazy val termNameRenderer: TermNameRenderer = new TermNameRendererImpl()
 
+  lazy val termParamRenderer: TermParamRenderer = new TermParamRendererImpl(
+    modListRenderer,
+    typeRenderer,
+    nameRenderer
+  )
+
   val termPlaceholderRenderer: TermPlaceholderRenderer = new TermPlaceholderRendererImpl()
 
   val thisRenderer: ThisRenderer = new ThisRendererImpl(nameRenderer)

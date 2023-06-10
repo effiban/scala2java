@@ -5,20 +5,19 @@ import io.github.effiban.scala2java.test.utils.matchers.{ListMatcher, TreeMatche
 import org.mockito.ArgumentMatcher
 import org.mockito.ArgumentMatchers.argThat
 
-import scala.meta.Mod.Annot
+import scala.meta.Mod
 
 class ModifiersRenderContextMatcher(expectedContext: ModifiersRenderContext) extends ArgumentMatcher[ModifiersRenderContext] {
 
   override def matches(actualContext: ModifiersRenderContext): Boolean = {
 
-    annotsMatch(actualContext) &&
+    scalaModsMatch(actualContext) &&
       actualContext.annotsOnSameLine == expectedContext.annotsOnSameLine &&
-      actualContext.hasImplicit == expectedContext.hasImplicit &&
       actualContext.javaModifiers == expectedContext.javaModifiers
   }
 
-  private def annotsMatch(actualContext: ModifiersRenderContext) = {
-    new ListMatcher(expectedContext.annots, new TreeMatcher[Annot](_)).matches(actualContext.annots)
+  private def scalaModsMatch(actualContext: ModifiersRenderContext) = {
+    new ListMatcher(expectedContext.scalaMods, new TreeMatcher[Mod](_)).matches(actualContext.scalaMods)
   }
 
   override def toString: String = s"Matcher for: $expectedContext"
