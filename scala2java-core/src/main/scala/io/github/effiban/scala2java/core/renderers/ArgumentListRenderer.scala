@@ -7,7 +7,7 @@ import scala.meta.Tree
 
 trait ArgumentListRenderer {
   def render[T <: Tree](args: List[T],
-                        argRenderer: => ArgumentRenderer[T],
+                        argRendererProvider: Int => ArgumentRenderer[T],
                         context: ArgumentListContext = ArgumentListContext()): Unit
 }
 
@@ -16,7 +16,7 @@ class ArgumentListRendererImpl(implicit javaWriter: JavaWriter) extends Argument
   import javaWriter._
 
   override def render[T <: Tree](args: List[T],
-                                 argRenderer: => ArgumentRenderer[T],
+                                 argRendererProvider: Int => ArgumentRenderer[T],
                                  context: ArgumentListContext = ArgumentListContext()): Unit = {
     if (args.nonEmpty || context.options.traverseEmpty) {
 
@@ -27,7 +27,7 @@ class ArgumentListRendererImpl(implicit javaWriter: JavaWriter) extends Argument
         val argContext = ArgumentContext(
           argNameAsComment = context.argNameAsComment
         )
-
+        val argRenderer = argRendererProvider(idx)
         argRenderer.render(tree, argContext)
         if (idx < args.size - 1) {
           writeListSeparator()
