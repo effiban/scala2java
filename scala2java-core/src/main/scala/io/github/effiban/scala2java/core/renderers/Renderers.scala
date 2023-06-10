@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.classifiers.JavaStatClassifier
+import io.github.effiban.scala2java.core.orderings.JavaModifierOrdering
 import io.github.effiban.scala2java.core.resolvers.ArrayInitializerRenderContextResolver
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
@@ -137,6 +138,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
   )
 
   val litRenderer: LitRenderer = new LitRendererImpl()
+
+  lazy val modListRenderer: ModListRenderer = new ModListRendererImpl(annotListRenderer, JavaModifierOrdering)
 
   lazy val nameIndeterminateRenderer: NameIndeterminateRenderer = new NameIndeterminateRendererImpl()
 

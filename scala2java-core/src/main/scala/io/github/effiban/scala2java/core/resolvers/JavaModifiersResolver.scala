@@ -29,6 +29,7 @@ class JavaModifiersResolverImpl(javaAllowedModifiersResolver: JavaAllowedModifie
 
     modifierNamesBuilder.result()
       .toList
+      // TODO remove once separation of traversers and renderers is complete
       .sorted(JavaModifierOrdering)
   }
 
