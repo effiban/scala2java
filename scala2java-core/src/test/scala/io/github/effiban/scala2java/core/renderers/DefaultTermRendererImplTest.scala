@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.{BlockRenderContext, IfRenderContext, TryRenderContext}
+import io.github.effiban.scala2java.core.contexts.{BlockRenderContext, IfRenderContext, TermFunctionRenderContext, TryRenderContext}
 import io.github.effiban.scala2java.core.matchers.BlockRenderContextMatcher.eqBlockRenderContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -24,6 +24,7 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
   private val matchRenderer = mock[TermMatchRenderer]
   private val tryRenderer = mock[TryRenderer]
   private val tryWithHandlerRenderer = mock[TryWithHandlerRenderer]
+  private val termFunctionRenderer = mock[TermFunctionRenderer]
   private val litRenderer = mock[LitRenderer]
 
   private val defaultTermRenderer = new DefaultTermRendererImpl(
@@ -41,6 +42,7 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
     matchRenderer,
     tryRenderer,
     tryWithHandlerRenderer,
+    termFunctionRenderer,
     litRenderer
   )
 
@@ -179,6 +181,14 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
     defaultTermRenderer.render(tryWithHandler)
 
     verify(tryWithHandlerRenderer).render(eqTree(tryWithHandler), eqTo(TryRenderContext()))
+  }
+
+  test("render Term.Function") {
+    val termFunction = q"x => doSomething(x)"
+
+    defaultTermRenderer.render(termFunction)
+
+    verify(termFunctionRenderer).render(eqTree(termFunction), eqTo(TermFunctionRenderContext()))
   }
 
   test("render Lit") {
