@@ -92,6 +92,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
     tryRenderer,
     tryWithHandlerRenderer,
     termFunctionRenderer,
+    whileRenderer,
     litRenderer
   )
 
@@ -287,4 +288,6 @@ class Renderers(implicit javaWriter: JavaWriter) {
   lazy val typeWildcardRenderer: TypeWildcardRenderer = new TypeWildcardRendererImpl(typeBoundsRenderer)
 
   lazy val typeWithRenderer: TypeWithRenderer = new TypeWithRendererImpl(typeRenderer)
+
+  lazy val whileRenderer: WhileRenderer = new WhileRendererImpl(expressionTermRenderer, defaultTermRenderer)
 }

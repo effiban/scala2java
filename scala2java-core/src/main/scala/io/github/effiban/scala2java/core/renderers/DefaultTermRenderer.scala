@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
-import scala.meta.Term.{AnonymousFunction, ApplyType, Ascribe, Assign, Block, Do, Eta, If, New, NewAnonymous, Return, Throw, Try, TryWithHandler, While}
+import scala.meta.Term.{ApplyType, Ascribe, Assign, Block, Do, Eta, If, New, NewAnonymous, Return, Throw, Try, TryWithHandler, While}
 import scala.meta.{Lit, Term}
 
 trait DefaultTermRenderer extends TermRenderer
@@ -22,6 +22,7 @@ private[renderers] class DefaultTermRendererImpl(defaultTermRefRenderer: => Defa
                                                  tryRenderer: => TryRenderer,
                                                  tryWithHandlerRenderer: => TryWithHandlerRenderer,
                                                  termFunctionRenderer: => TermFunctionRenderer,
+                                                 whileRenderer: => WhileRenderer,
                                                  litRenderer: LitRenderer)
                                                 (implicit javaWriter: JavaWriter) extends DefaultTermRenderer {
 
@@ -43,9 +44,7 @@ private[renderers] class DefaultTermRendererImpl(defaultTermRefRenderer: => Defa
     case `try`: Try => tryRenderer.render(`try`)
     case tryWithHandler: TryWithHandler => tryWithHandlerRenderer.render(tryWithHandler)
     case `function`: Term.Function => termFunctionRenderer.render(`function`)
-    case partialFunction: Term.PartialFunction => //TODO
-    case anonFunction: AnonymousFunction => //TODO
-    case `while`: While => //TODO
+    case `while`: While => whileRenderer.render(`while`)
     case `do`: Do => //TODO
     case `new`: New => //TODO
     case newAnonymous: NewAnonymous => //TODO
