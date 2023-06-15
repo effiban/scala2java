@@ -29,6 +29,7 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
   private val doRenderer = mock[DoRenderer]
   private val newRenderer = mock[NewRenderer]
   private val termPlaceholderRenderer = mock[TermPlaceholderRenderer]
+  private val etaRenderer = mock[EtaRenderer]
   private val litRenderer = mock[LitRenderer]
 
   private val defaultTermRenderer = new DefaultTermRendererImpl(
@@ -51,6 +52,7 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
     doRenderer,
     newRenderer,
     termPlaceholderRenderer,
+    etaRenderer,
     litRenderer
   )
 
@@ -237,6 +239,12 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
     defaultTermRenderer.render(Term.Placeholder())
 
     verify(termPlaceholderRenderer).render(eqTree(Term.Placeholder()))
+  }
+
+  test("render Eta") {
+    val eta = Term.Eta(q"func")
+    defaultTermRenderer.render(eta)
+    verify(etaRenderer).render(eqTree(eta))
   }
 
   test("render Lit") {

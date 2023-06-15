@@ -96,6 +96,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
     doRenderer,
     newRenderer,
     termPlaceholderRenderer,
+    etaRenderer,
     litRenderer
   )
 
@@ -105,6 +106,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
   )
 
   lazy val doRenderer: DoRenderer = new DoRendererImpl(expressionTermRenderer, defaultTermRenderer)
+
+  lazy val etaRenderer: EtaRenderer = new EtaRendererImpl(expressionTermRenderer)
 
   lazy val expressionTermRenderer: ExpressionTermRenderer = new ExpressionTermRendererImpl(
     expressionTermRefRenderer,
