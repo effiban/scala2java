@@ -23,6 +23,7 @@ private[renderers] class DefaultTermRendererImpl(defaultTermRefRenderer: => Defa
                                                  tryWithHandlerRenderer: => TryWithHandlerRenderer,
                                                  termFunctionRenderer: => TermFunctionRenderer,
                                                  whileRenderer: => WhileRenderer,
+                                                 doRenderer: => DoRenderer,
                                                  litRenderer: LitRenderer)
                                                 (implicit javaWriter: JavaWriter) extends DefaultTermRenderer {
 
@@ -45,7 +46,7 @@ private[renderers] class DefaultTermRendererImpl(defaultTermRefRenderer: => Defa
     case tryWithHandler: TryWithHandler => tryWithHandlerRenderer.render(tryWithHandler)
     case `function`: Term.Function => termFunctionRenderer.render(`function`)
     case `while`: While => whileRenderer.render(`while`)
-    case `do`: Do => //TODO
+    case `do`: Do => doRenderer.render(`do`)
     case `new`: New => //TODO
     case newAnonymous: NewAnonymous => //TODO
     case termPlaceholder: Term.Placeholder => //TODO

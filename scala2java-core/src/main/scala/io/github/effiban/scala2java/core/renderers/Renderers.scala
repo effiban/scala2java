@@ -93,6 +93,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
     tryWithHandlerRenderer,
     termFunctionRenderer,
     whileRenderer,
+    doRenderer,
     litRenderer
   )
 
@@ -100,6 +101,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
     defaultTermRefRenderer,
     termNameRenderer
   )
+
+  lazy val doRenderer: DoRenderer = new DoRendererImpl(expressionTermRenderer, defaultTermRenderer)
 
   lazy val expressionTermRenderer: ExpressionTermRenderer = new ExpressionTermRendererImpl(
     expressionTermRefRenderer,
