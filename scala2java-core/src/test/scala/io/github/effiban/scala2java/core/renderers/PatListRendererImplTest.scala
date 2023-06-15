@@ -6,7 +6,6 @@ import io.github.effiban.scala2java.core.matchers.ArgumentListContextMatcher.eqA
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import org.mockito.ArgumentMatchersSugar.eqTo
-import org.mockito.captor.ArgCaptor
 
 import scala.meta.{Pat, XtensionQuasiquoteCaseOrPattern}
 
@@ -17,8 +16,6 @@ class PatListRendererImplTest extends UnitTestSuite {
   private val argumentListRenderer = mock[ArgumentListRenderer]
   private val patArgRenderer = mock[ArgumentRenderer[Pat]]
 
-  private val argRendererProviderCaptor = ArgCaptor[Int => ArgumentRenderer[Pat]]
-
   private val patListRenderer = new PatListRendererImpl(argumentListRenderer, patArgRenderer)
 
 
@@ -27,11 +24,9 @@ class PatListRendererImplTest extends UnitTestSuite {
 
     verify(argumentListRenderer).render(
       args = eqTo(Nil),
-      argRendererProvider = argRendererProviderCaptor.capture,
+      argRenderer = eqTo(patArgRenderer),
       context = eqArgumentListContext(ExpectedArgListContext)
     )
-
-    argRendererProviderCaptor.value(0) shouldBe patArgRenderer
   }
 
   test("render() when one pat") {
@@ -42,11 +37,9 @@ class PatListRendererImplTest extends UnitTestSuite {
 
     verify(argumentListRenderer).render(
       args = eqTreeList(List(pat)),
-      argRendererProvider = argRendererProviderCaptor.capture,
+      argRenderer = eqTo(patArgRenderer),
       context = eqArgumentListContext(ExpectedArgListContext)
     )
-
-    argRendererProviderCaptor.value(0) shouldBe patArgRenderer
   }
 
   test("render() when two pats") {
@@ -57,10 +50,8 @@ class PatListRendererImplTest extends UnitTestSuite {
 
     verify(argumentListRenderer).render(
       args = eqTreeList(List(pat1, pat2)),
-      argRendererProvider = argRendererProviderCaptor.capture,
+      argRenderer = eqTo(patArgRenderer),
       context = eqArgumentListContext(ExpectedArgListContext)
     )
-
-    argRendererProviderCaptor.value(0) shouldBe patArgRenderer
   }
 }

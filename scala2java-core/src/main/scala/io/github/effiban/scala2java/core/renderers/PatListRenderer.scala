@@ -15,7 +15,7 @@ private[renderers] class PatListRendererImpl(argumentListRenderer: => ArgumentLi
   override def render(pats: List[Pat]): Unit = {
     argumentListRenderer.render(
       args = pats,
-      argRendererProvider = _ => patArgRenderer,
+      argRenderer = patArgRenderer,
       context = ArgumentListContext(options = ListTraversalOptions(onSameLine = true))
     )
   }
