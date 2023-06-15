@@ -11,6 +11,7 @@ private[renderers] class TermPlaceholderRendererImpl(implicit javaWriter: JavaWr
 
   import javaWriter._
 
+  // Underscore as expression - will compile in java only if it is an anonymous function, but rendering always
   override def render(ignored: Term.Placeholder): Unit = {
     write(JavaPlaceholder)
   }

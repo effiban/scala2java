@@ -182,7 +182,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
     forYieldTraverser,
     newTraverser,
     newAnonymousTraverser,
-    termPlaceholderTraverser,
+    termPlaceholderRenderer,
     etaTraverser,
     termRepeatedTraverser,
     defaultTermRenderer
@@ -502,8 +502,6 @@ class ScalaTreeTraversers(implicit factories: Factories,
     nameTraverser,
     nameRenderer
   )
-
-  private lazy val termPlaceholderTraverser: TermPlaceholderTraverser = new TermPlaceholderTraverserImpl(termPlaceholderRenderer)
 
   private lazy val termRepeatedTraverser: TermRepeatedTraverser = new TermRepeatedTraverserImpl(expressionTermTraverser)
 

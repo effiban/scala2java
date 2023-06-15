@@ -95,6 +95,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
     whileRenderer,
     doRenderer,
     newRenderer,
+    termPlaceholderRenderer,
     litRenderer
   )
 
