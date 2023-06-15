@@ -6,7 +6,7 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 import scala.meta.{Mod, Term}
 
 trait TermParamRenderer {
-  def render(termParam: Term.Param, context: TermParamRenderContext): Unit
+  def render(termParam: Term.Param, context: TermParamRenderContext = TermParamRenderContext()): Unit
 }
 
 private[renderers] class TermParamRendererImpl(modListRenderer: => ModListRenderer,
@@ -19,7 +19,7 @@ private[renderers] class TermParamRendererImpl(modListRenderer: => ModListRender
   // method/lambda parameter declaration
   // Note that a primary ctor. param in Scala is also a class member which requires additional handling,
   // but that aspect will be handled by one of the parent renderers before this one is called
-  override def render(termParam: Term.Param, context: TermParamRenderContext): Unit = {
+  override def render(termParam: Term.Param, context: TermParamRenderContext = TermParamRenderContext()): Unit = {
     val modifiersRenderContext = generateModifiersRenderContext(termParam.mods, context)
     modListRenderer.render(modifiersRenderContext)
     termParam.decltpe.foreach(declType => {

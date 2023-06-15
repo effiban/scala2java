@@ -91,6 +91,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
     termMatchRenderer,
     tryRenderer,
     tryWithHandlerRenderer,
+    termFunctionRenderer,
     litRenderer
   )
 
@@ -188,6 +189,13 @@ class Renderers(implicit javaWriter: JavaWriter) {
     argumentListRenderer,
     compositeInvocationArgRenderer,
     ArrayInitializerRenderContextResolver
+  )
+
+  lazy val termFunctionRenderer: TermFunctionRenderer = new TermFunctionRendererImpl(
+    termParamRenderer,
+    termParamListRenderer,
+    blockRenderer,
+    defaultTermRenderer
   )
 
   lazy val termMatchRenderer: TermMatchRenderer = new TermMatchRendererImpl(expressionTermRenderer, caseRenderer)

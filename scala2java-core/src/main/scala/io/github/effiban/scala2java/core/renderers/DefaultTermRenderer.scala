@@ -21,6 +21,7 @@ private[renderers] class DefaultTermRendererImpl(defaultTermRefRenderer: => Defa
                                                  matchRenderer: => TermMatchRenderer,
                                                  tryRenderer: => TryRenderer,
                                                  tryWithHandlerRenderer: => TryWithHandlerRenderer,
+                                                 termFunctionRenderer: => TermFunctionRenderer,
                                                  litRenderer: LitRenderer)
                                                 (implicit javaWriter: JavaWriter) extends DefaultTermRenderer {
 
@@ -41,7 +42,7 @@ private[renderers] class DefaultTermRendererImpl(defaultTermRefRenderer: => Defa
     case `match`: Term.Match => matchRenderer.render(`match`)
     case `try`: Try => tryRenderer.render(`try`)
     case tryWithHandler: TryWithHandler => tryWithHandlerRenderer.render(tryWithHandler)
-    case `function`: Term.Function => //TODO
+    case `function`: Term.Function => termFunctionRenderer.render(`function`)
     case partialFunction: Term.PartialFunction => //TODO
     case anonFunction: AnonymousFunction => //TODO
     case `while`: While => //TODO
