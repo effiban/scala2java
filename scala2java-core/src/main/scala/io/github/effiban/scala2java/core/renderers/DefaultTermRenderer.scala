@@ -26,6 +26,7 @@ private[renderers] class DefaultTermRendererImpl(defaultTermRefRenderer: => Defa
                                                  doRenderer: => DoRenderer,
                                                  newRenderer: => NewRenderer,
                                                  termPlaceholderRenderer: => TermPlaceholderRenderer,
+                                                 etaRenderer: => EtaRenderer,
                                                  litRenderer: LitRenderer)
                                                 (implicit javaWriter: JavaWriter) extends DefaultTermRenderer {
 
@@ -52,7 +53,7 @@ private[renderers] class DefaultTermRendererImpl(defaultTermRefRenderer: => Defa
     case `new`: New => newRenderer.render(`new`)
     case newAnonymous: NewAnonymous => //TODO once TemplateRenderer is ready
     case termPlaceholder: Term.Placeholder => termPlaceholderRenderer.render(termPlaceholder)
-    case eta: Eta => //TODO
+    case eta: Eta => etaRenderer.render(eta)
     case termRepeated: Term.Repeated => //TODO
     case literal: Lit => litRenderer.render(literal)
     case _ => writeComment(s"UNSUPPORTED: $term")
