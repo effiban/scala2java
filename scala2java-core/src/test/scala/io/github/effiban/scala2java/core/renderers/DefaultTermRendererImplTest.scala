@@ -25,6 +25,7 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
   private val tryRenderer = mock[TryRenderer]
   private val tryWithHandlerRenderer = mock[TryWithHandlerRenderer]
   private val termFunctionRenderer = mock[TermFunctionRenderer]
+  private val whileRenderer = mock[WhileRenderer]
   private val litRenderer = mock[LitRenderer]
 
   private val defaultTermRenderer = new DefaultTermRendererImpl(
@@ -43,6 +44,7 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
     tryRenderer,
     tryWithHandlerRenderer,
     termFunctionRenderer,
+    whileRenderer,
     litRenderer
   )
 
@@ -189,6 +191,19 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
     defaultTermRenderer.render(termFunction)
 
     verify(termFunctionRenderer).render(eqTree(termFunction), eqTo(TermFunctionRenderContext()))
+  }
+
+  test("render While") {
+    val `while` =
+      q"""
+      while (x > 3) {
+        doSomething(x)
+      }
+      """
+
+    defaultTermRenderer.render(`while`)
+
+    verify(whileRenderer).render(eqTree(`while`))
   }
 
   test("render Lit") {
