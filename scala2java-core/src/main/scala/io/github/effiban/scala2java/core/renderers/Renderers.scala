@@ -94,6 +94,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
     termFunctionRenderer,
     whileRenderer,
     doRenderer,
+    newRenderer,
     litRenderer
   )
 
@@ -152,6 +153,12 @@ class Renderers(implicit javaWriter: JavaWriter) {
     nameIndeterminateRenderer,
     termNameRenderer,
     typeNameRenderer
+  )
+
+  lazy val newRenderer: NewRenderer = new NewRendererImpl(
+    initRenderer,
+    arrayInitializerRenderer,
+    ArrayInitializerRenderContextResolver
   )
 
   lazy val patListRenderer: PatListRenderer = new PatListRendererImpl(

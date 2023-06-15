@@ -27,6 +27,7 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
   private val termFunctionRenderer = mock[TermFunctionRenderer]
   private val whileRenderer = mock[WhileRenderer]
   private val doRenderer = mock[DoRenderer]
+  private val newRenderer = mock[NewRenderer]
   private val litRenderer = mock[LitRenderer]
 
   private val defaultTermRenderer = new DefaultTermRendererImpl(
@@ -47,6 +48,7 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
     termFunctionRenderer,
     whileRenderer,
     doRenderer,
+    newRenderer,
     litRenderer
   )
 
@@ -219,6 +221,14 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
     defaultTermRenderer.render(`do`)
 
     verify(doRenderer).render(eqTree(`do`))
+  }
+
+  test("render New") {
+    val `new` = q"new MyClass(3)"
+
+    defaultTermRenderer.render(`new`)
+
+    verify(newRenderer).render(eqTree(`new`))
   }
 
   test("render Lit") {
