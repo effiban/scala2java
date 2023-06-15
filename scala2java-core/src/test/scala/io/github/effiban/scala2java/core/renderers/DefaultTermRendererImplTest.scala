@@ -6,7 +6,7 @@ import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
 
-import scala.meta.XtensionQuasiquoteTerm
+import scala.meta.{Term, XtensionQuasiquoteTerm}
 
 class DefaultTermRendererImplTest extends UnitTestSuite {
 
@@ -28,6 +28,7 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
   private val whileRenderer = mock[WhileRenderer]
   private val doRenderer = mock[DoRenderer]
   private val newRenderer = mock[NewRenderer]
+  private val termPlaceholderRenderer = mock[TermPlaceholderRenderer]
   private val litRenderer = mock[LitRenderer]
 
   private val defaultTermRenderer = new DefaultTermRendererImpl(
@@ -49,6 +50,7 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
     whileRenderer,
     doRenderer,
     newRenderer,
+    termPlaceholderRenderer,
     litRenderer
   )
 
@@ -229,6 +231,12 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
     defaultTermRenderer.render(`new`)
 
     verify(newRenderer).render(eqTree(`new`))
+  }
+
+  test("render Term.Placeholder") {
+    defaultTermRenderer.render(Term.Placeholder())
+
+    verify(termPlaceholderRenderer).render(eqTree(Term.Placeholder()))
   }
 
   test("render Lit") {

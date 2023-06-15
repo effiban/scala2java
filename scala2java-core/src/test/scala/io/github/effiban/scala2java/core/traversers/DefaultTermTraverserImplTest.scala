@@ -3,7 +3,7 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.{BlockContext, TryContext}
 import io.github.effiban.scala2java.core.entities.Decision.{No, Uncertain}
 import io.github.effiban.scala2java.core.matchers.BlockContextMatcher.eqBlockContext
-import io.github.effiban.scala2java.core.renderers.DefaultTermRenderer
+import io.github.effiban.scala2java.core.renderers.{DefaultTermRenderer, TermPlaceholderRenderer}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TermNames.Plus
 import io.github.effiban.scala2java.core.testtrees.TypeNames
@@ -41,7 +41,7 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
   private val forYieldTraverser = mock[ForYieldTraverser]
   private val newTraverser = mock[NewTraverser]
   private val newAnonymousTraverser = mock[NewAnonymousTraverser]
-  private val termPlaceholderTraverser = mock[TermPlaceholderTraverser]
+  private val termPlaceholderRenderer = mock[TermPlaceholderRenderer]
   private val etaTraverser = mock[EtaTraverser]
   private val termRepeatedTraverser = mock[TermRepeatedTraverser]
   private val defaultTermRenderer = mock[DefaultTermRenderer]
@@ -72,7 +72,7 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
     forYieldTraverser,
     newTraverser,
     newAnonymousTraverser,
-    termPlaceholderTraverser,
+    termPlaceholderRenderer,
     etaTraverser,
     termRepeatedTraverser,
     defaultTermRenderer
@@ -318,7 +318,7 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
 
   test("traverse() for Term.Placeholder") {
     defaultTermTraverser.traverse(Term.Placeholder())
-    verify(termPlaceholderTraverser).traverse(eqTree(Term.Placeholder()))
+    verify(termPlaceholderRenderer).render(eqTree(Term.Placeholder()))
   }
 
   test("traverse() for Eta") {

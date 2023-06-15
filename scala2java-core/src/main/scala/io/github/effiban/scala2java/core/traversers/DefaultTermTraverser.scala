@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.DefaultTermRenderer
+import io.github.effiban.scala2java.core.renderers.{DefaultTermRenderer, TermPlaceholderRenderer}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Term.{AnonymousFunction, ApplyType, Ascribe, Assign, Block, Do, Eta, For, ForYield, If, New, NewAnonymous, Return, Throw, Try, TryWithHandler, While}
@@ -32,7 +32,7 @@ private[traversers] class DefaultTermTraverserImpl(defaultTermRefTraverser: => D
                                                    forYieldTraverser: => ForYieldTraverser,
                                                    newTraverser: => NewTraverser,
                                                    newAnonymousTraverser: => NewAnonymousTraverser,
-                                                   termPlaceholderTraverser: => TermPlaceholderTraverser,
+                                                   termPlaceholderRenderer: => TermPlaceholderRenderer,
                                                    etaTraverser: => EtaTraverser,
                                                    termRepeatedTraverser: => TermRepeatedTraverser,
                                                    defaultTermRenderer: => DefaultTermRenderer)
@@ -67,7 +67,8 @@ private[traversers] class DefaultTermTraverserImpl(defaultTermRefTraverser: => D
     case forYield: ForYield => forYieldTraverser.traverse(forYield)
     case `new`: New => newTraverser.traverse(`new`)
     case newAnonymous: NewAnonymous => newAnonymousTraverser.traverse(newAnonymous)
-    case termPlaceholder: Term.Placeholder => termPlaceholderTraverser.traverse(termPlaceholder)
+    case termPlaceholder: Term.Placeholder =>
+      termPlaceholderRenderer.render(termPlaceholder)
     case eta: Eta => etaTraverser.traverse(eta)
     case termRepeated: Term.Repeated => termRepeatedTraverser.traverse(termRepeated)
     case literal: Lit =>
