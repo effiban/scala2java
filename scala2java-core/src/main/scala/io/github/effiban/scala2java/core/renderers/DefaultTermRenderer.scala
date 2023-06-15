@@ -54,7 +54,6 @@ private[renderers] class DefaultTermRendererImpl(defaultTermRefRenderer: => Defa
     case newAnonymous: NewAnonymous => //TODO once TemplateRenderer is ready
     case termPlaceholder: Term.Placeholder => termPlaceholderRenderer.render(termPlaceholder)
     case eta: Eta => etaRenderer.render(eta)
-    case termRepeated: Term.Repeated => //TODO
     case literal: Lit => litRenderer.render(literal)
     case _ => writeComment(s"UNSUPPORTED: $term")
   }
