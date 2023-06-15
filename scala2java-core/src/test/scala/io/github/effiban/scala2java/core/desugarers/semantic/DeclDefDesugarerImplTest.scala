@@ -21,6 +21,7 @@ class DeclDefDesugarerImplTest extends UnitTestSuite {
       case Some(q"func") => termParam.copy(default = Some(q"func()"))
       case Some(q"func2") => termParam.copy(default = Some(q"func2()"))
       case Some(q"func3") => termParam.copy(default = Some(q"func3()"))
+      case other => other
     }).when(termParamDesugarer).desugar(any[Term.Param])
 
     declDefDesugarer.desugar(declDef).structure shouldBe desugaredDeclDef.structure
