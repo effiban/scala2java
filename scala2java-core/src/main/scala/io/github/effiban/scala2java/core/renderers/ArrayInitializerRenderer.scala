@@ -32,7 +32,7 @@ private[renderers] class ArrayInitializerRendererImpl(typeRenderer: => TypeRende
     val options = ListTraversalOptions(maybeEnclosingDelimiter = Some(CurlyBrace), traverseEmpty = true)
     argumentListRenderer.render(
       args = values,
-      argRendererProvider = _ => argumentRenderer,
+      argRenderer = argumentRenderer,
       context = ArgumentListContext(options = options))
   }
 

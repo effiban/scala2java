@@ -23,7 +23,7 @@ private[renderers] class InitRendererImpl(typeRenderer: => TypeRenderer,
       val argListContext = ArgumentListContext(options = options, argNameAsComment = context.argNameAsComment)
       argumentListRenderer.render(
         args = init.argss.flatten,
-        argRendererProvider = _ => invocationArgRenderer,
+        argRenderer = invocationArgRenderer,
         context = argListContext)
     }
   }

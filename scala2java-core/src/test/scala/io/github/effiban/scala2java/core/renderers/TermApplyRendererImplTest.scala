@@ -11,8 +11,7 @@ import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{TermNames, TypeNames}
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
-import org.mockito.ArgumentMatchersSugar.any
-import org.mockito.captor.ArgCaptor
+import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.{Lit, Term}
 
@@ -22,8 +21,6 @@ class TermApplyRendererImplTest extends UnitTestSuite {
   private val argListRenderer = mock[ArgumentListRenderer]
   private val invocationArgRenderer = mock[InvocationArgRenderer[Term]]
   private val arrayInitializerRenderContextResolver = mock[ArrayInitializerRenderContextResolver]
-
-  private val argRendererProviderCaptor = ArgCaptor[Int => ArgumentRenderer[Term]]
 
   private val termApplyRenderer = new TermApplyRendererImpl(
     expressionTermRenderer,
@@ -49,7 +46,7 @@ class TermApplyRendererImplTest extends UnitTestSuite {
     doWrite("myMethod").when(expressionTermRenderer).render(eqTree(termApply.fun))
     doWrite("(arg1, arg2)").when(argListRenderer).render(
       args = eqTreeList(termApply.args),
-      any[Int => ArgumentRenderer[Term]],
+      argRenderer = eqTo(invocationArgRenderer),
       context = eqArgumentListContext(expectedArgListContext)
     )
 
@@ -57,13 +54,6 @@ class TermApplyRendererImplTest extends UnitTestSuite {
 
     outputWriter.toString shouldBe "myMethod(arg1, arg2)"
 
-    verify(argListRenderer).render(
-      args = eqTreeList(termApply.args),
-      argRendererProviderCaptor.capture,
-      context = eqArgumentListContext(expectedArgListContext)
-    )
-
-    argRendererProviderCaptor.value(0) shouldBe invocationArgRenderer
   }
 
   test("render() an Array initializer") {

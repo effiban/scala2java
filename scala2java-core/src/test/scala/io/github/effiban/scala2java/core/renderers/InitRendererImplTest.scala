@@ -8,8 +8,7 @@ import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
-import org.mockito.ArgumentMatchersSugar.{any, eqTo}
-import org.mockito.captor.ArgCaptor
+import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.{Init, Name, Term, XtensionQuasiquoteType}
 
@@ -22,8 +21,6 @@ class InitRendererImplTest extends UnitTestSuite {
   private val typeRenderer = mock[TypeRenderer]
   private val argumentListRenderer = mock[ArgumentListRenderer]
   private val invocationArgRenderer = mock[ArgumentRenderer[Term]]
-
-  private val argRendererProviderCaptor = ArgCaptor[Int => ArgumentRenderer[Term]]
 
   private val initRenderer = new InitRendererImpl(
     typeRenderer,
@@ -45,11 +42,9 @@ class InitRendererImplTest extends UnitTestSuite {
 
     verify(argumentListRenderer).render(
       eqTo(Nil),
-      argRendererProviderCaptor.capture,
+      eqTo(invocationArgRenderer),
       eqArgumentListContext(expectedArgListContext)
     )
-
-    argRendererProviderCaptor.value(0) shouldBe invocationArgRenderer
   }
 
   test("render() with no arguments, traverseEmpty = true and the rest default") {
@@ -69,11 +64,9 @@ class InitRendererImplTest extends UnitTestSuite {
 
     verify(argumentListRenderer).render(
       eqTo(Nil),
-      argRendererProviderCaptor.capture,
+      eqTo(invocationArgRenderer),
       eqArgumentListContext(expectedArgListContext)
     )
-
-    argRendererProviderCaptor.value(0) shouldBe invocationArgRenderer
   }
 
   test("render() for no arguments when ignored") {
@@ -100,7 +93,7 @@ class InitRendererImplTest extends UnitTestSuite {
         |arg2)""".stripMargin)
       .when(argumentListRenderer).render(
       eqTreeList(ArgList1),
-      any[Int => ArgumentRenderer[Term]],
+      eqTo(invocationArgRenderer),
       eqArgumentListContext(expectedArgListContext)
     )
 
@@ -109,14 +102,6 @@ class InitRendererImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """MyType(arg1,
         |arg2)""".stripMargin
-
-    verify(argumentListRenderer).render(
-      eqTreeList(ArgList1),
-      argRendererProviderCaptor.capture,
-      eqArgumentListContext(expectedArgListContext)
-    )
-
-    argRendererProviderCaptor.value(0) shouldBe invocationArgRenderer
   }
 
   test("render() for one argument list when argNameAsComment=true and the rest default") {
@@ -131,7 +116,7 @@ class InitRendererImplTest extends UnitTestSuite {
         |/*arg2Name = */arg2)""".stripMargin)
       .when(argumentListRenderer).render(
       eqTreeList(ArgList1),
-      any[Int => ArgumentRenderer[Term]],
+      eqTo(invocationArgRenderer),
       eqArgumentListContext(expectedArgListContext)
     )
 
@@ -140,14 +125,6 @@ class InitRendererImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """MyType(/*arg1Name = */arg1,
         |/*arg2Name = */arg2)""".stripMargin
-
-    verify(argumentListRenderer).render(
-      eqTreeList(ArgList1),
-      argRendererProviderCaptor.capture,
-      eqArgumentListContext(expectedArgListContext)
-    )
-
-    argRendererProviderCaptor.value(0) shouldBe invocationArgRenderer
   }
 
   test("render() for one argument list when ignored") {
@@ -181,7 +158,7 @@ class InitRendererImplTest extends UnitTestSuite {
         |arg4)""".stripMargin)
       .when(argumentListRenderer).render(
       eqTreeList(ArgList1 ++ ArgList2),
-      any[Int => ArgumentRenderer[Term]],
+      eqTo(invocationArgRenderer),
       eqArgumentListContext(expectedArgListContext)
     )
 
@@ -192,13 +169,5 @@ class InitRendererImplTest extends UnitTestSuite {
         |arg2,
         |arg3,
         |arg4)""".stripMargin
-
-    verify(argumentListRenderer).render(
-      eqTreeList(ArgList1 ++ ArgList2),
-      argRendererProviderCaptor.capture,
-      eqArgumentListContext(expectedArgListContext)
-    )
-
-    argRendererProviderCaptor.value(0) shouldBe invocationArgRenderer
   }
 }

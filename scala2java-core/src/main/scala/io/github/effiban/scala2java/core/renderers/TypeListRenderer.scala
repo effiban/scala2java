@@ -16,7 +16,7 @@ private[renderers] class TypeListRendererImpl(argumentListRenderer: => ArgumentL
   override def render(types: List[Type]): Unit = {
     argumentListRenderer.render(args = types,
       // TODO - call the renderer with an argument indicating that Java primitives should be boxed
-      argRendererProvider = _ => typeArgRenderer,
+      argRenderer = typeArgRenderer,
       context = ArgumentListContext(options = ListTraversalOptions(maybeEnclosingDelimiter = Some(AngleBracket), onSameLine = true))
     )
   }
