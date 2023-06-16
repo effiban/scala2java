@@ -157,6 +157,14 @@ class ScalaTreeTraversers(implicit factories: Factories,
     patListRenderer
   )
 
+  private lazy val defaultTermRefTraverser: DefaultTermRefTraverser = new DefaultTermRefTraverserImpl(
+    thisTraverser,
+    superTraverser,
+    defaultTermSelectTraverser
+  )
+
+  private lazy val defaultTermSelectTraverser: DefaultTermSelectTraverser = new DefaultTermSelectTraverserImpl(defaultTermRefTraverser)
+
   private lazy val deprecatedDefaultTermTraverser: DeprecatedDefaultTermTraverser = new DeprecatedDefaultTermTraverserImpl(
     defaultTermRefTraverser,
     deprecatedTermApplyTraverser,
@@ -186,13 +194,9 @@ class ScalaTreeTraversers(implicit factories: Factories,
     defaultTermRenderer
   )
 
-  private lazy val defaultTermRefTraverser: DefaultTermRefTraverser = new DefaultTermRefTraverserImpl(
-    thisTraverser,
-    superTraverser,
-    defaultTermSelectTraverser
+  private lazy val defaultTermTraverser: DefaultTermTraverser = new DefaultTermTraverserImpl(
+    defaultTermRefTraverser
   )
-
-  private lazy val defaultTermSelectTraverser: DefaultTermSelectTraverser = new DefaultTermSelectTraverserImpl(defaultTermRefTraverser)
 
   private lazy val defnDefTraverser: DefnDefTraverser = new DefnDefTraverserImpl(
     deprecatedModListTraverser,
