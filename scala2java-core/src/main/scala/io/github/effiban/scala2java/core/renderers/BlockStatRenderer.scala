@@ -1,12 +1,13 @@
 package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.classifiers.JavaStatClassifier
-import io.github.effiban.scala2java.core.contexts.{IfRenderContext, TryRenderContext}
+import io.github.effiban.scala2java.core.contexts.{IfRenderContext, TryRenderContext, ValOrVarRenderContext}
+import io.github.effiban.scala2java.core.entities.JavaModifier.Final
 import io.github.effiban.scala2java.core.entities.TraversalConstants.UncertainReturn
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Term.{If, Try, TryWithHandler}
-import scala.meta.{Stat, Term}
+import scala.meta.{Defn, Stat, Term}
 
 trait BlockStatRenderer {
 
@@ -20,6 +21,8 @@ private[renderers] class BlockStatRendererImpl(expressionTermRefRenderer: => Exp
                                                tryRenderer: => TryRenderer,
                                                tryWithHandlerRenderer: => TryWithHandlerRenderer,
                                                defaultTermRenderer: => DefaultTermRenderer,
+                                               defnValRenderer: => DefnValRenderer,
+                                               defnVarRenderer: => DefnVarRenderer,
                                                javaStatClassifier: JavaStatClassifier)
                                               (implicit javaWriter: JavaWriter) extends BlockStatRenderer {
 
@@ -29,8 +32,10 @@ private[renderers] class BlockStatRendererImpl(expressionTermRefRenderer: => Exp
     stat match {
       case termRef: Term.Ref => expressionTermRefRenderer.render(termRef)
       case aTerm: Term => defaultTermRenderer.render(aTerm)
-      // TODO support stats
-      case aStat: Stat => throw new UnsupportedOperationException("Rendering of a non-term stat in a block is not supported yet")
+      case defnVal: Defn.Val => defnValRenderer.render(defnVal, ValOrVarRenderContext(javaModifiers = List(Final), inBlock = true))
+      case defnVar: Defn.Var => defnVarRenderer.render(defnVar, ValOrVarRenderContext(inBlock = true))
+      // TODO support other stats once renderers are ready
+      case aStat: Stat => throw new UnsupportedOperationException(s"Rendering of $aStat in a block is not supported yet")
     }
     writeStatEnd(stat)
   }

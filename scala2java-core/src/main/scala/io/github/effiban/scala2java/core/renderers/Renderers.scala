@@ -53,6 +53,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
     tryRenderer,
     tryWithHandlerRenderer,
     defaultTermRenderer,
+    defnValRenderer,
+    defnVarRenderer,
     JavaStatClassifier
   )
 
