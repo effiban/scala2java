@@ -334,6 +334,14 @@ class ScalaTreeTraversers(implicit factories: Factories,
     ArrayInitializerContextResolver
   )
 
+  private lazy val nonTermStatTraverser: NonTermStatTraverser = new NonTermStatTraverserImpl(
+    importTraverser,
+    importRenderer,
+    pkgTraverser,
+    defnTraverser,
+    declTraverser
+  )
+
   private lazy val objectTraverser: ObjectTraverser = new ObjectTraverserImpl(
     modListTraverser,
     templateTraverser,
