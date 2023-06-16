@@ -54,6 +54,13 @@ class ScalaTreeTraversers(implicit factories: Factories,
     compositeCollectiveTypeInferrer
   )
 
+  private lazy val arrayInitializerTraverser: ArrayInitializerTraverser = new ArrayInitializerTraverserImpl(
+    typeTraverser,
+    expressionTermTraverser,
+    termTypeInferrer,
+    compositeCollectiveTypeInferrer
+  )
+
   private lazy val deprecatedAscribeTraverser: DeprecatedAscribeTraverser = new DeprecatedAscribeTraverserImpl(
     typeTraverser,
     typeRenderer,
