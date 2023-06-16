@@ -71,6 +71,12 @@ class Renderers(implicit javaWriter: JavaWriter) {
     expressionTermRenderer
   )
 
+  lazy val declVarRenderer: DeclVarRenderer = new DeclVarRendererImpl(
+    modListRenderer,
+    typeRenderer,
+    patListRenderer
+  )
+
   lazy val defaultTermRefRenderer: DefaultTermRefRenderer = new DefaultTermRefRendererImpl(
     thisRenderer,
     superRenderer,
