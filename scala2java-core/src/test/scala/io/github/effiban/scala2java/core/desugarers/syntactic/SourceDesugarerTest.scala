@@ -3,14 +3,21 @@ package io.github.effiban.scala2java.core.desugarers.syntactic
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.Term.{Apply, Select}
-import scala.meta.{Lit, Term, XtensionQuasiquoteSource}
+import scala.meta.Enumerator.Generator
+import scala.meta.Term.{Apply, For, ForYield, Select}
+import scala.meta.{Lit, Term, XtensionQuasiquoteCaseOrPattern, XtensionQuasiquoteSource, XtensionQuasiquoteTerm}
 
 class SourceDesugarerTest extends UnitTestSuite {
 
   private val termInterpolateDesugarer = mock[TermInterpolateDesugarer]
+  private val forDesugarer = mock[ForDesugarer]
+  private val forYieldDesugarer = mock[ForYieldDesugarer]
 
-  private val sourceDesugarer = new SourceDesugarerImpl(termInterpolateDesugarer)
+  private val sourceDesugarer = new SourceDesugarerImpl(
+    termInterpolateDesugarer,
+    forDesugarer,
+    forYieldDesugarer
+  )
 
   test("desugar when has a Term.Interpolate should return a desugared equivalent") {
     val interpolationArgs = List(Term.Name("x"), Term.Name("y"))
@@ -44,6 +51,72 @@ class SourceDesugarerTest extends UnitTestSuite {
     val maybeDesugaredTermApply = desugaredSource.collect { case termApply: Term.Apply => termApply }.headOption
 
     maybeDesugaredTermApply.value.structure shouldBe expectedJavaStringFormat.structure
+  }
+
+  test("desugar when has a Term.For should return a desugared equivalent") {
+    val enumerators = List(
+      Generator(pat = p"x", rhs = q"xs"),
+      Generator(pat = p"y", rhs = q"ys")
+    )
+    val body = q"handle(x, y)"
+    val `for` = For(enums = enumerators, body = body)
+
+    val source =
+      source"""
+      package dummy
+
+      class MyClass {
+         def foo(): Unit = {
+           for {
+             x <- xs
+             y <- ys
+           } handle(x, y)
+         }
+      }
+      """
+
+    val expectedTermApply = q"xs.foreach(x => ys.foreach(y => handle(x, y)))"
+
+    doReturn(expectedTermApply).when(forDesugarer).desugar(eqTree(`for`))
+
+    val desugaredSource = sourceDesugarer.desugar(source)
+
+    val maybeTermApply = desugaredSource.collect { case termApply@Term.Apply(q"xs.foreach", _) => termApply }.headOption
+
+    maybeTermApply.value.structure shouldBe expectedTermApply.structure
+  }
+
+  test("desugar when has a Term.ForYield should return a desugared equivalent") {
+    val enumerators = List(
+      Generator(pat = p"x", rhs = q"xs"),
+      Generator(pat = p"y", rhs = q"ys")
+    )
+    val body = q"result(x, y)"
+    val forYield = ForYield(enums = enumerators, body = body)
+
+    val source =
+      source"""
+      package dummy
+
+      class MyClass {
+         def foo(): Unit = {
+           for {
+             x <- xs
+             y <- ys
+           } yield result(x, y)
+         }
+      }
+      """
+
+    val expectedTermApply = q"xs.flatMap(x => ys.map(y => result(x, y)))"
+
+    doReturn(expectedTermApply).when(forYieldDesugarer).desugar(eqTree(forYield))
+
+    val desugaredSource = sourceDesugarer.desugar(source)
+
+    val maybeTermApply = desugaredSource.collect { case termApply@Term.Apply(q"xs.flatMap", _) => termApply }.headOption
+
+    maybeTermApply.value.structure shouldBe expectedTermApply.structure
   }
 
   test("desugar with no inner desugared elems should return unchanged") {
