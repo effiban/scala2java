@@ -16,13 +16,13 @@ trait DefnDefTraverser {
   def traverse(defnDef: Defn.Def, context: DefnDefContext = DefnDefContext()): Unit
 }
 
-private[traversers] class DefnDefTraverserImpl(modListTraverser: => ModListTraverser,
+private[traversers] class DefnDefTraverserImpl(modListTraverser: => DeprecatedModListTraverser,
                                                typeParamListTraverser: => TypeParamListTraverser,
                                                termNameRenderer: TermNameRenderer,
                                                typeTraverser: => TypeTraverser,
                                                typeRenderer: => TypeRenderer,
-                                               termParamListTraverser: => TermParamListTraverser,
-                                               blockTraverser: => BlockTraverser,
+                                               termParamListTraverser: => DeprecatedTermParamListTraverser,
+                                               blockTraverser: => DeprecatedBlockTraverser,
                                                termTypeInferrer: => TermTypeInferrer,
                                                defnDefTransformer: DefnDefTransformer)
                                               (implicit javaWriter: JavaWriter) extends DefnDefTraverser {

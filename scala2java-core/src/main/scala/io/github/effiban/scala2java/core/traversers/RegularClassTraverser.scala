@@ -13,7 +13,7 @@ trait RegularClassTraverser {
   def traverse(classDef: Defn.Class, context: ClassOrTraitContext = ClassOrTraitContext()): Unit
 }
 
-private[traversers] class RegularClassTraverserImpl(modListTraverser: => ModListTraverser,
+private[traversers] class RegularClassTraverserImpl(modListTraverser: => DeprecatedModListTraverser,
                                                     typeParamListTraverser: => TypeParamListTraverser,
                                                     templateTraverser: => TemplateTraverser,
                                                     paramToDeclValTransformer: ParamToDeclValTransformer,

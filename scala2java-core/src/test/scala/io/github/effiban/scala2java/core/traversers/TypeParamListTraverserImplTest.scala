@@ -18,8 +18,8 @@ class TypeParamListTraverserImplTest extends UnitTestSuite {
     maybeEnclosingDelimiter = Some(AngleBracket)
   )
 
-  private val argumentListTraverser = mock[ArgumentListTraverser]
-  private val typeParamArgTraverser = mock[ArgumentTraverser[Type.Param]]
+  private val argumentListTraverser = mock[DeprecatedArgumentListTraverser]
+  private val typeParamArgTraverser = mock[DeprecatedArgumentTraverser[Type.Param]]
 
   private val typeParamListTraverser = new TypeParamListTraverserImpl(argumentListTraverser, typeParamArgTraverser)
 

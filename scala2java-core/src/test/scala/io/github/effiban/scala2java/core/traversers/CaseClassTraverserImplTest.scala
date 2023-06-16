@@ -61,9 +61,9 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     )
   )
 
-  private val modListTraverser = mock[ModListTraverser]
+  private val modListTraverser = mock[DeprecatedModListTraverser]
   private val typeParamListTraverser = mock[TypeParamListTraverser]
-  private val termParamListTraverser = mock[TermParamListTraverser]
+  private val termParamListTraverser = mock[DeprecatedTermParamListTraverser]
   private val templateTraverser = mock[TemplateTraverser]
   private val javaTreeTypeResolver = mock[JavaTreeTypeResolver]
   private val javaChildScopeResolver = mock[JavaChildScopeResolver]

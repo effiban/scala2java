@@ -12,7 +12,7 @@ trait PermittedSubTypeNameListTraverser {
   def traverse(permittedSubTypeNames: List[Name]): Unit
 }
 
-private[traversers] class PermittedSubTypeNameListTraverserImpl(argumentListTraverser: => ArgumentListTraverser)
+private[traversers] class PermittedSubTypeNameListTraverserImpl(argumentListTraverser: => DeprecatedArgumentListTraverser)
                                                                (implicit javaWriter: JavaWriter) extends PermittedSubTypeNameListTraverser {
 
   import javaWriter._

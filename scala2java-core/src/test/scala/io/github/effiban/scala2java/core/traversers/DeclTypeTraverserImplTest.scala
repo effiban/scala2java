@@ -33,7 +33,7 @@ class DeclTypeTraverserImplTest extends UnitTestSuite {
     )
   )
 
-  private val modListTraverser = mock[ModListTraverser]
+  private val modListTraverser = mock[DeprecatedModListTraverser]
   private val typeParamListTraverser = mock[TypeParamListTraverser]
   private val javaTreeTypeResolver = mock[JavaTreeTypeResolver]
 

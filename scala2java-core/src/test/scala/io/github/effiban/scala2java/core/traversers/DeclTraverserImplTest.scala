@@ -15,7 +15,7 @@ class DeclTraverserImplTest extends UnitTestSuite {
   private val TheStatContext = StatContext(JavaScope.Class)
 
   private val declValTraverser =  mock[DeclValTraverser]
-  private val declVarTraverser =  mock[DeclVarTraverser]
+  private val declVarTraverser =  mock[DeprecatedDeclVarTraverser]
   private val declDefTraverser =  mock[DeclDefTraverser]
   private val declTypeTraverser = mock[DeclTypeTraverser]
 

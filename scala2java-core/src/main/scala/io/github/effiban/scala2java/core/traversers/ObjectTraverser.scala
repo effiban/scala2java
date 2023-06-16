@@ -11,7 +11,7 @@ trait ObjectTraverser {
   def traverse(objectDef: Defn.Object, context: StatContext = StatContext()): Unit
 }
 
-private[traversers] class ObjectTraverserImpl(modListTraverser: => ModListTraverser,
+private[traversers] class ObjectTraverserImpl(modListTraverser: => DeprecatedModListTraverser,
                                               templateTraverser: => TemplateTraverser,
                                               javaTreeTypeResolver: JavaTreeTypeResolver,
                                               javaChildScopeResolver: JavaChildScopeResolver)

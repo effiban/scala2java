@@ -6,7 +6,7 @@ import scala.meta.XtensionQuasiquoteTerm
 
 class EnumConstantListTraverserImplTest extends UnitTestSuite {
 
-  private val enumConstantListTraverser = new EnumConstantListTraverserImpl(new ArgumentListTraverserImpl())
+  private val enumConstantListTraverser = new EnumConstantListTraverserImpl(new DeprecatedArgumentListTraverserImpl())
 
 
   test("traverse() with one valid constant") {

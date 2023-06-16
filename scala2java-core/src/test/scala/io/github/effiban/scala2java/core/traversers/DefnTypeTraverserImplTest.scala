@@ -39,7 +39,7 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
   private val MyOtherType = t"MyOtherType"
   private val MyTraversedOtherType = t"MyTraversedOtherType"
 
-  private val modListTraverser = mock[ModListTraverser]
+  private val modListTraverser = mock[DeprecatedModListTraverser]
   private val typeParamListTraverser = mock[TypeParamListTraverser]
   private val typeTraverser = mock[TypeTraverser]
   private val typeRenderer = mock[TypeRenderer]

@@ -36,7 +36,7 @@ class ObjectTraverserImplTest extends UnitTestSuite {
     body = Block(List())
   )
 
-  private val modListTraverser = mock[ModListTraverser]
+  private val modListTraverser = mock[DeprecatedModListTraverser]
   private val templateTraverser = mock[TemplateTraverser]
   private val javaTreeTypeResolver = mock[JavaTreeTypeResolver]
   private val javaChildScopeResolver = mock[JavaChildScopeResolver]

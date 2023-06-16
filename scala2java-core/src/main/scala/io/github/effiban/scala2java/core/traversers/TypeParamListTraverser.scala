@@ -10,8 +10,8 @@ trait TypeParamListTraverser {
   def traverse(typeParams: List[Type.Param]): Unit
 }
 
-private[traversers] class TypeParamListTraverserImpl(argumentListTraverser: => ArgumentListTraverser,
-                                                     typeParamArgTraverser: => ArgumentTraverser[Type.Param]) extends TypeParamListTraverser {
+private[traversers] class TypeParamListTraverserImpl(argumentListTraverser: => DeprecatedArgumentListTraverser,
+                                                     typeParamArgTraverser: => DeprecatedArgumentTraverser[Type.Param]) extends TypeParamListTraverser {
 
   override def traverse(typeParams: List[Type.Param]): Unit = {
     argumentListTraverser.traverse(args = typeParams,
