@@ -3,13 +3,13 @@ package io.github.effiban.scala2java.core.desugarers.syntactic
 import scala.meta.Term.{Apply, Param, Select}
 import scala.meta.{Enumerator, Lit, Pat, Term}
 
-trait ForVariantDesugarer {
+protected[syntactic] trait ForVariantDesugarer {
   val patToTermParamDesugarer: PatToTermParamDesugarer
 
   val intermediateFunctionName: Term.Name
   val finalFunctionName: Term.Name
 
-  def desugar(enumerators: List[Enumerator], body: Term): Term.Apply = {
+  protected[syntactic] def desugar(enumerators: List[Enumerator], body: Term): Term.Apply = {
     enumerators match {
       case Nil => throw new IllegalStateException("A 'for' variant must have enumerators")
       case theEnumerators => desugarInner(theEnumerators, body)
