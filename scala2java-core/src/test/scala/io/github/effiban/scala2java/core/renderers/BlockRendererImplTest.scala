@@ -11,10 +11,10 @@ import scala.meta.Term.Block
 import scala.meta.{XtensionQuasiquoteInit, XtensionQuasiquoteTerm}
 
 class BlockRendererImplTest extends UnitTestSuite {
-  private val blockTermRenderer = mock[BlockTermRenderer]
+  private val blockStatRenderer = mock[BlockStatRenderer]
   private val initRenderer = mock[InitRenderer]
 
-  private val blockRenderer = new BlockRendererImpl(blockTermRenderer, initRenderer)
+  private val blockRenderer = new BlockRendererImpl(blockStatRenderer, initRenderer)
 
 
   test("render() when block is empty") {
@@ -26,7 +26,7 @@ class BlockRendererImplTest extends UnitTestSuite {
         |""".stripMargin
   }
 
-  test("render() for block of one term, uncertainReturn=false") {
+  test("render() for block of one statement, uncertainReturn=false") {
     val block =
       q"""
       {
@@ -36,7 +36,7 @@ class BlockRendererImplTest extends UnitTestSuite {
     doWrite(
       s"""  foo();
          |""".stripMargin)
-      .when(blockTermRenderer).renderLast(eqTree(q"foo()"), uncertainReturn = eqTo(false))
+      .when(blockStatRenderer).renderLast(eqTree(q"foo()"), uncertainReturn = eqTo(false))
 
     blockRenderer.render(block = block)
 
@@ -47,7 +47,7 @@ class BlockRendererImplTest extends UnitTestSuite {
          |""".stripMargin
   }
 
-  test("render() for block of one term, uncertainReturn=true") {
+  test("render() for block of one statement, uncertainReturn=true") {
     val block =
       q"""
       {
@@ -57,7 +57,7 @@ class BlockRendererImplTest extends UnitTestSuite {
     doWrite(
       s"""  /* return? */foo();
          |""".stripMargin)
-      .when(blockTermRenderer).renderLast(eqTree(q"foo()"), uncertainReturn = eqTo(true))
+      .when(blockStatRenderer).renderLast(eqTree(q"foo()"), uncertainReturn = eqTo(true))
 
     blockRenderer.render(block = block, context = BlockRenderContext(uncertainReturn = true))
 
@@ -68,7 +68,7 @@ class BlockRendererImplTest extends UnitTestSuite {
          |""".stripMargin
   }
 
-  test("render() for block of two terms, uncertainReturn=false") {
+  test("render() for block of two statements, uncertainReturn=false") {
     val block =
       q"""
         func1()
@@ -77,11 +77,11 @@ class BlockRendererImplTest extends UnitTestSuite {
     doWrite(
       s"""  func1();
          |""".stripMargin
-    ).when(blockTermRenderer).render(eqTree(q"func1()"))
+    ).when(blockStatRenderer).render(eqTree(q"func1()"))
     doWrite(
       s"""  func2();
          |""".stripMargin
-    ).when(blockTermRenderer).renderLast(eqTree(q"func2()"), uncertainReturn = eqTo(false))
+    ).when(blockStatRenderer).renderLast(eqTree(q"func2()"), uncertainReturn = eqTo(false))
 
     blockRenderer.render(block = block, context = BlockRenderContext())
 
@@ -93,7 +93,7 @@ class BlockRendererImplTest extends UnitTestSuite {
          |""".stripMargin
   }
 
-  test("render() for block of two terms, uncertainReturn=true") {
+  test("render() for block of two statements, uncertainReturn=true") {
     val block =
       q"""
     func1()
@@ -102,11 +102,11 @@ class BlockRendererImplTest extends UnitTestSuite {
     doWrite(
       s"""  func1();
          |""".stripMargin
-    ).when(blockTermRenderer).render(eqTree(q"func1()"))
+    ).when(blockStatRenderer).render(eqTree(q"func1()"))
     doWrite(
       s"""  /* return? */func2();
          |""".stripMargin
-    ).when(blockTermRenderer).renderLast(eqTree(q"func2()"), uncertainReturn = eqTo(true))
+    ).when(blockStatRenderer).renderLast(eqTree(q"func2()"), uncertainReturn = eqTo(true))
 
     blockRenderer.render(block = block, context = BlockRenderContext(uncertainReturn = true))
 
@@ -133,7 +133,7 @@ class BlockRendererImplTest extends UnitTestSuite {
     doWrite(
       s"""  foo();
          |""".stripMargin)
-      .when(blockTermRenderer).renderLast(eqTree(q"foo()"), uncertainReturn = eqTo(false))
+      .when(blockStatRenderer).renderLast(eqTree(q"foo()"), uncertainReturn = eqTo(false))
 
     blockRenderer.render(block = block, context = BlockRenderContext(maybeInit = Some(init)))
 
