@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.desugarers.syntactic
 
+import io.github.effiban.scala2java.core.entities.TraversalConstants.JavaPlaceholder
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
 
@@ -28,7 +29,8 @@ class PatToTermParamDesugarerTest extends UnitTestSuite {
   }
 
   test("transform a Pat.Wildcard") {
-    PatToTermParamDesugarer.desugar(Pat.Wildcard()) shouldBe None
+    val expectedTermParam = termParam(Term.Name(JavaPlaceholder))
+    PatToTermParamDesugarer.desugar(Pat.Wildcard()).value.structure shouldBe expectedTermParam.structure
   }
 
   private def termParam(name: Name, decltpe: Option[Type] = None): Term.Param = {
