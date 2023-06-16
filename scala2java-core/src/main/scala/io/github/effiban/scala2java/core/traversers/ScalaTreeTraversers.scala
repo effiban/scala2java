@@ -269,6 +269,10 @@ class ScalaTreeTraversers(implicit factories: Factories,
     deprecatedDefaultTermTraverser
   )
 
+  private lazy val expressionTermTraverser: ExpressionTermTraverser = new ExpressionTermTraverserImpl(
+    defaultTermTraverser
+  )
+
   private lazy val deprecatedExpressionTermRefTraverser: DeprecatedExpressionTermRefTraverser = new DeprecatedExpressionTermRefTraverserImpl(
     deprecatedTermNameTraverser,
     deprecatedExpressionTermSelectTraverser,
