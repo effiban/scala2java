@@ -55,6 +55,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
     defaultTermRenderer,
     defnValRenderer,
     defnVarRenderer,
+    declVarRenderer,
     JavaStatClassifier
   )
 

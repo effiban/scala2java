@@ -7,7 +7,7 @@ import io.github.effiban.scala2java.core.entities.TraversalConstants.UncertainRe
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Term.{If, Try, TryWithHandler}
-import scala.meta.{Defn, Stat, Term}
+import scala.meta.{Decl, Defn, Stat, Term}
 
 trait BlockStatRenderer {
 
@@ -23,6 +23,7 @@ private[renderers] class BlockStatRendererImpl(expressionTermRefRenderer: => Exp
                                                defaultTermRenderer: => DefaultTermRenderer,
                                                defnValRenderer: => DefnValRenderer,
                                                defnVarRenderer: => DefnVarRenderer,
+                                               declVarRenderer: => DeclVarRenderer,
                                                javaStatClassifier: JavaStatClassifier)
                                               (implicit javaWriter: JavaWriter) extends BlockStatRenderer {
 
@@ -34,6 +35,7 @@ private[renderers] class BlockStatRendererImpl(expressionTermRefRenderer: => Exp
       case aTerm: Term => defaultTermRenderer.render(aTerm)
       case defnVal: Defn.Val => defnValRenderer.render(defnVal, ValOrVarRenderContext(javaModifiers = List(Final), inBlock = true))
       case defnVar: Defn.Var => defnVarRenderer.render(defnVar, ValOrVarRenderContext(inBlock = true))
+      case declVar: Decl.Var => declVarRenderer.render(declVar, ValOrVarRenderContext(inBlock = true))
       // TODO support other stats once renderers are ready
       case aStat: Stat => throw new UnsupportedOperationException(s"Rendering of $aStat in a block is not supported yet")
     }
