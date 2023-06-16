@@ -178,8 +178,6 @@ class ScalaTreeTraversers(implicit factories: Factories,
     anonymousFunctionTraverser,
     whileTraverser,
     doTraverser,
-    forTraverser,
-    forYieldTraverser,
     newTraverser,
     newAnonymousTraverser,
     termPlaceholderRenderer,
@@ -285,10 +283,6 @@ class ScalaTreeTraversers(implicit factories: Factories,
   )
 
   private lazy val finallyTraverser: FinallyTraverser = new FinallyTraverserImpl(blockTraverser)
-
-  private lazy val forTraverser: ForTraverser = new ForTraverserImpl(termApplyTraverser, ForToTermApplyTransformer)
-
-  private lazy val forYieldTraverser: ForYieldTraverser = new ForYieldTraverserImpl(termApplyTraverser, ForYieldToTermApplyTransformer)
 
   private lazy val funTermSelectTraverser: FunTermSelectTraverser = new FunTermSelectTraverserImpl(
     defaultTermTraverser,

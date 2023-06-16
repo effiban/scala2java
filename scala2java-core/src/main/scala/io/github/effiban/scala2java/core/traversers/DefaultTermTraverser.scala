@@ -3,7 +3,7 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.renderers.{DefaultTermRenderer, TermPlaceholderRenderer}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
-import scala.meta.Term.{AnonymousFunction, ApplyType, Ascribe, Assign, Block, Do, Eta, For, ForYield, If, New, NewAnonymous, Return, Throw, Try, TryWithHandler, While}
+import scala.meta.Term.{AnonymousFunction, ApplyType, Ascribe, Assign, Block, Do, Eta, If, New, NewAnonymous, Return, Throw, Try, TryWithHandler, While}
 import scala.meta.{Lit, Term}
 
 trait DefaultTermTraverser extends TermTraverser
@@ -28,8 +28,6 @@ private[traversers] class DefaultTermTraverserImpl(defaultTermRefTraverser: => D
                                                    anonymousFunctionTraverser: => AnonymousFunctionTraverser,
                                                    whileTraverser: => WhileTraverser,
                                                    doTraverser: => DoTraverser,
-                                                   forTraverser: => ForTraverser,
-                                                   forYieldTraverser: => ForYieldTraverser,
                                                    newTraverser: => NewTraverser,
                                                    newAnonymousTraverser: => NewAnonymousTraverser,
                                                    termPlaceholderRenderer: => TermPlaceholderRenderer,
@@ -63,8 +61,6 @@ private[traversers] class DefaultTermTraverserImpl(defaultTermRefTraverser: => D
     case anonFunction: AnonymousFunction => anonymousFunctionTraverser.traverse(anonFunction)
     case `while`: While => whileTraverser.traverse(`while`)
     case `do`: Do => doTraverser.traverse(`do`)
-    case `for`: For => forTraverser.traverse(`for`)
-    case forYield: ForYield => forYieldTraverser.traverse(forYield)
     case `new`: New => newTraverser.traverse(`new`)
     case newAnonymous: NewAnonymous => newAnonymousTraverser.traverse(newAnonymous)
     case termPlaceholder: Term.Placeholder =>

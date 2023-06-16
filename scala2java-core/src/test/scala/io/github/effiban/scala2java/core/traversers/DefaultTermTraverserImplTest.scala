@@ -10,9 +10,8 @@ import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchers
 
-import scala.meta.Enumerator.Generator
 import scala.meta.Mod.Annot
-import scala.meta.Term.{Apply, ApplyInfix, ApplyType, Assign, Block, Eta, For, ForYield, If, NewAnonymous}
+import scala.meta.Term.{Apply, ApplyInfix, ApplyType, Assign, Block, Eta, If, NewAnonymous}
 import scala.meta.{Case, Init, Lit, Name, Pat, Self, Template, Term, Type, XtensionQuasiquoteTerm}
 
 class DefaultTermTraverserImplTest extends UnitTestSuite {
@@ -37,8 +36,6 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
   private val anonymousFunctionTraverser = mock[AnonymousFunctionTraverser]
   private val whileTraverser = mock[WhileTraverser]
   private val doTraverser = mock[DoTraverser]
-  private val forTraverser = mock[ForTraverser]
-  private val forYieldTraverser = mock[ForYieldTraverser]
   private val newTraverser = mock[NewTraverser]
   private val newAnonymousTraverser = mock[NewAnonymousTraverser]
   private val termPlaceholderRenderer = mock[TermPlaceholderRenderer]
@@ -68,8 +65,6 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
     anonymousFunctionTraverser,
     whileTraverser,
     doTraverser,
-    forTraverser,
-    forYieldTraverser,
     newTraverser,
     newAnonymousTraverser,
     termPlaceholderRenderer,
@@ -271,30 +266,6 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
     )
     defaultTermTraverser.traverse(`do`)
     verify(doTraverser).traverse(eqTree(`do`))
-  }
-
-  test("traverse() for For") {
-    val `for` = For(
-      enums = List(
-        Generator(pat = Pat.Var(Term.Name("x")), rhs = Term.Name("xs")),
-        Generator(pat = Pat.Var(Term.Name("y")), rhs = Term.Name("ys"))
-      ),
-      body = Term.Name("result")
-    )
-    defaultTermTraverser.traverse(`for`)
-    verify(forTraverser).traverse(eqTree(`for`))
-  }
-
-  test("traverse() for ForYield") {
-    val forYield = ForYield(
-      enums = List(
-        Generator(pat = Pat.Var(Term.Name("x")), rhs = Term.Name("xs")),
-        Generator(pat = Pat.Var(Term.Name("y")), rhs = Term.Name("ys"))
-      ),
-      body = Term.Name("result")
-    )
-    defaultTermTraverser.traverse(forYield)
-    verify(forYieldTraverser).traverse(eqTree(forYield))
   }
 
   test("traverse() for New") {
