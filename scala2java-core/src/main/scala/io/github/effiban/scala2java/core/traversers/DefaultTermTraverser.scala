@@ -5,11 +5,12 @@ import scala.meta.Term.{AnonymousFunction, ApplyType, Ascribe, Assign, Block, Do
 
 trait DefaultTermTraverser extends TermTraverser
 
-private[traversers] class DefaultTermTraverserImpl(defaultTermRefTraverser: => DefaultTermRefTraverser) extends DefaultTermTraverser {
+private[traversers] class DefaultTermTraverserImpl(defaultTermRefTraverser: => DefaultTermRefTraverser,
+                                                   termApplyTraverser: => TermApplyTraverser) extends DefaultTermTraverser {
 
   override def traverse(term: Term): Term = term match {
     case termRef: Term.Ref => defaultTermRefTraverser.traverse(termRef)
-    case apply: Term.Apply => apply //TODO
+    case apply: Term.Apply => termApplyTraverser.traverse(apply)
     case applyType: ApplyType => applyType //TODO
     case applyInfix: Term.ApplyInfix => applyInfix //TODO
     case assign: Assign => assign //TODO
