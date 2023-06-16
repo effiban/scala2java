@@ -5,29 +5,31 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Defn
 
-trait DefnValRenderer {
-  def render(valDef: Defn.Val, context: ValOrVarRenderContext = ValOrVarRenderContext()): Unit
+trait DefnVarRenderer {
+  def render(varDef: Defn.Var, context: ValOrVarRenderContext = ValOrVarRenderContext()): Unit
 }
 
-private[renderers] class DefnValRendererImpl(modListRenderer: => ModListRenderer,
+private[renderers] class DefnVarRendererImpl(modListRenderer: => ModListRenderer,
                                              defnValOrVarTypeRenderer: => DefnValOrVarTypeRenderer,
                                              patListRenderer: => PatListRenderer,
                                              expressionTermRenderer: => ExpressionTermRenderer)
-                                            (implicit javaWriter: JavaWriter) extends DefnValRenderer {
+                                            (implicit javaWriter: JavaWriter) extends DefnVarRenderer {
 
   import javaWriter._
 
-  override def render(valDef: Defn.Val, context: ValOrVarRenderContext = ValOrVarRenderContext()): Unit = {
+  override def render(varDef: Defn.Var, context: ValOrVarRenderContext = ValOrVarRenderContext()): Unit = {
     val modifiersRenderContext = ModifiersRenderContext(
-      scalaMods = valDef.mods,
+      scalaMods = varDef.mods,
       javaModifiers = context.javaModifiers
     )
     modListRenderer.render(modifiersRenderContext)
-    defnValOrVarTypeRenderer.render(valDef.decltpe, context)
+    defnValOrVarTypeRenderer.render(varDef.decltpe, context)
     write(" ")
     //TODO verify for non-simple cases
-    patListRenderer.render(valDef.pats)
-    write(" = ")
-    expressionTermRenderer.render(valDef.rhs)
+    patListRenderer.render(varDef.pats)
+    varDef.rhs.foreach { rhs =>
+      write(" = ")
+      expressionTermRenderer.render(rhs)
+    }
   }
 }
