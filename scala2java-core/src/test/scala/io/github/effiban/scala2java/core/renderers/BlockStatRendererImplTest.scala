@@ -19,6 +19,7 @@ class BlockStatRendererImplTest extends UnitTestSuite {
   private val tryWithHandlerRenderer = mock[TryWithHandlerRenderer]
   private val defnValRenderer = mock[DefnValRenderer]
   private val defnVarRenderer = mock[DefnVarRenderer]
+  private val declVarRenderer = mock[DeclVarRenderer]
   private val javaStatClassifier = mock[JavaStatClassifier]
 
   private val blockStatRenderer = new BlockStatRendererImpl(
@@ -29,6 +30,7 @@ class BlockStatRendererImplTest extends UnitTestSuite {
     defaultTermRenderer,
     defnValRenderer,
     defnVarRenderer,
+    declVarRenderer,
     javaStatClassifier
   )
 
@@ -105,13 +107,27 @@ class BlockStatRendererImplTest extends UnitTestSuite {
   }
 
   test("render() Defn.Var") {
-    val defnVar = q"var x: Int = _"
+    val defnVar = q"var x: Int = 3"
     val expectedValOrVarRenderContext = ValOrVarRenderContext(inBlock = true)
 
-    doWrite("int x").when(defnVarRenderer).render(eqTree(defnVar), eqTo(expectedValOrVarRenderContext))
+    doWrite("int x = 3").when(defnVarRenderer).render(eqTree(defnVar), eqTo(expectedValOrVarRenderContext))
     when(javaStatClassifier.requiresEndDelimiter(eqTree(defnVar))).thenReturn(true)
 
     blockStatRenderer.render(defnVar)
+
+    outputWriter.toString shouldBe
+      """int x = 3;
+        |""".stripMargin
+  }
+
+  test("render() Decl.Var") {
+    val declVar = q"var x: Int"
+    val expectedValOrVarRenderContext = ValOrVarRenderContext(inBlock = true)
+
+    doWrite("int x").when(declVarRenderer).render(eqTree(declVar), eqTo(expectedValOrVarRenderContext))
+    when(javaStatClassifier.requiresEndDelimiter(eqTree(declVar))).thenReturn(true)
+
+    blockStatRenderer.render(declVar)
 
     outputWriter.toString shouldBe
       """int x;
