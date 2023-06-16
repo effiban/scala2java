@@ -3,7 +3,7 @@ package io.github.effiban.scala2java.core.renderers
 import io.github.effiban.scala2java.core.contexts.{BlockRenderContext, InitContext}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
-import scala.meta.Term
+import scala.meta.Stat
 import scala.meta.Term.Block
 
 trait BlockRenderer {
@@ -11,7 +11,7 @@ trait BlockRenderer {
   def render(block: Block, context: BlockRenderContext = BlockRenderContext()): Unit
 }
 
-private[renderers] class BlockRendererImpl(blockTermRenderer: => BlockTermRenderer,
+private[renderers] class BlockRendererImpl(blockStatRenderer: => BlockStatRenderer,
                                            initRenderer: => InitRenderer)
                                           (implicit javaWriter: JavaWriter) extends BlockRenderer {
 
@@ -25,16 +25,14 @@ private[renderers] class BlockRendererImpl(blockTermRenderer: => BlockTermRender
       initRenderer.render(init, InitContext(argNameAsComment = true))
       writeStatementEnd()
     })
-    renderContents(block, uncertainReturn)
+    renderContents(block.stats, uncertainReturn)
     writeBlockEnd()
   }
 
-  private def renderContents(block: Block, uncertainReturnValue: Boolean): Unit = {
-    // TODO handle all stats and not just terms using the BlockStatRenderer when ready
-    val terms = block.stats.collect { case term: Term => term }
-    if (terms.nonEmpty) {
-      terms.slice(0, terms.length - 1).foreach(blockTermRenderer.render)
-      blockTermRenderer.renderLast(terms.last, uncertainReturnValue)
+  private def renderContents(stats: List[Stat], uncertainReturnValue: Boolean): Unit = {
+    if (stats.nonEmpty) {
+      stats.slice(0, stats.length - 1).foreach(blockStatRenderer.render)
+      blockStatRenderer.renderLast(stats.last, uncertainReturnValue)
     }
   }
 }

@@ -9,7 +9,7 @@ import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.XtensionQuasiquoteTerm
 
-class BlockTermRendererImplTest extends UnitTestSuite {
+class BlockStatRendererImplTest extends UnitTestSuite {
 
   private val expressionTermRefRenderer = mock[ExpressionTermRefRenderer]
   private val defaultTermRenderer = mock[DefaultTermRenderer]
@@ -18,7 +18,7 @@ class BlockTermRendererImplTest extends UnitTestSuite {
   private val tryWithHandlerRenderer = mock[TryWithHandlerRenderer]
   private val javaStatClassifier = mock[JavaStatClassifier]
 
-  private val blockTermRenderer = new BlockTermRendererImpl(
+  private val blockStatRenderer = new BlockStatRendererImpl(
     expressionTermRefRenderer,
     ifRenderer,
     tryRenderer,
@@ -34,7 +34,7 @@ class BlockTermRendererImplTest extends UnitTestSuite {
     doWrite("x").when(expressionTermRefRenderer).render(eqTree(termName))
     when(javaStatClassifier.requiresEndDelimiter(eqTree(termName))).thenReturn(true)
 
-    blockTermRenderer.render(termName)
+    blockStatRenderer.render(termName)
 
     outputWriter.toString shouldBe
       """x;
@@ -47,7 +47,7 @@ class BlockTermRendererImplTest extends UnitTestSuite {
     doWrite("func(2)").when(defaultTermRenderer).render(eqTree(termApply))
     when(javaStatClassifier.requiresEndDelimiter(eqTree(termApply))).thenReturn(true)
 
-    blockTermRenderer.render(termApply)
+    blockStatRenderer.render(termApply)
 
     outputWriter.toString shouldBe
       """func(2);
@@ -74,7 +74,7 @@ class BlockTermRendererImplTest extends UnitTestSuite {
 
     when(javaStatClassifier.requiresEndDelimiter(eqTree(termIf))).thenReturn(false)
 
-    blockTermRenderer.render(termIf)
+    blockStatRenderer.render(termIf)
 
     outputWriter.toString shouldBe
       """|if (cond) {
@@ -91,7 +91,7 @@ class BlockTermRendererImplTest extends UnitTestSuite {
     doWrite("x").when(expressionTermRefRenderer).render(eqTree(termName))
     when(javaStatClassifier.requiresEndDelimiter(eqTree(termName))).thenReturn(true)
 
-    blockTermRenderer.renderLast(termName)
+    blockStatRenderer.renderLast(termName)
 
     outputWriter.toString shouldBe
       """x;
@@ -104,7 +104,7 @@ class BlockTermRendererImplTest extends UnitTestSuite {
     doWrite("x").when(expressionTermRefRenderer).render(eqTree(termName))
     when(javaStatClassifier.requiresEndDelimiter(eqTree(termName))).thenReturn(true)
 
-    blockTermRenderer.renderLast(termName, uncertainReturn = true)
+    blockStatRenderer.renderLast(termName, uncertainReturn = true)
 
     outputWriter.toString shouldBe
       """/* return? */x;
@@ -117,7 +117,7 @@ class BlockTermRendererImplTest extends UnitTestSuite {
     doWrite("func(2)").when(defaultTermRenderer).render(eqTree(termApply))
     when(javaStatClassifier.requiresEndDelimiter(eqTree(termApply))).thenReturn(true)
 
-    blockTermRenderer.render(termApply)
+    blockStatRenderer.render(termApply)
 
     outputWriter.toString shouldBe
       """func(2);
@@ -142,7 +142,7 @@ class BlockTermRendererImplTest extends UnitTestSuite {
          |}""".stripMargin)
       .when(ifRenderer).render(eqTree(termIf), eqTo(IfRenderContext()))
 
-    blockTermRenderer.renderLast(termIf)
+    blockStatRenderer.renderLast(termIf)
 
     outputWriter.toString shouldBe
       """|if (cond) {
@@ -171,7 +171,7 @@ class BlockTermRendererImplTest extends UnitTestSuite {
          |}""".stripMargin)
       .when(ifRenderer).render(eqTree(termIf), eqTo(IfRenderContext(uncertainReturn = true)))
 
-    blockTermRenderer.renderLast(termIf, uncertainReturn = true)
+    blockStatRenderer.renderLast(termIf, uncertainReturn = true)
 
     outputWriter.toString shouldBe
       """|if (cond) {
@@ -200,7 +200,7 @@ class BlockTermRendererImplTest extends UnitTestSuite {
          |}""".stripMargin)
       .when(tryRenderer).render(eqTree(termTry), eqTo(TryRenderContext()))
 
-    blockTermRenderer.renderLast(termTry)
+    blockStatRenderer.renderLast(termTry)
 
     outputWriter.toString shouldBe
       """|try {
@@ -228,7 +228,7 @@ class BlockTermRendererImplTest extends UnitTestSuite {
          |}""".stripMargin)
       .when(tryRenderer).render(eqTree(termTry), eqTo(TryRenderContext(uncertainReturn = true)))
 
-    blockTermRenderer.renderLast(termTry, uncertainReturn = true)
+    blockStatRenderer.renderLast(termTry, uncertainReturn = true)
 
     outputWriter.toString shouldBe
       """|try {
@@ -254,7 +254,7 @@ class BlockTermRendererImplTest extends UnitTestSuite {
          |""".stripMargin)
       .when(tryWithHandlerRenderer).render(eqTree(tryWithHandler), eqTo(TryRenderContext()))
 
-    blockTermRenderer.renderLast(tryWithHandler)
+    blockStatRenderer.renderLast(tryWithHandler)
 
     outputWriter.toString shouldBe
       """|try {
@@ -280,7 +280,7 @@ class BlockTermRendererImplTest extends UnitTestSuite {
          |""".stripMargin)
       .when(tryWithHandlerRenderer).render(eqTree(tryWithHandler), eqTo(TryRenderContext(uncertainReturn = true)))
 
-    blockTermRenderer.renderLast(tryWithHandler, uncertainReturn = true)
+    blockStatRenderer.renderLast(tryWithHandler, uncertainReturn = true)
 
     outputWriter.toString shouldBe
       """|try {
