@@ -12,12 +12,12 @@ trait DeclDefTraverser {
   def traverse(defDecl: Decl.Def, context: StatContext = StatContext()): Unit
 }
 
-private[traversers] class DeclDefTraverserImpl(modListTraverser: => ModListTraverser,
+private[traversers] class DeclDefTraverserImpl(modListTraverser: => DeprecatedModListTraverser,
                                                typeParamListTraverser: => TypeParamListTraverser,
                                                typeTraverser: => TypeTraverser,
                                                typeRenderer: => TypeRenderer,
                                                termNameRenderer: TermNameRenderer,
-                                               termParamListTraverser: => TermParamListTraverser)
+                                               termParamListTraverser: => DeprecatedTermParamListTraverser)
                                               (implicit javaWriter: JavaWriter) extends DeclDefTraverser {
 
   import javaWriter._

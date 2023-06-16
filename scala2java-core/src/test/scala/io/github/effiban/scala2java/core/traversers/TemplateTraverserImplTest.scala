@@ -66,7 +66,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
   )
 
 
-  private val initListTraverser = mock[InitListTraverser]
+  private val initListTraverser = mock[DeprecatedInitListTraverser]
   private val selfTraverser = mock[SelfTraverser]
   private val javaInheritanceKeywordResolver = mock[JavaInheritanceKeywordResolver]
   private val templateBodyTraverser = mock[TemplateBodyTraverser]

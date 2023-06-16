@@ -56,13 +56,13 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
 
   private val InitialDefnDef = Defn.Def(Nil, Term.Name("foo"), Nil, List(Nil), Some(TypeNames.Int), Term.Apply(Term.Name("bar"), Nil))
 
-  private val modListTraverser = mock[ModListTraverser]
+  private val modListTraverser = mock[DeprecatedModListTraverser]
   private val typeParamListTraverser = mock[TypeParamListTraverser]
   private val termNameRenderer = mock[TermNameRenderer]
   private val typeTraverser = mock[TypeTraverser]
   private val typeRenderer = mock[TypeRenderer]
-  private val termParamListTraverser = mock[TermParamListTraverser]
-  private val blockTraverser = mock[BlockTraverser]
+  private val termParamListTraverser = mock[DeprecatedTermParamListTraverser]
+  private val blockTraverser = mock[DeprecatedBlockTraverser]
   private val termTypeInferrer = mock[TermTypeInferrer]
   private val defnDefTransformer = mock[DefnDefTransformer]
 

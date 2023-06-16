@@ -6,7 +6,7 @@ import scala.meta.{Defn, Pat}
 
 trait EnumConstantListTraverser extends ScalaTreeTraverser[Defn.Val]
 
-private[traversers] class EnumConstantListTraverserImpl(argumentListTraverser: => ArgumentListTraverser)
+private[traversers] class EnumConstantListTraverserImpl(argumentListTraverser: => DeprecatedArgumentListTraverser)
                                                        (implicit javaWriter: JavaWriter) extends EnumConstantListTraverser {
 
   import javaWriter._

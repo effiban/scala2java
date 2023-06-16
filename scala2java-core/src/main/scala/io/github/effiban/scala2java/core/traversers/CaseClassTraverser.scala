@@ -12,9 +12,9 @@ trait CaseClassTraverser {
   def traverse(classDef: Defn.Class, context: ClassOrTraitContext = ClassOrTraitContext()): Unit
 }
 
-private[traversers] class CaseClassTraverserImpl(modListTraverser: => ModListTraverser,
+private[traversers] class CaseClassTraverserImpl(modListTraverser: => DeprecatedModListTraverser,
                                                  typeParamListTraverser: => TypeParamListTraverser,
-                                                 termParamListTraverser: => TermParamListTraverser,
+                                                 termParamListTraverser: => DeprecatedTermParamListTraverser,
                                                  templateTraverser: => TemplateTraverser,
                                                  javaTreeTypeResolver: JavaTreeTypeResolver,
                                                  javaChildScopeResolver: JavaChildScopeResolver)

@@ -10,7 +10,7 @@ trait DeclTraverser {
 }
 
 private[traversers] class DeclTraverserImpl(declValTraverser: => DeclValTraverser,
-                                            declVarTraverser: => DeclVarTraverser,
+                                            declVarTraverser: => DeprecatedDeclVarTraverser,
                                             declDefTraverser: => DeclDefTraverser,
                                             declTypeTraverser: => DeclTypeTraverser)
                                            (implicit javaWriter: JavaWriter) extends DeclTraverser {

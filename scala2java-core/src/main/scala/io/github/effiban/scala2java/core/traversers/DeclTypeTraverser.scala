@@ -11,7 +11,7 @@ trait DeclTypeTraverser {
   def traverse(typeDecl: Decl.Type, context: StatContext = StatContext()): Unit
 }
 
-private[traversers] class DeclTypeTraverserImpl(modListTraverser: => ModListTraverser,
+private[traversers] class DeclTypeTraverserImpl(modListTraverser: => DeprecatedModListTraverser,
                                                 typeParamListTraverser: => TypeParamListTraverser,
                                                 javaTreeTypeResolver: JavaTreeTypeResolver)
                                                (implicit javaWriter: JavaWriter) extends DeclTypeTraverser {

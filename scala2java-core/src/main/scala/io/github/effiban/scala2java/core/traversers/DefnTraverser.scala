@@ -10,8 +10,8 @@ trait DefnTraverser {
   def traverse(defn: Defn, context: StatContext = StatContext()): Unit
 }
 
-private[traversers] class DefnTraverserImpl(defnValTraverser: => DefnValTraverser,
-                                            defnVarTraverser: => DefnVarTraverser,
+private[traversers] class DefnTraverserImpl(defnValTraverser: => DeprecatedDefnValTraverser,
+                                            defnVarTraverser: => DeprecatedDefnVarTraverser,
                                             defnDefTraverser: => DefnDefTraverser,
                                             defnTypeTraverser: => DefnTypeTraverser,
                                             classTraverser: => ClassTraverser,

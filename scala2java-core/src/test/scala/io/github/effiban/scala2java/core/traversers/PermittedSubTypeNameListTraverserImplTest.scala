@@ -6,7 +6,7 @@ import scala.meta.{Term, Type}
 
 class PermittedSubTypeNameListTraverserImplTest extends UnitTestSuite {
 
-  private val permittedSubTypeNameListTraverser = new PermittedSubTypeNameListTraverserImpl(new ArgumentListTraverserImpl())
+  private val permittedSubTypeNameListTraverser = new PermittedSubTypeNameListTraverserImpl(new DeprecatedArgumentListTraverserImpl())
 
   test("traverse() when one") {
     val permittedSubTypeName = Type.Name("A")

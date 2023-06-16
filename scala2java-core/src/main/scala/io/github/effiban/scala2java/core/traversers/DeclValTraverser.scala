@@ -11,7 +11,7 @@ trait DeclValTraverser {
   def traverse(valDecl: Decl.Val, context: StatContext = StatContext()): Unit
 }
 
-private[traversers] class DeclValTraverserImpl(modListTraverser: => ModListTraverser,
+private[traversers] class DeclValTraverserImpl(modListTraverser: => DeprecatedModListTraverser,
                                                typeTraverser: => TypeTraverser,
                                                typeRenderer: => TypeRenderer,
                                                patTraverser: => PatTraverser,

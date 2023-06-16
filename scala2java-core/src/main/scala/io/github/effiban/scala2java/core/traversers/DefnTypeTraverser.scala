@@ -13,7 +13,7 @@ trait DefnTypeTraverser {
   def traverse(typeDef: Defn.Type, context: StatContext = StatContext()): Unit
 }
 
-private[traversers] class DefnTypeTraverserImpl(modListTraverser: => ModListTraverser,
+private[traversers] class DefnTypeTraverserImpl(modListTraverser: => DeprecatedModListTraverser,
                                                 typeParamListTraverser: => TypeParamListTraverser,
                                                 typeTraverser: => TypeTraverser,
                                                 typeRenderer: => TypeRenderer,

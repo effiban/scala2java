@@ -26,7 +26,7 @@ class DeclValTraverserImplTest extends UnitTestSuite {
   )
   private val Modifiers = List(TheAnnot)
 
-  private val modListTraverser = mock[ModListTraverser]
+  private val modListTraverser = mock[DeprecatedModListTraverser]
   private val typeTraverser = mock[TypeTraverser]
   private val typeRenderer = mock[TypeRenderer]
   private val patTraverser = mock[PatTraverser]

@@ -13,7 +13,7 @@ trait TemplateTraverser {
   def traverse(template: Template, context: TemplateContext): Unit
 }
 
-private[traversers] class TemplateTraverserImpl(initListTraverser: => InitListTraverser,
+private[traversers] class TemplateTraverserImpl(initListTraverser: => DeprecatedInitListTraverser,
                                                 selfTraverser: => SelfTraverser,
                                                 templateBodyTraverser: => TemplateBodyTraverser,
                                                 permittedSubTypeNameListTraverser: PermittedSubTypeNameListTraverser,

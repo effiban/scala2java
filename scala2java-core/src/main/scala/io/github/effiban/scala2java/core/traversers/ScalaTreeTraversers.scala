@@ -34,74 +34,74 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val alternativeTraverser: AlternativeTraverser = new AlternativeTraverserImpl(patTraverser)
 
-  private lazy val annotListTraverser: AnnotListTraverser = new AnnotListTraverserImpl(annotTraverser)
+  private lazy val deprecatedAnnotListTraverser: DeprecatedAnnotListTraverser = new DeprecatedAnnotListTraverserImpl(deprecatedAnnotTraverser)
 
-  private lazy val annotTraverser: AnnotTraverser = new AnnotTraverserImpl(initTraverser)
+  private lazy val deprecatedAnnotTraverser: DeprecatedAnnotTraverser = new DeprecatedAnnotTraverserImpl(deprecatedInitTraverser)
 
-  private lazy val anonymousFunctionTraverser: AnonymousFunctionTraverser = new AnonymousFunctionTraverserImpl(termFunctionTraverser)
+  private lazy val deprecatedAnonymousFunctionTraverser: DeprecatedAnonymousFunctionTraverser = new DeprecatedAnonymousFunctionTraverserImpl(deprecatedTermFunctionTraverser)
 
-  private lazy val applyUnaryTraverser: ApplyUnaryTraverser = new ApplyUnaryTraverserImpl(termNameRenderer, expressionTermTraverser)
+  private lazy val deprecatedApplyUnaryTraverser: DeprecatedApplyUnaryTraverser = new DeprecatedApplyUnaryTraverserImpl(termNameRenderer, deprecatedExpressionTermTraverser)
 
-  private lazy val argumentListTraverser: ArgumentListTraverser = new ArgumentListTraverserImpl
+  private lazy val deprecatedArgumentListTraverser: DeprecatedArgumentListTraverser = new DeprecatedArgumentListTraverserImpl
 
-  private lazy val arrayInitializerTraverser: ArrayInitializerTraverser = new ArrayInitializerTraverserImpl(
+  private lazy val deprecatedArrayInitializerTraverser: DeprecatedArrayInitializerTraverser = new DeprecatedArrayInitializerTraverserImpl(
     typeTraverser,
     typeRenderer,
-    expressionTermTraverser,
-    new SimpleArgumentTraverser(expressionTermTraverser),
-    argumentListTraverser,
+    deprecatedExpressionTermTraverser,
+    new DeprecatedSimpleArgumentTraverser(deprecatedExpressionTermTraverser),
+    deprecatedArgumentListTraverser,
     termTypeInferrer,
     compositeCollectiveTypeInferrer
   )
 
-  private lazy val ascribeTraverser: AscribeTraverser = new AscribeTraverserImpl(
+  private lazy val deprecatedAscribeTraverser: DeprecatedAscribeTraverser = new DeprecatedAscribeTraverserImpl(
     typeTraverser,
     typeRenderer,
-    expressionTermTraverser
+    deprecatedExpressionTermTraverser
   )
 
-  private lazy val assignInvocationArgTraverser: InvocationArgTraverser[Assign] = new AssignInvocationArgTraverser(
-    assignLHSTraverser,
-    expressionTermTraverser
+  private lazy val deprecatedAssignInvocationArgTraverser: DeprecatedInvocationArgTraverser[Assign] = new DeprecatedAssignInvocationArgTraverser(
+    deprcatedAssignLHSTraverser,
+    deprecatedExpressionTermTraverser
   )
 
-  private lazy val assignLHSTraverser: AssignLHSTraverser = new AssignLHSTraverserImpl(expressionTermTraverser)
+  private lazy val deprcatedAssignLHSTraverser: DeprecatedAssignLHSTraverser = new DeprecatedAssignLHSTraverserImpl(deprecatedExpressionTermTraverser)
 
-  private lazy val assignTraverser: AssignTraverser = new AssignTraverserImpl(assignLHSTraverser, expressionTermTraverser)
+  private lazy val deprecatedAssignTraverser: DeprecatedAssignTraverser = new DeprecatedAssignTraverserImpl(deprcatedAssignLHSTraverser, deprecatedExpressionTermTraverser)
 
-  private lazy val blockStatTraverser: BlockStatTraverser = new BlockStatTraverserImpl(
-    ifTraverser,
-    tryTraverser,
-    tryWithHandlerTraverser,
+  private lazy val deprecatedBlockStatTraverser: DeprecatedBlockStatTraverser = new DeprecatedBlockStatTraverserImpl(
+    deprecatedIfTraverser,
+    deprecatedTryTraverser,
+    deprecatedTryWithHandlerTraverser,
     statTraverser,
     shouldReturnValueResolver,
     JavaStatClassifier
   )
 
-  private lazy val blockTraverser: BlockTraverser = new BlockTraverserImpl(
-    initTraverser,
-    blockStatTraverser,
+  private lazy val deprecatedBlockTraverser: DeprecatedBlockTraverser = new DeprecatedBlockTraverserImpl(
+    deprecatedInitTraverser,
+    deprecatedBlockStatTraverser,
   )
 
   private lazy val caseClassTraverser: CaseClassTraverser = new CaseClassTraverserImpl(
-    modListTraverser,
+    deprecatedModListTraverser,
     typeParamListTraverser,
-    termParamListTraverser,
+    deprecatedTermParamListTraverser,
     templateTraverser,
     JavaTreeTypeResolver,
     JavaChildScopeResolver
   )
 
-  private lazy val caseTraverser: CaseTraverser = new CaseTraverserImpl(
+  private lazy val deprecatedCaseTraverser: DeprecatedCaseTraverser = new DeprecatedCaseTraverserImpl(
     patTraverser,
     patRenderer,
-    expressionTermTraverser
+    deprecatedExpressionTermTraverser
   )
 
-  private lazy val catchHandlerTraverser: CatchHandlerTraverser = new CatchHandlerTraverserImpl(
+  private lazy val deprecatedCatchHandlerTraverser: DeprecatedCatchHandlerTraverser = new DeprecatedCatchHandlerTraverserImpl(
     CatchArgumentTraverser,
     catchArgumentRenderer,
-    blockTraverser
+    deprecatedBlockTraverser
   )
 
   private lazy val classTraverser: ClassTraverser = new ClassTraverserImpl(
@@ -112,9 +112,9 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val classOfTraverser: ClassOfTraverser = new ClassOfTraverserImpl(typeTraverser)
 
-  private lazy val compositeInvocationArgTraverser: InvocationArgTraverser[Term] = new CompositeInvocationArgTraverser(
-    assignInvocationArgTraverser,
-    expressionTermTraverser
+  private lazy val deprecatedCompositeInvocationArgTraverser: DeprecatedInvocationArgTraverser[Term] = new DeprecatedCompositeInvocationArgTraverser(
+    deprecatedAssignInvocationArgTraverser,
+    deprecatedExpressionTermTraverser
   )
 
   private lazy val ctorPrimaryTraverser: CtorPrimaryTraverser = new CtorPrimaryTraverserImpl(CtorPrimaryTransformer, defnDefTraverser)
@@ -122,12 +122,12 @@ class ScalaTreeTraversers(implicit factories: Factories,
   private lazy val ctorSecondaryTraverser: CtorSecondaryTraverser = new CtorSecondaryTraverserImpl(CtorSecondaryTransformer, defnDefTraverser)
 
   private lazy val declDefTraverser: DeclDefTraverser = new DeclDefTraverserImpl(
-    modListTraverser,
+    deprecatedModListTraverser,
     typeParamListTraverser,
     typeTraverser,
     typeRenderer,
     termNameRenderer,
-    termParamListTraverser
+    deprecatedTermParamListTraverser
   )
 
   private lazy val declTraverser: DeclTraverser = new DeclTraverserImpl(
@@ -137,52 +137,52 @@ class ScalaTreeTraversers(implicit factories: Factories,
     declTypeTraverser)
 
   private lazy val declTypeTraverser: DeclTypeTraverser = new DeclTypeTraverserImpl(
-    modListTraverser,
+    deprecatedModListTraverser,
     typeParamListTraverser,
     JavaTreeTypeResolver)
 
   private lazy val declValTraverser: DeclValTraverser = new DeclValTraverserImpl(
-    modListTraverser,
+    deprecatedModListTraverser,
     typeTraverser,
     typeRenderer,
     patTraverser,
     patListRenderer
   )
 
-  private lazy val declVarTraverser: DeclVarTraverser = new DeclVarTraverserImpl(
-    modListTraverser,
+  private lazy val declVarTraverser: DeprecatedDeclVarTraverser = new DeprecatedDeclVarTraverserImpl(
+    deprecatedModListTraverser,
     typeTraverser,
     typeRenderer,
     patTraverser,
     patListRenderer
   )
 
-  private lazy val defaultTermTraverser: DefaultTermTraverser = new DefaultTermTraverserImpl(
+  private lazy val deprecatedDefaultTermTraverser: DeprecatedDefaultTermTraverser = new DeprecatedDefaultTermTraverserImpl(
     defaultTermRefTraverser,
-    termApplyTraverser,
-    mainApplyTypeTraverser,
-    termApplyInfixTraverser,
-    assignTraverser,
-    returnTraverser,
-    throwTraverser,
-    ascribeTraverser,
-    termAnnotateTraverser,
-    termTupleTraverser,
-    blockTraverser,
-    ifTraverser,
-    termMatchTraverser,
-    tryTraverser,
-    tryWithHandlerTraverser,
-    termFunctionTraverser,
-    partialFunctionTraverser,
-    anonymousFunctionTraverser,
-    whileTraverser,
-    doTraverser,
-    newTraverser,
-    newAnonymousTraverser,
+    deprecatedTermApplyTraverser,
+    deprecatedMainApplyTypeTraverser,
+    deprecatedTermApplyInfixTraverser,
+    deprecatedAssignTraverser,
+    deprecatedReturnTraverser,
+    deprecatedThrowTraverser,
+    deprecatedAscribeTraverser,
+    deprecatedTermAnnotateTraverser,
+    deprecatedTermTupleTraverser,
+    deprecatedBlockTraverser,
+    deprecatedIfTraverser,
+    deprecatedTermMatchTraverser,
+    deprecatedTryTraverser,
+    deprecatedTryWithHandlerTraverser,
+    deprecatedTermFunctionTraverser,
+    deprecatedPartialFunctionTraverser,
+    deprecatedAnonymousFunctionTraverser,
+    deprecatedWhileTraverser,
+    deprecatedDoTraverser,
+    deprecatedNewTraverser,
+    deprecatedNewAnonymousTraverser,
     termPlaceholderRenderer,
-    etaTraverser,
-    termRepeatedTraverser,
+    deprecatedEtaTraverser,
+    deprecatedTermRepeatedTraverser,
     defaultTermRenderer
   )
 
@@ -195,20 +195,20 @@ class ScalaTreeTraversers(implicit factories: Factories,
   private lazy val defaultTermSelectTraverser: DefaultTermSelectTraverser = new DefaultTermSelectTraverserImpl(defaultTermRefTraverser)
 
   private lazy val defnDefTraverser: DefnDefTraverser = new DefnDefTraverserImpl(
-    modListTraverser,
+    deprecatedModListTraverser,
     typeParamListTraverser,
     termNameRenderer,
     typeTraverser,
     typeRenderer,
-    termParamListTraverser,
-    blockTraverser,
+    deprecatedTermParamListTraverser,
+    deprecatedBlockTraverser,
     termTypeInferrer,
     new CompositeDefnDefTransformer()
   )
 
   private lazy val defnTraverser: DefnTraverser = new DefnTraverserImpl(
-    defnValTraverser,
-    defnVarTraverser,
+    deprecatedDefnValTraverser,
+    deprecatedDefnVarTraverser,
     defnDefTraverser,
     defnTypeTraverser,
     classTraverser,
@@ -217,7 +217,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
   )
 
   private lazy val defnTypeTraverser: DefnTypeTraverser = new DefnTypeTraverserImpl(
-    modListTraverser,
+    deprecatedModListTraverser,
     typeParamListTraverser,
     typeTraverser,
     typeRenderer,
@@ -226,55 +226,55 @@ class ScalaTreeTraversers(implicit factories: Factories,
     JavaTreeTypeResolver
   )
 
-  private lazy val defnValOrVarTypeTraverser: DefnValOrVarTypeTraverser = new DefnValOrVarTypeTraverserImpl(
+  private lazy val deprecatedDefnValOrVarTypeTraverser: DeprecatedDefnValOrVarTypeTraverser = new DeprecatedDefnValOrVarTypeTraverserImpl(
     typeTraverser,
     typeRenderer,
     termTypeInferrer
   )
 
-  private lazy val defnValTraverser: DefnValTraverser = new DefnValTraverserImpl(
-    modListTraverser,
-    defnValOrVarTypeTraverser,
+  private lazy val deprecatedDefnValTraverser: DeprecatedDefnValTraverser = new DeprecatedDefnValTraverserImpl(
+    deprecatedModListTraverser,
+    deprecatedDefnValOrVarTypeTraverser,
     patTraverser,
     patListRenderer,
-    expressionTermTraverser,
+    deprecatedExpressionTermTraverser,
     declVarTraverser,
     new CompositeDefnValToDeclVarTransformer,
     new CompositeDefnValTransformer
   )
 
-  private lazy val defnVarTraverser: DefnVarTraverser = new DefnVarTraverserImpl(
-    modListTraverser,
-    defnValOrVarTypeTraverser,
+  private lazy val deprecatedDefnVarTraverser: DeprecatedDefnVarTraverser = new DeprecatedDefnVarTraverserImpl(
+    deprecatedModListTraverser,
+    deprecatedDefnValOrVarTypeTraverser,
     patTraverser,
     patListRenderer,
-    expressionTermTraverser
+    deprecatedExpressionTermTraverser
   )
 
-  private lazy val doTraverser: DoTraverser = new DoTraverserImpl(expressionTermTraverser, blockTraverser)
+  private lazy val deprecatedDoTraverser: DeprecatedDoTraverser = new DeprecatedDoTraverserImpl(deprecatedExpressionTermTraverser, deprecatedBlockTraverser)
 
-  private lazy val enumConstantListTraverser: EnumConstantListTraverser = new EnumConstantListTraverserImpl(argumentListTraverser)
+  private lazy val enumConstantListTraverser: EnumConstantListTraverser = new EnumConstantListTraverserImpl(deprecatedArgumentListTraverser)
 
-  private lazy val etaTraverser: EtaTraverser = new EtaTraverserImpl(expressionTermTraverser)
+  private lazy val deprecatedEtaTraverser: DeprecatedEtaTraverser = new DeprecatedEtaTraverserImpl(deprecatedExpressionTermTraverser)
 
-  private lazy val expressionTermTraverser: ExpressionTermTraverser = new ExpressionTermTraverserImpl(
-    ifTraverser,
+  private lazy val deprecatedExpressionTermTraverser: DeprecatedExpressionTermTraverser = new DeprecatedExpressionTermTraverserImpl(
+    deprecatedIfTraverser,
     statTraverser,
-    termApplyTraverser,
-    expressionTermRefTraverser,
-    defaultTermTraverser
+    deprecatedTermApplyTraverser,
+    deprecatedExpressionTermRefTraverser,
+    deprecatedDefaultTermTraverser
   )
 
-  private lazy val expressionTermRefTraverser: ExpressionTermRefTraverser = new ExpressionTermRefTraverserImpl(
-    termNameTraverser,
-    expressionTermSelectTraverser,
-    applyUnaryTraverser,
+  private lazy val deprecatedExpressionTermRefTraverser: DeprecatedExpressionTermRefTraverser = new DeprecatedExpressionTermRefTraverserImpl(
+    deprecatedTermNameTraverser,
+    deprecatedExpressionTermSelectTraverser,
+    deprecatedApplyUnaryTraverser,
     defaultTermRefTraverser,
     defaultTermRefRenderer
   )
 
-  private lazy val expressionTermSelectTraverser: ExpressionTermSelectTraverser = new ExpressionTermSelectTraverserImpl(
-    expressionTermTraverser,
+  private lazy val deprecatedExpressionTermSelectTraverser: DeprecatedExpressionTermSelectTraverser = new DeprecatedExpressionTermSelectTraverserImpl(
+    deprecatedExpressionTermTraverser,
     termNameRenderer,
     typeTraverser,
     typeListRenderer,
@@ -282,16 +282,16 @@ class ScalaTreeTraversers(implicit factories: Factories,
     new CompositeTermSelectTransformer(CoreTermSelectTransformer)
   )
 
-  private lazy val finallyTraverser: FinallyTraverser = new FinallyTraverserImpl(blockTraverser)
+  private lazy val deprecatedFinallyTraverser: DeprecatedFinallyTraverser = new DeprecatedFinallyTraverserImpl(deprecatedBlockTraverser)
 
-  private lazy val funTermSelectTraverser: FunTermSelectTraverser = new FunTermSelectTraverserImpl(
-    defaultTermTraverser,
+  private lazy val deprecatedFunTermSelectTraverser: DeprecatedFunTermSelectTraverser = new DeprecatedFunTermSelectTraverserImpl(
+    deprecatedDefaultTermTraverser,
     termNameRenderer,
     typeTraverser,
     typeListRenderer
   )
 
-  private lazy val ifTraverser: IfTraverser = new IfTraverserImpl(expressionTermTraverser, blockTraverser)
+  private lazy val deprecatedIfTraverser: DeprecatedIfTraverser = new DeprecatedIfTraverserImpl(deprecatedExpressionTermTraverser, deprecatedBlockTraverser)
 
   private lazy val importerTraverser: ImporterTraverser = new ImporterTraverserImpl(defaultTermRefTraverser)
 
@@ -301,46 +301,46 @@ class ScalaTreeTraversers(implicit factories: Factories,
     new CompositeImporterTransformer
   )
 
-  private lazy val initArgTraverserFactory: InitArgTraverserFactory = new InitArgTraverserFactoryImpl(initTraverser)
+  private lazy val deprecatedInitArgTraverserFactory: DeprecatedInitArgTraverserFactory = new DeprecatedInitArgTraverserFactoryImpl(deprecatedInitTraverser)
 
-  private lazy val initListTraverser: InitListTraverser = new InitListTraverserImpl(
-    argumentListTraverser,
-    initArgTraverserFactory
+  private lazy val deprecatedInitListTraverser: DeprecatedInitListTraverser = new DeprecatedInitListTraverserImpl(
+    deprecatedArgumentListTraverser,
+    deprecatedInitArgTraverserFactory
   )
 
-  private lazy val initTraverser: InitTraverser = new InitTraverserImpl(
+  private lazy val deprecatedInitTraverser: DeprecatedInitTraverser = new DeprecatedInitTraverserImpl(
     typeTraverser,
     typeRenderer,
-    argumentListTraverser,
-    compositeInvocationArgTraverser
+    deprecatedArgumentListTraverser,
+    deprecatedCompositeInvocationArgTraverser
   )
 
-  private lazy val mainApplyTypeTraverser: MainApplyTypeTraverser =
-    new MainApplyTypeTraverserImpl(
+  private lazy val deprecatedMainApplyTypeTraverser: DeprecatedMainApplyTypeTraverser =
+    new DeprecatedMainApplyTypeTraverserImpl(
       classOfTraverser,
       classOfRenderer,
-      standardApplyTypeTraverser
+      deprecatedStandardApplyTypeTraverser
     )
 
-  private lazy val modListTraverser: ModListTraverser = new ModListTraverserImpl(annotListTraverser, JavaModifiersResolver)
+  private lazy val deprecatedModListTraverser: DeprecatedModListTraverser = new DeprecatedModListTraverserImpl(deprecatedAnnotListTraverser, JavaModifiersResolver)
 
   private lazy val nameTraverser: NameTraverser = new NameTraverserImpl(typeNameTraverser)
 
-  private lazy val newAnonymousTraverser: NewAnonymousTraverser = new NewAnonymousTraverserImpl(templateTraverser)
+  private lazy val deprecatedNewAnonymousTraverser: DeprecatedNewAnonymousTraverser = new DeprecatedNewAnonymousTraverserImpl(templateTraverser)
 
-  private lazy val newTraverser: NewTraverser = new NewTraverserImpl(
-    initTraverser,
-    arrayInitializerTraverser,
+  private lazy val deprecatedNewTraverser: DeprecatedNewTraverser = new DeprecatedNewTraverserImpl(
+    deprecatedInitTraverser,
+    deprecatedArrayInitializerTraverser,
     ArrayInitializerContextResolver
   )
 
   private lazy val objectTraverser: ObjectTraverser = new ObjectTraverserImpl(
-    modListTraverser,
+    deprecatedModListTraverser,
     templateTraverser,
     JavaTreeTypeResolver,
     JavaChildScopeResolver)
 
-  private lazy val partialFunctionTraverser: PartialFunctionTraverser = new PartialFunctionTraverserImpl(termFunctionTraverser)
+  private lazy val deprecatedPartialFunctionTraverser: DeprecatedPartialFunctionTraverser = new DeprecatedPartialFunctionTraverserImpl(deprecatedTermFunctionTraverser)
 
   private lazy val patTraverser: PatTraverser = new PatTraverserImpl(
     PatSeqWildcardTraverser,
@@ -355,7 +355,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val patTypedTraverser: PatTypedTraverser = new PatTypedTraverserImpl(patTraverser, typeTraverser)
 
-  private lazy val permittedSubTypeNameListTraverser = new PermittedSubTypeNameListTraverserImpl(argumentListTraverser)
+  private lazy val permittedSubTypeNameListTraverser = new PermittedSubTypeNameListTraverserImpl(deprecatedArgumentListTraverser)
 
   private lazy val pkgStatTraverser: PkgStatTraverser = new PkgStatTraverserImpl(
     classTraverser,
@@ -377,7 +377,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
   )
 
   private lazy val regularClassTraverser: RegularClassTraverser = new RegularClassTraverserImpl(
-    modListTraverser,
+    deprecatedModListTraverser,
     typeParamListTraverser,
     templateTraverser,
     ParamToDeclValTransformer,
@@ -385,19 +385,19 @@ class ScalaTreeTraversers(implicit factories: Factories,
     JavaChildScopeResolver
   )
 
-  private lazy val returnTraverser: ReturnTraverser = new ReturnTraverserImpl(expressionTermTraverser)
+  private lazy val deprecatedReturnTraverser: DeprecatedReturnTraverser = new DeprecatedReturnTraverserImpl(deprecatedExpressionTermTraverser)
 
   private lazy val selfTraverser: SelfTraverser = new SelfTraverserImpl(selfRenderer)
 
   lazy val sourceTraverser: SourceTraverser = new SourceTraverserImpl(statTraverser)
 
-  private lazy val statTermTraverser: StatTermTraverser = new StatTermTraverserImpl(
-    expressionTermRefTraverser,
-    defaultTermTraverser
+  private lazy val deprecatedStatTermTraverser: DeprecatedStatTermTraverser = new DeprecatedStatTermTraverserImpl(
+    deprecatedExpressionTermRefTraverser,
+    deprecatedDefaultTermTraverser
   )
 
   private lazy val statTraverser: StatTraverser = new StatTraverserImpl(
-    statTermTraverser,
+    deprecatedStatTermTraverser,
     importTraverser,
     importRenderer,
     pkgTraverser,
@@ -405,11 +405,11 @@ class ScalaTreeTraversers(implicit factories: Factories,
     declTraverser
   )
 
-  private lazy val standardApplyTypeTraverser: StandardApplyTypeTraverser = new StandardApplyTypeTraverserImpl(
-    funTermSelectTraverser,
+  private lazy val deprecatedStandardApplyTypeTraverser: DeprecatedStandardApplyTypeTraverser = new DeprecatedStandardApplyTypeTraverserImpl(
+    deprecatedFunTermSelectTraverser,
     typeTraverser,
     typeListRenderer,
-    expressionTermTraverser
+    deprecatedExpressionTermTraverser
   )
 
   private lazy val superTraverser: SuperTraverser = new SuperTraverserImpl(nameTraverser)
@@ -436,7 +436,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
   )
 
   private lazy val templateTraverser: TemplateTraverser = new TemplateTraverserImpl(
-    initListTraverser,
+    deprecatedInitListTraverser,
     selfTraverser,
     templateBodyTraverser,
     permittedSubTypeNameListTraverser,
@@ -444,85 +444,85 @@ class ScalaTreeTraversers(implicit factories: Factories,
     new CompositeTemplateInitExcludedPredicate(CoreTemplateInitExcludedPredicate)
   )
 
-  private lazy val termAnnotateTraverser: TermAnnotateTraverser = new TermAnnotateTraverserImpl(annotListTraverser, expressionTermTraverser)
+  private lazy val deprecatedTermAnnotateTraverser: DeprecatedTermAnnotateTraverser = new DeprecatedTermAnnotateTraverserImpl(deprecatedAnnotListTraverser, deprecatedExpressionTermTraverser)
 
-  private lazy val termApplyInfixTraverser: TermApplyInfixTraverser = new TermApplyInfixTraverserImpl(
-    expressionTermTraverser,
-    termApplyTraverser,
+  private lazy val deprecatedTermApplyInfixTraverser: DeprecatedTermApplyInfixTraverser = new DeprecatedTermApplyInfixTraverserImpl(
+    deprecatedExpressionTermTraverser,
+    deprecatedTermApplyTraverser,
     termNameRenderer,
     new CompositeTermApplyInfixToTermApplyTransformer(CoreTermApplyInfixToTermApplyTransformer)
   )
 
-  private lazy val termApplyTraverser: TermApplyTraverser = new TermApplyTraverserImpl(
-    expressionTermTraverser,
-    arrayInitializerTraverser,
-    argumentListTraverser,
-    compositeInvocationArgTraverser,
+  private lazy val deprecatedTermApplyTraverser: DeprecatedTermApplyTraverser = new DeprecatedTermApplyTraverserImpl(
+    deprecatedExpressionTermTraverser,
+    deprecatedArrayInitializerTraverser,
+    deprecatedArgumentListTraverser,
+    deprecatedCompositeInvocationArgTraverser,
     termApplyTransformationContextFactory,
     ArrayInitializerContextResolver,
     internalTermApplyTransformer
   )
 
-  private lazy val termFunctionTraverser: TermFunctionTraverser = new TermFunctionTraverserImpl(
-    termParamTraverser,
-    termParamListTraverser,
+  private lazy val deprecatedTermFunctionTraverser: DeprecatedTermFunctionTraverser = new DeprecatedTermFunctionTraverserImpl(
+    deprecatedTermParamTraverser,
+    deprecatedTermParamListTraverser,
     statTraverser,
-    blockTraverser
+    deprecatedBlockTraverser
   )
 
-  private lazy val termMatchTraverser: TermMatchTraverser = new TermMatchTraverserImpl(expressionTermTraverser, caseTraverser)
+  private lazy val deprecatedTermMatchTraverser: DeprecatedTermMatchTraverser = new DeprecatedTermMatchTraverserImpl(deprecatedExpressionTermTraverser, deprecatedCaseTraverser)
 
-  private lazy val termNameTraverser: TermNameTraverser = new TermNameTraverserImpl(
-    termNameWithoutRenderTraverser,
+  private lazy val deprecatedTermNameTraverser: DeprecatedTermNameTraverser = new DeprecatedTermNameTraverserImpl(
+    deprecatedTermNameWithoutRenderTraverser,
     termNameRenderer
   )
 
-  private lazy val termNameWithoutRenderTraverser: TermNameWithoutRenderTraverser = new TermNameWithoutRenderTraverserImpl(
-    expressionTermTraverser,
+  private lazy val deprecatedTermNameWithoutRenderTraverser: DeprecatedTermNameWithoutRenderTraverser = new DeprecatedTermNameWithoutRenderTraverserImpl(
+    deprecatedExpressionTermTraverser,
     new CompositeTermNameTransformer(CoreTermNameTransformer),
   )
 
-  private lazy val termParamArgTraverserFactory: TermParamArgTraverserFactory = new TermParamArgTraverserFactoryImpl(termParamTraverser)
+  private lazy val deprecatedTermParamArgTraverserFactory: DeprecatedTermParamArgTraverserFactory = new DeprecatedTermParamArgTraverserFactoryImpl(deprecatedTermParamTraverser)
 
-  private lazy val termParamListTraverser: TermParamListTraverser = new TermParamListTraverserImpl(
-    argumentListTraverser,
-    termParamArgTraverserFactory
+  private lazy val deprecatedTermParamListTraverser: DeprecatedTermParamListTraverser = new DeprecatedTermParamListTraverserImpl(
+    deprecatedArgumentListTraverser,
+    deprecatedTermParamArgTraverserFactory
   )
 
-  private lazy val termParamTraverser: TermParamTraverser = new TermParamTraverserImpl(
-    modListTraverser,
+  private lazy val deprecatedTermParamTraverser: DeprecatedTermParamTraverser = new DeprecatedTermParamTraverserImpl(
+    deprecatedModListTraverser,
     typeTraverser,
     typeRenderer,
     nameTraverser,
     nameRenderer
   )
 
-  private lazy val termRepeatedTraverser: TermRepeatedTraverser = new TermRepeatedTraverserImpl(expressionTermTraverser)
+  private lazy val deprecatedTermRepeatedTraverser: DeprecatedTermRepeatedTraverser = new DeprecatedTermRepeatedTraverserImpl(deprecatedExpressionTermTraverser)
 
-  private lazy val termTupleTraverser: TermTupleTraverser = new TermTupleTraverserImpl(
-    termApplyTraverser,
+  private lazy val deprecatedTermTupleTraverser: DeprecatedTermTupleTraverser = new DeprecatedTermTupleTraverserImpl(
+    deprecatedTermApplyTraverser,
     TermTupleToTermApplyTransformer
   )
 
   private lazy val thisTraverser: ThisTraverser = new ThisTraverserImpl(nameTraverser)
 
-  private lazy val throwTraverser: ThrowTraverser = new ThrowTraverserImpl(expressionTermTraverser)
+  private lazy val deprecatedThrowTraverser: DeprecatedThrowTraverser = new DeprecatedThrowTraverserImpl(deprecatedExpressionTermTraverser)
 
   private lazy val traitTraverser: TraitTraverser = new TraitTraverserImpl(
-    modListTraverser,
+    deprecatedModListTraverser,
     typeParamListTraverser,
     templateTraverser,
     JavaTreeTypeResolver,
     JavaChildScopeResolver
   )
 
-  private lazy val tryTraverser: TryTraverser = new TryTraverserImpl(
-    blockTraverser,
-    catchHandlerTraverser,
-    finallyTraverser
+  private lazy val deprecatedTryTraverser: DeprecatedTryTraverser = new DeprecatedTryTraverserImpl(
+    deprecatedBlockTraverser,
+    deprecatedCatchHandlerTraverser,
+    deprecatedFinallyTraverser
   )
 
-  private lazy val tryWithHandlerTraverser: TryWithHandlerTraverser = new TryWithHandlerTraverserImpl(blockTraverser, finallyTraverser)
+  private lazy val deprecatedTryWithHandlerTraverser: DeprecatedTryWithHandlerTraverser = new DeprecatedTryWithHandlerTraverserImpl(deprecatedBlockTraverser, deprecatedFinallyTraverser)
 
   private lazy val typeAnnotateTraverser: TypeAnnotateTraverser = new TypeAnnotateTraverserImpl(typeTraverser)
 
@@ -541,8 +541,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
   private lazy val typeNameTraverser: TypeNameTraverser = new TypeNameTraverserImpl(new CompositeTypeNameTransformer(CoreTypeNameTransformer))
 
   private lazy val typeParamListTraverser: TypeParamListTraverser = new TypeParamListTraverserImpl(
-    argumentListTraverser,
-    new SimpleArgumentTraverser(typeParamTraverser)
+    deprecatedArgumentListTraverser,
+    new DeprecatedSimpleArgumentTraverser(typeParamTraverser)
   )
 
   private lazy val typeParamTraverser: TypeParamTraverser = new TypeParamTraverserImpl(
@@ -600,5 +600,5 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val typeWithTraverser: TypeWithTraverser = new TypeWithTraverserImpl(typeTraverser)
 
-  private lazy val whileTraverser: WhileTraverser = new WhileTraverserImpl(expressionTermTraverser, blockTraverser)
+  private lazy val deprecatedWhileTraverser: DeprecatedWhileTraverser = new DeprecatedWhileTraverserImpl(deprecatedExpressionTermTraverser, deprecatedBlockTraverser)
 }

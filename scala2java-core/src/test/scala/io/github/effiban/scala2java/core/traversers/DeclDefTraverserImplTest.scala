@@ -48,12 +48,12 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     termParamInt("param4")
   )
 
-  private val modListTraverser = mock[ModListTraverser]
+  private val modListTraverser = mock[DeprecatedModListTraverser]
   private val typeTraverser = mock[TypeTraverser]
   private val typeRenderer = mock[TypeRenderer]
   private val typeParamListTraverser = mock[TypeParamListTraverser]
   private val termNameRenderer = mock[TermNameRenderer]
-  private val termParamListTraverser = mock[TermParamListTraverser]
+  private val termParamListTraverser = mock[DeprecatedTermParamListTraverser]
 
   private val declDefTraverser = new DeclDefTraverserImpl(
     modListTraverser,

@@ -10,7 +10,7 @@ trait StatTraverser {
   def traverse(stat: Stat, statContext: StatContext = StatContext()): Unit
 }
 
-private[traversers] class StatTraverserImpl(statTermTraverser: => StatTermTraverser,
+private[traversers] class StatTraverserImpl(statTermTraverser: => DeprecatedStatTermTraverser,
                                             importTraverser: => ImportTraverser,
                                             importRenderer: => ImportRenderer,
                                             pkgTraverser: => PkgTraverser,
