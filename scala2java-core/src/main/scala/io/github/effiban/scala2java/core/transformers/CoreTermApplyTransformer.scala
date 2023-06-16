@@ -78,6 +78,7 @@ private[transformers] class CoreTermApplyTransformer(termNameClassifier: TermNam
         Some(Term.Select(Term.Name(Map), Term.Name(JavaOfEntries)))
       case (nm: Term.Name, Term.Name(Empty)) if termNameClassifier.isJavaMapLike(nm) =>
         Some(Term.Select(Term.Name(Map), Term.Name(JavaOf)))
+      case (qual, q"foreach") => Some(Term.Select(qual, q"forEach"))
 
       case (termFunction: Term.Function, methodName: Term.Name) =>
         Some(termSelectTermFunctionTransformer.transform(termFunction, methodName))

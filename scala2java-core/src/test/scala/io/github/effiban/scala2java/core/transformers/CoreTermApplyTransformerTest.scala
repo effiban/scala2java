@@ -427,6 +427,14 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
     termApplyTransformer.transform(scalaTermApply, context).structure shouldBe expectedJavaTermApply.structure
   }
 
+  test("transform 'elems.foreach(print(_))' should return 'elems.forEach(print(_))'") {
+    val scalaTermApply = q"elems.foreach(print(_))"
+    val expectedJavaTermApply = q"elems.forEach(print(_))"
+
+    termApplyTransformer.transform(scalaTermApply, DummyContext).structure shouldBe expectedJavaTermApply.structure
+  }
+
+
   test("transform 'Dummy.dummy(1)' should return same") {
     val termApply = q"Dummy.dummy(1)"
 
