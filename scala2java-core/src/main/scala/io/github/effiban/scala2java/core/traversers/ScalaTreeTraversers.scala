@@ -203,7 +203,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val defaultTermTraverser: DefaultTermTraverser = new DefaultTermTraverserImpl(
     defaultTermRefTraverser,
-    termApplyTraverser
+    termApplyTraverser,
+    termApplyInfixTraverser
   )
 
   private lazy val defnDefTraverser: DefnDefTraverser = new DefnDefTraverserImpl(
@@ -466,6 +467,12 @@ class ScalaTreeTraversers(implicit factories: Factories,
     deprecatedExpressionTermTraverser,
     deprecatedTermApplyTraverser,
     termNameRenderer,
+    new CompositeTermApplyInfixToTermApplyTransformer(CoreTermApplyInfixToTermApplyTransformer)
+  )
+
+  private lazy val termApplyInfixTraverser: TermApplyInfixTraverser = new TermApplyInfixTraverserImpl(
+    expressionTermTraverser,
+    termApplyTraverser,
     new CompositeTermApplyInfixToTermApplyTransformer(CoreTermApplyInfixToTermApplyTransformer)
   )
 
