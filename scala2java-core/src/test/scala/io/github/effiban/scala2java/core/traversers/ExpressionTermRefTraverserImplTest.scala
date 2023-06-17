@@ -9,11 +9,13 @@ class ExpressionTermRefTraverserImplTest extends UnitTestSuite {
 
   private val expressionTermNameTraverser = mock[ExpressionTermNameTraverser]
   private val expressionTermSelectTraverser = mock[ExpressionTermSelectTraverser]
+  private val applyUnaryTraverser = mock[ApplyUnaryTraverser]
   private val defaultTermRefTraverser = mock[DefaultTermRefTraverser]
 
   private val expressionTermRefTraverser = new ExpressionTermRefTraverserImpl(
     expressionTermNameTraverser,
     expressionTermSelectTraverser,
+    applyUnaryTraverser,
     defaultTermRefTraverser
   )
 
@@ -33,6 +35,15 @@ class ExpressionTermRefTraverserImplTest extends UnitTestSuite {
     doReturn(traversedTerm).when(expressionTermSelectTraverser).traverse(eqTree(termSelect))
 
     expressionTermRefTraverser.traverse(termSelect).structure shouldBe traversedTerm.structure
+  }
+
+  test("traverse() for Term.ApplyUnary") {
+    val applyUnary = q"!flag"
+    val traversedApplyUnary = q"!traversedFlag"
+
+    doReturn(traversedApplyUnary).when(applyUnaryTraverser).traverse(eqTree(applyUnary))
+
+    expressionTermRefTraverser.traverse(applyUnary).structure shouldBe traversedApplyUnary.structure
   }
 
   test("traverse() for Term.This") {
