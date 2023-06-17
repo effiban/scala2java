@@ -10,7 +10,7 @@ import scala.meta.Term.ApplyType
 trait DeprecatedMainApplyTypeTraverser extends ScalaTreeTraverser[Term.ApplyType]
 
 @deprecated
-private[traversers] class DeprecatedMainApplyTypeTraverserImpl(classOfTraverser: => ClassOfTraverser,
+private[traversers] class DeprecatedMainApplyTypeTraverserImpl(classOfTraverser: => DeprecatedClassOfTraverser,
                                                                classOfRenderer: => ClassOfRenderer,
                                                                standardApplyTypeTraverser: => DeprecatedStandardApplyTypeTraverser)
   extends DeprecatedMainApplyTypeTraverser {
