@@ -8,7 +8,7 @@ import scala.meta.XtensionQuasiquoteTerm
 
 class DeprecatedMainApplyTypeTraverserImplTest extends UnitTestSuite {
 
-  private val classOfTraverser = mock[ClassOfTraverser]
+  private val classOfTraverser = mock[DeprecatedClassOfTraverser]
   private val classOfRenderer = mock[ClassOfRenderer]
   private val standardApplyTypeTraverser = mock[DeprecatedStandardApplyTypeTraverser]
 

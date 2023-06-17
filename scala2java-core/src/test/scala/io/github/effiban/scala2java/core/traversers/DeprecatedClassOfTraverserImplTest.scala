@@ -5,11 +5,11 @@ import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.{XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
-class ClassOfTraverserImplTest extends UnitTestSuite {
+class DeprecatedClassOfTraverserImplTest extends UnitTestSuite {
 
   private val typeTraverser = mock[TypeTraverser]
 
-  private val classOfTraverser = new ClassOfTraverserImpl(typeTraverser)
+  private val classOfTraverser = new DeprecatedClassOfTraverserImpl(typeTraverser)
 
   test("traverse() when there is one type") {
     val typeName = t"T"
