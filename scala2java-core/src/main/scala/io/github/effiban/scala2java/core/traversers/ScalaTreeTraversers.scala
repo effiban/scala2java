@@ -42,6 +42,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val deprecatedApplyUnaryTraverser: DeprecatedApplyUnaryTraverser = new DeprecatedApplyUnaryTraverserImpl(termNameRenderer, deprecatedExpressionTermTraverser)
 
+  private lazy val applyUnaryTraverser: ApplyUnaryTraverser = new ApplyUnaryTraverserImpl(expressionTermTraverser)
+
   private lazy val deprecatedArgumentListTraverser: DeprecatedArgumentListTraverser = new DeprecatedArgumentListTraverserImpl
 
   private lazy val deprecatedArrayInitializerTraverser: DeprecatedArrayInitializerTraverser = new DeprecatedArrayInitializerTraverserImpl(
@@ -286,6 +288,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
   private lazy val expressionTermRefTraverser: ExpressionTermRefTraverser = new ExpressionTermRefTraverserImpl(
     expressionTermNameTraverser,
     expressionTermSelectTraverser,
+    applyUnaryTraverser,
     defaultTermRefTraverser
   )
 
