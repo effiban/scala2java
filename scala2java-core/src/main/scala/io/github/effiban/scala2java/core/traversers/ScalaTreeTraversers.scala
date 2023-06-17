@@ -270,24 +270,16 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val deprecatedEtaTraverser: DeprecatedEtaTraverser = new DeprecatedEtaTraverserImpl(deprecatedExpressionTermTraverser)
 
-  private lazy val deprecatedExpressionTermTraverser: DeprecatedExpressionTermTraverser = new DeprecatedExpressionTermTraverserImpl(
-    deprecatedIfTraverser,
-    statTraverser,
-    deprecatedTermApplyTraverser,
-    deprecatedExpressionTermRefTraverser,
-    deprecatedDefaultTermTraverser
-  )
-
-  private lazy val expressionTermTraverser: ExpressionTermTraverser = new ExpressionTermTraverserImpl(
-    defaultTermTraverser
-  )
-
   private lazy val deprecatedExpressionTermRefTraverser: DeprecatedExpressionTermRefTraverser = new DeprecatedExpressionTermRefTraverserImpl(
     deprecatedTermNameTraverser,
     deprecatedExpressionTermSelectTraverser,
     deprecatedApplyUnaryTraverser,
     defaultTermRefTraverser,
     defaultTermRefRenderer
+  )
+
+  private lazy val expressionTermRefTraverser: ExpressionTermRefTraverser = new ExpressionTermRefTraverserImpl(
+    defaultTermRefTraverser
   )
 
   private lazy val deprecatedExpressionTermSelectTraverser: DeprecatedExpressionTermSelectTraverser = new DeprecatedExpressionTermSelectTraverserImpl(
@@ -297,6 +289,19 @@ class ScalaTreeTraversers(implicit factories: Factories,
     typeListRenderer,
     qualifierTypeInferrer,
     new CompositeTermSelectTransformer(CoreTermSelectTransformer)
+  )
+
+  private lazy val deprecatedExpressionTermTraverser: DeprecatedExpressionTermTraverser = new DeprecatedExpressionTermTraverserImpl(
+    deprecatedIfTraverser,
+    statTraverser,
+    deprecatedTermApplyTraverser,
+    deprecatedExpressionTermRefTraverser,
+    deprecatedDefaultTermTraverser
+  )
+
+  private lazy val expressionTermTraverser: ExpressionTermTraverser = new ExpressionTermTraverserImpl(
+    expressionTermRefTraverser,
+    defaultTermTraverser
   )
 
   private lazy val deprecatedFinallyTraverser: DeprecatedFinallyTraverser = new DeprecatedFinallyTraverserImpl(deprecatedBlockTraverser)
