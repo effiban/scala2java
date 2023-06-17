@@ -11,12 +11,14 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
   private val termApplyTraverser = mock[TermApplyTraverser]
   private val applyTypeTraverser = mock[ApplyTypeTraverser]
   private val termApplyInfixTraverser = mock[TermApplyInfixTraverser]
+  private val assignTraverser = mock[AssignTraverser]
 
   private val defaultTermTraverser = new DefaultTermTraverserImpl(
     defaultTermRefTraverser,
     termApplyTraverser,
     applyTypeTraverser,
-    termApplyInfixTraverser
+    termApplyInfixTraverser,
+    assignTraverser
   )
 
   test("traverse() for Term.Name") {
@@ -50,6 +52,14 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
     doReturn(traversedTermApplyInfix).when(termApplyInfixTraverser).traverse(eqTree(termApplyInfix))
 
     defaultTermTraverser.traverse(termApplyInfix).structure shouldBe traversedTermApplyInfix.structure
+  }
+
+  test("traverse() for Term.Assign") {
+    val assign = q"x = 3"
+    val traversedAssign = q"xx = 33"
+    doReturn(traversedAssign).when(assignTraverser).traverse(eqTree(assign))
+
+    defaultTermTraverser.traverse(assign).structure shouldBe traversedAssign.structure
   }
 
   test("traverse() for Term.Placeholder") {

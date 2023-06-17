@@ -8,7 +8,8 @@ trait DefaultTermTraverser extends TermTraverser
 private[traversers] class DefaultTermTraverserImpl(defaultTermRefTraverser: => DefaultTermRefTraverser,
                                                    termApplyTraverser: => TermApplyTraverser,
                                                    applyTypeTraverser: => ApplyTypeTraverser,
-                                                   termApplyInfixTraverser: => TermApplyInfixTraverser)
+                                                   termApplyInfixTraverser: => TermApplyInfixTraverser,
+                                                   assignTraverser: => AssignTraverser)
   extends DefaultTermTraverser {
 
   override def traverse(term: Term): Term = term match {
@@ -16,7 +17,7 @@ private[traversers] class DefaultTermTraverserImpl(defaultTermRefTraverser: => D
     case apply: Term.Apply => termApplyTraverser.traverse(apply)
     case applyType: ApplyType => applyTypeTraverser.traverse(applyType)
     case applyInfix: Term.ApplyInfix => termApplyInfixTraverser.traverse(applyInfix)
-    case assign: Assign => assign //TODO
+    case assign: Assign => assignTraverser.traverse(assign)
     case `return`: Return => `return` //TODO
     case `throw`: Throw => `throw` //TODO
     case ascribe: Ascribe => ascribe //TODO
