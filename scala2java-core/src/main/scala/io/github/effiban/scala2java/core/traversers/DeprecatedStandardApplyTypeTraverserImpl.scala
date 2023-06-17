@@ -8,17 +8,17 @@ import scala.meta.Term
 import scala.meta.Term.ApplyType
 
 @deprecated
-private[traversers] class DeprecatedStandardApplyTypeTraverserImpl(funTermSelectTraverser: => DeprecatedFunTermSelectTraverser,
+private[traversers] class DeprecatedStandardApplyTypeTraverserImpl(expressionTermSelectTraverser: => DeprecatedExpressionTermSelectTraverser,
                                                                    typeTraverser: => TypeTraverser,
                                                                    typeListRenderer: => TypeListRenderer,
-                                                                   unqualifiedTermTraverser: => DeprecatedTermTraverser)
+                                                                   unqualifiedTermTraverser: => DeprecatedExpressionTermTraverser)
                                                                   (implicit javaWriter: JavaWriter) extends DeprecatedStandardApplyTypeTraverser {
 
   import javaWriter._
 
   // parametrized type application which is the 'fun' of a method invocation (after a possible desugaring and transformation)
   override def traverse(termApplyType: ApplyType): Unit = termApplyType.fun match {
-    case termSelect: Term.Select => funTermSelectTraverser.traverse(termSelect, TermSelectContext(termApplyType.targs))
+    case termSelect: Term.Select => expressionTermSelectTraverser.traverse(termSelect, TermSelectContext(termApplyType.targs))
     case term => traverseUnqualified(termApplyType, term)
   }
 

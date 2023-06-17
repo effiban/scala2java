@@ -12,14 +12,14 @@ import scala.meta.{Term, Type, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 class DeprecatedStandardApplyTypeTraverserImplTest extends UnitTestSuite {
 
-  private val funTermSelectTraverser = mock[DeprecatedFunTermSelectTraverser]
+  private val expressionTermSelectTraverser = mock[DeprecatedExpressionTermSelectTraverser]
   private val typeTraverser = mock[TypeTraverser]
   private val typeListRenderer = mock[TypeListRenderer]
-  private val unqualifiedTermTraverser = mock[DeprecatedTermTraverser]
+  private val unqualifiedTermTraverser = mock[DeprecatedExpressionTermTraverser]
   private val termApplyTraverser = mock[DeprecatedTermApplyTraverser]
 
   private val standardApplyTypeTraverser = new DeprecatedStandardApplyTypeTraverserImpl(
-    funTermSelectTraverser,
+    expressionTermSelectTraverser,
     typeTraverser,
     typeListRenderer,
     unqualifiedTermTraverser
@@ -30,7 +30,7 @@ class DeprecatedStandardApplyTypeTraverserImplTest extends UnitTestSuite {
     val typeArgs = List(Type.Name("T1"), Type.Name("T2"))
 
     doWrite("myObj<T1, T2>.myFunc")
-      .when(funTermSelectTraverser).traverse(eqTree(fun), eqTermSelectContext(TermSelectContext(typeArgs)))
+      .when(expressionTermSelectTraverser).traverse(eqTree(fun), eqTermSelectContext(TermSelectContext(typeArgs)))
     standardApplyTypeTraverser.traverse(Term.ApplyType(fun = fun, targs = typeArgs))
 
     outputWriter.toString shouldBe "myObj<T1, T2>.myFunc"
@@ -58,6 +58,6 @@ class DeprecatedStandardApplyTypeTraverserImplTest extends UnitTestSuite {
 
     outputWriter.toString shouldBe "/* this? */.<U1, U2>myFunc"
 
-    verifyNoMoreInteractions(funTermSelectTraverser, termApplyTraverser)
+    verifyNoMoreInteractions(expressionTermSelectTraverser, termApplyTraverser)
   }
 }

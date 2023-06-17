@@ -301,13 +301,6 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val deprecatedFinallyTraverser: DeprecatedFinallyTraverser = new DeprecatedFinallyTraverserImpl(deprecatedBlockTraverser)
 
-  private lazy val deprecatedFunTermSelectTraverser: DeprecatedFunTermSelectTraverser = new DeprecatedFunTermSelectTraverserImpl(
-    deprecatedDefaultTermTraverser,
-    termNameRenderer,
-    typeTraverser,
-    typeListRenderer
-  )
-
   private lazy val deprecatedIfTraverser: DeprecatedIfTraverser = new DeprecatedIfTraverserImpl(deprecatedExpressionTermTraverser, deprecatedBlockTraverser)
 
   private lazy val importerTraverser: ImporterTraverser = new ImporterTraverserImpl(defaultTermRefTraverser)
@@ -423,7 +416,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
   )
 
   private lazy val deprecatedStandardApplyTypeTraverser: DeprecatedStandardApplyTypeTraverser = new DeprecatedStandardApplyTypeTraverserImpl(
-    deprecatedFunTermSelectTraverser,
+    deprecatedExpressionTermSelectTraverser,
     typeTraverser,
     typeListRenderer,
     deprecatedExpressionTermTraverser
