@@ -80,6 +80,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val deprecatedAssignTraverser: DeprecatedAssignTraverser = new DeprecatedAssignTraverserImpl(deprcatedAssignLHSTraverser, deprecatedExpressionTermTraverser)
 
+  private lazy val assignTraverser: AssignTraverser = new AssignTraverserImpl(expressionTermTraverser)
+
   private lazy val deprecatedBlockStatTraverser: DeprecatedBlockStatTraverser = new DeprecatedBlockStatTraverserImpl(
     deprecatedIfTraverser,
     deprecatedTryTraverser,
@@ -210,7 +212,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
     defaultTermRefTraverser,
     termApplyTraverser,
     applyTypeTraverser,
-    termApplyInfixTraverser
+    termApplyInfixTraverser,
+    assignTraverser
   )
 
   private lazy val defnDefTraverser: DefnDefTraverser = new DefnDefTraverserImpl(
