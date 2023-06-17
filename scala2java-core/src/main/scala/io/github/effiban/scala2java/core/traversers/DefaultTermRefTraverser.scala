@@ -3,7 +3,7 @@ package io.github.effiban.scala2java.core.traversers
 import scala.meta.Term
 import scala.meta.Term.{Super, This}
 
-trait DefaultTermRefTraverser extends TermRefTraverser1
+trait DefaultTermRefTraverser extends TermRefTraverser
 
 private[traversers] class DefaultTermRefTraverserImpl(thisTraverser: ThisTraverser,
                                                       superTraverser: SuperTraverser,
