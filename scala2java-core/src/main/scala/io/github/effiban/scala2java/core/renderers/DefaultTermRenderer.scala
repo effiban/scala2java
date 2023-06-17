@@ -9,7 +9,7 @@ trait DefaultTermRenderer extends TermRenderer
 
 private[renderers] class DefaultTermRendererImpl(defaultTermRefRenderer: => DefaultTermRefRenderer,
                                                  applyRenderer: => TermApplyRenderer,
-                                                 applyTypeRenderer: => ApplyTypeRenderer,
+                                                 compositeApplyTypeRenderer: => CompositeApplyTypeRenderer,
                                                  applyInfixRenderer: => TermApplyInfixRenderer,
                                                  assignRenderer: => AssignRenderer,
                                                  returnRenderer: => ReturnRenderer,
@@ -35,7 +35,7 @@ private[renderers] class DefaultTermRendererImpl(defaultTermRefRenderer: => Defa
   override def render(term: Term): Unit = term match {
     case termRef: Term.Ref => defaultTermRefRenderer.render(termRef)
     case apply: Term.Apply => applyRenderer.render(apply)
-    case applyType: ApplyType => applyTypeRenderer.render(applyType)
+    case applyType: ApplyType => compositeApplyTypeRenderer.render(applyType)
     case applyInfix: Term.ApplyInfix => applyInfixRenderer.render(applyInfix)
     case assign: Assign => assignRenderer.render(assign)
     case `return`: Return => returnRenderer.render(`return`)

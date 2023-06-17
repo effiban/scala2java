@@ -16,8 +16,6 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   lazy val annotRenderer: AnnotRenderer = new AnnotRendererImpl(initRenderer)
 
-  lazy val applyTypeRenderer: ApplyTypeRenderer = new ApplyTypeRendererImpl(classOfRenderer)
-
   lazy val applyUnaryRenderer: ApplyUnaryRenderer = new ApplyUnaryRendererImpl(termNameRenderer, expressionTermRenderer)
 
   val argumentListRenderer: ArgumentListRenderer = new ArgumentListRendererImpl()
@@ -67,6 +65,11 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   lazy val classOfRenderer: ClassOfRenderer = new ClassOfRendererImpl(typeRenderer)
 
+  private lazy val compositeApplyTypeRenderer: CompositeApplyTypeRenderer = new CompositeApplyTypeRendererImpl(
+    classOfRenderer,
+    standardApplyTypeRenderer
+  )
+
   lazy val compositeInvocationArgRenderer: InvocationArgRenderer[Term] = new CompositeInvocationArgRenderer(
     assignInvocationArgRenderer,
     expressionTermRenderer
@@ -88,7 +91,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
   lazy val defaultTermRenderer: DefaultTermRenderer = new DefaultTermRendererImpl(
     defaultTermRefRenderer,
     termApplyRenderer,
-    applyTypeRenderer,
+    compositeApplyTypeRenderer,
     termApplyInfixRenderer,
     assignRenderer,
     returnRenderer,
@@ -213,6 +216,12 @@ class Renderers(implicit javaWriter: JavaWriter) {
   lazy val returnRenderer: ReturnRenderer = new ReturnRendererImpl(expressionTermRenderer)
 
   val selfRenderer: SelfRenderer = new SelfRendererImpl()
+
+  lazy val standardApplyTypeRenderer: StandardApplyTypeRenderer = new StandardApplyTypeRendererImpl(
+    expressionTermSelectRenderer,
+    typeListRenderer,
+    expressionTermRenderer
+  )
 
   val superRenderer: SuperRenderer = new SuperRendererImpl(nameRenderer)
 
