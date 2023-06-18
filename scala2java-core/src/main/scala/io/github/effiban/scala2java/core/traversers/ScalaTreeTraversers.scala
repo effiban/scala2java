@@ -38,6 +38,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val deprecatedAnnotTraverser: DeprecatedAnnotTraverser = new DeprecatedAnnotTraverserImpl(deprecatedInitTraverser)
 
+  private lazy val annotTraverser: AnnotTraverser = new AnnotTraverserImpl(initTraverser)
+
   private lazy val deprecatedAnonymousFunctionTraverser: DeprecatedAnonymousFunctionTraverser = new DeprecatedAnonymousFunctionTraverserImpl(deprecatedTermFunctionTraverser)
 
   private lazy val applyTypeTraverser: ApplyTypeTraverser = new ApplyTypeTraverserImpl(expressionTermTraverser, typeTraverser)
