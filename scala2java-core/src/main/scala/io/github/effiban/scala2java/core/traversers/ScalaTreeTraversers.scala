@@ -223,7 +223,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
     assignTraverser,
     returnTraverser,
     throwTraverser,
-    ascribeTraverser
+    ascribeTraverser,
+    termAnnotateTraverser
   )
 
   private lazy val defnDefTraverser: DefnDefTraverser = new DefnDefTraverserImpl(
@@ -497,6 +498,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
   )
 
   private lazy val deprecatedTermAnnotateTraverser: DeprecatedTermAnnotateTraverser = new DeprecatedTermAnnotateTraverserImpl(deprecatedAnnotListTraverser, deprecatedExpressionTermTraverser)
+
+  private lazy val termAnnotateTraverser: TermAnnotateTraverser = new TermAnnotateTraverserImpl(expressionTermTraverser, annotTraverser)
 
   private lazy val deprecatedTermApplyInfixTraverser: DeprecatedTermApplyInfixTraverser = new DeprecatedTermApplyInfixTraverserImpl(
     deprecatedExpressionTermTraverser,
