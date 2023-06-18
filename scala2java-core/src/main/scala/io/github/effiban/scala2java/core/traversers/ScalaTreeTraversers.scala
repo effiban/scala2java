@@ -361,6 +361,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
     deprecatedCompositeInvocationArgTraverser
   )
 
+  private lazy val initTraverser: InitTraverser = new InitTraverserImpl(typeTraverser, expressionTermTraverser)
+
   private lazy val deprecatedMainApplyTypeTraverser: DeprecatedMainApplyTypeTraverser =
     new DeprecatedMainApplyTypeTraverserImpl(
       deprecatedClassOfTraverser,
