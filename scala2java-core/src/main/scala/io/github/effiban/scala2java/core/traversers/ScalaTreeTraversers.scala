@@ -98,6 +98,12 @@ class ScalaTreeTraversers(implicit factories: Factories,
     JavaStatClassifier
   )
 
+  private lazy val blockStatTraverser: BlockStatTraverser = new BlockStatTraverserImpl(
+    expressionTermRefTraverser,
+    defaultTermTraverser,
+    shouldReturnValueResolver
+  )
+
   private lazy val deprecatedBlockTraverser: DeprecatedBlockTraverser = new DeprecatedBlockTraverserImpl(
     deprecatedInitTraverser,
     deprecatedBlockStatTraverser,
