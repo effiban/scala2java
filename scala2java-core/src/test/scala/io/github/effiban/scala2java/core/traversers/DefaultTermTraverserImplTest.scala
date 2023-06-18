@@ -16,6 +16,7 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
   private val throwTraverser = mock[ThrowTraverser]
   private val ascribeTraverser = mock[AscribeTraverser]
   private val termAnnotateTraverser = mock[TermAnnotateTraverser]
+  private val termTupleTraverser = mock[TermTupleTraverser]
 
   private val defaultTermTraverser = new DefaultTermTraverserImpl(
     defaultTermRefTraverser,
@@ -26,7 +27,8 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
     returnTraverser,
     throwTraverser,
     ascribeTraverser,
-    termAnnotateTraverser
+    termAnnotateTraverser,
+    termTupleTraverser
   )
 
   test("traverse() for Term.Name") {
@@ -100,6 +102,14 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
     doReturn(traversedAnnotate).when(termAnnotateTraverser).traverse(eqTree(annotate))
 
     defaultTermTraverser.traverse(annotate).structure shouldBe traversedAnnotate.structure
+  }
+
+  test("traverse() for Term.Tuple") {
+    val tuple = q"(x, 1)"
+    val traversedTermApply = q"Tuple.tuple(x, 1)"
+    doReturn(traversedTermApply).when(termTupleTraverser).traverse(eqTree(tuple))
+
+    defaultTermTraverser.traverse(tuple).structure shouldBe traversedTermApply.structure
   }
 
   test("traverse() for Term.Placeholder") {

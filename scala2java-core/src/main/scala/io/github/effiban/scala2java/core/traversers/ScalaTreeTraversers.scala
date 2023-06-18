@@ -224,7 +224,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
     returnTraverser,
     throwTraverser,
     ascribeTraverser,
-    termAnnotateTraverser
+    termAnnotateTraverser,
+    termTupleTraverser
   )
 
   private lazy val defnDefTraverser: DefnDefTraverser = new DefnDefTraverserImpl(
@@ -572,6 +573,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
     deprecatedTermApplyTraverser,
     TermTupleToTermApplyTransformer
   )
+
+  private lazy val termTupleTraverser: TermTupleTraverser = new TermTupleTraverserImpl(termApplyTraverser, TermTupleToTermApplyTransformer)
 
   private lazy val thisTraverser: ThisTraverser = new ThisTraverserImpl(nameTraverser)
 
