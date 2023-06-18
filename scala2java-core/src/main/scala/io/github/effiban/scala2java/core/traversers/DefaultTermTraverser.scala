@@ -11,7 +11,8 @@ private[traversers] class DefaultTermTraverserImpl(defaultTermRefTraverser: => D
                                                    termApplyInfixTraverser: => TermApplyInfixTraverser,
                                                    assignTraverser: => AssignTraverser,
                                                    returnTraverser: => ReturnTraverser,
-                                                   throwTraverser: => ThrowTraverser)
+                                                   throwTraverser: => ThrowTraverser,
+                                                   ascribeTraverser: => AscribeTraverser)
   extends DefaultTermTraverser {
 
   override def traverse(term: Term): Term = term match {
@@ -22,7 +23,7 @@ private[traversers] class DefaultTermTraverserImpl(defaultTermRefTraverser: => D
     case assign: Assign => assignTraverser.traverse(assign)
     case `return`: Return => returnTraverser.traverse(`return`)
     case `throw`: Throw => throwTraverser.traverse(`throw`)
-    case ascribe: Ascribe => ascribe //TODO
+    case ascribe: Ascribe => ascribeTraverser.traverse(ascribe)
     case annotate: Term.Annotate => annotate //TODO
     case tuple: Term.Tuple => tuple //TODO
     case block: Block => block //TODO
