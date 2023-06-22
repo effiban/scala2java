@@ -7,14 +7,14 @@ import io.github.effiban.scala2java.core.traversers.results.BlockTraversalResult
 import scala.meta.Stat
 import scala.meta.Term.Block
 
-trait BlockTraverser {
+trait DefaultBlockTraverser {
 
   def traverse(block: Block, context: BlockContext = BlockContext()): BlockTraversalResult
 }
 
-private[traversers] class BlockTraverserImpl(initTraverser: => InitTraverser,
-                                             blockStatTraverser: => BlockStatTraverser,
-                                             blockLastStatTraverser: => BlockLastStatTraverser) extends BlockTraverser {
+private[traversers] class DefaultBlockTraverserImpl(initTraverser: => InitTraverser,
+                                                    blockStatTraverser: => BlockStatTraverser,
+                                                    blockLastStatTraverser: => BlockLastStatTraverser) extends DefaultBlockTraverser {
 
   override def traverse(block: Block, context: BlockContext = BlockContext()): BlockTraversalResult = {
     import context._

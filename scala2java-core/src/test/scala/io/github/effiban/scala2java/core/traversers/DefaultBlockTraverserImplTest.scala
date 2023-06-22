@@ -11,7 +11,7 @@ import org.mockito.ArgumentMatchersSugar.{any, eqTo}
 import scala.meta.Term.Block
 import scala.meta.{Stat, XtensionQuasiquoteInit, XtensionQuasiquoteTerm}
 
-class BlockTraverserImplTest extends UnitTestSuite {
+class DefaultBlockTraverserImplTest extends UnitTestSuite {
 
   private val Stat1 = q"stat1"
   private val Stat2 = q"stat2"
@@ -25,7 +25,7 @@ class BlockTraverserImplTest extends UnitTestSuite {
   private val blockStatTraverser = mock[BlockStatTraverser]
   private val blockLastStatTraverser = mock[BlockLastStatTraverser]
 
-  private val blockTraverser = new BlockTraverserImpl(
+  private val blockTraverser = new DefaultBlockTraverserImpl(
     initTraverser,
     blockStatTraverser,
     blockLastStatTraverser

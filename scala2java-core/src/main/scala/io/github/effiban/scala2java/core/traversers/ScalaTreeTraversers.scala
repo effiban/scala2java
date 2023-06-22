@@ -113,12 +113,6 @@ class ScalaTreeTraversers(implicit factories: Factories,
     deprecatedBlockStatTraverser,
   )
 
-  private lazy val blockTraverser: BlockTraverser = new BlockTraverserImpl(
-    initTraverser,
-    blockStatTraverser,
-    blockLastStatTraverser
-  )
-
   private lazy val caseClassTraverser: CaseClassTraverser = new CaseClassTraverserImpl(
     deprecatedModListTraverser,
     typeParamListTraverser,
@@ -194,6 +188,12 @@ class ScalaTreeTraversers(implicit factories: Factories,
     patListRenderer
   )
 
+  private lazy val defaultBlockTraverser: DefaultBlockTraverser = new DefaultBlockTraverserImpl(
+    initTraverser,
+    blockStatTraverser,
+    blockLastStatTraverser
+  )
+
   private lazy val defaultTermRefTraverser: DefaultTermRefTraverser = new DefaultTermRefTraverserImpl(
     thisTraverser,
     superTraverser,
@@ -242,7 +242,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
     ascribeTraverser,
     termAnnotateTraverser,
     termTupleTraverser,
-    blockTraverser
+    defaultBlockTraverser
   )
 
   private lazy val defnDefTraverser: DefnDefTraverser = new DefnDefTraverserImpl(
@@ -308,6 +308,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val deprecatedEtaTraverser: DeprecatedEtaTraverser = new DeprecatedEtaTraverserImpl(deprecatedExpressionTermTraverser)
 
+  private lazy val expressionBlockTraverser: ExpressionBlockTraverser = new ExpressionBlockTraverserImpl(expressionTermTraverser)
+
   private lazy val expressionTermNameTraverser: ExpressionTermNameTraverser = new ExpressionTermNameTraverserImpl(
     expressionTermTraverser,
     new CompositeTermNameTransformer(CoreTermNameTransformer)
@@ -353,6 +355,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val expressionTermTraverser: ExpressionTermTraverser = new ExpressionTermTraverserImpl(
     expressionTermRefTraverser,
+    expressionBlockTraverser,
     defaultTermTraverser
   )
 
