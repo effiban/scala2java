@@ -1,6 +1,9 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.contexts.BlockContext
+import io.github.effiban.scala2java.core.matchers.BlockContextMatcher.eqBlockContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
+import io.github.effiban.scala2java.core.traversers.results.BlockTraversalResult
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.{Lit, Term, XtensionQuasiquoteTerm}
@@ -17,6 +20,7 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
   private val ascribeTraverser = mock[AscribeTraverser]
   private val termAnnotateTraverser = mock[TermAnnotateTraverser]
   private val termTupleTraverser = mock[TermTupleTraverser]
+  private val blockTraverser = mock[BlockTraverser]
 
   private val defaultTermTraverser = new DefaultTermTraverserImpl(
     defaultTermRefTraverser,
@@ -28,7 +32,8 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
     throwTraverser,
     ascribeTraverser,
     termAnnotateTraverser,
-    termTupleTraverser
+    termTupleTraverser,
+    blockTraverser
   )
 
   test("traverse() for Term.Name") {
@@ -110,6 +115,28 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
     doReturn(traversedTermApply).when(termTupleTraverser).traverse(eqTree(tuple))
 
     defaultTermTraverser.traverse(tuple).structure shouldBe traversedTermApply.structure
+  }
+
+  test("traverse() for Block") {
+    val block =
+      q"""
+      {
+        stat1
+        stat2
+      }
+      """
+
+    val traversedBlock =
+      q"""
+      {
+        traversedStat1
+        traversedStat2
+      }
+      """
+
+    doReturn(BlockTraversalResult(traversedBlock)).when(blockTraverser).traverse(eqTree(block), eqBlockContext(BlockContext()))
+
+    defaultTermTraverser.traverse(block).structure shouldBe traversedBlock.structure
   }
 
   test("traverse() for Term.Placeholder") {
