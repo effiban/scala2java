@@ -113,6 +113,12 @@ class ScalaTreeTraversers(implicit factories: Factories,
     deprecatedBlockStatTraverser,
   )
 
+  private lazy val blockTraverser: BlockTraverser = new BlockTraverserImpl(
+    initTraverser,
+    blockStatTraverser,
+    blockLastStatTraverser
+  )
+
   private lazy val caseClassTraverser: CaseClassTraverser = new CaseClassTraverserImpl(
     deprecatedModListTraverser,
     typeParamListTraverser,
@@ -235,7 +241,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
     throwTraverser,
     ascribeTraverser,
     termAnnotateTraverser,
-    termTupleTraverser
+    termTupleTraverser,
+    blockTraverser
   )
 
   private lazy val defnDefTraverser: DefnDefTraverser = new DefnDefTraverserImpl(
