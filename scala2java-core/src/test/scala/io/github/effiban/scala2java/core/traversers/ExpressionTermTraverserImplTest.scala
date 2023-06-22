@@ -8,10 +8,12 @@ import scala.meta.XtensionQuasiquoteTerm
 class ExpressionTermTraverserImplTest extends UnitTestSuite {
 
   private val expressionTermRefTraverser = mock[ExpressionTermRefTraverser]
+  private val expressionBlockTraverser = mock[ExpressionBlockTraverser]
   private val defaultTermTraverser = mock[DefaultTermTraverser]
 
   private val expressionTraverser = new ExpressionTermTraverserImpl(
     expressionTermRefTraverser,
+    expressionBlockTraverser,
     defaultTermTraverser
   )
 
@@ -21,6 +23,21 @@ class ExpressionTermTraverserImplTest extends UnitTestSuite {
     doReturn(traversedTermName).when(expressionTermRefTraverser).traverse(eqTree(termName))
 
     expressionTraverser.traverse(termName).structure shouldBe traversedTermName.structure
+  }
+
+  test("traverse() for a Block") {
+    val block =
+      q"""
+      {
+        stat1
+      }
+      """
+
+    val traversedTerm = q"stat1"
+
+    doReturn(traversedTerm).when(expressionBlockTraverser).traverse(eqTree(block))
+
+    expressionTraverser.traverse(block).structure shouldBe traversedTerm.structure
   }
 
   test("traverse() for Lit.Int") {
