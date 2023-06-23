@@ -100,6 +100,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val blockLastStatTraverser: BlockLastStatTraverser = new BlockLastStatTraverserImpl(
     blockStatTraverser,
+    defaultIfTraverser,
     shouldReturnValueResolver
   )
 
@@ -110,7 +111,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val deprecatedBlockTraverser: DeprecatedBlockTraverser = new DeprecatedBlockTraverserImpl(
     deprecatedInitTraverser,
-    deprecatedBlockStatTraverser,
+    deprecatedBlockStatTraverser
   )
 
   private lazy val blockWrappingTermTraverser: BlockWrappingTermTraverser = new BlockWrappingTermTraverserImpl(defaultBlockTraverser)
@@ -196,6 +197,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
     blockLastStatTraverser
   )
 
+  private lazy val defaultIfTraverser: DefaultIfTraverser = new DefaultIfTraverserImpl(expressionTermTraverser, blockWrappingTermTraverser)
+
   private lazy val defaultTermRefTraverser: DefaultTermRefTraverser = new DefaultTermRefTraverserImpl(
     thisTraverser,
     superTraverser,
@@ -244,7 +247,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
     ascribeTraverser,
     termAnnotateTraverser,
     termTupleTraverser,
-    defaultBlockTraverser
+    defaultBlockTraverser,
+    defaultIfTraverser
   )
 
   private lazy val defnDefTraverser: DefnDefTraverser = new DefnDefTraverserImpl(

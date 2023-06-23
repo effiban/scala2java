@@ -1,10 +1,11 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.BlockContext
+import io.github.effiban.scala2java.core.contexts.{BlockContext, IfContext}
 import io.github.effiban.scala2java.core.matchers.BlockContextMatcher.eqBlockContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.BlockTraversalResult
+import io.github.effiban.scala2java.core.traversers.results.{BlockTraversalResult, IfTraversalResult}
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
+import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.{Lit, Term, XtensionQuasiquoteTerm}
 
@@ -21,6 +22,7 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
   private val termAnnotateTraverser = mock[TermAnnotateTraverser]
   private val termTupleTraverser = mock[TermTupleTraverser]
   private val defaultBlockTraverser = mock[DefaultBlockTraverser]
+  private val defaultIfTraverser = mock[DefaultIfTraverser]
 
   private val defaultTermTraverser = new DefaultTermTraverserImpl(
     defaultTermRefTraverser,
@@ -33,7 +35,8 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
     ascribeTraverser,
     termAnnotateTraverser,
     termTupleTraverser,
-    defaultBlockTraverser
+    defaultBlockTraverser,
+    defaultIfTraverser
   )
 
   test("traverse() for Term.Name") {
@@ -137,6 +140,15 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
     doReturn(BlockTraversalResult(traversedBlock)).when(defaultBlockTraverser).traverse(eqTree(block), eqBlockContext(BlockContext()))
 
     defaultTermTraverser.traverse(block).structure shouldBe traversedBlock.structure
+  }
+
+  test("traverse() for Term.If") {
+    val `if` = q"if (x < 3) doA() else doB()"
+    val traversedIf = q"if (x < 33) doAA() else doBB()"
+
+    doReturn(IfTraversalResult(traversedIf)).when(defaultIfTraverser).traverse(eqTree(`if`), eqTo(IfContext()))
+
+    defaultTermTraverser.traverse(`if`).structure shouldBe traversedIf.structure
   }
 
   test("traverse() for Term.Placeholder") {
