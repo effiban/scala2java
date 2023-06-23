@@ -113,6 +113,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
     deprecatedBlockStatTraverser,
   )
 
+  private lazy val blockWrappingTermTraverser: BlockWrappingTermTraverser = new BlockWrappingTermTraverserImpl(defaultBlockTraverser)
+
   private lazy val caseClassTraverser: CaseClassTraverser = new CaseClassTraverserImpl(
     deprecatedModListTraverser,
     typeParamListTraverser,
