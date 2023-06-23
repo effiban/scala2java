@@ -9,11 +9,13 @@ class ExpressionTermTraverserImplTest extends UnitTestSuite {
 
   private val expressionTermRefTraverser = mock[ExpressionTermRefTraverser]
   private val expressionBlockTraverser = mock[ExpressionBlockTraverser]
+  private val expressionIfTraverser = mock[ExpressionIfTraverser]
   private val defaultTermTraverser = mock[DefaultTermTraverser]
 
   private val expressionTraverser = new ExpressionTermTraverserImpl(
     expressionTermRefTraverser,
     expressionBlockTraverser,
+    expressionIfTraverser,
     defaultTermTraverser
   )
 
@@ -38,6 +40,15 @@ class ExpressionTermTraverserImplTest extends UnitTestSuite {
     doReturn(traversedTerm).when(expressionBlockTraverser).traverse(eqTree(block))
 
     expressionTraverser.traverse(block).structure shouldBe traversedTerm.structure
+  }
+
+  test("traverse() for a Term.If") {
+    val `if` = q"if (x < 3) calc(x) else otherCalc(x)"
+    val traversedIf = q"if (xx < 33) calc(xx) else otherCalc(xx)"
+
+    doReturn(traversedIf).when(expressionIfTraverser).traverse(eqTree(`if`))
+
+    expressionTraverser.traverse(`if`).structure shouldBe traversedIf.structure
   }
 
   test("traverse() for Lit.Int") {
