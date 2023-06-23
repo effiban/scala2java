@@ -23,6 +23,7 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
   private val termTupleTraverser = mock[TermTupleTraverser]
   private val defaultBlockTraverser = mock[DefaultBlockTraverser]
   private val defaultIfTraverser = mock[DefaultIfTraverser]
+  private val termMatchTraverser = mock[TermMatchTraverser]
 
   private val defaultTermTraverser = new DefaultTermTraverserImpl(
     defaultTermRefTraverser,
@@ -36,7 +37,8 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
     termAnnotateTraverser,
     termTupleTraverser,
     defaultBlockTraverser,
-    defaultIfTraverser
+    defaultIfTraverser,
+    termMatchTraverser
   )
 
   test("traverse() for Term.Name") {
@@ -149,6 +151,30 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
     doReturn(IfTraversalResult(traversedIf)).when(defaultIfTraverser).traverse(eqTree(`if`), eqTo(IfContext()))
 
     defaultTermTraverser.traverse(`if`).structure shouldBe traversedIf.structure
+  }
+
+  test("traverse() for Term.Match") {
+    val termMatch =
+      q"""
+      x match {
+        case 1 => "one"
+        case 2 => "two"
+        case _ => "many"
+      }
+      """
+
+    val traversedTermMatch =
+      q"""
+      xx match {
+        case 10 => "ten"
+        case 20 => "twenty"
+        case _ => "many"
+      }
+      """
+
+    doReturn(traversedTermMatch).when(termMatchTraverser).traverse(eqTree(termMatch))
+
+    defaultTermTraverser.traverse(termMatch).structure shouldBe traversedTermMatch.structure
   }
 
   test("traverse() for Term.Placeholder") {

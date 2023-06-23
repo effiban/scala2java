@@ -16,7 +16,8 @@ private[traversers] class DefaultTermTraverserImpl(defaultTermRefTraverser: => D
                                                    termAnnotateTraverser: => TermAnnotateTraverser,
                                                    termTupleTraverser: => TermTupleTraverser,
                                                    defaultBlockTraverser: => DefaultBlockTraverser,
-                                                   defaultIfTraverser: => DefaultIfTraverser)
+                                                   defaultIfTraverser: => DefaultIfTraverser,
+                                                   termMatchTraverser: => TermMatchTraverser)
   extends DefaultTermTraverser {
 
   override def traverse(term: Term): Term = term match {
@@ -32,7 +33,7 @@ private[traversers] class DefaultTermTraverserImpl(defaultTermRefTraverser: => D
     case tuple: Term.Tuple => termTupleTraverser.traverse(tuple)
     case block: Block => defaultBlockTraverser.traverse(block).block
     case `if`: If => defaultIfTraverser.traverse(`if`).`if`
-    case `match`: Term.Match => `match` //TODO
+    case `match`: Term.Match => termMatchTraverser.traverse(`match`)
     case `try`: Try => `try` //TODO
     case tryWithHandler: TryWithHandler => tryWithHandler //TODO
     case `function`: Term.Function => `function` //TODO
