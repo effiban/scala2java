@@ -131,6 +131,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
     deprecatedExpressionTermTraverser
   )
 
+  private lazy val caseTraverser: CaseTraverser = new CaseTraverserImpl(patTraverser, expressionTermTraverser)
+
   private lazy val deprecatedCatchHandlerTraverser: DeprecatedCatchHandlerTraverser = new DeprecatedCatchHandlerTraverserImpl(
     CatchArgumentTraverser,
     catchArgumentRenderer,
