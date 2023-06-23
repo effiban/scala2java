@@ -316,6 +316,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val expressionBlockTraverser: ExpressionBlockTraverser = new ExpressionBlockTraverserImpl(expressionTermTraverser)
 
+  private lazy val expressionIfTraverser: ExpressionIfTraverser = new ExpressionIfTraverserImpl(expressionTermTraverser)
+
   private lazy val expressionTermNameTraverser: ExpressionTermNameTraverser = new ExpressionTermNameTraverserImpl(
     expressionTermTraverser,
     new CompositeTermNameTransformer(CoreTermNameTransformer)
@@ -362,6 +364,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
   private lazy val expressionTermTraverser: ExpressionTermTraverser = new ExpressionTermTraverserImpl(
     expressionTermRefTraverser,
     expressionBlockTraverser,
+    expressionIfTraverser,
     defaultTermTraverser
   )
 
