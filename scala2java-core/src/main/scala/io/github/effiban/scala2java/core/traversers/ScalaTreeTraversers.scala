@@ -139,6 +139,11 @@ class ScalaTreeTraversers(implicit factories: Factories,
     deprecatedBlockTraverser
   )
 
+  private lazy val catchHandlerTraverser: CatchHandlerTraverser = new CatchHandlerTraverserImpl(
+    CatchArgumentTraverser,
+    blockWrappingTermTraverser
+  )
+
   private lazy val classTraverser: ClassTraverser = new ClassTraverserImpl(
     caseClassTraverser,
     regularClassTraverser,
