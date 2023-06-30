@@ -35,6 +35,7 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
   private val doTraverser = mock[DoTraverser]
   private val newTraverser = mock[NewTraverser]
   private val etaTraverser = mock[EtaTraverser]
+  private val termRepeatedTraverser = mock[TermRepeatedTraverser]
 
   private val defaultTermTraverser = new DefaultTermTraverserImpl(
     defaultTermRefTraverser,
@@ -58,7 +59,8 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
     whileTraverser,
     doTraverser,
     newTraverser,
-    etaTraverser
+    etaTraverser,
+    termRepeatedTraverser
   )
 
   test("traverse() for Term.Name") {
@@ -326,6 +328,14 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
 
     doReturn(traversedEta).when(etaTraverser).traverse(eqTree(eta))
     defaultTermTraverser.traverse(eta).structure shouldBe traversedEta.structure
+  }
+
+  test("traverse() for Term.Repeated") {
+    val termRepeated = Term.Repeated(q"x")
+    val traversedTermRepeated = Term.Repeated(q"xx")
+
+    doReturn(traversedTermRepeated).when(termRepeatedTraverser).traverse(eqTree(termRepeated))
+    defaultTermTraverser.traverse(termRepeated).structure shouldBe traversedTermRepeated.structure
   }
 
   test("traverse() for Term.Placeholder") {
