@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.{BlockRenderContext, InitContext}
+import io.github.effiban.scala2java.core.contexts.{BlockRenderContext, BlockStatRenderContext, InitContext}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Stat
@@ -25,14 +25,14 @@ private[renderers] class BlockRendererImpl(blockStatRenderer: => BlockStatRender
       initRenderer.render(init, InitContext(argNameAsComment = true))
       writeStatementEnd()
     })
-    renderContents(block.stats, uncertainReturn)
+    renderContents(block.stats, context.lastStatContext)
     writeBlockEnd()
   }
 
-  private def renderContents(stats: List[Stat], uncertainReturnValue: Boolean): Unit = {
+  private def renderContents(stats: List[Stat], lastStatContext: BlockStatRenderContext): Unit = {
     if (stats.nonEmpty) {
       stats.slice(0, stats.length - 1).foreach(blockStatRenderer.render)
-      blockStatRenderer.renderLast(stats.last, uncertainReturnValue)
+      blockStatRenderer.renderLast(stats.last, lastStatContext)
     }
   }
 }

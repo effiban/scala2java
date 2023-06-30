@@ -10,7 +10,11 @@ import scala.meta.Init
 class BlockRenderContextMatcher(expectedContext: BlockRenderContext) extends ArgumentMatcher[BlockRenderContext] {
 
   override def matches(actualContext: BlockRenderContext): Boolean = {
-    actualContext.uncertainReturn == expectedContext.uncertainReturn && maybeInitMatches(actualContext)
+    lastStatContextMatches(actualContext) && maybeInitMatches(actualContext)
+  }
+
+  private def lastStatContextMatches(actualContext: BlockRenderContext) = {
+    new BlockStatRenderContextMatcher(expectedContext.lastStatContext).matches(actualContext.lastStatContext)
   }
 
   private def maybeInitMatches(actualContext: BlockRenderContext) = {

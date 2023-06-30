@@ -18,7 +18,7 @@ private[renderers] class TryWithHandlerRendererImpl(blockRenderer: => BlockRende
 
   override def render(tryWithHandler: TryWithHandler, context: TryRenderContext = TryRenderContext()): Unit = {
     write("try")
-    renderBody(tryWithHandler.expr, context)
+    renderBody(tryWithHandler.expr, context.exprContext)
     // The catch handler is some term which evaluates to a partial function, which we cannot handle (without semantic information)
     writeComment(s"UNPARSEABLE catch handler: ${tryWithHandler.catchp}")
     writeLine()
@@ -26,11 +26,11 @@ private[renderers] class TryWithHandlerRendererImpl(blockRenderer: => BlockRende
     tryWithHandler.finallyp.foreach(finallyRenderer.render)
   }
 
-  private def renderBody(tryExpr: Term, context: TryRenderContext): Unit = {
+  private def renderBody(tryExpr: Term, context: BlockRenderContext): Unit = {
     val tryBlock = tryExpr match {
       case aBlock: Block => aBlock
       case _ => throw new IllegalStateException("A try expression must be converted to a Block before this point")
     }
-    blockRenderer.render(tryBlock, context = BlockRenderContext(uncertainReturn = context.uncertainReturn))
+    blockRenderer.render(tryBlock, context)
   }
 }

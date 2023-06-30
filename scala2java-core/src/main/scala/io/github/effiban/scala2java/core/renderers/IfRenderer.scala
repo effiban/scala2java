@@ -24,12 +24,12 @@ private[renderers] class IfRendererImpl(expressionTermRenderer: => ExpressionTer
     write("if (")
     expressionTermRenderer.render(`if`.cond)
     write(")")
-    renderNonExpressionClause(`if`.thenp, context)
+    renderNonExpressionClause(`if`.thenp, context.thenContext)
     `if`.elsep match {
       case Lit.Unit() =>
       case elsep =>
         write("else")
-        renderNonExpressionClause(elsep, context)
+        renderNonExpressionClause(elsep, context.elseContext)
     }
   }
 
@@ -45,9 +45,9 @@ private[renderers] class IfRendererImpl(expressionTermRenderer: => ExpressionTer
     }
   }
 
-  private def renderNonExpressionClause(clause: Term, ifRenderContext: IfRenderContext): Unit = {
+  private def renderNonExpressionClause(clause: Term, clauseContext: BlockRenderContext): Unit = {
     clause match {
-      case block: Block => blockRenderer.render(block, BlockRenderContext(ifRenderContext.uncertainReturn))
+      case block: Block => blockRenderer.render(block, clauseContext)
       case term =>
         write(" ")
         defaultTermRenderer.render(term)

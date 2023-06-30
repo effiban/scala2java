@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.{BlockRenderContext, TermFunctionRenderContext, TermParamListRenderContext}
+import io.github.effiban.scala2java.core.contexts.{BlockRenderContext, SimpleBlockStatRenderContext, TermFunctionRenderContext, TermParamListRenderContext}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Term
@@ -32,7 +32,7 @@ private[renderers] class TermFunctionRendererImpl(termParamRenderer: => TermPara
     function.body match {
       case block: Block => blockRenderer.render(
         block = block,
-        context = BlockRenderContext(uncertainReturn = context.uncertainReturn)
+        context = BlockRenderContext(lastStatContext = SimpleBlockStatRenderContext(context.uncertainReturn))
       )
       case term => defaultTermRenderer.render(term)
     }
