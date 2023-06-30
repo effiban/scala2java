@@ -23,6 +23,8 @@ class BlockStatTraversalResultScalatestMatcher(expectedTraversalResult: BlockSta
         new SimpleBlockStatTraversalResultScalatestMatcher(expectedResult)(actualResult).matches
       case (actualResult: IfTraversalResult, expectedResult: IfTraversalResult) =>
         new IfTraversalResultScalatestMatcher(expectedResult)(actualResult).matches
+      case (actualResult: TryTraversalResult, expectedResult: TryTraversalResult) =>
+        new TryTraversalResultScalatestMatcher(expectedResult)(actualResult).matches
       case _ => false
     }
   }

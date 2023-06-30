@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.IfContext
+import io.github.effiban.scala2java.core.contexts.{IfContext, TryContext}
 import io.github.effiban.scala2java.core.entities.Decision.{No, Uncertain, Yes}
 import io.github.effiban.scala2java.core.matchers.BlockStatTraversalResultScalatestMatcher.equalBlockStatTraversalResult
 import io.github.effiban.scala2java.core.resolvers.ShouldReturnValueResolver
@@ -24,16 +24,30 @@ class BlockLastStatTraverserImplTest extends UnitTestSuite {
     }
     """
 
+  private val TheTry = q"try(doSomething) catch { case e: Exception1 => log(error) }"
+  private val TheTraversedTry =
+    q"""
+    try {
+      doSomething
+    } catch {
+      case ee: Exception11 => {
+        log(error)
+      }
+    }
+    """
+
   private val TheTermApply = q"foo()"
   private val TheTraversedTermApply = q"traversedFoo()"
 
   private val blockStatTraverser = mock[BlockStatTraverser]
   private val defaultIfTraverser = mock[DefaultIfTraverser]
+  private val tryTraverser = mock[TryTraverser]
   private val shouldReturnValueResolver = mock[ShouldReturnValueResolver]
 
   private val blockLastStatTraverser = new BlockLastStatTraverserImpl(
     blockStatTraverser,
     defaultIfTraverser,
+    tryTraverser,
     shouldReturnValueResolver
   )
 
@@ -61,6 +75,30 @@ class BlockLastStatTraverserImplTest extends UnitTestSuite {
 
     val actualTraversalResult = blockLastStatTraverser.traverse(TheIf, shouldReturnValue = Uncertain)
     actualTraversalResult should equalBlockStatTraversalResult(expectedIfTraversalResult)
+  }
+
+  test("traverse() for a 'Term.Try' when shouldReturnValue=No") {
+    val expectedTraversalResult = TestableTryTraversalResult(TheTraversedTry, catchUncertainReturns = List(false))
+
+    doReturn(expectedTraversalResult).when(tryTraverser).traverse(eqTree(TheTry), eqTo(TryContext()))
+
+    blockLastStatTraverser.traverse(TheTry) should equalBlockStatTraversalResult(expectedTraversalResult)
+  }
+
+  test("traverse() for a 'Term.Try' when shouldReturnValue=Yes") {
+    val expectedTraversalResult = TestableTryTraversalResult(TheTraversedTry, catchUncertainReturns = List(false))
+
+    doReturn(expectedTraversalResult).when(tryTraverser).traverse(eqTree(TheTry), eqTo(TryContext(shouldReturnValue = Yes)))
+
+    blockLastStatTraverser.traverse(TheTry, shouldReturnValue = Yes) should equalBlockStatTraversalResult(expectedTraversalResult)
+  }
+
+  test("traverse() for a 'Term.Try' when shouldReturnValue=Uncertain and catch result has uncertainReturn=true") {
+    val expectedTraversalResult = TestableTryTraversalResult(TheTraversedTry, catchUncertainReturns = List(true))
+
+    doReturn(expectedTraversalResult).when(tryTraverser).traverse(eqTree(TheTry), eqTo(TryContext(shouldReturnValue = Uncertain)))
+
+    blockLastStatTraverser.traverse(TheTry, shouldReturnValue = Uncertain) should equalBlockStatTraversalResult(expectedTraversalResult)
   }
 
   test("traverse() for a 'Term.Apply' when shouldReturnValue=Yes and shouldTermReturnValue=Yes") {
