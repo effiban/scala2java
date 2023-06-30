@@ -36,18 +36,28 @@ class BlockLastStatTraverserImplTest extends UnitTestSuite {
     }
     """
 
+  private val TheTryWithHandler = q"try(doSomething) catch(catchHandler)"
+  private val TheTraversedTryWithHandler =
+    q"""
+    try {
+      doSomething2
+    } catch(catchHandler)
+    """
+
   private val TheTermApply = q"foo()"
   private val TheTraversedTermApply = q"traversedFoo()"
 
   private val blockStatTraverser = mock[BlockStatTraverser]
   private val defaultIfTraverser = mock[DefaultIfTraverser]
   private val tryTraverser = mock[TryTraverser]
+  private val tryWithHandlerTraverser = mock[TryWithHandlerTraverser]
   private val shouldReturnValueResolver = mock[ShouldReturnValueResolver]
 
   private val blockLastStatTraverser = new BlockLastStatTraverserImpl(
     blockStatTraverser,
     defaultIfTraverser,
     tryTraverser,
+    tryWithHandlerTraverser,
     shouldReturnValueResolver
   )
 
@@ -99,6 +109,34 @@ class BlockLastStatTraverserImplTest extends UnitTestSuite {
     doReturn(expectedTraversalResult).when(tryTraverser).traverse(eqTree(TheTry), eqTo(TryContext(shouldReturnValue = Uncertain)))
 
     blockLastStatTraverser.traverse(TheTry, shouldReturnValue = Uncertain) should equalBlockStatTraversalResult(expectedTraversalResult)
+  }
+
+  test("traverse() for a 'Term.TryWithHandler' when shouldReturnValue=No") {
+    val expectedTraversalResult = TestableTryWithHandlerTraversalResult(TheTraversedTryWithHandler)
+
+    doReturn(expectedTraversalResult).when(tryWithHandlerTraverser).traverse(eqTree(TheTryWithHandler), eqTo(TryContext()))
+
+    blockLastStatTraverser.traverse(TheTryWithHandler) should equalBlockStatTraversalResult(expectedTraversalResult)
+  }
+
+  test("traverse() for a 'Term.TryWithHandler' when shouldReturnValue=Yes") {
+    val expectedTraversalResult = TestableTryWithHandlerTraversalResult(TheTraversedTryWithHandler)
+
+    doReturn(expectedTraversalResult)
+      .when(tryWithHandlerTraverser).traverse(eqTree(TheTryWithHandler), eqTo(TryContext(shouldReturnValue = Yes)))
+
+    blockLastStatTraverser.traverse(TheTryWithHandler, shouldReturnValue = Yes) should
+      equalBlockStatTraversalResult(expectedTraversalResult)
+  }
+
+  test("traverse() for a 'Term.TryWithHandler' when shouldReturnValue=Uncertain and expr result has uncertainReturn=true") {
+    val expectedTraversalResult = TestableTryWithHandlerTraversalResult(TheTraversedTryWithHandler, exprUncertainReturn = true)
+
+    doReturn(expectedTraversalResult)
+      .when(tryWithHandlerTraverser).traverse(eqTree(TheTryWithHandler), eqTo(TryContext(shouldReturnValue = Uncertain)))
+
+    blockLastStatTraverser.traverse(TheTryWithHandler, shouldReturnValue = Uncertain) should
+      equalBlockStatTraversalResult(expectedTraversalResult)
   }
 
   test("traverse() for a 'Term.Apply' when shouldReturnValue=Yes and shouldTermReturnValue=Yes") {

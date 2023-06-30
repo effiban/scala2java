@@ -14,6 +14,6 @@ private[traversers] class BlockStatTraverserImpl(expressionTermRefTraverser: => 
     case defnVar: Defn.Var => defnVar //TODO
     case declVar: Decl.Var => declVar //TODO
     // TODO support other stats once renderers are ready
-    case aStat: Stat => throw new UnsupportedOperationException(s"Rendering of $aStat in a block is not supported yet")
+    case aStat: Stat => throw new UnsupportedOperationException(s"Traversal of $aStat in a block is not supported yet")
   }
 }

@@ -102,6 +102,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
     blockStatTraverser,
     defaultIfTraverser,
     tryTraverser,
+    tryWithHandlerTraverser,
     shouldReturnValueResolver
   )
 
@@ -258,7 +259,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
     defaultBlockTraverser,
     defaultIfTraverser,
     termMatchTraverser,
-    tryTraverser
+    tryTraverser,
+    tryWithHandlerTraverser
   )
 
   private lazy val defnDefTraverser: DefnDefTraverser = new DefnDefTraverserImpl(
@@ -646,6 +648,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
   )
 
   private lazy val deprecatedTryWithHandlerTraverser: DeprecatedTryWithHandlerTraverser = new DeprecatedTryWithHandlerTraverserImpl(deprecatedBlockTraverser, deprecatedFinallyTraverser)
+
+  private lazy val tryWithHandlerTraverser: TryWithHandlerTraverser = new TryWithHandlerTraverserImpl(blockWrappingTermTraverser, finallyTraverser)
 
   private lazy val typeAnnotateTraverser: TypeAnnotateTraverser = new TypeAnnotateTraverserImpl(typeTraverser)
 

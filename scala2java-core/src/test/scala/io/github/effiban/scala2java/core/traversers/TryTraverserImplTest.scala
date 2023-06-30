@@ -88,25 +88,6 @@ class TryTraverserImplTest extends UnitTestSuite {
     finallyTraverser
   )
 
-  test("traverse with a statement expr, no 'catch' cases and no 'finally'") {
-    val `try` = Term.Try(
-      expr = TryExprStatement,
-      catchp = Nil,
-      finallyp = None
-    )
-    val traversedTry = Term.Try(
-      expr = TraversedTryExprBlock,
-      catchp = Nil,
-      finallyp = None
-    )
-    val expectedResult = TestableTryTraversalResult(traversedTry)
-
-    doReturn(TestableBlockTraversalResult(TraversedTryExprBlock))
-      .when(blockWrappingTermTraverser).traverse(term = eqTree(TryExprStatement), context = eqBlockContext(BlockContext()))
-
-    tryTraverser.traverse(`try`) should equalTryTraversalResult(expectedResult)
-  }
-
   test("traverse with a statement expr") {
     val `try` = Term.Try(
       expr = TryExprStatement,

@@ -16,6 +16,7 @@ trait BlockLastStatTraverser {
 private[traversers] class BlockLastStatTraverserImpl(blockStatTraverser: => BlockStatTraverser,
                                                      defaultIfTraverser: => DefaultIfTraverser,
                                                      tryTraverser: => TryTraverser,
+                                                     tryWithHandlerTraverser: => TryWithHandlerTraverser,
                                                      shouldReturnValueResolver: => ShouldReturnValueResolver)
   extends BlockLastStatTraverser {
 
@@ -23,7 +24,7 @@ private[traversers] class BlockLastStatTraverserImpl(blockStatTraverser: => Bloc
     stat match {
       case `if`: If => traverseIf(`if`, shouldReturnValue)
       case `try`: Try => traverseTry(`try`, shouldReturnValue)
-      case tryWithHandler: TryWithHandler => SimpleBlockStatTraversalResult(tryWithHandler) //TODO
+      case tryWithHandler: TryWithHandler => traverseTryWithHandler(tryWithHandler, shouldReturnValue)
       case term: Term => traverseSimpleTerm(term, shouldReturnValue)
       case aStat => SimpleBlockStatTraversalResult(traverseInner(aStat))
     }
@@ -35,6 +36,10 @@ private[traversers] class BlockLastStatTraverserImpl(blockStatTraverser: => Bloc
 
   private def traverseTry(`try`: Try, shouldReturnValue: Decision) = {
     tryTraverser.traverse(`try`, TryContext(shouldReturnValue))
+  }
+
+  private def traverseTryWithHandler(tryWithHandler: TryWithHandler, shouldReturnValue: Decision) = {
+    tryWithHandlerTraverser.traverse(tryWithHandler, TryContext(shouldReturnValue))
   }
 
   private def traverseSimpleTerm(term: Term, shouldReturnValue: Decision): SimpleBlockStatTraversalResult = {
