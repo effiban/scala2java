@@ -21,6 +21,7 @@ private[traversers] class DefaultTermTraverserImpl(defaultTermRefTraverser: => D
                                                    tryTraverser: => TryTraverser,
                                                    tryWithHandlerTraverser: => TryWithHandlerTraverser,
                                                    termFunctionTraverser: => TermFunctionTraverser,
+                                                   partialFunctionTraverser: => PartialFunctionTraverser,
                                                    anonymousFunctionTraverser: => AnonymousFunctionTraverser)
   extends DefaultTermTraverser {
 
@@ -41,7 +42,7 @@ private[traversers] class DefaultTermTraverserImpl(defaultTermRefTraverser: => D
     case `try`: Try => tryTraverser.traverse(`try`).stat
     case tryWithHandler: TryWithHandler => tryWithHandlerTraverser.traverse(tryWithHandler).stat
     case `function`: Term.Function => termFunctionTraverser.traverse(`function`).function
-    case partialFunction: Term.PartialFunction => partialFunction //TODO
+    case partialFunction: Term.PartialFunction => partialFunctionTraverser.traverse(partialFunction).function
     case anonFunction: AnonymousFunction => anonymousFunctionTraverser.traverse(anonFunction).function
     case `while`: While => `while` //TODO
     case `do`: Do => `do` //TODO

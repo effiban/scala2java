@@ -264,6 +264,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
     tryTraverser,
     tryWithHandlerTraverser,
     termFunctionTraverser,
+    partialFunctionTraverser,
     anonymousFunctionTraverser
   )
 
@@ -442,6 +443,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
     JavaChildScopeResolver)
 
   private lazy val deprecatedPartialFunctionTraverser: DeprecatedPartialFunctionTraverser = new DeprecatedPartialFunctionTraverserImpl(deprecatedTermFunctionTraverser)
+
+  private lazy val partialFunctionTraverser: PartialFunctionTraverser = new PartialFunctionTraverserImpl(termFunctionTraverser)
 
   private lazy val patTraverser: PatTraverser = new PatTraverserImpl(
     PatSeqWildcardTraverser,
