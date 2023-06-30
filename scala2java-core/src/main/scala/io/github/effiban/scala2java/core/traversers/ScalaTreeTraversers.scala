@@ -614,6 +614,13 @@ class ScalaTreeTraversers(implicit factories: Factories,
     nameRenderer
   )
 
+  private lazy val termParamTraverser: TermParamTraverser = new TermParamTraverserImpl(
+    modListTraverser,
+    nameTraverser,
+    typeTraverser,
+    expressionTermTraverser
+  )
+
   private lazy val deprecatedTermRepeatedTraverser: DeprecatedTermRepeatedTraverser = new DeprecatedTermRepeatedTraverserImpl(deprecatedExpressionTermTraverser)
 
   private lazy val deprecatedTermTupleTraverser: DeprecatedTermTupleTraverser = new DeprecatedTermTupleTraverserImpl(
