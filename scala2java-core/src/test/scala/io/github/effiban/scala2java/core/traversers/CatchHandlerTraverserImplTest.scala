@@ -5,7 +5,7 @@ import io.github.effiban.scala2java.core.entities.Decision.{Uncertain, Yes}
 import io.github.effiban.scala2java.core.matchers.BlockContextMatcher.eqBlockContext
 import io.github.effiban.scala2java.core.matchers.CatchHandlerTraversalResultScalatestMatcher.equalCatchHandlerTraversalResult
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.{BlockTraversalResult, CatchHandlerTraversalResult}
+import io.github.effiban.scala2java.core.traversers.results.CatchHandlerTraversalResult
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.{Case, XtensionQuasiquoteCaseOrPattern, XtensionQuasiquoteTerm}
@@ -28,11 +28,6 @@ class CatchHandlerTraverserImplTest extends UnitTestSuite {
     cond = None,
     body = Body
   )
-  private val TraversedCatchCase = Case(
-    pat = TraversedCatchArg,
-    cond = None,
-    body = TraversedBody
-  )
 
   private val catchArgumentTraverser = mock[CatchArgumentTraverser]
   private val blockWrappingTermTraverser = mock[BlockWrappingTermTraverser]
@@ -43,8 +38,8 @@ class CatchHandlerTraverserImplTest extends UnitTestSuite {
   )
 
   test("traverse() when shouldReturnValue=No") {
-    val expectedBlockTraversalResult = BlockTraversalResult(TraversedBody)
-    val expectedCatchHandlerTraversalResult = CatchHandlerTraversalResult(TraversedCatchCase)
+    val expectedBlockTraversalResult = TestableBlockTraversalResult(TraversedBody)
+    val expectedCatchHandlerTraversalResult = CatchHandlerTraversalResult(TraversedCatchArg, expectedBlockTraversalResult)
 
     doReturn(TraversedCatchArg).when(catchArgumentTraverser).traverse(eqTree(CatchArg))
 
@@ -60,8 +55,8 @@ class CatchHandlerTraverserImplTest extends UnitTestSuite {
     val catchHandlerContext = CatchHandlerContext(shouldReturnValue = Yes)
     val expectedBlockContext = BlockContext(shouldReturnValue = Yes)
 
-    val expectedBlockTraversalResult = BlockTraversalResult(TraversedBody)
-    val expectedCatchHandlerTraversalResult = CatchHandlerTraversalResult(TraversedCatchCase)
+    val expectedBlockTraversalResult = TestableBlockTraversalResult(TraversedBody)
+    val expectedCatchHandlerTraversalResult = CatchHandlerTraversalResult(TraversedCatchArg, expectedBlockTraversalResult)
 
     doReturn(TraversedCatchArg).when(catchArgumentTraverser).traverse(eqTree(CatchArg))
 
@@ -76,8 +71,8 @@ class CatchHandlerTraverserImplTest extends UnitTestSuite {
     val catchHandlerContext = CatchHandlerContext(shouldReturnValue = Uncertain)
     val expectedBlockContext = BlockContext(shouldReturnValue = Uncertain)
 
-    val expectedBlockTraversalResult = BlockTraversalResult(TraversedBody, uncertainReturn = true)
-    val expectedCatchHandlerTraversalResult = CatchHandlerTraversalResult(TraversedCatchCase, uncertainReturn = true)
+    val expectedBlockTraversalResult = TestableBlockTraversalResult(TraversedBody, uncertainReturn = true)
+    val expectedCatchHandlerTraversalResult = CatchHandlerTraversalResult(TraversedCatchArg, expectedBlockTraversalResult)
 
     doReturn(TraversedCatchArg).when(catchArgumentTraverser).traverse(eqTree(CatchArg))
 

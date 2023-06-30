@@ -1,8 +1,11 @@
 package io.github.effiban.scala2java.core.traversers.results
 
-import scala.meta.Init
 import scala.meta.Term.Block
+import scala.meta.{Init, Stat}
 
-case class BlockTraversalResult(block: Block,
-                                maybeInit: Option[Init] = None,
-                                uncertainReturn: Boolean = false)
+case class BlockTraversalResult(nonLastStats: List[Stat] = Nil,
+                                maybeLastStatResult: Option[BlockStatTraversalResult] = None,
+                                maybeInit: Option[Init] = None) {
+
+  val block: Block = Block(nonLastStats ++ maybeLastStatResult.map(_.stat))
+}

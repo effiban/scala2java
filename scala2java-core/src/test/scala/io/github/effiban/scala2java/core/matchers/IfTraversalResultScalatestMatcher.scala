@@ -7,8 +7,9 @@ class IfTraversalResultScalatestMatcher(expectedTraversalResult: IfTraversalResu
   extends Matcher[IfTraversalResult] {
 
   override def apply(actualTraversalResult: IfTraversalResult): MatchResult = {
-    val matches = theIfMatches(actualTraversalResult) &&
-      actualTraversalResult.uncertainReturn == expectedTraversalResult.uncertainReturn
+    val matches = condMatches(actualTraversalResult) &&
+      thenpResultMatches(actualTraversalResult) &&
+      maybeElsepResultMatches(actualTraversalResult)
 
     MatchResult(matches,
       s"Actual traversal result: $actualTraversalResult is NOT the same as expected traversal result: $expectedTraversalResult",
@@ -18,8 +19,20 @@ class IfTraversalResultScalatestMatcher(expectedTraversalResult: IfTraversalResu
 
   override def toString: String = s"Matcher for: $expectedTraversalResult"
 
-  private def theIfMatches(actualTraversalResult: IfTraversalResult) = {
-    actualTraversalResult.`if`.structure == expectedTraversalResult.`if`.structure
+  private def condMatches(actualTraversalResult: IfTraversalResult) = {
+    actualTraversalResult.cond.structure == expectedTraversalResult.cond.structure
+  }
+
+  private def thenpResultMatches(actualTraversalResult: IfTraversalResult): Boolean = {
+    new BlockTraversalResultScalatestMatcher(expectedTraversalResult.thenpResult)(actualTraversalResult.thenpResult).matches
+  }
+
+  private def maybeElsepResultMatches(actualTraversalResult: IfTraversalResult): Boolean = {
+    (actualTraversalResult.maybeElsepResult, expectedTraversalResult.maybeElsepResult) match {
+      case (Some(actualResult), Some(expectedResult)) => new BlockTraversalResultScalatestMatcher(expectedResult)(actualResult).matches
+      case (None, None) => true
+      case _ => false
+    }
   }
 }
 

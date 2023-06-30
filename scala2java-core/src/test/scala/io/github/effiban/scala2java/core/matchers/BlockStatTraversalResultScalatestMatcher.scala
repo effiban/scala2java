@@ -1,14 +1,13 @@
 package io.github.effiban.scala2java.core.matchers
 
-import io.github.effiban.scala2java.core.traversers.results.BlockStatTraversalResult
+import io.github.effiban.scala2java.core.traversers.results._
 import org.scalatest.matchers.{MatchResult, Matcher}
 
 class BlockStatTraversalResultScalatestMatcher(expectedTraversalResult: BlockStatTraversalResult)
   extends Matcher[BlockStatTraversalResult] {
 
   override def apply(actualTraversalResult: BlockStatTraversalResult): MatchResult = {
-    val matches = statMatches(actualTraversalResult) &&
-      actualTraversalResult.uncertainReturn == expectedTraversalResult.uncertainReturn
+    val matches = matchesByType(actualTraversalResult)
 
     MatchResult(matches,
       s"Actual traversal result: $actualTraversalResult is NOT the same as expected traversal result: $expectedTraversalResult",
@@ -18,8 +17,14 @@ class BlockStatTraversalResultScalatestMatcher(expectedTraversalResult: BlockSta
 
   override def toString: String = s"Matcher for: $expectedTraversalResult"
 
-  private def statMatches(actualTraversalResult: BlockStatTraversalResult) = {
-    actualTraversalResult.stat.structure == expectedTraversalResult.stat.structure
+  private def matchesByType(actualTraversalResult: BlockStatTraversalResult): Boolean = {
+    (actualTraversalResult, expectedTraversalResult) match {
+      case (actualResult: SimpleBlockStatTraversalResult, expectedResult: SimpleBlockStatTraversalResult) =>
+        new SimpleBlockStatTraversalResultScalatestMatcher(expectedResult)(actualResult).matches
+      case (actualResult: IfTraversalResult, expectedResult: IfTraversalResult) =>
+        new IfTraversalResultScalatestMatcher(expectedResult)(actualResult).matches
+      case _ => false
+    }
   }
 }
 
