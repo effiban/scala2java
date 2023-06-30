@@ -260,7 +260,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
     defaultIfTraverser,
     termMatchTraverser,
     tryTraverser,
-    tryWithHandlerTraverser
+    tryWithHandlerTraverser,
+    termFunctionTraverser
   )
 
   private lazy val defnDefTraverser: DefnDefTraverser = new DefnDefTraverserImpl(
@@ -583,6 +584,12 @@ class ScalaTreeTraversers(implicit factories: Factories,
     deprecatedTermParamListTraverser,
     statTraverser,
     deprecatedBlockTraverser
+  )
+
+  private lazy val termFunctionTraverser: TermFunctionTraverser = new TermFunctionTraverserImpl(
+    termParamTraverser,
+    defaultBlockTraverser,
+    defaultTermTraverser
   )
 
   private lazy val deprecatedTermMatchTraverser: DeprecatedTermMatchTraverser = new DeprecatedTermMatchTraverserImpl(deprecatedExpressionTermTraverser, deprecatedCaseTraverser)
