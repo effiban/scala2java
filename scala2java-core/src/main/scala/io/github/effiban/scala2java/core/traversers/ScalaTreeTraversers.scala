@@ -265,7 +265,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
     tryWithHandlerTraverser,
     termFunctionTraverser,
     partialFunctionTraverser,
-    anonymousFunctionTraverser
+    anonymousFunctionTraverser,
+    whileTraverser
   )
 
   private lazy val defnDefTraverser: DefnDefTraverser = new DefnDefTraverserImpl(
@@ -750,4 +751,6 @@ class ScalaTreeTraversers(implicit factories: Factories,
   private lazy val typeWithTraverser: TypeWithTraverser = new TypeWithTraverserImpl(typeTraverser)
 
   private lazy val deprecatedWhileTraverser: DeprecatedWhileTraverser = new DeprecatedWhileTraverserImpl(deprecatedExpressionTermTraverser, deprecatedBlockTraverser)
+
+  private lazy val whileTraverser: WhileTraverser = new WhileTraverserImpl(expressionTermTraverser, blockWrappingTermTraverser)
 }
