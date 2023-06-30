@@ -419,6 +419,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val deprecatedModListTraverser: DeprecatedModListTraverser = new DeprecatedModListTraverserImpl(deprecatedAnnotListTraverser, JavaModifiersResolver)
 
+  private lazy val modListTraverser: ModListTraverser = new ModListTraverserImpl(annotTraverser, JavaModifiersResolver)
+
   private lazy val nameTraverser: NameTraverser = new NameTraverserImpl(typeNameTraverser)
 
   private lazy val deprecatedNewAnonymousTraverser: DeprecatedNewAnonymousTraverser = new DeprecatedNewAnonymousTraverserImpl(templateTraverser)
