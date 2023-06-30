@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.classifiers.JavaStatClassifier
-import io.github.effiban.scala2java.core.contexts.{IfRenderContext, TryRenderContext, ValOrVarRenderContext}
+import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.entities.JavaModifier.Final
 import io.github.effiban.scala2java.core.entities.TraversalConstants.UncertainReturn
 import io.github.effiban.scala2java.core.writers.JavaWriter
@@ -13,7 +13,7 @@ trait BlockStatRenderer {
 
   def render(stat: Stat): Unit
 
-  def renderLast(stat: Stat, uncertainReturn: Boolean = false): Unit
+  def renderLast(stat: Stat, blockStatRenderContext: BlockStatRenderContext = SimpleBlockStatRenderContext()): Unit
 }
 
 private[renderers] class BlockStatRendererImpl(expressionTermRefRenderer: => ExpressionTermRefRenderer,
@@ -42,13 +42,12 @@ private[renderers] class BlockStatRendererImpl(expressionTermRefRenderer: => Exp
     writeStatEnd(stat)
   }
 
-  override def renderLast(stat: Stat, uncertainReturn: Boolean = false): Unit = {
-    stat match {
-      case `if`: If => ifRenderer.render(`if`, context = IfRenderContext(uncertainReturn = uncertainReturn))
-      case `try`: Try => tryRenderer.render(`try`, context = TryRenderContext(uncertainReturn = uncertainReturn))
-      case tryWithHandler: TryWithHandler =>
-        tryWithHandlerRenderer.render(tryWithHandler, context = TryRenderContext(uncertainReturn = uncertainReturn))
-      case _ if uncertainReturn =>
+  override def renderLast(stat: Stat, context: BlockStatRenderContext = SimpleBlockStatRenderContext()): Unit = {
+    (stat, context) match {
+      case (`if`: If, anIfContext: IfRenderContext) => ifRenderer.render(`if`, anIfContext)
+      case (`try`: Try, tryContext: TryRenderContext)  => tryRenderer.render(`try`, tryContext)
+      case (tryWithHandler: TryWithHandler, tryContext: TryRenderContext) => tryWithHandlerRenderer.render(tryWithHandler, tryContext)
+      case (_, context: SimpleBlockStatRenderContext) if context.uncertainReturn =>
         writeComment(UncertainReturn)
         render(stat)
       case _ => render(stat)

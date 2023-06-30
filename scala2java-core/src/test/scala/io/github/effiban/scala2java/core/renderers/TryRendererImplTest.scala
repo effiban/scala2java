@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.{BlockRenderContext, CatchHandlerRenderContext, TryRenderContext}
+import io.github.effiban.scala2java.core.contexts.{BlockRenderContext, SimpleBlockStatRenderContext, TryRenderContext}
 import io.github.effiban.scala2java.core.matchers.BlockRenderContextMatcher.eqBlockRenderContext
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
@@ -74,6 +74,31 @@ class TryRendererImplTest extends UnitTestSuite {
         |""".stripMargin
   }
 
+  test("render with no 'catch' cases and no 'finally', and 'expr' has uncertain return") {
+    val `try` = Term.Try(
+      expr = TryBlock,
+      catchp = Nil,
+      finallyp = None
+    )
+    val exprContext = BlockRenderContext(lastStatContext = SimpleBlockStatRenderContext(uncertainReturn = true))
+    val tryContext = TryRenderContext(exprContext = exprContext)
+
+    doWrite(
+      """ {
+        |  /* return? */doSomething();
+        |}
+        |""".stripMargin)
+      .when(blockRenderer).render(block = eqTree(TryBlock), context = eqBlockRenderContext(exprContext))
+
+    tryRenderer.render(`try`, tryContext)
+
+    outputWriter.toString shouldBe
+      """try {
+        |  /* return? */doSomething();
+        |}
+        |""".stripMargin
+  }
+
   test("render with one 'catch' case and no 'finally'") {
     val `try` = Term.Try(
       expr = TryBlock,
@@ -97,9 +122,9 @@ class TryRendererImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(catchHandlerRenderer).render(
       eqTree(CatchCase1),
-      eqTo(CatchHandlerRenderContext()))
+      eqTo(BlockRenderContext()))
 
-    tryRenderer.render(`try`)
+    tryRenderer.render(`try`, TryRenderContext(catchContexts = List(BlockRenderContext())))
 
     outputWriter.toString shouldBe
       """try {
@@ -107,6 +132,90 @@ class TryRendererImplTest extends UnitTestSuite {
         |}
         |catch (IllegalArgumentException e1) {
         |  log.error(e1);
+        |}
+        |""".stripMargin
+  }
+
+  test("render with one 'catch' case and no 'finally', when 'expr' has uncertain return") {
+    val `try` = Term.Try(
+      expr = TryBlock,
+      catchp = List(
+        CatchCase1
+      ),
+      finallyp = None
+    )
+
+    val exprContext = BlockRenderContext(lastStatContext = SimpleBlockStatRenderContext(uncertainReturn = true))
+    val tryContext = TryRenderContext(exprContext = exprContext, catchContexts = List(BlockRenderContext()))
+
+    doWrite(
+      """ {
+        |  /* return? */doSomething();
+        |}
+        |""".stripMargin)
+      .when(blockRenderer).render(
+      block = eqTree(TryBlock),
+      context = eqBlockRenderContext(exprContext))
+
+    doWrite(
+      """catch (IllegalArgumentException e1) {
+        |  "failed";
+        |}
+        |""".stripMargin)
+      .when(catchHandlerRenderer).render(
+      catchCase = eqTree(CatchCase1),
+      context = eqBlockRenderContext(BlockRenderContext()))
+
+    tryRenderer.render(`try` = `try`, context = tryContext)
+
+    outputWriter.toString shouldBe
+      """try {
+        |  /* return? */doSomething();
+        |}
+        |catch (IllegalArgumentException e1) {
+        |  "failed";
+        |}
+        |""".stripMargin
+  }
+
+  test("render with one 'catch' case and no 'finally', when both 'expr' and 'catch' case have uncertain returns") {
+    val `try` = Term.Try(
+      expr = TryBlock,
+      catchp = List(
+        CatchCase1
+      ),
+      finallyp = None
+    )
+
+    val clauseContext = BlockRenderContext(lastStatContext = SimpleBlockStatRenderContext(uncertainReturn = true))
+    val tryContext = TryRenderContext(exprContext = clauseContext, catchContexts = List(clauseContext))
+
+    doWrite(
+      """ {
+        |  /* return? */doSomething();
+        |}
+        |""".stripMargin)
+      .when(blockRenderer).render(
+      block = eqTree(TryBlock),
+      context = eqBlockRenderContext(clauseContext))
+
+    doWrite(
+      """catch (IllegalArgumentException e1) {
+        |  /* return? */"failed";
+        |}
+        |""".stripMargin)
+      .when(catchHandlerRenderer).render(
+      catchCase = eqTree(CatchCase1),
+      context = eqBlockRenderContext(clauseContext))
+
+    tryRenderer.render(`try` = `try`, context = tryContext)
+
+    outputWriter.toString shouldBe
+      """try {
+        |  /* return? */doSomething();
+        |}
+        |catch (IllegalArgumentException e1) {
+        |  /* return? */"failed";
         |}
         |""".stripMargin
   }
@@ -135,7 +244,7 @@ class TryRendererImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(catchHandlerRenderer).render(
       eqTree(CatchCase1),
-      eqTo(CatchHandlerRenderContext())
+      eqTo(BlockRenderContext())
     )
 
     doWrite(
@@ -145,10 +254,10 @@ class TryRendererImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(catchHandlerRenderer).render(
       eqTree(CatchCase2),
-      eqTo(CatchHandlerRenderContext())
+      eqTo(BlockRenderContext())
     )
 
-    tryRenderer.render(`try`)
+    tryRenderer.render(`try`, TryRenderContext(catchContexts = List(BlockRenderContext(), BlockRenderContext())))
 
     outputWriter.toString shouldBe
       """try {
@@ -159,6 +268,116 @@ class TryRendererImplTest extends UnitTestSuite {
         |}
         |catch (IllegalStateException e2) {
         |  log.error(e2);
+        |}
+        |""".stripMargin
+  }
+
+  test("render with two 'catch' cases and no 'finally', when first 'catch' has uncertain return") {
+    val `try` = Term.Try(
+      expr = TryBlock,
+      catchp = List(
+        CatchCase1,
+        CatchCase2
+      ),
+      finallyp = None
+    )
+
+    val firstCatchContext = BlockRenderContext(lastStatContext = SimpleBlockStatRenderContext(uncertainReturn = true))
+    val tryContext = TryRenderContext(catchContexts = List(firstCatchContext, BlockRenderContext()))
+
+    doWrite(
+      """ {
+        |  doSomething();
+        |}
+        |""".stripMargin)
+      .when(blockRenderer).render(block = eqTree(TryBlock), context = eqBlockRenderContext(BlockRenderContext()))
+
+    doWrite(
+      """catch (IllegalArgumentException e1) {
+        |  /* return? */log.error(e1);
+        |}
+        |""".stripMargin)
+      .when(catchHandlerRenderer).render(
+      eqTree(CatchCase1),
+      eqBlockRenderContext(firstCatchContext)
+    )
+
+    doWrite(
+      """catch (IllegalStateException e2) {
+        |  log.error(e2);
+        |}
+        |""".stripMargin)
+      .when(catchHandlerRenderer).render(
+      eqTree(CatchCase2),
+      eqBlockRenderContext(BlockRenderContext())
+    )
+
+    tryRenderer.render(`try`, tryContext)
+
+    outputWriter.toString shouldBe
+      """try {
+        |  doSomething();
+        |}
+        |catch (IllegalArgumentException e1) {
+        |  /* return? */log.error(e1);
+        |}
+        |catch (IllegalStateException e2) {
+        |  log.error(e2);
+        |}
+        |""".stripMargin
+  }
+
+  test("render with two 'catch' cases and no 'finally', when both 'catch'-es have uncertain return") {
+    val `try` = Term.Try(
+      expr = TryBlock,
+      catchp = List(
+        CatchCase1,
+        CatchCase2
+      ),
+      finallyp = None
+    )
+
+    val catchContext = BlockRenderContext(lastStatContext = SimpleBlockStatRenderContext(uncertainReturn = true))
+    val tryContext = TryRenderContext(catchContexts = List(catchContext, catchContext))
+
+    doWrite(
+      """ {
+        |  doSomething();
+        |}
+        |""".stripMargin)
+      .when(blockRenderer).render(block = eqTree(TryBlock), context = eqBlockRenderContext(BlockRenderContext()))
+
+    doWrite(
+      """catch (IllegalArgumentException e1) {
+        |  /* return? */log.error(e1);
+        |}
+        |""".stripMargin)
+      .when(catchHandlerRenderer).render(
+      eqTree(CatchCase1),
+      eqBlockRenderContext(catchContext)
+    )
+
+    doWrite(
+      """catch (IllegalStateException e2) {
+        |  /* return? */log.error(e2);
+        |}
+        |""".stripMargin)
+      .when(catchHandlerRenderer).render(
+      eqTree(CatchCase2),
+      eqBlockRenderContext(catchContext)
+    )
+
+    tryRenderer.render(`try`, tryContext)
+
+    outputWriter.toString shouldBe
+      """try {
+        |  doSomething();
+        |}
+        |catch (IllegalArgumentException e1) {
+        |  /* return? */log.error(e1);
+        |}
+        |catch (IllegalStateException e2) {
+        |  /* return? */log.error(e2);
         |}
         |""".stripMargin
   }
@@ -186,7 +405,7 @@ class TryRendererImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(catchHandlerRenderer).render(
       eqTree(CatchCase1),
-      eqTo(CatchHandlerRenderContext())
+      eqTo(BlockRenderContext())
     )
 
     doWrite(
@@ -196,7 +415,7 @@ class TryRendererImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(finallyRenderer).render(eqTree(FinallyBlock))
 
-    tryRenderer.render(`try`)
+    tryRenderer.render(`try`,TryRenderContext(catchContexts = List(BlockRenderContext())))
 
     outputWriter.toString shouldBe
       """try {
@@ -204,54 +423,6 @@ class TryRendererImplTest extends UnitTestSuite {
         |}
         |catch (IllegalArgumentException e1) {
         |  log.error(e1);
-        |}
-        |finally {
-        |  cleanup();
-        |}
-        |""".stripMargin
-  }
-
-  test("render with one 'catch' case and a 'finally', and shouldReturnValue=Uncertain") {
-    val `try` = Term.Try(
-      expr = TryBlock,
-      catchp = List(
-        CatchCase1
-      ),
-      finallyp = Some(FinallyBlock)
-    )
-
-    doWrite(
-      """ {
-        |  /* return? */doSomething();
-        |}
-        |""".stripMargin)
-      .when(blockRenderer).render(
-      block = eqTree(TryBlock),context = eqBlockRenderContext(BlockRenderContext(uncertainReturn = true)))
-
-    doWrite(
-      """catch (IllegalArgumentException e1) {
-        |  /* return? */"failed";
-        |}
-        |""".stripMargin)
-      .when(catchHandlerRenderer).render(
-      catchCase = eqTree(CatchCase1),
-      context = eqTo(CatchHandlerRenderContext(uncertainReturn = true)))
-
-    doWrite(
-      """finally {
-        |  cleanup();
-        |}
-        |""".stripMargin)
-      .when(finallyRenderer).render(eqTree(FinallyBlock))
-
-    tryRenderer.render(`try` = `try`, context = TryRenderContext(uncertainReturn = true))
-
-    outputWriter.toString shouldBe
-      """try {
-        |  /* return? */doSomething();
-        |}
-        |catch (IllegalArgumentException e1) {
-        |  /* return? */"failed";
         |}
         |finally {
         |  cleanup();

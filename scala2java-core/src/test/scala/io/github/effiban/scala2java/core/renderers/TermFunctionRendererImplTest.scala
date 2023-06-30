@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.{BlockRenderContext, TermFunctionRenderContext, TermParamListRenderContext, TermParamRenderContext}
+import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.matchers.BlockRenderContextMatcher.eqBlockRenderContext
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
@@ -108,6 +108,8 @@ class TermFunctionRendererImplTest extends UnitTestSuite {
     )
     val function = Term.Function(params = List(param), body = functionBody)
 
+    val expectedBlockContext = BlockRenderContext(lastStatContext = SimpleBlockStatRenderContext(uncertainReturn = true))
+
     doWrite("val1")
       .when(termParamRenderer).render(termParam = eqTree(param), context = eqTo(TermParamRenderContext()))
     doWrite(
@@ -116,7 +118,7 @@ class TermFunctionRendererImplTest extends UnitTestSuite {
         |  /* return? */ last;
         |}""".stripMargin
     ).when(blockRenderer).render(
-      block = eqTree(functionBody), context = eqBlockRenderContext(BlockRenderContext(uncertainReturn = true))
+      block = eqTree(functionBody), context = eqBlockRenderContext(expectedBlockContext)
     )
 
     termFunctionRenderer.render(function, context = TermFunctionRenderContext(uncertainReturn = true))

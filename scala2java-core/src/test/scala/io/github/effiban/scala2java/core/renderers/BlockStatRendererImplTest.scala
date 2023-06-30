@@ -1,8 +1,10 @@
 package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.classifiers.JavaStatClassifier
-import io.github.effiban.scala2java.core.contexts.{IfRenderContext, TryRenderContext, ValOrVarRenderContext}
+import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.entities.JavaModifier.Final
+import io.github.effiban.scala2java.core.matchers.IfRenderContextMatcher.eqIfRenderContext
+import io.github.effiban.scala2java.core.matchers.TryRenderContextMatcher.eqTryRenderContext
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -153,7 +155,7 @@ class BlockStatRendererImplTest extends UnitTestSuite {
     doWrite("x").when(expressionTermRefRenderer).render(eqTree(termName))
     when(javaStatClassifier.requiresEndDelimiter(eqTree(termName))).thenReturn(true)
 
-    blockStatRenderer.renderLast(termName, uncertainReturn = true)
+    blockStatRenderer.renderLast(termName, SimpleBlockStatRenderContext(uncertainReturn = true))
 
     outputWriter.toString shouldBe
       """/* return? */x;
@@ -191,7 +193,7 @@ class BlockStatRendererImplTest extends UnitTestSuite {
          |}""".stripMargin)
       .when(ifRenderer).render(eqTree(termIf), eqTo(IfRenderContext()))
 
-    blockStatRenderer.renderLast(termIf)
+    blockStatRenderer.renderLast(termIf, IfRenderContext())
 
     outputWriter.toString shouldBe
       """|if (cond) {
@@ -202,7 +204,7 @@ class BlockStatRendererImplTest extends UnitTestSuite {
 
   }
 
-  test("renderLast() Term.If when has uncertain return") {
+  test("renderLast() Term.If when both clauses have uncertain return") {
     val termIf =
       q"""
       if (cond) {
@@ -212,15 +214,18 @@ class BlockStatRendererImplTest extends UnitTestSuite {
       }
       """
 
+    val clauseContext = BlockRenderContext(lastStatContext = SimpleBlockStatRenderContext(uncertainReturn = true))
+    val ifRenderContext = IfRenderContext(thenContext = clauseContext, elseContext = clauseContext)
+
     doWrite(
       """|if (cond) {
          |  /* return? */doSomething();
          |} else {
          |  /* return? */doSomethingElse();
          |}""".stripMargin)
-      .when(ifRenderer).render(eqTree(termIf), eqTo(IfRenderContext(uncertainReturn = true)))
+      .when(ifRenderer).render(eqTree(termIf), eqIfRenderContext(ifRenderContext))
 
-    blockStatRenderer.renderLast(termIf, uncertainReturn = true)
+    blockStatRenderer.renderLast(termIf, context = ifRenderContext)
 
     outputWriter.toString shouldBe
       """|if (cond) {
@@ -249,7 +254,7 @@ class BlockStatRendererImplTest extends UnitTestSuite {
          |}""".stripMargin)
       .when(tryRenderer).render(eqTree(termTry), eqTo(TryRenderContext()))
 
-    blockStatRenderer.renderLast(termTry)
+    blockStatRenderer.renderLast(termTry, TryRenderContext())
 
     outputWriter.toString shouldBe
       """|try {
@@ -259,7 +264,7 @@ class BlockStatRendererImplTest extends UnitTestSuite {
          |}""".stripMargin
   }
 
-  test("renderLast() Term.Try when has uncertain return") {
+  test("renderLast() Term.Try when both clauses have uncertain return") {
     val termTry =
       q"""
       try {
@@ -269,15 +274,20 @@ class BlockStatRendererImplTest extends UnitTestSuite {
       }
       """
 
+    val tryRenderContext = TryRenderContext(
+      exprContext = BlockRenderContext(lastStatContext = SimpleBlockStatRenderContext(uncertainReturn = true)),
+      catchContexts = List(BlockRenderContext(lastStatContext = SimpleBlockStatRenderContext(uncertainReturn = true)))
+    )
+
     doWrite(
       """|try {
          |  /* return? */doSomething();
          |} catch (Throwable e) {
          |  /* return? */doSomethingElse();
          |}""".stripMargin)
-      .when(tryRenderer).render(eqTree(termTry), eqTo(TryRenderContext(uncertainReturn = true)))
+      .when(tryRenderer).render(eqTree(termTry), eqTryRenderContext(tryRenderContext))
 
-    blockStatRenderer.renderLast(termTry, uncertainReturn = true)
+    blockStatRenderer.renderLast(termTry, tryRenderContext)
 
     outputWriter.toString shouldBe
       """|try {
@@ -303,7 +313,7 @@ class BlockStatRendererImplTest extends UnitTestSuite {
          |""".stripMargin)
       .when(tryWithHandlerRenderer).render(eqTree(tryWithHandler), eqTo(TryRenderContext()))
 
-    blockStatRenderer.renderLast(tryWithHandler)
+    blockStatRenderer.renderLast(tryWithHandler, TryRenderContext())
 
     outputWriter.toString shouldBe
       """|try {
@@ -321,15 +331,19 @@ class BlockStatRendererImplTest extends UnitTestSuite {
       } catch(someCatchHandler)
       """
 
+    val tryRenderContext = TryRenderContext(
+      exprContext = BlockRenderContext(lastStatContext = SimpleBlockStatRenderContext(uncertainReturn = true))
+    )
+
     doWrite(
       """|try {
          |  /* return? */doSomething();
          |}
          |/* UNPARSEABLE catch handler: someCatchHandler */
          |""".stripMargin)
-      .when(tryWithHandlerRenderer).render(eqTree(tryWithHandler), eqTo(TryRenderContext(uncertainReturn = true)))
+      .when(tryWithHandlerRenderer).render(eqTree(tryWithHandler), eqTryRenderContext(tryRenderContext))
 
-    blockStatRenderer.renderLast(tryWithHandler, uncertainReturn = true)
+    blockStatRenderer.renderLast(tryWithHandler, tryRenderContext)
 
     outputWriter.toString shouldBe
       """|try {

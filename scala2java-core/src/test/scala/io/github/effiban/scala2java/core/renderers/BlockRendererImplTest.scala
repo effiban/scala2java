@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.{BlockRenderContext, InitContext}
+import io.github.effiban.scala2java.core.contexts.{BlockRenderContext, IfRenderContext, InitContext, SimpleBlockStatRenderContext}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -26,7 +26,7 @@ class BlockRendererImplTest extends UnitTestSuite {
         |""".stripMargin
   }
 
-  test("render() for block of one statement, uncertainReturn=false") {
+  test("render() for block of one simple statement, uncertainReturn=false") {
     val block =
       q"""
       {
@@ -36,7 +36,7 @@ class BlockRendererImplTest extends UnitTestSuite {
     doWrite(
       s"""  foo();
          |""".stripMargin)
-      .when(blockStatRenderer).renderLast(eqTree(q"foo()"), uncertainReturn = eqTo(false))
+      .when(blockStatRenderer).renderLast(eqTree(q"foo()"), eqTo(SimpleBlockStatRenderContext()))
 
     blockRenderer.render(block = block)
 
@@ -47,19 +47,21 @@ class BlockRendererImplTest extends UnitTestSuite {
          |""".stripMargin
   }
 
-  test("render() for block of one statement, uncertainReturn=true") {
+  test("render() for block of one simple statement, uncertainReturn=true") {
     val block =
       q"""
       {
         foo()
       }
       """
+    val lastStatContext = SimpleBlockStatRenderContext(uncertainReturn = true)
+
     doWrite(
       s"""  /* return? */foo();
          |""".stripMargin)
-      .when(blockStatRenderer).renderLast(eqTree(q"foo()"), uncertainReturn = eqTo(true))
+      .when(blockStatRenderer).renderLast(eqTree(q"foo()"), eqTo(lastStatContext))
 
-    blockRenderer.render(block = block, context = BlockRenderContext(uncertainReturn = true))
+    blockRenderer.render(block = block, context = BlockRenderContext(lastStatContext = lastStatContext))
 
     outputWriter.toString shouldBe
       s""" {
@@ -68,7 +70,7 @@ class BlockRendererImplTest extends UnitTestSuite {
          |""".stripMargin
   }
 
-  test("render() for block of two statements, uncertainReturn=false") {
+  test("render() for block of two simple statements, uncertainReturn=false") {
     val block =
       q"""
         func1()
@@ -81,7 +83,7 @@ class BlockRendererImplTest extends UnitTestSuite {
     doWrite(
       s"""  func2();
          |""".stripMargin
-    ).when(blockStatRenderer).renderLast(eqTree(q"func2()"), uncertainReturn = eqTo(false))
+    ).when(blockStatRenderer).renderLast(eqTree(q"func2()"), eqTo(SimpleBlockStatRenderContext()))
 
     blockRenderer.render(block = block, context = BlockRenderContext())
 
@@ -93,12 +95,15 @@ class BlockRendererImplTest extends UnitTestSuite {
          |""".stripMargin
   }
 
-  test("render() for block of two statements, uncertainReturn=true") {
+  test("render() for block of two simple statements, uncertainReturn=true") {
     val block =
       q"""
-    func1()
-    func2()
-  """
+      func1()
+      func2()
+      """
+
+    val lastStatContext = SimpleBlockStatRenderContext(uncertainReturn = true)
+
     doWrite(
       s"""  func1();
          |""".stripMargin
@@ -106,9 +111,9 @@ class BlockRendererImplTest extends UnitTestSuite {
     doWrite(
       s"""  /* return? */func2();
          |""".stripMargin
-    ).when(blockStatRenderer).renderLast(eqTree(q"func2()"), uncertainReturn = eqTo(true))
+    ).when(blockStatRenderer).renderLast(eqTree(q"func2()"), eqTo(lastStatContext))
 
-    blockRenderer.render(block = block, context = BlockRenderContext(uncertainReturn = true))
+    blockRenderer.render(block = block, context = BlockRenderContext(lastStatContext = lastStatContext))
 
     outputWriter.toString shouldBe
       s""" {
@@ -118,7 +123,44 @@ class BlockRendererImplTest extends UnitTestSuite {
          |""".stripMargin
   }
 
-  test("render() for an 'init' and one statement") {
+  test("render() for block of one Term.Apply + one If, uncertainReturn=true") {
+    val block =
+      q"""
+      func1()
+      if (x < 3) small() else large()
+      """
+
+    val clauseContext = BlockRenderContext(lastStatContext = SimpleBlockStatRenderContext(uncertainReturn = true))
+    val lastStatContext = IfRenderContext(thenContext = clauseContext, elseContext = clauseContext)
+
+    doWrite(
+      s"""  func1();
+         |""".stripMargin
+    ).when(blockStatRenderer).render(eqTree(q"func1()"))
+    doWrite(
+      s"""  if (x < 3) {
+         |    /* return? */ small()
+         |  } else {
+         |    /* return? */ large()
+         |  }
+         |""".stripMargin
+    ).when(blockStatRenderer).renderLast(eqTree(q"if (x < 3) small() else large()"), eqTo(lastStatContext))
+
+    blockRenderer.render(block = block, context = BlockRenderContext(lastStatContext = lastStatContext))
+
+    outputWriter.toString shouldBe
+      s""" {
+         |  func1();
+         |  if (x < 3) {
+         |    /* return? */ small()
+         |  } else {
+         |    /* return? */ large()
+         |  }
+         |}
+         |""".stripMargin
+  }
+
+  test("render() for an 'init' and one simple statement") {
     val block =
       q"""
       {
@@ -133,7 +175,7 @@ class BlockRendererImplTest extends UnitTestSuite {
     doWrite(
       s"""  foo();
          |""".stripMargin)
-      .when(blockStatRenderer).renderLast(eqTree(q"foo()"), uncertainReturn = eqTo(false))
+      .when(blockStatRenderer).renderLast(eqTree(q"foo()"), eqTo(SimpleBlockStatRenderContext()))
 
     blockRenderer.render(block = block, context = BlockRenderContext(maybeInit = Some(init)))
 
