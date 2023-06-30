@@ -25,7 +25,8 @@ private[traversers] class DefaultTermTraverserImpl(defaultTermRefTraverser: => D
                                                    anonymousFunctionTraverser: => AnonymousFunctionTraverser,
                                                    whileTraverser: => WhileTraverser,
                                                    doTraverser: => DoTraverser,
-                                                   newTraverser: => NewTraverser) extends DefaultTermTraverser {
+                                                   newTraverser: => NewTraverser,
+                                                   etaTraverser: => EtaTraverser) extends DefaultTermTraverser {
 
   override def traverse(term: Term): Term = term match {
     case termRef: Term.Ref => defaultTermRefTraverser.traverse(termRef)
@@ -49,8 +50,8 @@ private[traversers] class DefaultTermTraverserImpl(defaultTermRefTraverser: => D
     case `while`: While => whileTraverser.traverse(`while`)
     case `do`: Do => doTraverser.traverse(`do`)
     case `new`: New => newTraverser.traverse(`new`)
-    case newAnonymous: NewAnonymous => newAnonymous //TODO
-    case eta: Eta => eta //TODO
+    case newAnonymous: NewAnonymous => newAnonymous //TODO once TemplateTraverser is ready
+    case eta: Eta => etaTraverser.traverse(eta)
     case termRepeated: Term.Repeated => termRepeated //TODO
     case other => other
   }
