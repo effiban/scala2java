@@ -3,7 +3,6 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.{BlockContext, IfContext}
 import io.github.effiban.scala2java.core.matchers.BlockContextMatcher.eqBlockContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.{BlockTraversalResult, IfTraversalResult}
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
 
@@ -139,16 +138,23 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
       }
       """
 
-    doReturn(BlockTraversalResult(traversedBlock)).when(defaultBlockTraverser).traverse(eqTree(block), eqBlockContext(BlockContext()))
+    doReturn(TestableBlockTraversalResult(traversedBlock)).when(defaultBlockTraverser).traverse(eqTree(block), eqBlockContext(BlockContext()))
 
     defaultTermTraverser.traverse(block).structure shouldBe traversedBlock.structure
   }
 
   test("traverse() for Term.If") {
     val `if` = q"if (x < 3) doA() else doB()"
-    val traversedIf = q"if (x < 33) doAA() else doBB()"
+    val traversedIf =
+      q"""
+      if (x < 33) {
+        doAA()
+      } else {
+        doBB()
+      }
+      """
 
-    doReturn(IfTraversalResult(traversedIf)).when(defaultIfTraverser).traverse(eqTree(`if`), eqTo(IfContext()))
+    doReturn(TestableIfTraversalResult(traversedIf)).when(defaultIfTraverser).traverse(eqTree(`if`), eqTo(IfContext()))
 
     defaultTermTraverser.traverse(`if`).structure shouldBe traversedIf.structure
   }

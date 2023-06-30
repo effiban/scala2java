@@ -7,8 +7,7 @@ class CatchHandlerTraversalResultScalatestMatcher(expectedTraversalResult: Catch
   extends Matcher[CatchHandlerTraversalResult] {
 
   override def apply(actualTraversalResult: CatchHandlerTraversalResult): MatchResult = {
-    val matches = catchCaseMatches(actualTraversalResult) &&
-      actualTraversalResult.uncertainReturn == expectedTraversalResult.uncertainReturn
+    val matches = catchArgMatches(actualTraversalResult) && bodyMatches(actualTraversalResult)
 
     MatchResult(matches,
       s"Actual traversal result: $actualTraversalResult is NOT the same as expected traversal result: $expectedTraversalResult",
@@ -16,10 +15,14 @@ class CatchHandlerTraversalResultScalatestMatcher(expectedTraversalResult: Catch
     )
   }
 
+  private def bodyMatches(actualTraversalResult: CatchHandlerTraversalResult): Boolean = {
+    new BlockTraversalResultScalatestMatcher(expectedTraversalResult.bodyResult)(actualTraversalResult.bodyResult).matches
+  }
+
   override def toString: String = s"Matcher for: $expectedTraversalResult"
 
-  private def catchCaseMatches(actualTraversalResult: CatchHandlerTraversalResult) = {
-    actualTraversalResult.catchCase.structure == expectedTraversalResult.catchCase.structure
+  private def catchArgMatches(actualTraversalResult: CatchHandlerTraversalResult) = {
+    actualTraversalResult.pat.structure == expectedTraversalResult.pat.structure
   }
 }
 
