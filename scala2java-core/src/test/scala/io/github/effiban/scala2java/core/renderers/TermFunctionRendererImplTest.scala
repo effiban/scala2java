@@ -108,7 +108,7 @@ class TermFunctionRendererImplTest extends UnitTestSuite {
     )
     val function = Term.Function(params = List(param), body = functionBody)
 
-    val expectedBlockContext = BlockRenderContext(lastStatContext = SimpleBlockStatRenderContext(uncertainReturn = true))
+    val bodyContext = BlockRenderContext(lastStatContext = SimpleBlockStatRenderContext(uncertainReturn = true))
 
     doWrite("val1")
       .when(termParamRenderer).render(termParam = eqTree(param), context = eqTo(TermParamRenderContext()))
@@ -118,10 +118,10 @@ class TermFunctionRendererImplTest extends UnitTestSuite {
         |  /* return? */ last;
         |}""".stripMargin
     ).when(blockRenderer).render(
-      block = eqTree(functionBody), context = eqBlockRenderContext(expectedBlockContext)
+      block = eqTree(functionBody), context = eqBlockRenderContext(bodyContext)
     )
 
-    termFunctionRenderer.render(function, context = TermFunctionRenderContext(uncertainReturn = true))
+    termFunctionRenderer.render(function, context = TermFunctionRenderContext(bodyContext))
 
     outputWriter.toString shouldBe
       """val1 ->  {
