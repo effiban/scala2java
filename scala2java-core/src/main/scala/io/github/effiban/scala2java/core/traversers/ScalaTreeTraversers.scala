@@ -269,7 +269,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
     whileTraverser,
     doTraverser,
     newTraverser,
-    etaTraverser
+    etaTraverser,
+    termRepeatedTraverser
   )
 
   private lazy val defnDefTraverser: DefnDefTraverser = new DefnDefTraverserImpl(
@@ -649,6 +650,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
   )
 
   private lazy val deprecatedTermRepeatedTraverser: DeprecatedTermRepeatedTraverser = new DeprecatedTermRepeatedTraverserImpl(deprecatedExpressionTermTraverser)
+
+  private lazy val termRepeatedTraverser: TermRepeatedTraverser = new TermRepeatedTraverserImpl(expressionTermTraverser)
 
   private lazy val deprecatedTermTupleTraverser: DeprecatedTermTupleTraverser = new DeprecatedTermTupleTraverserImpl(
     deprecatedTermApplyTraverser,
