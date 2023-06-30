@@ -24,6 +24,7 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
   private val defaultIfTraverser = mock[DefaultIfTraverser]
   private val termMatchTraverser = mock[TermMatchTraverser]
   private val tryTraverser = mock[TryTraverser]
+  private val tryWithHandlerTraverser = mock[TryWithHandlerTraverser]
 
   private val defaultTermTraverser = new DefaultTermTraverserImpl(
     defaultTermRefTraverser,
@@ -39,7 +40,8 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
     defaultBlockTraverser,
     defaultIfTraverser,
     termMatchTraverser,
-    tryTraverser
+    tryTraverser,
+    tryWithHandlerTraverser
   )
 
   test("traverse() for Term.Name") {
@@ -203,6 +205,22 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
       .when(tryTraverser).traverse(eqTree(termTry), eqTo(TryContext()))
 
     defaultTermTraverser.traverse(termTry).structure shouldBe traversedTermTry.structure
+  }
+
+  test("traverse() for Term.TryWithHandler") {
+    val tryWithHandler = q"try(doSomething) catch(catchHandler)"
+
+    val traversedTryWithHandler =
+      q"""
+      try {
+        doSomething2
+      } catch(catchHandler)
+      """
+
+    doReturn(TestableTryWithHandlerTraversalResult(traversedTryWithHandler))
+      .when(tryWithHandlerTraverser).traverse(eqTree(tryWithHandler), eqTo(TryContext()))
+
+    defaultTermTraverser.traverse(tryWithHandler).structure shouldBe traversedTryWithHandler.structure
   }
 
   test("traverse() for Term.Placeholder") {
