@@ -266,7 +266,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
     termFunctionTraverser,
     partialFunctionTraverser,
     anonymousFunctionTraverser,
-    whileTraverser
+    whileTraverser,
+    doTraverser
   )
 
   private lazy val defnDefTraverser: DefnDefTraverser = new DefnDefTraverserImpl(
@@ -327,6 +328,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
   )
 
   private lazy val deprecatedDoTraverser: DeprecatedDoTraverser = new DeprecatedDoTraverserImpl(deprecatedExpressionTermTraverser, deprecatedBlockTraverser)
+
+  private lazy val doTraverser: DoTraverser = new DoTraverserImpl(blockWrappingTermTraverser, expressionTermTraverser)
 
   private lazy val enumConstantListTraverser: EnumConstantListTraverser = new EnumConstantListTraverserImpl(deprecatedArgumentListTraverser)
 
