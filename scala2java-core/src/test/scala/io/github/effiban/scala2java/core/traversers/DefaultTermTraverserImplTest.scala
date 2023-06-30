@@ -8,7 +8,7 @@ import io.github.effiban.scala2java.core.traversers.results.SingleTermFunctionTr
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
 
-import scala.meta.Term.AnonymousFunction
+import scala.meta.Term.{AnonymousFunction, Eta}
 import scala.meta.{Lit, Term, XtensionQuasiquoteTerm}
 
 class DefaultTermTraverserImplTest extends UnitTestSuite {
@@ -34,6 +34,7 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
   private val whileTraverser = mock[WhileTraverser]
   private val doTraverser = mock[DoTraverser]
   private val newTraverser = mock[NewTraverser]
+  private val etaTraverser = mock[EtaTraverser]
 
   private val defaultTermTraverser = new DefaultTermTraverserImpl(
     defaultTermRefTraverser,
@@ -56,7 +57,8 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
     anonymousFunctionTraverser,
     whileTraverser,
     doTraverser,
-    newTraverser
+    newTraverser,
+    etaTraverser
   )
 
   test("traverse() for Term.Name") {
@@ -316,6 +318,14 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
     doReturn(traversedNew).when(newTraverser).traverse(eqTree(`new`))
 
     defaultTermTraverser.traverse(`new`).structure shouldBe traversedNew.structure
+  }
+
+  test("traverse() for Eta") {
+    val eta = Eta(q"method()")
+    val traversedEta = Eta(q"traversedMethod()")
+
+    doReturn(traversedEta).when(etaTraverser).traverse(eqTree(eta))
+    defaultTermTraverser.traverse(eta).structure shouldBe traversedEta.structure
   }
 
   test("traverse() for Term.Placeholder") {
