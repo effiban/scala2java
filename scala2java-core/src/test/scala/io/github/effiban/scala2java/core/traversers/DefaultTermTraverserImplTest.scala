@@ -1,8 +1,10 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{BlockContext, IfContext, TryContext}
+import io.github.effiban.scala2java.core.entities.Decision.No
 import io.github.effiban.scala2java.core.matchers.BlockContextMatcher.eqBlockContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
+import io.github.effiban.scala2java.core.traversers.results.SingleTermFunctionTraversalResult
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
 
@@ -25,6 +27,7 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
   private val termMatchTraverser = mock[TermMatchTraverser]
   private val tryTraverser = mock[TryTraverser]
   private val tryWithHandlerTraverser = mock[TryWithHandlerTraverser]
+  private val termFunctionTraverser = mock[TermFunctionTraverser]
 
   private val defaultTermTraverser = new DefaultTermTraverserImpl(
     defaultTermRefTraverser,
@@ -41,7 +44,8 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
     defaultIfTraverser,
     termMatchTraverser,
     tryTraverser,
-    tryWithHandlerTraverser
+    tryWithHandlerTraverser,
+    termFunctionTraverser
   )
 
   test("traverse() for Term.Name") {
@@ -221,6 +225,16 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
       .when(tryWithHandlerTraverser).traverse(eqTree(tryWithHandler), eqTo(TryContext()))
 
     defaultTermTraverser.traverse(tryWithHandler).structure shouldBe traversedTryWithHandler.structure
+  }
+
+  test("traverse() for Term.Function") {
+    val termFunction = q"arg => doSomething(arg)"
+    val traversedTermFunction = q"traversedArg => doSomethingElse(traversedArg)"
+
+    doReturn(SingleTermFunctionTraversalResult(traversedTermFunction))
+      .when(termFunctionTraverser).traverse(eqTree(termFunction), eqTo(No))
+
+    defaultTermTraverser.traverse(termFunction).structure shouldBe traversedTermFunction.structure
   }
 
   test("traverse() for Term.Placeholder") {

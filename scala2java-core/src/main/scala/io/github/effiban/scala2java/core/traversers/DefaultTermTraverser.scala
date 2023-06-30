@@ -19,7 +19,8 @@ private[traversers] class DefaultTermTraverserImpl(defaultTermRefTraverser: => D
                                                    defaultIfTraverser: => DefaultIfTraverser,
                                                    termMatchTraverser: => TermMatchTraverser,
                                                    tryTraverser: => TryTraverser,
-                                                   tryWithHandlerTraverser: => TryWithHandlerTraverser)
+                                                   tryWithHandlerTraverser: => TryWithHandlerTraverser,
+                                                   termFunctionTraverser: => TermFunctionTraverser)
   extends DefaultTermTraverser {
 
   override def traverse(term: Term): Term = term match {
@@ -38,7 +39,7 @@ private[traversers] class DefaultTermTraverserImpl(defaultTermRefTraverser: => D
     case `match`: Term.Match => termMatchTraverser.traverse(`match`)
     case `try`: Try => tryTraverser.traverse(`try`).stat
     case tryWithHandler: TryWithHandler => tryWithHandlerTraverser.traverse(tryWithHandler).stat
-    case `function`: Term.Function => `function` //TODO
+    case `function`: Term.Function => termFunctionTraverser.traverse(`function`).function
     case partialFunction: Term.PartialFunction => partialFunction //TODO
     case anonFunction: AnonymousFunction => anonFunction //TODO
     case `while`: While => `while` //TODO
