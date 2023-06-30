@@ -267,7 +267,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
     partialFunctionTraverser,
     anonymousFunctionTraverser,
     whileTraverser,
-    doTraverser
+    doTraverser,
+    newTraverser
   )
 
   private lazy val defnDefTraverser: DefnDefTraverser = new DefnDefTraverserImpl(
@@ -437,6 +438,12 @@ class ScalaTreeTraversers(implicit factories: Factories,
   private lazy val deprecatedNewTraverser: DeprecatedNewTraverser = new DeprecatedNewTraverserImpl(
     deprecatedInitTraverser,
     deprecatedArrayInitializerTraverser,
+    ArrayInitializerContextResolver
+  )
+
+  private lazy val newTraverser: NewTraverser = new NewTraverserImpl(
+    initTraverser,
+    arrayInitializerTraverser,
     ArrayInitializerContextResolver
   )
 
