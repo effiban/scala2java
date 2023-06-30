@@ -32,6 +32,7 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
   private val partialFunctionTraverser = mock[PartialFunctionTraverser]
   private val anonymousFunctionTraverser = mock[AnonymousFunctionTraverser]
   private val whileTraverser = mock[WhileTraverser]
+  private val doTraverser = mock[DoTraverser]
 
   private val defaultTermTraverser = new DefaultTermTraverserImpl(
     defaultTermRefTraverser,
@@ -52,7 +53,8 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
     termFunctionTraverser,
     partialFunctionTraverser,
     anonymousFunctionTraverser,
-    whileTraverser
+    whileTraverser,
+    doTraverser
   )
 
   test("traverse() for Term.Name") {
@@ -289,6 +291,20 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
     doReturn(traversedWhile).when(whileTraverser).traverse(eqTree(`while`))
 
     defaultTermTraverser.traverse(`while`).structure shouldBe traversedWhile.structure
+  }
+
+  test("traverse() for Do") {
+    val `do` = q"do theAction(x) while (x < 3)"
+    val traversedDo =
+      q"""
+      do {
+        theAction(xx)
+      } while (xx < 33)
+      """
+
+    doReturn(traversedDo).when(doTraverser).traverse(eqTree(`do`))
+
+    defaultTermTraverser.traverse(`do`).structure shouldBe traversedDo.structure
   }
 
   test("traverse() for Term.Placeholder") {
