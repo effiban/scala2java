@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.{BlockContext, IfContext}
+import io.github.effiban.scala2java.core.contexts.{BlockContext, IfContext, TryContext}
 import io.github.effiban.scala2java.core.matchers.BlockContextMatcher.eqBlockContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -23,6 +23,7 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
   private val defaultBlockTraverser = mock[DefaultBlockTraverser]
   private val defaultIfTraverser = mock[DefaultIfTraverser]
   private val termMatchTraverser = mock[TermMatchTraverser]
+  private val tryTraverser = mock[TryTraverser]
 
   private val defaultTermTraverser = new DefaultTermTraverserImpl(
     defaultTermRefTraverser,
@@ -37,7 +38,8 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
     termTupleTraverser,
     defaultBlockTraverser,
     defaultIfTraverser,
-    termMatchTraverser
+    termMatchTraverser,
+    tryTraverser
   )
 
   test("traverse() for Term.Name") {
@@ -181,6 +183,26 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
     doReturn(traversedTermMatch).when(termMatchTraverser).traverse(eqTree(termMatch))
 
     defaultTermTraverser.traverse(termMatch).structure shouldBe traversedTermMatch.structure
+  }
+
+  test("traverse() for Term.Try") {
+    val termTry = q"try(doSomething) catch { case e: Exception1 => log(error) }"
+
+    val traversedTermTry =
+      q"""
+      try {
+        doSomething
+      } catch {
+        case ee: Exception11 => {
+          log(error)
+        }
+      }
+      """
+
+    doReturn(TestableTryTraversalResult(traversedTermTry, catchUncertainReturns = List(false)))
+      .when(tryTraverser).traverse(eqTree(termTry), eqTo(TryContext()))
+
+    defaultTermTraverser.traverse(termTry).structure shouldBe traversedTermTry.structure
   }
 
   test("traverse() for Term.Placeholder") {

@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.IfContext
+import io.github.effiban.scala2java.core.contexts.{IfContext, TryContext}
 import io.github.effiban.scala2java.core.entities.Decision.{Decision, No, Uncertain, Yes}
 import io.github.effiban.scala2java.core.resolvers.ShouldReturnValueResolver
 import io.github.effiban.scala2java.core.traversers.results.{BlockStatTraversalResult, SimpleBlockStatTraversalResult}
@@ -15,13 +15,14 @@ trait BlockLastStatTraverser {
 
 private[traversers] class BlockLastStatTraverserImpl(blockStatTraverser: => BlockStatTraverser,
                                                      defaultIfTraverser: => DefaultIfTraverser,
+                                                     tryTraverser: => TryTraverser,
                                                      shouldReturnValueResolver: => ShouldReturnValueResolver)
   extends BlockLastStatTraverser {
 
   override def traverse(stat: Stat, shouldReturnValue: Decision = No): BlockStatTraversalResult = {
     stat match {
       case `if`: If => traverseIf(`if`, shouldReturnValue)
-      case `try`: Try => SimpleBlockStatTraversalResult(`try`) // TODO
+      case `try`: Try => traverseTry(`try`, shouldReturnValue)
       case tryWithHandler: TryWithHandler => SimpleBlockStatTraversalResult(tryWithHandler) //TODO
       case term: Term => traverseSimpleTerm(term, shouldReturnValue)
       case aStat => SimpleBlockStatTraversalResult(traverseInner(aStat))
@@ -30,6 +31,10 @@ private[traversers] class BlockLastStatTraverserImpl(blockStatTraverser: => Bloc
 
   private def traverseIf(`if`: If, shouldReturnValue: Decision) = {
     defaultIfTraverser.traverse(`if`, IfContext(shouldReturnValue))
+  }
+
+  private def traverseTry(`try`: Try, shouldReturnValue: Decision) = {
+    tryTraverser.traverse(`try`, TryContext(shouldReturnValue))
   }
 
   private def traverseSimpleTerm(term: Term, shouldReturnValue: Decision): SimpleBlockStatTraversalResult = {
