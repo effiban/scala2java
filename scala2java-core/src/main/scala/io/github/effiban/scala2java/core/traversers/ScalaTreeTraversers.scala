@@ -42,6 +42,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val deprecatedAnonymousFunctionTraverser: DeprecatedAnonymousFunctionTraverser = new DeprecatedAnonymousFunctionTraverserImpl(deprecatedTermFunctionTraverser)
 
+  private lazy val anonymousFunctionTraverser: AnonymousFunctionTraverser = new AnonymousFunctionTraverserImpl(termFunctionTraverser)
+
   private lazy val applyTypeTraverser: ApplyTypeTraverser = new ApplyTypeTraverserImpl(expressionTermTraverser, typeTraverser)
 
   private lazy val deprecatedApplyUnaryTraverser: DeprecatedApplyUnaryTraverser = new DeprecatedApplyUnaryTraverserImpl(termNameRenderer, deprecatedExpressionTermTraverser)
@@ -261,7 +263,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
     termMatchTraverser,
     tryTraverser,
     tryWithHandlerTraverser,
-    termFunctionTraverser
+    termFunctionTraverser,
+    anonymousFunctionTraverser
   )
 
   private lazy val defnDefTraverser: DefnDefTraverser = new DefnDefTraverserImpl(
