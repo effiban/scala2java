@@ -15,17 +15,17 @@ private[traversers] class DeclVarTraverserImpl(modListTraverser: => ModListTrave
                                                patTraverser: => PatTraverser) extends DeclVarTraverser {
 
   //TODO replace mutable interface data member (invalid in Java) with accessor / mutator methods
-  override def traverse(varDecl: Decl.Var, context: StatContext = StatContext()): DeclVarTraversalResult = {
-    val modListResult = modListTraverser.traverse(ModifiersContext(varDecl, JavaTreeType.Variable, context.javaScope))
+  override def traverse(declVar: Decl.Var, context: StatContext = StatContext()): DeclVarTraversalResult = {
+    val modListResult = modListTraverser.traverse(ModifiersContext(declVar, JavaTreeType.Variable, context.javaScope))
     //TODO - verify when not simple case
-    val traversedPats = varDecl.pats.map(patTraverser.traverse)
-    val traversedType = typeTraverser.traverse(varDecl.decltpe)
+    val traversedPats = declVar.pats.map(patTraverser.traverse)
+    val traversedType = typeTraverser.traverse(declVar.decltpe)
 
-    val declVar = Decl.Var(
+    val traversedDeclVar = Decl.Var(
       mods = modListResult.scalaMods,
       pats = traversedPats,
       decltpe = traversedType
     )
-    DeclVarTraversalResult(declVar, modListResult.javaModifiers)
+    DeclVarTraversalResult(traversedDeclVar, modListResult.javaModifiers)
   }
 }
