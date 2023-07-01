@@ -311,6 +311,11 @@ class ScalaTreeTraversers(implicit factories: Factories,
     termTypeInferrer
   )
 
+  private lazy val defnValOrVarTypeTraverser: DefnValOrVarTypeTraverser = new DefnValOrVarTypeTraverserImpl(
+    typeTraverser,
+    termTypeInferrer
+  )
+
   private lazy val deprecatedDefnValTraverser: DeprecatedDefnValTraverser = new DeprecatedDefnValTraverserImpl(
     deprecatedModListTraverser,
     deprecatedDefnValOrVarTypeTraverser,
