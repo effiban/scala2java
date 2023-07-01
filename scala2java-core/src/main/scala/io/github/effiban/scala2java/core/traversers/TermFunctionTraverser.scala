@@ -22,7 +22,7 @@ private[traversers] class TermFunctionTraverserImpl(termParamTraverser: => TermP
     val traversedParams = function.params
       .map(param => termParamTraverser.traverse(param, paramContext))
       // Ignoring the returned Java modifiers here, since there cannot be any Java modifiers for a lambda param
-      .map(_.termParam)
+      .map(_.tree)
 
     function.body match {
       case block: Block => traverseBlockBody(shouldBodyReturnValue, traversedParams, block)

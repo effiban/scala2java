@@ -111,6 +111,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
   private lazy val blockStatTraverser: BlockStatTraverser = new BlockStatTraverserImpl(
     expressionTermRefTraverser,
     defaultTermTraverser,
+    defnValTraverser,
     defnVarTraverser,
     declVarTraverser
   )
@@ -331,6 +332,16 @@ class ScalaTreeTraversers(implicit factories: Factories,
     patListRenderer,
     deprecatedExpressionTermTraverser,
     deprecatedDeclVarTraverser,
+    new CompositeDefnValToDeclVarTransformer,
+    new CompositeDefnValTransformer
+  )
+
+  private lazy val defnValTraverser: DefnValTraverser = new DefnValTraverserImpl(
+    modListTraverser,
+    defnValOrVarTypeTraverser,
+    patTraverser,
+    expressionTermTraverser,
+    declVarTraverser,
     new CompositeDefnValToDeclVarTransformer,
     new CompositeDefnValTransformer
   )

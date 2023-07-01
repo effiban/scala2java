@@ -3,7 +3,7 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.{ModifiersContext, StatContext}
 import io.github.effiban.scala2java.core.entities.{JavaModifier, JavaTreeType}
 import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
-import io.github.effiban.scala2java.core.matchers.TermParamTraversalResultScalatestMatcher.equalTermParamTraversalResult
+import io.github.effiban.scala2java.core.matchers.WithJavaModifiersTraversalResultScalatestMatcher.equalWithJavaModifiersTraversalResult
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.traversers.results.{ModListTraversalResult, TermParamTraversalResult}
 import io.github.effiban.scala2java.spi.entities.JavaScope
@@ -64,7 +64,7 @@ class TermParamTraverserImplTest extends UnitTestSuite {
     doReturn(TheTraversedType).when(typeTraverser).traverse(eqTree(TheType))
     doReturn(TheTraversedDefault).when(expressionTermTraverser).traverse(eqTree(TheDefault))
 
-    termParamTraverser.traverse(termParam, TheStatContext) should equalTermParamTraversalResult(expectedResult)
+    termParamTraverser.traverse(termParam, TheStatContext) should equalWithJavaModifiersTraversalResult(expectedResult)
   }
 
   test("traverse without type and without default") {
@@ -88,7 +88,7 @@ class TermParamTraverserImplTest extends UnitTestSuite {
 
     termParamTraverser.traverse(termParam, TheStatContext)
 
-    termParamTraverser.traverse(termParam, TheStatContext) should equalTermParamTraversalResult(expectedResult)
+    termParamTraverser.traverse(termParam, TheStatContext) should equalWithJavaModifiersTraversalResult(expectedResult)
   }
 
   private def eqExpectedModifiers(termParam: Term.Param) = {

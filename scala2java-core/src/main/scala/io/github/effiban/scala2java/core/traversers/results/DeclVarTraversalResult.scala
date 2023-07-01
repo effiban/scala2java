@@ -4,4 +4,6 @@ import io.github.effiban.scala2java.core.entities.JavaModifier
 
 import scala.meta.Decl
 
-case class DeclVarTraversalResult(declVar: Decl.Var, javaModifiers: List[JavaModifier] = Nil)
+case class DeclVarTraversalResult(override val tree: Decl.Var, override val javaModifiers: List[JavaModifier] = Nil)
+  extends StatWithJavaModifiersTraversalResult {
+}
