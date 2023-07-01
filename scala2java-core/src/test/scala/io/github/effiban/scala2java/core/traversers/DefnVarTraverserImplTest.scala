@@ -2,8 +2,8 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{ModifiersContext, StatContext}
 import io.github.effiban.scala2java.core.entities.{JavaModifier, JavaTreeType}
-import io.github.effiban.scala2java.core.matchers.DefnVarTraversalResultScalatestMatcher.equalDefnVarTraversalResult
 import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
+import io.github.effiban.scala2java.core.matchers.WithJavaModifiersTraversalResultScalatestMatcher.equalWithJavaModifiersTraversalResult
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.traversers.results.{DefnVarTraversalResult, ModListTraversalResult}
 import io.github.effiban.scala2java.spi.entities.JavaScope
@@ -66,7 +66,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
     doReturn(MyTraversedVarPat).when(patTraverser).traverse(eqTree(MyVarPat))
     doReturn(TheTraversedRhs).when(expressionTermTraverser).traverse(eqTree(TheRhs))
 
-    defnVarTraverser.traverse(defnVar, StatContext(javaScope)) should equalDefnVarTraversalResult(expectedResult)
+    defnVarTraverser.traverse(defnVar, StatContext(javaScope)) should equalWithJavaModifiersTraversalResult(expectedResult)
   }
 
   test("traverse() when it is a class member - typed without value") {
@@ -90,7 +90,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
     doReturn(Some(TheTraversedType)).when(defnValOrVarTypeTraverser).traverse(eqSomeTree(TheType), eqTo(None))
     doReturn(MyTraversedVarPat).when(patTraverser).traverse(eqTree(MyVarPat))
 
-    defnVarTraverser.traverse(defnVar, StatContext(javaScope)) should equalDefnVarTraversalResult(expectedResult)
+    defnVarTraverser.traverse(defnVar, StatContext(javaScope)) should equalWithJavaModifiersTraversalResult(expectedResult)
   }
 
   test("traverse() when it is a class member - untyped with value - type inferred") {
@@ -115,7 +115,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
     doReturn(MyTraversedVarPat).when(patTraverser).traverse(eqTree(MyVarPat))
     doReturn(TheTraversedRhs).when(expressionTermTraverser).traverse(eqTree(TheRhs))
 
-    defnVarTraverser.traverse(defnVar, StatContext(javaScope)) should equalDefnVarTraversalResult(expectedResult)
+    defnVarTraverser.traverse(defnVar, StatContext(javaScope)) should equalWithJavaModifiersTraversalResult(expectedResult)
   }
 
   test("traverse() when it is a class member - untyped with value - type not inferred") {
@@ -140,7 +140,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
     doReturn(MyTraversedVarPat).when(patTraverser).traverse(eqTree(MyVarPat))
     doReturn(TheTraversedRhs).when(expressionTermTraverser).traverse(eqTree(TheRhs))
 
-    defnVarTraverser.traverse(defnVar, StatContext(javaScope)) should equalDefnVarTraversalResult(expectedResult)
+    defnVarTraverser.traverse(defnVar, StatContext(javaScope)) should equalWithJavaModifiersTraversalResult(expectedResult)
   }
 
   test("traverse() when it is an interface member - typed with value") {
@@ -165,7 +165,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
     doReturn(MyTraversedVarPat).when(patTraverser).traverse(eqTree(MyVarPat))
     doReturn(TheTraversedRhs).when(expressionTermTraverser).traverse(eqTree(TheRhs))
 
-    defnVarTraverser.traverse(defnVar, StatContext(javaScope)) should equalDefnVarTraversalResult(expectedResult)
+    defnVarTraverser.traverse(defnVar, StatContext(javaScope)) should equalWithJavaModifiersTraversalResult(expectedResult)
   }
 
   test("traverse() when it is an interface member - typed without value") {
@@ -189,7 +189,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
     doReturn(Some(TheTraversedType)).when(defnValOrVarTypeTraverser).traverse(eqSomeTree(TheType), eqTo(None))
     doReturn(MyTraversedVarPat).when(patTraverser).traverse(eqTree(MyVarPat))
 
-    defnVarTraverser.traverse(defnVar, StatContext(javaScope)) should equalDefnVarTraversalResult(expectedResult)
+    defnVarTraverser.traverse(defnVar, StatContext(javaScope)) should equalWithJavaModifiersTraversalResult(expectedResult)
   }
 
   test("traverse() when it is an interface member - untyped with value - type inferred") {
@@ -214,7 +214,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
     doReturn(MyTraversedVarPat).when(patTraverser).traverse(eqTree(MyVarPat))
     doReturn(TheTraversedRhs).when(expressionTermTraverser).traverse(eqTree(TheRhs))
 
-    defnVarTraverser.traverse(defnVar, StatContext(javaScope)) should equalDefnVarTraversalResult(expectedResult)
+    defnVarTraverser.traverse(defnVar, StatContext(javaScope)) should equalWithJavaModifiersTraversalResult(expectedResult)
   }
 
   test("traverse() when it is an interface member - untyped with value - type not inferred") {
@@ -239,7 +239,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
     doReturn(MyTraversedVarPat).when(patTraverser).traverse(eqTree(MyVarPat))
     doReturn(TheTraversedRhs).when(expressionTermTraverser).traverse(eqTree(TheRhs))
 
-    defnVarTraverser.traverse(defnVar, StatContext(javaScope)) should equalDefnVarTraversalResult(expectedResult)
+    defnVarTraverser.traverse(defnVar, StatContext(javaScope)) should equalWithJavaModifiersTraversalResult(expectedResult)
   }
 
   private def eqExpectedModifiers(defnVar: Defn.Var, javaScope: JavaScope) = {
