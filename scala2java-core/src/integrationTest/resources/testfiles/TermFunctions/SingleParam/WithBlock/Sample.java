@@ -12,7 +12,7 @@ public class Sample {
     public void foo() {
         x ->  {
             doSomething(x);
-            /* return? */doSomethingElse(x);
+            doSomethingElse(x);
         }
     }
 }

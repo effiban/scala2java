@@ -10,6 +10,6 @@ import java.util.stream.*;
 public class Sample {
 
     public void foo() {
-        final var parity = (x % 2 == 0) ? "even" : "odd";
+        final String parity = (x % 2 == 0) ? "even" : "odd";
     }
 }

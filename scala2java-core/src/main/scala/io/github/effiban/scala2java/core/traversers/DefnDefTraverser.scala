@@ -4,7 +4,8 @@ import io.github.effiban.scala2java.core.contexts.{BlockContext, DefnDefContext,
 import io.github.effiban.scala2java.core.entities.Decision.{No, Uncertain, Yes}
 import io.github.effiban.scala2java.core.entities.JavaTreeType
 import io.github.effiban.scala2java.core.entities.TraversalConstants.UnknownType
-import io.github.effiban.scala2java.core.renderers.{TermNameRenderer, TypeRenderer}
+import io.github.effiban.scala2java.core.renderers.contextfactories.BlockRenderContextFactory
+import io.github.effiban.scala2java.core.renderers.{BlockRenderer, TermNameRenderer, TypeRenderer}
 import io.github.effiban.scala2java.core.typeinference.TermTypeInferrer
 import io.github.effiban.scala2java.core.writers.JavaWriter
 import io.github.effiban.scala2java.spi.entities.JavaScope
@@ -22,7 +23,9 @@ private[traversers] class DefnDefTraverserImpl(modListTraverser: => DeprecatedMo
                                                typeTraverser: => TypeTraverser,
                                                typeRenderer: => TypeRenderer,
                                                termParamListTraverser: => DeprecatedTermParamListTraverser,
-                                               blockTraverser: => DeprecatedBlockTraverser,
+                                               blockWrappingTermTraverser: => BlockWrappingTermTraverser,
+                                               blockRenderContextFactory: => BlockRenderContextFactory,
+                                               blockRenderer: => BlockRenderer,
                                                termTypeInferrer: => TermTypeInferrer,
                                                defnDefTransformer: DefnDefTransformer)
                                               (implicit javaWriter: JavaWriter) extends DefnDefTraverser {
@@ -48,7 +51,9 @@ private[traversers] class DefnDefTraverserImpl(modListTraverser: => DeprecatedMo
       case None => Uncertain
     }
     val blockContext = BlockContext(shouldReturnValue = shouldReturnValue, maybeInit = maybeInit)
-    blockTraverser.traverse(stat = defDef.body, context = blockContext)
+    val blockTraversalResult = blockWrappingTermTraverser.traverse(term = defDef.body, context = blockContext)
+    val blockRenderContext = blockRenderContextFactory(blockTraversalResult)
+    blockRenderer.render(blockTraversalResult.block, blockRenderContext)
   }
 
   private def traverseTypeParams(tparams: List[Type.Param]): Unit = {

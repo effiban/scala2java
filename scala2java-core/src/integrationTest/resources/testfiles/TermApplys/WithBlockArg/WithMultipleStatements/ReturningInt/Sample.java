@@ -13,7 +13,7 @@ public class Sample {
         doSomething(((Supplier<int>)() ->  {
             doFirst();
             doSecond();
-            /* return? */3;
+            3;
             }
             ).get());
     }
