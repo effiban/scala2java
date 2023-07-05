@@ -20,6 +20,7 @@ private[renderers] class DefnValOrVarTypeRendererImpl(typeRenderer: => TypeRende
                       context: ValOrVarRenderContext = ValOrVarRenderContext()): Unit = {
     maybeDeclType match {
       case Some(declType) => typeRenderer.render(declType)
+      // TODO write 'var' also if type is parameterized (Type.Apply)
       case None if context.inBlock => write("var")
       case _ => handleUnknownType()
     }

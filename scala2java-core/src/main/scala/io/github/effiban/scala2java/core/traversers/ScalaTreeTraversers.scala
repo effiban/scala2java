@@ -26,6 +26,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
   private lazy val renderers = new Renderers()
 
   import factories._
+  import io.github.effiban.scala2java.core.renderers.contextfactories.RenderContextFactories._
   import renderers._
   import resolvers._
   import transformers._
@@ -289,7 +290,9 @@ class ScalaTreeTraversers(implicit factories: Factories,
     typeTraverser,
     typeRenderer,
     deprecatedTermParamListTraverser,
-    deprecatedBlockTraverser,
+    blockWrappingTermTraverser,
+    blockRenderContextFactory,
+    blockRenderer,
     termTypeInferrer,
     new CompositeDefnDefTransformer()
   )

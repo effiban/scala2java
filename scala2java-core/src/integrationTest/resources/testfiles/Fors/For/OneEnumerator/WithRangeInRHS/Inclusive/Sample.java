@@ -10,6 +10,7 @@ import java.util.stream.*;
 public class Sample {
 
     public void foo() {
-        IntStream.rangeClosed(1, 4).forEach(i -> doSomething(i));
+        IntStream.rangeClosed(1, 4)
+                .forEach(i -> doSomething(i));
     }
 }

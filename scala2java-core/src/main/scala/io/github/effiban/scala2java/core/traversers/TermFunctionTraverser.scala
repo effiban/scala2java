@@ -25,8 +25,13 @@ private[traversers] class TermFunctionTraverserImpl(termParamTraverser: => TermP
       .map(_.tree)
 
     function.body match {
+      // Block of size 2 or more
+      case block@Block(_ :: _ :: _) => traverseBlockBody(shouldBodyReturnValue, traversedParams, block)
+      // Block of size 1 with a Term - treat as a plain term for nicer style, because Java does support a single-term lambda
+      case Block(List(term: Term)) => traverseSingleTermBody(traversedParams, term)
+      // Block of size 1 with a non-Term - must treat as a Block because a Java lambda body must be a Term
       case block: Block => traverseBlockBody(shouldBodyReturnValue, traversedParams, block)
-      case bodyTerm => traverseSingleTermBody(traversedParams, bodyTerm)
+      case term => traverseSingleTermBody(traversedParams, term)
     }
   }
 
@@ -37,8 +42,8 @@ private[traversers] class TermFunctionTraverserImpl(termParamTraverser: => TermP
     BlockTermFunctionTraversalResult(traversedParams, bodyResult)
   }
 
-  private def traverseSingleTermBody(traversedParams: List[Term.Param], bodyTerm: Term) = {
-    val traversedTerm = defaultTermTraverser.traverse(bodyTerm)
+  private def traverseSingleTermBody(traversedParams: List[Term.Param], term: Term) = {
+    val traversedTerm = defaultTermTraverser.traverse(term)
     SingleTermFunctionTraversalResult(Term.Function(traversedParams, traversedTerm))
   }
 }

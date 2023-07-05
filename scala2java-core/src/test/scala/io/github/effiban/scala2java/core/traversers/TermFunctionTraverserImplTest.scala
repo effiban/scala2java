@@ -84,7 +84,61 @@ class TermFunctionTraverserImplTest extends UnitTestSuite {
     termFunctionTraverser.traverse(function) should equalTermFunctionTraversalResult(expectedResult)
   }
 
-  test("traverse with one param and a block") {
+  test("traverse with one param and a block of one term") {
+    val param = param"arg: Int"
+    val traversedParam = param"traversedArg: Int"
+
+    val bodyAsTerm = q"doSomething(arg)"
+    val bodyAsBlock =
+      q"""
+      {
+        doSomething(arg)
+      }
+      """
+    val traversedBody = q"doSomethingg(traversedArg)"
+
+    val function = Term.Function(List(param), bodyAsBlock)
+    val traversedFunction = Term.Function(List(traversedParam), traversedBody)
+
+    val expectedFunctionTraversalResult = SingleTermFunctionTraversalResult(traversedFunction)
+
+    doReturn(TermParamTraversalResult(traversedParam)).when(termParamTraverser).traverse(eqTree(param), eqTo(LambdaStatContext))
+    doReturn(traversedBody).when(defaultTermTraverser).traverse(eqTree(bodyAsTerm))
+
+    termFunctionTraverser.traverse(function) should equalTermFunctionTraversalResult(expectedFunctionTraversalResult)
+  }
+
+  test("traverse with one param and a block of one non-term stat") {
+    val param = param"arg: Int"
+    val traversedParam = param"traversedArg: Int"
+
+    val body =
+      q"""
+      {
+        val y = arg
+      }
+      """
+    val traversedBody =
+      q"""
+      {
+        val yy = traversedArg
+      }
+      """
+
+    val function = Term.Function(List(param), body)
+
+    val blockTraversalResult = TestableBlockTraversalResult(traversedBody)
+    val expectedFunctionTraversalResult = BlockTermFunctionTraversalResult(List(traversedParam), blockTraversalResult)
+
+    doReturn(TermParamTraversalResult(traversedParam)).when(termParamTraverser).traverse(eqTree(param), eqTo(LambdaStatContext))
+    doReturn(TestableBlockTraversalResult(traversedBody))
+      .when(defaultBlockTraverser).traverse(eqTree(body), eqBlockContext(BlockContext(shouldReturnValue = No))
+    )
+
+    termFunctionTraverser.traverse(function) should equalTermFunctionTraversalResult(expectedFunctionTraversalResult)
+  }
+
+  test("traverse with one param and a block of two stats") {
     val param = param"arg: Int"
     val traversedParam = param"traversedArg: Int"
 
