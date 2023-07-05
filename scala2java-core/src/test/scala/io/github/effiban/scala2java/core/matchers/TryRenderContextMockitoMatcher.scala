@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.contexts.TryRenderContext
 import org.mockito.ArgumentMatcher
 import org.mockito.ArgumentMatchers.argThat
 
-class TryRenderContextMatcher(expectedContext: TryRenderContext) extends ArgumentMatcher[TryRenderContext] {
+class TryRenderContextMockitoMatcher(expectedContext: TryRenderContext) extends ArgumentMatcher[TryRenderContext] {
 
   override def matches(actualContext: TryRenderContext): Boolean = {
     exprContextMatches(actualContext) && catchContextsMatch(actualContext)
@@ -13,7 +13,7 @@ class TryRenderContextMatcher(expectedContext: TryRenderContext) extends Argumen
   override def toString: String = s"Matcher for: $expectedContext"
 
   private def exprContextMatches(actualContext: TryRenderContext) = {
-    new BlockRenderContextMatcher(expectedContext.exprContext).matches(actualContext.exprContext)
+    new BlockRenderContextMockitoMatcher(expectedContext.exprContext).matches(actualContext.exprContext)
   }
 
   private def catchContextsMatch(actualContext: TryRenderContext) = {
@@ -22,14 +22,15 @@ class TryRenderContextMatcher(expectedContext: TryRenderContext) extends Argumen
 
   private def catchContextMatches(actualTryContext: TryRenderContext, idx: Int): Boolean = {
     if (idx >= actualTryContext.catchContexts.length) {
-      return false;
+      false
+    } else {
+      val expectedCatchContext = expectedContext.catchContexts(idx)
+      val actualCatchContext = actualTryContext.catchContexts(idx)
+      new BlockRenderContextMockitoMatcher(expectedCatchContext).matches(actualCatchContext)
     }
-    val expectedCatchContext = expectedContext.catchContexts(idx)
-    val actualCatchContext = actualTryContext.catchContexts(idx)
-    new BlockRenderContextMatcher(expectedCatchContext).matches(actualCatchContext)
   }
 }
 
-object TryRenderContextMatcher {
-  def eqTryRenderContext(expectedContext: TryRenderContext): TryRenderContext = argThat(new TryRenderContextMatcher(expectedContext))
+object TryRenderContextMockitoMatcher {
+  def eqTryRenderContext(expectedContext: TryRenderContext): TryRenderContext = argThat(new TryRenderContextMockitoMatcher(expectedContext))
 }

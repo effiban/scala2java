@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.contexts.{BlockStatRenderContext, IfRen
 import org.mockito.ArgumentMatcher
 import org.mockito.ArgumentMatchers.argThat
 
-class BlockStatRenderContextMatcher(expectedContext: BlockStatRenderContext) extends ArgumentMatcher[BlockStatRenderContext] {
+class BlockStatRenderContextMockitoMatcher(expectedContext: BlockStatRenderContext) extends ArgumentMatcher[BlockStatRenderContext] {
 
   override def matches(actualContext: BlockStatRenderContext): Boolean = {
     matchesByType(actualContext)
@@ -15,9 +15,9 @@ class BlockStatRenderContextMatcher(expectedContext: BlockStatRenderContext) ext
       case (actualContext: SimpleBlockStatRenderContext, expectedContext: SimpleBlockStatRenderContext) =>
         actualContext == expectedContext
       case (actualContext: IfRenderContext, expectedContext: IfRenderContext) =>
-        new IfRenderContextMatcher(expectedContext).matches(actualContext)
+        new IfRenderContextMockitoMatcher(expectedContext).matches(actualContext)
       case (actualContext: TryRenderContext, expectedContext: TryRenderContext) =>
-        new TryRenderContextMatcher(expectedContext).matches(actualContext)
+        new TryRenderContextMockitoMatcher(expectedContext).matches(actualContext)
       case _ => false
     }
   }
@@ -25,6 +25,7 @@ class BlockStatRenderContextMatcher(expectedContext: BlockStatRenderContext) ext
   override def toString: String = s"Matcher for: $expectedContext"
 }
 
-object BlockStatRenderContextMatcher {
-  def eqBlockStatRenderContext(expectedContext: BlockStatRenderContext): BlockStatRenderContext = argThat(new BlockStatRenderContextMatcher(expectedContext))
+object BlockStatRenderContextMockitoMatcher {
+  def eqBlockStatRenderContext(expectedContext: BlockStatRenderContext): BlockStatRenderContext =
+    argThat(new BlockStatRenderContextMockitoMatcher(expectedContext))
 }

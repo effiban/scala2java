@@ -7,14 +7,14 @@ import org.mockito.ArgumentMatchers.argThat
 
 import scala.meta.Init
 
-class BlockRenderContextMatcher(expectedContext: BlockRenderContext) extends ArgumentMatcher[BlockRenderContext] {
+class BlockRenderContextMockitoMatcher(expectedContext: BlockRenderContext) extends ArgumentMatcher[BlockRenderContext] {
 
   override def matches(actualContext: BlockRenderContext): Boolean = {
     lastStatContextMatches(actualContext) && maybeInitMatches(actualContext)
   }
 
   private def lastStatContextMatches(actualContext: BlockRenderContext) = {
-    new BlockStatRenderContextMatcher(expectedContext.lastStatContext).matches(actualContext.lastStatContext)
+    new BlockStatRenderContextMockitoMatcher(expectedContext.lastStatContext).matches(actualContext.lastStatContext)
   }
 
   private def maybeInitMatches(actualContext: BlockRenderContext) = {
@@ -24,7 +24,8 @@ class BlockRenderContextMatcher(expectedContext: BlockRenderContext) extends Arg
   override def toString: String = s"Matcher for: $expectedContext"
 }
 
-object BlockRenderContextMatcher {
-  def eqBlockRenderContext(expectedContext: BlockRenderContext): BlockRenderContext = argThat(new BlockRenderContextMatcher(expectedContext))
+object BlockRenderContextMockitoMatcher {
+  def eqBlockRenderContext(expectedContext: BlockRenderContext): BlockRenderContext =
+    argThat(new BlockRenderContextMockitoMatcher(expectedContext))
 }
 
