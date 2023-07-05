@@ -3,8 +3,8 @@ package io.github.effiban.scala2java.core.renderers
 import io.github.effiban.scala2java.core.classifiers.JavaStatClassifier
 import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.entities.JavaModifier.Final
-import io.github.effiban.scala2java.core.matchers.IfRenderContextMatcher.eqIfRenderContext
-import io.github.effiban.scala2java.core.matchers.TryRenderContextMatcher.eqTryRenderContext
+import io.github.effiban.scala2java.core.matchers.IfRenderContextMockitoMatcher.eqIfRenderContext
+import io.github.effiban.scala2java.core.matchers.TryRenderContextMockitoMatcher.eqTryRenderContext
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
