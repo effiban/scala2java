@@ -3,7 +3,7 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.{JavaTreeTypeContext, ModifiersContext, StatContext}
 import io.github.effiban.scala2java.core.entities.JavaTreeTypeToKeywordMapping
 import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
-import io.github.effiban.scala2java.core.renderers.{ModListRenderer, TypeBoundsRenderer, TypeRenderer}
+import io.github.effiban.scala2java.core.renderers.{ModListRenderer, TypeBoundsRenderer, TypeParamListRenderer, TypeRenderer}
 import io.github.effiban.scala2java.core.resolvers.JavaTreeTypeResolver
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
@@ -17,7 +17,8 @@ trait DefnTypeTraverser {
 private[traversers] class DefnTypeTraverserImpl(modListTraverser: => ModListTraverser,
                                                 modifiersRenderContextFactory: ModifiersRenderContextFactory,
                                                 modListRenderer: => ModListRenderer,
-                                                typeParamListTraverser: => DeprecatedTypeParamListTraverser,
+                                                typeParamTraverser: => TypeParamTraverser,
+                                                typeParamListRenderer: => TypeParamListRenderer,
                                                 typeTraverser: => TypeTraverser,
                                                 typeRenderer: => TypeRenderer,
                                                 typeBoundsTraverser: => TypeBoundsTraverser,
@@ -35,7 +36,8 @@ private[traversers] class DefnTypeTraverserImpl(modListTraverser: => ModListTrav
     val modifiersRenderContext = modifiersRenderContextFactory(modListTraversalResult)
     modListRenderer.render(modifiersRenderContext)
     writeNamedType(JavaTreeTypeToKeywordMapping(javaTreeType), typeDef.name.value)
-    typeParamListTraverser.traverse(typeDef.tparams)
+    val traversedTypeParams = typeDef.tparams.map(typeParamTraverser.traverse)
+    typeParamListRenderer.render(traversedTypeParams)
     typeDef.bounds match {
       case Bounds(None, None) =>
       case bounds =>

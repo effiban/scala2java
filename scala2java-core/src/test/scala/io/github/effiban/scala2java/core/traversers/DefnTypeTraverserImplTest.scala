@@ -7,7 +7,7 @@ import io.github.effiban.scala2java.core.matchers.ModListTraversalResultMockitoM
 import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
 import io.github.effiban.scala2java.core.matchers.ModifiersRenderContextMatcher.eqModifiersRenderContext
 import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
-import io.github.effiban.scala2java.core.renderers.{ModListRenderer, TypeBoundsRenderer, TypeRenderer}
+import io.github.effiban.scala2java.core.renderers.{ModListRenderer, TypeBoundsRenderer, TypeParamListRenderer, TypeRenderer}
 import io.github.effiban.scala2java.core.resolvers.JavaTreeTypeResolver
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
@@ -15,10 +15,10 @@ import io.github.effiban.scala2java.core.traversers.results.ModListTraversalResu
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
-import org.mockito.ArgumentMatchersSugar.eqTo
+import org.mockito.ArgumentMatchersSugar.{any, eqTo}
 
 import scala.meta.Type.Bounds
-import scala.meta.{Defn, Init, Mod, Name, Type, XtensionQuasiquoteType}
+import scala.meta.{Defn, Init, Mod, Name, Type, XtensionQuasiquoteType, XtensionQuasiquoteTypeParam}
 
 class DefnTypeTraverserImplTest extends UnitTestSuite {
 
@@ -28,16 +28,13 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
     )
   )
 
-  private val TypeParams = List(
-    Type.Param(
-      mods = List(),
-      name = Type.Name("T"),
-      tparams = List(),
-      tbounds = Bounds(lo = None, hi = None),
-      vbounds = List(),
-      cbounds = List()
-    )
-  )
+  private val TypeParam1 = tparam"T1"
+  private val TypeParam2 = tparam"T2"
+  private val TypeParams = List(TypeParam1, TypeParam2)
+
+  private val TraversedTypeParam1 = tparam"T11"
+  private val TraversedTypeParam2 = tparam"T22"
+  private val TraversedTypeParams = List(TraversedTypeParam1, TraversedTypeParam2)
 
   private val MyType = t"MyType"
   private val MyOtherType = t"MyOtherType"
@@ -46,7 +43,8 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
   private val modListTraverser = mock[ModListTraverser]
   private val modifiersRenderContextFactory = mock[ModifiersRenderContextFactory]
   private val modListRenderer = mock[ModListRenderer]
-  private val typeParamListTraverser = mock[DeprecatedTypeParamListTraverser]
+  private val typeParamTraverser = mock[TypeParamTraverser]
+  private val typeParamListRenderer = mock[TypeParamListRenderer]
   private val typeTraverser = mock[TypeTraverser]
   private val typeRenderer = mock[TypeRenderer]
   private val typeBoundsTraverser = mock[TypeBoundsTraverser]
@@ -57,7 +55,8 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
     modListTraverser,
     modifiersRenderContextFactory,
     modListRenderer,
-    typeParamListTraverser,
+    typeParamTraverser,
+    typeParamListRenderer,
     typeTraverser,
     typeRenderer,
     typeBoundsTraverser,
@@ -86,7 +85,12 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |private """.stripMargin)
       .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
-    doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
+    doAnswer((tparam: Type.Param) => tparam match {
+      case aTypeParam if aTypeParam.structure == TypeParam1.structure => TraversedTypeParam1
+      case aTypeParam if aTypeParam.structure == TypeParam2.structure => TraversedTypeParam2
+      case aTypeParam => aTypeParam
+    }).when(typeParamTraverser).traverse(any[Type.Param])
+    doWrite("<T11, T22>").when(typeParamListRenderer).render(eqTreeList(TraversedTypeParams))
     doReturn(MyTraversedOtherType).when(typeTraverser).traverse(eqTree(MyOtherType))
     doWrite("MyTraversedOtherType").when(typeRenderer).render(eqTree(MyTraversedOtherType))
 
@@ -94,7 +98,7 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
 
     outputWriter.toString shouldBe
       """@MyAnnotation
-        |private interface MyType<T> extends MyTraversedOtherType {
+        |private interface MyType<T11, T22> extends MyTraversedOtherType {
         |}
         |""".stripMargin
   }
@@ -121,7 +125,12 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |private """.stripMargin)
       .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
-    doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
+    doAnswer((tparam: Type.Param) => tparam match {
+      case aTypeParam if aTypeParam.structure == TypeParam1.structure => TraversedTypeParam1
+      case aTypeParam if aTypeParam.structure == TypeParam2.structure => TraversedTypeParam2
+      case aTypeParam => aTypeParam
+    }).when(typeParamTraverser).traverse(any[Type.Param])
+    doWrite("<T11, T22>").when(typeParamListRenderer).render(eqTreeList(TraversedTypeParams))
     doReturn(traversedBounds).when(typeBoundsTraverser).traverse(eqTree(bounds))
     doWrite("extends MyTraversedOtherType").when(typeBoundsRenderer).render(eqTree(traversedBounds))
 
@@ -129,7 +138,7 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
 
     outputWriter.toString shouldBe
       """@MyAnnotation
-        |private interface MyType<T> extends MyTraversedOtherType {
+        |private interface MyType<T11, T22> extends MyTraversedOtherType {
         |}
         |""".stripMargin
   }
