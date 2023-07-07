@@ -1,65 +1,91 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.{ClassOrTraitContext, DefnDefContext, StatContext}
+import io.github.effiban.scala2java.core.contexts.{ClassOrTraitContext, DefnDefContext, StatContext, ValOrVarRenderContext}
+import io.github.effiban.scala2java.core.entities.JavaModifier
 import io.github.effiban.scala2java.core.matchers.DefnDefContextMatcher.eqDefnDefContext
+import io.github.effiban.scala2java.core.renderers.{DeclVarRenderer, DefnValRenderer, DefnVarRenderer}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
+import io.github.effiban.scala2java.core.traversers.results.{DeclVarTraversalResult, DefnValTraversalResult, DefnVarTraversalResult}
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
-import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.Ctor.Primary
 import scala.meta.Term.Apply
-import scala.meta.{Decl, Defn, Lit, Name, Pat, Self, Template, Term, Type}
+import scala.meta.{Decl, Defn, Lit, Name, Pat, Self, Template, Term, Type, XtensionQuasiquoteTerm}
 
 class DefnTraverserImplTest extends UnitTestSuite {
 
   private val TheStatContext = StatContext(JavaScope.Class)
   private val TheClassOrTraitContext = ClassOrTraitContext(JavaScope.Class)
 
-  private val defnValTraverser  = mock[DeprecatedDefnValTraverser]
-  private val defnVarTraverser  = mock[DeprecatedDefnVarTraverser]
-  private val defnDefTraverser  = mock[DefnDefTraverser]
+  private val defnValTraverser = mock[DefnValTraverser]
+  private val defnValRenderer = mock[DefnValRenderer]
+  private val declVarRenderer = mock[DeclVarRenderer]
+  private val defnVarTraverser = mock[DefnVarTraverser]
+  private val defnVarRenderer = mock[DefnVarRenderer]
+  private val defnDefTraverser = mock[DefnDefTraverser]
   private val defnTypeTraverser = mock[DefnTypeTraverser]
-  private val classTraverser    = mock[ClassTraverser]
-  private val traitTraverser    = mock[TraitTraverser]
-  private val objectTraverser   = mock[ObjectTraverser]
+  private val classTraverser = mock[ClassTraverser]
+  private val traitTraverser = mock[TraitTraverser]
+  private val objectTraverser = mock[ObjectTraverser]
 
   private val defnTraverser = new DefnTraverserImpl(
     defnValTraverser,
+    defnValRenderer,
+    declVarRenderer,
     defnVarTraverser,
+    defnVarRenderer,
     defnDefTraverser,
     defnTypeTraverser,
     classTraverser,
     traitTraverser,
     objectTraverser)
 
-  test("traverse() for Defn.Val") {
+  test("traverse() for Defn.Val when Defn.Val returned") {
 
-    val defnVal = Defn.Val(
-      mods = List(),
-      pats = List(Pat.Var(Term.Name("myVal"))),
-      decltpe = Some(TypeNames.Int),
-      rhs = Lit.Int(3)
-    )
+    val defnVal = q"private val myVal: Int = 3"
+    val traversedDefnVal = q"private val myTraversedVal: Int = 33"
+    val javaModifiers = List(JavaModifier.Private)
+    val traversalResult = DefnValTraversalResult(traversedDefnVal, javaModifiers)
+    val renderContext = ValOrVarRenderContext(javaModifiers)
+
+    doReturn(traversalResult).when(defnValTraverser).traverse(eqTree(defnVal), eqTo(TheStatContext))
 
     defnTraverser.traverse(defnVal, TheStatContext)
 
-    verify(defnValTraverser).traverse(eqTree(defnVal), ArgumentMatchers.eq(TheStatContext))
+    verify(defnValRenderer).render(eqTree(traversalResult.tree), eqTo(renderContext))
+  }
+
+  test("traverse() for Defn.Val when Decl.Var returned") {
+
+    val defnVal = q"private val myVal: Int = 3"
+    val declVar = q"private var myVar: Int"
+    val javaModifiers = List(JavaModifier.Private)
+    val traversalResult = DeclVarTraversalResult(declVar, javaModifiers)
+    val renderContext = ValOrVarRenderContext(javaModifiers)
+
+    doReturn(traversalResult).when(defnValTraverser).traverse(eqTree(defnVal), eqTo(TheStatContext))
+
+    defnTraverser.traverse(defnVal, TheStatContext)
+
+    verify(declVarRenderer).render(eqTree(traversalResult.tree), eqTo(renderContext))
   }
 
   test("traverse() for Defn.Var") {
 
-    val defnVar = Defn.Var(
-      mods = List(),
-      pats = List(Pat.Var(Term.Name("myVar"))),
-      decltpe = Some(TypeNames.Int),
-      rhs = Some(Lit.Int(3))
-    )
+    val defnVar = q"private var myVar: Int = 3"
+    val traversedDefnVar = q"private var myTraversedVar: Int = 33"
+    val javaModifiers = List(JavaModifier.Private)
+    val traversalResult = DefnVarTraversalResult(traversedDefnVar, javaModifiers)
+    val renderContext = ValOrVarRenderContext(javaModifiers)
+
+    doReturn(traversalResult).when(defnVarTraverser).traverse(eqTree(defnVar), eqTo(TheStatContext))
 
     defnTraverser.traverse(defnVar, TheStatContext)
 
-    verify(defnVarTraverser).traverse(eqTree(defnVar), ArgumentMatchers.eq(TheStatContext))
+    verify(defnVarRenderer).render(eqTree(traversedDefnVar), eqTo(renderContext))
   }
 
   test("traverse() for Defn.Def") {
@@ -92,7 +118,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
 
     defnTraverser.traverse(defnType, TheStatContext)
 
-    verify(defnTypeTraverser).traverse(eqTree(defnType), ArgumentMatchers.eq(TheStatContext))
+    verify(defnTypeTraverser).traverse(eqTree(defnType), eqTo(TheStatContext))
   }
 
   test("traverse() for Defn.Class") {
@@ -118,7 +144,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
 
     defnTraverser.traverse(defnClass, TheStatContext)
 
-    verify(classTraverser).traverse(eqTree(defnClass), ArgumentMatchers.eq(TheClassOrTraitContext))
+    verify(classTraverser).traverse(eqTree(defnClass), eqTo(TheClassOrTraitContext))
   }
 
   test("traverse() for Trait") {
@@ -148,7 +174,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
 
     defnTraverser.traverse(defnTrait, TheStatContext)
 
-    verify(traitTraverser).traverse(eqTree(defnTrait), ArgumentMatchers.eq(TheClassOrTraitContext))
+    verify(traitTraverser).traverse(eqTree(defnTrait), eqTo(TheClassOrTraitContext))
   }
 
   test("traverse() for Object") {
@@ -173,7 +199,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
 
     defnTraverser.traverse(defnObject, TheStatContext)
 
-    verify(objectTraverser).traverse(eqTree(defnObject), ArgumentMatchers.eq(TheStatContext))
+    verify(objectTraverser).traverse(eqTree(defnObject), eqTo(TheStatContext))
   }
 
   private def termParam(name: String, typeName: String) = {
