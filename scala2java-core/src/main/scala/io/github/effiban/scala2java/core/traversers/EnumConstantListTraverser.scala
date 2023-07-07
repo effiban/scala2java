@@ -1,12 +1,13 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.renderers.ArgumentListRenderer
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.{Defn, Pat}
 
 trait EnumConstantListTraverser extends ScalaTreeTraverser[Defn.Val]
 
-private[traversers] class EnumConstantListTraverserImpl(argumentListTraverser: => DeprecatedArgumentListTraverser)
+private[traversers] class EnumConstantListTraverserImpl(argumentListRenderer: => ArgumentListRenderer)
                                                        (implicit javaWriter: JavaWriter) extends EnumConstantListTraverser {
 
   import javaWriter._
@@ -19,9 +20,9 @@ private[traversers] class EnumConstantListTraverserImpl(argumentListTraverser: =
       case (Nil, _) => throw new IllegalStateException(s"No valid enum constants found in LHS of $enumConstantsVal")
       case (_, _ :: _) => throw new IllegalStateException(s"Invalid enum constants found in LHS of $enumConstantsVal")
       case (enumConsts, _) =>
-        argumentListTraverser.traverse(
+        argumentListRenderer.render(
           args = enumConsts,
-          argTraverser = (patVar: Pat.Var, _) => write(patVar.name.value)
+          argRenderer = (patVar: Pat.Var, _) => write(patVar.name.value)
         )
     }
   }
