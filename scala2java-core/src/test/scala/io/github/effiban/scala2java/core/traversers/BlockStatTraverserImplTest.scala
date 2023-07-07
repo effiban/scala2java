@@ -27,15 +27,13 @@ class BlockStatTraverserImplTest extends UnitTestSuite {
   private val TheTraversedDeclVar = q"var xx: MyTraversedType"
 
 
-  private val expressionTermRefTraverser = mock[ExpressionTermRefTraverser]
-  private val defaultTermTraverser = mock[DefaultTermTraverser]
+  private val statTermTraverser = mock[StatTermTraverser]
   private val defnValTraverser = mock[DefnValTraverser]
   private val defnVarTraverser = mock[DefnVarTraverser]
   private val declVarTraverser = mock[DeclVarTraverser]
 
   private val blockStatTraverser = new BlockStatTraverserImpl(
-    expressionTermRefTraverser,
-    defaultTermTraverser,
+    statTermTraverser,
     defnValTraverser,
     defnVarTraverser,
     declVarTraverser
@@ -43,13 +41,13 @@ class BlockStatTraverserImplTest extends UnitTestSuite {
 
 
   test("traverse() for a Term.Name") {
-    doReturn(TheTraversedTermName).when(expressionTermRefTraverser).traverse(eqTree(TheTermName))
+    doReturn(TheTraversedTermName).when(statTermTraverser).traverse(eqTree(TheTermName))
 
     blockStatTraverser.traverse(TheTermName).structure shouldBe TheTraversedTermName.structure
   }
 
   test("traverse() for a Term.Apply") {
-    doReturn(TheTraversedTermApply).when(defaultTermTraverser).traverse(eqTree(TheTermApply))
+    doReturn(TheTraversedTermApply).when(statTermTraverser).traverse(eqTree(TheTermApply))
 
     blockStatTraverser.traverse(TheTermApply).structure shouldBe TheTraversedTermApply.structure
   }
