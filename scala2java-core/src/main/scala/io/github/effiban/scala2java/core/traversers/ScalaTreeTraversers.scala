@@ -181,7 +181,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
     typeTraverser,
     typeRenderer,
     termNameRenderer,
-    deprecatedTermParamListTraverser
+    termParamTraverser,
+    termParamListRenderer
   )
 
   private lazy val declTraverser: DeclTraverser = new DeclTraverserImpl(

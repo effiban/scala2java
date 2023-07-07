@@ -17,6 +17,7 @@ object JavaFinalModifierResolver extends JavaExtraModifierResolver {
       case (_: Decl.Val | _: Defn.Val, _,  JavaScope.Class | JavaScope.UtilityClass | JavaScope.Enum | JavaScope.Block) => Some(JavaModifier.Final)
       // Can't add final in a Lambda param because it might not have an explicit type,
       // and we are not adding 'var' there either at this point since it has complicated rules
+      // TODO interface method declaration params do not need the 'final' either (implicitly 'final')
       case (_: Term.Param, _, JavaScope.LambdaSignature) => None
       case (_: Term.Param, _, _) => Some(JavaModifier.Final)
       case _ => None
