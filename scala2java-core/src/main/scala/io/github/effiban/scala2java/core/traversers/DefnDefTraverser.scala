@@ -20,7 +20,8 @@ trait DefnDefTraverser {
 private[traversers] class DefnDefTraverserImpl(modListTraverser: => ModListTraverser,
                                                modifiersRenderContextFactory: ModifiersRenderContextFactory,
                                                modListRenderer: => ModListRenderer,
-                                               typeParamListTraverser: => DeprecatedTypeParamListTraverser,
+                                               typeParamTraverser: => TypeParamTraverser,
+                                               typeParamListRenderer: => TypeParamListRenderer,
                                                termNameRenderer: TermNameRenderer,
                                                typeTraverser: => TypeTraverser,
                                                typeRenderer: => TypeRenderer,
@@ -68,7 +69,8 @@ private[traversers] class DefnDefTraverserImpl(modListTraverser: => ModListTrave
     tparams match {
       case Nil =>
       case typeParams =>
-        typeParamListTraverser.traverse(typeParams)
+        val traversedTypeParams = typeParams.map(typeParamTraverser.traverse)
+        typeParamListRenderer.render(traversedTypeParams)
         write(" ")
     }
   }
