@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.entities.JavaTreeType.JavaTreeType
 import io.github.effiban.scala2java.core.entities.JavaTreeTypeToKeywordMapping
 import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
-import io.github.effiban.scala2java.core.renderers.{ModListRenderer, TermParamListRenderer}
+import io.github.effiban.scala2java.core.renderers.{ModListRenderer, TermParamListRenderer, TypeParamListRenderer}
 import io.github.effiban.scala2java.core.resolvers.{JavaChildScopeResolver, JavaTreeTypeResolver}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
@@ -17,7 +17,8 @@ trait CaseClassTraverser {
 private[traversers] class CaseClassTraverserImpl(modListTraverser: => ModListTraverser,
                                                  modifiersRenderContextFactory: ModifiersRenderContextFactory,
                                                  modListRenderer: => ModListRenderer,
-                                                 typeParamListTraverser: => DeprecatedTypeParamListTraverser,
+                                                 typeParamTraverser: => TypeParamTraverser,
+                                                 typeParamListRenderer: => TypeParamListRenderer,
                                                  termParamTraverser: => TermParamTraverser,
                                                  termParamListRenderer: => TermParamListRenderer,
                                                  templateTraverser: => TemplateTraverser,
@@ -34,7 +35,8 @@ private[traversers] class CaseClassTraverserImpl(modListTraverser: => ModListTra
     val modifiersRenderContext = modifiersRenderContextFactory(modListTraversalResult)
     modListRenderer.render(modifiersRenderContext)
     writeNamedType(JavaTreeTypeToKeywordMapping(javaTreeType), classDef.name.value)
-    typeParamListTraverser.traverse(classDef.tparams)
+    val traversedTypeParams = classDef.tparams.map(typeParamTraverser.traverse)
+    typeParamListRenderer.render(traversedTypeParams)
     traverseCtorAndTemplate(classDef, javaTreeType, context)
   }
 
