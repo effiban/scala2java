@@ -168,6 +168,10 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   lazy val importerRenderer: ImporterRenderer = new ImporterRendererImpl(defaultTermRefRenderer, importeeRenderer)
 
+  lazy val initArgRendererFactory: InitArgRendererFactory = new InitArgRendererFactoryImpl(initRenderer)
+
+  lazy val initListRenderer: InitListRenderer = new InitListRendererImpl(argumentListRenderer, initArgRendererFactory)
+
   lazy val initRenderer: InitRenderer = new InitRendererImpl(
     typeRenderer,
     argumentListRenderer,
