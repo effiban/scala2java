@@ -1,11 +1,11 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.{BlockContext, DefnDefContext, ModifiersContext, StatContext}
+import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.entities.Decision.{No, Uncertain, Yes}
 import io.github.effiban.scala2java.core.entities.JavaTreeType
 import io.github.effiban.scala2java.core.entities.TraversalConstants.UnknownType
 import io.github.effiban.scala2java.core.renderers.contextfactories.{BlockRenderContextFactory, ModifiersRenderContextFactory}
-import io.github.effiban.scala2java.core.renderers.{BlockRenderer, ModListRenderer, TermNameRenderer, TypeRenderer}
+import io.github.effiban.scala2java.core.renderers._
 import io.github.effiban.scala2java.core.typeinference.TermTypeInferrer
 import io.github.effiban.scala2java.core.writers.JavaWriter
 import io.github.effiban.scala2java.spi.entities.JavaScope
@@ -24,7 +24,8 @@ private[traversers] class DefnDefTraverserImpl(modListTraverser: => ModListTrave
                                                termNameRenderer: TermNameRenderer,
                                                typeTraverser: => TypeTraverser,
                                                typeRenderer: => TypeRenderer,
-                                               termParamListTraverser: => DeprecatedTermParamListTraverser,
+                                               termParamTraverser: => TermParamTraverser,
+                                               termParamListRenderer: => TermParamListRenderer,
                                                blockWrappingTermTraverser: => BlockWrappingTermTraverser,
                                                blockRenderContextFactory: => BlockRenderContextFactory,
                                                blockRenderer: => BlockRenderer,
@@ -48,7 +49,10 @@ private[traversers] class DefnDefTraverserImpl(modListTraverser: => ModListTrave
   }
 
   private def traverseMethodParamsAndBody(defDef: Defn.Def, maybeMethodType: Option[Type], maybeInit: Option[Init] = None): Unit = {
-    termParamListTraverser.traverse(termParams = defDef.paramss.flatten, context = StatContext(JavaScope.MethodSignature))
+    val methodParamTraversalResults = defDef.paramss.flatten.map(param => termParamTraverser.traverse(param, StatContext(JavaScope.MethodSignature)))
+    // We can assume the Java modifiers in the results are all the same (all 'final') so we can combine them
+    val paramListRenderContext = TermParamListRenderContext(javaModifiers = methodParamTraversalResults.flatMap(_.javaModifiers).distinct)
+    termParamListRenderer.render(methodParamTraversalResults.map(_.tree), paramListRenderContext)
     val shouldReturnValue = maybeMethodType match {
       case Some(Type.Name("Unit") | Type.AnonymousName()) => No
       case Some(_) => Yes
