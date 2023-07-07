@@ -12,5 +12,6 @@ public class Sample {
             2,
             3), Tuple.tuple(4,
             5,
-            6)).v1.v1;
+            6))
+            .v1.v1;
 }
