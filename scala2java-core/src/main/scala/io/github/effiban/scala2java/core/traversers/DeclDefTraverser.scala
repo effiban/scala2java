@@ -3,7 +3,7 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.{ModifiersContext, StatContext, TermParamListRenderContext}
 import io.github.effiban.scala2java.core.entities.JavaTreeType
 import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
-import io.github.effiban.scala2java.core.renderers.{ModListRenderer, TermNameRenderer, TermParamListRenderer, TypeRenderer}
+import io.github.effiban.scala2java.core.renderers._
 import io.github.effiban.scala2java.core.writers.JavaWriter
 import io.github.effiban.scala2java.spi.entities.JavaScope
 
@@ -16,7 +16,8 @@ trait DeclDefTraverser {
 private[traversers] class DeclDefTraverserImpl(modListTraverser: => ModListTraverser,
                                                modifiersRenderContextFactory: ModifiersRenderContextFactory,
                                                modListRenderer: => ModListRenderer,
-                                               typeParamListTraverser: => DeprecatedTypeParamListTraverser,
+                                               typeParamTraverser: => TypeParamTraverser,
+                                               typeParamListRenderer: => TypeParamListRenderer,
                                                typeTraverser: => TypeTraverser,
                                                typeRenderer: => TypeRenderer,
                                                termNameRenderer: TermNameRenderer,
@@ -46,7 +47,8 @@ private[traversers] class DeclDefTraverserImpl(modListTraverser: => ModListTrave
     tparams match {
       case Nil =>
       case typeParams =>
-        typeParamListTraverser.traverse(typeParams)
+        val traversedTypeParams = tparams.map(typeParamTraverser.traverse)
+        typeParamListRenderer.render(traversedTypeParams)
         write(" ")
     }
   }
