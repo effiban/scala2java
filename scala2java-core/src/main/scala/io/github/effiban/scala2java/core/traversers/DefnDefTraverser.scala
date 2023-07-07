@@ -4,8 +4,8 @@ import io.github.effiban.scala2java.core.contexts.{BlockContext, DefnDefContext,
 import io.github.effiban.scala2java.core.entities.Decision.{No, Uncertain, Yes}
 import io.github.effiban.scala2java.core.entities.JavaTreeType
 import io.github.effiban.scala2java.core.entities.TraversalConstants.UnknownType
-import io.github.effiban.scala2java.core.renderers.contextfactories.BlockRenderContextFactory
-import io.github.effiban.scala2java.core.renderers.{BlockRenderer, TermNameRenderer, TypeRenderer}
+import io.github.effiban.scala2java.core.renderers.contextfactories.{BlockRenderContextFactory, ModifiersRenderContextFactory}
+import io.github.effiban.scala2java.core.renderers.{BlockRenderer, ModListRenderer, TermNameRenderer, TypeRenderer}
 import io.github.effiban.scala2java.core.typeinference.TermTypeInferrer
 import io.github.effiban.scala2java.core.writers.JavaWriter
 import io.github.effiban.scala2java.spi.entities.JavaScope
@@ -17,7 +17,9 @@ trait DefnDefTraverser {
   def traverse(defnDef: Defn.Def, context: DefnDefContext = DefnDefContext()): Unit
 }
 
-private[traversers] class DefnDefTraverserImpl(modListTraverser: => DeprecatedModListTraverser,
+private[traversers] class DefnDefTraverserImpl(modListTraverser: => ModListTraverser,
+                                               modifiersRenderContextFactory: ModifiersRenderContextFactory,
+                                               modListRenderer: => ModListRenderer,
                                                typeParamListTraverser: => TypeParamListTraverser,
                                                termNameRenderer: TermNameRenderer,
                                                typeTraverser: => TypeTraverser,
@@ -35,7 +37,9 @@ private[traversers] class DefnDefTraverserImpl(modListTraverser: => DeprecatedMo
   override def traverse(defnDef: Defn.Def, context: DefnDefContext = DefnDefContext()): Unit = {
     val transformedDefnDef = defnDefTransformer.transform(defnDef)
     writeLine()
-    modListTraverser.traverse(ModifiersContext(transformedDefnDef, JavaTreeType.Method, context.javaScope))
+    val modListTraversalResult = modListTraverser.traverse(ModifiersContext(transformedDefnDef, JavaTreeType.Method, context.javaScope))
+    val modifiersRenderContext = modifiersRenderContextFactory(modListTraversalResult)
+    modListRenderer.render(modifiersRenderContext)
     traverseTypeParams(transformedDefnDef.tparams)
     val maybeMethodType = resolveMethodType(transformedDefnDef)
     traverseMethodType(maybeMethodType)
