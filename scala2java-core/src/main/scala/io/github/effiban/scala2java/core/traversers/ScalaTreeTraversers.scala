@@ -198,7 +198,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
     modListTraverser,
     ModifiersRenderContextFactory,
     modListRenderer,
-    deprecatedTypeParamListTraverser,
+    typeParamTraverser,
+    typeParamListRenderer,
     JavaTreeTypeResolver)
 
   private lazy val declValTraverser: DeclValTraverser = new DeclValTraverserImpl(
