@@ -7,8 +7,8 @@ import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
 
-public record Sample(final String param1,
-    final int param2,
-    final String param3,
-    final int param4) {
+public record Sample(String param1,
+    int param2,
+    String param3,
+    int param4) {
 }

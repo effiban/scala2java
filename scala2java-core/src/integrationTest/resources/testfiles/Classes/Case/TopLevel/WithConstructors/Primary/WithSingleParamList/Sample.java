@@ -7,5 +7,5 @@ import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
 
-public record Sample(final String param1, final int param2) {
+public record Sample(String param1, int param2) {
 }

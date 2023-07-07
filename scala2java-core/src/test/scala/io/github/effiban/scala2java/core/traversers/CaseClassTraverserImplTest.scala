@@ -8,22 +8,21 @@ import io.github.effiban.scala2java.core.matchers.ModListTraversalResultMockitoM
 import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
 import io.github.effiban.scala2java.core.matchers.ModifiersRenderContextMatcher.eqModifiersRenderContext
 import io.github.effiban.scala2java.core.matchers.TemplateContextMatcher.eqTemplateContext
-import io.github.effiban.scala2java.core.renderers.ModListRenderer
 import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
+import io.github.effiban.scala2java.core.renderers.{ModListRenderer, TermParamListRenderer}
 import io.github.effiban.scala2java.core.resolvers.{JavaChildScopeResolver, JavaTreeTypeResolver}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
-import io.github.effiban.scala2java.core.traversers.results.ModListTraversalResult
+import io.github.effiban.scala2java.core.traversers.results.{ModListTraversalResult, TermParamTraversalResult}
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
-import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchersSugar.eqTo
+import org.mockito.ArgumentMatchersSugar.{any, eqTo}
 
 import scala.meta.Term.Block
 import scala.meta.Type.Bounds
-import scala.meta.{Ctor, Defn, Init, Mod, Name, Self, Template, Term, Type}
+import scala.meta.{Ctor, Defn, Init, Mod, Name, Self, Template, Term, Type, XtensionQuasiquoteTermParam}
 
 class CaseClassTraverserImplTest extends UnitTestSuite {
 
@@ -42,14 +41,13 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     )
   )
 
-  private val CtorArgs1 = List(
-    termParam("arg1", "Int"),
-    termParam("arg2", "Int")
-  )
-  private val CtorArgs2 = List(
-    termParam("arg3", "Int"),
-    termParam("arg4", "Int")
-  )
+  private val ctorArg1 = param"arg1: Int"
+  private val ctorArg2 = param"arg2: Int"
+  private val ctorArg3 = param"arg3: Int"
+  private val ctorArg4 = param"arg4: Int"
+
+  private val CtorArgList1 = List(ctorArg1, ctorArg2)
+  private val CtorArgList2 = List(ctorArg3, ctorArg4)
 
   private val TheTemplate = Template(
     early = List(),
@@ -60,7 +58,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
         mods = List(),
         name = Term.Name("MyMethod"),
         tparams = List(),
-        paramss = List(List(termParam("myParam", "String"))),
+        paramss = List(List(param"myParam: String")),
         decltpe = Some(TypeNames.String),
         body = Block(List())
       )
@@ -71,7 +69,8 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
   private val modifiersRenderContextFactory = mock[ModifiersRenderContextFactory]
   private val modListRenderer = mock[ModListRenderer]
   private val typeParamListTraverser = mock[TypeParamListTraverser]
-  private val termParamListTraverser = mock[DeprecatedTermParamListTraverser]
+  private val termParamTraverser = mock[TermParamTraverser]
+  private val termParamListRenderer = mock[TermParamListRenderer]  
   private val templateTraverser = mock[TemplateTraverser]
   private val javaTreeTypeResolver = mock[JavaTreeTypeResolver]
   private val javaChildScopeResolver = mock[JavaChildScopeResolver]
@@ -83,7 +82,8 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     modifiersRenderContextFactory,
     modListRenderer,
     typeParamListTraverser,
-    termParamListTraverser,
+    termParamTraverser,
+    termParamListRenderer,
     templateTraverser,
     javaTreeTypeResolver,
     javaChildScopeResolver)
@@ -100,7 +100,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       Mod.Case()
     )
 
-    val primaryCtor = Ctor.Primary(mods = List(), name = Name.Anonymous(), paramss = List(CtorArgs1))
+    val primaryCtor = Ctor.Primary(mods = List(), name = Name.Anonymous(), paramss = List(CtorArgList1))
 
     val cls = Defn.Class(
       mods = scalaMods,
@@ -123,10 +123,11 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Record)))).thenReturn(JavaScope.Class)
-    doWrite("(int arg1, int arg2)").when(termParamListTraverser).traverse(
-        termParams = eqTreeList(CtorArgs1),
-        context = ArgumentMatchers.eq(StatContext(JavaScope.Class)),
-        onSameLine = ArgumentMatchers.eq(false)
+    doAnswer((param: Term.Param) => TermParamTraversalResult(param))
+      .when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.Class)))
+    doWrite("(int arg1, int arg2)").when(termParamListRenderer).render(
+        termParams = eqTreeList(CtorArgList1),
+        context = eqTo(TermParamListRenderContext())
     )
     doWrite(
       """ {
@@ -163,7 +164,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
         )
       ),
       name = Name.Anonymous(),
-      paramss = List(CtorArgs1))
+      paramss = List(CtorArgList1))
 
     val cls = Defn.Class(
       mods = scalaMods,
@@ -186,10 +187,11 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Record)))).thenReturn(JavaScope.Class)
-    doWrite("(int arg1, int arg2)").when(termParamListTraverser).traverse(
-      termParams = eqTreeList(CtorArgs1),
-      context = ArgumentMatchers.eq(StatContext(JavaScope.Class)),
-      onSameLine = ArgumentMatchers.eq(false)
+    doAnswer((param: Term.Param) => TermParamTraversalResult(param))
+      .when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.Class)))
+    doWrite("(int arg1, int arg2)").when(termParamListRenderer).render(
+      termParams = eqTreeList(CtorArgList1),
+      context = eqTo(TermParamListRenderContext())
     )
     doWrite(
       """ {
@@ -220,7 +222,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       Mod.Case()
     )
 
-    val primaryCtor = Ctor.Primary(mods = List(), name = Name.Anonymous(), paramss = List(CtorArgs1))
+    val primaryCtor = Ctor.Primary(mods = List(), name = Name.Anonymous(), paramss = List(CtorArgList1))
 
     val cls = Defn.Class(
       mods = scalaMods,
@@ -245,10 +247,11 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Record)))).thenReturn(JavaScope.Class)
-    doWrite("(int arg1, int arg2)").when(termParamListTraverser).traverse(
-      termParams = eqTreeList(CtorArgs1),
-      context = ArgumentMatchers.eq(StatContext(JavaScope.Class)),
-      onSameLine = ArgumentMatchers.eq(false)
+    doAnswer((param: Term.Param) => TermParamTraversalResult(param))
+      .when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.Class)))
+    doWrite("(int arg1, int arg2)").when(termParamListRenderer).render(
+      termParams = eqTreeList(CtorArgList1),
+      context = eqTo(TermParamListRenderContext())
     )
     doWrite(
       """ {
@@ -287,7 +290,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       Mod.Case()
     )
 
-    val primaryCtor = Ctor.Primary(mods = List(), name = Name.Anonymous(), paramss = List(CtorArgs1, CtorArgs2))
+    val primaryCtor = Ctor.Primary(mods = List(), name = Name.Anonymous(), paramss = List(CtorArgList1, CtorArgList2))
 
     val cls = Defn.Class(
       mods = scalaMods,
@@ -310,10 +313,11 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Record)))).thenReturn(JavaScope.Class)
-    doWrite("(int arg1, int arg2, int arg3, int arg4)").when(termParamListTraverser).traverse(
-      termParams = eqTreeList(CtorArgs1 ++ CtorArgs2),
-      context = ArgumentMatchers.eq(StatContext(JavaScope.Class)),
-      onSameLine = ArgumentMatchers.eq(false)
+    doAnswer((param: Term.Param) => TermParamTraversalResult(param))
+      .when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.Class)))
+    doWrite("(int arg1, int arg2, int arg3, int arg4)").when(termParamListRenderer).render(
+      termParams = eqTreeList(CtorArgList1 ++ CtorArgList2),
+      context = eqTo(TermParamListRenderContext())
     )
     doWrite(
       """ {
@@ -333,10 +337,6 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
         | /* BODY */
         |}
         |""".stripMargin
-  }
-
-  private def termParam(name: String, typeName: String) = {
-    Term.Param(mods = List(), name = Term.Name(name), decltpe = Some(Type.Name(typeName)), default = None)
   }
 
   private def whenResolveJavaTreeTypeThenReturnRecord(cls: Defn.Class, modifiers: List[Mod]): Unit = {
