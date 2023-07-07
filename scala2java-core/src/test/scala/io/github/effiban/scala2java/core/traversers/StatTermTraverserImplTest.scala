@@ -41,7 +41,7 @@ class StatTermTraverserImplTest extends UnitTestSuite {
     statTermTraverser.traverse(termApplyType).structure shouldBe traversedTermApplyType.structure
   }
 
-  test("traverse() when fun is a Term.Apply should call the DefaultTermTraverser") {
+  test("traverse() a Term.Apply should call the DefaultTermTraverser") {
     val termApply = q"a(1)"
     val traversedTermApply = q"A(11)"
 
@@ -50,7 +50,7 @@ class StatTermTraverserImplTest extends UnitTestSuite {
     statTermTraverser.traverse(termApply).structure shouldBe traversedTermApply.structure
   }
 
-  test("traverse() when fun is a Term.ApplyInfix should call the DefaultTermTraverser") {
+  test("traverse() a Term.ApplyInfix should call the DefaultTermTraverser") {
     val termApplyInfix = q"a + b"
     val traversedTermApplyInfix = q"A + B"
 
