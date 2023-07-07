@@ -2,7 +2,8 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{JavaTreeTypeContext, ModifiersContext, StatContext}
 import io.github.effiban.scala2java.core.entities.JavaTreeTypeToKeywordMapping
-import io.github.effiban.scala2java.core.renderers.{TypeBoundsRenderer, TypeRenderer}
+import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
+import io.github.effiban.scala2java.core.renderers.{ModListRenderer, TypeBoundsRenderer, TypeRenderer}
 import io.github.effiban.scala2java.core.resolvers.JavaTreeTypeResolver
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
@@ -13,7 +14,9 @@ trait DefnTypeTraverser {
   def traverse(typeDef: Defn.Type, context: StatContext = StatContext()): Unit
 }
 
-private[traversers] class DefnTypeTraverserImpl(modListTraverser: => DeprecatedModListTraverser,
+private[traversers] class DefnTypeTraverserImpl(modListTraverser: => ModListTraverser,
+                                                modifiersRenderContextFactory: ModifiersRenderContextFactory,
+                                                modListRenderer: => ModListRenderer,
                                                 typeParamListTraverser: => TypeParamListTraverser,
                                                 typeTraverser: => TypeTraverser,
                                                 typeRenderer: => TypeRenderer,
@@ -28,7 +31,9 @@ private[traversers] class DefnTypeTraverserImpl(modListTraverser: => DeprecatedM
   override def traverse(typeDef: Defn.Type, context: StatContext = StatContext()): Unit = {
     //TODO - transform to Defn.Trait instead of traversing directly (+ the Java tree type is incorrect anyway)
     val javaTreeType = javaTreeTypeResolver.resolve(JavaTreeTypeContext(typeDef, typeDef.mods))
-    modListTraverser.traverse(ModifiersContext(typeDef, javaTreeType, context.javaScope))
+    val modListTraversalResult = modListTraverser.traverse(ModifiersContext(typeDef, javaTreeType, context.javaScope))
+    val modifiersRenderContext = modifiersRenderContextFactory(modListTraversalResult)
+    modListRenderer.render(modifiersRenderContext)
     writeNamedType(JavaTreeTypeToKeywordMapping(javaTreeType), typeDef.name.value)
     typeParamListTraverser.traverse(typeDef.tparams)
     typeDef.bounds match {

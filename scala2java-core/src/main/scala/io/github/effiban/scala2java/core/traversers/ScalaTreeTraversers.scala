@@ -318,7 +318,9 @@ class ScalaTreeTraversers(implicit factories: Factories,
   )
 
   private lazy val defnTypeTraverser: DefnTypeTraverser = new DefnTypeTraverserImpl(
-    deprecatedModListTraverser,
+    modListTraverser,
+    ModifiersRenderContextFactory,
+    modListRenderer,
     typeParamListTraverser,
     typeTraverser,
     typeRenderer,
