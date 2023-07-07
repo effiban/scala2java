@@ -17,7 +17,7 @@ trait CaseClassTraverser {
 private[traversers] class CaseClassTraverserImpl(modListTraverser: => ModListTraverser,
                                                  modifiersRenderContextFactory: ModifiersRenderContextFactory,
                                                  modListRenderer: => ModListRenderer,
-                                                 typeParamListTraverser: => TypeParamListTraverser,
+                                                 typeParamListTraverser: => DeprecatedTypeParamListTraverser,
                                                  termParamTraverser: => TermParamTraverser,
                                                  termParamListRenderer: => TermParamListRenderer,
                                                  templateTraverser: => TemplateTraverser,

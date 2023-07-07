@@ -16,7 +16,7 @@ trait DeclTypeTraverser {
 private[traversers] class DeclTypeTraverserImpl(modListTraverser: => ModListTraverser,
                                                 modifiersRenderContextFactory: ModifiersRenderContextFactory,
                                                 modListRenderer: => ModListRenderer,
-                                                typeParamListTraverser: => TypeParamListTraverser,
+                                                typeParamListTraverser: => DeprecatedTypeParamListTraverser,
                                                 javaTreeTypeResolver: JavaTreeTypeResolver)
                                                (implicit javaWriter: JavaWriter) extends DeclTypeTraverser {
 

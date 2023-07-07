@@ -16,7 +16,7 @@ trait TraitTraverser {
 private[traversers] class TraitTraverserImpl(modListTraverser: => ModListTraverser,
                                              modifiersRenderContextFactory: ModifiersRenderContextFactory,
                                              modListRenderer: => ModListRenderer,
-                                             typeParamListTraverser: => TypeParamListTraverser,
+                                             typeParamListTraverser: => DeprecatedTypeParamListTraverser,
                                              templateTraverser: => TemplateTraverser,
                                              javaTreeTypeResolver: JavaTreeTypeResolver,
                                              javaChildScopeResolver: JavaChildScopeResolver)

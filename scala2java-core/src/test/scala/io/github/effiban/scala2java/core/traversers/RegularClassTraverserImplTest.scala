@@ -84,7 +84,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
   private val modListTraverser = mock[ModListTraverser]
   private val modifiersRenderContextFactory = mock[ModifiersRenderContextFactory]
   private val modListRenderer = mock[ModListRenderer]
-  private val typeParamListTraverser = mock[TypeParamListTraverser]
+  private val typeParamListTraverser = mock[DeprecatedTypeParamListTraverser]
   private val templateTraverser = mock[TemplateTraverser]
   private val paramToDeclValTransformer = mock[ParamToDeclValTransformer]
   private val javaTreeTypeResolver = mock[JavaTreeTypeResolver]

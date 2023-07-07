@@ -11,7 +11,7 @@ import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.Type
 
-class TypeParamListTraverserImplTest extends UnitTestSuite {
+class DeprecatedTypeParamListTraverserImplTest extends UnitTestSuite {
 
   private val ExpectedTraversalOptions = ListTraversalOptions(
     onSameLine = true,
@@ -21,7 +21,7 @@ class TypeParamListTraverserImplTest extends UnitTestSuite {
   private val argumentListTraverser = mock[DeprecatedArgumentListTraverser]
   private val typeParamArgTraverser = mock[DeprecatedArgumentTraverser[Type.Param]]
 
-  private val typeParamListTraverser = new TypeParamListTraverserImpl(argumentListTraverser, typeParamArgTraverser)
+  private val typeParamListTraverser = new DeprecatedTypeParamListTraverserImpl(argumentListTraverser, typeParamArgTraverser)
 
 
   test("traverse() when no params") {

@@ -16,7 +16,7 @@ trait DeclDefTraverser {
 private[traversers] class DeclDefTraverserImpl(modListTraverser: => ModListTraverser,
                                                modifiersRenderContextFactory: ModifiersRenderContextFactory,
                                                modListRenderer: => ModListRenderer,
-                                               typeParamListTraverser: => TypeParamListTraverser,
+                                               typeParamListTraverser: => DeprecatedTypeParamListTraverser,
                                                typeTraverser: => TypeTraverser,
                                                typeRenderer: => TypeRenderer,
                                                termNameRenderer: TermNameRenderer,
