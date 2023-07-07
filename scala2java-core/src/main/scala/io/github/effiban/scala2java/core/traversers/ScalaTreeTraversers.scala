@@ -551,6 +551,11 @@ class ScalaTreeTraversers(implicit factories: Factories,
     deprecatedDefaultTermTraverser
   )
 
+  private lazy val statTermTraverser: StatTermTraverser = new StatTermTraverserImpl(
+    expressionTermRefTraverser,
+    defaultTermTraverser
+  )
+
   private lazy val statTraverser: StatTraverser = new StatTraverserImpl(
     deprecatedStatTermTraverser,
     importTraverser,
