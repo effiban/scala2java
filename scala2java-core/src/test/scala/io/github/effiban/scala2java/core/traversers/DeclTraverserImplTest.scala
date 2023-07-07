@@ -1,27 +1,32 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.StatContext
+import io.github.effiban.scala2java.core.contexts.{StatContext, ValOrVarRenderContext}
+import io.github.effiban.scala2java.core.entities.JavaModifier
+import io.github.effiban.scala2java.core.renderers.DeclVarRenderer
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
+import io.github.effiban.scala2java.core.traversers.results.DeclVarTraversalResult
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
-import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.Type.Bounds
-import scala.meta.{Decl, Pat, Term, Type}
+import scala.meta.{Decl, Pat, Term, Type, XtensionQuasiquoteTerm}
 
 class DeclTraverserImplTest extends UnitTestSuite {
 
   private val TheStatContext = StatContext(JavaScope.Class)
 
-  private val declValTraverser =  mock[DeclValTraverser]
-  private val declVarTraverser =  mock[DeprecatedDeclVarTraverser]
-  private val declDefTraverser =  mock[DeclDefTraverser]
+  private val declValTraverser = mock[DeclValTraverser]
+  private val declVarTraverser = mock[DeclVarTraverser]
+  private val declVarRenderer = mock[DeclVarRenderer]
+  private val declDefTraverser = mock[DeclDefTraverser]
   private val declTypeTraverser = mock[DeclTypeTraverser]
 
   private val declTraverser = new DeclTraverserImpl(
     declValTraverser,
     declVarTraverser,
+    declVarRenderer,
     declDefTraverser,
     declTypeTraverser)
 
@@ -35,20 +40,20 @@ class DeclTraverserImplTest extends UnitTestSuite {
 
     declTraverser.traverse(declVal, TheStatContext)
 
-    verify(declValTraverser).traverse(eqTree(declVal), ArgumentMatchers.eq(TheStatContext))
+    verify(declValTraverser).traverse(eqTree(declVal), eqTo(TheStatContext))
   }
 
   test("traverse() a Decl.Var") {
+    val declVar = q"private var myVar: Int"
+    val traversedDeclVar = q"var myTraversedVar: Int"
+    val javaModifiers = List(JavaModifier.Private)
+    val traversalResult = DeclVarTraversalResult(traversedDeclVar, javaModifiers)
 
-    val declVar = Decl.Var(
-      mods = List(),
-      pats = List(Pat.Var(Term.Name("myVar"))),
-      decltpe = TypeNames.Int
-    )
-
+    doReturn(traversalResult).when(declVarTraverser).traverse(eqTree(declVar), eqTo(TheStatContext))
+    
     declTraverser.traverse(declVar, TheStatContext)
 
-    verify(declVarTraverser).traverse(eqTree(declVar), ArgumentMatchers.eq(TheStatContext))
+    verify(declVarRenderer).render(eqTree(traversedDeclVar), eqTo(ValOrVarRenderContext(javaModifiers)))
   }
 
   test("traverse() a Decl.Def") {
@@ -63,7 +68,7 @@ class DeclTraverserImplTest extends UnitTestSuite {
 
     declTraverser.traverse(declDef, TheStatContext)
 
-    verify(declDefTraverser).traverse(eqTree(declDef), ArgumentMatchers.eq(TheStatContext))
+    verify(declDefTraverser).traverse(eqTree(declDef), eqTo(TheStatContext))
   }
 
   test("traverse() a Decl.Type") {
@@ -77,6 +82,6 @@ class DeclTraverserImplTest extends UnitTestSuite {
 
     declTraverser.traverse(declType, TheStatContext)
 
-    verify(declTypeTraverser).traverse(eqTree(declType), ArgumentMatchers.eq(TheStatContext))
+    verify(declTypeTraverser).traverse(eqTree(declType), eqTo(TheStatContext))
   }
 }
