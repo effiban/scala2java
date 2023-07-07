@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{InitContext, TemplateBodyContext, TemplateContext}
+import io.github.effiban.scala2java.core.renderers.InitListRenderer
 import io.github.effiban.scala2java.core.resolvers.JavaInheritanceKeywordResolver
 import io.github.effiban.scala2java.core.writers.JavaWriter
 import io.github.effiban.scala2java.spi.entities.JavaScope.JavaScope
@@ -13,7 +14,8 @@ trait TemplateTraverser {
   def traverse(template: Template, context: TemplateContext): Unit
 }
 
-private[traversers] class TemplateTraverserImpl(initListTraverser: => DeprecatedInitListTraverser,
+private[traversers] class TemplateTraverserImpl(initTraverser: => InitTraverser,
+                                                initListRenderer: => InitListRenderer,
                                                 selfTraverser: => SelfTraverser,
                                                 templateBodyTraverser: => TemplateBodyTraverser,
                                                 permittedSubTypeNameListTraverser: PermittedSubTypeNameListTraverser,
@@ -46,7 +48,8 @@ private[traversers] class TemplateTraverserImpl(initListTraverser: => Deprecated
       write(" ")
       writeKeyword(inheritanceKeyword)
       write(" ")
-      initListTraverser.traverse(inits, InitContext(ignoreArgs = true))
+      val traversedInits = inits.map(initTraverser.traverse)
+      initListRenderer.render(traversedInits, InitContext(ignoreArgs = true))
     }
   }
 }

@@ -3,6 +3,7 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.{InitContext, TemplateBodyContext, TemplateContext}
 import io.github.effiban.scala2java.core.entities.JavaKeyword.Implements
 import io.github.effiban.scala2java.core.matchers.TemplateBodyContextMatcher.eqTemplateBodyContext
+import io.github.effiban.scala2java.core.renderers.InitListRenderer
 import io.github.effiban.scala2java.core.resolvers.JavaInheritanceKeywordResolver
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
@@ -12,25 +13,24 @@ import io.github.effiban.scala2java.spi.entities.JavaScope.JavaScope
 import io.github.effiban.scala2java.spi.predicates.TemplateInitExcludedPredicate
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
-import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchersSugar.eqTo
 
-import scala.meta.{Ctor, Defn, Init, Lit, Name, Pat, Self, Stat, Template, Term, Type}
+import scala.meta.{Ctor, Defn, Init, Lit, Name, Pat, Self, Stat, Template, Term, Type, XtensionQuasiquoteInit}
 
 class TemplateTraverserImplTest extends UnitTestSuite {
 
   private val ClassName = Type.Name("MyClass")
 
-  private val IncludedInits = List(
-    Init(tpe = Type.Name("Parent1"), name = Name.Anonymous(), argss = List()),
-    Init(tpe = Type.Name("Parent2"), name = Name.Anonymous(), argss = List())
-  )
+  private val IncludedInit1 = init"Parent1()"
+  private val IncludedInit2 = init"Parent2()"
+  private val IncludedInits = List(IncludedInit1, IncludedInit2)
 
-  private val ExcludedInits = List(
-    Init(tpe = Type.Name("Product"), name = Name.Anonymous(), argss = List()),
-    Init(tpe = Type.Name("Serializable"), name = Name.Anonymous(), argss = List()),
-    Init(tpe = Type.Name("Enumeration"), name = Name.Anonymous(), argss = List())
-  )
+  private val TraversedIncludedInit1 = init"TraversedParent1()"
+  private val TraversedIncludedInit2 = init"TraversedParent2()"
+  private val TraversedIncludedInits = List(TraversedIncludedInit1, TraversedIncludedInit2)
+
+  private val ExcludedInits = List(init"Product()", init"Serializable()", init"Enumeration()")
 
   private val NonEmptySelf = Self(name = Name.Indeterminate("SelfName"), decltpe = Some(Type.Name("SelfType")))
 
@@ -66,7 +66,8 @@ class TemplateTraverserImplTest extends UnitTestSuite {
   )
 
 
-  private val initListTraverser = mock[DeprecatedInitListTraverser]
+  private val initTraverser = mock[InitTraverser]
+  private val initListRenderer = mock[InitListRenderer]
   private val selfTraverser = mock[SelfTraverser]
   private val javaInheritanceKeywordResolver = mock[JavaInheritanceKeywordResolver]
   private val templateBodyTraverser = mock[TemplateBodyTraverser]
@@ -74,7 +75,8 @@ class TemplateTraverserImplTest extends UnitTestSuite {
   private val templateInitExcludedPredicate = mock[TemplateInitExcludedPredicate]
 
   private val templateTraverser = new TemplateTraverserImpl(
-    initListTraverser,
+    initTraverser,
+    initListRenderer,
     selfTraverser,
     templateBodyTraverser,
     permittedSubTypeNameListTraverser,
@@ -95,7 +97,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin
 
-    verifyZeroInteractions(initListTraverser)
+    verifyZeroInteractions(initListRenderer)
   }
 
   test("traverse when has inits only, nothing to skip") {
@@ -114,7 +116,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     templateTraverser.traverse(template, context = TemplateContext(javaScope = JavaScope.Class))
 
     outputWriter.toString shouldBe
-      """ implements Parent1, Parent2 {
+      """ implements TraversedParent1, TraversedParent2 {
         |  /* BODY */
         |}
         |""".stripMargin
@@ -136,7 +138,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     templateTraverser.traverse(template, context = TemplateContext(javaScope = JavaScope.Class))
 
     outputWriter.toString shouldBe
-      """ implements Parent1, Parent2 {
+      """ implements TraversedParent1, TraversedParent2 {
         |  /* BODY */
         |}
         |""".stripMargin
@@ -161,7 +163,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin
 
-    verifyZeroInteractions(initListTraverser)
+    verifyZeroInteractions(initListRenderer)
   }
 
   test("traverse when has permitted subtypes only") {
@@ -183,7 +185,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin
 
-    verifyZeroInteractions(initListTraverser)
+    verifyZeroInteractions(initListRenderer)
   }
 
   test("traverse when has primary ctor only") {
@@ -236,7 +238,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin
 
-    verifyZeroInteractions(initListTraverser)
+    verifyZeroInteractions(initListRenderer)
   }
 
   test("traverse when has everything") {
@@ -273,7 +275,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     templateTraverser.traverse(template = template, context = context)
 
     outputWriter.toString shouldBe
-      """ implements Parent1, Parent2/* extends SelfName: SelfType */ permits Child1, Child2 {
+      """ implements TraversedParent1, TraversedParent2/* extends SelfName: SelfType */ permits Child1, Child2 {
         |  /* BODY */
         |}
         |""".stripMargin
@@ -290,10 +292,14 @@ class TemplateTraverserImplTest extends UnitTestSuite {
   }
 
   private def expectWriteInits(javaScope: JavaScope): Unit = {
-    when(javaInheritanceKeywordResolver.resolve(ArgumentMatchers.eq(javaScope), eqTreeList(IncludedInits))).thenReturn(Implements)
-    doWrite("Parent1, Parent2")
-      .when(initListTraverser).traverse(
-      eqTreeList(IncludedInits), ArgumentMatchers.eq(InitContext(ignoreArgs = true)))
+    when(javaInheritanceKeywordResolver.resolve(eqTo(javaScope), eqTreeList(IncludedInits))).thenReturn(Implements)
+    doAnswer((init: Init) => init match {
+      case anInit if anInit.structure == IncludedInit1.structure => TraversedIncludedInit1
+      case anInit if anInit.structure == IncludedInit2.structure => TraversedIncludedInit2
+      case anInit => anInit
+    }).when(initTraverser).traverse(any[Init])
+    doWrite("TraversedParent1, TraversedParent2")
+      .when(initListRenderer).render(eqTreeList(TraversedIncludedInits), eqTo(InitContext(ignoreArgs = true)))
   }
 
   private def expectWriteSelf(self: Self = Selfs.Empty): Unit = {
