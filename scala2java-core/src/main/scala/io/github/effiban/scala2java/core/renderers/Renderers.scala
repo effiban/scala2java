@@ -5,8 +5,8 @@ import io.github.effiban.scala2java.core.orderings.JavaModifierOrdering
 import io.github.effiban.scala2java.core.resolvers.ArrayInitializerRenderContextResolver
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
-import scala.meta.Term
 import scala.meta.Term.Assign
+import scala.meta.{Term, Type}
 
 class Renderers(implicit javaWriter: JavaWriter) {
 
@@ -304,6 +304,17 @@ class Renderers(implicit javaWriter: JavaWriter) {
   )
 
   lazy val typeNameRenderer: TypeNameRenderer = new TypeNameRendererImpl()
+
+  lazy val typeParamRenderer: TypeParamRenderer = new TypeParamRendererImpl(
+    nameRenderer,
+    typeParamListRenderer,
+    typeBoundsRenderer
+  )
+
+  lazy val typeParamListRenderer: TypeParamListRenderer = new TypeParamListRendererImpl(
+    argumentListRenderer,
+    new SimpleArgumentRenderer[Type.Param](typeParamRenderer)
+  )
 
   lazy val typeProjectRenderer: TypeProjectRenderer = new TypeProjectRendererImpl(
     typeRenderer,
