@@ -8,8 +8,8 @@ import io.github.effiban.scala2java.core.matchers.ModListTraversalResultMockitoM
 import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
 import io.github.effiban.scala2java.core.matchers.ModifiersRenderContextMatcher.eqModifiersRenderContext
 import io.github.effiban.scala2java.core.matchers.TemplateContextMatcher.eqTemplateContext
-import io.github.effiban.scala2java.core.renderers.ModListRenderer
 import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
+import io.github.effiban.scala2java.core.renderers.{ModListRenderer, TypeParamListRenderer}
 import io.github.effiban.scala2java.core.resolvers.{JavaChildScopeResolver, JavaTreeTypeResolver}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
@@ -23,8 +23,7 @@ import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.Mod.{Final, Private}
 import scala.meta.Term.Block
-import scala.meta.Type.Bounds
-import scala.meta.{Ctor, Decl, Defn, Init, Mod, Name, Pat, Self, Template, Term, Type}
+import scala.meta.{Ctor, Decl, Defn, Init, Mod, Name, Pat, Self, Template, Term, Type, XtensionQuasiquoteTypeParam}
 
 class RegularClassTraverserImplTest extends UnitTestSuite {
 
@@ -36,16 +35,13 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
     )
   )
 
-  private val TypeParams = List(
-    Type.Param(
-      mods = List(),
-      name = Type.Name("T"),
-      tparams = List(),
-      tbounds = Bounds(lo = None, hi = None),
-      vbounds = List(),
-      cbounds = List()
-    )
-  )
+  private val TypeParam1 = tparam"T1"
+  private val TypeParam2 = tparam"T2"
+  private val TypeParams = List(TypeParam1, TypeParam2)
+
+  private val TraversedTypeParam1 = tparam"T11"
+  private val TraversedTypeParam2 = tparam"T22"
+  private val TraversedTypeParams = List(TraversedTypeParam1, TraversedTypeParam2)
 
   private val Arg1Name = "arg1"
   private val Arg2Name = "arg2"
@@ -84,7 +80,8 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
   private val modListTraverser = mock[ModListTraverser]
   private val modifiersRenderContextFactory = mock[ModifiersRenderContextFactory]
   private val modListRenderer = mock[ModListRenderer]
-  private val typeParamListTraverser = mock[DeprecatedTypeParamListTraverser]
+  private val typeParamTraverser = mock[TypeParamTraverser]
+  private val typeParamListRenderer = mock[TypeParamListRenderer]
   private val templateTraverser = mock[TemplateTraverser]
   private val paramToDeclValTransformer = mock[ParamToDeclValTransformer]
   private val javaTreeTypeResolver = mock[JavaTreeTypeResolver]
@@ -94,7 +91,8 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
     modListTraverser,
     modifiersRenderContextFactory,
     modListRenderer,
-    typeParamListTraverser,
+    typeParamTraverser,
+    typeParamListRenderer,
     templateTraverser,
     paramToDeclValTransformer,
     javaTreeTypeResolver,
@@ -130,7 +128,12 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |public """.stripMargin)
       .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
-    doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
+    doAnswer((tparam: Type.Param) => tparam match {
+      case aTypeParam if aTypeParam.structure == TypeParam1.structure => TraversedTypeParam1
+      case aTypeParam if aTypeParam.structure == TypeParam2.structure => TraversedTypeParam2
+      case aTypeParam => aTypeParam
+    }).when(typeParamTraverser).traverse(any[Type.Param])
+    doWrite("<T11, T22>").when(typeParamListRenderer).render(eqTreeList(TraversedTypeParams))
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Class)))).thenReturn(JavaScope.Class)
 
     when(paramToDeclValTransformer.transform(any[Term.Param])).thenAnswer( (ctorArg: Term.Param) => ctorArg match {
@@ -153,7 +156,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """
         |@MyAnnotation
-        |public class MyClass<T> {
+        |public class MyClass<T11, T22> {
         |  /* BODY */
         |}
         |""".stripMargin
@@ -190,7 +193,12 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |public """.stripMargin)
       .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
-    doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
+    doAnswer((tparam: Type.Param) => tparam match {
+      case aTypeParam if aTypeParam.structure == TypeParam1.structure => TraversedTypeParam1
+      case aTypeParam if aTypeParam.structure == TypeParam2.structure => TraversedTypeParam2
+      case aTypeParam => aTypeParam
+    }).when(typeParamTraverser).traverse(any[Type.Param])
+    doWrite("<T11, T22>").when(typeParamListRenderer).render(eqTreeList(TraversedTypeParams))
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Class)))).thenReturn(JavaScope.Class)
 
     when(paramToDeclValTransformer.transform(any[Term.Param])).thenAnswer((ctorArg: Term.Param) => ctorArg match {
@@ -219,7 +227,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """
         |@MyAnnotation
-        |public class MyClass<T> {
+        |public class MyClass<T11, T22> {
         |  /* BODY */
         |}
         |""".stripMargin
@@ -265,7 +273,12 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |public """.stripMargin)
       .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
-    doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
+    doAnswer((tparam: Type.Param) => tparam match {
+      case aTypeParam if aTypeParam.structure == TypeParam1.structure => TraversedTypeParam1
+      case aTypeParam if aTypeParam.structure == TypeParam2.structure => TraversedTypeParam2
+      case aTypeParam => aTypeParam
+    }).when(typeParamTraverser).traverse(any[Type.Param])
+    doWrite("<T11, T22>").when(typeParamListRenderer).render(eqTreeList(TraversedTypeParams))
 
     when(paramToDeclValTransformer.transform(any[Term.Param])).thenAnswer( (ctorArg: Term.Param) => ctorArg match {
       case arg if arg.structure == CtorArg1.structure => ExpectedMemberDecl1
@@ -289,7 +302,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """
         |@MyAnnotation
-        |public class MyClass<T> {
+        |public class MyClass<T11, T22> {
         |  /* BODY */
         |}
         |""".stripMargin
