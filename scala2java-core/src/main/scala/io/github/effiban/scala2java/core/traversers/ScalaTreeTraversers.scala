@@ -615,7 +615,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
   )
 
   private lazy val templateTraverser: TemplateTraverser = new TemplateTraverserImpl(
-    deprecatedInitListTraverser,
+    initTraverser,
+    initListRenderer,
     selfTraverser,
     templateBodyTraverser,
     permittedSubTypeNameListTraverser,
