@@ -128,7 +128,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
     modListTraverser,
     ModifiersRenderContextFactory,
     modListRenderer,
-    typeParamListTraverser,
+    deprecatedTypeParamListTraverser,
     termParamTraverser,
     termParamListRenderer,
     templateTraverser,
@@ -177,7 +177,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
     modListTraverser,
     ModifiersRenderContextFactory,
     modListRenderer,
-    typeParamListTraverser,
+    deprecatedTypeParamListTraverser,
     typeTraverser,
     typeRenderer,
     termNameRenderer,
@@ -196,7 +196,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
     modListTraverser,
     ModifiersRenderContextFactory,
     modListRenderer,
-    typeParamListTraverser,
+    deprecatedTypeParamListTraverser,
     JavaTreeTypeResolver)
 
   private lazy val declValTraverser: DeclValTraverser = new DeclValTraverserImpl(
@@ -298,7 +298,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
     modListTraverser,
     ModifiersRenderContextFactory,
     modListRenderer,
-    typeParamListTraverser,
+    deprecatedTypeParamListTraverser,
     termNameRenderer,
     typeTraverser,
     typeRenderer,
@@ -328,7 +328,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
     modListTraverser,
     ModifiersRenderContextFactory,
     modListRenderer,
-    typeParamListTraverser,
+    deprecatedTypeParamListTraverser,
     typeTraverser,
     typeRenderer,
     typeBoundsTraverser,
@@ -554,7 +554,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
     modListTraverser,
     ModifiersRenderContextFactory,
     modListRenderer,
-    typeParamListTraverser,
+    deprecatedTypeParamListTraverser,
     templateTraverser,
     ParamToDeclValTransformer,
     JavaTreeTypeResolver,
@@ -729,7 +729,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
     modListTraverser,
     ModifiersRenderContextFactory,
     modListRenderer,
-    typeParamListTraverser,
+    deprecatedTypeParamListTraverser,
     templateTraverser,
     JavaTreeTypeResolver,
     JavaChildScopeResolver
@@ -767,15 +767,15 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val typeNameTraverser: TypeNameTraverser = new TypeNameTraverserImpl(new CompositeTypeNameTransformer(CoreTypeNameTransformer))
 
-  private lazy val typeParamListTraverser: TypeParamListTraverser = new TypeParamListTraverserImpl(
+  private lazy val deprecatedTypeParamListTraverser: DeprecatedTypeParamListTraverser = new DeprecatedTypeParamListTraverserImpl(
     deprecatedArgumentListTraverser,
-    new DeprecatedSimpleArgumentTraverser(typeParamTraverser)
+    new DeprecatedSimpleArgumentTraverser(deprecatedTypeParamTraverser)
   )
 
-  private lazy val typeParamTraverser: TypeParamTraverser = new TypeParamTraverserImpl(
+  private lazy val deprecatedTypeParamTraverser: DeprecatedTypeParamTraverser = new DeprecatedTypeParamTraverserImpl(
     nameTraverser,
     nameRenderer,
-    typeParamListTraverser,
+    deprecatedTypeParamListTraverser,
     typeBoundsTraverser,
     typeBoundsRenderer
   )

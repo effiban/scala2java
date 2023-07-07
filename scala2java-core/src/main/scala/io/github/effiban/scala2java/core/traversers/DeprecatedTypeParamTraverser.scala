@@ -4,13 +4,15 @@ import io.github.effiban.scala2java.core.renderers.{NameRenderer, TypeBoundsRend
 
 import scala.meta.Type
 
-trait TypeParamTraverser extends ScalaTreeTraverser[Type.Param]
+@deprecated
+trait DeprecatedTypeParamTraverser extends ScalaTreeTraverser[Type.Param]
 
-private[traversers] class TypeParamTraverserImpl(nameTraverser: NameTraverser,
-                                                 nameRenderer: NameRenderer,
-                                                 typeParamListTraverser: => TypeParamListTraverser,
-                                                 typeBoundsTraverser: => TypeBoundsTraverser,
-                                                 typeBoundsRenderer: => TypeBoundsRenderer) extends TypeParamTraverser {
+@deprecated
+private[traversers] class DeprecatedTypeParamTraverserImpl(nameTraverser: NameTraverser,
+                                                           nameRenderer: NameRenderer,
+                                                           typeParamListTraverser: => DeprecatedTypeParamListTraverser,
+                                                           typeBoundsTraverser: => TypeBoundsTraverser,
+                                                           typeBoundsRenderer: => TypeBoundsRenderer) extends DeprecatedTypeParamTraverser {
 
   // Type param declaration, e.g.: `T` in trait MyTrait[T]
   override def traverse(typeParam: Type.Param): Unit = {

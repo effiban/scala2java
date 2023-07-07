@@ -6,12 +6,15 @@ import io.github.effiban.scala2java.core.entities.ListTraversalOptions
 
 import scala.meta.Type
 
-trait TypeParamListTraverser {
+@deprecated
+trait DeprecatedTypeParamListTraverser {
   def traverse(typeParams: List[Type.Param]): Unit
 }
 
-private[traversers] class TypeParamListTraverserImpl(argumentListTraverser: => DeprecatedArgumentListTraverser,
-                                                     typeParamArgTraverser: => DeprecatedArgumentTraverser[Type.Param]) extends TypeParamListTraverser {
+@deprecated
+private[traversers] class DeprecatedTypeParamListTraverserImpl(argumentListTraverser: => DeprecatedArgumentListTraverser,
+                                                               typeParamArgTraverser: => DeprecatedArgumentTraverser[Type.Param])
+  extends DeprecatedTypeParamListTraverser {
 
   override def traverse(typeParams: List[Type.Param]): Unit = {
     argumentListTraverser.traverse(args = typeParams,

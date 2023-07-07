@@ -18,7 +18,7 @@ trait RegularClassTraverser {
 private[traversers] class RegularClassTraverserImpl(modListTraverser: => ModListTraverser,
                                                     modifiersRenderContextFactory: ModifiersRenderContextFactory,
                                                     modListRenderer: => ModListRenderer,
-                                                    typeParamListTraverser: => TypeParamListTraverser,
+                                                    typeParamListTraverser: => DeprecatedTypeParamListTraverser,
                                                     templateTraverser: => TemplateTraverser,
                                                     paramToDeclValTransformer: ParamToDeclValTransformer,
                                                     javaTreeTypeResolver: JavaTreeTypeResolver,

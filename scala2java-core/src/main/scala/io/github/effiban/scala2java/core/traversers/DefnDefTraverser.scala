@@ -4,8 +4,8 @@ import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.entities.Decision.{No, Uncertain, Yes}
 import io.github.effiban.scala2java.core.entities.JavaTreeType
 import io.github.effiban.scala2java.core.entities.TraversalConstants.UnknownType
-import io.github.effiban.scala2java.core.renderers.contextfactories.{BlockRenderContextFactory, ModifiersRenderContextFactory}
 import io.github.effiban.scala2java.core.renderers._
+import io.github.effiban.scala2java.core.renderers.contextfactories.{BlockRenderContextFactory, ModifiersRenderContextFactory}
 import io.github.effiban.scala2java.core.typeinference.TermTypeInferrer
 import io.github.effiban.scala2java.core.writers.JavaWriter
 import io.github.effiban.scala2java.spi.entities.JavaScope
@@ -20,7 +20,7 @@ trait DefnDefTraverser {
 private[traversers] class DefnDefTraverserImpl(modListTraverser: => ModListTraverser,
                                                modifiersRenderContextFactory: ModifiersRenderContextFactory,
                                                modListRenderer: => ModListRenderer,
-                                               typeParamListTraverser: => TypeParamListTraverser,
+                                               typeParamListTraverser: => DeprecatedTypeParamListTraverser,
                                                termNameRenderer: TermNameRenderer,
                                                typeTraverser: => TypeTraverser,
                                                typeRenderer: => TypeRenderer,

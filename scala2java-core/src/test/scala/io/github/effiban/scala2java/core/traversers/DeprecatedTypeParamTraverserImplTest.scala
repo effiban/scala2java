@@ -8,15 +8,15 @@ import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.{Type, XtensionQuasiquoteType, XtensionQuasiquoteTypeParam}
 
-class TypeParamTraverserImplTest extends UnitTestSuite {
+class DeprecatedTypeParamTraverserImplTest extends UnitTestSuite {
 
   private val nameTraverser = mock[NameTraverser]
   private val nameRenderer = mock[NameRenderer]
-  private val typeParamListTraverser = mock[TypeParamListTraverser]
+  private val typeParamListTraverser = mock[DeprecatedTypeParamListTraverser]
   private val typeBoundsTraverser = mock[TypeBoundsTraverser]
   private val typeBoundsRenderer = mock[TypeBoundsRenderer]
 
-  private val typeParamTraverser = new TypeParamTraverserImpl(
+  private val typeParamTraverser = new DeprecatedTypeParamTraverserImpl(
     nameTraverser,
     nameRenderer,
     typeParamListTraverser,
