@@ -780,6 +780,11 @@ class ScalaTreeTraversers(implicit factories: Factories,
     typeBoundsRenderer
   )
 
+  private lazy val typeParamTraverser: TypeParamTraverser = new TypeParamTraverserImpl(
+    nameTraverser,
+    typeBoundsTraverser
+  )
+
   private lazy val typeProjectTraverser: TypeProjectTraverser = new TypeProjectTraverserImpl(
     typeTraverser,
     typeNameTraverser
