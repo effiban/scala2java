@@ -7,6 +7,7 @@ import io.github.effiban.scala2java.core.orderings.JavaTemplateChildOrdering
 import io.github.effiban.scala2java.core.predicates._
 import io.github.effiban.scala2java.core.providers.{CompositeAdditionalImportersProvider, CoreAdditionalImportersProvider}
 import io.github.effiban.scala2java.core.renderers.Renderers
+import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
 import io.github.effiban.scala2java.core.resolvers._
 import io.github.effiban.scala2java.core.transformers._
 import io.github.effiban.scala2java.core.typeinference.TypeInferrers
@@ -124,7 +125,9 @@ class ScalaTreeTraversers(implicit factories: Factories,
   private lazy val blockWrappingTermTraverser: BlockWrappingTermTraverser = new BlockWrappingTermTraverserImpl(defaultBlockTraverser)
 
   private lazy val caseClassTraverser: CaseClassTraverser = new CaseClassTraverserImpl(
-    deprecatedModListTraverser,
+    modListTraverser,
+    ModifiersRenderContextFactory,
+    modListRenderer,
     typeParamListTraverser,
     deprecatedTermParamListTraverser,
     templateTraverser,
