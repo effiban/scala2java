@@ -9,7 +9,7 @@ import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModi
 import io.github.effiban.scala2java.core.matchers.ModifiersRenderContextMatcher.eqModifiersRenderContext
 import io.github.effiban.scala2java.core.matchers.TemplateContextMatcher.eqTemplateContext
 import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
-import io.github.effiban.scala2java.core.renderers.{ModListRenderer, TermParamListRenderer}
+import io.github.effiban.scala2java.core.renderers.{ModListRenderer, TermParamListRenderer, TypeParamListRenderer}
 import io.github.effiban.scala2java.core.resolvers.{JavaChildScopeResolver, JavaTreeTypeResolver}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
@@ -21,8 +21,7 @@ import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.{any, eqTo}
 
 import scala.meta.Term.Block
-import scala.meta.Type.Bounds
-import scala.meta.{Ctor, Defn, Init, Mod, Name, Self, Template, Term, Type, XtensionQuasiquoteTermParam}
+import scala.meta.{Ctor, Defn, Init, Mod, Name, Self, Template, Term, Type, XtensionQuasiquoteTermParam, XtensionQuasiquoteTypeParam}
 
 class CaseClassTraverserImplTest extends UnitTestSuite {
 
@@ -30,16 +29,13 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
 
   private val ClassName = Type.Name("MyRecord")
 
-  private val TypeParams = List(
-    Type.Param(
-      mods = List(),
-      name = Type.Name("T"),
-      tparams = List(),
-      tbounds = Bounds(lo = None, hi = None),
-      vbounds = List(),
-      cbounds = List()
-    )
-  )
+  private val TypeParam1 = tparam"T1"
+  private val TypeParam2 = tparam"T2"
+  private val TypeParams = List(TypeParam1, TypeParam2)
+
+  private val TraversedTypeParam1 = tparam"T11"
+  private val TraversedTypeParam2 = tparam"T22"
+  private val TraversedTypeParams = List(TraversedTypeParam1, TraversedTypeParam2)
 
   private val CtorArg1 = param"arg1: Int"
   private val CtorArg2 = param"arg2: Int"
@@ -76,7 +72,8 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
   private val modListTraverser = mock[ModListTraverser]
   private val modifiersRenderContextFactory = mock[ModifiersRenderContextFactory]
   private val modListRenderer = mock[ModListRenderer]
-  private val typeParamListTraverser = mock[DeprecatedTypeParamListTraverser]
+  private val typeParamTraverser = mock[TypeParamTraverser]
+  private val typeParamListRenderer = mock[TypeParamListRenderer]
   private val termParamTraverser = mock[TermParamTraverser]
   private val termParamListRenderer = mock[TermParamListRenderer]  
   private val templateTraverser = mock[TemplateTraverser]
@@ -84,12 +81,12 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
   private val javaChildScopeResolver = mock[JavaChildScopeResolver]
 
 
-
   private val classTraverser = new CaseClassTraverserImpl(
     modListTraverser,
     modifiersRenderContextFactory,
     modListRenderer,
-    typeParamListTraverser,
+    typeParamTraverser,
+    typeParamListRenderer,
     termParamTraverser,
     termParamListRenderer,
     templateTraverser,
@@ -129,7 +126,12 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |public """.stripMargin)
       .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
-    doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
+    doAnswer((tparam: Type.Param) => tparam match {
+      case aTypeParam if aTypeParam.structure == TypeParam1.structure => TraversedTypeParam1
+      case aTypeParam if aTypeParam.structure == TypeParam2.structure => TraversedTypeParam2
+      case aTypeParam => aTypeParam
+    }).when(typeParamTraverser).traverse(any[Type.Param])
+    doWrite("<T11, T22>").when(typeParamListRenderer).render(eqTreeList(TraversedTypeParams))
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Record)))).thenReturn(JavaScope.Class)
     doAnswer((param: Term.Param) => {
       val traversedParam = param match {
@@ -156,7 +158,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """
         |@MyAnnotation
-        |public record MyRecord<T>(int arg11, int arg22) {
+        |public record MyRecord<T11, T22>(int arg11, int arg22) {
         | /* BODY */
         |}
         |""".stripMargin
@@ -198,7 +200,12 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |public """.stripMargin)
       .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
-    doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
+    doAnswer((tparam: Type.Param) => tparam match {
+      case aTypeParam if aTypeParam.structure == TypeParam1.structure => TraversedTypeParam1
+      case aTypeParam if aTypeParam.structure == TypeParam2.structure => TraversedTypeParam2
+      case aTypeParam => aTypeParam
+    }).when(typeParamTraverser).traverse(any[Type.Param])
+    doWrite("<T11, T22>").when(typeParamListRenderer).render(eqTreeList(TraversedTypeParams))
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Record)))).thenReturn(JavaScope.Class)
     doAnswer((param: Term.Param) => {
       val traversedParam = param match {
@@ -226,7 +233,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """
         |@MyAnnotation
-        |public record MyRecord<T>(int arg11, int arg22) {
+        |public record MyRecord<T11, T22>(int arg11, int arg22) {
         | /* BODY */
         |}
         |""".stripMargin
@@ -263,7 +270,12 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |public """.stripMargin)
       .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
-    doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
+    doAnswer((tparam: Type.Param) => tparam match {
+      case aTypeParam if aTypeParam.structure == TypeParam1.structure => TraversedTypeParam1
+      case aTypeParam if aTypeParam.structure == TypeParam2.structure => TraversedTypeParam2
+      case aTypeParam => aTypeParam
+    }).when(typeParamTraverser).traverse(any[Type.Param])
+    doWrite("<T11, T22>").when(typeParamListRenderer).render(eqTreeList(TraversedTypeParams))
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Record)))).thenReturn(JavaScope.Class)
     doAnswer((param: Term.Param) => {
       val traversedParam = param match {
@@ -299,7 +311,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """
         |@MyAnnotation
-        |public record MyRecord<T>(int arg11, int arg22) {
+        |public record MyRecord<T11, T22>(int arg11, int arg22) {
         | /* BODY */
         |}
         |""".stripMargin
@@ -334,7 +346,12 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |public """.stripMargin)
       .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
-    doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
+    doAnswer((tparam: Type.Param) => tparam match {
+      case aTypeParam if aTypeParam.structure == TypeParam1.structure => TraversedTypeParam1
+      case aTypeParam if aTypeParam.structure == TypeParam2.structure => TraversedTypeParam2
+      case aTypeParam => aTypeParam
+    }).when(typeParamTraverser).traverse(any[Type.Param])
+    doWrite("<T11, T22>").when(typeParamListRenderer).render(eqTreeList(TraversedTypeParams))
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Record)))).thenReturn(JavaScope.Class)
     doAnswer((param: Term.Param) => {
       val traversedParam = param match {
@@ -363,7 +380,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """
         |@MyAnnotation
-        |public record MyRecord<T>(int arg11, int arg22, int arg33, int arg44) {
+        |public record MyRecord<T11, T22>(int arg11, int arg22, int arg33, int arg44) {
         | /* BODY */
         |}
         |""".stripMargin
