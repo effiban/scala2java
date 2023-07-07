@@ -5,8 +5,8 @@ import io.github.effiban.scala2java.core.entities.{JavaModifier, JavaTreeType}
 import io.github.effiban.scala2java.core.matchers.ModListTraversalResultMockitoMatcher.eqModListTraversalResult
 import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
 import io.github.effiban.scala2java.core.matchers.ModifiersRenderContextMatcher.eqModifiersRenderContext
+import io.github.effiban.scala2java.core.renderers._
 import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
-import io.github.effiban.scala2java.core.renderers.{ModListRenderer, TermNameRenderer, TermParamListRenderer, TypeRenderer}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.traversers.results.{ModListTraversalResult, TermParamTraversalResult}
@@ -16,8 +16,7 @@ import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeL
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.{any, eqTo}
 
-import scala.meta.Type.Bounds
-import scala.meta.{Decl, Init, Mod, Name, Term, Type, XtensionQuasiquoteTermParam, XtensionQuasiquoteType}
+import scala.meta.{Decl, Init, Mod, Name, Term, Type, XtensionQuasiquoteTermParam, XtensionQuasiquoteType, XtensionQuasiquoteTypeParam}
 
 class DeclDefTraverserImplTest extends UnitTestSuite {
 
@@ -31,16 +30,13 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     )
   )
 
-  private val TypeParams = List(
-    Type.Param(
-      mods = List(),
-      name = Type.Name("T"),
-      tparams = List(),
-      tbounds = Bounds(lo = None, hi = None),
-      vbounds = List(),
-      cbounds = List()
-    )
-  )
+  private val TypeParam1 = tparam"T1"
+  private val TypeParam2 = tparam"T2"
+  private val TypeParams = List(TypeParam1, TypeParam2)
+
+  private val TraversedTypeParam1 = tparam"T11"
+  private val TraversedTypeParam2 = tparam"T22"
+  private val TraversedTypeParams = List(TraversedTypeParam1, TraversedTypeParam2)
 
   private val MethodParam1 = param"param1: Int"
   private val MethodParam2 = param"param2: Int"
@@ -63,7 +59,8 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
   private val modListRenderer = mock[ModListRenderer]
   private val typeTraverser = mock[TypeTraverser]
   private val typeRenderer = mock[TypeRenderer]
-  private val typeParamListTraverser = mock[DeprecatedTypeParamListTraverser]
+  private val typeParamTraverser = mock[TypeParamTraverser]
+  private val typeParamListRenderer = mock[TypeParamListRenderer]
   private val termNameRenderer = mock[TermNameRenderer]
   private val termParamTraverser = mock[TermParamTraverser]
   private val termParamListRenderer = mock[TermParamListRenderer]
@@ -72,7 +69,8 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     modListTraverser,
     modifiersRenderContextFactory,
     modListRenderer,
-    typeParamListTraverser,
+    typeParamTraverser,
+    typeParamListRenderer,
     typeTraverser,
     typeRenderer,
     termNameRenderer,
@@ -146,7 +144,12 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
       """@MyAnnotation
         |public """.stripMargin)
       .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
-    doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
+    doAnswer((tparam: Type.Param) => tparam match {
+      case aTypeParam if aTypeParam.structure == TypeParam1.structure => TraversedTypeParam1
+      case aTypeParam if aTypeParam.structure == TypeParam2.structure => TraversedTypeParam2
+      case aTypeParam => aTypeParam
+    }).when(typeParamTraverser).traverse(any[Type.Param])
+    doWrite("<T11, T22>").when(typeParamListRenderer).render(eqTreeList(TraversedTypeParams))
     doReturn(TraversedMethodType).when(typeTraverser).traverse(eqTree(MethodType))
     doWrite("TraversedMethodType").when(typeRenderer).render(eqTree(TraversedMethodType))
     doWrite("myMethod").when(termNameRenderer).render(eqTree(MethodName))
@@ -167,7 +170,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """
         |@MyAnnotation
-        |public <T> TraversedMethodType myMethod(final int param11, final int param22)""".stripMargin
+        |public <T11, T22> TraversedMethodType myMethod(final int param11, final int param22)""".stripMargin
   }
 
   test("traverse() for interface method when has one list of params") {
