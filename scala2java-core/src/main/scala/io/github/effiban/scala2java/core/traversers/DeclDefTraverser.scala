@@ -2,7 +2,8 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{ModifiersContext, StatContext}
 import io.github.effiban.scala2java.core.entities.JavaTreeType
-import io.github.effiban.scala2java.core.renderers.{TermNameRenderer, TypeRenderer}
+import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
+import io.github.effiban.scala2java.core.renderers.{ModListRenderer, TermNameRenderer, TypeRenderer}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 import io.github.effiban.scala2java.spi.entities.JavaScope
 
@@ -12,7 +13,9 @@ trait DeclDefTraverser {
   def traverse(defDecl: Decl.Def, context: StatContext = StatContext()): Unit
 }
 
-private[traversers] class DeclDefTraverserImpl(modListTraverser: => DeprecatedModListTraverser,
+private[traversers] class DeclDefTraverserImpl(modListTraverser: => ModListTraverser,
+                                               modifiersRenderContextFactory: ModifiersRenderContextFactory,
+                                               modListRenderer: => ModListRenderer,
                                                typeParamListTraverser: => TypeParamListTraverser,
                                                typeTraverser: => TypeTraverser,
                                                typeRenderer: => TypeRenderer,
@@ -24,7 +27,9 @@ private[traversers] class DeclDefTraverserImpl(modListTraverser: => DeprecatedMo
 
   override def traverse(defDecl: Decl.Def, context: StatContext = StatContext()): Unit = {
     writeLine()
-    modListTraverser.traverse(ModifiersContext(defDecl, JavaTreeType.Method, context.javaScope))
+    val modListTraversalResult = modListTraverser.traverse(ModifiersContext(defDecl, JavaTreeType.Method, context.javaScope))
+    val modifiersRenderContext = modifiersRenderContextFactory(modListTraversalResult)
+    modListRenderer.render(modifiersRenderContext)
     traverseTypeParams(defDecl.tparams)
     val traversedType = typeTraverser.traverse(defDecl.decltpe)
     typeRenderer.render(traversedType)
