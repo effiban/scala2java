@@ -488,7 +488,9 @@ class ScalaTreeTraversers(implicit factories: Factories,
   )
 
   private lazy val objectTraverser: ObjectTraverser = new ObjectTraverserImpl(
-    deprecatedModListTraverser,
+    modListTraverser,
+    ModifiersRenderContextFactory,
+    modListRenderer,
     templateTraverser,
     JavaTreeTypeResolver,
     JavaChildScopeResolver)

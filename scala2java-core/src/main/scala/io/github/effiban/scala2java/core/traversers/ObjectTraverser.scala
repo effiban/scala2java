@@ -2,6 +2,8 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.entities.JavaTreeTypeToKeywordMapping
+import io.github.effiban.scala2java.core.renderers.ModListRenderer
+import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
 import io.github.effiban.scala2java.core.resolvers.{JavaChildScopeResolver, JavaTreeTypeResolver}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
@@ -11,7 +13,9 @@ trait ObjectTraverser {
   def traverse(objectDef: Defn.Object, context: StatContext = StatContext()): Unit
 }
 
-private[traversers] class ObjectTraverserImpl(modListTraverser: => DeprecatedModListTraverser,
+private[traversers] class ObjectTraverserImpl(modListTraverser: => ModListTraverser,
+                                              modifiersRenderContextFactory: ModifiersRenderContextFactory,
+                                              modListRenderer: => ModListRenderer,
                                               templateTraverser: => TemplateTraverser,
                                               javaTreeTypeResolver: JavaTreeTypeResolver,
                                               javaChildScopeResolver: JavaChildScopeResolver)
@@ -22,7 +26,9 @@ private[traversers] class ObjectTraverserImpl(modListTraverser: => DeprecatedMod
   override def traverse(objectDef: Defn.Object, context: StatContext = StatContext()): Unit = {
     writeLine()
     val javaTreeType = javaTreeTypeResolver.resolve(JavaTreeTypeContext(objectDef, objectDef.mods))
-    modListTraverser.traverse(ModifiersContext(objectDef, javaTreeType, context.javaScope))
+    val modListTraversalResult = modListTraverser.traverse(ModifiersContext(objectDef, javaTreeType, context.javaScope))
+    val modifiersRenderContext = modifiersRenderContextFactory(modListTraversalResult)
+    modListRenderer.render(modifiersRenderContext)
     writeNamedType(JavaTreeTypeToKeywordMapping(javaTreeType), objectDef.name.value)
     val javaChildScope = javaChildScopeResolver.resolve(JavaChildScopeContext(objectDef, javaTreeType))
     // TODO if child scope is utility class, add private ctor.
