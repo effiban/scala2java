@@ -2,8 +2,8 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{JavaTreeTypeContext, ModifiersContext, StatContext}
 import io.github.effiban.scala2java.core.entities.JavaTreeTypeToKeywordMapping
-import io.github.effiban.scala2java.core.renderers.ModListRenderer
 import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
+import io.github.effiban.scala2java.core.renderers.{ModListRenderer, TypeParamListRenderer}
 import io.github.effiban.scala2java.core.resolvers.JavaTreeTypeResolver
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
@@ -16,7 +16,8 @@ trait DeclTypeTraverser {
 private[traversers] class DeclTypeTraverserImpl(modListTraverser: => ModListTraverser,
                                                 modifiersRenderContextFactory: ModifiersRenderContextFactory,
                                                 modListRenderer: => ModListRenderer,
-                                                typeParamListTraverser: => DeprecatedTypeParamListTraverser,
+                                                typeParamTraverser: => TypeParamTraverser,
+                                                typeParamListRenderer: => TypeParamListRenderer,
                                                 javaTreeTypeResolver: JavaTreeTypeResolver)
                                                (implicit javaWriter: JavaWriter) extends DeclTypeTraverser {
 
@@ -31,7 +32,8 @@ private[traversers] class DeclTypeTraverserImpl(modListTraverser: => ModListTrav
     val modifiersRenderContext = modifiersRenderContextFactory(modListTraversalResult)
     modListRenderer.render(modifiersRenderContext)
     writeNamedType(JavaTreeTypeToKeywordMapping(javaTreeType), typeDecl.name.value)
-    typeParamListTraverser.traverse(typeDecl.tparams)
+    val traversedTypeParams = typeDecl.tparams.map(typeParamTraverser.traverse)
+    typeParamListRenderer.render(traversedTypeParams)
     //TODO handle bounds properly
     writeBlockStart()
     writeBlockEnd()

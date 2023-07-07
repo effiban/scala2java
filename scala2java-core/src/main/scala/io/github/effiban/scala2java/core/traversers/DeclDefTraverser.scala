@@ -2,8 +2,8 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{ModifiersContext, StatContext, TermParamListRenderContext}
 import io.github.effiban.scala2java.core.entities.JavaTreeType
-import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
 import io.github.effiban.scala2java.core.renderers._
+import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
 import io.github.effiban.scala2java.core.writers.JavaWriter
 import io.github.effiban.scala2java.spi.entities.JavaScope
 
@@ -47,7 +47,7 @@ private[traversers] class DeclDefTraverserImpl(modListTraverser: => ModListTrave
     tparams match {
       case Nil =>
       case typeParams =>
-        val traversedTypeParams = tparams.map(typeParamTraverser.traverse)
+        val traversedTypeParams = typeParams.map(typeParamTraverser.traverse)
         typeParamListRenderer.render(traversedTypeParams)
         write(" ")
     }
