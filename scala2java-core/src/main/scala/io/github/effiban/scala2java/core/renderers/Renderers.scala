@@ -223,6 +223,11 @@ class Renderers(implicit javaWriter: JavaWriter) {
     expressionTermRenderer
   )
 
+  lazy val statTermRenderer: StatTermRenderer = new StatTermRendererImpl(
+    expressionTermRefRenderer,
+    defaultTermRenderer
+  )
+
   val superRenderer: SuperRenderer = new SuperRendererImpl(nameRenderer)
 
   lazy val termAnnotateRenderer: TermAnnotateRenderer = new TermAnnotateRendererImpl(annotListRenderer, expressionTermRenderer)
