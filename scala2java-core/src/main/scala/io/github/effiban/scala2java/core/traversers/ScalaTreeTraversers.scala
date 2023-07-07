@@ -532,7 +532,9 @@ class ScalaTreeTraversers(implicit factories: Factories,
   )
 
   private lazy val regularClassTraverser: RegularClassTraverser = new RegularClassTraverserImpl(
-    deprecatedModListTraverser,
+    modListTraverser,
+    ModifiersRenderContextFactory,
+    modListRenderer,
     typeParamListTraverser,
     templateTraverser,
     ParamToDeclValTransformer,

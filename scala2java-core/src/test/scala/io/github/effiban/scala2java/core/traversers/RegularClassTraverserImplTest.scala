@@ -1,20 +1,25 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts._
-import io.github.effiban.scala2java.core.entities.JavaTreeType
+import io.github.effiban.scala2java.core.entities.{JavaModifier, JavaTreeType}
 import io.github.effiban.scala2java.core.matchers.JavaChildScopeContextMatcher.eqJavaChildScopeContext
 import io.github.effiban.scala2java.core.matchers.JavaTreeTypeContextMatcher.eqJavaTreeTypeContext
+import io.github.effiban.scala2java.core.matchers.ModListTraversalResultMockitoMatcher.eqModListTraversalResult
 import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
+import io.github.effiban.scala2java.core.matchers.ModifiersRenderContextMatcher.eqModifiersRenderContext
 import io.github.effiban.scala2java.core.matchers.TemplateContextMatcher.eqTemplateContext
+import io.github.effiban.scala2java.core.renderers.ModListRenderer
+import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
 import io.github.effiban.scala2java.core.resolvers.{JavaChildScopeResolver, JavaTreeTypeResolver}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.transformers.ParamToDeclValTransformer
+import io.github.effiban.scala2java.core.traversers.results.ModListTraversalResult
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
-import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.Mod.{Final, Private}
 import scala.meta.Term.Block
@@ -25,7 +30,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
 
   private val ClassName = Type.Name("MyClass")
 
-  private val Modifiers: List[Mod.Annot] = List(
+  private val ScalaMods: List[Mod.Annot] = List(
     Mod.Annot(
       Init(tpe = Type.Name("MyAnnotation"), name = Name.Anonymous(), argss = List())
     )
@@ -76,7 +81,9 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       )
     )
 
-  private val modListTraverser = mock[DeprecatedModListTraverser]
+  private val modListTraverser = mock[ModListTraverser]
+  private val modifiersRenderContextFactory = mock[ModifiersRenderContextFactory]
+  private val modListRenderer = mock[ModListRenderer]
   private val typeParamListTraverser = mock[TypeParamListTraverser]
   private val templateTraverser = mock[TemplateTraverser]
   private val paramToDeclValTransformer = mock[ParamToDeclValTransformer]
@@ -85,6 +92,8 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
 
   private val classTraverser = new RegularClassTraverserImpl(
     modListTraverser,
+    modifiersRenderContextFactory,
+    modListRenderer,
     typeParamListTraverser,
     templateTraverser,
     paramToDeclValTransformer,
@@ -100,7 +109,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
     )
 
     val cls = Defn.Class(
-      mods = Modifiers,
+      mods = ScalaMods,
       name = ClassName,
       tparams = TypeParams,
       ctor = primaryCtor,
@@ -110,11 +119,17 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
     val expectedMemberDecls = List(ExpectedMemberDecl1, ExpectedMemberDecl2)
     val expectedAdjustedTemplate = InitialTemplate.copy(stats = expectedMemberDecls ++ InitialTemplate.stats)
 
+    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Public))
+    val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Public))
+
     whenResolveJavaTreeTypeThenReturnClass(cls)
+    doReturn(expectedModListTraversalResult).when(modListTraverser).traverse(eqExpectedScalaMods(cls))
+    doReturn(expectedModifiersRenderContext)
+      .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
     doWrite(
-    """@MyAnnotation
-      |public """.stripMargin)
-      .when(modListTraverser).traverse(eqExpectedModifiers(cls), annotsOnSameLine = ArgumentMatchers.eq(false))
+      """@MyAnnotation
+        |public """.stripMargin)
+      .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Class)))).thenReturn(JavaScope.Class)
 
@@ -152,7 +167,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
     )
 
     val cls = Defn.Class(
-      mods = Modifiers,
+      mods = ScalaMods,
       name = ClassName,
       tparams = TypeParams,
       ctor = primaryCtor,
@@ -164,11 +179,17 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
 
     val permittedSubTypeNames = List(Type.Name("A"), Term.Name("B"))
 
+    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Public))
+    val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Public))
+
     whenResolveJavaTreeTypeThenReturnClass(cls)
+    doReturn(expectedModListTraversalResult).when(modListTraverser).traverse(eqExpectedScalaMods(cls))
+    doReturn(expectedModifiersRenderContext)
+      .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
     doWrite(
-    """@MyAnnotation
-      |public """.stripMargin)
-      .when(modListTraverser).traverse(eqExpectedModifiers(cls), annotsOnSameLine = ArgumentMatchers.eq(false))
+      """@MyAnnotation
+        |public """.stripMargin)
+      .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Class)))).thenReturn(JavaScope.Class)
 
@@ -215,7 +236,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
     )
 
     val cls = Defn.Class(
-      mods = Modifiers,
+      mods = ScalaMods,
       name = ClassName,
       tparams = TypeParams,
       ctor = primaryCtor,
@@ -231,13 +252,19 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
 
     val expectedAdjustedTemplate = InitialTemplate.copy(stats = expectedMemberDecls ++ InitialTemplate.stats)
 
+    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Public))
+    val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Public))
+
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Class)))).thenReturn(JavaScope.Class)
 
     whenResolveJavaTreeTypeThenReturnClass(cls)
+    doReturn(expectedModListTraversalResult).when(modListTraverser).traverse(eqExpectedScalaMods(cls))
+    doReturn(expectedModifiersRenderContext)
+      .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
     doWrite(
-    """@MyAnnotation
+      """@MyAnnotation
         |public """.stripMargin)
-      .when(modListTraverser).traverse(eqExpectedModifiers(cls), annotsOnSameLine = ArgumentMatchers.eq(false))
+      .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
 
     when(paramToDeclValTransformer.transform(any[Term.Param])).thenAnswer( (ctorArg: Term.Param) => ctorArg match {
@@ -286,11 +313,11 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
   }
 
   private def whenResolveJavaTreeTypeThenReturnClass(cls: Defn.Class): Unit = {
-    val expectedContext = JavaTreeTypeContext(cls, Modifiers)
+    val expectedContext = JavaTreeTypeContext(cls, ScalaMods)
     when(javaTreeTypeResolver.resolve(eqJavaTreeTypeContext(expectedContext))).thenReturn(JavaTreeType.Class)
   }
 
-  private def eqExpectedModifiers(classDef: Defn.Class) = {
+  private def eqExpectedScalaMods(classDef: Defn.Class) = {
     val expectedModifiersContext = ModifiersContext(classDef, JavaTreeType.Class, JavaScope.Package)
     eqModifiersContext(expectedModifiersContext)
   }

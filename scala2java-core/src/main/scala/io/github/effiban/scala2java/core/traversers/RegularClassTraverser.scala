@@ -3,6 +3,8 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.entities.JavaTreeType.JavaTreeType
 import io.github.effiban.scala2java.core.entities.JavaTreeTypeToKeywordMapping
+import io.github.effiban.scala2java.core.renderers.ModListRenderer
+import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
 import io.github.effiban.scala2java.core.resolvers.{JavaChildScopeResolver, JavaTreeTypeResolver}
 import io.github.effiban.scala2java.core.transformers.ParamToDeclValTransformer
 import io.github.effiban.scala2java.core.writers.JavaWriter
@@ -13,7 +15,9 @@ trait RegularClassTraverser {
   def traverse(classDef: Defn.Class, context: ClassOrTraitContext = ClassOrTraitContext()): Unit
 }
 
-private[traversers] class RegularClassTraverserImpl(modListTraverser: => DeprecatedModListTraverser,
+private[traversers] class RegularClassTraverserImpl(modListTraverser: => ModListTraverser,
+                                                    modifiersRenderContextFactory: ModifiersRenderContextFactory,
+                                                    modListRenderer: => ModListRenderer,
                                                     typeParamListTraverser: => TypeParamListTraverser,
                                                     templateTraverser: => TemplateTraverser,
                                                     paramToDeclValTransformer: ParamToDeclValTransformer,
@@ -26,7 +30,9 @@ private[traversers] class RegularClassTraverserImpl(modListTraverser: => Depreca
   def traverse(classDef: Defn.Class, context: ClassOrTraitContext = ClassOrTraitContext()): Unit = {
     writeLine()
     val javaTreeType = javaTreeTypeResolver.resolve(JavaTreeTypeContext(classDef, classDef.mods))
-    modListTraverser.traverse(ModifiersContext(classDef, javaTreeType, context.javaScope))
+    val modListTraversalResult = modListTraverser.traverse(ModifiersContext(classDef, javaTreeType, context.javaScope))
+    val modifiersRenderContext = modifiersRenderContextFactory(modListTraversalResult)
+    modListRenderer.render(modifiersRenderContext);
     writeNamedType(JavaTreeTypeToKeywordMapping(javaTreeType), classDef.name.value)
     typeParamListTraverser.traverse(classDef.tparams)
     traverseCtorAndTemplate(classDef, javaTreeType, context)
