@@ -1,17 +1,22 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.{ModifiersContext, StatContext}
-import io.github.effiban.scala2java.core.entities.JavaTreeType
+import io.github.effiban.scala2java.core.contexts.{ModifiersContext, ModifiersRenderContext, StatContext}
+import io.github.effiban.scala2java.core.entities.{JavaModifier, JavaTreeType}
+import io.github.effiban.scala2java.core.matchers.ModListTraversalResultMockitoMatcher.eqModListTraversalResult
 import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
-import io.github.effiban.scala2java.core.renderers.{TermNameRenderer, TypeRenderer}
+import io.github.effiban.scala2java.core.matchers.ModifiersRenderContextMatcher.eqModifiersRenderContext
+import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
+import io.github.effiban.scala2java.core.renderers.{ModListRenderer, TermNameRenderer, TypeRenderer}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
+import io.github.effiban.scala2java.core.traversers.results.ModListTraversalResult
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.spi.entities.JavaScope.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.Type.Bounds
 import scala.meta.{Decl, Init, Mod, Name, Term, Type, XtensionQuasiquoteType}
@@ -22,7 +27,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
   private val TraversedMethodType = t"TraversedMethodType"
   private val MethodName: Term.Name = Term.Name("myMethod")
 
-  private val Modifiers: List[Mod] = List(
+  private val ScalaMods: List[Mod] = List(
     Mod.Annot(
       Init(tpe = Type.Name("MyAnnotation"), name = Name.Anonymous(), argss = List())
     )
@@ -48,7 +53,9 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     termParamInt("param4")
   )
 
-  private val modListTraverser = mock[DeprecatedModListTraverser]
+  private val modListTraverser = mock[ModListTraverser]
+  private val modifiersRenderContextFactory = mock[ModifiersRenderContextFactory]
+  private val modListRenderer = mock[ModListRenderer]
   private val typeTraverser = mock[TypeTraverser]
   private val typeRenderer = mock[TypeRenderer]
   private val typeParamListTraverser = mock[TypeParamListTraverser]
@@ -57,6 +64,8 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
 
   private val declDefTraverser = new DeclDefTraverserImpl(
     modListTraverser,
+    modifiersRenderContextFactory,
+    modListRenderer,
     typeParamListTraverser,
     typeTraverser,
     typeRenderer,
@@ -68,17 +77,23 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     val javaScope = JavaScope.Class
 
     val declDef = Decl.Def(
-      mods = Modifiers,
+      mods = ScalaMods,
       name = MethodName,
       tparams = Nil,
       paramss = List(MethodParams1),
       decltpe = MethodType
     )
 
+    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Public))
+    val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Public))
+
+    doReturn(expectedModListTraversalResult).when(modListTraverser).traverse(eqExpectedScalaMods(declDef, javaScope))
+    doReturn(expectedModifiersRenderContext)
+      .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
     doWrite(
       """@MyAnnotation
         |public """.stripMargin)
-      .when(modListTraverser).traverse(eqExpectedModifiers(declDef, javaScope), annotsOnSameLine = ArgumentMatchers.eq(false))
+      .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doReturn(TraversedMethodType).when(typeTraverser).traverse(eqTree(MethodType))
     doWrite("TraversedMethodType").when(typeRenderer).render(eqTree(TraversedMethodType))
     doWrite("myMethod").when(termNameRenderer).render(eqTree(MethodName))
@@ -100,17 +115,23 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     val javaScope = JavaScope.Class
 
     val declDef = Decl.Def(
-      mods = Modifiers,
+      mods = ScalaMods,
       name = MethodName,
       tparams = TypeParams,
       paramss = List(MethodParams1),
       decltpe = MethodType
     )
 
+    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Public))
+    val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Public))
+
+    doReturn(expectedModListTraversalResult).when(modListTraverser).traverse(eqExpectedScalaMods(declDef, javaScope))
+    doReturn(expectedModifiersRenderContext)
+      .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
     doWrite(
       """@MyAnnotation
         |public """.stripMargin)
-      .when(modListTraverser).traverse(eqExpectedModifiers(declDef, javaScope), annotsOnSameLine = ArgumentMatchers.eq(false))
+      .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     doReturn(TraversedMethodType).when(typeTraverser).traverse(eqTree(MethodType))
     doWrite("TraversedMethodType").when(typeRenderer).render(eqTree(TraversedMethodType))
@@ -133,17 +154,23 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     val javaScope = JavaScope.Interface
 
     val declDef = Decl.Def(
-      mods = Modifiers,
+      mods = ScalaMods,
       name = MethodName,
       tparams = Nil,
       paramss = List(MethodParams1),
       decltpe = MethodType
     )
 
+    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = ScalaMods)
+    val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods)
+
+    doReturn(expectedModListTraversalResult).when(modListTraverser).traverse(eqExpectedScalaMods(declDef, javaScope))
+    doReturn(expectedModifiersRenderContext)
+      .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
     doWrite(
       """@MyAnnotation
         |""".stripMargin)
-      .when(modListTraverser).traverse(eqExpectedModifiers(declDef, javaScope), annotsOnSameLine = ArgumentMatchers.eq(false))
+      .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doReturn(TraversedMethodType).when(typeTraverser).traverse(eqTree(MethodType))
     doWrite("TraversedMethodType").when(typeRenderer).render(eqTree(TraversedMethodType))
     doWrite("myMethod").when(termNameRenderer).render(eqTree(MethodName))
@@ -165,17 +192,23 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     val javaScope = JavaScope.Interface
 
     val declDef = Decl.Def(
-      mods = Modifiers,
+      mods = ScalaMods,
       name = MethodName,
       tparams = Nil,
       paramss = List(MethodParams1, MethodParams2),
       decltpe = MethodType
     )
 
+    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = ScalaMods)
+    val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods)
+
+    doReturn(expectedModListTraversalResult).when(modListTraverser).traverse(eqExpectedScalaMods(declDef, javaScope))
+    doReturn(expectedModifiersRenderContext)
+      .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
     doWrite(
       """@MyAnnotation
         |""".stripMargin)
-      .when(modListTraverser).traverse(eqExpectedModifiers(declDef, javaScope), annotsOnSameLine = ArgumentMatchers.eq(false))
+      .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doReturn(TraversedMethodType).when(typeTraverser).traverse(eqTree(MethodType))
     doWrite("TraversedMethodType").when(typeRenderer).render(eqTree(TraversedMethodType))
     doWrite("myMethod").when(termNameRenderer).render(eqTree(MethodName))
@@ -197,7 +230,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     Term.Param(mods = List(), name = Term.Name(name), decltpe = Some(TypeNames.Int), default = None)
   }
 
-  private def eqExpectedModifiers(declDef: Decl.Def, javaScope: JavaScope) = {
+  private def eqExpectedScalaMods(declDef: Decl.Def, javaScope: JavaScope) = {
     val expectedModifiersContext = ModifiersContext(declDef, JavaTreeType.Method, javaScope)
     eqModifiersContext(expectedModifiersContext)
   }
