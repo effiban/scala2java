@@ -1,24 +1,28 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.{JavaTreeTypeContext, ModifiersContext, StatContext}
-import io.github.effiban.scala2java.core.entities.JavaTreeType
+import io.github.effiban.scala2java.core.contexts.{JavaTreeTypeContext, ModifiersContext, ModifiersRenderContext, StatContext}
+import io.github.effiban.scala2java.core.entities.{JavaModifier, JavaTreeType}
 import io.github.effiban.scala2java.core.matchers.JavaTreeTypeContextMatcher.eqJavaTreeTypeContext
+import io.github.effiban.scala2java.core.matchers.ModListTraversalResultMockitoMatcher.eqModListTraversalResult
 import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
-import io.github.effiban.scala2java.core.renderers.{TypeBoundsRenderer, TypeRenderer}
+import io.github.effiban.scala2java.core.matchers.ModifiersRenderContextMatcher.eqModifiersRenderContext
+import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
+import io.github.effiban.scala2java.core.renderers.{ModListRenderer, TypeBoundsRenderer, TypeRenderer}
 import io.github.effiban.scala2java.core.resolvers.JavaTreeTypeResolver
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
+import io.github.effiban.scala2java.core.traversers.results.ModListTraversalResult
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
-import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.Type.Bounds
 import scala.meta.{Defn, Init, Mod, Name, Type, XtensionQuasiquoteType}
 
 class DefnTypeTraverserImplTest extends UnitTestSuite {
 
-  private val Modifiers: List[Mod.Annot] = List(
+  private val ScalaMods: List[Mod.Annot] = List(
     Mod.Annot(
       Init(tpe = Type.Name("MyAnnotation"), name = Name.Anonymous(), argss = List())
     )
@@ -39,7 +43,9 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
   private val MyOtherType = t"MyOtherType"
   private val MyTraversedOtherType = t"MyTraversedOtherType"
 
-  private val modListTraverser = mock[DeprecatedModListTraverser]
+  private val modListTraverser = mock[ModListTraverser]
+  private val modifiersRenderContextFactory = mock[ModifiersRenderContextFactory]
+  private val modListRenderer = mock[ModListRenderer]
   private val typeParamListTraverser = mock[TypeParamListTraverser]
   private val typeTraverser = mock[TypeTraverser]
   private val typeRenderer = mock[TypeRenderer]
@@ -49,6 +55,8 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
 
   private val defnTypeTraverser = new DefnTypeTraverserImpl(
     modListTraverser,
+    modifiersRenderContextFactory,
+    modListRenderer,
     typeParamListTraverser,
     typeTraverser,
     typeRenderer,
@@ -61,17 +69,23 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
     val javaScope = JavaScope.Class
 
     val defnType = Defn.Type(
-      mods = Modifiers,
+      mods = ScalaMods,
       name = MyType,
       tparams = TypeParams,
       body = MyOtherType
     )
 
+    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Private))
+    val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Private))
+
     whenResolveJavaTreeTypeThenReturnInterface(defnType)
+    doReturn(expectedModListTraversalResult).when(modListTraverser).traverse(eqExpectedScalaMods(defnType))
+    doReturn(expectedModifiersRenderContext)
+      .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
     doWrite(
       """@MyAnnotation
         |private """.stripMargin)
-      .when(modListTraverser).traverse(eqExpectedModifiers(defnType), annotsOnSameLine = ArgumentMatchers.eq(false))
+      .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     doReturn(MyTraversedOtherType).when(typeTraverser).traverse(eqTree(MyOtherType))
     doWrite("MyTraversedOtherType").when(typeRenderer).render(eqTree(MyTraversedOtherType))
@@ -89,18 +103,24 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
     val bounds = Bounds(lo = None, hi = Some(MyOtherType))
     val traversedBounds = Bounds(lo = None, hi = Some(MyTraversedOtherType))
     val defnType = Defn.Type(
-      mods = Modifiers,
+      mods = ScalaMods,
       name = MyType,
       tparams = TypeParams,
       body = Type.AnonymousName(),
       bounds = bounds
     )
 
+    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Private))
+    val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Private))
+
     whenResolveJavaTreeTypeThenReturnInterface(defnType)
+    doReturn(expectedModListTraversalResult).when(modListTraverser).traverse(eqExpectedScalaMods(defnType))
+    doReturn(expectedModifiersRenderContext)
+      .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
     doWrite(
       """@MyAnnotation
         |private """.stripMargin)
-      .when(modListTraverser).traverse(eqExpectedModifiers(defnType), annotsOnSameLine = ArgumentMatchers.eq(false))
+      .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     doReturn(traversedBounds).when(typeBoundsTraverser).traverse(eqTree(bounds))
     doWrite("extends MyTraversedOtherType").when(typeBoundsRenderer).render(eqTree(traversedBounds))
@@ -115,11 +135,11 @@ class DefnTypeTraverserImplTest extends UnitTestSuite {
   }
 
   private def whenResolveJavaTreeTypeThenReturnInterface(defnType: Defn.Type): Unit = {
-    val expectedJavaTreeTypeContext = JavaTreeTypeContext(defnType, Modifiers)
+    val expectedJavaTreeTypeContext = JavaTreeTypeContext(defnType, ScalaMods)
     when(javaTreeTypeResolver.resolve(eqJavaTreeTypeContext(expectedJavaTreeTypeContext))).thenReturn(JavaTreeType.Interface)
   }
 
-  private def eqExpectedModifiers(defnType: Defn.Type) = {
+  private def eqExpectedScalaMods(defnType: Defn.Type) = {
     val expectedModifiersContext = ModifiersContext(defnType, JavaTreeType.Interface, JavaScope.Class)
     eqModifiersContext(expectedModifiersContext)
   }
