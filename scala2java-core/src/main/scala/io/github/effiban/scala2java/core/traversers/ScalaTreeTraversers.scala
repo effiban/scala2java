@@ -706,7 +706,9 @@ class ScalaTreeTraversers(implicit factories: Factories,
   private lazy val throwTraverser: ThrowTraverser = new ThrowTraverserImpl(expressionTermTraverser)
 
   private lazy val traitTraverser: TraitTraverser = new TraitTraverserImpl(
-    deprecatedModListTraverser,
+    modListTraverser,
+    ModifiersRenderContextFactory,
+    modListRenderer,
     typeParamListTraverser,
     templateTraverser,
     JavaTreeTypeResolver,

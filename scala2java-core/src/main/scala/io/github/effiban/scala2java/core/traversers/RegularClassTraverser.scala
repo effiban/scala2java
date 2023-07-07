@@ -32,7 +32,7 @@ private[traversers] class RegularClassTraverserImpl(modListTraverser: => ModList
     val javaTreeType = javaTreeTypeResolver.resolve(JavaTreeTypeContext(classDef, classDef.mods))
     val modListTraversalResult = modListTraverser.traverse(ModifiersContext(classDef, javaTreeType, context.javaScope))
     val modifiersRenderContext = modifiersRenderContextFactory(modListTraversalResult)
-    modListRenderer.render(modifiersRenderContext);
+    modListRenderer.render(modifiersRenderContext)
     writeNamedType(JavaTreeTypeToKeywordMapping(javaTreeType), classDef.name.value)
     typeParamListTraverser.traverse(classDef.tparams)
     traverseCtorAndTemplate(classDef, javaTreeType, context)

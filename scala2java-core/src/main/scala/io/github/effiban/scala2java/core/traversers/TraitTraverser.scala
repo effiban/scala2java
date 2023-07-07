@@ -2,6 +2,8 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.entities.JavaTreeTypeToKeywordMapping
+import io.github.effiban.scala2java.core.renderers.ModListRenderer
+import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
 import io.github.effiban.scala2java.core.resolvers.{JavaChildScopeResolver, JavaTreeTypeResolver}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
@@ -11,7 +13,9 @@ trait TraitTraverser {
   def traverse(traitDef: Trait, context: ClassOrTraitContext = ClassOrTraitContext()): Unit
 }
 
-private[traversers] class TraitTraverserImpl(modListTraverser: => DeprecatedModListTraverser,
+private[traversers] class TraitTraverserImpl(modListTraverser: => ModListTraverser,
+                                             modifiersRenderContextFactory: ModifiersRenderContextFactory,
+                                             modListRenderer: => ModListRenderer,
                                              typeParamListTraverser: => TypeParamListTraverser,
                                              templateTraverser: => TemplateTraverser,
                                              javaTreeTypeResolver: JavaTreeTypeResolver,
@@ -23,7 +27,9 @@ private[traversers] class TraitTraverserImpl(modListTraverser: => DeprecatedModL
   override def traverse(traitDef: Trait, context: ClassOrTraitContext = ClassOrTraitContext()): Unit = {
     writeLine()
     val javaTreeType = javaTreeTypeResolver.resolve(JavaTreeTypeContext(traitDef, traitDef.mods))
-    modListTraverser.traverse(ModifiersContext(traitDef, javaTreeType, context.javaScope))
+    val modListTraversalResult = modListTraverser.traverse(ModifiersContext(traitDef, javaTreeType, context.javaScope))
+    val modifiersRenderContext = modifiersRenderContextFactory(modListTraversalResult)
+    modListRenderer.render(modifiersRenderContext)
     writeNamedType(JavaTreeTypeToKeywordMapping(javaTreeType), traitDef.name.value)
     typeParamListTraverser.traverse(traitDef.tparams)
     val javaChildScope = javaChildScopeResolver.resolve(JavaChildScopeContext(traitDef, javaTreeType))
