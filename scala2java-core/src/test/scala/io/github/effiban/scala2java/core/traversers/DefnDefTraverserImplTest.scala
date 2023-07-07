@@ -9,24 +9,23 @@ import io.github.effiban.scala2java.core.matchers.BlockTraversalResultMockitoMat
 import io.github.effiban.scala2java.core.matchers.ModListTraversalResultMockitoMatcher.eqModListTraversalResult
 import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
 import io.github.effiban.scala2java.core.matchers.ModifiersRenderContextMatcher.eqModifiersRenderContext
+import io.github.effiban.scala2java.core.renderers._
 import io.github.effiban.scala2java.core.renderers.contextfactories.{BlockRenderContextFactory, ModifiersRenderContextFactory}
-import io.github.effiban.scala2java.core.renderers.{BlockRenderer, ModListRenderer, TermNameRenderer, TypeRenderer}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
-import io.github.effiban.scala2java.core.traversers.results.ModListTraversalResult
+import io.github.effiban.scala2java.core.traversers.results.{ModListTraversalResult, TermParamTraversalResult}
 import io.github.effiban.scala2java.core.typeinference.TermTypeInferrer
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.spi.entities.JavaScope.JavaScope
 import io.github.effiban.scala2java.spi.transformers.DefnDefTransformer
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
-import org.mockito.ArgumentMatchers
-import org.mockito.ArgumentMatchersSugar.eqTo
+import org.mockito.ArgumentMatchersSugar.{any, eqTo}
 
 import scala.meta.Term.Block
 import scala.meta.Type.Bounds
-import scala.meta.{Defn, Init, Mod, Name, Term, Type, XtensionQuasiquoteType}
+import scala.meta.{Defn, Init, Mod, Name, Term, Type, XtensionQuasiquoteTermParam, XtensionQuasiquoteType}
 
 class DefnDefTraverserImplTest extends UnitTestSuite {
 
@@ -49,14 +48,21 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     )
   )
 
-  private val MethodParams1 = List(
-    termParamInt("param1"),
-    termParamInt("param2")
-  )
-  private val MethodParams2 = List(
-    termParamInt("param3"),
-    termParamInt("param4")
-  )
+  private val MethodParam1 = param"param1: Int"
+  private val MethodParam2 = param"param2: Int"
+  private val MethodParam3 = param"param3: Int"
+  private val MethodParam4 = param"param4: Int"
+
+  private val MethodParamList1 = List(MethodParam1, MethodParam2)
+  private val MethodParamList2 = List(MethodParam3, MethodParam4)
+
+  private val TraversedMethodParam1 = param"param11: Int"
+  private val TraversedMethodParam2 = param"param22: Int"
+  private val TraversedMethodParam3 = param"param33: Int"
+  private val TraversedMethodParam4 = param"param44: Int"
+
+  private val TraversedMethodParamList1 = List(TraversedMethodParam1, TraversedMethodParam2)
+  private val TraversedMethodParamList2 = List(TraversedMethodParam3, TraversedMethodParam4)
 
   private val Statement1 = Term.Apply(fun = Term.Name("doSomething"), args = List(Term.Name("param1")))
   private val Statement2 = Term.Apply(fun = Term.Name("doSomethingElse"), args = List(Term.Name("param2")))
@@ -70,7 +76,8 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
   private val termNameRenderer = mock[TermNameRenderer]
   private val typeTraverser = mock[TypeTraverser]
   private val typeRenderer = mock[TypeRenderer]
-  private val termParamListTraverser = mock[DeprecatedTermParamListTraverser]
+  private val termParamTraverser = mock[TermParamTraverser]
+  private val termParamListRenderer = mock[TermParamListRenderer]
   private val blockWrappingTermTraverser = mock[BlockWrappingTermTraverser]
   private val blockRenderContextFactory = mock[BlockRenderContextFactory]
   private val blockRenderer = mock[BlockRenderer]
@@ -85,7 +92,8 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     termNameRenderer,
     typeTraverser,
     typeRenderer,
-    termParamListTraverser,
+    termParamTraverser,
+    termParamListRenderer,
     blockWrappingTermTraverser,
     blockRenderContextFactory,
     blockRenderer,
@@ -100,7 +108,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       mods = ScalaMods,
       name = MethodName,
       tparams = Nil,
-      paramss = List(MethodParams1),
+      paramss = List(MethodParamList1),
       decltpe = Some(TypeNames.Int),
       body = Statement1
     )
@@ -119,10 +127,16 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     doReturn(t"int").when(typeTraverser).traverse(eqTree(TypeNames.Int))
     doWrite("int").when(typeRenderer).render(eqTree(t"int"))
     doWrite("myMethod").when(termNameRenderer).render(eqTree(MethodName))
-    doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
-      termParams = eqTreeList(MethodParams1),
-      context = ArgumentMatchers.eq(StatContext(JavaScope.MethodSignature)),
-      onSameLine = ArgumentMatchers.eq(false)
+    doAnswer((param: Term.Param) => {
+      val traversedParam = param match {
+        case aParam if aParam.structure == MethodParam1.structure => TraversedMethodParam1
+        case aParam if aParam.structure == MethodParam2.structure => TraversedMethodParam2
+      }
+      TermParamTraversalResult(traversedParam, List(JavaModifier.Final))
+    }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.MethodSignature)))
+    doWrite("(final int param11, final int param22)").when(termParamListRenderer).render(
+      termParams = eqTreeList(TraversedMethodParamList1),
+      context = eqTo(TermParamListRenderContext(List(JavaModifier.Final)))
     )
     val block = Block(List(Statement1))
     val blockTraversalResult = TestableBlockTraversalResult(block)
@@ -145,7 +159,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """
         |@MyAnnotation
-        |public int myMethod(int param1, int param2) {
+        |public int myMethod(final int param11, final int param22) {
         |  /* BODY */
         |}
         |""".stripMargin
@@ -158,7 +172,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       mods = ScalaMods,
       name = MethodName,
       tparams = Nil,
-      paramss = List(MethodParams1),
+      paramss = List(MethodParamList1),
       decltpe = Some(TypeNames.Unit),
       body = Statement1
     )
@@ -177,10 +191,16 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     doReturn(t"void").when(typeTraverser).traverse(eqTree(TypeNames.Unit))
     doWrite("void").when(typeRenderer).render(eqTree(t"void"))
     doWrite("myMethod").when(termNameRenderer).render(eqTree(MethodName))
-    doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
-      termParams = eqTreeList(MethodParams1),
-      context = ArgumentMatchers.eq(StatContext(JavaScope.MethodSignature)),
-      onSameLine = ArgumentMatchers.eq(false)
+    doAnswer((param: Term.Param) => {
+      val traversedParam = param match {
+        case aParam if aParam.structure == MethodParam1.structure => TraversedMethodParam1
+        case aParam if aParam.structure == MethodParam2.structure => TraversedMethodParam2
+      }
+      TermParamTraversalResult(traversedParam, List(JavaModifier.Final))
+    }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.MethodSignature)))
+    doWrite("(final int param11, final int param22)").when(termParamListRenderer).render(
+      termParams = eqTreeList(TraversedMethodParamList1),
+      context = eqTo(TermParamListRenderContext(List(JavaModifier.Final)))
     )
     val block = Block(List(Statement1))
     val blockTraversalResult = TestableBlockTraversalResult(block)
@@ -203,7 +223,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """
         |@MyAnnotation
-        |public void myMethod(int param1, int param2) {
+        |public void myMethod(final int param11, final int param22) {
         |  /* BODY */
         |}
         |""".stripMargin
@@ -216,7 +236,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       mods = ScalaMods,
       name = MethodName,
       tparams = TypeParams,
-      paramss = List(MethodParams1),
+      paramss = List(MethodParamList1),
       decltpe = Some(TypeNames.Unit),
       body = Statement1
     )
@@ -236,10 +256,16 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     doReturn(t"void").when(typeTraverser).traverse(eqTree(TypeNames.Unit))
     doWrite("void").when(typeRenderer).render(eqTree(t"void"))
     doWrite("myMethod").when(termNameRenderer).render(eqTree(MethodName))
-    doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
-      termParams = eqTreeList(MethodParams1),
-      context = ArgumentMatchers.eq(StatContext(JavaScope.MethodSignature)),
-      onSameLine = ArgumentMatchers.eq(false)
+    doAnswer((param: Term.Param) => {
+      val traversedParam = param match {
+        case aParam if aParam.structure == MethodParam1.structure => TraversedMethodParam1
+        case aParam if aParam.structure == MethodParam2.structure => TraversedMethodParam2
+      }
+      TermParamTraversalResult(traversedParam, List(JavaModifier.Final))
+    }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.MethodSignature)))
+    doWrite("(final int param11, final int param22)").when(termParamListRenderer).render(
+      termParams = eqTreeList(TraversedMethodParamList1),
+      context = eqTo(TermParamListRenderContext(List(JavaModifier.Final)))
     )
     val block = Block(List(Statement1))
     val blockTraversalResult = TestableBlockTraversalResult(block)
@@ -262,7 +288,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """
         |@MyAnnotation
-        |public <T> void myMethod(int param1, int param2) {
+        |public <T> void myMethod(final int param11, final int param22) {
         |  /* BODY */
         |}
         |""".stripMargin
@@ -275,7 +301,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       mods = ScalaMods,
       name = ClassName,
       tparams = Nil,
-      paramss = List(MethodParams1),
+      paramss = List(MethodParamList1),
       decltpe = Some(Type.AnonymousName()),
       body = Statement1
     )
@@ -298,10 +324,16 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |public """.stripMargin)
       .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doWrite("MyClass").when(termNameRenderer).render(eqTree(ClassName))
-    doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
-      termParams = eqTreeList(MethodParams1),
-      context = ArgumentMatchers.eq(StatContext(JavaScope.MethodSignature)),
-      onSameLine = ArgumentMatchers.eq(false)
+    doAnswer((param: Term.Param) => {
+      val traversedParam = param match {
+        case aParam if aParam.structure == MethodParam1.structure => TraversedMethodParam1
+        case aParam if aParam.structure == MethodParam2.structure => TraversedMethodParam2
+      }
+      TermParamTraversalResult(traversedParam, List(JavaModifier.Final))
+    }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.MethodSignature)))
+    doWrite("(final int param11, final int param22)").when(termParamListRenderer).render(
+      termParams = eqTreeList(TraversedMethodParamList1),
+      context = eqTo(TermParamListRenderContext(List(JavaModifier.Final)))
     )
     val block = Block(List(Statement1))
     val blockTraversalResult = TestableBlockTraversalResult(block = block, maybeInit = Some(init))
@@ -325,7 +357,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """
         |@MyAnnotation
-        |public MyClass(int param1, int param2) {
+        |public MyClass(final int param11, final int param22) {
         |  /* BODY */
         |}
         |""".stripMargin
@@ -338,7 +370,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       mods = ScalaMods,
       name = MethodName,
       tparams = Nil,
-      paramss = List(MethodParams1),
+      paramss = List(MethodParamList1),
       decltpe = None,
       body = Statement1
     )
@@ -356,10 +388,16 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     when(termTypeInferrer.infer(eqTree(Statement1))).thenReturn(None)
     doWrite("myMethod").when(termNameRenderer).render(eqTree(MethodName))
-    doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
-      termParams = eqTreeList(MethodParams1),
-      context = ArgumentMatchers.eq(StatContext(JavaScope.MethodSignature)),
-      onSameLine = ArgumentMatchers.eq(false)
+    doAnswer((param: Term.Param) => {
+      val traversedParam = param match {
+        case aParam if aParam.structure == MethodParam1.structure => TraversedMethodParam1
+        case aParam if aParam.structure == MethodParam2.structure => TraversedMethodParam2
+      }
+      TermParamTraversalResult(traversedParam, List(JavaModifier.Final))
+    }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.MethodSignature)))
+    doWrite("(final int param11, final int param22)").when(termParamListRenderer).render(
+      termParams = eqTreeList(TraversedMethodParamList1),
+      context = eqTo(TermParamListRenderContext(List(JavaModifier.Final)))
     )
     val block = Block(List(Statement1))
     val blockTraversalResult = TestableBlockTraversalResult(block)
@@ -383,7 +421,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """
         |@MyAnnotation
-        |public /* UnknownType */ myMethod(int param1, int param2) {
+        |public /* UnknownType */ myMethod(final int param11, final int param22) {
         |  /* BODY */
         |}
         |""".stripMargin
@@ -396,7 +434,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       mods = ScalaMods,
       name = MethodName,
       tparams = Nil,
-      paramss = List(MethodParams1),
+      paramss = List(MethodParamList1),
       decltpe = None,
       body = Statement1
     )
@@ -416,10 +454,16 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     doReturn(TypeNames.String).when(typeTraverser).traverse(eqTree(TypeNames.String))
     doWrite("String").when(typeRenderer).render(eqTree(TypeNames.String))
     doWrite("myMethod").when(termNameRenderer).render(eqTree(MethodName))
-    doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
-      termParams = eqTreeList(MethodParams1),
-      context = ArgumentMatchers.eq(StatContext(JavaScope.MethodSignature)),
-      onSameLine = ArgumentMatchers.eq(false)
+    doAnswer((param: Term.Param) => {
+      val traversedParam = param match {
+        case aParam if aParam.structure == MethodParam1.structure => TraversedMethodParam1
+        case aParam if aParam.structure == MethodParam2.structure => TraversedMethodParam2
+      }
+      TermParamTraversalResult(traversedParam, List(JavaModifier.Final))
+    }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.MethodSignature)))
+    doWrite("(final int param11, final int param22)").when(termParamListRenderer).render(
+      termParams = eqTreeList(TraversedMethodParamList1),
+      context = eqTo(TermParamListRenderContext(List(JavaModifier.Final)))
     )
     val block = Block(List(Statement1))
     val blockTraversalResult = TestableBlockTraversalResult(block)
@@ -442,7 +486,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """
         |@MyAnnotation
-        |public String myMethod(int param1, int param2) {
+        |public String myMethod(final int param11, final int param22) {
         |  /* BODY */
         |}
         |""".stripMargin
@@ -457,7 +501,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       mods = ScalaMods,
       name = MethodName,
       tparams = Nil,
-      paramss = List(MethodParams1),
+      paramss = List(MethodParamList1),
       decltpe = Some(TypeNames.Int),
       body = body
     )
@@ -476,10 +520,16 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     doReturn(t"int").when(typeTraverser).traverse(eqTree(TypeNames.Int))
     doWrite("int").when(typeRenderer).render(eqTree(t"int"))
     doWrite("myMethod").when(termNameRenderer).render(eqTree(MethodName))
-    doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
-      termParams = eqTreeList(MethodParams1),
-      context = ArgumentMatchers.eq(StatContext(JavaScope.MethodSignature)),
-      onSameLine = ArgumentMatchers.eq(false)
+    doAnswer((param: Term.Param) => {
+      val traversedParam = param match {
+        case aParam if aParam.structure == MethodParam1.structure => TraversedMethodParam1
+        case aParam if aParam.structure == MethodParam2.structure => TraversedMethodParam2
+      }
+      TermParamTraversalResult(traversedParam, List(JavaModifier.Final))
+    }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.MethodSignature)))
+    doWrite("(final int param11, final int param22)").when(termParamListRenderer).render(
+      termParams = eqTreeList(TraversedMethodParamList1),
+      context = eqTo(TermParamListRenderContext(List(JavaModifier.Final)))
     )
     val blockTraversalResult = TestableBlockTraversalResult(body)
     doReturn(blockTraversalResult)
@@ -501,7 +551,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """
         |@MyAnnotation
-        |public int myMethod(int param1, int param2) {
+        |public int myMethod(final int param11, final int param22) {
         |  /* BODY */
         |}
         |""".stripMargin
@@ -514,7 +564,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       mods = ScalaMods,
       name = MethodName,
       tparams = Nil,
-      paramss = List(MethodParams1),
+      paramss = List(MethodParamList1),
       decltpe = Some(TypeNames.Int),
       body = Statement1
     )
@@ -533,10 +583,16 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     doReturn(t"int").when(typeTraverser).traverse(eqTree(TypeNames.Int))
     doWrite("int").when(typeRenderer).render(eqTree(t"int"))
     doWrite("myMethod").when(termNameRenderer).render(eqTree(MethodName))
-    doWrite("(int param1, int param2)").when(termParamListTraverser).traverse(
-      termParams = eqTreeList(MethodParams1),
-      context = ArgumentMatchers.eq(StatContext(JavaScope.MethodSignature)),
-      onSameLine = ArgumentMatchers.eq(false)
+    doAnswer((param: Term.Param) => {
+      val traversedParam = param match {
+        case aParam if aParam.structure == MethodParam1.structure => TraversedMethodParam1
+        case aParam if aParam.structure == MethodParam2.structure => TraversedMethodParam2
+      }
+      TermParamTraversalResult(traversedParam)
+    }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.MethodSignature)))
+    doWrite("(int param11, int param22)").when(termParamListRenderer).render(
+      termParams = eqTreeList(TraversedMethodParamList1),
+      context = eqTo(TermParamListRenderContext())
     )
     val block = Block(List(Statement1))
     val blockTraversalResult = TestableBlockTraversalResult(block)
@@ -559,7 +615,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """
         |@MyAnnotation
-        |default int myMethod(int param1, int param2) {
+        |default int myMethod(int param11, int param22) {
         |  /* BODY */
         |}
         |""".stripMargin
@@ -572,7 +628,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       mods = ScalaMods,
       name = MethodName,
       tparams = Nil,
-      paramss = List(MethodParams1, MethodParams2),
+      paramss = List(MethodParamList1, MethodParamList2),
       decltpe = Some(TypeNames.Int),
       body = Statement1
     )
@@ -591,10 +647,18 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     doReturn(t"int").when(typeTraverser).traverse(eqTree(TypeNames.Int))
     doWrite("int").when(typeRenderer).render(eqTree(t"int"))
     doWrite("myMethod").when(termNameRenderer).render(eqTree(MethodName))
-    doWrite("(int param1, int param2, int param3, int param4)").when(termParamListTraverser).traverse(
-      termParams = eqTreeList(MethodParams1 ++ MethodParams2),
-      context = ArgumentMatchers.eq(StatContext(JavaScope.MethodSignature)),
-      onSameLine = ArgumentMatchers.eq(false)
+    doAnswer((param: Term.Param) => {
+      val traversedParam = param match {
+        case aParam if aParam.structure == MethodParam1.structure => TraversedMethodParam1
+        case aParam if aParam.structure == MethodParam2.structure => TraversedMethodParam2
+        case aParam if aParam.structure == MethodParam3.structure => TraversedMethodParam3
+        case aParam if aParam.structure == MethodParam4.structure => TraversedMethodParam4
+      }
+      TermParamTraversalResult(traversedParam)
+    }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.MethodSignature)))
+    doWrite("(int param11, int param22, int param33, int param44)").when(termParamListRenderer).render(
+      termParams = eqTreeList(TraversedMethodParamList1 ++ TraversedMethodParamList2),
+      context = eqTo(TermParamListRenderContext())
     )
     val block = Block(List(Statement1))
     val blockTraversalResult = TestableBlockTraversalResult(block)
@@ -617,14 +681,10 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """
         |@MyAnnotation
-        |default int myMethod(int param1, int param2, int param3, int param4) {
+        |default int myMethod(int param11, int param22, int param33, int param44) {
         |  /* BODY */
         |}
         |""".stripMargin
-  }
-
-  private def termParamInt(name: String) = {
-    Term.Param(mods = List(), name = Term.Name(name), decltpe = Some(TypeNames.Int), default = None)
   }
 
   private def eqExpectedScalaMods(defnDef: Defn.Def, javaScope: JavaScope) = {
