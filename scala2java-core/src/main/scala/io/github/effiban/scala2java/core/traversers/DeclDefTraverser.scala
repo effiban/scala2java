@@ -1,9 +1,9 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.{ModifiersContext, StatContext}
+import io.github.effiban.scala2java.core.contexts.{ModifiersContext, StatContext, TermParamListRenderContext}
 import io.github.effiban.scala2java.core.entities.JavaTreeType
 import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
-import io.github.effiban.scala2java.core.renderers.{ModListRenderer, TermNameRenderer, TypeRenderer}
+import io.github.effiban.scala2java.core.renderers.{ModListRenderer, TermNameRenderer, TermParamListRenderer, TypeRenderer}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 import io.github.effiban.scala2java.spi.entities.JavaScope
 
@@ -20,7 +20,8 @@ private[traversers] class DeclDefTraverserImpl(modListTraverser: => ModListTrave
                                                typeTraverser: => TypeTraverser,
                                                typeRenderer: => TypeRenderer,
                                                termNameRenderer: TermNameRenderer,
-                                               termParamListTraverser: => DeprecatedTermParamListTraverser)
+                                               termParamTraverser: => TermParamTraverser,
+                                               termParamListRenderer: => TermParamListRenderer)
                                               (implicit javaWriter: JavaWriter) extends DeclDefTraverser {
 
   import javaWriter._
@@ -35,7 +36,10 @@ private[traversers] class DeclDefTraverserImpl(modListTraverser: => ModListTrave
     typeRenderer.render(traversedType)
     write(" ")
     termNameRenderer.render(defDecl.name)
-    termParamListTraverser.traverse(termParams = defDecl.paramss.flatten, context = StatContext(JavaScope.MethodSignature))
+    val methodParamTraversalResults = defDecl.paramss.flatten.map(param => termParamTraverser.traverse(param, StatContext(JavaScope.MethodSignature)))
+    // We can assume the Java modifiers in the results are all the same (all 'final' or all empty) so we can combine them
+    val paramListRenderContext = TermParamListRenderContext(javaModifiers = methodParamTraversalResults.flatMap(_.javaModifiers).distinct)
+    termParamListRenderer.render(methodParamTraversalResults.map(_.tree), paramListRenderContext)
   }
 
   private def traverseTypeParams(tparams: List[Type.Param]): Unit = {

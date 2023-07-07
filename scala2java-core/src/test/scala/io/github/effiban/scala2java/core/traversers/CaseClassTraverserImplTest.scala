@@ -41,13 +41,21 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     )
   )
 
-  private val ctorArg1 = param"arg1: Int"
-  private val ctorArg2 = param"arg2: Int"
-  private val ctorArg3 = param"arg3: Int"
-  private val ctorArg4 = param"arg4: Int"
+  private val CtorArg1 = param"arg1: Int"
+  private val CtorArg2 = param"arg2: Int"
+  private val CtorArg3 = param"arg3: Int"
+  private val CtorArg4 = param"arg4: Int"
 
-  private val CtorArgList1 = List(ctorArg1, ctorArg2)
-  private val CtorArgList2 = List(ctorArg3, ctorArg4)
+  private val CtorArgList1 = List(CtorArg1, CtorArg2)
+  private val CtorArgList2 = List(CtorArg3, CtorArg4)
+
+  private val TraversedCtorArg1 = param"arg11: Int"
+  private val TraversedCtorArg2 = param"arg22: Int"
+  private val TraversedCtorArg3 = param"arg33: Int"
+  private val TraversedCtorArg4 = param"arg44: Int"
+
+  private val TraversedCtorArgList1 = List(TraversedCtorArg1, TraversedCtorArg2)
+  private val TraversedCtorArgList2 = List(TraversedCtorArg3, TraversedCtorArg4)
 
   private val TheTemplate = Template(
     early = List(),
@@ -123,10 +131,15 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Record)))).thenReturn(JavaScope.Class)
-    doAnswer((param: Term.Param) => TermParamTraversalResult(param))
-      .when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.Class)))
-    doWrite("(int arg1, int arg2)").when(termParamListRenderer).render(
-        termParams = eqTreeList(CtorArgList1),
+    doAnswer((param: Term.Param) => {
+      val traversedParam = param match {
+        case aParam if aParam.structure == CtorArg1.structure => TraversedCtorArg1
+        case aParam if aParam.structure == CtorArg2.structure => TraversedCtorArg2
+      }
+      TermParamTraversalResult(traversedParam)
+    }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.Class)))
+    doWrite("(int arg11, int arg22)").when(termParamListRenderer).render(
+        termParams = eqTreeList(TraversedCtorArgList1),
         context = eqTo(TermParamListRenderContext())
     )
     doWrite(
@@ -143,7 +156,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """
         |@MyAnnotation
-        |public record MyRecord<T>(int arg1, int arg2) {
+        |public record MyRecord<T>(int arg11, int arg22) {
         | /* BODY */
         |}
         |""".stripMargin
@@ -187,10 +200,15 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Record)))).thenReturn(JavaScope.Class)
-    doAnswer((param: Term.Param) => TermParamTraversalResult(param))
-      .when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.Class)))
-    doWrite("(int arg1, int arg2)").when(termParamListRenderer).render(
-      termParams = eqTreeList(CtorArgList1),
+    doAnswer((param: Term.Param) => {
+      val traversedParam = param match {
+        case aParam if aParam.structure == CtorArg1.structure => TraversedCtorArg1
+        case aParam if aParam.structure == CtorArg2.structure => TraversedCtorArg2
+      }
+      TermParamTraversalResult(traversedParam)
+    }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.Class)))
+    doWrite("(int arg11, int arg22)").when(termParamListRenderer).render(
+      termParams = eqTreeList(TraversedCtorArgList1),
       context = eqTo(TermParamListRenderContext())
     )
     doWrite(
@@ -208,7 +226,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """
         |@MyAnnotation
-        |public record MyRecord<T>(int arg1, int arg2) {
+        |public record MyRecord<T>(int arg11, int arg22) {
         | /* BODY */
         |}
         |""".stripMargin
@@ -247,10 +265,15 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Record)))).thenReturn(JavaScope.Class)
-    doAnswer((param: Term.Param) => TermParamTraversalResult(param))
-      .when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.Class)))
-    doWrite("(int arg1, int arg2)").when(termParamListRenderer).render(
-      termParams = eqTreeList(CtorArgList1),
+    doAnswer((param: Term.Param) => {
+      val traversedParam = param match {
+        case aParam if aParam.structure == CtorArg1.structure => TraversedCtorArg1
+        case aParam if aParam.structure == CtorArg2.structure => TraversedCtorArg2
+      }
+      TermParamTraversalResult(traversedParam)
+    }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.Class)))
+    doWrite("(int arg11, int arg22)").when(termParamListRenderer).render(
+      termParams = eqTreeList(TraversedCtorArgList1),
       context = eqTo(TermParamListRenderContext())
     )
     doWrite(
@@ -276,7 +299,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """
         |@MyAnnotation
-        |public record MyRecord<T>(int arg1, int arg2) {
+        |public record MyRecord<T>(int arg11, int arg22) {
         | /* BODY */
         |}
         |""".stripMargin
@@ -313,10 +336,17 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doWrite("<T>").when(typeParamListTraverser).traverse(eqTreeList(TypeParams))
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Record)))).thenReturn(JavaScope.Class)
-    doAnswer((param: Term.Param) => TermParamTraversalResult(param))
-      .when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.Class)))
-    doWrite("(int arg1, int arg2, int arg3, int arg4)").when(termParamListRenderer).render(
-      termParams = eqTreeList(CtorArgList1 ++ CtorArgList2),
+    doAnswer((param: Term.Param) => {
+      val traversedParam = param match {
+        case aParam if aParam.structure == CtorArg1.structure => TraversedCtorArg1
+        case aParam if aParam.structure == CtorArg2.structure => TraversedCtorArg2
+        case aParam if aParam.structure == CtorArg3.structure => TraversedCtorArg3
+        case aParam if aParam.structure == CtorArg4.structure => TraversedCtorArg4
+      }
+      TermParamTraversalResult(traversedParam)
+    }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.Class)))
+    doWrite("(int arg11, int arg22, int arg33, int arg44)").when(termParamListRenderer).render(
+      termParams = eqTreeList(TraversedCtorArgList1 ++ TraversedCtorArgList2),
       context = eqTo(TermParamListRenderContext())
     )
     doWrite(
@@ -333,7 +363,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """
         |@MyAnnotation
-        |public record MyRecord<T>(int arg1, int arg2, int arg3, int arg4) {
+        |public record MyRecord<T>(int arg11, int arg22, int arg33, int arg44) {
         | /* BODY */
         |}
         |""".stripMargin
