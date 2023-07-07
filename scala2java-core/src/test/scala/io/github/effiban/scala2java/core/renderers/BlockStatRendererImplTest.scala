@@ -14,8 +14,7 @@ import scala.meta.XtensionQuasiquoteTerm
 
 class BlockStatRendererImplTest extends UnitTestSuite {
 
-  private val expressionTermRefRenderer = mock[ExpressionTermRefRenderer]
-  private val defaultTermRenderer = mock[DefaultTermRenderer]
+  private val statTermRenderer = mock[StatTermRenderer]
   private val ifRenderer = mock[IfRenderer]
   private val tryRenderer = mock[TryRenderer]
   private val tryWithHandlerRenderer = mock[TryWithHandlerRenderer]
@@ -25,11 +24,10 @@ class BlockStatRendererImplTest extends UnitTestSuite {
   private val javaStatClassifier = mock[JavaStatClassifier]
 
   private val blockStatRenderer = new BlockStatRendererImpl(
-    expressionTermRefRenderer,
+    statTermRenderer,
     ifRenderer,
     tryRenderer,
     tryWithHandlerRenderer,
-    defaultTermRenderer,
     defnValRenderer,
     defnVarRenderer,
     declVarRenderer,
@@ -40,7 +38,7 @@ class BlockStatRendererImplTest extends UnitTestSuite {
   test("render() Term.Name") {
     val termName = q"x"
 
-    doWrite("x").when(expressionTermRefRenderer).render(eqTree(termName))
+    doWrite("x").when(statTermRenderer).render(eqTree(termName))
     when(javaStatClassifier.requiresEndDelimiter(eqTree(termName))).thenReturn(true)
 
     blockStatRenderer.render(termName)
@@ -53,7 +51,7 @@ class BlockStatRendererImplTest extends UnitTestSuite {
   test("render() Term.Apply") {
     val termApply = q"func(2)"
 
-    doWrite("func(2)").when(defaultTermRenderer).render(eqTree(termApply))
+    doWrite("func(2)").when(statTermRenderer).render(eqTree(termApply))
     when(javaStatClassifier.requiresEndDelimiter(eqTree(termApply))).thenReturn(true)
 
     blockStatRenderer.render(termApply)
@@ -79,7 +77,7 @@ class BlockStatRendererImplTest extends UnitTestSuite {
          |} else {
          |  doSomethingElse()
          |}""".stripMargin)
-      .when(defaultTermRenderer).render(eqTree(termIf))
+      .when(statTermRenderer).render(eqTree(termIf))
 
     when(javaStatClassifier.requiresEndDelimiter(eqTree(termIf))).thenReturn(false)
 
@@ -139,7 +137,7 @@ class BlockStatRendererImplTest extends UnitTestSuite {
   test("renderLast() Term.Name with no uncertain return") {
     val termName = q"x"
 
-    doWrite("x").when(expressionTermRefRenderer).render(eqTree(termName))
+    doWrite("x").when(statTermRenderer).render(eqTree(termName))
     when(javaStatClassifier.requiresEndDelimiter(eqTree(termName))).thenReturn(true)
 
     blockStatRenderer.renderLast(termName)
@@ -152,7 +150,7 @@ class BlockStatRendererImplTest extends UnitTestSuite {
   test("renderLast() Term.Name when has uncertain return") {
     val termName = q"x"
 
-    doWrite("x").when(expressionTermRefRenderer).render(eqTree(termName))
+    doWrite("x").when(statTermRenderer).render(eqTree(termName))
     when(javaStatClassifier.requiresEndDelimiter(eqTree(termName))).thenReturn(true)
 
     blockStatRenderer.renderLast(termName, SimpleBlockStatRenderContext(uncertainReturn = true))
@@ -165,7 +163,7 @@ class BlockStatRendererImplTest extends UnitTestSuite {
   test("renderLast() Term.Apply with no uncertain return") {
     val termApply = q"func(2)"
 
-    doWrite("func(2)").when(defaultTermRenderer).render(eqTree(termApply))
+    doWrite("func(2)").when(statTermRenderer).render(eqTree(termApply))
     when(javaStatClassifier.requiresEndDelimiter(eqTree(termApply))).thenReturn(true)
 
     blockStatRenderer.render(termApply)

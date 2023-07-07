@@ -110,8 +110,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
   )
 
   private lazy val blockStatTraverser: BlockStatTraverser = new BlockStatTraverserImpl(
-    expressionTermRefTraverser,
-    defaultTermTraverser,
+    statTermTraverser,
     defnValTraverser,
     defnVarTraverser,
     declVarTraverser
@@ -546,18 +545,14 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   lazy val sourceTraverser: SourceTraverser = new SourceTraverserImpl(statTraverser)
 
-  private lazy val deprecatedStatTermTraverser: DeprecatedStatTermTraverser = new DeprecatedStatTermTraverserImpl(
-    deprecatedExpressionTermRefTraverser,
-    deprecatedDefaultTermTraverser
-  )
-
   private lazy val statTermTraverser: StatTermTraverser = new StatTermTraverserImpl(
     expressionTermRefTraverser,
     defaultTermTraverser
   )
 
   private lazy val statTraverser: StatTraverser = new StatTraverserImpl(
-    deprecatedStatTermTraverser,
+    statTermTraverser,
+    statTermRenderer,
     importTraverser,
     importRenderer,
     pkgTraverser,

@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.StatContext
 import io.github.effiban.scala2java.core.matchers.StatContextMatcher.eqStatContext
-import io.github.effiban.scala2java.core.renderers.ImportRenderer
+import io.github.effiban.scala2java.core.renderers.{ImportRenderer, StatTermRenderer}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
@@ -16,7 +16,8 @@ import scala.meta.{Decl, Defn, Lit, Name, Pat, Pkg, Self, Template, Term, Type, 
 
 class StatTraverserImplTest extends UnitTestSuite {
 
-  private val statTermTraverser = mock[DeprecatedStatTermTraverser]
+  private val statTermTraverser = mock[StatTermTraverser]
+  private val statTermRenderer = mock[StatTermRenderer]
   private val importTraverser = mock[ImportTraverser]
   private val importRenderer = mock[ImportRenderer]
   private val pkgTraverser = mock[PkgTraverser]
@@ -25,6 +26,7 @@ class StatTraverserImplTest extends UnitTestSuite {
 
   private val statTraverser = new StatTraverserImpl(
     statTermTraverser,
+    statTermRenderer,
     importTraverser,
     importRenderer,
     pkgTraverser,
@@ -35,13 +37,15 @@ class StatTraverserImplTest extends UnitTestSuite {
   private val pkg = pkgDefinition()
 
   test("traverse Term.Name") {
-    val termName = Term.Name("myName")
+    val termName = q"myName"
+    val traversedTermName = q"myTraversedName"
 
-    doWrite("myName").when(statTermTraverser).traverse(eqTree(termName))
+    doReturn(traversedTermName).when(statTermTraverser).traverse(eqTree(termName))
+    doWrite("myTraversedName").when(statTermRenderer).render(eqTree(traversedTermName))
 
     statTraverser.traverse(termName, StatContext(JavaScope.Class))
 
-    outputWriter.toString shouldBe "myName"
+    outputWriter.toString shouldBe "myTraversedName"
   }
 
   test("traverse Import when traverser returns an import") {

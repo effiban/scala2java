@@ -16,11 +16,10 @@ trait BlockStatRenderer {
   def renderLast(stat: Stat, blockStatRenderContext: BlockStatRenderContext = SimpleBlockStatRenderContext()): Unit
 }
 
-private[renderers] class BlockStatRendererImpl(expressionTermRefRenderer: => ExpressionTermRefRenderer,
+private[renderers] class BlockStatRendererImpl(statTermRenderer: => StatTermRenderer,
                                                ifRenderer: => IfRenderer,
                                                tryRenderer: => TryRenderer,
                                                tryWithHandlerRenderer: => TryWithHandlerRenderer,
-                                               defaultTermRenderer: => DefaultTermRenderer,
                                                defnValRenderer: => DefnValRenderer,
                                                defnVarRenderer: => DefnVarRenderer,
                                                declVarRenderer: => DeclVarRenderer,
@@ -31,8 +30,7 @@ private[renderers] class BlockStatRendererImpl(expressionTermRefRenderer: => Exp
 
   override def render(stat: Stat): Unit = {
     stat match {
-      case termRef: Term.Ref => expressionTermRefRenderer.render(termRef)
-      case aTerm: Term => defaultTermRenderer.render(aTerm)
+      case term: Term => statTermRenderer.render(term)
       case defnVal: Defn.Val => defnValRenderer.render(defnVal, ValOrVarRenderContext(javaModifiers = List(Final), inBlock = true))
       case defnVar: Defn.Var => defnVarRenderer.render(defnVar, ValOrVarRenderContext(inBlock = true))
       case declVar: Decl.Var => declVarRenderer.render(declVar, ValOrVarRenderContext(inBlock = true))

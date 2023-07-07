@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.StatContext
-import io.github.effiban.scala2java.core.renderers.ImportRenderer
+import io.github.effiban.scala2java.core.renderers.{ImportRenderer, StatTermRenderer}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.{Decl, Defn, Import, Pkg, Stat, Term}
@@ -10,7 +10,8 @@ trait StatTraverser {
   def traverse(stat: Stat, statContext: StatContext = StatContext()): Unit
 }
 
-private[traversers] class StatTraverserImpl(statTermTraverser: => DeprecatedStatTermTraverser,
+private[traversers] class StatTraverserImpl(statTermTraverser: => StatTermTraverser,
+                                            statTermRenderer: => StatTermRenderer,
                                             importTraverser: => ImportTraverser,
                                             importRenderer: => ImportRenderer,
                                             pkgTraverser: => PkgTraverser,
@@ -21,7 +22,9 @@ private[traversers] class StatTraverserImpl(statTermTraverser: => DeprecatedStat
   import javaWriter._
 
   override def traverse(stat: Stat, statContext: StatContext = StatContext()): Unit = stat match {
-    case term: Term => statTermTraverser.traverse(term)
+    case term: Term =>
+      val traversedStat = statTermTraverser.traverse(term)
+      statTermRenderer.render(traversedStat)
     case `import`: Import =>
       importTraverser.traverse(`import`)
         .foreach(traversedImport => importRenderer.render(traversedImport, statContext))
