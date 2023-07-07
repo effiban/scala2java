@@ -2,6 +2,8 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{JavaTreeTypeContext, ModifiersContext, StatContext}
 import io.github.effiban.scala2java.core.entities.JavaTreeTypeToKeywordMapping
+import io.github.effiban.scala2java.core.renderers.ModListRenderer
+import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
 import io.github.effiban.scala2java.core.resolvers.JavaTreeTypeResolver
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
@@ -11,7 +13,9 @@ trait DeclTypeTraverser {
   def traverse(typeDecl: Decl.Type, context: StatContext = StatContext()): Unit
 }
 
-private[traversers] class DeclTypeTraverserImpl(modListTraverser: => DeprecatedModListTraverser,
+private[traversers] class DeclTypeTraverserImpl(modListTraverser: => ModListTraverser,
+                                                modifiersRenderContextFactory: ModifiersRenderContextFactory,
+                                                modListRenderer: => ModListRenderer,
                                                 typeParamListTraverser: => TypeParamListTraverser,
                                                 javaTreeTypeResolver: JavaTreeTypeResolver)
                                                (implicit javaWriter: JavaWriter) extends DeclTypeTraverser {
@@ -23,7 +27,9 @@ private[traversers] class DeclTypeTraverserImpl(modListTraverser: => DeprecatedM
     writeLine()
     //TODO - transform to Defn.Trait instead of traversing directly (+ the Java tree type is incorrect anyway)
     val javaTreeType = javaTreeTypeResolver.resolve(JavaTreeTypeContext(typeDecl, typeDecl.mods))
-    modListTraverser.traverse(ModifiersContext(typeDecl, javaTreeType, context.javaScope))
+    val modListTraversalResult = modListTraverser.traverse(ModifiersContext(typeDecl, javaTreeType, context.javaScope))
+    val modifiersRenderContext = modifiersRenderContextFactory(modListTraversalResult)
+    modListRenderer.render(modifiersRenderContext)
     writeNamedType(JavaTreeTypeToKeywordMapping(javaTreeType), typeDecl.name.value)
     typeParamListTraverser.traverse(typeDecl.tparams)
     //TODO handle bounds properly
