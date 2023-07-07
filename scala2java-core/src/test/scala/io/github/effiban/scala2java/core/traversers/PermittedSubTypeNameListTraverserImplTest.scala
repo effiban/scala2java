@@ -1,12 +1,13 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.renderers.ArgumentListRendererImpl
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 
 import scala.meta.{Term, Type}
 
 class PermittedSubTypeNameListTraverserImplTest extends UnitTestSuite {
 
-  private val permittedSubTypeNameListTraverser = new PermittedSubTypeNameListTraverserImpl(new DeprecatedArgumentListTraverserImpl())
+  private val permittedSubTypeNameListTraverser = new PermittedSubTypeNameListTraverserImpl(new ArgumentListRendererImpl())
 
   test("traverse() when one") {
     val permittedSubTypeName = Type.Name("A")
