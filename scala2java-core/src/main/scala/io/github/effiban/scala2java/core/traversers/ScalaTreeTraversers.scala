@@ -159,7 +159,6 @@ class ScalaTreeTraversers(implicit factories: Factories,
   )
 
   private lazy val defaultBlockTraverser: DefaultBlockTraverser = new DefaultBlockTraverserImpl(
-    initTraverser,
     blockStatTraverser,
     blockLastStatTraverser
   )

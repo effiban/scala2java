@@ -12,19 +12,12 @@ trait DefaultBlockTraverser {
   def traverse(block: Block, context: BlockContext = BlockContext()): BlockTraversalResult
 }
 
-private[traversers] class DefaultBlockTraverserImpl(initTraverser: => InitTraverser,
-                                                    blockStatTraverser: => BlockStatTraverser,
+private[traversers] class DefaultBlockTraverserImpl(blockStatTraverser: => BlockStatTraverser,
                                                     blockLastStatTraverser: => BlockLastStatTraverser) extends DefaultBlockTraverser {
 
   override def traverse(block: Block, context: BlockContext = BlockContext()): BlockTraversalResult = {
     import context._
 
-    val traversedMaybeInit = maybeInit.map(initTraverser.traverse)
-    val statsResult = traverseStats(block, shouldReturnValue)
-    statsResult.copy(maybeInit = traversedMaybeInit)
-  }
-
-  private def traverseStats(block: Block, shouldReturnValue: Decision): BlockTraversalResult = {
     block.stats match {
       case nonLastStats :+ lastStat => traverseNonEmptyStats(nonLastStats, lastStat, shouldReturnValue)
       case Nil => BlockTraversalResult()

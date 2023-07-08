@@ -59,7 +59,7 @@ private[traversers] class DefnDefTraverserImpl(modListTraverser: => ModListTrave
       case Some(_) => Yes
       case None => Uncertain
     }
-    val blockContext = BlockContext(shouldReturnValue = shouldReturnValue, maybeInit = maybeInit)
+    val blockContext = BlockContext(shouldReturnValue = shouldReturnValue)
     val blockTraversalResult = blockWrappingTermTraverser.traverse(term = defDef.body, context = blockContext)
     val blockRenderContext = blockRenderContextFactory(blockTraversalResult)
     blockRenderer.render(blockTraversalResult.block, blockRenderContext)

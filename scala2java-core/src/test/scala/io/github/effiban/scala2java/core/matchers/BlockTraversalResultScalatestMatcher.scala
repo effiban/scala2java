@@ -8,8 +8,7 @@ class BlockTraversalResultScalatestMatcher(expectedTraversalResult: BlockTravers
 
   override def apply(actualTraversalResult: BlockTraversalResult): MatchResult = {
     val matches = nonLastStatsMatch(actualTraversalResult) &&
-      maybeLastStatResultMatches(actualTraversalResult) &&
-      maybeInitMatches(actualTraversalResult)
+      maybeLastStatResultMatches(actualTraversalResult)
 
     MatchResult(matches,
       s"Actual traversal result: $actualTraversalResult is NOT the same as expected traversal result: $expectedTraversalResult",
@@ -31,11 +30,6 @@ class BlockTraversalResultScalatestMatcher(expectedTraversalResult: BlockTravers
       case _ => false
     }
   }
-
-  private def maybeInitMatches(actualTraversalResult: BlockTraversalResult): Boolean = {
-    actualTraversalResult.maybeInit.structure == expectedTraversalResult.maybeInit.structure
-  }
-
 }
 
 object BlockTraversalResultScalatestMatcher {

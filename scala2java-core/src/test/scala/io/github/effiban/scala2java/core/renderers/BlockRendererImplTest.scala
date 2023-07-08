@@ -1,20 +1,18 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.{BlockRenderContext, IfRenderContext, InitContext, SimpleBlockStatRenderContext}
+import io.github.effiban.scala2java.core.contexts.{BlockRenderContext, IfRenderContext, SimpleBlockStatRenderContext}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
-import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.Term.Block
-import scala.meta.{XtensionQuasiquoteInit, XtensionQuasiquoteTerm}
+import scala.meta.XtensionQuasiquoteTerm
 
 class BlockRendererImplTest extends UnitTestSuite {
   private val blockStatRenderer = mock[BlockStatRenderer]
-  private val initRenderer = mock[InitRenderer]
 
-  private val blockRenderer = new BlockRendererImpl(blockStatRenderer, initRenderer)
+  private val blockRenderer = new BlockRendererImpl(blockStatRenderer)
 
 
   test("render() when block is empty") {
@@ -159,32 +157,4 @@ class BlockRendererImplTest extends UnitTestSuite {
          |}
          |""".stripMargin
   }
-
-  test("render() for an 'init' and one simple statement") {
-    val block =
-      q"""
-      {
-        foo()
-      }
-      """
-    val init = init"this(dummy)"
-    val initStr = "  this(dummy)"
-
-    doWrite(initStr)
-      .when(initRenderer).render(eqTree(init), ArgumentMatchers.eq(InitContext(argNameAsComment = true)))
-    doWrite(
-      s"""  foo();
-         |""".stripMargin)
-      .when(blockStatRenderer).renderLast(eqTree(q"foo()"), eqTo(SimpleBlockStatRenderContext()))
-
-    blockRenderer.render(block = block, context = BlockRenderContext(maybeInit = Some(init)))
-
-    outputWriter.toString shouldBe
-      s""" {
-         |  this(dummy);
-         |  foo();
-         |}
-         |""".stripMargin
-  }
-
 }
