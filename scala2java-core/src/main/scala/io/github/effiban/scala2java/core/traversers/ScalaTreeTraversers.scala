@@ -100,7 +100,19 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val ctorPrimaryTraverser: CtorPrimaryTraverser = new CtorPrimaryTraverserImpl(CtorPrimaryTransformer, defnDefTraverser)
 
-  private lazy val ctorSecondaryTraverser: CtorSecondaryTraverser = new CtorSecondaryTraverserImpl(CtorSecondaryTransformer, defnDefTraverser)
+  private lazy val ctorSecondaryTraverser: CtorSecondaryTraverser = new CtorSecondaryTraverserImpl(
+    modListTraverser,
+    ModifiersRenderContextFactory,
+    modListRenderer,
+    typeNameTraverser,
+    typeNameRenderer,
+    termParamTraverser,
+    termParamListRenderer,
+    initTraverser,
+    initRenderer,
+    blockStatTraverser,
+    blockStatRenderer
+  )
 
   private lazy val declDefTraverser: DeclDefTraverser = new DeclDefTraverserImpl(
     modListTraverser,
@@ -145,7 +157,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
     typeTraverser,
     patTraverser
   )
-  
+
   private lazy val defaultBlockTraverser: DefaultBlockTraverser = new DefaultBlockTraverserImpl(
     initTraverser,
     blockStatTraverser,

@@ -1,72 +1,258 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.{CtorContext, DefnDefContext}
-import io.github.effiban.scala2java.core.matchers.CtorContextMatcher.eqCtorContext
-import io.github.effiban.scala2java.core.matchers.DefnDefContextMatcher.eqDefnDefContext
+import io.github.effiban.scala2java.core.contexts._
+import io.github.effiban.scala2java.core.entities.{JavaModifier, JavaTreeType}
+import io.github.effiban.scala2java.core.matchers.ModListTraversalResultMockitoMatcher.eqModListTraversalResult
+import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
+import io.github.effiban.scala2java.core.matchers.ModifiersRenderContextMatcher.eqModifiersRenderContext
+import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
+import io.github.effiban.scala2java.core.renderers._
+import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.testtrees.TypeNames
-import io.github.effiban.scala2java.core.transformers.CtorSecondaryTransformer
+import io.github.effiban.scala2java.core.traversers.results.{ModListTraversalResult, TermParamTraversalResult}
 import io.github.effiban.scala2java.spi.entities.JavaScope
+import io.github.effiban.scala2java.spi.entities.JavaScope.JavaScope
+import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
+import org.mockito.ArgumentMatchersSugar.{any, eqTo}
 
-import scala.meta.{Ctor, Defn, Init, Name, Term, Type}
+import scala.meta.{Ctor, Init, Mod, Name, Stat, Term, Type, XtensionQuasiquoteInit, XtensionQuasiquoteTerm, XtensionQuasiquoteTermParam, XtensionQuasiquoteType}
 
 class CtorSecondaryTraverserImplTest extends UnitTestSuite {
 
-  private val ClassName = Type.Name("MyClass")
+  private val ClassName = t"MyClass"
+  private val TraversedClassName = t"MyTraversedClass"
 
-  private val TheInits = List(
-    Init(tpe = Type.Name("Parent1"), name = Name.Anonymous(), argss = List()),
-    Init(tpe = Type.Name("Parent2"), name = Name.Anonymous(), argss = List())
-  )
+  private val TheParentInits = List(init"Parent1", init"Parent2")
 
   private val TheCtorContext = CtorContext(
     javaScope = JavaScope.Class,
     className = ClassName,
-    inits = TheInits
+    inits = TheParentInits
   )
 
-  private val CtorArgs = List(
-    termParam("arg1", "Int"),
-    termParam("arg2", "String")
+  private val TheAnnot = Mod.Annot(
+    Init(tpe = Type.Name("MyAnnotation"), name = Name.Anonymous(), argss = List())
+  )
+  private val TheScalaMods = List(TheAnnot)
+
+  private val CtorArg1 = param"param1: Int"
+  private val CtorArg2 = param"param2: Int"
+  private val CtorArg3 = param"param3: Int"
+  private val CtorArg4 = param"param4: Int"
+
+  private val CtorArgList1 = List(CtorArg1, CtorArg2)
+  private val CtorArgList2 = List(CtorArg3, CtorArg4)
+
+  private val TraversedCtorArg1 = param"param11: Int"
+  private val TraversedCtorArg2 = param"param22: Int"
+  private val TraversedCtorArg3 = param"param33: Int"
+  private val TraversedCtorArg4 = param"param44: Int"
+
+  private val TraversedCtorArgList1 = List(TraversedCtorArg1, TraversedCtorArg2)
+  private val TraversedCtorArgList2 = List(TraversedCtorArg3, TraversedCtorArg4)
+
+  private val TheSelfInit = init"this(param1)"
+  private val TheTraversedSelfInit = init"this(param11)"
+
+  private val Statement1 = q"doSomething1(param1)"
+  private val Statement2 = q"doSomething2(param2)"
+
+  private val TraversedStatement1 = q"doSomething11(param11)"
+  private val TraversedStatement2 = q"doSomething22(param22)"
+
+  private val modListTraverser = mock[ModListTraverser]
+  private val modifiersRenderContextFactory = mock[ModifiersRenderContextFactory]
+  private val modListRenderer = mock[ModListRenderer]
+  private val typeNameTraverser = mock[TypeNameTraverser]
+  private val typeNameRenderer = mock[TypeNameRenderer]
+  private val termParamTraverser = mock[TermParamTraverser]
+  private val termParamListRenderer = mock[TermParamListRenderer]
+  private val initTraverser = mock[InitTraverser]
+  private val initRenderer = mock[InitRenderer]
+  private val blockStatTraverser = mock[BlockStatTraverser]
+  private val blockStatRenderer = mock[BlockStatRenderer]
+
+  private val ctorSecondaryTraverser = new CtorSecondaryTraverserImpl(
+    modListTraverser,
+    modifiersRenderContextFactory,
+    modListRenderer,
+    typeNameTraverser,
+    typeNameRenderer,
+    termParamTraverser, 
+    termParamListRenderer,
+    initTraverser,
+    initRenderer,
+    blockStatTraverser,
+    blockStatRenderer
   )
 
-  private val SecondaryCtor = Ctor.Secondary(
-    mods = Nil,
-    name = Name.Anonymous(),
-    paramss = List(CtorArgs),
-    init = Init(tpe = Type.Singleton(Term.This(Name.Anonymous())), name = Name.Anonymous(), argss = List(Nil)),
-    stats = Nil
-  )
+  test("traverse() with no statements") {
+    val javaScope = JavaScope.Class
 
-  private val Statement = Term.Apply(fun = Term.Name("doSomething"), args = List(Term.Name("param1")))
-
-  private val ExpectedDefnDef = Defn.Def(
-    mods = Nil,
-    name = Term.Name("myMethod"),
-    tparams = Nil,
-    paramss = List(List(termParam("param", "Int"))),
-    decltpe = Some(TypeNames.Int),
-    body = Statement
-  )
-
-  private val ctorSecondaryTransformer = mock[CtorSecondaryTransformer]
-  private val defnDefTraverser = mock[DefnDefTraverser]
-
-  private val ctorSecondaryTraverser = new CtorSecondaryTraverserImpl(ctorSecondaryTransformer, defnDefTraverser)
-
-  test("traverse") {
-    when(ctorSecondaryTransformer.transform(eqTree(SecondaryCtor), eqCtorContext(TheCtorContext))).thenReturn(ExpectedDefnDef)
-
-    ctorSecondaryTraverser.traverse(SecondaryCtor, TheCtorContext)
-
-    verify(defnDefTraverser).traverse(
-      eqTree(ExpectedDefnDef),
-      eqDefnDefContext(DefnDefContext(javaScope = JavaScope.Class, maybeInit = Some(SecondaryCtor.init)))
+    val ctorSecondary = Ctor.Secondary(
+      mods = TheScalaMods,
+      name = Name.Anonymous(),
+      paramss = List(CtorArgList1),
+      init = TheSelfInit,
+      stats = Nil
     )
+
+    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TheScalaMods, javaModifiers = List(JavaModifier.Public))
+    val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = TheScalaMods, javaModifiers = List(JavaModifier.Public))
+
+    doReturn(expectedModListTraversalResult).when(modListTraverser).traverse(eqExpectedScalaMods(ctorSecondary, javaScope))
+    doReturn(expectedModifiersRenderContext)
+      .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
+    doWrite(
+      """@MyAnnotation
+        |public """.stripMargin)
+      .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
+    doReturn(TraversedClassName).when(typeNameTraverser).traverse(eqTree(ClassName))
+    doWrite("MyTraversedClass").when(typeNameRenderer).render(eqTree(TraversedClassName))
+    doAnswer((param: Term.Param) => {
+      val traversedParam = param match {
+        case aParam if aParam.structure == CtorArg1.structure => TraversedCtorArg1
+        case aParam if aParam.structure == CtorArg2.structure => TraversedCtorArg2
+        case aParam => aParam
+      }
+      TermParamTraversalResult(traversedParam, List(JavaModifier.Final))
+    }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.MethodSignature)))
+    doWrite("(final int param11, final int param22)").when(termParamListRenderer).render(
+      termParams = eqTreeList(TraversedCtorArgList1),
+      context = eqTo(TermParamListRenderContext(List(JavaModifier.Final)))
+    )
+    doReturn(TheTraversedSelfInit).when(initTraverser).traverse(eqTree(TheSelfInit))
+    doWrite("  this(param11)").when(initRenderer).render(eqTree(TheTraversedSelfInit), eqTo(InitContext(argNameAsComment = true)))
+
+    ctorSecondaryTraverser.traverse(ctorSecondary, TheCtorContext)
+
+    outputWriter.toString shouldBe
+      """
+        |@MyAnnotation
+        |public MyTraversedClass(final int param11, final int param22) {
+        |  this(param11);
+        |}
+        |""".stripMargin
   }
 
-  private def termParam(name: String, typeName: String) = {
-    Term.Param(mods = List(), name = Term.Name(name), decltpe = Some(Type.Name(typeName)), default = None)
+  test("traverse() with statements") {
+    val javaScope = JavaScope.Class
+
+    val ctorSecondary = Ctor.Secondary(
+      mods = TheScalaMods,
+      name = Name.Anonymous(),
+      paramss = List(CtorArgList1),
+      init = TheSelfInit,
+      stats = List(Statement1, Statement2)
+    )
+
+    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TheScalaMods, javaModifiers = List(JavaModifier.Public))
+    val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = TheScalaMods, javaModifiers = List(JavaModifier.Public))
+
+    doReturn(expectedModListTraversalResult).when(modListTraverser).traverse(eqExpectedScalaMods(ctorSecondary, javaScope))
+    doReturn(expectedModifiersRenderContext)
+      .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
+    doWrite(
+      """@MyAnnotation
+        |public """.stripMargin)
+      .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
+    doReturn(TraversedClassName).when(typeNameTraverser).traverse(eqTree(ClassName))
+    doWrite("MyTraversedClass").when(typeNameRenderer).render(eqTree(TraversedClassName))
+    doAnswer((param: Term.Param) => {
+      val traversedParam = param match {
+        case aParam if aParam.structure == CtorArg1.structure => TraversedCtorArg1
+        case aParam if aParam.structure == CtorArg2.structure => TraversedCtorArg2
+        case aParam => aParam
+      }
+      TermParamTraversalResult(traversedParam, List(JavaModifier.Final))
+    }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.MethodSignature)))
+    doWrite("(final int param11, final int param22)").when(termParamListRenderer).render(
+      termParams = eqTreeList(TraversedCtorArgList1),
+      context = eqTo(TermParamListRenderContext(List(JavaModifier.Final)))
+    )
+    doReturn(TheTraversedSelfInit).when(initTraverser).traverse(eqTree(TheSelfInit))
+    doWrite("  this(param11)").when(initRenderer).render(eqTree(TheTraversedSelfInit), eqTo(InitContext(argNameAsComment = true)))
+
+    doAnswer((stat: Stat) => stat match {
+      case aStat if aStat.structure == Statement1.structure => TraversedStatement1
+      case aStat if aStat.structure == Statement2.structure => TraversedStatement2
+      case aStat => aStat
+    }).when(blockStatTraverser).traverse(any[Stat])
+    doWrite(
+      """  doSomething11(param11);
+        |""".stripMargin).when(blockStatRenderer).render(eqTree(TraversedStatement1))
+    doWrite(
+      """  doSomething22(param22);
+        |""".stripMargin).when(blockStatRenderer).render(eqTree(TraversedStatement2))
+
+    ctorSecondaryTraverser.traverse(ctorSecondary, TheCtorContext)
+
+    outputWriter.toString shouldBe
+      """
+        |@MyAnnotation
+        |public MyTraversedClass(final int param11, final int param22) {
+        |  this(param11);
+        |  doSomething11(param11);
+        |  doSomething22(param22);
+        |}
+        |""".stripMargin
+  }
+
+  test("traverse() with two argument lists") {
+    val javaScope = JavaScope.Class
+
+    val ctorSecondary = Ctor.Secondary(
+      mods = TheScalaMods,
+      name = Name.Anonymous(),
+      paramss = List(CtorArgList1, CtorArgList2),
+      init = TheSelfInit,
+      stats = Nil
+    )
+
+    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TheScalaMods, javaModifiers = List(JavaModifier.Public))
+    val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = TheScalaMods, javaModifiers = List(JavaModifier.Public))
+
+    doReturn(expectedModListTraversalResult).when(modListTraverser).traverse(eqExpectedScalaMods(ctorSecondary, javaScope))
+    doReturn(expectedModifiersRenderContext)
+      .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
+    doWrite(
+      """@MyAnnotation
+        |public """.stripMargin)
+      .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
+    doReturn(TraversedClassName).when(typeNameTraverser).traverse(eqTree(ClassName))
+    doWrite("MyTraversedClass").when(typeNameRenderer).render(eqTree(TraversedClassName))
+    doAnswer((param: Term.Param) => {
+      val traversedParam = param match {
+        case aParam if aParam.structure == CtorArg1.structure => TraversedCtorArg1
+        case aParam if aParam.structure == CtorArg2.structure => TraversedCtorArg2
+        case aParam if aParam.structure == CtorArg3.structure => TraversedCtorArg3
+        case aParam if aParam.structure == CtorArg4.structure => TraversedCtorArg4
+        case aParam => aParam
+      }
+      TermParamTraversalResult(traversedParam, List(JavaModifier.Final))
+    }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.MethodSignature)))
+    doWrite("(final int param11, final int param22, final int param33, final int param44)")
+      .when(termParamListRenderer).render(
+      termParams = eqTreeList(TraversedCtorArgList1 ++ TraversedCtorArgList2),
+      context = eqTo(TermParamListRenderContext(List(JavaModifier.Final)))
+    )
+    doReturn(TheTraversedSelfInit).when(initTraverser).traverse(eqTree(TheSelfInit))
+    doWrite("  this(param11)").when(initRenderer).render(eqTree(TheTraversedSelfInit), eqTo(InitContext(argNameAsComment = true)))
+
+    ctorSecondaryTraverser.traverse(ctorSecondary, TheCtorContext)
+
+    outputWriter.toString shouldBe
+      """
+        |@MyAnnotation
+        |public MyTraversedClass(final int param11, final int param22, final int param33, final int param44) {
+        |  this(param11);
+        |}
+        |""".stripMargin
+  }
+
+  private def eqExpectedScalaMods(ctorSecondary: Ctor.Secondary, javaScope: JavaScope) = {
+    val expectedModifiersContext = ModifiersContext(ctorSecondary, JavaTreeType.Method, javaScope)
+    eqModifiersContext(expectedModifiersContext)
   }
 }
