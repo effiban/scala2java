@@ -43,7 +43,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
     expressionTermRenderer
   )
 
-  lazy val blockRenderer: BlockRenderer = new BlockRendererImpl(blockStatRenderer, initRenderer)
+  lazy val blockRenderer: BlockRenderer = new BlockRendererImpl(blockStatRenderer)
 
   lazy val blockStatRenderer: BlockStatRenderer = new BlockStatRendererImpl(
     statTermRenderer,

@@ -9,8 +9,7 @@ class BlockTraversalResultMockitoMatcher(expectedTraversalResult: BlockTraversal
 
   override def matches(actualTraversalResult: BlockTraversalResult): Boolean = {
     nonLastStatsMatch(actualTraversalResult) &&
-      maybeLastStatResultMatches(actualTraversalResult) &&
-      maybeInitMatches(actualTraversalResult)
+      maybeLastStatResultMatches(actualTraversalResult)
   }
 
   override def toString: String = s"Matcher for: $expectedTraversalResult"
@@ -27,11 +26,6 @@ class BlockTraversalResultMockitoMatcher(expectedTraversalResult: BlockTraversal
       case _ => false
     }
   }
-
-  private def maybeInitMatches(actualTraversalResult: BlockTraversalResult): Boolean = {
-    actualTraversalResult.maybeInit.structure == expectedTraversalResult.maybeInit.structure
-  }
-
 }
 
 object BlockTraversalResultMockitoMatcher {

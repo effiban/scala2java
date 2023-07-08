@@ -12,7 +12,6 @@ private[contextfactories] class BlockRenderContextFactoryImpl(blockStatRenderCon
     val lastStatContext = traversalResult.maybeLastStatResult
       .map(blockStatRenderContextFactory)
       .getOrElse(SimpleBlockStatRenderContext())
-    val maybeInit = traversalResult.maybeInit
-    BlockRenderContext(lastStatContext = lastStatContext, maybeInit = maybeInit)
+    BlockRenderContext(lastStatContext = lastStatContext)
   }
 }

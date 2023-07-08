@@ -9,7 +9,7 @@ import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.{any, eqTo}
 
 import scala.meta.Term.Block
-import scala.meta.{Stat, XtensionQuasiquoteInit, XtensionQuasiquoteTerm}
+import scala.meta.{Stat, XtensionQuasiquoteTerm}
 
 class DefaultBlockTraverserImplTest extends UnitTestSuite {
 
@@ -21,12 +21,10 @@ class DefaultBlockTraverserImplTest extends UnitTestSuite {
   private val TraversedStat2 = q"traversedStat2"
   private val TraversedStat3 = q"traversedStat3"
 
-  private val initTraverser = mock[InitTraverser]
   private val blockStatTraverser = mock[BlockStatTraverser]
   private val blockLastStatTraverser = mock[BlockLastStatTraverser]
 
   private val blockTraverser = new DefaultBlockTraverserImpl(
-    initTraverser,
     blockStatTraverser,
     blockLastStatTraverser
   )
@@ -93,19 +91,5 @@ class DefaultBlockTraverserImplTest extends UnitTestSuite {
     doReturn(expectedLastStatResult).when(blockLastStatTraverser).traverse(eqTree(Stat3), eqTo(No))
 
     blockTraverser.traverse(block) should equalBlockTraversalResult(expectedBlockResult)
-  }
-
-
-  test("traverse() for an 'init' and one statement") {
-    val init = init"this(x)"
-    val traversedInit = init"this(xx)"
-    val block = Block(List(Stat1))
-    val expectedLastStatResult = SimpleBlockStatTraversalResult(TraversedStat1)
-    val expectedBlockResult = TestableBlockTraversalResult(block = Block(List(TraversedStat1)), maybeInit = Some(traversedInit))
-
-    doReturn(traversedInit).when(initTraverser).traverse(eqTree(init))
-    doReturn(expectedLastStatResult).when(blockLastStatTraverser).traverse(eqTree(Stat1), eqTo(No))
-
-    blockTraverser.traverse(block, BlockContext(maybeInit = Some(init))) should equalBlockTraversalResult(expectedBlockResult)
   }
 }

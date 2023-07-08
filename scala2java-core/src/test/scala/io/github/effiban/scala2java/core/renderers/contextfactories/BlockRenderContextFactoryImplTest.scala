@@ -21,11 +21,10 @@ class BlockRenderContextFactoryImplTest extends UnitTestSuite {
     val blockTraversalResult = BlockTraversalResult(
       nonLastStats = List(q"stat1"),
       maybeLastStatResult = Some(lastStatTraversalResult),
-      maybeInit = Some(init)
     )
 
     val expectedBlockStatContext = SimpleBlockStatRenderContext(uncertainReturn = true)
-    val expectedBlockContext = BlockRenderContext(lastStatContext = expectedBlockStatContext, maybeInit = Some(init))
+    val expectedBlockContext = BlockRenderContext(lastStatContext = expectedBlockStatContext)
 
     doReturn(expectedBlockStatContext).when(blockStatRenderContextFactory)(eqBlockStatTraversalResult(lastStatTraversalResult))
 
