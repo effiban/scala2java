@@ -1,13 +1,13 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.{BlockRenderContext2, IfRenderContext2}
+import io.github.effiban.scala2java.core.contexts.{BlockRenderContext, IfRenderContext}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Term.{Block, If}
 import scala.meta.{Lit, Term}
 
 trait IfRenderer {
-  def render(`if`: If, context: IfRenderContext2 = IfRenderContext2()): Unit
+  def render(`if`: If, context: IfRenderContext = IfRenderContext()): Unit
 
   def renderAsTertiaryOp(`if`: If): Unit
 }
@@ -19,17 +19,17 @@ private[renderers] class IfRendererImpl(expressionTermRenderer: => ExpressionTer
 
   import javaWriter._
 
-  override def render(`if`: If, context: IfRenderContext2 = IfRenderContext2()): Unit = {
+  override def render(`if`: If, context: IfRenderContext = IfRenderContext()): Unit = {
     //TODO handle mods (what do they represent in an 'if'?...)
     write("if (")
     expressionTermRenderer.render(`if`.cond)
     write(")")
-    renderNonExpressionClause(`if`.thenp, BlockRenderContext2(context.uncertainReturn))
+    renderNonExpressionClause(`if`.thenp, BlockRenderContext(context.uncertainReturn))
     `if`.elsep match {
       case Lit.Unit() =>
       case elsep =>
         write("else")
-        renderNonExpressionClause(elsep, BlockRenderContext2(context.uncertainReturn))
+        renderNonExpressionClause(elsep, BlockRenderContext(context.uncertainReturn))
     }
   }
 
@@ -45,7 +45,7 @@ private[renderers] class IfRendererImpl(expressionTermRenderer: => ExpressionTer
     }
   }
 
-  private def renderNonExpressionClause(clause: Term, context: BlockRenderContext2): Unit = {
+  private def renderNonExpressionClause(clause: Term, context: BlockRenderContext): Unit = {
     clause match {
       case block: Block => blockRenderer.render(block, context)
       case term =>

@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.{BlockRenderContext2, IfRenderContext2}
+import io.github.effiban.scala2java.core.contexts.{BlockRenderContext, IfRenderContext}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -70,7 +70,7 @@ class IfRendererImplTest extends UnitTestSuite {
         |  /* BODY */
         |}
         |""".stripMargin)
-      .when(blockRenderer).render(block = eqTree(ThenBlock), context = eqTo(BlockRenderContext2()))
+      .when(blockRenderer).render(block = eqTree(ThenBlock), context = eqTo(BlockRenderContext()))
 
     ifRenderer.render(`if`)
 
@@ -88,7 +88,7 @@ class IfRendererImplTest extends UnitTestSuite {
       elsep = Lit.Unit()
     )
 
-    val ifContext = IfRenderContext2(uncertainReturn = true)
+    val ifContext = IfRenderContext(uncertainReturn = true)
 
     doWrite("x < 3").when(expressionTermRenderer).render(eqTree(Condition))
     doWrite(
@@ -98,7 +98,7 @@ class IfRendererImplTest extends UnitTestSuite {
         |}
         |""".stripMargin).when(blockRenderer).render(
       block = eqTree(ThenBlock),
-      context = eqTo(BlockRenderContext2(uncertainReturn = true))
+      context = eqTo(BlockRenderContext(uncertainReturn = true))
     )
 
     ifRenderer.render(`if`, ifContext)
@@ -140,13 +140,13 @@ class IfRendererImplTest extends UnitTestSuite {
         |  /* THEN BODY */
         |}
         |""".stripMargin)
-      .when(blockRenderer).render(block = eqTree(ThenBlock), context = eqTo(BlockRenderContext2()))
+      .when(blockRenderer).render(block = eqTree(ThenBlock), context = eqTo(BlockRenderContext()))
     doWrite(
       """ {
         |  /* ELSE BODY */
         |}
         |""".stripMargin)
-      .when(blockRenderer).render(block = eqTree(ElseBlock), context = eqTo(BlockRenderContext2()))
+      .when(blockRenderer).render(block = eqTree(ElseBlock), context = eqTo(BlockRenderContext()))
 
     ifRenderer.render(`if`)
 
@@ -167,8 +167,8 @@ class IfRendererImplTest extends UnitTestSuite {
       elsep = ElseBlock
     )
 
-    val clauseContext = BlockRenderContext2(uncertainReturn = true)
-    val ifContext = IfRenderContext2(uncertainReturn = true)
+    val clauseContext = BlockRenderContext(uncertainReturn = true)
+    val ifContext = IfRenderContext(uncertainReturn = true)
 
     doWrite("x < 3").when(expressionTermRenderer).render(eqTree(Condition))
     doWrite(
@@ -215,7 +215,7 @@ class IfRendererImplTest extends UnitTestSuite {
         |  /* THEN BODY */
         |}
         |""".stripMargin).when(blockRenderer).render(
-      block = eqTree(ThenBlock), context = eqTo(BlockRenderContext2())
+      block = eqTree(ThenBlock), context = eqTo(BlockRenderContext())
     )
     doWrite(ElseStatementStr).when(defaultTermRenderer).render(eqTree(ElseStatement))
 

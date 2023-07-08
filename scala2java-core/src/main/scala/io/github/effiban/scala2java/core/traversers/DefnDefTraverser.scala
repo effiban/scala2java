@@ -60,7 +60,7 @@ private[traversers] class DefnDefTraverserImpl(modListTraverser: => ModListTrave
     }
     val blockContext = BlockContext(shouldReturnValue = shouldReturnValue)
     val blockTraversalResult = blockWrappingTermTraverser.traverse(term = defDef.body, context = blockContext)
-    blockRenderer.render(blockTraversalResult.block, BlockRenderContext2(uncertainReturn = maybeMethodType.isEmpty))
+    blockRenderer.render(blockTraversalResult.block, BlockRenderContext(uncertainReturn = maybeMethodType.isEmpty))
   }
 
   private def traverseTypeParams(tparams: List[Type.Param]): Unit = {

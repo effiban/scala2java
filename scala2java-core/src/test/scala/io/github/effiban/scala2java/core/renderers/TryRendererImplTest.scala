@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.{BlockRenderContext2, TryRenderContext2}
+import io.github.effiban.scala2java.core.contexts.{BlockRenderContext, TryRenderContext}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -62,7 +62,7 @@ class TryRendererImplTest extends UnitTestSuite {
         |  doSomething();
         |}
         |""".stripMargin)
-      .when(blockRenderer).render(block = eqTree(TryBlock), context = eqTo(BlockRenderContext2()))
+      .when(blockRenderer).render(block = eqTree(TryBlock), context = eqTo(BlockRenderContext()))
 
     tryRenderer.render(`try`)
 
@@ -79,8 +79,8 @@ class TryRendererImplTest extends UnitTestSuite {
       catchp = Nil,
       finallyp = None
     )
-    val exprContext = BlockRenderContext2(uncertainReturn = true)
-    val tryContext = TryRenderContext2(uncertainReturn = true)
+    val exprContext = BlockRenderContext(uncertainReturn = true)
+    val tryContext = TryRenderContext(uncertainReturn = true)
 
     doWrite(
       """ {
@@ -112,7 +112,7 @@ class TryRendererImplTest extends UnitTestSuite {
         |  doSomething();
         |}
         |""".stripMargin)
-      .when(blockRenderer).render(block = eqTree(TryBlock),context = eqTo(BlockRenderContext2()))
+      .when(blockRenderer).render(block = eqTree(TryBlock),context = eqTo(BlockRenderContext()))
 
     doWrite(
       """catch (IllegalArgumentException e1) {
@@ -121,7 +121,7 @@ class TryRendererImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(catchHandlerRenderer).render(
       eqTree(CatchCase1),
-      eqTo(BlockRenderContext2()))
+      eqTo(BlockRenderContext()))
 
     tryRenderer.render(`try`)
 
@@ -144,8 +144,8 @@ class TryRendererImplTest extends UnitTestSuite {
       finallyp = None
     )
 
-    val clauseContext = BlockRenderContext2(uncertainReturn = true)
-    val tryContext = TryRenderContext2(uncertainReturn = true)
+    val clauseContext = BlockRenderContext(uncertainReturn = true)
+    val tryContext = TryRenderContext(uncertainReturn = true)
 
     doWrite(
       """ {
@@ -193,7 +193,7 @@ class TryRendererImplTest extends UnitTestSuite {
         |  doSomething();
         |}
         |""".stripMargin)
-      .when(blockRenderer).render(block = eqTree(TryBlock), context = eqTo(BlockRenderContext2()))
+      .when(blockRenderer).render(block = eqTree(TryBlock), context = eqTo(BlockRenderContext()))
 
     doWrite(
       """catch (IllegalArgumentException e1) {
@@ -202,7 +202,7 @@ class TryRendererImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(catchHandlerRenderer).render(
       eqTree(CatchCase1),
-      eqTo(BlockRenderContext2())
+      eqTo(BlockRenderContext())
     )
 
     doWrite(
@@ -212,7 +212,7 @@ class TryRendererImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(catchHandlerRenderer).render(
       eqTree(CatchCase2),
-      eqTo(BlockRenderContext2())
+      eqTo(BlockRenderContext())
     )
 
     tryRenderer.render(`try`)
@@ -240,8 +240,8 @@ class TryRendererImplTest extends UnitTestSuite {
       finallyp = None
     )
 
-    val clauseContext = BlockRenderContext2(uncertainReturn = true)
-    val tryContext = TryRenderContext2(uncertainReturn = true)
+    val clauseContext = BlockRenderContext(uncertainReturn = true)
+    val tryContext = TryRenderContext(uncertainReturn = true)
 
     doWrite(
       """ {
@@ -299,7 +299,7 @@ class TryRendererImplTest extends UnitTestSuite {
         |  doSomething();
         |}
         |""".stripMargin)
-      .when(blockRenderer).render(block = eqTree(TryBlock), context = eqTo(BlockRenderContext2()))
+      .when(blockRenderer).render(block = eqTree(TryBlock), context = eqTo(BlockRenderContext()))
 
     doWrite(
       """catch (IllegalArgumentException e1) {
@@ -308,7 +308,7 @@ class TryRendererImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(catchHandlerRenderer).render(
       eqTree(CatchCase1),
-      eqTo(BlockRenderContext2())
+      eqTo(BlockRenderContext())
     )
 
     doWrite(

@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.{BlockRenderContext2, TryRenderContext2}
+import io.github.effiban.scala2java.core.contexts.{BlockRenderContext, TryRenderContext}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -36,7 +36,7 @@ class TryWithHandlerRendererImplTest extends UnitTestSuite {
         |  doSomething();
         |}
         |""".stripMargin)
-      .when(blockRenderer).render(block = eqTree(TryBlock),context = eqTo(BlockRenderContext2()))
+      .when(blockRenderer).render(block = eqTree(TryBlock),context = eqTo(BlockRenderContext()))
 
     tryWithHandlerRenderer.render(tryWithHandler)
 
@@ -61,7 +61,7 @@ class TryWithHandlerRendererImplTest extends UnitTestSuite {
         |  doSomething();
         |}
         |""".stripMargin)
-      .when(blockRenderer).render(block = eqTree(TryBlock), context = eqTo(BlockRenderContext2()))
+      .when(blockRenderer).render(block = eqTree(TryBlock), context = eqTo(BlockRenderContext()))
 
     doWrite(
       """finally {
@@ -90,8 +90,8 @@ class TryWithHandlerRendererImplTest extends UnitTestSuite {
       finallyp = Some(FinallyBlock)
     )
 
-    val exprContext = BlockRenderContext2(uncertainReturn = true)
-    val tryContext = TryRenderContext2(uncertainReturn = true)
+    val exprContext = BlockRenderContext(uncertainReturn = true)
+    val tryContext = TryRenderContext(uncertainReturn = true)
 
     doWrite(
       """ {
