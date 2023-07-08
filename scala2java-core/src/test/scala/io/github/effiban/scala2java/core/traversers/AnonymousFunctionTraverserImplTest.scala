@@ -1,9 +1,8 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.entities.Decision.{No, Uncertain, Yes}
-import io.github.effiban.scala2java.core.matchers.TermFunctionTraversalResultScalatestMatcher.equalTermFunctionTraversalResult
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.{BlockTermFunctionTraversalResult, BlockTraversalResult}
+import io.github.effiban.scala2java.core.traversers.results.TermFunctionTraversalResult
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
 
@@ -22,11 +21,6 @@ class AnonymousFunctionTraverserImplTest extends UnitTestSuite {
       doA()
       doB()
       """
-    val traversedBody =
-      q"""
-      doAA()
-      doBB()
-      """
 
     val expectedFunction =
       q"""
@@ -36,11 +30,11 @@ class AnonymousFunctionTraverserImplTest extends UnitTestSuite {
       }
       """
 
-    val expectedResult = BlockTermFunctionTraversalResult(bodyResult = BlockTraversalResult(traversedBody))
+    val expectedResult = TermFunctionTraversalResult(expectedFunction)
 
     doReturn(expectedResult).when(termFunctionTraverser).traverse(eqTree(expectedFunction), eqTo(No))
 
-    anonymousFunctionTraverser.traverse(AnonymousFunction(body)) should equalTermFunctionTraversalResult(expectedResult)
+    anonymousFunctionTraverser.traverse(AnonymousFunction(body)).function.structure shouldBe expectedFunction.structure
   }
 
   test("traverse() when body is a block and shouldBodyReturnValue=Yes") {
@@ -49,11 +43,6 @@ class AnonymousFunctionTraverserImplTest extends UnitTestSuite {
       doA()
       doB()
       """
-    val traversedBody =
-      q"""
-      doAA()
-      doBB()
-      """
 
     val expectedFunction =
       q"""
@@ -63,12 +52,12 @@ class AnonymousFunctionTraverserImplTest extends UnitTestSuite {
       }
       """
 
-    val expectedResult = BlockTermFunctionTraversalResult(bodyResult = BlockTraversalResult(traversedBody))
+    val expectedResult = TermFunctionTraversalResult(expectedFunction)
 
     doReturn(expectedResult).when(termFunctionTraverser).traverse(eqTree(expectedFunction), shouldBodyReturnValue = eqTo(Yes))
 
-    anonymousFunctionTraverser.traverse(AnonymousFunction(body), shouldBodyReturnValue = Yes) should
-      equalTermFunctionTraversalResult(expectedResult)
+    val actualResult = anonymousFunctionTraverser.traverse(AnonymousFunction(body), shouldBodyReturnValue = Yes)
+    actualResult.function.structure shouldBe expectedResult.function.structure
   }
 
   test("traverse() when body is a block, shouldBodyReturnValue=Uncertain and output uncertainReturn=true") {
@@ -76,11 +65,6 @@ class AnonymousFunctionTraverserImplTest extends UnitTestSuite {
       q"""
       doA()
       doB()
-      """
-    val traversedBody =
-      q"""
-      doAA()
-      /* return? */doBB()
       """
 
     val expectedFunction =
@@ -91,11 +75,11 @@ class AnonymousFunctionTraverserImplTest extends UnitTestSuite {
       }
       """
 
-    val expectedResult = BlockTermFunctionTraversalResult(bodyResult = BlockTraversalResult(traversedBody))
+    val expectedResult = TermFunctionTraversalResult(expectedFunction)
 
     doReturn(expectedResult).when(termFunctionTraverser).traverse(eqTree(expectedFunction), shouldBodyReturnValue = eqTo(Uncertain))
 
-    anonymousFunctionTraverser.traverse(AnonymousFunction(body), shouldBodyReturnValue = Uncertain) should
-      equalTermFunctionTraversalResult(expectedResult)
+    val actualResult = anonymousFunctionTraverser.traverse(AnonymousFunction(body), shouldBodyReturnValue = Uncertain)
+    actualResult.function.structure shouldBe expectedResult.function.structure
   }
 }

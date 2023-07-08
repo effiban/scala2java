@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{BlockContext, StatContext}
 import io.github.effiban.scala2java.core.entities.Decision.{Decision, No}
-import io.github.effiban.scala2java.core.traversers.results.{BlockTermFunctionTraversalResult, SingleTermFunctionTraversalResult, TermFunctionTraversalResult}
+import io.github.effiban.scala2java.core.traversers.results.TermFunctionTraversalResult
 import io.github.effiban.scala2java.spi.entities.JavaScope
 
 import scala.meta.Term
@@ -39,11 +39,11 @@ private[traversers] class TermFunctionTraverserImpl(termParamTraverser: => TermP
                                 traversedParams: List[Term.Param],
                                 blockBody: Block) = {
     val bodyResult = defaultBlockTraverser.traverse(blockBody, context = BlockContext(shouldReturnValue = shouldBodyReturnValue))
-    BlockTermFunctionTraversalResult(traversedParams, bodyResult)
+    TermFunctionTraversalResult(Term.Function(traversedParams, bodyResult.block))
   }
 
   private def traverseSingleTermBody(traversedParams: List[Term.Param], term: Term) = {
     val traversedTerm = defaultTermTraverser.traverse(term)
-    SingleTermFunctionTraversalResult(Term.Function(traversedParams, traversedTerm))
+    TermFunctionTraversalResult(Term.Function(traversedParams, traversedTerm))
   }
 }
