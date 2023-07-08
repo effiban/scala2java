@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.classifiers.JavaStatClassifier
+import io.github.effiban.scala2java.core.classifiers.{JavaStatClassifier, TermTreeClassifier}
 import io.github.effiban.scala2java.core.orderings.JavaModifierOrdering
 import io.github.effiban.scala2java.core.resolvers.ArrayInitializerRenderContextResolver
 import io.github.effiban.scala2java.core.writers.JavaWriter
@@ -53,6 +53,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
     defnValRenderer,
     defnVarRenderer,
     declVarRenderer,
+    TermTreeClassifier,
     JavaStatClassifier
   )
 

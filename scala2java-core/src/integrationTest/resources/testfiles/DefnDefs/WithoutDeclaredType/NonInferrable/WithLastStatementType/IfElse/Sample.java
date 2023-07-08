@@ -10,6 +10,12 @@ import java.util.stream.*;
 public class Sample {
 
     public /* UnknownType */ foo() {
-        /* return? */doSomething();
+        doSomething();
+        if (x < 3) {
+            /* return? */doSomething2A();
+        }
+        else {
+            /* return? */doSomething2B();
+        }
     }
 }

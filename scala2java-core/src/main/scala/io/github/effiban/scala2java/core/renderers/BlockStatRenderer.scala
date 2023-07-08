@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.classifiers.JavaStatClassifier
+import io.github.effiban.scala2java.core.classifiers.{JavaStatClassifier, TermTreeClassifier}
 import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.entities.JavaModifier.Final
 import io.github.effiban.scala2java.core.entities.TraversalConstants.UncertainReturn
@@ -13,7 +13,7 @@ trait BlockStatRenderer {
 
   def render(stat: Stat): Unit
 
-  def renderLast(stat: Stat, blockStatRenderContext: BlockStatRenderContext = SimpleBlockStatRenderContext()): Unit
+  def renderLast(stat: Stat, blockStatRenderContext: BlockStatRenderContext2 = BlockStatRenderContext2()): Unit
 }
 
 private[renderers] class BlockStatRendererImpl(statTermRenderer: => StatTermRenderer,
@@ -23,6 +23,7 @@ private[renderers] class BlockStatRendererImpl(statTermRenderer: => StatTermRend
                                                defnValRenderer: => DefnValRenderer,
                                                defnVarRenderer: => DefnVarRenderer,
                                                declVarRenderer: => DeclVarRenderer,
+                                               termTreeClassifier: TermTreeClassifier,
                                                javaStatClassifier: JavaStatClassifier)
                                               (implicit javaWriter: JavaWriter) extends BlockStatRenderer {
 
@@ -40,12 +41,12 @@ private[renderers] class BlockStatRendererImpl(statTermRenderer: => StatTermRend
     writeStatEnd(stat)
   }
 
-  override def renderLast(stat: Stat, context: BlockStatRenderContext = SimpleBlockStatRenderContext()): Unit = {
-    (stat, context) match {
-      case (`if`: If, anIfContext: IfRenderContext) => ifRenderer.render(`if`, anIfContext)
-      case (`try`: Try, tryContext: TryRenderContext)  => tryRenderer.render(`try`, tryContext)
-      case (tryWithHandler: TryWithHandler, tryContext: TryRenderContext) => tryWithHandlerRenderer.render(tryWithHandler, tryContext)
-      case (_, context: SimpleBlockStatRenderContext) if context.uncertainReturn =>
+  override def renderLast(stat: Stat, context: BlockStatRenderContext2 = BlockStatRenderContext2()): Unit = {
+    stat match {
+      case `if`: If => ifRenderer.render(`if`, IfRenderContext2(context.uncertainReturn))
+      case `try`: Try  => tryRenderer.render(`try`, TryRenderContext2(context.uncertainReturn))
+      case tryWithHandler: TryWithHandler => tryWithHandlerRenderer.render(tryWithHandler, TryRenderContext2(context.uncertainReturn))
+      case term: Term if context.uncertainReturn && termTreeClassifier.isReturnable(term) =>
         writeComment(UncertainReturn)
         render(stat)
       case _ => render(stat)

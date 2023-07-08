@@ -1,7 +1,6 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.{BlockRenderContext, IfRenderContext, TermFunctionRenderContext, TryRenderContext}
-import io.github.effiban.scala2java.core.matchers.BlockRenderContextMockitoMatcher.eqBlockRenderContext
+import io.github.effiban.scala2java.core.contexts.{BlockRenderContext2, IfRenderContext2, TermFunctionRenderContext2, TryRenderContext2}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
@@ -132,7 +131,7 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
 
     defaultTermRenderer.render(block)
 
-    verify(blockRenderer).render(eqTree(block), eqBlockRenderContext(BlockRenderContext()))
+    verify(blockRenderer).render(eqTree(block), eqTo(BlockRenderContext2()))
   }
 
   test("render If") {
@@ -147,7 +146,7 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
 
     defaultTermRenderer.render(termIf)
 
-    verify(ifRenderer).render(eqTree(termIf), eqTo(IfRenderContext()))
+    verify(ifRenderer).render(eqTree(termIf), eqTo(IfRenderContext2()))
   }
 
   test("render Match") {
@@ -177,7 +176,7 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
 
     defaultTermRenderer.render(termTry)
 
-    verify(tryRenderer).render(eqTree(termTry), eqTo(TryRenderContext()))
+    verify(tryRenderer).render(eqTree(termTry), eqTo(TryRenderContext2()))
   }
 
   test("render TryWithHandler") {
@@ -190,7 +189,7 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
 
     defaultTermRenderer.render(tryWithHandler)
 
-    verify(tryWithHandlerRenderer).render(eqTree(tryWithHandler), eqTo(TryRenderContext()))
+    verify(tryWithHandlerRenderer).render(eqTree(tryWithHandler), eqTo(TryRenderContext2()))
   }
 
   test("render Term.Function") {
@@ -198,7 +197,7 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
 
     defaultTermRenderer.render(termFunction)
 
-    verify(termFunctionRenderer).render(eqTree(termFunction), eqTo(TermFunctionRenderContext()))
+    verify(termFunctionRenderer).render(eqTree(termFunction), eqTo(TermFunctionRenderContext2()))
   }
 
   test("render While") {

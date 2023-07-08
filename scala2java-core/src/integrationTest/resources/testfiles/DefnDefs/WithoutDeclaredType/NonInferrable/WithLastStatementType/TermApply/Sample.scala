@@ -2,6 +2,7 @@ package dummy
 
 class Sample {
   def foo = {
-    doSomething()
+    doSomething1()
+    doSomething2()
   }
 }

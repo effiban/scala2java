@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.{BlockRenderContext, IfRenderContext, SimpleBlockStatRenderContext}
+import io.github.effiban.scala2java.core.contexts.{BlockRenderContext2, BlockStatRenderContext2}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -34,7 +34,7 @@ class BlockRendererImplTest extends UnitTestSuite {
     doWrite(
       s"""  foo();
          |""".stripMargin)
-      .when(blockStatRenderer).renderLast(eqTree(q"foo()"), eqTo(SimpleBlockStatRenderContext()))
+      .when(blockStatRenderer).renderLast(eqTree(q"foo()"), eqTo(BlockStatRenderContext2()))
 
     blockRenderer.render(block = block)
 
@@ -52,14 +52,14 @@ class BlockRendererImplTest extends UnitTestSuite {
         foo()
       }
       """
-    val lastStatContext = SimpleBlockStatRenderContext(uncertainReturn = true)
+    val lastStatContext = BlockStatRenderContext2(uncertainReturn = true)
 
     doWrite(
       s"""  /* return? */foo();
          |""".stripMargin)
       .when(blockStatRenderer).renderLast(eqTree(q"foo()"), eqTo(lastStatContext))
 
-    blockRenderer.render(block = block, context = BlockRenderContext(lastStatContext = lastStatContext))
+    blockRenderer.render(block = block, context = BlockRenderContext2(uncertainReturn = true))
 
     outputWriter.toString shouldBe
       s""" {
@@ -81,9 +81,9 @@ class BlockRendererImplTest extends UnitTestSuite {
     doWrite(
       s"""  func2();
          |""".stripMargin
-    ).when(blockStatRenderer).renderLast(eqTree(q"func2()"), eqTo(SimpleBlockStatRenderContext()))
+    ).when(blockStatRenderer).renderLast(eqTree(q"func2()"), eqTo(BlockStatRenderContext2()))
 
-    blockRenderer.render(block = block, context = BlockRenderContext())
+    blockRenderer.render(block = block, context = BlockRenderContext2())
 
     outputWriter.toString shouldBe
       s""" {
@@ -100,7 +100,7 @@ class BlockRendererImplTest extends UnitTestSuite {
       func2()
       """
 
-    val lastStatContext = SimpleBlockStatRenderContext(uncertainReturn = true)
+    val lastStatContext = BlockStatRenderContext2(uncertainReturn = true)
 
     doWrite(
       s"""  func1();
@@ -111,7 +111,7 @@ class BlockRendererImplTest extends UnitTestSuite {
          |""".stripMargin
     ).when(blockStatRenderer).renderLast(eqTree(q"func2()"), eqTo(lastStatContext))
 
-    blockRenderer.render(block = block, context = BlockRenderContext(lastStatContext = lastStatContext))
+    blockRenderer.render(block = block, context = BlockRenderContext2(uncertainReturn = true))
 
     outputWriter.toString shouldBe
       s""" {
@@ -128,8 +128,7 @@ class BlockRendererImplTest extends UnitTestSuite {
       if (x < 3) small() else large()
       """
 
-    val clauseContext = BlockRenderContext(lastStatContext = SimpleBlockStatRenderContext(uncertainReturn = true))
-    val lastStatContext = IfRenderContext(thenContext = clauseContext, elseContext = clauseContext)
+    val lastStatContext = BlockStatRenderContext2(uncertainReturn = true)
 
     doWrite(
       s"""  func1();
@@ -144,7 +143,7 @@ class BlockRendererImplTest extends UnitTestSuite {
          |""".stripMargin
     ).when(blockStatRenderer).renderLast(eqTree(q"if (x < 3) small() else large()"), eqTo(lastStatContext))
 
-    blockRenderer.render(block = block, context = BlockRenderContext(lastStatContext = lastStatContext))
+    blockRenderer.render(block = block, context = BlockRenderContext2(uncertainReturn = true))
 
     outputWriter.toString shouldBe
       s""" {
