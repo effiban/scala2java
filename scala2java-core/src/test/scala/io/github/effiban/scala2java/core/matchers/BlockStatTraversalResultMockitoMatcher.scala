@@ -20,7 +20,7 @@ class BlockStatTraversalResultMockitoMatcher(expectedTraversalResult: BlockStatT
       case (actualResult: TryTraversalResult, expectedResult: TryTraversalResult) =>
         actualResult.stat.structure == expectedResult.stat.structure
       case (actualResult: TryWithHandlerTraversalResult, expectedResult: TryWithHandlerTraversalResult) =>
-        new TryWithHandlerTraversalResultMockitoMatcher(expectedResult).matches(actualResult)
+        actualResult.stat.structure == expectedResult.stat.structure
       case _ => false
     }
   }
