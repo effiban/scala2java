@@ -20,6 +20,12 @@ private[traversers] class TryWithHandlerTraverserImpl(blockWrappingTermTraverser
     // TODO - The catch handler is some term which evaluates to a partial function, handle it once we have semantic information
     val maybeTraversedFinally = finallyp.map(finallyTraverser.traverse)
 
-    TryWithHandlerTraversalResult(exprResult, catchp, maybeTraversedFinally)
+    val traversedTryWithHandler = TryWithHandler(
+      expr = exprResult.block,
+      catchp = catchp,
+      finallyp = maybeTraversedFinally
+    )
+
+    TryWithHandlerTraversalResult(traversedTryWithHandler)
   }
 }

@@ -26,7 +26,7 @@ class BlockStatTraversalResultScalatestMatcher(expectedTraversalResult: BlockSta
       case (actualResult: TryTraversalResult, expectedResult: TryTraversalResult) =>
         actualResult.stat.structure == expectedResult.stat.structure
       case (actualResult: TryWithHandlerTraversalResult, expectedResult: TryWithHandlerTraversalResult) =>
-        new TryWithHandlerTraversalResultScalatestMatcher(expectedResult)(actualResult).matches
+        actualResult.stat.structure == expectedResult.stat.structure
       case _ => false
     }
   }
