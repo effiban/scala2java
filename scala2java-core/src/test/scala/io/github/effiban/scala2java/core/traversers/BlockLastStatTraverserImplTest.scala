@@ -5,7 +5,7 @@ import io.github.effiban.scala2java.core.entities.Decision.{No, Uncertain, Yes}
 import io.github.effiban.scala2java.core.matchers.BlockStatTraversalResultScalatestMatcher.equalBlockStatTraversalResult
 import io.github.effiban.scala2java.core.resolvers.ShouldReturnValueResolver
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.SimpleBlockStatTraversalResult
+import io.github.effiban.scala2java.core.traversers.results.{IfTraversalResult, SimpleBlockStatTraversalResult}
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
 
@@ -62,7 +62,7 @@ class BlockLastStatTraverserImplTest extends UnitTestSuite {
   )
 
   test("traverse() for a 'Term.If' when shouldReturnValue=No") {
-    val expectedIfTraversalResult = TestableIfTraversalResult(TheTraversedIf)
+    val expectedIfTraversalResult = IfTraversalResult(TheTraversedIf)
 
     doReturn(expectedIfTraversalResult).when(defaultIfTraverser).traverse(eqTree(TheIf), eqTo(IfContext()))
 
@@ -70,7 +70,7 @@ class BlockLastStatTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for a 'Term.If' when shouldReturnValue=Yes") {
-    val expectedIfTraversalResult = TestableIfTraversalResult(TheTraversedIf)
+    val expectedIfTraversalResult = IfTraversalResult(TheTraversedIf)
 
     doReturn(expectedIfTraversalResult).when(defaultIfTraverser).traverse(eqTree(TheIf), eqTo(IfContext(shouldReturnValue = Yes)))
 
@@ -78,8 +78,8 @@ class BlockLastStatTraverserImplTest extends UnitTestSuite {
     actualTraversalResult should equalBlockStatTraversalResult(expectedIfTraversalResult)
   }
 
-  test("traverse() for a 'Term.If' when shouldReturnValue=Uncertain and output uncertainReturn=true") {
-    val expectedIfTraversalResult = TestableIfTraversalResult(TheTraversedIf, thenUncertainReturn = true, elseUncertainReturn = true)
+  test("traverse() for a 'Term.If' when shouldReturnValue=Uncertain") {
+    val expectedIfTraversalResult = IfTraversalResult(TheTraversedIf)
 
     doReturn(expectedIfTraversalResult).when(defaultIfTraverser).traverse(eqTree(TheIf), eqTo(IfContext(shouldReturnValue = Uncertain)))
 

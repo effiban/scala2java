@@ -3,8 +3,8 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.{BlockContext, IfContext}
 import io.github.effiban.scala2java.core.entities.Decision.{Uncertain, Yes}
 import io.github.effiban.scala2java.core.matchers.BlockContextMatcher.eqBlockContext
-import io.github.effiban.scala2java.core.matchers.IfTraversalResultScalatestMatcher.equalIfTraversalResult
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
+import io.github.effiban.scala2java.core.traversers.results.IfTraversalResult
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.any
 
@@ -71,7 +71,7 @@ class DefaultIfTraverserImplTest extends UnitTestSuite {
     doReturn(TestableBlockTraversalResult(TraversedThenBlock))
       .when(blockWrappingTermTraverser).traverse(term = eqTree(ThenBlock), context = eqBlockContext(BlockContext()))
 
-    ifTraverser.traverse(`if`) should equalIfTraversalResult(TestableIfTraversalResult(traversedIf))
+    ifTraverser.traverse(`if`).stat.structure shouldBe traversedIf.structure
   }
 
   test("traverse() when 'then' is a block, no 'else', and shouldReturnValue=Yes") {
@@ -95,10 +95,10 @@ class DefaultIfTraverserImplTest extends UnitTestSuite {
     )
 
     val result = ifTraverser.traverse(`if`, context = IfContext(shouldReturnValue = Yes))
-    result should equalIfTraversalResult(TestableIfTraversalResult(traversedIf))
+    result.stat.structure shouldBe traversedIf.structure
   }
 
-  test("traverse() when 'then' is a block, no 'else', shouldReturnValue=Uncertain, output uncertainReturn=true") {
+  test("traverse() when 'then' is a block, no 'else', shouldReturnValue=Uncertain") {
     val `if` = If(
       cond = Condition,
       thenp = ThenBlock,
@@ -119,7 +119,7 @@ class DefaultIfTraverserImplTest extends UnitTestSuite {
     )
 
     val result = ifTraverser.traverse(`if`, context = IfContext(shouldReturnValue = Uncertain))
-    result should equalIfTraversalResult(TestableIfTraversalResult(traversedIf, thenUncertainReturn = true))
+    result.stat.structure shouldBe traversedIf.structure
   }
 
   test("traverse() when 'then' is a non-block term, no 'else', and shouldReturnValue=No") {
@@ -139,7 +139,7 @@ class DefaultIfTraverserImplTest extends UnitTestSuite {
     doReturn(TestableBlockTraversalResult(TraversedThenBlock))
       .when(blockWrappingTermTraverser).traverse(term = eqTree(ThenTerm), context = eqBlockContext(BlockContext()))
 
-    ifTraverser.traverse(`if`) should equalIfTraversalResult(TestableIfTraversalResult(traversedIf))
+    ifTraverser.traverse(`if`).stat.structure shouldBe traversedIf.structure
   }
 
   test("traverse() when 'else' is a block, and shouldReturnValue=No") {
@@ -164,7 +164,7 @@ class DefaultIfTraverserImplTest extends UnitTestSuite {
       term = any[Term], context = eqBlockContext(BlockContext())
     )
 
-    ifTraverser.traverse(`if`) should equalIfTraversalResult(TestableIfTraversalResult(traversedIf))
+    ifTraverser.traverse(`if`).stat.structure shouldBe traversedIf.structure
   }
 
   test("traverse() when 'else' is a block, and shouldReturnValue=Yes") {
@@ -190,10 +190,10 @@ class DefaultIfTraverserImplTest extends UnitTestSuite {
     )
 
     val result = ifTraverser.traverse(`if`, context = IfContext(shouldReturnValue = Yes))
-    result should equalIfTraversalResult(TestableIfTraversalResult(traversedIf))
+    result.stat.structure shouldBe traversedIf.structure
   }
 
-  test("traverse() when 'else' is a block, shouldReturnValue=Uncertain, both output uncertainReturn=true") {
+  test("traverse() when 'else' is a block, shouldReturnValue=Uncertain") {
     val `if` = If(
       cond = Condition,
       thenp = ThenTerm,
@@ -205,7 +205,7 @@ class DefaultIfTraverserImplTest extends UnitTestSuite {
       thenp = TraversedThenBlock,
       elsep = TraversedElseBlock
     )
-    val expectedResult = TestableIfTraversalResult(traversedIf, thenUncertainReturn = true, elseUncertainReturn = true)
+    val expectedResult = IfTraversalResult(traversedIf)
 
     doReturn(TraversedCondition).when(expressionTermTraverser).traverse(eqTree(Condition))
     doAnswer((term: Term, _: BlockContext) => term match {
@@ -218,61 +218,7 @@ class DefaultIfTraverserImplTest extends UnitTestSuite {
 
 
     val actualResult = ifTraverser.traverse(`if`, context = IfContext(shouldReturnValue = Uncertain))
-    actualResult should equalIfTraversalResult(expectedResult)
-  }
-
-  test("traverse() when 'else' is a block, shouldReturnValue=Uncertain, only 'then' outputs uncertainReturn=true") {
-    val `if` = If(
-      cond = Condition,
-      thenp = ThenTerm,
-      elsep = ElseBlock
-    )
-
-    val traversedIf = If(
-      cond = TraversedCondition,
-      thenp = TraversedThenBlock,
-      elsep = TraversedElseBlock
-    )
-    val expectedResult = TestableIfTraversalResult(traversedIf, thenUncertainReturn = true)
-
-    doReturn(TraversedCondition).when(expressionTermTraverser).traverse(eqTree(Condition))
-    doAnswer((term: Term, _: BlockContext) => term match {
-      case aTerm if aTerm.structure == ThenTerm.structure => TestableBlockTraversalResult(TraversedThenBlock, uncertainReturn = true)
-      case aTerm if aTerm.structure == ElseBlock.structure => TestableBlockTraversalResult(TraversedElseBlock)
-      case _ => TestableBlockTraversalResult(Block(List(Lit.Unit())))
-    }).when(blockWrappingTermTraverser).traverse(
-      term = any[Term], context = eqBlockContext(BlockContext(shouldReturnValue = Uncertain))
-    )
-
-    val actualResult = ifTraverser.traverse(`if`, context = IfContext(shouldReturnValue = Uncertain))
-    actualResult should equalIfTraversalResult(expectedResult)
-  }
-
-  test("traverse() when 'else' is a block, shouldReturnValue=Uncertain, only 'else' outputs uncertainReturn=true") {
-    val `if` = If(
-      cond = Condition,
-      thenp = ThenTerm,
-      elsep = ElseBlock
-    )
-
-    val traversedIf = If(
-      cond = TraversedCondition,
-      thenp = TraversedThenBlock,
-      elsep = TraversedElseBlock
-    )
-    val expectedResult = TestableIfTraversalResult(traversedIf, elseUncertainReturn = true)
-
-    doReturn(TraversedCondition).when(expressionTermTraverser).traverse(eqTree(Condition))
-    doAnswer((term: Term, _: BlockContext) => term match {
-      case aTerm if aTerm.structure == ThenTerm.structure => TestableBlockTraversalResult(TraversedThenBlock)
-      case aTerm if aTerm.structure == ElseBlock.structure => TestableBlockTraversalResult(TraversedElseBlock, uncertainReturn = true)
-      case _ => TestableBlockTraversalResult(Block(List(Lit.Unit())))
-    }).when(blockWrappingTermTraverser).traverse(
-      term = any[Term], context = eqBlockContext(BlockContext(shouldReturnValue = Uncertain))
-    )
-
-    val actualResult = ifTraverser.traverse(`if`, context = IfContext(shouldReturnValue = Uncertain))
-    actualResult should equalIfTraversalResult(expectedResult)
+    actualResult.stat.structure shouldBe expectedResult.stat.structure
   }
 
   test("traverse() when 'else' is a non-block term, and shouldReturnValue=No") {
@@ -297,6 +243,6 @@ class DefaultIfTraverserImplTest extends UnitTestSuite {
       term = any[Term], context = eqBlockContext(BlockContext())
     )
 
-    ifTraverser.traverse(`if`) should equalIfTraversalResult(TestableIfTraversalResult(traversedIf))
+    ifTraverser.traverse(`if`).stat.structure shouldBe traversedIf.structure
   }
 }
