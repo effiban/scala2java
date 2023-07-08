@@ -3,7 +3,7 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.entities.Decision.{No, Uncertain, Yes}
 import io.github.effiban.scala2java.core.matchers.TermFunctionTraversalResultScalatestMatcher.equalTermFunctionTraversalResult
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.BlockTermFunctionTraversalResult
+import io.github.effiban.scala2java.core.traversers.results.{BlockTermFunctionTraversalResult, BlockTraversalResult}
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
 
@@ -36,7 +36,7 @@ class AnonymousFunctionTraverserImplTest extends UnitTestSuite {
       }
       """
 
-    val expectedResult = BlockTermFunctionTraversalResult(bodyResult = TestableBlockTraversalResult(traversedBody))
+    val expectedResult = BlockTermFunctionTraversalResult(bodyResult = BlockTraversalResult(traversedBody))
 
     doReturn(expectedResult).when(termFunctionTraverser).traverse(eqTree(expectedFunction), eqTo(No))
 
@@ -63,7 +63,7 @@ class AnonymousFunctionTraverserImplTest extends UnitTestSuite {
       }
       """
 
-    val expectedResult = BlockTermFunctionTraversalResult(bodyResult = TestableBlockTraversalResult(traversedBody))
+    val expectedResult = BlockTermFunctionTraversalResult(bodyResult = BlockTraversalResult(traversedBody))
 
     doReturn(expectedResult).when(termFunctionTraverser).traverse(eqTree(expectedFunction), shouldBodyReturnValue = eqTo(Yes))
 
@@ -91,7 +91,7 @@ class AnonymousFunctionTraverserImplTest extends UnitTestSuite {
       }
       """
 
-    val expectedResult = BlockTermFunctionTraversalResult(bodyResult = TestableBlockTraversalResult(traversedBody, uncertainReturn = true))
+    val expectedResult = BlockTermFunctionTraversalResult(bodyResult = BlockTraversalResult(traversedBody))
 
     doReturn(expectedResult).when(termFunctionTraverser).traverse(eqTree(expectedFunction), shouldBodyReturnValue = eqTo(Uncertain))
 

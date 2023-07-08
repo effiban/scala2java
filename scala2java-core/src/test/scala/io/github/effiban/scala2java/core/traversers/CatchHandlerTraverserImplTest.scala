@@ -4,6 +4,7 @@ import io.github.effiban.scala2java.core.contexts.{BlockContext, CatchHandlerCon
 import io.github.effiban.scala2java.core.entities.Decision.{Uncertain, Yes}
 import io.github.effiban.scala2java.core.matchers.BlockContextMatcher.eqBlockContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
+import io.github.effiban.scala2java.core.traversers.results.BlockTraversalResult
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.{Case, XtensionQuasiquoteCaseOrPattern, XtensionQuasiquoteTerm}
@@ -42,7 +43,7 @@ class CatchHandlerTraverserImplTest extends UnitTestSuite {
   )
 
   test("traverse() when shouldReturnValue=No") {
-    val expectedBlockTraversalResult = TestableBlockTraversalResult(TraversedBody)
+    val expectedBlockTraversalResult = BlockTraversalResult(TraversedBody)
 
     doReturn(TraversedCatchArg).when(catchArgumentTraverser).traverse(eqTree(CatchArg))
 
@@ -58,7 +59,7 @@ class CatchHandlerTraverserImplTest extends UnitTestSuite {
     val catchHandlerContext = CatchHandlerContext(shouldReturnValue = Yes)
     val expectedBlockContext = BlockContext(shouldReturnValue = Yes)
 
-    val expectedBlockTraversalResult = TestableBlockTraversalResult(TraversedBody)
+    val expectedBlockTraversalResult = BlockTraversalResult(TraversedBody)
 
     doReturn(TraversedCatchArg).when(catchArgumentTraverser).traverse(eqTree(CatchArg))
 
@@ -73,7 +74,7 @@ class CatchHandlerTraverserImplTest extends UnitTestSuite {
     val catchHandlerContext = CatchHandlerContext(shouldReturnValue = Uncertain)
     val expectedBlockContext = BlockContext(shouldReturnValue = Uncertain)
 
-    val expectedBlockTraversalResult = TestableBlockTraversalResult(TraversedBody, uncertainReturn = true)
+    val expectedBlockTraversalResult = BlockTraversalResult(TraversedBody)
 
     doReturn(TraversedCatchArg).when(catchArgumentTraverser).traverse(eqTree(CatchArg))
 

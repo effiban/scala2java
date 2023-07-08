@@ -3,6 +3,7 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.BlockContext
 import io.github.effiban.scala2java.core.matchers.BlockContextMatcher.eqBlockContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
+import io.github.effiban.scala2java.core.traversers.results.BlockTraversalResult
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.Term.Do
@@ -38,7 +39,7 @@ class DoTraverserImplTest extends UnitTestSuite {
     val `do` = Do(TheSimpleBody, TheExpr)
     val traversedDo = Do(TheTraversedBlockBody, TheTraversedExpr)
 
-    doReturn(TestableBlockTraversalResult(TheTraversedBlockBody))
+    doReturn(BlockTraversalResult(TheTraversedBlockBody))
       .when(blockWrappingTermTraverser).traverse(eqTree(TheSimpleBody), eqBlockContext(BlockContext()))
     doReturn(TheTraversedExpr).when(expressionTermTraverser).traverse(eqTree(TheExpr))
 
@@ -49,7 +50,7 @@ class DoTraverserImplTest extends UnitTestSuite {
     val `do` = Do(TheBlockBody, TheExpr)
     val traversedDo = Do(TheTraversedBlockBody, TheTraversedExpr)
 
-    doReturn(TestableBlockTraversalResult(TheTraversedBlockBody))
+    doReturn(BlockTraversalResult(TheTraversedBlockBody))
       .when(blockWrappingTermTraverser).traverse(eqTree(TheBlockBody), eqBlockContext(BlockContext()))
     doReturn(TheTraversedExpr).when(expressionTermTraverser).traverse(eqTree(TheExpr))
 

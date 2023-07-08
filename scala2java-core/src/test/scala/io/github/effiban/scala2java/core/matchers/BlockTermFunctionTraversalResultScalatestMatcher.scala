@@ -7,7 +7,7 @@ class BlockTermFunctionTraversalResultScalatestMatcher(expectedTraversalResult: 
   extends Matcher[BlockTermFunctionTraversalResult] {
 
   override def apply(actualTraversalResult: BlockTermFunctionTraversalResult): MatchResult = {
-    val matches = paramListsMatch(actualTraversalResult) && bodyResultsMatch(actualTraversalResult)
+    val matches = paramListsMatch(actualTraversalResult) && bodiesMatch(actualTraversalResult)
 
     MatchResult(matches,
       s"Actual traversal result: $actualTraversalResult is NOT the same as expected traversal result: $expectedTraversalResult",
@@ -21,8 +21,8 @@ class BlockTermFunctionTraversalResultScalatestMatcher(expectedTraversalResult: 
     actualTraversalResult.params.structure == expectedTraversalResult.params.structure
   }
 
-  private def bodyResultsMatch(actualTraversalResult: BlockTermFunctionTraversalResult) = {
-    new BlockTraversalResultScalatestMatcher(expectedTraversalResult.bodyResult)(actualTraversalResult.bodyResult).matches
+  private def bodiesMatch(actualTraversalResult: BlockTermFunctionTraversalResult) = {
+    actualTraversalResult.bodyResult.block.structure == expectedTraversalResult.bodyResult.block.structure
   }
 }
 

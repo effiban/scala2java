@@ -20,16 +20,13 @@ private[traversers] class DefaultBlockTraverserImpl(blockStatTraverser: => Block
 
     block.stats match {
       case nonLastStats :+ lastStat => traverseNonEmptyStats(nonLastStats, lastStat, shouldReturnValue)
-      case Nil => BlockTraversalResult()
+      case Nil => BlockTraversalResult(Block(Nil))
     }
   }
 
   private def traverseNonEmptyStats(nonLastStats: List[Stat], lastStat: Stat, shouldReturnValue: Decision) = {
     val traversedNonLastStats = nonLastStats.map(blockStatTraverser.traverse)
     val lastStatResult = blockLastStatTraverser.traverse(lastStat, shouldReturnValue)
-    BlockTraversalResult(
-      nonLastStats = traversedNonLastStats,
-      maybeLastStatResult = Some(lastStatResult)
-    )
+    BlockTraversalResult(Block(traversedNonLastStats :+ lastStatResult.stat))
   }
 }
