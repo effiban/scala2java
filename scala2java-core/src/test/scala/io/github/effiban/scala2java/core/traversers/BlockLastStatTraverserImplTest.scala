@@ -5,7 +5,7 @@ import io.github.effiban.scala2java.core.entities.Decision.{No, Uncertain, Yes}
 import io.github.effiban.scala2java.core.matchers.BlockStatTraversalResultScalatestMatcher.equalBlockStatTraversalResult
 import io.github.effiban.scala2java.core.resolvers.ShouldReturnValueResolver
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.{IfTraversalResult, SimpleBlockStatTraversalResult}
+import io.github.effiban.scala2java.core.traversers.results.{IfTraversalResult, SimpleBlockStatTraversalResult, TryTraversalResult}
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
 
@@ -88,7 +88,7 @@ class BlockLastStatTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for a 'Term.Try' when shouldReturnValue=No") {
-    val expectedTraversalResult = TestableTryTraversalResult(TheTraversedTry, catchUncertainReturns = List(false))
+    val expectedTraversalResult = TryTraversalResult(TheTraversedTry)
 
     doReturn(expectedTraversalResult).when(tryTraverser).traverse(eqTree(TheTry), eqTo(TryContext()))
 
@@ -96,7 +96,7 @@ class BlockLastStatTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for a 'Term.Try' when shouldReturnValue=Yes") {
-    val expectedTraversalResult = TestableTryTraversalResult(TheTraversedTry, catchUncertainReturns = List(false))
+    val expectedTraversalResult = TryTraversalResult(TheTraversedTry)
 
     doReturn(expectedTraversalResult).when(tryTraverser).traverse(eqTree(TheTry), eqTo(TryContext(shouldReturnValue = Yes)))
 
@@ -104,7 +104,7 @@ class BlockLastStatTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for a 'Term.Try' when shouldReturnValue=Uncertain and catch result has uncertainReturn=true") {
-    val expectedTraversalResult = TestableTryTraversalResult(TheTraversedTry, catchUncertainReturns = List(true))
+    val expectedTraversalResult = TryTraversalResult(TheTraversedTry)
 
     doReturn(expectedTraversalResult).when(tryTraverser).traverse(eqTree(TheTry), eqTo(TryContext(shouldReturnValue = Uncertain)))
 
