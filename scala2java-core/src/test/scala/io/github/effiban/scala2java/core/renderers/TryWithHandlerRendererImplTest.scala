@@ -1,10 +1,10 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.{BlockRenderContext, SimpleBlockStatRenderContext, TryRenderContext}
-import io.github.effiban.scala2java.core.matchers.BlockRenderContextMockitoMatcher.eqBlockRenderContext
+import io.github.effiban.scala2java.core.contexts.{BlockRenderContext2, TryRenderContext2}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
+import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.{Term, XtensionQuasiquoteTerm}
 
@@ -36,7 +36,7 @@ class TryWithHandlerRendererImplTest extends UnitTestSuite {
         |  doSomething();
         |}
         |""".stripMargin)
-      .when(blockRenderer).render(block = eqTree(TryBlock),context = eqBlockRenderContext(BlockRenderContext()))
+      .when(blockRenderer).render(block = eqTree(TryBlock),context = eqTo(BlockRenderContext2()))
 
     tryWithHandlerRenderer.render(tryWithHandler)
 
@@ -61,7 +61,7 @@ class TryWithHandlerRendererImplTest extends UnitTestSuite {
         |  doSomething();
         |}
         |""".stripMargin)
-      .when(blockRenderer).render(block = eqTree(TryBlock), context = eqBlockRenderContext(BlockRenderContext()))
+      .when(blockRenderer).render(block = eqTree(TryBlock), context = eqTo(BlockRenderContext2()))
 
     doWrite(
       """finally {
@@ -83,15 +83,15 @@ class TryWithHandlerRendererImplTest extends UnitTestSuite {
         |""".stripMargin
   }
 
-  test("render with a 'finally', and 'expr' has uncertainReturn=true") {
+  test("render with a 'finally', when has uncertainReturn=true") {
     val tryWithHandler = Term.TryWithHandler(
       expr = TryBlock,
       catchp = CatchHandler,
       finallyp = Some(FinallyBlock)
     )
 
-    val exprContext = BlockRenderContext(lastStatContext = SimpleBlockStatRenderContext(uncertainReturn = true))
-    val tryContext = TryRenderContext(exprContext = exprContext, catchContexts = List(exprContext))
+    val exprContext = BlockRenderContext2(uncertainReturn = true)
+    val tryContext = TryRenderContext2(uncertainReturn = true)
 
     doWrite(
       """ {
@@ -99,7 +99,7 @@ class TryWithHandlerRendererImplTest extends UnitTestSuite {
         |}
         |""".stripMargin)
       .when(blockRenderer).render(
-      block = eqTree(TryBlock),context = eqBlockRenderContext(exprContext))
+      block = eqTree(TryBlock),context = eqTo(exprContext))
 
     doWrite(
       """finally {

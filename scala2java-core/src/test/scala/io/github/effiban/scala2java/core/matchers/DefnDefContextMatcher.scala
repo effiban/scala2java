@@ -1,20 +1,13 @@
 package io.github.effiban.scala2java.core.matchers
 
 import io.github.effiban.scala2java.core.contexts.DefnDefContext
-import io.github.effiban.scala2java.test.utils.matchers.{OptionMatcher, TreeMatcher}
 import org.mockito.ArgumentMatcher
 import org.mockito.ArgumentMatchers.argThat
-
-import scala.meta.Init
 
 class DefnDefContextMatcher(expectedContext: DefnDefContext) extends ArgumentMatcher[DefnDefContext] {
 
   override def matches(actualContext: DefnDefContext): Boolean = {
-    actualContext.javaScope == expectedContext.javaScope && maybeInitMatches(actualContext)
-  }
-
-  private def maybeInitMatches(actualContext: DefnDefContext) = {
-    new OptionMatcher[Init](expectedContext.maybeInit, new TreeMatcher[Init](_)).matches(actualContext.maybeInit)
+    actualContext.javaScope == expectedContext.javaScope
   }
 
   override def toString: String = s"Matcher for: $expectedContext"

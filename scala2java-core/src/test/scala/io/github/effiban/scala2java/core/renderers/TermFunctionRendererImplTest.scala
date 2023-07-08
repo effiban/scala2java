@@ -1,7 +1,6 @@
 package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.contexts._
-import io.github.effiban.scala2java.core.matchers.BlockRenderContextMockitoMatcher.eqBlockRenderContext
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
@@ -87,7 +86,7 @@ class TermFunctionRendererImplTest extends UnitTestSuite {
         |  /* BODY */
         |}""".stripMargin
     ).when(blockRenderer).render(
-      block = eqTree(functionBody), context = eqBlockRenderContext(BlockRenderContext())
+      block = eqTree(functionBody), context = eqTo(BlockRenderContext2())
     )
 
     termFunctionRenderer.render(function)
@@ -108,7 +107,7 @@ class TermFunctionRendererImplTest extends UnitTestSuite {
     )
     val function = Term.Function(params = List(param), body = functionBody)
 
-    val bodyContext = BlockRenderContext(lastStatContext = SimpleBlockStatRenderContext(uncertainReturn = true))
+    val bodyContext = BlockRenderContext2(uncertainReturn = true)
 
     doWrite("val1")
       .when(termParamRenderer).render(termParam = eqTree(param), context = eqTo(TermParamRenderContext()))
@@ -118,10 +117,10 @@ class TermFunctionRendererImplTest extends UnitTestSuite {
         |  /* return? */ last;
         |}""".stripMargin
     ).when(blockRenderer).render(
-      block = eqTree(functionBody), context = eqBlockRenderContext(bodyContext)
+      block = eqTree(functionBody), context = eqTo(bodyContext)
     )
 
-    termFunctionRenderer.render(function, context = TermFunctionRenderContext(bodyContext))
+    termFunctionRenderer.render(function, context = TermFunctionRenderContext2(uncertainReturn = true))
 
     outputWriter.toString shouldBe
       """val1 ->  {
@@ -129,7 +128,7 @@ class TermFunctionRendererImplTest extends UnitTestSuite {
         |  /* return? */ last;
         |}""".stripMargin
   }
-  
+
   test("render with two args and one term") {
     val params = List(termParam("val1"), termParam("val2"))
     val functionBody = Term.Apply(Term.Name("doSomething"), List(Term.Name("val1"), Term.Name("val2")))

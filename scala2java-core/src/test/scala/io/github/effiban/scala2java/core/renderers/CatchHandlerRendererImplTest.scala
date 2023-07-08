@@ -1,10 +1,10 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.{BlockRenderContext, SimpleBlockStatRenderContext}
-import io.github.effiban.scala2java.core.matchers.BlockRenderContextMockitoMatcher.eqBlockRenderContext
+import io.github.effiban.scala2java.core.contexts.BlockRenderContext2
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
+import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.{Case, XtensionQuasiquoteCaseOrPattern, XtensionQuasiquoteTerm}
 
@@ -46,7 +46,7 @@ class CatchHandlerRendererImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(blockRenderer).render(
       block = eqTree(BlockOfCertainReturnStatement),
-      context = eqBlockRenderContext(BlockRenderContext())
+      context = eqTo(BlockRenderContext2())
     )
 
     catchHandlerRenderer.render(CatchCase)
@@ -61,7 +61,7 @@ class CatchHandlerRendererImplTest extends UnitTestSuite {
   test("traverse() when body has uncertainReturn=true") {
     val CatchCase = Case(pat = CatchArg, cond = None, body = BlockOfUncertainReturnStatement)
 
-    val context = BlockRenderContext(lastStatContext = SimpleBlockStatRenderContext(uncertainReturn = true))
+    val context = BlockRenderContext2(uncertainReturn = true)
 
     doWrite(RenderedCatchArg).when(catchArgumentRenderer).render(eqTree(CatchArg))
 
@@ -72,7 +72,7 @@ class CatchHandlerRendererImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(blockRenderer).render(
       block = eqTree(BlockOfUncertainReturnStatement),
-      context = eqBlockRenderContext(context)
+      context = eqTo(context)
     )
 
     catchHandlerRenderer.render(CatchCase, context)

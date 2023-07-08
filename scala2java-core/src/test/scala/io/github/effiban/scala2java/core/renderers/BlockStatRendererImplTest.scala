@@ -1,10 +1,8 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.classifiers.JavaStatClassifier
+import io.github.effiban.scala2java.core.classifiers.{JavaStatClassifier, TermTreeClassifier}
 import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.entities.JavaModifier.Final
-import io.github.effiban.scala2java.core.matchers.IfRenderContextMockitoMatcher.eqIfRenderContext
-import io.github.effiban.scala2java.core.matchers.TryRenderContextMockitoMatcher.eqTryRenderContext
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -21,6 +19,7 @@ class BlockStatRendererImplTest extends UnitTestSuite {
   private val defnValRenderer = mock[DefnValRenderer]
   private val defnVarRenderer = mock[DefnVarRenderer]
   private val declVarRenderer = mock[DeclVarRenderer]
+  private val termTreeClassifier: TermTreeClassifier = mock[TermTreeClassifier]
   private val javaStatClassifier = mock[JavaStatClassifier]
 
   private val blockStatRenderer = new BlockStatRendererImpl(
@@ -31,6 +30,7 @@ class BlockStatRendererImplTest extends UnitTestSuite {
     defnValRenderer,
     defnVarRenderer,
     declVarRenderer,
+    termTreeClassifier,
     javaStatClassifier
   )
 
@@ -134,10 +134,11 @@ class BlockStatRendererImplTest extends UnitTestSuite {
         |""".stripMargin
   }
 
-  test("renderLast() Term.Name with no uncertain return") {
+  test("renderLast() Term.Name when has no uncertain return should not add comment") {
     val termName = q"x"
 
     doWrite("x").when(statTermRenderer).render(eqTree(termName))
+    when(termTreeClassifier.isReturnable(eqTree(termName))).thenReturn(true)
     when(javaStatClassifier.requiresEndDelimiter(eqTree(termName))).thenReturn(true)
 
     blockStatRenderer.renderLast(termName)
@@ -147,29 +148,45 @@ class BlockStatRendererImplTest extends UnitTestSuite {
         |""".stripMargin
   }
 
-  test("renderLast() Term.Name when has uncertain return") {
+  test("renderLast() Term.Name when has uncertain return should add comment") {
     val termName = q"x"
 
     doWrite("x").when(statTermRenderer).render(eqTree(termName))
+    when(termTreeClassifier.isReturnable(eqTree(termName))).thenReturn(true)
     when(javaStatClassifier.requiresEndDelimiter(eqTree(termName))).thenReturn(true)
 
-    blockStatRenderer.renderLast(termName, SimpleBlockStatRenderContext(uncertainReturn = true))
+    blockStatRenderer.renderLast(termName, BlockStatRenderContext2(uncertainReturn = true))
 
     outputWriter.toString shouldBe
       """/* return? */x;
         |""".stripMargin
   }
 
-  test("renderLast() Term.Apply with no uncertain return") {
+  test("renderLast() Term.Apply when has no uncertain return should not add comment") {
     val termApply = q"func(2)"
 
     doWrite("func(2)").when(statTermRenderer).render(eqTree(termApply))
+    when(termTreeClassifier.isReturnable(eqTree(termApply))).thenReturn(true)
     when(javaStatClassifier.requiresEndDelimiter(eqTree(termApply))).thenReturn(true)
 
-    blockStatRenderer.render(termApply)
+    blockStatRenderer.renderLast(termApply)
 
     outputWriter.toString shouldBe
       """func(2);
+        |""".stripMargin
+  }
+
+  test("renderLast() Term.Throw when has uncertain return should not add comment") {
+    val termThrow = q"throw new IllegalStateException()"
+
+    doWrite("throw new IllegalStateException()").when(statTermRenderer).render(eqTree(termThrow))
+    when(termTreeClassifier.isReturnable(eqTree(termThrow))).thenReturn(false)
+    when(javaStatClassifier.requiresEndDelimiter(eqTree(termThrow))).thenReturn(true)
+
+    blockStatRenderer.renderLast(termThrow, BlockStatRenderContext2(uncertainReturn = true))
+
+    outputWriter.toString shouldBe
+      """throw new IllegalStateException();
         |""".stripMargin
   }
 
@@ -189,9 +206,9 @@ class BlockStatRendererImplTest extends UnitTestSuite {
          |} else {
          |  doSomethingElse();
          |}""".stripMargin)
-      .when(ifRenderer).render(eqTree(termIf), eqTo(IfRenderContext()))
+      .when(ifRenderer).render(eqTree(termIf), eqTo(IfRenderContext2()))
 
-    blockStatRenderer.renderLast(termIf, IfRenderContext())
+    blockStatRenderer.renderLast(termIf)
 
     outputWriter.toString shouldBe
       """|if (cond) {
@@ -212,18 +229,15 @@ class BlockStatRendererImplTest extends UnitTestSuite {
       }
       """
 
-    val clauseContext = BlockRenderContext(lastStatContext = SimpleBlockStatRenderContext(uncertainReturn = true))
-    val ifRenderContext = IfRenderContext(thenContext = clauseContext, elseContext = clauseContext)
-
     doWrite(
       """|if (cond) {
          |  /* return? */doSomething();
          |} else {
          |  /* return? */doSomethingElse();
          |}""".stripMargin)
-      .when(ifRenderer).render(eqTree(termIf), eqIfRenderContext(ifRenderContext))
+      .when(ifRenderer).render(eqTree(termIf), eqTo(IfRenderContext2(uncertainReturn = true)))
 
-    blockStatRenderer.renderLast(termIf, context = ifRenderContext)
+    blockStatRenderer.renderLast(termIf, context = BlockStatRenderContext2(uncertainReturn = true))
 
     outputWriter.toString shouldBe
       """|if (cond) {
@@ -250,9 +264,9 @@ class BlockStatRendererImplTest extends UnitTestSuite {
          |} catch (Throwable e) {
          |  doSomethingElse();
          |}""".stripMargin)
-      .when(tryRenderer).render(eqTree(termTry), eqTo(TryRenderContext()))
+      .when(tryRenderer).render(eqTree(termTry), eqTo(TryRenderContext2()))
 
-    blockStatRenderer.renderLast(termTry, TryRenderContext())
+    blockStatRenderer.renderLast(termTry)
 
     outputWriter.toString shouldBe
       """|try {
@@ -272,20 +286,15 @@ class BlockStatRendererImplTest extends UnitTestSuite {
       }
       """
 
-    val tryRenderContext = TryRenderContext(
-      exprContext = BlockRenderContext(lastStatContext = SimpleBlockStatRenderContext(uncertainReturn = true)),
-      catchContexts = List(BlockRenderContext(lastStatContext = SimpleBlockStatRenderContext(uncertainReturn = true)))
-    )
-
     doWrite(
       """|try {
          |  /* return? */doSomething();
          |} catch (Throwable e) {
          |  /* return? */doSomethingElse();
          |}""".stripMargin)
-      .when(tryRenderer).render(eqTree(termTry), eqTryRenderContext(tryRenderContext))
+      .when(tryRenderer).render(eqTree(termTry), eqTo(TryRenderContext2(uncertainReturn = true)))
 
-    blockStatRenderer.renderLast(termTry, tryRenderContext)
+    blockStatRenderer.renderLast(termTry, BlockStatRenderContext2(uncertainReturn = true))
 
     outputWriter.toString shouldBe
       """|try {
@@ -309,9 +318,9 @@ class BlockStatRendererImplTest extends UnitTestSuite {
          |}
          |/* UNPARSEABLE catch handler: someCatchHandler */
          |""".stripMargin)
-      .when(tryWithHandlerRenderer).render(eqTree(tryWithHandler), eqTo(TryRenderContext()))
+      .when(tryWithHandlerRenderer).render(eqTree(tryWithHandler), eqTo(TryRenderContext2()))
 
-    blockStatRenderer.renderLast(tryWithHandler, TryRenderContext())
+    blockStatRenderer.renderLast(tryWithHandler)
 
     outputWriter.toString shouldBe
       """|try {
@@ -329,19 +338,15 @@ class BlockStatRendererImplTest extends UnitTestSuite {
       } catch(someCatchHandler)
       """
 
-    val tryRenderContext = TryRenderContext(
-      exprContext = BlockRenderContext(lastStatContext = SimpleBlockStatRenderContext(uncertainReturn = true))
-    )
-
     doWrite(
       """|try {
          |  /* return? */doSomething();
          |}
          |/* UNPARSEABLE catch handler: someCatchHandler */
          |""".stripMargin)
-      .when(tryWithHandlerRenderer).render(eqTree(tryWithHandler), eqTryRenderContext(tryRenderContext))
+      .when(tryWithHandlerRenderer).render(eqTree(tryWithHandler), eqTo(TryRenderContext2()))
 
-    blockStatRenderer.renderLast(tryWithHandler, tryRenderContext)
+    blockStatRenderer.renderLast(tryWithHandler)
 
     outputWriter.toString shouldBe
       """|try {

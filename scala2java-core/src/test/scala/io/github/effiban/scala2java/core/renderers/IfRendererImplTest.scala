@@ -1,10 +1,10 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.{BlockRenderContext, IfRenderContext, SimpleBlockStatRenderContext}
-import io.github.effiban.scala2java.core.matchers.BlockRenderContextMockitoMatcher.eqBlockRenderContext
+import io.github.effiban.scala2java.core.contexts.{BlockRenderContext2, IfRenderContext2}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
+import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.Term.{Apply, ApplyInfix, Block, If}
 import scala.meta.{Lit, Term}
@@ -57,7 +57,7 @@ class IfRendererImplTest extends UnitTestSuite {
   private val ElseStatementStr = "otherOperation1(x)"
 
 
-  test("traverse() when 'then' is a block, no 'else', and no uncertain returns") {
+  test("render() when 'then' is a block, no 'else', and no uncertain returns") {
     val `if` = If(
       cond = Condition,
       thenp = ThenBlock,
@@ -70,7 +70,7 @@ class IfRendererImplTest extends UnitTestSuite {
         |  /* BODY */
         |}
         |""".stripMargin)
-      .when(blockRenderer).render(block = eqTree(ThenBlock), context = eqBlockRenderContext(BlockRenderContext()))
+      .when(blockRenderer).render(block = eqTree(ThenBlock), context = eqTo(BlockRenderContext2()))
 
     ifRenderer.render(`if`)
 
@@ -81,16 +81,14 @@ class IfRendererImplTest extends UnitTestSuite {
         |""".stripMargin
   }
 
-  test("traverse() when 'then' is a block, no 'else', and has uncertain return") {
+  test("render() when 'then' is a block, no 'else', and has uncertain return") {
     val `if` = If(
       cond = Condition,
       thenp = ThenBlock,
       elsep = Lit.Unit()
     )
 
-    val ifContext = IfRenderContext(
-      thenContext = BlockRenderContext(lastStatContext = SimpleBlockStatRenderContext(uncertainReturn = true))
-    )
+    val ifContext = IfRenderContext2(uncertainReturn = true)
 
     doWrite("x < 3").when(expressionTermRenderer).render(eqTree(Condition))
     doWrite(
@@ -100,7 +98,7 @@ class IfRendererImplTest extends UnitTestSuite {
         |}
         |""".stripMargin).when(blockRenderer).render(
       block = eqTree(ThenBlock),
-      context = eqBlockRenderContext(ifContext.thenContext)
+      context = eqTo(BlockRenderContext2(uncertainReturn = true))
     )
 
     ifRenderer.render(`if`, ifContext)
@@ -113,7 +111,7 @@ class IfRendererImplTest extends UnitTestSuite {
         |""".stripMargin
   }
 
-  test("traverse() when 'then' is a single statement, and no 'else'") {
+  test("render() when 'then' is a single statement, and no 'else', and no uncertain return") {
     val `if` = If(
       cond = Condition,
       thenp = ThenStatement,
@@ -129,7 +127,7 @@ class IfRendererImplTest extends UnitTestSuite {
       s"if (x < 3) $ThenStatement"
   }
 
-  test("traverse() when 'else' is a block, and no uncertain return") {
+  test("render() when 'else' is a block, and no uncertain return") {
     val `if` = If(
       cond = Condition,
       thenp = ThenBlock,
@@ -142,13 +140,13 @@ class IfRendererImplTest extends UnitTestSuite {
         |  /* THEN BODY */
         |}
         |""".stripMargin)
-      .when(blockRenderer).render(block = eqTree(ThenBlock), context = eqBlockRenderContext(BlockRenderContext()))
+      .when(blockRenderer).render(block = eqTree(ThenBlock), context = eqTo(BlockRenderContext2()))
     doWrite(
       """ {
         |  /* ELSE BODY */
         |}
         |""".stripMargin)
-      .when(blockRenderer).render(block = eqTree(ElseBlock), context = eqBlockRenderContext(BlockRenderContext()))
+      .when(blockRenderer).render(block = eqTree(ElseBlock), context = eqTo(BlockRenderContext2()))
 
     ifRenderer.render(`if`)
 
@@ -162,15 +160,15 @@ class IfRendererImplTest extends UnitTestSuite {
         |""".stripMargin
   }
 
-  test("traverse() when 'else' is a block, and 'then' has uncertain return") {
+  test("render() when 'else' is a block, and has uncertain return") {
     val `if` = If(
       cond = Condition,
       thenp = ThenBlock,
       elsep = ElseBlock
     )
 
-    val thenContext = BlockRenderContext(lastStatContext = SimpleBlockStatRenderContext(uncertainReturn = true))
-    val ifContext = IfRenderContext(thenContext = thenContext)
+    val clauseContext = BlockRenderContext2(uncertainReturn = true)
+    val ifContext = IfRenderContext2(uncertainReturn = true)
 
     doWrite("x < 3").when(expressionTermRenderer).render(eqTree(Condition))
     doWrite(
@@ -179,49 +177,7 @@ class IfRendererImplTest extends UnitTestSuite {
         |  /* return? */last
         |}
         |""".stripMargin).when(blockRenderer).render(
-      block = eqTree(ThenBlock), context = eqBlockRenderContext(thenContext)
-    )
-    doWrite(
-      """ {
-        |  /* ELSE BODY */
-        |  last
-        |}
-        |""".stripMargin).when(blockRenderer).render(
-      block = eqTree(ElseBlock), context = eqBlockRenderContext(BlockRenderContext())
-    )
-
-    ifRenderer.render(`if`, ifContext)
-
-    outputWriter.toString shouldBe
-      """if (x < 3) {
-        |  /* THEN BODY */
-        |  /* return? */last
-        |}
-        |else {
-        |  /* ELSE BODY */
-        |  last
-        |}
-        |""".stripMargin
-  }
-
-  test("traverse() when 'else' is a block, and 'else' has uncertain return") {
-    val `if` = If(
-      cond = Condition,
-      thenp = ThenBlock,
-      elsep = ElseBlock
-    )
-
-    val elseContext = BlockRenderContext(lastStatContext = SimpleBlockStatRenderContext(uncertainReturn = true))
-    val ifContext = IfRenderContext(elseContext = elseContext)
-
-    doWrite("x < 3").when(expressionTermRenderer).render(eqTree(Condition))
-    doWrite(
-      """ {
-        |  /* THEN BODY */
-        |  last
-        |}
-        |""".stripMargin).when(blockRenderer).render(
-      block = eqTree(ThenBlock), context = eqBlockRenderContext(BlockRenderContext())
+      block = eqTree(ThenBlock), context = eqTo(clauseContext)
     )
     doWrite(
       """ {
@@ -229,49 +185,7 @@ class IfRendererImplTest extends UnitTestSuite {
         |  /* return? */last
         |}
         |""".stripMargin).when(blockRenderer).render(
-      block = eqTree(ElseBlock), context = eqBlockRenderContext(elseContext)
-    )
-
-    ifRenderer.render(`if`, ifContext)
-
-    outputWriter.toString shouldBe
-      """if (x < 3) {
-        |  /* THEN BODY */
-        |  last
-        |}
-        |else {
-        |  /* ELSE BODY */
-        |  /* return? */last
-        |}
-        |""".stripMargin
-  }
-
-  test("traverse() when 'else' is a block, and both clauses have uncertain return") {
-    val `if` = If(
-      cond = Condition,
-      thenp = ThenBlock,
-      elsep = ElseBlock
-    )
-
-    val clauseContext = BlockRenderContext(lastStatContext = SimpleBlockStatRenderContext(uncertainReturn = true))
-    val ifContext = IfRenderContext(thenContext = clauseContext, elseContext = clauseContext)
-
-    doWrite("x < 3").when(expressionTermRenderer).render(eqTree(Condition))
-    doWrite(
-      """ {
-        |  /* THEN BODY */
-        |  /* return? */last
-        |}
-        |""".stripMargin).when(blockRenderer).render(
-      block = eqTree(ThenBlock), context = eqBlockRenderContext(clauseContext)
-    )
-    doWrite(
-      """ {
-        |  /* ELSE BODY */
-        |  /* return? */last
-        |}
-        |""".stripMargin).when(blockRenderer).render(
-      block = eqTree(ElseBlock), context = eqBlockRenderContext(clauseContext)
+      block = eqTree(ElseBlock), context = eqTo(clauseContext)
     )
 
     ifRenderer.render(`if`, ifContext)
@@ -288,7 +202,7 @@ class IfRendererImplTest extends UnitTestSuite {
         |""".stripMargin
   }
 
-  test("traverse() when 'else' is a single statement, and no uncertain return") {
+  test("render() when 'else' is a single statement, and no uncertain return") {
     val `if` = If(
       cond = Condition,
       thenp = ThenBlock,
@@ -301,7 +215,7 @@ class IfRendererImplTest extends UnitTestSuite {
         |  /* THEN BODY */
         |}
         |""".stripMargin).when(blockRenderer).render(
-      block = eqTree(ThenBlock), context = eqBlockRenderContext(BlockRenderContext())
+      block = eqTree(ThenBlock), context = eqTo(BlockRenderContext2())
     )
     doWrite(ElseStatementStr).when(defaultTermRenderer).render(eqTree(ElseStatement))
 
@@ -314,7 +228,7 @@ class IfRendererImplTest extends UnitTestSuite {
          |else $ElseStatementStr""".stripMargin
   }
 
-  test("traverseAsTertiaryOp()") {
+  test("renderAsTertiaryOp()") {
     val lessThanThree = Lit.String("LessThanThree")
     val threeOrMore = Lit.String("ThreeOrMore")
 

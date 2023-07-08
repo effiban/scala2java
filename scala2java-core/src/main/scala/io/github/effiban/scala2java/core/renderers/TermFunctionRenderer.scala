@@ -1,13 +1,13 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.{TermFunctionRenderContext, TermParamListRenderContext}
+import io.github.effiban.scala2java.core.contexts.{BlockRenderContext2, TermFunctionRenderContext2, TermParamListRenderContext}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Term
 import scala.meta.Term.Block
 
 trait TermFunctionRenderer {
-  def render(function: Term.Function, context: TermFunctionRenderContext = TermFunctionRenderContext()): Unit
+  def render(function: Term.Function, context: TermFunctionRenderContext2 = TermFunctionRenderContext2()): Unit
 }
 
 private[renderers] class TermFunctionRendererImpl(termParamRenderer: => TermParamRenderer,
@@ -19,7 +19,7 @@ private[renderers] class TermFunctionRendererImpl(termParamRenderer: => TermPara
   import javaWriter._
 
   // lambda definition
-  override def render(function: Term.Function, context: TermFunctionRenderContext = TermFunctionRenderContext()): Unit = {
+  override def render(function: Term.Function, context: TermFunctionRenderContext2 = TermFunctionRenderContext2()): Unit = {
     function.params match {
       case param :: Nil if param.decltpe.isEmpty => termParamRenderer.render(param)
       case _ =>
@@ -30,7 +30,7 @@ private[renderers] class TermFunctionRendererImpl(termParamRenderer: => TermPara
     }
     writeArrow()
     function.body match {
-      case block: Block => blockRenderer.render(block = block, context = context.bodyContext)
+      case block: Block => blockRenderer.render(block = block, context = BlockRenderContext2(context.uncertainReturn))
       case term => defaultTermRenderer.render(term)
     }
   }
