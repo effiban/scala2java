@@ -155,7 +155,7 @@ class BlockStatRendererImplTest extends UnitTestSuite {
     when(termTreeClassifier.isReturnable(eqTree(termName))).thenReturn(true)
     when(javaStatClassifier.requiresEndDelimiter(eqTree(termName))).thenReturn(true)
 
-    blockStatRenderer.renderLast(termName, BlockStatRenderContext2(uncertainReturn = true))
+    blockStatRenderer.renderLast(termName, BlockStatRenderContext(uncertainReturn = true))
 
     outputWriter.toString shouldBe
       """/* return? */x;
@@ -183,7 +183,7 @@ class BlockStatRendererImplTest extends UnitTestSuite {
     when(termTreeClassifier.isReturnable(eqTree(termThrow))).thenReturn(false)
     when(javaStatClassifier.requiresEndDelimiter(eqTree(termThrow))).thenReturn(true)
 
-    blockStatRenderer.renderLast(termThrow, BlockStatRenderContext2(uncertainReturn = true))
+    blockStatRenderer.renderLast(termThrow, BlockStatRenderContext(uncertainReturn = true))
 
     outputWriter.toString shouldBe
       """throw new IllegalStateException();
@@ -206,7 +206,7 @@ class BlockStatRendererImplTest extends UnitTestSuite {
          |} else {
          |  doSomethingElse();
          |}""".stripMargin)
-      .when(ifRenderer).render(eqTree(termIf), eqTo(IfRenderContext2()))
+      .when(ifRenderer).render(eqTree(termIf), eqTo(IfRenderContext()))
 
     blockStatRenderer.renderLast(termIf)
 
@@ -235,9 +235,9 @@ class BlockStatRendererImplTest extends UnitTestSuite {
          |} else {
          |  /* return? */doSomethingElse();
          |}""".stripMargin)
-      .when(ifRenderer).render(eqTree(termIf), eqTo(IfRenderContext2(uncertainReturn = true)))
+      .when(ifRenderer).render(eqTree(termIf), eqTo(IfRenderContext(uncertainReturn = true)))
 
-    blockStatRenderer.renderLast(termIf, context = BlockStatRenderContext2(uncertainReturn = true))
+    blockStatRenderer.renderLast(termIf, context = BlockStatRenderContext(uncertainReturn = true))
 
     outputWriter.toString shouldBe
       """|if (cond) {
@@ -264,7 +264,7 @@ class BlockStatRendererImplTest extends UnitTestSuite {
          |} catch (Throwable e) {
          |  doSomethingElse();
          |}""".stripMargin)
-      .when(tryRenderer).render(eqTree(termTry), eqTo(TryRenderContext2()))
+      .when(tryRenderer).render(eqTree(termTry), eqTo(TryRenderContext()))
 
     blockStatRenderer.renderLast(termTry)
 
@@ -292,9 +292,9 @@ class BlockStatRendererImplTest extends UnitTestSuite {
          |} catch (Throwable e) {
          |  /* return? */doSomethingElse();
          |}""".stripMargin)
-      .when(tryRenderer).render(eqTree(termTry), eqTo(TryRenderContext2(uncertainReturn = true)))
+      .when(tryRenderer).render(eqTree(termTry), eqTo(TryRenderContext(uncertainReturn = true)))
 
-    blockStatRenderer.renderLast(termTry, BlockStatRenderContext2(uncertainReturn = true))
+    blockStatRenderer.renderLast(termTry, BlockStatRenderContext(uncertainReturn = true))
 
     outputWriter.toString shouldBe
       """|try {
@@ -318,7 +318,7 @@ class BlockStatRendererImplTest extends UnitTestSuite {
          |}
          |/* UNPARSEABLE catch handler: someCatchHandler */
          |""".stripMargin)
-      .when(tryWithHandlerRenderer).render(eqTree(tryWithHandler), eqTo(TryRenderContext2()))
+      .when(tryWithHandlerRenderer).render(eqTree(tryWithHandler), eqTo(TryRenderContext()))
 
     blockStatRenderer.renderLast(tryWithHandler)
 
@@ -344,7 +344,7 @@ class BlockStatRendererImplTest extends UnitTestSuite {
          |}
          |/* UNPARSEABLE catch handler: someCatchHandler */
          |""".stripMargin)
-      .when(tryWithHandlerRenderer).render(eqTree(tryWithHandler), eqTo(TryRenderContext2()))
+      .when(tryWithHandlerRenderer).render(eqTree(tryWithHandler), eqTo(TryRenderContext()))
 
     blockStatRenderer.renderLast(tryWithHandler)
 

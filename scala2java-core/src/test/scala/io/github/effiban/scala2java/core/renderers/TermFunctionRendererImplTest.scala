@@ -86,7 +86,7 @@ class TermFunctionRendererImplTest extends UnitTestSuite {
         |  /* BODY */
         |}""".stripMargin
     ).when(blockRenderer).render(
-      block = eqTree(functionBody), context = eqTo(BlockRenderContext2())
+      block = eqTree(functionBody), context = eqTo(BlockRenderContext())
     )
 
     termFunctionRenderer.render(function)
@@ -107,7 +107,7 @@ class TermFunctionRendererImplTest extends UnitTestSuite {
     )
     val function = Term.Function(params = List(param), body = functionBody)
 
-    val bodyContext = BlockRenderContext2(uncertainReturn = true)
+    val bodyContext = BlockRenderContext(uncertainReturn = true)
 
     doWrite("val1")
       .when(termParamRenderer).render(termParam = eqTree(param), context = eqTo(TermParamRenderContext()))
@@ -120,7 +120,7 @@ class TermFunctionRendererImplTest extends UnitTestSuite {
       block = eqTree(functionBody), context = eqTo(bodyContext)
     )
 
-    termFunctionRenderer.render(function, context = TermFunctionRenderContext2(uncertainReturn = true))
+    termFunctionRenderer.render(function, context = TermFunctionRenderContext(uncertainReturn = true))
 
     outputWriter.toString shouldBe
       """val1 ->  {

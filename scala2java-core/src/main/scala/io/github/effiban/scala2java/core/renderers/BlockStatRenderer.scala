@@ -13,7 +13,7 @@ trait BlockStatRenderer {
 
   def render(stat: Stat): Unit
 
-  def renderLast(stat: Stat, blockStatRenderContext: BlockStatRenderContext2 = BlockStatRenderContext2()): Unit
+  def renderLast(stat: Stat, blockStatRenderContext: BlockStatRenderContext = BlockStatRenderContext()): Unit
 }
 
 private[renderers] class BlockStatRendererImpl(statTermRenderer: => StatTermRenderer,
@@ -41,11 +41,11 @@ private[renderers] class BlockStatRendererImpl(statTermRenderer: => StatTermRend
     writeStatEnd(stat)
   }
 
-  override def renderLast(stat: Stat, context: BlockStatRenderContext2 = BlockStatRenderContext2()): Unit = {
+  override def renderLast(stat: Stat, context: BlockStatRenderContext = BlockStatRenderContext()): Unit = {
     stat match {
-      case `if`: If => ifRenderer.render(`if`, IfRenderContext2(context.uncertainReturn))
-      case `try`: Try  => tryRenderer.render(`try`, TryRenderContext2(context.uncertainReturn))
-      case tryWithHandler: TryWithHandler => tryWithHandlerRenderer.render(tryWithHandler, TryRenderContext2(context.uncertainReturn))
+      case `if`: If => ifRenderer.render(`if`, IfRenderContext(context.uncertainReturn))
+      case `try`: Try  => tryRenderer.render(`try`, TryRenderContext(context.uncertainReturn))
+      case tryWithHandler: TryWithHandler => tryWithHandlerRenderer.render(tryWithHandler, TryRenderContext(context.uncertainReturn))
       case term: Term if context.uncertainReturn && termTreeClassifier.isReturnable(term) =>
         writeComment(UncertainReturn)
         render(stat)

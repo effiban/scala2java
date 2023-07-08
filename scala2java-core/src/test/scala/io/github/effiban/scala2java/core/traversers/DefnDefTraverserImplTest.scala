@@ -143,7 +143,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin)
       .when(blockRenderer).render(block = eqTree(block),
-      context = eqTo(BlockRenderContext2())
+      context = eqTo(BlockRenderContext())
     )
 
     defnDefTraverser.traverse(InitialDefnDef, DefnDefContext(javaScope = javaScope))
@@ -206,7 +206,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin)
       .when(blockRenderer).render(block = eqTree(block),
-      context = eqTo(BlockRenderContext2())
+      context = eqTo(BlockRenderContext())
     )
 
     defnDefTraverser.traverse(InitialDefnDef, DefnDefContext(javaScope = javaScope))
@@ -275,7 +275,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin)
       .when(blockRenderer).render(block = eqTree(block),
-      context = eqTo(BlockRenderContext2())
+      context = eqTo(BlockRenderContext())
     )
 
     defnDefTraverser.traverse(InitialDefnDef, DefnDefContext(javaScope = javaScope))
@@ -337,7 +337,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin)
       .when(blockRenderer).render(block = eqTree(block),
-      context = eqTo(BlockRenderContext2(uncertainReturn = true))
+      context = eqTo(BlockRenderContext(uncertainReturn = true))
     )
 
     defnDefTraverser.traverse(InitialDefnDef, DefnDefContext(javaScope = javaScope))
@@ -401,7 +401,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin)
       .when(blockRenderer).render(block = eqTree(block),
-      context = eqTo(BlockRenderContext2())
+      context = eqTo(BlockRenderContext())
     )
 
     defnDefTraverser.traverse(InitialDefnDef, DefnDefContext(javaScope = javaScope))
@@ -465,7 +465,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin)
       .when(blockRenderer).render(block = eqTree(body),
-      context = eqTo(BlockRenderContext2())
+      context = eqTo(BlockRenderContext())
     )
 
     defnDefTraverser.traverse(InitialDefnDef, DefnDefContext(javaScope = javaScope))
@@ -528,7 +528,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin)
       .when(blockRenderer).render(block = eqTree(block),
-      context = eqTo(BlockRenderContext2())
+      context = eqTo(BlockRenderContext())
     )
 
     defnDefTraverser.traverse(InitialDefnDef, DefnDefContext(javaScope = javaScope))
@@ -593,7 +593,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |}
         |""".stripMargin)
       .when(blockRenderer).render(block = eqTree(block),
-      context = eqTo(BlockRenderContext2())
+      context = eqTo(BlockRenderContext())
     )
 
     defnDefTraverser.traverse(InitialDefnDef, DefnDefContext(javaScope = javaScope))

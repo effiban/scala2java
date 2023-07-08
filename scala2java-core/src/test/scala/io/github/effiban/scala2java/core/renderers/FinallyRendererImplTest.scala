@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.BlockRenderContext2
+import io.github.effiban.scala2java.core.contexts.BlockRenderContext
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -29,7 +29,7 @@ class FinallyRendererImplTest extends UnitTestSuite {
         |""".stripMargin)
       .when(blockRenderer).render(
       block = eqTree(FinallyBlock),
-      context = eqTo(BlockRenderContext2()))
+      context = eqTo(BlockRenderContext()))
 
     finallyRenderer.render(FinallyBlock)
 
