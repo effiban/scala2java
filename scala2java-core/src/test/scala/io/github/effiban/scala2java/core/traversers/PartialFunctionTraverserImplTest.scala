@@ -1,9 +1,8 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.entities.Decision.No
-import io.github.effiban.scala2java.core.matchers.TermFunctionTraversalResultScalatestMatcher.equalTermFunctionTraversalResult
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.SingleTermFunctionTraversalResult
+import io.github.effiban.scala2java.core.traversers.results.TermFunctionTraversalResult
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
 
@@ -33,10 +32,10 @@ class PartialFunctionTraverserImplTest extends UnitTestSuite {
   private val partialFunctionTraverser = new PartialFunctionTraverserImpl(termFunctionTraverser)
 
   test("traverse()") {
-    val expectedResult = SingleTermFunctionTraversalResult(TheTraversedFunction)
+    val expectedResult = TermFunctionTraversalResult(TheTraversedFunction)
 
     doReturn(expectedResult).when(termFunctionTraverser).traverse(eqTree(TheFunction), shouldBodyReturnValue = eqTo(No))
 
-    partialFunctionTraverser.traverse(ThePartialFunction) should equalTermFunctionTraversalResult(expectedResult)
+    partialFunctionTraverser.traverse(ThePartialFunction).function.structure shouldBe TheTraversedFunction.structure
   }
 }
