@@ -3,8 +3,8 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.{BlockContext, CatchHandlerContext, TryContext}
 import io.github.effiban.scala2java.core.entities.Decision.{Uncertain, Yes}
 import io.github.effiban.scala2java.core.matchers.BlockContextMatcher.eqBlockContext
-import io.github.effiban.scala2java.core.matchers.TryTraversalResultScalatestMatcher.equalTryTraversalResult
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
+import io.github.effiban.scala2java.core.traversers.results.TryTraversalResult
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.{any, eqTo}
 
@@ -99,15 +99,15 @@ class TryTraverserImplTest extends UnitTestSuite {
       catchp = Nil,
       finallyp = None
     )
-    val expectedResult = TestableTryTraversalResult(traversedTry)
+    val expectedResult = TryTraversalResult(traversedTry)
 
     doReturn(TestableBlockTraversalResult(TraversedTryExprBlock))
       .when(blockWrappingTermTraverser).traverse(term = eqTree(TryExprStatement), context = eqBlockContext(BlockContext()))
 
-    tryTraverser.traverse(`try`) should equalTryTraversalResult(expectedResult)
+    tryTraverser.traverse(`try`).stat.structure shouldBe expectedResult.stat.structure
   }
 
-  test("traverse with a statement expr, shouldReturnValue=Uncertain and output uncertainReturn=true ") {
+  test("traverse with a statement expr, shouldReturnValue=Uncertain") {
     val `try` = Term.Try(
       expr = TryExprStatement,
       catchp = Nil,
@@ -121,12 +121,11 @@ class TryTraverserImplTest extends UnitTestSuite {
     val tryContext = TryContext(shouldReturnValue = Uncertain)
     val expectedExprContext = BlockContext(shouldReturnValue = Uncertain)
     val expectedExprResult = TestableBlockTraversalResult(TraversedTryExprBlock, uncertainReturn = true)
-    val expectedTryResult = TestableTryTraversalResult(traversedTry, exprUncertainReturn = true)
 
     doReturn(expectedExprResult)
       .when(blockWrappingTermTraverser).traverse(term = eqTree(TryExprStatement), context = eqBlockContext(expectedExprContext))
 
-    tryTraverser.traverse(`try`, tryContext) should equalTryTraversalResult(expectedTryResult)
+    tryTraverser.traverse(`try`, tryContext).stat.structure shouldBe traversedTry.structure
   }
 
   test("traverse with a block expr") {
@@ -140,12 +139,11 @@ class TryTraverserImplTest extends UnitTestSuite {
       catchp = Nil,
       finallyp = None
     )
-    val expectedResult = TestableTryTraversalResult(traversedTry)
 
     doReturn(TestableBlockTraversalResult(TraversedTryExprBlock))
       .when(blockWrappingTermTraverser).traverse(term = eqTree(Block(List(TryExprStatement))), context = eqBlockContext(BlockContext()))
 
-    tryTraverser.traverse(`try`) should equalTryTraversalResult(expectedResult)
+    tryTraverser.traverse(`try`).stat.structure shouldBe traversedTry.structure
   }
 
   test("traverse with statement expr and one 'catch' case") {
@@ -159,14 +157,13 @@ class TryTraverserImplTest extends UnitTestSuite {
       catchp = List(TraversedCatchCase1),
       finallyp = None
     )
-    val expectedResult = TestableTryTraversalResult(traversedTry, catchUncertainReturns = List(false))
 
     doReturn(TestableBlockTraversalResult(TraversedTryExprBlock))
       .when(blockWrappingTermTraverser).traverse(term = eqTree(TryExprStatement),context = eqBlockContext(BlockContext()))
     doReturn(TestableCatchHandlerTraversalResult(TraversedCatchCase1))
       .when(catchHandlerTraverser).traverse(eqTree(CatchCase1), eqTo(CatchHandlerContext()))
 
-    tryTraverser.traverse(`try`) should equalTryTraversalResult(expectedResult)
+    tryTraverser.traverse(`try`).stat.structure shouldBe traversedTry.structure
   }
 
   test("traverse with a statement expr and two 'catch' cases") {
@@ -180,7 +177,6 @@ class TryTraverserImplTest extends UnitTestSuite {
       catchp = List(TraversedCatchCase1, TraversedCatchCase2),
       finallyp = None
     )
-    val expectedResult = TestableTryTraversalResult(traversedTry, catchUncertainReturns = List(false, false))
 
     doReturn(TestableBlockTraversalResult(TraversedTryExprBlock))
       .when(blockWrappingTermTraverser).traverse(term = eqTree(TryExprStatement), context = eqBlockContext(BlockContext()))
@@ -191,10 +187,10 @@ class TryTraverserImplTest extends UnitTestSuite {
       case aCatchCase => aCatchCase
     }).when(catchHandlerTraverser).traverse(any[Case], eqTo(CatchHandlerContext()))
 
-    tryTraverser.traverse(`try`) should equalTryTraversalResult(expectedResult)
+    tryTraverser.traverse(`try`).stat.structure shouldBe traversedTry.structure
   }
 
-  test("traverse with a statement expr and two 'catch' cases, shouldReturnValue=Uncertain and all results have uncertainReturn=true") {
+  test("traverse with a statement expr and two 'catch' cases, shouldReturnValue=Uncertain") {
     val `try` = Term.Try(
       expr = TryExprStatement,
       catchp = List(CatchCase1, CatchCase2),
@@ -211,7 +207,6 @@ class TryTraverserImplTest extends UnitTestSuite {
     val expectedExprResult = TestableBlockTraversalResult(TraversedTryExprBlock, uncertainReturn = true)
     val expectedCatchCase1Result = TestableCatchHandlerTraversalResult(TraversedCatchCase1, uncertainReturn = true)
     val expectedCatchCase2Result = TestableCatchHandlerTraversalResult(TraversedCatchCase2, uncertainReturn = true)
-    val expectedTryResult = TestableTryTraversalResult(traversedTry, exprUncertainReturn = true, catchUncertainReturns = List(true, true))
 
     doReturn(expectedExprResult)
       .when(blockWrappingTermTraverser).traverse(term = eqTree(TryExprStatement), context = eqBlockContext(expectedExprContext))
@@ -222,38 +217,7 @@ class TryTraverserImplTest extends UnitTestSuite {
       case aCatchCase => aCatchCase
     }).when(catchHandlerTraverser).traverse(any[Case], eqTo(expectedCatchHandlerContext))
 
-    tryTraverser.traverse(`try`, tryContext) should equalTryTraversalResult(expectedTryResult)
-  }
-
-  test("traverse with a statement expr and two 'catch' cases, shouldReturnValue=Uncertain and all but second 'catch' have uncertainReturn=true") {
-    val `try` = Term.Try(
-      expr = TryExprStatement,
-      catchp = List(CatchCase1, CatchCase2),
-      finallyp = None
-    )
-    val traversedTry = Term.Try(
-      expr = TraversedTryExprBlock,
-      catchp = List(TraversedCatchCase1, TraversedCatchCase2),
-      finallyp = None
-    )
-    val tryContext = TryContext(shouldReturnValue = Uncertain)
-    val expectedExprContext = BlockContext(shouldReturnValue = Uncertain)
-    val expectedCatchHandlerContext = CatchHandlerContext(shouldReturnValue = Uncertain)
-    val expectedExprResult = TestableBlockTraversalResult(TraversedTryExprBlock, uncertainReturn = true)
-    val expectedCatchCase1Result = TestableCatchHandlerTraversalResult(TraversedCatchCase1, uncertainReturn = true)
-    val expectedCatchCase2Result = TestableCatchHandlerTraversalResult(TraversedCatchCase2)
-    val expectedTryResult = TestableTryTraversalResult(traversedTry, exprUncertainReturn = true, catchUncertainReturns = List(true, false))
-
-    doReturn(expectedExprResult)
-      .when(blockWrappingTermTraverser).traverse(term = eqTree(TryExprStatement), context = eqBlockContext(expectedExprContext))
-
-    doAnswer((catchCase: Case) => catchCase match {
-      case aCatchCase if aCatchCase.structure == CatchCase1.structure => expectedCatchCase1Result
-      case aCatchCase if aCatchCase.structure == CatchCase2.structure => expectedCatchCase2Result
-      case aCatchCase => aCatchCase
-    }).when(catchHandlerTraverser).traverse(any[Case], eqTo(expectedCatchHandlerContext))
-
-    tryTraverser.traverse(`try`, tryContext) should equalTryTraversalResult(expectedTryResult)
+    tryTraverser.traverse(`try`, tryContext).stat.structure shouldBe traversedTry.structure
   }
 
   test("traverse with a statement expr, one 'catch' case and a 'finally' statement") {
@@ -267,7 +231,6 @@ class TryTraverserImplTest extends UnitTestSuite {
       catchp = List(TraversedCatchCase1),
       finallyp = Some(TraversedFinallyBlock)
     )
-    val expectedResult = TestableTryTraversalResult(traversedTry, catchUncertainReturns = List(false))
 
     doReturn(TestableBlockTraversalResult(TraversedTryExprBlock))
       .when(blockWrappingTermTraverser).traverse(term = eqTree(TryExprStatement), context = eqBlockContext(BlockContext()))
@@ -275,7 +238,7 @@ class TryTraverserImplTest extends UnitTestSuite {
       .when(catchHandlerTraverser).traverse(eqTree(CatchCase1), eqTo(CatchHandlerContext()))
     doReturn(TraversedFinallyBlock).when(finallyTraverser).traverse(eqTree(FinallyStatement))
 
-    tryTraverser.traverse(`try`) should equalTryTraversalResult(expectedResult)
+    tryTraverser.traverse(`try`).stat.structure shouldBe traversedTry.structure
   }
 
   test("traverse with a statement expr, one 'catch' case and a 'finally' block") {
@@ -289,7 +252,6 @@ class TryTraverserImplTest extends UnitTestSuite {
       catchp = List(TraversedCatchCase1),
       finallyp = Some(TraversedFinallyBlock)
     )
-    val expectedResult = TestableTryTraversalResult(traversedTry, catchUncertainReturns = List(false))
 
     doReturn(TestableBlockTraversalResult(TraversedTryExprBlock))
       .when(blockWrappingTermTraverser).traverse(term = eqTree(TryExprStatement), context = eqBlockContext(BlockContext()))
@@ -297,7 +259,7 @@ class TryTraverserImplTest extends UnitTestSuite {
       .when(catchHandlerTraverser).traverse(eqTree(CatchCase1), eqTo(CatchHandlerContext()))
     doReturn(TraversedFinallyBlock).when(finallyTraverser).traverse(eqTree(FinallyBlock))
 
-    tryTraverser.traverse(`try`) should equalTryTraversalResult(expectedResult)
+    tryTraverser.traverse(`try`).stat.structure shouldBe traversedTry.structure
   }
 
   test("traverse with a statement expr, one 'catch' case and a 'finally', and shouldReturnValue=Yes") {
@@ -311,7 +273,6 @@ class TryTraverserImplTest extends UnitTestSuite {
       catchp = List(TraversedCatchCase1),
       finallyp = Some(TraversedFinallyBlock)
     )
-    val expectedResult = TestableTryTraversalResult(traversedTry, catchUncertainReturns = List(false))
 
     doReturn(TestableBlockTraversalResult(TraversedTryExprBlock)).when(blockWrappingTermTraverser).traverse(
       term = eqTree(TryExprStatement),
@@ -324,6 +285,6 @@ class TryTraverserImplTest extends UnitTestSuite {
     doReturn(TraversedFinallyBlock).when(finallyTraverser).traverse(eqTree(FinallyStatement))
 
     val actualResult = tryTraverser.traverse(`try` = `try`, context = TryContext(shouldReturnValue = Yes))
-    actualResult should equalTryTraversalResult(expectedResult)
+    actualResult.stat.structure shouldBe traversedTry.structure
   }
 }

@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.contexts.{BlockContext, IfContext, TryC
 import io.github.effiban.scala2java.core.entities.Decision.No
 import io.github.effiban.scala2java.core.matchers.BlockContextMatcher.eqBlockContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.{IfTraversalResult, SingleTermFunctionTraversalResult}
+import io.github.effiban.scala2java.core.traversers.results.{IfTraversalResult, SingleTermFunctionTraversalResult, TryTraversalResult}
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
 
@@ -220,7 +220,7 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
       }
       """
 
-    doReturn(TestableTryTraversalResult(traversedTermTry, catchUncertainReturns = List(false)))
+    doReturn(TryTraversalResult(traversedTermTry))
       .when(tryTraverser).traverse(eqTree(termTry), eqTo(TryContext()))
 
     defaultTermTraverser.traverse(termTry).structure shouldBe traversedTermTry.structure
