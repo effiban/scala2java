@@ -2,9 +2,8 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.BlockContext
 import io.github.effiban.scala2java.core.entities.Decision.{No, Uncertain, Yes}
-import io.github.effiban.scala2java.core.matchers.BlockTraversalResultScalatestMatcher.equalBlockTraversalResult
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.SimpleBlockStatTraversalResult
+import io.github.effiban.scala2java.core.traversers.results.{BlockTraversalResult, SimpleBlockStatTraversalResult}
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.{any, eqTo}
 
@@ -32,56 +31,58 @@ class DefaultBlockTraverserImplTest extends UnitTestSuite {
 
   test("traverse() when block is empty") {
     val emptyBlock = Block(List.empty)
-    blockTraverser.traverse(emptyBlock) should equalBlockTraversalResult(TestableBlockTraversalResult(emptyBlock))
+    blockTraverser.traverse(emptyBlock).block.structure shouldBe emptyBlock.structure
   }
 
   test("traverse() for block of one statement, shouldReturnValue=No") {
     val block = Block(List(Stat1))
     val expectedLastStatResult = SimpleBlockStatTraversalResult(TraversedStat1)
-    val expectedBlockResult = TestableBlockTraversalResult(block = Block(List(TraversedStat1)))
+    val expectedBlockResult = BlockTraversalResult(block = Block(List(TraversedStat1)))
 
     doReturn(expectedLastStatResult).when(blockLastStatTraverser).traverse(eqTree(Stat1), eqTo(No))
 
-    blockTraverser.traverse(block) should equalBlockTraversalResult(expectedBlockResult)
+    blockTraverser.traverse(block).block.structure shouldBe expectedBlockResult.block.structure
   }
 
   test("traverse() for block of two statements, shouldReturnValue=Yes") {
     val block = Block(List(Stat1, Stat2))
     val expectedLastStatResult = SimpleBlockStatTraversalResult(TraversedStat2)
-    val expectedBlockResult = TestableBlockTraversalResult(block = Block(List(TraversedStat1, TraversedStat2)))
+    val expectedBlockResult = BlockTraversalResult(block = Block(List(TraversedStat1, TraversedStat2)))
 
     doReturn(TraversedStat1).when(blockStatTraverser).traverse(eqTree(Stat1))
     doReturn(expectedLastStatResult).when(blockLastStatTraverser).traverse(eqTree(Stat2), eqTo(Yes))
 
-    blockTraverser.traverse(block, BlockContext(shouldReturnValue = Yes)) should equalBlockTraversalResult(expectedBlockResult)
+    val actualResult = blockTraverser.traverse(block, BlockContext(shouldReturnValue = Yes))
+    actualResult.block.structure shouldBe expectedBlockResult.block.structure
   }
 
   test("traverse() for block of two statements, shouldReturnValue=No") {
     val block = Block(List(Stat1, Stat2))
     val expectedLastStatResult = SimpleBlockStatTraversalResult(TraversedStat2)
-    val expectedBlockResult = TestableBlockTraversalResult(block = Block(List(TraversedStat1, TraversedStat2)))
+    val expectedBlockResult = BlockTraversalResult(block = Block(List(TraversedStat1, TraversedStat2)))
 
     doReturn(TraversedStat1).when(blockStatTraverser).traverse(eqTree(Stat1))
     doReturn(expectedLastStatResult).when(blockLastStatTraverser).traverse(eqTree(Stat2), eqTo(No))
 
-    blockTraverser.traverse(block) should equalBlockTraversalResult(expectedBlockResult)
+    blockTraverser.traverse(block).block.structure shouldBe expectedBlockResult.block.structure
   }
 
   test("traverse() for block of two statements, shouldReturnValue=Uncertain") {
     val block = Block(List(Stat1, Stat2))
     val expectedLastStatResult = SimpleBlockStatTraversalResult(TraversedStat2, uncertainReturn = true)
-    val expectedBlockResult = TestableBlockTraversalResult(block = Block(List(TraversedStat1, TraversedStat2)), uncertainReturn = true)
+    val expectedBlockResult = BlockTraversalResult(block = Block(List(TraversedStat1, TraversedStat2)))
 
     doReturn(TraversedStat1).when(blockStatTraverser).traverse(eqTree(Stat1))
     doReturn(expectedLastStatResult).when(blockLastStatTraverser).traverse(eqTree(Stat2), eqTo(Uncertain))
 
-    blockTraverser.traverse(block, BlockContext(shouldReturnValue = Uncertain)) should equalBlockTraversalResult(expectedBlockResult)
+    val actualResult = blockTraverser.traverse(block, BlockContext(shouldReturnValue = Uncertain))
+    actualResult.block.structure shouldBe expectedBlockResult.block.structure
   }
 
   test("traverse() for block of three statements, shouldReturnValue=No") {
     val block = Block(List(Stat1, Stat2, Stat3))
     val expectedLastStatResult = SimpleBlockStatTraversalResult(TraversedStat3)
-    val expectedBlockResult = TestableBlockTraversalResult(block = Block(List(TraversedStat1, TraversedStat2, TraversedStat3)))
+    val expectedBlockResult = BlockTraversalResult(block = Block(List(TraversedStat1, TraversedStat2, TraversedStat3)))
 
     doAnswer((stat: Stat) => stat match {
       case aStat if aStat.structure == Stat1.structure => TraversedStat1
@@ -90,6 +91,6 @@ class DefaultBlockTraverserImplTest extends UnitTestSuite {
     }).when(blockStatTraverser).traverse(any[Stat])
     doReturn(expectedLastStatResult).when(blockLastStatTraverser).traverse(eqTree(Stat3), eqTo(No))
 
-    blockTraverser.traverse(block) should equalBlockTraversalResult(expectedBlockResult)
+    blockTraverser.traverse(block).block.structure shouldBe expectedBlockResult.block.structure
   }
 }
