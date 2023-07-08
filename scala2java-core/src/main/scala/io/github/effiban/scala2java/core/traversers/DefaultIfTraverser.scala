@@ -24,9 +24,11 @@ private[traversers] class DefaultIfTraverserImpl(expressionTermTraverser: => Exp
         Some(traverseClause(elsep, context))
     }
     IfTraversalResult(
-      cond = traversedCond,
-      thenpResult = thenpResult,
-      maybeElsepResult = maybeElsepResult
+      If(
+        cond = traversedCond,
+        thenp = thenpResult.block,
+        elsep = maybeElsepResult.map(_.block).getOrElse(Lit.Unit())
+      )
     )
   }
 
