@@ -1,5 +1,5 @@
 package io.github.effiban.scala2java.core.traversers.results
 
-import scala.meta.Pat
+import scala.meta.Case
 
-case class CatchHandlerTraversalResult(pat: Pat, bodyResult: BlockTraversalResult)
+case class CatchHandlerTraversalResult(catchp: Case)

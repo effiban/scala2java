@@ -19,6 +19,7 @@ private[traversers] class CatchHandlerTraverserImpl(catchArgumentTraverser: => C
     // TODO - handle cond by moving into body
     val bodyTraversalResult = blockWrappingTermTraverser.traverse(catchCase.body,
       context = BlockContext(shouldReturnValue = context.shouldReturnValue))
-    CatchHandlerTraversalResult(pat = traversedPat, bodyTraversalResult)
+    val traversedCatchp = Case(pat = traversedPat, cond = None, body = bodyTraversalResult.block)
+    CatchHandlerTraversalResult(traversedCatchp)
   }
 }
