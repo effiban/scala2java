@@ -4,7 +4,6 @@ import io.github.effiban.scala2java.core.contexts.{IfContext, TryContext}
 import io.github.effiban.scala2java.core.entities.Decision.{No, Uncertain, Yes}
 import io.github.effiban.scala2java.core.resolvers.ShouldReturnValueResolver
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.TryWithHandlerTraversalResult
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
 
@@ -105,17 +104,13 @@ class BlockLastStatTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for a 'Term.TryWithHandler' when shouldReturnValue=No") {
-    val expectedTraversalResult = TryWithHandlerTraversalResult(TheTraversedTryWithHandler)
-
-    doReturn(expectedTraversalResult).when(tryWithHandlerTraverser).traverse(eqTree(TheTryWithHandler), eqTo(TryContext()))
+    doReturn(TheTraversedTryWithHandler).when(tryWithHandlerTraverser).traverse(eqTree(TheTryWithHandler), eqTo(TryContext()))
 
     blockLastStatTraverser.traverse(TheTryWithHandler).structure shouldBe TheTraversedTryWithHandler.structure
   }
 
   test("traverse() for a 'Term.TryWithHandler' when shouldReturnValue=Yes") {
-    val expectedTraversalResult = TryWithHandlerTraversalResult(TheTraversedTryWithHandler)
-
-    doReturn(expectedTraversalResult)
+    doReturn(TheTraversedTryWithHandler)
       .when(tryWithHandlerTraverser).traverse(eqTree(TheTryWithHandler), eqTo(TryContext(shouldReturnValue = Yes)))
 
     val actualTraversedTryWithHandler = blockLastStatTraverser.traverse(TheTryWithHandler, shouldReturnValue = Yes)
@@ -123,9 +118,7 @@ class BlockLastStatTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for a 'Term.TryWithHandler' when shouldReturnValue=Uncertain") {
-    val expectedTraversalResult = TryWithHandlerTraversalResult(TheTraversedTryWithHandler)
-
-    doReturn(expectedTraversalResult)
+    doReturn(TheTraversedTryWithHandler)
       .when(tryWithHandlerTraverser).traverse(eqTree(TheTryWithHandler), eqTo(TryContext(shouldReturnValue = Uncertain)))
 
     val actualTraversedTryWithHandler = blockLastStatTraverser.traverse(TheTryWithHandler, shouldReturnValue = Uncertain)

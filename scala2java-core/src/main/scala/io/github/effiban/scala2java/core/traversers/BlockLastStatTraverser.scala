@@ -23,7 +23,7 @@ private[traversers] class BlockLastStatTraverserImpl(blockStatTraverser: => Bloc
     stat match {
       case `if`: If => traverseIf(`if`, shouldReturnValue)
       case `try`: Try => traverseTry(`try`, shouldReturnValue)
-      case tryWithHandler: TryWithHandler => traverseTryWithHandler(tryWithHandler, shouldReturnValue).stat
+      case tryWithHandler: TryWithHandler => traverseTryWithHandler(tryWithHandler, shouldReturnValue)
       case term: Term => traverseSimpleTerm(term, shouldReturnValue)
       case aStat => traverseInner(aStat)
     }
