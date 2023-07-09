@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.contexts.{IfContext, TryContext}
 import io.github.effiban.scala2java.core.entities.Decision.{No, Uncertain, Yes}
 import io.github.effiban.scala2java.core.resolvers.ShouldReturnValueResolver
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.{IfTraversalResult, TryTraversalResult, TryWithHandlerTraversalResult}
+import io.github.effiban.scala2java.core.traversers.results.{TryTraversalResult, TryWithHandlerTraversalResult}
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
 
@@ -61,26 +61,20 @@ class BlockLastStatTraverserImplTest extends UnitTestSuite {
   )
 
   test("traverse() for a 'Term.If' when shouldReturnValue=No") {
-    val expectedIfTraversalResult = IfTraversalResult(TheTraversedIf)
-
-    doReturn(expectedIfTraversalResult).when(defaultIfTraverser).traverse(eqTree(TheIf), eqTo(IfContext()))
+    doReturn(TheTraversedIf).when(defaultIfTraverser).traverse(eqTree(TheIf), eqTo(IfContext()))
 
     blockLastStatTraverser.traverse(TheIf).structure shouldBe TheTraversedIf.structure
   }
 
   test("traverse() for a 'Term.If' when shouldReturnValue=Yes") {
-    val expectedIfTraversalResult = IfTraversalResult(TheTraversedIf)
-
-    doReturn(expectedIfTraversalResult).when(defaultIfTraverser).traverse(eqTree(TheIf), eqTo(IfContext(shouldReturnValue = Yes)))
+    doReturn(TheTraversedIf).when(defaultIfTraverser).traverse(eqTree(TheIf), eqTo(IfContext(shouldReturnValue = Yes)))
 
     val actualTraversedIf = blockLastStatTraverser.traverse(TheIf, shouldReturnValue = Yes)
     actualTraversedIf.structure shouldBe TheTraversedIf.structure
   }
 
   test("traverse() for a 'Term.If' when shouldReturnValue=Uncertain") {
-    val expectedIfTraversalResult = IfTraversalResult(TheTraversedIf)
-
-    doReturn(expectedIfTraversalResult).when(defaultIfTraverser).traverse(eqTree(TheIf), eqTo(IfContext(shouldReturnValue = Uncertain)))
+    doReturn(TheTraversedIf).when(defaultIfTraverser).traverse(eqTree(TheIf), eqTo(IfContext(shouldReturnValue = Uncertain)))
 
     val actualTraversedIf = blockLastStatTraverser.traverse(TheIf, shouldReturnValue = Uncertain)
     actualTraversedIf.structure shouldBe TheTraversedIf.structure
