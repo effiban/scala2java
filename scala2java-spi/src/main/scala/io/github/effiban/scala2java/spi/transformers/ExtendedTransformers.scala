@@ -63,14 +63,14 @@ trait ExtendedTransformers {
    */
   def defnVarTransformer(): DefnVarTransformer = DefnVarTransformer.Identity
 
-  /** Override this method if you need to transform a [[scala.meta.Defn.Val]] (`val` definition) into a
-   * [[scala.meta.Decl.Var]] (`var` declaration).<br>
+  /** Override this method if you need to transform a [[scala.meta.Defn.Var]] (variable definition) into a
+   * [[scala.meta.Decl.Var]] (variable declaration).<br>
    * @see [[DefnValToDeclVarTransformer]] for a usage example.
    *
-   * @return if overriden - a transformer which transforms a [[scala.meta.Defn.Val]] into a [[scala.meta.Decl.Var]] where applicable<br>
+   * @return if overriden - a transformer which transforms a [[scala.meta.Defn.Var]] into a [[scala.meta.Decl.Var]] where applicable<br>
    *         otherwise - the default transformer which never transforms (returns `None`)<br>
    */
-  def defnValToDeclVarTransformer(): DefnValToDeclVarTransformer = DefnValToDeclVarTransformer.Empty
+  def defnVarToDeclVarTransformer(): DefnVarToDeclVarTransformer = DefnVarToDeclVarTransformer.Empty
 
   /** Override this method if you need to modify a [[scala.meta.Defn.Def]] (method definition)
    *
