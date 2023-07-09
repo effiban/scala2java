@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.contexts.{BlockContext, StatContext}
 import io.github.effiban.scala2java.core.entities.Decision.{No, Uncertain, Yes}
 import io.github.effiban.scala2java.core.matchers.BlockContextMatcher.eqBlockContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.{BlockTraversalResult, TermParamTraversalResult}
+import io.github.effiban.scala2java.core.traversers.results.TermParamTraversalResult
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.{any, eqTo}
@@ -120,7 +120,7 @@ class TermFunctionTraverserImplTest extends UnitTestSuite {
     val expectedFunctionTraversalResult = Term.Function(List(traversedParam), traversedBody)
 
     doReturn(TermParamTraversalResult(traversedParam)).when(termParamTraverser).traverse(eqTree(param), eqTo(LambdaStatContext))
-    doReturn(BlockTraversalResult(traversedBody))
+    doReturn(traversedBody)
       .when(defaultBlockTraverser).traverse(eqTree(body), eqBlockContext(BlockContext(shouldReturnValue = No))
     )
 
@@ -147,7 +147,7 @@ class TermFunctionTraverserImplTest extends UnitTestSuite {
     val expectedFunctionTraversalResult = Term.Function(List(traversedParam), traversedBody)
 
     doReturn(TermParamTraversalResult(traversedParam)).when(termParamTraverser).traverse(eqTree(param), eqTo(LambdaStatContext))
-    doReturn(BlockTraversalResult(traversedBody))
+    doReturn(traversedBody)
       .when(defaultBlockTraverser).traverse(eqTree(body), eqBlockContext(BlockContext(shouldReturnValue = No))
     )
 
@@ -174,7 +174,7 @@ class TermFunctionTraverserImplTest extends UnitTestSuite {
     val expectedFunctionTraversalResult = Term.Function(List(traversedParam), traversedBody)
 
     doReturn(TermParamTraversalResult(traversedParam)).when(termParamTraverser).traverse(eqTree(param), eqTo(LambdaStatContext))
-    doReturn(BlockTraversalResult(traversedBody))
+    doReturn(traversedBody)
       .when(defaultBlockTraverser).traverse(eqTree(body), eqBlockContext(BlockContext(shouldReturnValue = Yes))
     )
 
@@ -199,11 +199,11 @@ class TermFunctionTraverserImplTest extends UnitTestSuite {
 
     val function = Term.Function(List(param), body)
 
-    val blockTraversalResult = BlockTraversalResult(traversedBody)
+    val block = traversedBody
     val expectedFunctionTraversalResult = Term.Function(List(traversedParam), traversedBody)
 
     doReturn(TermParamTraversalResult(traversedParam)).when(termParamTraverser).traverse(eqTree(param), eqTo(LambdaStatContext))
-    doReturn(blockTraversalResult)
+    doReturn(block)
       .when(defaultBlockTraverser).traverse(eqTree(body), eqBlockContext(BlockContext(shouldReturnValue = Uncertain)))
 
     val actualResult = termFunctionTraverser.traverse(function, shouldBodyReturnValue = Uncertain)

@@ -15,12 +15,12 @@ private[traversers] class TryWithHandlerTraverserImpl(blockWrappingTermTraverser
   override def traverse(tryWithHandler: TryWithHandler, context: TryContext = TryContext()): TryWithHandler = {
     import tryWithHandler._
 
-    val exprResult = blockWrappingTermTraverser.traverse(expr, BlockContext(shouldReturnValue = context.shouldReturnValue))
+    val traversedExpr = blockWrappingTermTraverser.traverse(expr, BlockContext(shouldReturnValue = context.shouldReturnValue))
     // TODO - The catch handler is some term which evaluates to a partial function, handle it once we have semantic information
     val maybeTraversedFinally = finallyp.map(finallyTraverser.traverse)
 
     TryWithHandler(
-      expr = exprResult.block,
+      expr = traversedExpr,
       catchp = catchp,
       finallyp = maybeTraversedFinally
     )

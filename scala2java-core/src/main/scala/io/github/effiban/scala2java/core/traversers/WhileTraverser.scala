@@ -9,7 +9,7 @@ private[traversers] class WhileTraverserImpl(expressionTermTraverser: => Express
 
   override def traverse(`while`: While): While = {
     val traversedExpr = expressionTermTraverser.traverse(`while`.expr)
-    val traversedBody = blockWrappingTermTraverser.traverse(`while`.body).block
+    val traversedBody = blockWrappingTermTraverser.traverse(`while`.body)
     While(traversedExpr, traversedBody)
   }
 }

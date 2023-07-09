@@ -12,7 +12,7 @@ import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRen
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
-import io.github.effiban.scala2java.core.traversers.results.{BlockTraversalResult, ModListTraversalResult, TermParamTraversalResult}
+import io.github.effiban.scala2java.core.traversers.results.{ModListTraversalResult, TermParamTraversalResult}
 import io.github.effiban.scala2java.core.typeinference.TermTypeInferrer
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.spi.entities.JavaScope.JavaScope
@@ -59,6 +59,9 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
 
   private val Statement1 = Term.Apply(fun = Term.Name("doSomething"), args = List(Term.Name("param1")))
   private val Statement2 = Term.Apply(fun = Term.Name("doSomethingElse"), args = List(Term.Name("param2")))
+
+  private val TraversedStatement1 = Term.Apply(fun = Term.Name("doSomething"), args = List(Term.Name("param11")))
+  private val TraversedStatement2 = Term.Apply(fun = Term.Name("doSomethingElse"), args = List(Term.Name("param22")))
 
   private val InitialDefnDef = Defn.Def(Nil, Term.Name("foo"), Nil, List(Nil), Some(TypeNames.Int), Term.Apply(Term.Name("bar"), Nil))
 
@@ -131,9 +134,8 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       termParams = eqTreeList(TraversedMethodParamList1),
       context = eqTo(TermParamListRenderContext(List(JavaModifier.Final)))
     )
-    val block = Block(List(Statement1))
-    val blockTraversalResult = BlockTraversalResult(block)
-    doReturn(blockTraversalResult)
+    val traversedBody = Block(List(TraversedStatement1))
+    doReturn(traversedBody)
       .when(blockWrappingTermTraverser).traverse(eqTree(Statement1),
       context = eqBlockContext(BlockContext(shouldReturnValue = Yes))
     )
@@ -142,7 +144,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}
         |""".stripMargin)
-      .when(blockRenderer).render(block = eqTree(block),
+      .when(blockRenderer).render(block = eqTree(traversedBody),
       context = eqTo(BlockRenderContext())
     )
 
@@ -194,9 +196,8 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       termParams = eqTreeList(TraversedMethodParamList1),
       context = eqTo(TermParamListRenderContext(List(JavaModifier.Final)))
     )
-    val block = Block(List(Statement1))
-    val blockTraversalResult = BlockTraversalResult(block)
-    doReturn(blockTraversalResult)
+    val traversedBody = Block(List(TraversedStatement1))
+    doReturn(traversedBody)
       .when(blockWrappingTermTraverser).traverse(eqTree(Statement1),
       context = eqBlockContext(BlockContext())
     )
@@ -205,7 +206,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}
         |""".stripMargin)
-      .when(blockRenderer).render(block = eqTree(block),
+      .when(blockRenderer).render(block = eqTree(traversedBody),
       context = eqTo(BlockRenderContext())
     )
 
@@ -263,9 +264,8 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       termParams = eqTreeList(TraversedMethodParamList1),
       context = eqTo(TermParamListRenderContext(List(JavaModifier.Final)))
     )
-    val block = Block(List(Statement1))
-    val blockTraversalResult = BlockTraversalResult(block)
-    doReturn(blockTraversalResult)
+    val traversedBody = Block(List(TraversedStatement1))
+    doReturn(traversedBody)
       .when(blockWrappingTermTraverser).traverse(eqTree(Statement1),
       context = eqBlockContext(BlockContext())
     )
@@ -274,7 +274,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}
         |""".stripMargin)
-      .when(blockRenderer).render(block = eqTree(block),
+      .when(blockRenderer).render(block = eqTree(traversedBody),
       context = eqTo(BlockRenderContext())
     )
 
@@ -325,9 +325,8 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       termParams = eqTreeList(TraversedMethodParamList1),
       context = eqTo(TermParamListRenderContext(List(JavaModifier.Final)))
     )
-    val block = Block(List(Statement1))
-    val blockTraversalResult = BlockTraversalResult(block)
-    doReturn(blockTraversalResult)
+    val traversedBody = Block(List(TraversedStatement1))
+    doReturn(traversedBody)
       .when(blockWrappingTermTraverser).traverse(eqTree(Statement1),
       context = eqBlockContext(BlockContext(shouldReturnValue = Uncertain))
     )
@@ -336,7 +335,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}
         |""".stripMargin)
-      .when(blockRenderer).render(block = eqTree(block),
+      .when(blockRenderer).render(block = eqTree(traversedBody),
       context = eqTo(BlockRenderContext(uncertainReturn = true))
     )
 
@@ -389,9 +388,8 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       termParams = eqTreeList(TraversedMethodParamList1),
       context = eqTo(TermParamListRenderContext(List(JavaModifier.Final)))
     )
-    val block = Block(List(Statement1))
-    val blockTraversalResult = BlockTraversalResult(block)
-    doReturn(blockTraversalResult)
+    val traversedBody = Block(List(TraversedStatement1))
+    doReturn(traversedBody)
       .when(blockWrappingTermTraverser).traverse(eqTree(Statement1),
       context = eqBlockContext(BlockContext(shouldReturnValue = Yes))
     )
@@ -400,7 +398,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}
         |""".stripMargin)
-      .when(blockRenderer).render(block = eqTree(block),
+      .when(blockRenderer).render(block = eqTree(traversedBody),
       context = eqTo(BlockRenderContext())
     )
 
@@ -454,8 +452,8 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       termParams = eqTreeList(TraversedMethodParamList1),
       context = eqTo(TermParamListRenderContext(List(JavaModifier.Final)))
     )
-    val blockTraversalResult = BlockTraversalResult(body)
-    doReturn(blockTraversalResult)
+    val traversedBody = Block(List(TraversedStatement1, TraversedStatement2))
+    doReturn(traversedBody)
       .when(blockWrappingTermTraverser).traverse(eqTree(body),
       context = eqBlockContext(BlockContext(shouldReturnValue = Yes))
     )
@@ -464,7 +462,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}
         |""".stripMargin)
-      .when(blockRenderer).render(block = eqTree(body),
+      .when(blockRenderer).render(block = eqTree(traversedBody),
       context = eqTo(BlockRenderContext())
     )
 
@@ -516,9 +514,8 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       termParams = eqTreeList(TraversedMethodParamList1),
       context = eqTo(TermParamListRenderContext())
     )
-    val block = Block(List(Statement1))
-    val blockTraversalResult = BlockTraversalResult(block)
-    doReturn(blockTraversalResult)
+    val traversedBody = Block(List(TraversedStatement1))
+    doReturn(traversedBody)
       .when(blockWrappingTermTraverser).traverse(eqTree(Statement1),
       context = eqBlockContext(BlockContext(shouldReturnValue = Yes))
     )
@@ -527,7 +524,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}
         |""".stripMargin)
-      .when(blockRenderer).render(block = eqTree(block),
+      .when(blockRenderer).render(block = eqTree(traversedBody),
       context = eqTo(BlockRenderContext())
     )
 
@@ -581,9 +578,8 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       termParams = eqTreeList(TraversedMethodParamList1 ++ TraversedMethodParamList2),
       context = eqTo(TermParamListRenderContext())
     )
-    val block = Block(List(Statement1))
-    val blockTraversalResult = BlockTraversalResult(block)
-    doReturn(blockTraversalResult)
+    val traversedBody = Block(List(Statement1))
+    doReturn(traversedBody)
       .when(blockWrappingTermTraverser).traverse(eqTree(Statement1),
       context = eqBlockContext(BlockContext(shouldReturnValue = Yes))
     )
@@ -592,7 +588,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
         |  /* BODY */
         |}
         |""".stripMargin)
-      .when(blockRenderer).render(block = eqTree(block),
+      .when(blockRenderer).render(block = eqTree(traversedBody),
       context = eqTo(BlockRenderContext())
     )
 

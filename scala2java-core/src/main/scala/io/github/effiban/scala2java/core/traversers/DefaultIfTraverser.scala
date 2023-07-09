@@ -24,8 +24,8 @@ private[traversers] class DefaultIfTraverserImpl(expressionTermTraverser: => Exp
     }
     If(
       cond = traversedCond,
-      thenp = thenpResult.block,
-      elsep = maybeElsepResult.map(_.block).getOrElse(Lit.Unit())
+      thenp = thenpResult,
+      elsep = maybeElsepResult.getOrElse(Lit.Unit())
     )
   }
 
