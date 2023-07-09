@@ -52,7 +52,7 @@ class CatchHandlerTraverserImplTest extends UnitTestSuite {
       context = eqBlockContext(BlockContext())
     )
 
-    catchHandlerTraverser.traverse(CatchCase).catchp.structure shouldBe TraversedCatchCase.structure
+    catchHandlerTraverser.traverse(CatchCase).structure shouldBe TraversedCatchCase.structure
   }
 
   test("traverse() when shouldReturnValue=Yes") {
@@ -67,7 +67,7 @@ class CatchHandlerTraverserImplTest extends UnitTestSuite {
       .when(blockWrappingTermTraverser).traverse(term = eqTree(Body), context = eqBlockContext(expectedBlockContext))
 
     val actualCatchHandlerResult = catchHandlerTraverser.traverse(CatchCase, catchHandlerContext)
-    actualCatchHandlerResult.catchp.structure shouldBe TraversedCatchCase.structure
+    actualCatchHandlerResult.structure shouldBe TraversedCatchCase.structure
   }
 
   test("traverse() when shouldReturnValue=Uncertain") {
@@ -82,6 +82,6 @@ class CatchHandlerTraverserImplTest extends UnitTestSuite {
       .when(blockWrappingTermTraverser).traverse(term = eqTree(Body), context = eqBlockContext(expectedBlockContext))
 
     val actualCatchHandlerResult = catchHandlerTraverser.traverse(CatchCase, catchHandlerContext)
-    actualCatchHandlerResult.catchp.structure shouldBe TraversedCatchCase.structure
+    actualCatchHandlerResult.structure shouldBe TraversedCatchCase.structure
   }
 }
