@@ -236,8 +236,7 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
       } catch(catchHandler)
       """
 
-    doReturn(TryWithHandlerTraversalResult(traversedTryWithHandler))
-      .when(tryWithHandlerTraverser).traverse(eqTree(tryWithHandler), eqTo(TryContext()))
+    doReturn(traversedTryWithHandler).when(tryWithHandlerTraverser).traverse(eqTree(tryWithHandler), eqTo(TryContext()))
 
     defaultTermTraverser.traverse(tryWithHandler).structure shouldBe traversedTryWithHandler.structure
   }

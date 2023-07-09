@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.contexts.{BlockContext, TryContext}
 import io.github.effiban.scala2java.core.entities.Decision.{Uncertain, Yes}
 import io.github.effiban.scala2java.core.matchers.BlockContextMatcher.eqBlockContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.{BlockTraversalResult, TryWithHandlerTraversalResult}
+import io.github.effiban.scala2java.core.traversers.results.BlockTraversalResult
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.Term.{Block, TryWithHandler}
@@ -65,7 +65,7 @@ class TryWithHandlerTraverserImplTest extends UnitTestSuite {
     doReturn(BlockTraversalResult(traversedTryWithHandlerExprBlock))
       .when(blockWrappingTermTraverser).traverse(term = eqTree(TryExprStatement), context = eqBlockContext(BlockContext()))
 
-    tryWithHandlerTraverser.traverse(tryWithHandler).stat.structure shouldBe traversedTryWithHandler.structure
+    tryWithHandlerTraverser.traverse(tryWithHandler).structure shouldBe traversedTryWithHandler.structure
   }
 
   test("traverse with a statement expr and shouldReturnValue=Yes") {
@@ -85,7 +85,7 @@ class TryWithHandlerTraverserImplTest extends UnitTestSuite {
       .when(blockWrappingTermTraverser).traverse(term = eqTree(TryExprStatement), context = eqBlockContext(expectedBlockContext))
 
     val actualResult = tryWithHandlerTraverser.traverse(tryWithHandler, TryContext(shouldReturnValue = Yes))
-    actualResult.stat.structure shouldBe traversedTryWithHandler.structure
+    actualResult.structure shouldBe traversedTryWithHandler.structure
   }
   
   test("traverse with a statement expr, shouldReturnValue=Uncertain") {
@@ -106,7 +106,7 @@ class TryWithHandlerTraverserImplTest extends UnitTestSuite {
     doReturn(expectedExprResult)
       .when(blockWrappingTermTraverser).traverse(term = eqTree(TryExprStatement), context = eqBlockContext(expectedExprContext))
 
-    tryWithHandlerTraverser.traverse(tryWithHandler, tryContext).stat.structure shouldBe traversedTryWithHandler.structure
+    tryWithHandlerTraverser.traverse(tryWithHandler, tryContext).structure shouldBe traversedTryWithHandler.structure
   }
 
   test("traverse with a block expr") {
@@ -124,7 +124,7 @@ class TryWithHandlerTraverserImplTest extends UnitTestSuite {
     doReturn(BlockTraversalResult(traversedTryWithHandlerExprBlock))
       .when(blockWrappingTermTraverser).traverse(term = eqTree(Block(List(TryExprStatement))), context = eqBlockContext(BlockContext()))
 
-    tryWithHandlerTraverser.traverse(tryWithHandler).stat.structure shouldBe traversedTryWithHandler.structure
+    tryWithHandlerTraverser.traverse(tryWithHandler).structure shouldBe traversedTryWithHandler.structure
   }
 
   test("traverse with a statement expr and a 'finally' statement") {
@@ -138,13 +138,12 @@ class TryWithHandlerTraverserImplTest extends UnitTestSuite {
       catchp = CatchHandler,
       finallyp = Some(TraversedFinallyBlock)
     )
-    val expectedResult = TryWithHandlerTraversalResult(traversedTryWithHandler)
 
     doReturn(BlockTraversalResult(traversedTryWithHandlerExprBlock))
       .when(blockWrappingTermTraverser).traverse(term = eqTree(TryExprStatement), context = eqBlockContext(BlockContext()))
     doReturn(TraversedFinallyBlock).when(finallyTraverser).traverse(eqTree(FinallyStatement))
 
-    tryWithHandlerTraverser.traverse(tryWithHandler).stat.structure shouldBe traversedTryWithHandler.structure
+    tryWithHandlerTraverser.traverse(tryWithHandler).structure shouldBe traversedTryWithHandler.structure
   }
 
   test("traverse with a statement expr and a 'finally' block") {
@@ -163,6 +162,6 @@ class TryWithHandlerTraverserImplTest extends UnitTestSuite {
       .when(blockWrappingTermTraverser).traverse(term = eqTree(TryExprStatement), context = eqBlockContext(BlockContext()))
     doReturn(TraversedFinallyBlock).when(finallyTraverser).traverse(eqTree(FinallyBlock))
 
-    tryWithHandlerTraverser.traverse(tryWithHandler).stat.structure shouldBe traversedTryWithHandler.structure
+    tryWithHandlerTraverser.traverse(tryWithHandler).structure shouldBe traversedTryWithHandler.structure
   }
 }
