@@ -2,7 +2,6 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.entities.Decision.{No, Uncertain, Yes}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.TermFunctionTraversalResult
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
 
@@ -30,11 +29,11 @@ class AnonymousFunctionTraverserImplTest extends UnitTestSuite {
       }
       """
 
-    val expectedResult = TermFunctionTraversalResult(expectedFunction)
+    val expectedResult = expectedFunction
 
     doReturn(expectedResult).when(termFunctionTraverser).traverse(eqTree(expectedFunction), eqTo(No))
 
-    anonymousFunctionTraverser.traverse(AnonymousFunction(body)).function.structure shouldBe expectedFunction.structure
+    anonymousFunctionTraverser.traverse(AnonymousFunction(body)).structure shouldBe expectedFunction.structure
   }
 
   test("traverse() when body is a block and shouldBodyReturnValue=Yes") {
@@ -52,12 +51,12 @@ class AnonymousFunctionTraverserImplTest extends UnitTestSuite {
       }
       """
 
-    val expectedResult = TermFunctionTraversalResult(expectedFunction)
+    val expectedResult = expectedFunction
 
     doReturn(expectedResult).when(termFunctionTraverser).traverse(eqTree(expectedFunction), shouldBodyReturnValue = eqTo(Yes))
 
     val actualResult = anonymousFunctionTraverser.traverse(AnonymousFunction(body), shouldBodyReturnValue = Yes)
-    actualResult.function.structure shouldBe expectedResult.function.structure
+    actualResult.structure shouldBe expectedResult.structure
   }
 
   test("traverse() when body is a block, shouldBodyReturnValue=Uncertain and output uncertainReturn=true") {
@@ -75,11 +74,11 @@ class AnonymousFunctionTraverserImplTest extends UnitTestSuite {
       }
       """
 
-    val expectedResult = TermFunctionTraversalResult(expectedFunction)
+    val expectedResult = expectedFunction
 
     doReturn(expectedResult).when(termFunctionTraverser).traverse(eqTree(expectedFunction), shouldBodyReturnValue = eqTo(Uncertain))
 
     val actualResult = anonymousFunctionTraverser.traverse(AnonymousFunction(body), shouldBodyReturnValue = Uncertain)
-    actualResult.function.structure shouldBe expectedResult.function.structure
+    actualResult.structure shouldBe expectedResult.structure
   }
 }

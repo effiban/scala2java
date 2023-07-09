@@ -2,14 +2,13 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{BlockContext, StatContext}
 import io.github.effiban.scala2java.core.entities.Decision.{Decision, No}
-import io.github.effiban.scala2java.core.traversers.results.TermFunctionTraversalResult
 import io.github.effiban.scala2java.spi.entities.JavaScope
 
 import scala.meta.Term
 import scala.meta.Term.Block
 
 trait TermFunctionTraverser {
-  def traverse(function: Term.Function, shouldBodyReturnValue: Decision = No): TermFunctionTraversalResult
+  def traverse(function: Term.Function, shouldBodyReturnValue: Decision = No): Term.Function
 }
 
 private[traversers] class TermFunctionTraverserImpl(termParamTraverser: => TermParamTraverser,
@@ -17,7 +16,7 @@ private[traversers] class TermFunctionTraverserImpl(termParamTraverser: => TermP
                                                     defaultTermTraverser: => DefaultTermTraverser) extends TermFunctionTraverser {
 
   // lambda definition
-  override def traverse(function: Term.Function, shouldBodyReturnValue: Decision = No): TermFunctionTraversalResult = {
+  override def traverse(function: Term.Function, shouldBodyReturnValue: Decision = No): Term.Function = {
     val paramContext = StatContext(JavaScope.LambdaSignature)
     val traversedParams = function.params
       .map(param => termParamTraverser.traverse(param, paramContext))
@@ -39,11 +38,11 @@ private[traversers] class TermFunctionTraverserImpl(termParamTraverser: => TermP
                                 traversedParams: List[Term.Param],
                                 blockBody: Block) = {
     val bodyResult = defaultBlockTraverser.traverse(blockBody, context = BlockContext(shouldReturnValue = shouldBodyReturnValue))
-    TermFunctionTraversalResult(Term.Function(traversedParams, bodyResult.block))
+    Term.Function(traversedParams, bodyResult.block)
   }
 
   private def traverseSingleTermBody(traversedParams: List[Term.Param], term: Term) = {
     val traversedTerm = defaultTermTraverser.traverse(term)
-    TermFunctionTraversalResult(Term.Function(traversedParams, traversedTerm))
+    Term.Function(traversedParams, traversedTerm)
   }
 }
