@@ -245,7 +245,7 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
     val termFunction = q"arg => doSomething(arg)"
     val traversedTermFunction = q"traversedArg => doSomethingElse(traversedArg)"
 
-    doReturn(TermFunctionTraversalResult(traversedTermFunction))
+    doReturn(traversedTermFunction)
       .when(termFunctionTraverser).traverse(eqTree(termFunction), eqTo(No))
 
     defaultTermTraverser.traverse(termFunction).structure shouldBe traversedTermFunction.structure
@@ -268,7 +268,7 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
       }
       """
 
-    doReturn(TermFunctionTraversalResult(traversedTermFunction))
+    doReturn(traversedTermFunction)
       .when(partialFunctionTraverser).traverse(eqTree(partialFunction))
 
     defaultTermTraverser.traverse(partialFunction).structure shouldBe traversedTermFunction.structure
@@ -278,7 +278,7 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
     val anonFunction = AnonymousFunction(q"doSomething()")
     val traversedFunction = q"__ => doSomethingElse()"
 
-    doReturn(TermFunctionTraversalResult(traversedFunction))
+    doReturn(traversedFunction)
       .when(anonymousFunctionTraverser).traverse(eqTree(anonFunction), eqTo(No))
 
     defaultTermTraverser.traverse(anonFunction).structure shouldBe traversedFunction.structure

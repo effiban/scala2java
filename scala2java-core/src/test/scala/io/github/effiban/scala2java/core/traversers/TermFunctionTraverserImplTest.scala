@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.contexts.{BlockContext, StatContext}
 import io.github.effiban.scala2java.core.entities.Decision.{No, Uncertain, Yes}
 import io.github.effiban.scala2java.core.matchers.BlockContextMatcher.eqBlockContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.{BlockTraversalResult, TermFunctionTraversalResult, TermParamTraversalResult}
+import io.github.effiban.scala2java.core.traversers.results.{BlockTraversalResult, TermParamTraversalResult}
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.{any, eqTo}
@@ -35,7 +35,7 @@ class TermFunctionTraverserImplTest extends UnitTestSuite {
 
     doReturn(traversedBody).when(defaultTermTraverser).traverse(eqTree(body))
 
-    termFunctionTraverser.traverse(function).function.structure shouldBe traversedFunction.structure
+    termFunctionTraverser.traverse(function).structure shouldBe traversedFunction.structure
   }
 
   test("traverse with one param and one term") {
@@ -51,7 +51,7 @@ class TermFunctionTraverserImplTest extends UnitTestSuite {
     doReturn(TermParamTraversalResult(traversedParam)).when(termParamTraverser).traverse(eqTree(param), eqTo(LambdaStatContext))
     doReturn(traversedBody).when(defaultTermTraverser).traverse(eqTree(body))
 
-    termFunctionTraverser.traverse(function).function.structure shouldBe traversedFunction.structure
+    termFunctionTraverser.traverse(function).structure shouldBe traversedFunction.structure
   }
 
   test("traverse with two params and one term") {
@@ -74,7 +74,7 @@ class TermFunctionTraverserImplTest extends UnitTestSuite {
 
     doReturn(traversedBody).when(defaultTermTraverser).traverse(eqTree(body))
 
-    termFunctionTraverser.traverse(function).function.structure shouldBe traversedFunction.structure
+    termFunctionTraverser.traverse(function).structure shouldBe traversedFunction.structure
   }
 
   test("traverse with one param and a block of one term") {
@@ -96,7 +96,7 @@ class TermFunctionTraverserImplTest extends UnitTestSuite {
     doReturn(TermParamTraversalResult(traversedParam)).when(termParamTraverser).traverse(eqTree(param), eqTo(LambdaStatContext))
     doReturn(traversedBody).when(defaultTermTraverser).traverse(eqTree(bodyAsTerm))
 
-    termFunctionTraverser.traverse(function).function.structure shouldBe traversedFunction.structure  }
+    termFunctionTraverser.traverse(function).structure shouldBe traversedFunction.structure  }
 
   test("traverse with one param and a block of one non-term stat") {
     val param = param"arg: Int"
@@ -117,15 +117,14 @@ class TermFunctionTraverserImplTest extends UnitTestSuite {
 
     val function = Term.Function(List(param), body)
 
-    val blockTraversalResult = BlockTraversalResult(traversedBody)
-    val expectedFunctionTraversalResult = TermFunctionTraversalResult(Term.Function(List(traversedParam), traversedBody))
+    val expectedFunctionTraversalResult = Term.Function(List(traversedParam), traversedBody)
 
     doReturn(TermParamTraversalResult(traversedParam)).when(termParamTraverser).traverse(eqTree(param), eqTo(LambdaStatContext))
     doReturn(BlockTraversalResult(traversedBody))
       .when(defaultBlockTraverser).traverse(eqTree(body), eqBlockContext(BlockContext(shouldReturnValue = No))
     )
 
-    termFunctionTraverser.traverse(function).function.structure shouldBe expectedFunctionTraversalResult.function.structure
+    termFunctionTraverser.traverse(function).structure shouldBe expectedFunctionTraversalResult.structure
   }
 
   test("traverse with one param and a block of two stats") {
@@ -145,14 +144,14 @@ class TermFunctionTraverserImplTest extends UnitTestSuite {
 
     val function = Term.Function(List(param), body)
 
-    val expectedFunctionTraversalResult = TermFunctionTraversalResult(Term.Function(List(traversedParam), traversedBody))
+    val expectedFunctionTraversalResult = Term.Function(List(traversedParam), traversedBody)
 
     doReturn(TermParamTraversalResult(traversedParam)).when(termParamTraverser).traverse(eqTree(param), eqTo(LambdaStatContext))
     doReturn(BlockTraversalResult(traversedBody))
       .when(defaultBlockTraverser).traverse(eqTree(body), eqBlockContext(BlockContext(shouldReturnValue = No))
     )
 
-    termFunctionTraverser.traverse(function).function.structure shouldBe expectedFunctionTraversalResult.function.structure
+    termFunctionTraverser.traverse(function).structure shouldBe expectedFunctionTraversalResult.structure
   }
 
   test("traverse with one param and a block when shouldBodyReturnValue='Yes'") {
@@ -172,7 +171,7 @@ class TermFunctionTraverserImplTest extends UnitTestSuite {
 
     val function = Term.Function(List(param), body)
 
-    val expectedFunctionTraversalResult = TermFunctionTraversalResult(Term.Function(List(traversedParam), traversedBody))
+    val expectedFunctionTraversalResult = Term.Function(List(traversedParam), traversedBody)
 
     doReturn(TermParamTraversalResult(traversedParam)).when(termParamTraverser).traverse(eqTree(param), eqTo(LambdaStatContext))
     doReturn(BlockTraversalResult(traversedBody))
@@ -180,7 +179,7 @@ class TermFunctionTraverserImplTest extends UnitTestSuite {
     )
 
     val actualResult = termFunctionTraverser.traverse(function, shouldBodyReturnValue = Yes)
-    actualResult.function.structure shouldBe expectedFunctionTraversalResult.function.structure
+    actualResult.structure shouldBe expectedFunctionTraversalResult.structure
   }
 
   test("traverse with one param and a block when shouldBodyReturnValue='Uncertain'") {
@@ -201,13 +200,13 @@ class TermFunctionTraverserImplTest extends UnitTestSuite {
     val function = Term.Function(List(param), body)
 
     val blockTraversalResult = BlockTraversalResult(traversedBody)
-    val expectedFunctionTraversalResult = TermFunctionTraversalResult(Term.Function(List(traversedParam), traversedBody))
+    val expectedFunctionTraversalResult = Term.Function(List(traversedParam), traversedBody)
 
     doReturn(TermParamTraversalResult(traversedParam)).when(termParamTraverser).traverse(eqTree(param), eqTo(LambdaStatContext))
     doReturn(blockTraversalResult)
       .when(defaultBlockTraverser).traverse(eqTree(body), eqBlockContext(BlockContext(shouldReturnValue = Uncertain)))
 
     val actualResult = termFunctionTraverser.traverse(function, shouldBodyReturnValue = Uncertain)
-    actualResult.function.structure shouldBe expectedFunctionTraversalResult.function.structure
+    actualResult.structure shouldBe expectedFunctionTraversalResult.structure
   }
 }
