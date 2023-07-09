@@ -252,15 +252,15 @@ class ScalaTreeTraversers(implicit factories: Factories,
     patTraverser,
     expressionTermTraverser,
     declVarTraverser,
-    new CompositeDefnValToDeclVarTransformer,
-    new CompositeDefnValTransformer
+    new CompositeDefnValToDeclVarTransformer
   )
 
   private lazy val defnVarTraverser: DefnVarTraverser = new DefnVarTraverserImpl(
     modListTraverser,
     defnValOrVarTypeTraverser,
     patTraverser,
-    expressionTermTraverser
+    expressionTermTraverser,
+    new CompositeDefnVarTransformer
   )
 
   private lazy val doTraverser: DoTraverser = new DoTraverserImpl(blockWrappingTermTraverser, expressionTermTraverser)
