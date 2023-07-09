@@ -5,15 +5,14 @@ import io.github.effiban.scala2java.core.entities.{JavaModifier, JavaTreeType}
 import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
 import io.github.effiban.scala2java.core.matchers.WithJavaModifiersTraversalResultScalatestMatcher.equalWithJavaModifiersTraversalResult
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.{DeclVarTraversalResult, DefnValTraversalResult, ModListTraversalResult}
+import io.github.effiban.scala2java.core.traversers.results.{DefnValTraversalResult, ModListTraversalResult}
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.spi.entities.JavaScope.JavaScope
-import io.github.effiban.scala2java.spi.transformers.DefnValToDeclVarTransformer
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqSomeTree
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
 
-import scala.meta.{Decl, Defn, Mod, Name, XtensionQuasiquoteCaseOrPattern, XtensionQuasiquoteMod, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
+import scala.meta.{Defn, Mod, Name, XtensionQuasiquoteCaseOrPattern, XtensionQuasiquoteMod, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 class DefnValTraverserImplTest extends UnitTestSuite {
 
@@ -38,49 +37,14 @@ class DefnValTraverserImplTest extends UnitTestSuite {
   private val defnValOrVarTypeTraverser = mock[DefnValOrVarTypeTraverser]
   private val patTraverser = mock[PatTraverser]
   private val expressionTermTraverser = mock[ExpressionTermTraverser]
-  private val declVarTraverser = mock[DeclVarTraverser]
-  private val defnValToDeclVarTransformer = mock[DefnValToDeclVarTransformer]
 
   private val defnValTraverser = new DefnValTraverserImpl(
     modListTraverser,
     defnValOrVarTypeTraverser,
     patTraverser,
-    expressionTermTraverser,
-    declVarTraverser,
-    defnValToDeclVarTransformer
+    expressionTermTraverser
   )
 
-
-  test("traverse() when transformed to a Decl.Var, should traverse with the DeclVarTraverser") {
-    val javaScope = JavaScope.Class
-
-    val defnVal = Defn.Val(
-      mods = TheScalaMods,
-      pats = List(MyValPat),
-      decltpe = Some(TheType),
-      rhs = TheRhs
-    )
-    
-    val declVar = Decl.Var(
-      mods = TheScalaMods,
-      pats = List(MyValPat),
-      decltpe = TheType
-    )
-    val traversedDeclVar = Decl.Var(
-      mods = TheTraversedScalaMods,
-      pats = List(MyTraversedValPat),
-      decltpe = TheTraversedType
-    )
-
-    val context = StatContext(javaScope)
-
-    val expectedResult = DeclVarTraversalResult(traversedDeclVar, TheJavaModifiers)
-
-    when(defnValToDeclVarTransformer.transform(eqTree(defnVal), eqTo(javaScope))).thenReturn(Some(declVar))
-    doReturn(expectedResult).when(declVarTraverser).traverse(eqTree(declVar), eqTo(context))
-
-    defnValTraverser.traverse(defnVal, context) should equalWithJavaModifiersTraversalResult(expectedResult)
-  }
 
   test("traverse() when not transformed, and it is a class member - typed") {
     val javaScope = JavaScope.Class
@@ -99,7 +63,6 @@ class DefnValTraverserImplTest extends UnitTestSuite {
     )
     val expectedResult = DefnValTraversalResult(traversedDefnVal, TheJavaModifiers)
 
-    when(defnValToDeclVarTransformer.transform(eqTree(defnVal), eqTo(javaScope))).thenReturn(None)
     doReturn(TheModListResult).when(modListTraverser).traverse(eqExpectedModifiers(defnVal, javaScope))
     doReturn(Some(TheTraversedType)).when(defnValOrVarTypeTraverser).traverse(eqSomeTree(TheType), eqSomeTree(TheRhs))
     doReturn(MyTraversedValPat).when(patTraverser).traverse(eqTree(MyValPat))
@@ -125,7 +88,6 @@ class DefnValTraverserImplTest extends UnitTestSuite {
     )
     val expectedResult = DefnValTraversalResult(traversedDefnVal, TheJavaModifiers)
 
-    when(defnValToDeclVarTransformer.transform(eqTree(defnVal), eqTo(javaScope))).thenReturn(None)
     doReturn(TheModListResult).when(modListTraverser).traverse(eqExpectedModifiers(defnVal, javaScope))
     doReturn(Some(TheTraversedType)).when(defnValOrVarTypeTraverser).traverse(eqTo(None), eqSomeTree(TheRhs))
     doReturn(MyTraversedValPat).when(patTraverser).traverse(eqTree(MyValPat))
@@ -151,7 +113,6 @@ class DefnValTraverserImplTest extends UnitTestSuite {
     )
     val expectedResult = DefnValTraversalResult(traversedDefnVal, TheJavaModifiers)
 
-    when(defnValToDeclVarTransformer.transform(eqTree(defnVal), eqTo(javaScope))).thenReturn(None)
     doReturn(TheModListResult).when(modListTraverser).traverse(eqExpectedModifiers(defnVal, javaScope))
     doReturn(None).when(defnValOrVarTypeTraverser).traverse(eqTo(None), eqSomeTree(TheRhs))
     doReturn(MyTraversedValPat).when(patTraverser).traverse(eqTree(MyValPat))
@@ -177,7 +138,6 @@ class DefnValTraverserImplTest extends UnitTestSuite {
     )
     val expectedResult = DefnValTraversalResult(traversedDefnVal, TheJavaModifiers)
 
-    when(defnValToDeclVarTransformer.transform(eqTree(defnVal), eqTo(javaScope))).thenReturn(None)
     doReturn(TheModListResult).when(modListTraverser).traverse(eqExpectedModifiers(defnVal, javaScope))
     doReturn(Some(TheTraversedType)).when(defnValOrVarTypeTraverser).traverse(eqSomeTree(TheType), eqSomeTree(TheRhs))
     doReturn(MyTraversedValPat).when(patTraverser).traverse(eqTree(MyValPat))
@@ -203,7 +163,6 @@ class DefnValTraverserImplTest extends UnitTestSuite {
     )
     val expectedResult = DefnValTraversalResult(traversedDefnVal, TheJavaModifiers)
 
-    when(defnValToDeclVarTransformer.transform(eqTree(defnVal), eqTo(javaScope))).thenReturn(None)
     doReturn(TheModListResult).when(modListTraverser).traverse(eqExpectedModifiers(defnVal, javaScope))
     doReturn(Some(TheTraversedType)).when(defnValOrVarTypeTraverser).traverse(eqTo(None), eqSomeTree(TheRhs))
     doReturn(MyTraversedValPat).when(patTraverser).traverse(eqTree(MyValPat))
@@ -229,7 +188,6 @@ class DefnValTraverserImplTest extends UnitTestSuite {
     )
     val expectedResult = DefnValTraversalResult(traversedDefnVal, TheJavaModifiers)
 
-    when(defnValToDeclVarTransformer.transform(eqTree(defnVal), eqTo(javaScope))).thenReturn(None)
     doReturn(TheModListResult).when(modListTraverser).traverse(eqExpectedModifiers(defnVal, javaScope))
     doReturn(None).when(defnValOrVarTypeTraverser).traverse(eqTo(None), eqSomeTree(TheRhs))
     doReturn(MyTraversedValPat).when(patTraverser).traverse(eqTree(MyValPat))

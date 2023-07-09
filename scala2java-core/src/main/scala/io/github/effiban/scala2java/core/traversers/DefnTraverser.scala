@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{ClassOrTraitContext, DefnDefContext, StatContext, ValOrVarRenderContext}
 import io.github.effiban.scala2java.core.renderers.{DeclVarRenderer, DefnValRenderer, DefnVarRenderer}
-import io.github.effiban.scala2java.core.traversers.results.{DeclVarTraversalResult, DefnValTraversalResult}
+import io.github.effiban.scala2java.core.traversers.results.{DeclVarTraversalResult, DefnVarTraversalResult}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Defn
@@ -37,19 +37,20 @@ private[traversers] class DefnTraverserImpl(defnValTraverser: => DefnValTraverse
     case _ => writeComment(s"UNSUPPORTED: $defn")
   }
 
-  private def traverseDefnVal(defnVal: Defn.Val, context: StatContext): Unit  = {
+  private def traverseDefnVal(defnVal: Defn.Val, context: StatContext): Unit = {
     val traversalResult = defnValTraverser.traverse(defnVal, context)
     val renderContext = ValOrVarRenderContext(traversalResult.javaModifiers)
-    traversalResult match {
-      case declVarResult: DeclVarTraversalResult => declVarRenderer.render(declVarResult.tree, renderContext)
-      case defnValResult: DefnValTraversalResult => defnValRenderer.render(defnValResult.tree, renderContext)
-      case unsupportedResult => throw new IllegalStateException(s"Unsupported result tree for Defn.Val traversal: ${unsupportedResult.tree}")
-    }
+    defnValRenderer.render(traversalResult.tree, renderContext)
   }
 
   private def traverseDefnVar(defnVar: Defn.Var, context: StatContext): Unit = {
     val traversalResult = defnVarTraverser.traverse(defnVar, context)
     val renderContext = ValOrVarRenderContext(traversalResult.javaModifiers)
-    defnVarRenderer.render(traversalResult.tree, renderContext)
+    traversalResult match {
+      case declVarResult: DeclVarTraversalResult => declVarRenderer.render(declVarResult.tree, renderContext)
+      case defnVarResult: DefnVarTraversalResult => defnVarRenderer.render(defnVarResult.tree, renderContext)
+      case unsupportedResult => throw new IllegalStateException(s"Unsupported result tree for Defn.Val traversal: ${unsupportedResult.tree}")
+    }
   }
+
 }

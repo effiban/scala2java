@@ -88,17 +88,17 @@ class ExtendedTransformersTest extends UnitTestSuite {
     extensionRegistry.defnVarTransformers shouldBe defnVarTransformers
   }
 
-  test("defnValToDeclVarTransformers") {
-    val defnValToDeclVarTransformer1 = mock[DefnValToDeclVarTransformer]
-    val defnValToDeclVarTransformer2 = mock[DefnValToDeclVarTransformer]
-    val defnValToDeclVarTransformers = List(defnValToDeclVarTransformer1, defnValToDeclVarTransformer2)
+  test("defnVarToDeclVarTransformers") {
+    val defnVarToDeclVarTransformer1 = mock[DefnVarToDeclVarTransformer]
+    val defnVarToDeclVarTransformer2 = mock[DefnVarToDeclVarTransformer]
+    val defnVarToDeclVarTransformers = List(defnVarToDeclVarTransformer1, defnVarToDeclVarTransformer2)
 
-    when(extension1.defnValToDeclVarTransformer()).thenReturn(defnValToDeclVarTransformer1)
-    when(extension2.defnValToDeclVarTransformer()).thenReturn(defnValToDeclVarTransformer2)
+    when(extension1.defnVarToDeclVarTransformer()).thenReturn(defnVarToDeclVarTransformer1)
+    when(extension2.defnVarToDeclVarTransformer()).thenReturn(defnVarToDeclVarTransformer2)
 
     val extensionRegistry = ExtensionRegistry(extensions)
 
-    extensionRegistry.defnValToDeclVarTransformers shouldBe defnValToDeclVarTransformers
+    extensionRegistry.defnVarToDeclVarTransformers shouldBe defnVarToDeclVarTransformers
   }
 
   test("defnDefTransformers") {

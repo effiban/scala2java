@@ -43,7 +43,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
     traitTraverser,
     objectTraverser)
 
-  test("traverse() for Defn.Val when Defn.Val returned") {
+  test("traverse() for Defn.Val") {
 
     val defnVal = q"private val myVal: Int = 3"
     val traversedDefnVal = q"private val myTraversedVal: Int = 33"
@@ -55,25 +55,10 @@ class DefnTraverserImplTest extends UnitTestSuite {
 
     defnTraverser.traverse(defnVal, TheStatContext)
 
-    verify(defnValRenderer).render(eqTree(traversalResult.tree), eqTo(renderContext))
+    verify(defnValRenderer).render(eqTree(traversedDefnVal), eqTo(renderContext))
   }
 
-  test("traverse() for Defn.Val when Decl.Var returned") {
-
-    val defnVal = q"private val myVal: Int = 3"
-    val declVar = q"private var myVar: Int"
-    val javaModifiers = List(JavaModifier.Private)
-    val traversalResult = DeclVarTraversalResult(declVar, javaModifiers)
-    val renderContext = ValOrVarRenderContext(javaModifiers)
-
-    doReturn(traversalResult).when(defnValTraverser).traverse(eqTree(defnVal), eqTo(TheStatContext))
-
-    defnTraverser.traverse(defnVal, TheStatContext)
-
-    verify(declVarRenderer).render(eqTree(traversalResult.tree), eqTo(renderContext))
-  }
-
-  test("traverse() for Defn.Var") {
+  test("traverse() for Defn.Var when Defn.Var returned") {
 
     val defnVar = q"private var myVar: Int = 3"
     val traversedDefnVar = q"private var myTraversedVar: Int = 33"
@@ -85,7 +70,22 @@ class DefnTraverserImplTest extends UnitTestSuite {
 
     defnTraverser.traverse(defnVar, TheStatContext)
 
-    verify(defnVarRenderer).render(eqTree(traversedDefnVar), eqTo(renderContext))
+    verify(defnVarRenderer).render(eqTree(traversalResult.tree), eqTo(renderContext))
+  }
+
+  test("traverse() for Defn.Var when Decl.Var returned") {
+
+    val defnVar = q"private var myVar: Int = 3"
+    val declVar = q"private var myVar: Int"
+    val javaModifiers = List(JavaModifier.Private)
+    val traversalResult = DeclVarTraversalResult(declVar, javaModifiers)
+    val renderContext = ValOrVarRenderContext(javaModifiers)
+
+    doReturn(traversalResult).when(defnVarTraverser).traverse(eqTree(defnVar), eqTo(TheStatContext))
+
+    defnTraverser.traverse(defnVar, TheStatContext)
+
+    verify(declVarRenderer).render(eqTree(traversalResult.tree), eqTo(renderContext))
   }
 
   test("traverse() for Defn.Def") {
