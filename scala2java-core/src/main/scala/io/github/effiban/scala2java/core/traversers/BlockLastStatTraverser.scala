@@ -1,16 +1,15 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{IfContext, TryContext}
-import io.github.effiban.scala2java.core.entities.Decision.{Decision, No, Uncertain, Yes}
+import io.github.effiban.scala2java.core.entities.Decision.{Decision, No, Yes}
 import io.github.effiban.scala2java.core.resolvers.ShouldReturnValueResolver
-import io.github.effiban.scala2java.core.traversers.results.{BlockStatTraversalResult, SimpleBlockStatTraversalResult}
 
 import scala.meta.Term.{If, Return, Try, TryWithHandler}
 import scala.meta.{Stat, Term}
 
 trait BlockLastStatTraverser {
 
-  def traverse(stat: Stat, shouldReturnValue: Decision = No): BlockStatTraversalResult
+  def traverse(stat: Stat, shouldReturnValue: Decision = No): Stat
 }
 
 private[traversers] class BlockLastStatTraverserImpl(blockStatTraverser: => BlockStatTraverser,
@@ -20,13 +19,13 @@ private[traversers] class BlockLastStatTraverserImpl(blockStatTraverser: => Bloc
                                                      shouldReturnValueResolver: => ShouldReturnValueResolver)
   extends BlockLastStatTraverser {
 
-  override def traverse(stat: Stat, shouldReturnValue: Decision = No): BlockStatTraversalResult = {
+  override def traverse(stat: Stat, shouldReturnValue: Decision = No): Stat = {
     stat match {
-      case `if`: If => traverseIf(`if`, shouldReturnValue)
-      case `try`: Try => traverseTry(`try`, shouldReturnValue)
-      case tryWithHandler: TryWithHandler => traverseTryWithHandler(tryWithHandler, shouldReturnValue)
+      case `if`: If => traverseIf(`if`, shouldReturnValue).stat
+      case `try`: Try => traverseTry(`try`, shouldReturnValue).stat
+      case tryWithHandler: TryWithHandler => traverseTryWithHandler(tryWithHandler, shouldReturnValue).stat
       case term: Term => traverseSimpleTerm(term, shouldReturnValue)
-      case aStat => SimpleBlockStatTraversalResult(traverseInner(aStat))
+      case aStat => traverseInner(aStat)
     }
   }
 
@@ -42,12 +41,11 @@ private[traversers] class BlockLastStatTraverserImpl(blockStatTraverser: => Bloc
     tryWithHandlerTraverser.traverse(tryWithHandler, TryContext(shouldReturnValue))
   }
 
-  private def traverseSimpleTerm(term: Term, shouldReturnValue: Decision): SimpleBlockStatTraversalResult = {
+  private def traverseSimpleTerm(term: Term, shouldReturnValue: Decision): Stat = {
     val shouldTermReturnValue = shouldReturnValueResolver.resolve(term, shouldReturnValue)
     shouldTermReturnValue match {
-      case Yes => SimpleBlockStatTraversalResult(traverseInner(Return(term)))
-      case Uncertain => SimpleBlockStatTraversalResult(traverseInner(term), uncertainReturn = true)
-      case No => SimpleBlockStatTraversalResult(traverseInner(term))
+      case Yes => traverseInner(Return(term))
+      case _ => traverseInner(term)
     }
   }
 
