@@ -220,7 +220,7 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
       }
       """
 
-    doReturn(TryTraversalResult(traversedTermTry))
+    doReturn(traversedTermTry)
       .when(tryTraverser).traverse(eqTree(termTry), eqTo(TryContext()))
 
     defaultTermTraverser.traverse(termTry).structure shouldBe traversedTermTry.structure

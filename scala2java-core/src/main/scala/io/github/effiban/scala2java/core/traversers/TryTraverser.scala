@@ -1,12 +1,11 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{BlockContext, CatchHandlerContext, TryContext}
-import io.github.effiban.scala2java.core.traversers.results.TryTraversalResult
 
 import scala.meta.Term
 
 trait TryTraverser {
-  def traverse(`try`: Term.Try, context: TryContext = TryContext()): TryTraversalResult
+  def traverse(`try`: Term.Try, context: TryContext = TryContext()): Term.Try
 }
 
 
@@ -14,7 +13,7 @@ private[traversers] class TryTraverserImpl(blockWrappingTermTraverser: => BlockW
                                            catchHandlerTraverser: => CatchHandlerTraverser,
                                            finallyTraverser: => FinallyTraverser) extends TryTraverser {
 
-  override def traverse(`try`: Term.Try, context: TryContext = TryContext()): TryTraversalResult = {
+  override def traverse(`try`: Term.Try, context: TryContext = TryContext()): Term.Try = {
     import `try`._
 
     val exprResult = blockWrappingTermTraverser.traverse(expr, BlockContext(shouldReturnValue = context.shouldReturnValue))
@@ -28,12 +27,10 @@ private[traversers] class TryTraverserImpl(blockWrappingTermTraverser: => BlockW
 
     val maybeTraversedFinally = finallyp.map(finallyTraverser.traverse)
 
-    val traversedTry = Term.Try(
+    Term.Try(
       expr = exprResult.block,
       catchp = traversedCatchCases,
       finallyp = maybeTraversedFinally
     )
-
-    TryTraversalResult(traversedTry)
   }
 }
