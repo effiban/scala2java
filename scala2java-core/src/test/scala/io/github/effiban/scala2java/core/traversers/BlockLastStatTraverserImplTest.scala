@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.contexts.{IfContext, TryContext}
 import io.github.effiban.scala2java.core.entities.Decision.{No, Uncertain, Yes}
 import io.github.effiban.scala2java.core.resolvers.ShouldReturnValueResolver
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.{TryTraversalResult, TryWithHandlerTraversalResult}
+import io.github.effiban.scala2java.core.traversers.results.TryWithHandlerTraversalResult
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
 
@@ -81,7 +81,7 @@ class BlockLastStatTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for a 'Term.Try' when shouldReturnValue=No") {
-    val expectedTraversalResult = TryTraversalResult(TheTraversedTry)
+    val expectedTraversalResult = TheTraversedTry
 
     doReturn(expectedTraversalResult).when(tryTraverser).traverse(eqTree(TheTry), eqTo(TryContext()))
 
@@ -89,7 +89,7 @@ class BlockLastStatTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for a 'Term.Try' when shouldReturnValue=Yes") {
-    val expectedTraversalResult = TryTraversalResult(TheTraversedTry)
+    val expectedTraversalResult = TheTraversedTry
 
     doReturn(expectedTraversalResult).when(tryTraverser).traverse(eqTree(TheTry), eqTo(TryContext(shouldReturnValue = Yes)))
 
@@ -97,7 +97,7 @@ class BlockLastStatTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for a 'Term.Try' when shouldReturnValue=Uncertain and catch result has uncertainReturn=true") {
-    val expectedTraversalResult = TryTraversalResult(TheTraversedTry)
+    val expectedTraversalResult = TheTraversedTry
 
     doReturn(expectedTraversalResult).when(tryTraverser).traverse(eqTree(TheTry), eqTo(TryContext(shouldReturnValue = Uncertain)))
 

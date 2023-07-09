@@ -22,7 +22,7 @@ private[traversers] class BlockLastStatTraverserImpl(blockStatTraverser: => Bloc
   override def traverse(stat: Stat, shouldReturnValue: Decision = No): Stat = {
     stat match {
       case `if`: If => traverseIf(`if`, shouldReturnValue)
-      case `try`: Try => traverseTry(`try`, shouldReturnValue).stat
+      case `try`: Try => traverseTry(`try`, shouldReturnValue)
       case tryWithHandler: TryWithHandler => traverseTryWithHandler(tryWithHandler, shouldReturnValue).stat
       case term: Term => traverseSimpleTerm(term, shouldReturnValue)
       case aStat => traverseInner(aStat)
