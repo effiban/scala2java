@@ -177,7 +177,7 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
       }
       """
 
-    doReturn(IfTraversalResult(traversedIf)).when(defaultIfTraverser).traverse(eqTree(`if`), eqTo(IfContext()))
+    doReturn(traversedIf).when(defaultIfTraverser).traverse(eqTree(`if`), eqTo(IfContext()))
 
     defaultTermTraverser.traverse(`if`).structure shouldBe traversedIf.structure
   }

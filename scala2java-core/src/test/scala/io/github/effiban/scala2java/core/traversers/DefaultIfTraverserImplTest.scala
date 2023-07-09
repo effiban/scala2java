@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.contexts.{BlockContext, IfContext}
 import io.github.effiban.scala2java.core.entities.Decision.{Uncertain, Yes}
 import io.github.effiban.scala2java.core.matchers.BlockContextMatcher.eqBlockContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.{BlockTraversalResult, IfTraversalResult}
+import io.github.effiban.scala2java.core.traversers.results.BlockTraversalResult
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.any
 
@@ -71,7 +71,7 @@ class DefaultIfTraverserImplTest extends UnitTestSuite {
     doReturn(BlockTraversalResult(TraversedThenBlock))
       .when(blockWrappingTermTraverser).traverse(term = eqTree(ThenBlock), context = eqBlockContext(BlockContext()))
 
-    ifTraverser.traverse(`if`).stat.structure shouldBe traversedIf.structure
+    ifTraverser.traverse(`if`).structure shouldBe traversedIf.structure
   }
 
   test("traverse() when 'then' is a block, no 'else', and shouldReturnValue=Yes") {
@@ -95,7 +95,7 @@ class DefaultIfTraverserImplTest extends UnitTestSuite {
     )
 
     val result = ifTraverser.traverse(`if`, context = IfContext(shouldReturnValue = Yes))
-    result.stat.structure shouldBe traversedIf.structure
+    result.structure shouldBe traversedIf.structure
   }
 
   test("traverse() when 'then' is a block, no 'else', shouldReturnValue=Uncertain") {
@@ -119,7 +119,7 @@ class DefaultIfTraverserImplTest extends UnitTestSuite {
     )
 
     val result = ifTraverser.traverse(`if`, context = IfContext(shouldReturnValue = Uncertain))
-    result.stat.structure shouldBe traversedIf.structure
+    result.structure shouldBe traversedIf.structure
   }
 
   test("traverse() when 'then' is a non-block term, no 'else', and shouldReturnValue=No") {
@@ -139,7 +139,7 @@ class DefaultIfTraverserImplTest extends UnitTestSuite {
     doReturn(BlockTraversalResult(TraversedThenBlock))
       .when(blockWrappingTermTraverser).traverse(term = eqTree(ThenTerm), context = eqBlockContext(BlockContext()))
 
-    ifTraverser.traverse(`if`).stat.structure shouldBe traversedIf.structure
+    ifTraverser.traverse(`if`).structure shouldBe traversedIf.structure
   }
 
   test("traverse() when 'else' is a block, and shouldReturnValue=No") {
@@ -164,7 +164,7 @@ class DefaultIfTraverserImplTest extends UnitTestSuite {
       term = any[Term], context = eqBlockContext(BlockContext())
     )
 
-    ifTraverser.traverse(`if`).stat.structure shouldBe traversedIf.structure
+    ifTraverser.traverse(`if`).structure shouldBe traversedIf.structure
   }
 
   test("traverse() when 'else' is a block, and shouldReturnValue=Yes") {
@@ -190,7 +190,7 @@ class DefaultIfTraverserImplTest extends UnitTestSuite {
     )
 
     val result = ifTraverser.traverse(`if`, context = IfContext(shouldReturnValue = Yes))
-    result.stat.structure shouldBe traversedIf.structure
+    result.structure shouldBe traversedIf.structure
   }
 
   test("traverse() when 'else' is a block, shouldReturnValue=Uncertain") {
@@ -205,7 +205,6 @@ class DefaultIfTraverserImplTest extends UnitTestSuite {
       thenp = TraversedThenBlock,
       elsep = TraversedElseBlock
     )
-    val expectedResult = IfTraversalResult(traversedIf)
 
     doReturn(TraversedCondition).when(expressionTermTraverser).traverse(eqTree(Condition))
     doAnswer((term: Term, _: BlockContext) => term match {
@@ -218,7 +217,7 @@ class DefaultIfTraverserImplTest extends UnitTestSuite {
 
 
     val actualResult = ifTraverser.traverse(`if`, context = IfContext(shouldReturnValue = Uncertain))
-    actualResult.stat.structure shouldBe expectedResult.stat.structure
+    actualResult.structure shouldBe traversedIf.structure
   }
 
   test("traverse() when 'else' is a non-block term, and shouldReturnValue=No") {
@@ -243,6 +242,6 @@ class DefaultIfTraverserImplTest extends UnitTestSuite {
       term = any[Term], context = eqBlockContext(BlockContext())
     )
 
-    ifTraverser.traverse(`if`).stat.structure shouldBe traversedIf.structure
+    ifTraverser.traverse(`if`).structure shouldBe traversedIf.structure
   }
 }
