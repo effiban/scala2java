@@ -9,6 +9,6 @@ private[traversers] class FinallyTraverserImpl(blockWrappingTermTraverser: => Bl
 
   // TODO support return value flag
   override def traverse(finallyp: Term): Block = {
-    blockWrappingTermTraverser.traverse(finallyp).block
+    blockWrappingTermTraverser.traverse(finallyp)
   }
 }

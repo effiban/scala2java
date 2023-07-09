@@ -4,7 +4,6 @@ import io.github.effiban.scala2java.core.contexts.{BlockContext, TryContext}
 import io.github.effiban.scala2java.core.entities.Decision.{Uncertain, Yes}
 import io.github.effiban.scala2java.core.matchers.BlockContextMatcher.eqBlockContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.BlockTraversalResult
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.Term.{Block, TryWithHandler}
@@ -62,7 +61,7 @@ class TryWithHandlerTraverserImplTest extends UnitTestSuite {
       finallyp = None
     )
 
-    doReturn(BlockTraversalResult(traversedTryWithHandlerExprBlock))
+    doReturn(traversedTryWithHandlerExprBlock)
       .when(blockWrappingTermTraverser).traverse(term = eqTree(TryExprStatement), context = eqBlockContext(BlockContext()))
 
     tryWithHandlerTraverser.traverse(tryWithHandler).structure shouldBe traversedTryWithHandler.structure
@@ -81,7 +80,7 @@ class TryWithHandlerTraverserImplTest extends UnitTestSuite {
     )
     val expectedBlockContext = BlockContext(shouldReturnValue = Yes)
 
-    doReturn(BlockTraversalResult(traversedTryWithHandlerExprBlock))
+    doReturn(traversedTryWithHandlerExprBlock)
       .when(blockWrappingTermTraverser).traverse(term = eqTree(TryExprStatement), context = eqBlockContext(expectedBlockContext))
 
     val actualResult = tryWithHandlerTraverser.traverse(tryWithHandler, TryContext(shouldReturnValue = Yes))
@@ -101,7 +100,7 @@ class TryWithHandlerTraverserImplTest extends UnitTestSuite {
     )
     val tryContext = TryContext(shouldReturnValue = Uncertain)
     val expectedExprContext = BlockContext(shouldReturnValue = Uncertain)
-    val expectedExprResult = BlockTraversalResult(traversedTryWithHandlerExprBlock)
+    val expectedExprResult = traversedTryWithHandlerExprBlock
 
     doReturn(expectedExprResult)
       .when(blockWrappingTermTraverser).traverse(term = eqTree(TryExprStatement), context = eqBlockContext(expectedExprContext))
@@ -121,7 +120,7 @@ class TryWithHandlerTraverserImplTest extends UnitTestSuite {
       finallyp = None
     )
 
-    doReturn(BlockTraversalResult(traversedTryWithHandlerExprBlock))
+    doReturn(traversedTryWithHandlerExprBlock)
       .when(blockWrappingTermTraverser).traverse(term = eqTree(Block(List(TryExprStatement))), context = eqBlockContext(BlockContext()))
 
     tryWithHandlerTraverser.traverse(tryWithHandler).structure shouldBe traversedTryWithHandler.structure
@@ -139,7 +138,7 @@ class TryWithHandlerTraverserImplTest extends UnitTestSuite {
       finallyp = Some(TraversedFinallyBlock)
     )
 
-    doReturn(BlockTraversalResult(traversedTryWithHandlerExprBlock))
+    doReturn(traversedTryWithHandlerExprBlock)
       .when(blockWrappingTermTraverser).traverse(term = eqTree(TryExprStatement), context = eqBlockContext(BlockContext()))
     doReturn(TraversedFinallyBlock).when(finallyTraverser).traverse(eqTree(FinallyStatement))
 
@@ -158,7 +157,7 @@ class TryWithHandlerTraverserImplTest extends UnitTestSuite {
       finallyp = Some(TraversedFinallyBlock)
     )
 
-    doReturn(BlockTraversalResult(traversedTryWithHandlerExprBlock))
+    doReturn(traversedTryWithHandlerExprBlock)
       .when(blockWrappingTermTraverser).traverse(term = eqTree(TryExprStatement), context = eqBlockContext(BlockContext()))
     doReturn(TraversedFinallyBlock).when(finallyTraverser).traverse(eqTree(FinallyBlock))
 

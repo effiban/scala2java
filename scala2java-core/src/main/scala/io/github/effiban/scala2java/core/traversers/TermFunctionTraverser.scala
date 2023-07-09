@@ -37,8 +37,8 @@ private[traversers] class TermFunctionTraverserImpl(termParamTraverser: => TermP
   private def traverseBlockBody(shouldBodyReturnValue: Decision,
                                 traversedParams: List[Term.Param],
                                 blockBody: Block) = {
-    val bodyResult = defaultBlockTraverser.traverse(blockBody, context = BlockContext(shouldReturnValue = shouldBodyReturnValue))
-    Term.Function(traversedParams, bodyResult.block)
+    val traversedBody = defaultBlockTraverser.traverse(blockBody, context = BlockContext(shouldReturnValue = shouldBodyReturnValue))
+    Term.Function(traversedParams, traversedBody)
   }
 
   private def traverseSingleTermBody(traversedParams: List[Term.Param], term: Term) = {

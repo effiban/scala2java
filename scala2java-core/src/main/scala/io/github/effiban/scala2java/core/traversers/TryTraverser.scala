@@ -16,7 +16,7 @@ private[traversers] class TryTraverserImpl(blockWrappingTermTraverser: => BlockW
   override def traverse(`try`: Term.Try, context: TryContext = TryContext()): Term.Try = {
     import `try`._
 
-    val exprResult = blockWrappingTermTraverser.traverse(expr, BlockContext(shouldReturnValue = context.shouldReturnValue))
+    val traversedExpr = blockWrappingTermTraverser.traverse(expr, BlockContext(shouldReturnValue = context.shouldReturnValue))
 
     val traversedCatchCases = catchp.map(`case` =>
       catchHandlerTraverser.traverse(
@@ -28,7 +28,7 @@ private[traversers] class TryTraverserImpl(blockWrappingTermTraverser: => BlockW
     val maybeTraversedFinally = finallyp.map(finallyTraverser.traverse)
 
     Term.Try(
-      expr = exprResult.block,
+      expr = traversedExpr,
       catchp = traversedCatchCases,
       finallyp = maybeTraversedFinally
     )

@@ -8,7 +8,7 @@ private[traversers] class DoTraverserImpl(blockWrappingTermTraverser: => BlockWr
                                           expressionTermTraverser: => ExpressionTermTraverser) extends DoTraverser {
 
   override def traverse(`do`: Do): Do = {
-    val traversedBody = blockWrappingTermTraverser.traverse(`do`.body).block
+    val traversedBody = blockWrappingTermTraverser.traverse(`do`.body)
     val traversedExpr = expressionTermTraverser.traverse(`do`.expr)
     Do(traversedBody, traversedExpr)
   }

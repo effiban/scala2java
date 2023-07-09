@@ -4,7 +4,6 @@ import io.github.effiban.scala2java.core.contexts.BlockContext
 import io.github.effiban.scala2java.core.entities.Decision.Yes
 import io.github.effiban.scala2java.core.matchers.BlockContextMatcher.eqBlockContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.BlockTraversalResult
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.XtensionQuasiquoteTerm
@@ -32,11 +31,11 @@ class BlockWrappingTermTraverserImplTest extends UnitTestSuite {
       }
       """
 
-    val expectedResult = BlockTraversalResult(traversedBlock)
+    val expectedResult = traversedBlock
 
     doReturn(expectedResult).when(defaultBlockTraverser).traverse(eqTree(block), eqBlockContext(BlockContext()))
 
-    blockWrappingTermTraverser.traverse(block).block.structure shouldBe traversedBlock.structure
+    blockWrappingTermTraverser.traverse(block).structure shouldBe traversedBlock.structure
   }
 
   test("traverse for a Block with shouldReturnValue = Yes") {
@@ -58,11 +57,11 @@ class BlockWrappingTermTraverserImplTest extends UnitTestSuite {
 
     val context = BlockContext(shouldReturnValue = Yes)
 
-    val expectedResult = BlockTraversalResult(traversedBlock)
+    val expectedResult = traversedBlock
 
     doReturn(expectedResult).when(defaultBlockTraverser).traverse(eqTree(block), eqBlockContext(context))
 
-    blockWrappingTermTraverser.traverse(block, context).block.structure shouldBe traversedBlock.structure
+    blockWrappingTermTraverser.traverse(block, context).structure shouldBe traversedBlock.structure
   }
 
   test("traverse for a Term.Name with shouldReturnValue = No") {
@@ -82,11 +81,11 @@ class BlockWrappingTermTraverserImplTest extends UnitTestSuite {
       }
       """
 
-    val expectedResult = BlockTraversalResult(traversedBlock)
+    val expectedResult = traversedBlock
 
     doReturn(expectedResult).when(defaultBlockTraverser).traverse(eqTree(block), eqBlockContext(BlockContext()))
 
-    blockWrappingTermTraverser.traverse(term).block.structure shouldBe traversedBlock.structure
+    blockWrappingTermTraverser.traverse(term).structure shouldBe traversedBlock.structure
   }
 
   test("traverse for a Term.Name with shouldReturnValue = Yes") {
@@ -108,10 +107,10 @@ class BlockWrappingTermTraverserImplTest extends UnitTestSuite {
 
     val context = BlockContext(shouldReturnValue = Yes)
 
-    val expectedResult = BlockTraversalResult(traversedBlock)
+    val expectedResult = traversedBlock
 
     doReturn(expectedResult).when(defaultBlockTraverser).traverse(eqTree(block), eqBlockContext(context))
 
-    blockWrappingTermTraverser.traverse(term, context).block.structure shouldBe traversedBlock.structure
+    blockWrappingTermTraverser.traverse(term, context).structure shouldBe traversedBlock.structure
   }
 }

@@ -4,7 +4,6 @@ import io.github.effiban.scala2java.core.contexts.{BlockContext, IfContext}
 import io.github.effiban.scala2java.core.entities.Decision.{Uncertain, Yes}
 import io.github.effiban.scala2java.core.matchers.BlockContextMatcher.eqBlockContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.BlockTraversalResult
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.any
 
@@ -68,7 +67,7 @@ class DefaultIfTraverserImplTest extends UnitTestSuite {
     )
 
     doReturn(TraversedCondition).when(expressionTermTraverser).traverse(eqTree(Condition))
-    doReturn(BlockTraversalResult(TraversedThenBlock))
+    doReturn(TraversedThenBlock)
       .when(blockWrappingTermTraverser).traverse(term = eqTree(ThenBlock), context = eqBlockContext(BlockContext()))
 
     ifTraverser.traverse(`if`).structure shouldBe traversedIf.structure
@@ -89,7 +88,7 @@ class DefaultIfTraverserImplTest extends UnitTestSuite {
 
 
     doReturn(TraversedCondition).when(expressionTermTraverser).traverse(eqTree(Condition))
-    doReturn(BlockTraversalResult(TraversedThenBlock)).when(blockWrappingTermTraverser).traverse(
+    doReturn(TraversedThenBlock).when(blockWrappingTermTraverser).traverse(
       term = eqTree(ThenBlock),
       context = eqBlockContext(BlockContext(shouldReturnValue = Yes))
     )
@@ -113,7 +112,7 @@ class DefaultIfTraverserImplTest extends UnitTestSuite {
 
 
     doReturn(TraversedCondition).when(expressionTermTraverser).traverse(eqTree(Condition))
-    doReturn(BlockTraversalResult(TraversedThenBlock)).when(blockWrappingTermTraverser).traverse(
+    doReturn(TraversedThenBlock).when(blockWrappingTermTraverser).traverse(
       term = eqTree(ThenBlock),
       context = eqBlockContext(BlockContext(shouldReturnValue = Uncertain))
     )
@@ -136,7 +135,7 @@ class DefaultIfTraverserImplTest extends UnitTestSuite {
     )
 
     doReturn(TraversedCondition).when(expressionTermTraverser).traverse(eqTree(Condition))
-    doReturn(BlockTraversalResult(TraversedThenBlock))
+    doReturn(TraversedThenBlock)
       .when(blockWrappingTermTraverser).traverse(term = eqTree(ThenTerm), context = eqBlockContext(BlockContext()))
 
     ifTraverser.traverse(`if`).structure shouldBe traversedIf.structure
@@ -157,9 +156,9 @@ class DefaultIfTraverserImplTest extends UnitTestSuite {
 
     doReturn(TraversedCondition).when(expressionTermTraverser).traverse(eqTree(Condition))
     doAnswer((term: Term, _: BlockContext) => term match {
-      case aTerm if aTerm.structure == ThenTerm.structure => BlockTraversalResult(TraversedThenBlock)
-      case aTerm if aTerm.structure == ElseBlock.structure => BlockTraversalResult(TraversedElseBlock)
-      case _ => BlockTraversalResult(Block(List(Lit.Unit())))
+      case aTerm if aTerm.structure == ThenTerm.structure => TraversedThenBlock
+      case aTerm if aTerm.structure == ElseBlock.structure => TraversedElseBlock
+      case _ => Block(List(Lit.Unit()))
     }).when(blockWrappingTermTraverser).traverse(
       term = any[Term], context = eqBlockContext(BlockContext())
     )
@@ -182,9 +181,9 @@ class DefaultIfTraverserImplTest extends UnitTestSuite {
 
     doReturn(TraversedCondition).when(expressionTermTraverser).traverse(eqTree(Condition))
     doAnswer((term: Term, _: BlockContext) => term match {
-      case aTerm if aTerm.structure == ThenTerm.structure => BlockTraversalResult(TraversedThenBlock)
-      case aTerm if aTerm.structure == ElseBlock.structure => BlockTraversalResult(TraversedElseBlock)
-      case _ => BlockTraversalResult(Block(List(Lit.Unit())))
+      case aTerm if aTerm.structure == ThenTerm.structure => TraversedThenBlock
+      case aTerm if aTerm.structure == ElseBlock.structure => TraversedElseBlock
+      case _ => Block(List(Lit.Unit()))
     }).when(blockWrappingTermTraverser).traverse(
       term = any[Term], context = eqBlockContext(BlockContext(shouldReturnValue = Yes))
     )
@@ -208,9 +207,9 @@ class DefaultIfTraverserImplTest extends UnitTestSuite {
 
     doReturn(TraversedCondition).when(expressionTermTraverser).traverse(eqTree(Condition))
     doAnswer((term: Term, _: BlockContext) => term match {
-      case aTerm if aTerm.structure == ThenTerm.structure => BlockTraversalResult(TraversedThenBlock)
-      case aTerm if aTerm.structure == ElseBlock.structure => BlockTraversalResult(TraversedElseBlock)
-      case _ => BlockTraversalResult(Block(Nil))
+      case aTerm if aTerm.structure == ThenTerm.structure => TraversedThenBlock
+      case aTerm if aTerm.structure == ElseBlock.structure => TraversedElseBlock
+      case _ => Block(Nil)
     }).when(blockWrappingTermTraverser).traverse(
       term = any[Term], context = eqBlockContext(BlockContext(shouldReturnValue = Uncertain))
     )
@@ -235,9 +234,9 @@ class DefaultIfTraverserImplTest extends UnitTestSuite {
 
     doReturn(TraversedCondition).when(expressionTermTraverser).traverse(eqTree(Condition))
     doAnswer((term: Term, _: BlockContext) => term match {
-      case aTerm if aTerm.structure == ThenTerm.structure => BlockTraversalResult(TraversedThenBlock)
-      case aTerm if aTerm.structure == ElseTerm.structure => BlockTraversalResult(TraversedElseBlock)
-      case _ => BlockTraversalResult(Block(List(Lit.Unit())))
+      case aTerm if aTerm.structure == ThenTerm.structure => TraversedThenBlock
+      case aTerm if aTerm.structure == ElseTerm.structure => TraversedElseBlock
+      case _ => Block(List(Lit.Unit()))
     }).when(blockWrappingTermTraverser).traverse(
       term = any[Term], context = eqBlockContext(BlockContext())
     )
