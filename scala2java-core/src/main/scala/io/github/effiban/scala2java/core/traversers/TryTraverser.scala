@@ -19,7 +19,7 @@ private[traversers] class TryTraverserImpl(blockWrappingTermTraverser: => BlockW
 
     val exprResult = blockWrappingTermTraverser.traverse(expr, BlockContext(shouldReturnValue = context.shouldReturnValue))
 
-    val catchHandlerResults = catchp.map(`case` =>
+    val traversedCatchCases = catchp.map(`case` =>
       catchHandlerTraverser.traverse(
         catchCase = `case`,
         context = CatchHandlerContext(shouldReturnValue = context.shouldReturnValue)
@@ -30,7 +30,7 @@ private[traversers] class TryTraverserImpl(blockWrappingTermTraverser: => BlockW
 
     val traversedTry = Term.Try(
       expr = exprResult.block,
-      catchp = catchHandlerResults.map(_.catchp),
+      catchp = traversedCatchCases,
       finallyp = maybeTraversedFinally
     )
 
