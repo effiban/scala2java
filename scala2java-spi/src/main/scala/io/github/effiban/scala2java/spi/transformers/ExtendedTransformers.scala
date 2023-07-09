@@ -56,12 +56,12 @@ trait ExtendedTransformers {
    */
   def templateTermApplyToDefnTransformer(): TemplateTermApplyToDefnTransformer = TemplateTermApplyToDefnTransformer.Empty
 
-  /** Override this method if you need to transform a [[scala.meta.Defn.Val]] (`val`, immutable variable definition).<br>
+  /** Override this method if you need to transform a [[scala.meta.Defn.Var]] (variable definition).<br>
    *
-   * @return if overriden - a transformer which transforms a [[scala.meta.Defn.Val]]<br>
+   * @return if overriden - a transformer which transforms a [[scala.meta.Defn.Var]]<br>
    *         otherwise - the default transformer which doesn't modify anything<br>
    */
-  def defnValTransformer(): DefnValTransformer = DefnValTransformer.Identity
+  def defnVarTransformer(): DefnVarTransformer = DefnVarTransformer.Identity
 
   /** Override this method if you need to transform a [[scala.meta.Defn.Val]] (`val` definition) into a
    * [[scala.meta.Decl.Var]] (`var` declaration).<br>

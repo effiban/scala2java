@@ -3,6 +3,7 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.{ModifiersContext, StatContext}
 import io.github.effiban.scala2java.core.entities.JavaTreeType
 import io.github.effiban.scala2java.core.traversers.results.DefnVarTraversalResult
+import io.github.effiban.scala2java.spi.transformers.DefnVarTransformer
 
 import scala.meta.Defn
 
@@ -13,15 +14,17 @@ trait DefnVarTraverser {
 private[traversers] class DefnVarTraverserImpl(modListTraverser: => ModListTraverser,
                                                defnValOrVarTypeTraverser: => DefnValOrVarTypeTraverser,
                                                patTraverser: => PatTraverser,
-                                               expressionTermTraverser: => ExpressionTermTraverser) extends DefnVarTraverser {
+                                               expressionTermTraverser: => ExpressionTermTraverser,
+                                               defnVarTransformer: DefnVarTransformer) extends DefnVarTraverser {
 
   //TODO replace mutable interface data member (invalid in Java) with accessor/mutator methods
   override def traverse(defnVar: Defn.Var, context: StatContext = StatContext()): DefnVarTraversalResult = {
-    val modListResult = modListTraverser.traverse(ModifiersContext(defnVar, JavaTreeType.Variable, context.javaScope))
+    val transformedDefnVar = defnVarTransformer.transform(defnVar, context.javaScope)
+    val modListResult = modListTraverser.traverse(ModifiersContext(transformedDefnVar, JavaTreeType.Variable, context.javaScope))
     //TODO - verify when not simple case
-    val traversedPats = defnVar.pats.map(patTraverser.traverse)
-    val maybeTraversedType = defnValOrVarTypeTraverser.traverse(defnVar.decltpe, defnVar.rhs)
-    val maybeTraversedRhs = defnVar.rhs.map(expressionTermTraverser.traverse)
+    val traversedPats = transformedDefnVar.pats.map(patTraverser.traverse)
+    val maybeTraversedType = defnValOrVarTypeTraverser.traverse(transformedDefnVar.decltpe, transformedDefnVar.rhs)
+    val maybeTraversedRhs = transformedDefnVar.rhs.map(expressionTermTraverser.traverse)
 
     val traversedDefnVar = Defn.Var(
       mods = modListResult.scalaMods,
