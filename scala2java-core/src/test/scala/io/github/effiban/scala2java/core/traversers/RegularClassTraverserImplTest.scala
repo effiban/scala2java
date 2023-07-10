@@ -13,7 +13,7 @@ import io.github.effiban.scala2java.core.renderers.{ModListRenderer, TypeParamLi
 import io.github.effiban.scala2java.core.resolvers.{JavaChildScopeResolver, JavaTreeTypeResolver}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.transformers.ParamToDeclValTransformer
+import io.github.effiban.scala2java.core.transformers.ParamToDeclVarTransformer
 import io.github.effiban.scala2java.core.traversers.results.ModListTraversalResult
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
@@ -55,10 +55,10 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
   private val CtorArg3 = termParam(Arg3Name, IntTypeName)
   private val CtorArg4 = termParam(Arg4Name, IntTypeName)
 
-  private val ExpectedMemberDecl1 = declVal(Arg1Name, IntTypeName)
-  private val ExpectedMemberDecl2 = declVal(Arg2Name, IntTypeName)
-  private val ExpectedMemberDecl3 = declVal(Arg3Name, IntTypeName)
-  private val ExpectedMemberDecl4 = declVal(Arg4Name, IntTypeName)
+  private val ExpectedMemberDecl1 = declVar(Arg1Name, IntTypeName)
+  private val ExpectedMemberDecl2 = declVar(Arg2Name, IntTypeName)
+  private val ExpectedMemberDecl3 = declVar(Arg3Name, IntTypeName)
+  private val ExpectedMemberDecl4 = declVar(Arg4Name, IntTypeName)
 
   private val InitialTemplate =
     Template(
@@ -83,7 +83,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
   private val typeParamTraverser = mock[TypeParamTraverser]
   private val typeParamListRenderer = mock[TypeParamListRenderer]
   private val templateTraverser = mock[TemplateTraverser]
-  private val paramToDeclValTransformer = mock[ParamToDeclValTransformer]
+  private val paramToDeclVarTransformer = mock[ParamToDeclVarTransformer]
   private val javaTreeTypeResolver = mock[JavaTreeTypeResolver]
   private val javaChildScopeResolver = mock[JavaChildScopeResolver]
 
@@ -94,7 +94,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
     typeParamTraverser,
     typeParamListRenderer,
     templateTraverser,
-    paramToDeclValTransformer,
+    paramToDeclVarTransformer,
     javaTreeTypeResolver,
     javaChildScopeResolver
   )
@@ -136,7 +136,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
     doWrite("<T11, T22>").when(typeParamListRenderer).render(eqTreeList(TraversedTypeParams))
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Class)))).thenReturn(JavaScope.Class)
 
-    when(paramToDeclValTransformer.transform(any[Term.Param])).thenAnswer( (ctorArg: Term.Param) => ctorArg match {
+    when(paramToDeclVarTransformer.transform(any[Term.Param])).thenAnswer( (ctorArg: Term.Param) => ctorArg match {
       case arg1 if arg1.structure == CtorArg1.structure => ExpectedMemberDecl1
       case arg2 if arg2.structure == CtorArg2.structure => ExpectedMemberDecl2
     })
@@ -201,7 +201,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
     doWrite("<T11, T22>").when(typeParamListRenderer).render(eqTreeList(TraversedTypeParams))
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, JavaTreeType.Class)))).thenReturn(JavaScope.Class)
 
-    when(paramToDeclValTransformer.transform(any[Term.Param])).thenAnswer((ctorArg: Term.Param) => ctorArg match {
+    when(paramToDeclVarTransformer.transform(any[Term.Param])).thenAnswer((ctorArg: Term.Param) => ctorArg match {
       case arg1 if arg1.structure == CtorArg1.structure => ExpectedMemberDecl1
       case arg2 if arg2.structure == CtorArg2.structure => ExpectedMemberDecl2
     })
@@ -280,7 +280,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
     }).when(typeParamTraverser).traverse(any[Type.Param])
     doWrite("<T11, T22>").when(typeParamListRenderer).render(eqTreeList(TraversedTypeParams))
 
-    when(paramToDeclValTransformer.transform(any[Term.Param])).thenAnswer( (ctorArg: Term.Param) => ctorArg match {
+    when(paramToDeclVarTransformer.transform(any[Term.Param])).thenAnswer( (ctorArg: Term.Param) => ctorArg match {
       case arg if arg.structure == CtorArg1.structure => ExpectedMemberDecl1
       case arg if arg.structure == CtorArg2.structure => ExpectedMemberDecl2
       case arg if arg.structure == CtorArg3.structure => ExpectedMemberDecl3
@@ -317,8 +317,8 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
     )
   }
 
-  private def declVal(name: String, typeName: String) = {
-    Decl.Val(
+  private def declVar(name: String, typeName: String) = {
+    Decl.Var(
       mods = List(Private(within = Name.Anonymous()), Final()),
       pats = List(Pat.Var(Term.Name(name))),
       decltpe = Type.Name(typeName)

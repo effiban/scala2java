@@ -371,7 +371,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
     typeParamTraverser,
     typeParamListRenderer,
     templateTraverser,
-    ParamToDeclValTransformer,
+    ParamToDeclVarTransformer,
     JavaTreeTypeResolver,
     JavaChildScopeResolver
   )

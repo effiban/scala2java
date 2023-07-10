@@ -6,7 +6,7 @@ import io.github.effiban.scala2java.core.entities.JavaTreeTypeToKeywordMapping
 import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
 import io.github.effiban.scala2java.core.renderers.{ModListRenderer, TypeParamListRenderer}
 import io.github.effiban.scala2java.core.resolvers.{JavaChildScopeResolver, JavaTreeTypeResolver}
-import io.github.effiban.scala2java.core.transformers.ParamToDeclValTransformer
+import io.github.effiban.scala2java.core.transformers.ParamToDeclVarTransformer
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Defn
@@ -21,7 +21,7 @@ private[traversers] class RegularClassTraverserImpl(modListTraverser: => ModList
                                                     typeParamTraverser: => TypeParamTraverser,
                                                     typeParamListRenderer: => TypeParamListRenderer,
                                                     templateTraverser: => TemplateTraverser,
-                                                    paramToDeclValTransformer: ParamToDeclValTransformer,
+                                                    paramToDeclVarTransformer: ParamToDeclVarTransformer,
                                                     javaTreeTypeResolver: JavaTreeTypeResolver,
                                                     javaChildScopeResolver: JavaChildScopeResolver)
                                                    (implicit javaWriter: JavaWriter) extends RegularClassTraverser {
@@ -41,7 +41,7 @@ private[traversers] class RegularClassTraverserImpl(modListTraverser: => ModList
   }
 
   private def traverseCtorAndTemplate(classDef: Defn.Class, javaTreeType: JavaTreeType, context: ClassOrTraitContext): Unit = {
-    val explicitMemberDecls = classDef.ctor.paramss.flatten.map(paramToDeclValTransformer.transform)
+    val explicitMemberDecls = classDef.ctor.paramss.flatten.map(paramToDeclVarTransformer.transform)
     // TODO if the ctor. params have 'ValParam' or 'VarParam' modifiers, need to generate accessors/mutators for them as well
     val enrichedStats = explicitMemberDecls ++ classDef.templ.stats
     val enrichedTemplate = classDef.templ.copy(stats = enrichedStats)

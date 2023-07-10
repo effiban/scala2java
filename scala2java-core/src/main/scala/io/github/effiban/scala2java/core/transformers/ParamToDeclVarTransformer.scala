@@ -5,13 +5,13 @@ import io.github.effiban.scala2java.core.entities.TraversalConstants.UnknownType
 import scala.meta.Mod.{Final, Private}
 import scala.meta.{Decl, Name, Pat, Term, Type}
 
-trait ParamToDeclValTransformer {
-  def transform(param: Term.Param): Decl.Val
+trait ParamToDeclVarTransformer {
+  def transform(param: Term.Param): Decl.Var
 }
 
-class ParamToDeclValTransformerImpl(typeByNameToSupplierTypeTransformer: TypeByNameToSupplierTypeTransformer) extends ParamToDeclValTransformer {
-  override def transform(param: Term.Param): Decl.Val = {
-    Decl.Val(
+class ParamToDeclVarTransformerImpl(typeByNameToSupplierTypeTransformer: TypeByNameToSupplierTypeTransformer) extends ParamToDeclVarTransformer {
+  override def transform(param: Term.Param): Decl.Var = {
+    Decl.Var(
       mods = List(Private(within = Name.Anonymous()), Final()),
       pats = List(Pat.Var(Term.Name(param.name.value))),
       decltpe = param.decltpe match {
@@ -23,4 +23,4 @@ class ParamToDeclValTransformerImpl(typeByNameToSupplierTypeTransformer: TypeByN
   }
 }
 
-object ParamToDeclValTransformer extends ParamToDeclValTransformerImpl(TypeByNameToSupplierTypeTransformer)
+object ParamToDeclVarTransformer extends ParamToDeclVarTransformerImpl(TypeByNameToSupplierTypeTransformer)
