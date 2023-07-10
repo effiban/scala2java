@@ -2,6 +2,7 @@ package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.classifiers.{JavaStatClassifier, TermTreeClassifier}
 import io.github.effiban.scala2java.core.contexts._
+import io.github.effiban.scala2java.core.entities.JavaModifier
 import io.github.effiban.scala2java.core.entities.JavaModifier.Final
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
@@ -106,7 +107,21 @@ class BlockStatRendererImplTest extends UnitTestSuite {
         |""".stripMargin
   }
 
-  test("render() Defn.Var") {
+  test("render() Defn.Var when 'final'") {
+    val defnVar = q"final var x: Int = 3"
+    val expectedValOrVarRenderContext = ValOrVarRenderContext(javaModifiers = List(JavaModifier.Final), inBlock = true)
+
+    doWrite("final int x = 3").when(defnVarRenderer).render(eqTree(defnVar), eqTo(expectedValOrVarRenderContext))
+    when(javaStatClassifier.requiresEndDelimiter(eqTree(defnVar))).thenReturn(true)
+
+    blockStatRenderer.render(defnVar)
+
+    outputWriter.toString shouldBe
+      """final int x = 3;
+        |""".stripMargin
+  }
+
+  test("render() Defn.Var when not 'final'") {
     val defnVar = q"var x: Int = 3"
     val expectedValOrVarRenderContext = ValOrVarRenderContext(inBlock = true)
 
