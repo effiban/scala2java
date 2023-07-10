@@ -14,7 +14,7 @@ private[traversers] class DeclVarTraverserImpl(modListTraverser: => ModListTrave
                                                typeTraverser: => TypeTraverser,
                                                patTraverser: => PatTraverser) extends DeclVarTraverser {
 
-  //TODO replace mutable interface data member (invalid in Java) with accessor / mutator methods
+  //TODO replace interface data member (invalid in Java) with accessor method (+ mutator if not final)
   override def traverse(declVar: Decl.Var, context: StatContext = StatContext()): DeclVarTraversalResult = {
     val modListResult = modListTraverser.traverse(ModifiersContext(declVar, JavaTreeType.Variable, context.javaScope))
     //TODO - verify when not simple case

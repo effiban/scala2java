@@ -10,8 +10,7 @@ trait DeclTraverser {
   def traverse(decl: Decl, context: StatContext = StatContext()): Unit
 }
 
-private[traversers] class DeclTraverserImpl(declValTraverser: => DeclValTraverser,
-                                            declVarTraverser: => DeclVarTraverser,
+private[traversers] class DeclTraverserImpl(declVarTraverser: => DeclVarTraverser,
                                             declVarRenderer: => DeclVarRenderer,
                                             declDefTraverser: => DeclDefTraverser,
                                             declTypeTraverser: => DeclTypeTraverser)
@@ -20,7 +19,6 @@ private[traversers] class DeclTraverserImpl(declValTraverser: => DeclValTraverse
   import javaWriter._
 
   override def traverse(decl: Decl, context: StatContext = StatContext()): Unit = decl match {
-    case valDecl: Decl.Val => declValTraverser.traverse(valDecl, context)
     case varDecl: Decl.Var =>
       val traversalResult = declVarTraverser.traverse(varDecl, context)
       val renderContext = ValOrVarRenderContext(traversalResult.javaModifiers)
