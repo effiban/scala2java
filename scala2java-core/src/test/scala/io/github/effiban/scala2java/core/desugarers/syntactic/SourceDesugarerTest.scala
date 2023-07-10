@@ -12,11 +12,13 @@ class SourceDesugarerTest extends UnitTestSuite {
   private val termInterpolateDesugarer = mock[TermInterpolateDesugarer]
   private val forDesugarer = mock[ForDesugarer]
   private val forYieldDesugarer = mock[ForYieldDesugarer]
+  private val declValToDeclVarDesugarer = mock[DeclValToDeclVarDesugarer]
 
   private val sourceDesugarer = new SourceDesugarerImpl(
     termInterpolateDesugarer,
     forDesugarer,
-    forYieldDesugarer
+    forYieldDesugarer,
+    declValToDeclVarDesugarer
   )
 
   test("desugar when has a Term.Interpolate should return a desugared equivalent") {
@@ -117,6 +119,33 @@ class SourceDesugarerTest extends UnitTestSuite {
     val maybeTermApply = desugaredSource.collect { case termApply@Term.Apply(q"xs.flatMap", _) => termApply }.headOption
 
     maybeTermApply.value.structure shouldBe expectedTermApply.structure
+  }
+
+  test("desugar when has a Decl.Val should return a corresponding Decl.Var") {
+
+    val declVal = q"val x: Int"
+    val source =
+      source"""
+      package dummy
+
+      class MyClass {
+        $declVal
+      }
+      """
+
+    val expectedDeclVar = q"final var x: Int"
+    val expectedDesugaredSource =
+      source"""
+      package dummy
+
+      class MyClass {
+        $expectedDeclVar
+      }
+      """
+
+    doReturn(expectedDeclVar).when(declValToDeclVarDesugarer).desugar(eqTree(declVal))
+
+    sourceDesugarer.desugar(source).structure shouldBe expectedDesugaredSource.structure
   }
 
   test("desugar with no inner desugared elems should return unchanged") {
