@@ -21,7 +21,6 @@ private[renderers] class BlockStatRendererImpl(statTermRenderer: => StatTermRend
                                                ifRenderer: => IfRenderer,
                                                tryRenderer: => TryRenderer,
                                                tryWithHandlerRenderer: => TryWithHandlerRenderer,
-                                               defnValRenderer: => DefnValRenderer,
                                                defnVarRenderer: => DefnVarRenderer,
                                                declVarRenderer: => DeclVarRenderer,
                                                termTreeClassifier: TermTreeClassifier,
@@ -33,7 +32,6 @@ private[renderers] class BlockStatRendererImpl(statTermRenderer: => StatTermRend
   override def render(stat: Stat): Unit = {
     stat match {
       case term: Term => statTermRenderer.render(term)
-      case defnVal: Defn.Val => defnValRenderer.render(defnVal, ValOrVarRenderContext(javaModifiers = List(JavaModifier.Final), inBlock = true))
       case defnVar: Defn.Var =>
         val javaModifiers = resolveDefnVarJavaModifiers(defnVar)
         defnVarRenderer.render(defnVar, ValOrVarRenderContext(javaModifiers, inBlock = true))
