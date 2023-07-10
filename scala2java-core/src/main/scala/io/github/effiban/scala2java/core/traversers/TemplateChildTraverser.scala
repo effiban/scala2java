@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.classifiers.{DefnValClassifier, JavaStatClassifier}
+import io.github.effiban.scala2java.core.classifiers.{DefnVarClassifier, JavaStatClassifier}
 import io.github.effiban.scala2java.core.contexts.{CtorContext, StatContext, TemplateChildContext}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
@@ -14,7 +14,7 @@ private[traversers] class TemplateChildTraverserImpl(ctorPrimaryTraverser: => Ct
                                                      ctorSecondaryTraverser: => CtorSecondaryTraverser,
                                                      enumConstantListTraverser: => EnumConstantListTraverser,
                                                      statTraverser: => StatTraverser,
-                                                     defnValClassifier: DefnValClassifier,
+                                                     defnVarClassifier: DefnVarClassifier,
                                                      javaStatClassifier: JavaStatClassifier)
                                                     (implicit javaWriter: JavaWriter) extends TemplateChildTraverser {
 
@@ -23,8 +23,8 @@ private[traversers] class TemplateChildTraverserImpl(ctorPrimaryTraverser: => Ct
   override def traverse(child: Tree, context: TemplateChildContext): Unit = child match {
     case primaryCtor: Ctor.Primary => traversePrimaryCtor(primaryCtor, context)
     case secondaryCtor: Ctor.Secondary => traverseSecondaryCtor(secondaryCtor, context)
-    case defnVal: Defn.Val if defnValClassifier.isEnumConstantList(defnVal, context.javaScope) =>
-      enumConstantListTraverser.traverse(defnVal)
+    case defnVar: Defn.Var if defnVarClassifier.isEnumConstantList(defnVar, context.javaScope) =>
+      enumConstantListTraverser.traverse(defnVar)
       writeStatementEnd()
     case stat: Stat => traverseNonConstructorStat(stat, context)
     case unexpected: Tree => throw new IllegalStateException(s"Unexpected template child: $unexpected")

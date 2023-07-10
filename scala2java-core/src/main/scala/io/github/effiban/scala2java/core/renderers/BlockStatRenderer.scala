@@ -2,10 +2,11 @@ package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.classifiers.{JavaStatClassifier, TermTreeClassifier}
 import io.github.effiban.scala2java.core.contexts._
-import io.github.effiban.scala2java.core.entities.JavaModifier.Final
+import io.github.effiban.scala2java.core.entities.JavaModifier
 import io.github.effiban.scala2java.core.entities.TraversalConstants.UncertainReturn
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
+import scala.meta.Mod.Final
 import scala.meta.Term.{If, Try, TryWithHandler}
 import scala.meta.{Decl, Defn, Stat, Term}
 
@@ -32,13 +33,22 @@ private[renderers] class BlockStatRendererImpl(statTermRenderer: => StatTermRend
   override def render(stat: Stat): Unit = {
     stat match {
       case term: Term => statTermRenderer.render(term)
-      case defnVal: Defn.Val => defnValRenderer.render(defnVal, ValOrVarRenderContext(javaModifiers = List(Final), inBlock = true))
-      case defnVar: Defn.Var => defnVarRenderer.render(defnVar, ValOrVarRenderContext(inBlock = true))
+      case defnVal: Defn.Val => defnValRenderer.render(defnVal, ValOrVarRenderContext(javaModifiers = List(JavaModifier.Final), inBlock = true))
+      case defnVar: Defn.Var =>
+        val javaModifiers = resolveDefnVarJavaModifiers(defnVar)
+        defnVarRenderer.render(defnVar, ValOrVarRenderContext(javaModifiers, inBlock = true))
       case declVar: Decl.Var => declVarRenderer.render(declVar, ValOrVarRenderContext(inBlock = true))
       // TODO support other stats once renderers are ready
       case aStat: Stat => throw new UnsupportedOperationException(s"Rendering of $aStat in a block is not supported yet")
     }
     writeStatEnd(stat)
+  }
+
+  private def resolveDefnVarJavaModifiers(defnVar: Defn.Var): List[JavaModifier] = {
+    defnVar.mods.flatMap {
+      case _: Final => Some(JavaModifier.Final)
+      case _ => None
+    }
   }
 
   override def renderLast(stat: Stat, context: BlockStatRenderContext = BlockStatRenderContext()): Unit = {

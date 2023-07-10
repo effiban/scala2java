@@ -7,18 +7,20 @@ import scala.meta.Enumerator.Generator
 import scala.meta.Term.{Apply, For, ForYield, Select}
 import scala.meta.{Lit, Term, XtensionQuasiquoteCaseOrPattern, XtensionQuasiquoteSource, XtensionQuasiquoteTerm}
 
-class SourceDesugarerTest extends UnitTestSuite {
+class SourceDesugarerImplTest extends UnitTestSuite {
 
   private val termInterpolateDesugarer = mock[TermInterpolateDesugarer]
   private val forDesugarer = mock[ForDesugarer]
   private val forYieldDesugarer = mock[ForYieldDesugarer]
   private val declValToDeclVarDesugarer = mock[DeclValToDeclVarDesugarer]
+  private val defnValToDefnVarDesugarer = mock[DefnValToDefnVarDesugarer]
 
   private val sourceDesugarer = new SourceDesugarerImpl(
     termInterpolateDesugarer,
     forDesugarer,
     forYieldDesugarer,
-    declValToDeclVarDesugarer
+    declValToDeclVarDesugarer,
+    defnValToDefnVarDesugarer
   )
 
   test("desugar when has a Term.Interpolate should return a desugared equivalent") {
@@ -42,7 +44,9 @@ class SourceDesugarerTest extends UnitTestSuite {
       package dummy
 
       class MyClass {
-         val x = $termInterpolate
+         def foo(): String = {
+           $termInterpolate
+         }
       }
       """
 
@@ -148,13 +152,39 @@ class SourceDesugarerTest extends UnitTestSuite {
     sourceDesugarer.desugar(source).structure shouldBe expectedDesugaredSource.structure
   }
 
+  test("desugar when has a Defn.Val should return a corresponding Defn.Var") {
+
+    val defnVal = q"val x: Int = 3"
+    val source =
+      source"""
+      package dummy
+
+      class MyClass {
+        $defnVal
+      }
+      """
+
+    val expectedDefnVar = q"final var x: Int = 3"
+    val expectedDesugaredSource =
+      source"""
+      package dummy
+
+      class MyClass {
+        $expectedDefnVar
+      }
+      """
+
+    doReturn(expectedDefnVar).when(defnValToDefnVarDesugarer).desugar(eqTree(defnVal))
+
+    sourceDesugarer.desugar(source).structure shouldBe expectedDesugaredSource.structure
+  }
+
   test("desugar with no inner desugared elems should return unchanged") {
     val source =
       source"""
       package dummy
 
       class MyClass {
-        val x = 3
       }
       """
 

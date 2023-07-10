@@ -11,13 +11,13 @@ class EnumConstantListTraverserImplTest extends UnitTestSuite {
 
 
   test("traverse() with one valid constant") {
-    enumConstantListTraverser.traverse(q"val One = Value")
+    enumConstantListTraverser.traverse(q"final var One = Value")
 
     outputWriter.toString shouldBe "One"
   }
 
   test("traverse() with two valid constants") {
-    enumConstantListTraverser.traverse(q"val One, Two = Value")
+    enumConstantListTraverser.traverse(q"final var One, Two = Value")
 
     outputWriter.toString shouldBe "One, Two"
   }
