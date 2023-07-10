@@ -50,7 +50,6 @@ class Renderers(implicit javaWriter: JavaWriter) {
     ifRenderer,
     tryRenderer,
     tryWithHandlerRenderer,
-    defnValRenderer,
     defnVarRenderer,
     declVarRenderer,
     TermTreeClassifier,
@@ -118,13 +117,6 @@ class Renderers(implicit javaWriter: JavaWriter) {
   )
 
   lazy val defnValOrVarTypeRenderer: DefnValOrVarTypeRenderer = new DefnValOrVarTypeRendererImpl(typeRenderer)
-
-  lazy val defnValRenderer: DefnValRenderer = new DefnValRendererImpl(
-    modListRenderer,
-    defnValOrVarTypeRenderer,
-    patListRenderer,
-    expressionTermRenderer
-  )
 
   lazy val defnVarRenderer: DefnVarRenderer = new DefnVarRendererImpl(
     modListRenderer,

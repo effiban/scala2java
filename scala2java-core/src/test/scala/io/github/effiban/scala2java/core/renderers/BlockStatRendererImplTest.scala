@@ -3,7 +3,6 @@ package io.github.effiban.scala2java.core.renderers
 import io.github.effiban.scala2java.core.classifiers.{JavaStatClassifier, TermTreeClassifier}
 import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.entities.JavaModifier
-import io.github.effiban.scala2java.core.entities.JavaModifier.Final
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -17,7 +16,6 @@ class BlockStatRendererImplTest extends UnitTestSuite {
   private val ifRenderer = mock[IfRenderer]
   private val tryRenderer = mock[TryRenderer]
   private val tryWithHandlerRenderer = mock[TryWithHandlerRenderer]
-  private val defnValRenderer = mock[DefnValRenderer]
   private val defnVarRenderer = mock[DefnVarRenderer]
   private val declVarRenderer = mock[DeclVarRenderer]
   private val termTreeClassifier: TermTreeClassifier = mock[TermTreeClassifier]
@@ -28,7 +26,6 @@ class BlockStatRendererImplTest extends UnitTestSuite {
     ifRenderer,
     tryRenderer,
     tryWithHandlerRenderer,
-    defnValRenderer,
     defnVarRenderer,
     declVarRenderer,
     termTreeClassifier,
@@ -91,20 +88,6 @@ class BlockStatRendererImplTest extends UnitTestSuite {
          |  doSomethingElse()
          |}""".stripMargin
 
-  }
-
-  test("render() Defn.Val") {
-    val defnVal = q"val x: Int = 3"
-    val expectedValOrVarRenderContext = ValOrVarRenderContext(javaModifiers = List(Final), inBlock = true)
-
-    doWrite("final int x = 3").when(defnValRenderer).render(eqTree(defnVal), eqTo(expectedValOrVarRenderContext))
-    when(javaStatClassifier.requiresEndDelimiter(eqTree(defnVal))).thenReturn(true)
-
-    blockStatRenderer.render(defnVal)
-
-    outputWriter.toString shouldBe
-      """final int x = 3;
-        |""".stripMargin
   }
 
   test("render() Defn.Var when 'final'") {

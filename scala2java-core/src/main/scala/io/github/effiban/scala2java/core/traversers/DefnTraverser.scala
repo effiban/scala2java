@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{ClassOrTraitContext, DefnDefContext, StatContext, ValOrVarRenderContext}
-import io.github.effiban.scala2java.core.renderers.{DeclVarRenderer, DefnValRenderer, DefnVarRenderer}
+import io.github.effiban.scala2java.core.renderers.{DeclVarRenderer, DefnVarRenderer}
 import io.github.effiban.scala2java.core.traversers.results.{DeclVarTraversalResult, DefnVarTraversalResult}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
@@ -12,9 +12,7 @@ trait DefnTraverser {
   def traverse(defn: Defn, context: StatContext = StatContext()): Unit
 }
 
-private[traversers] class DefnTraverserImpl(defnValTraverser: => DefnValTraverser,
-                                            defnValRenderer: => DefnValRenderer,
-                                            declVarRenderer: => DeclVarRenderer,
+private[traversers] class DefnTraverserImpl(declVarRenderer: => DeclVarRenderer,
                                             defnVarTraverser: => DefnVarTraverser,
                                             defnVarRenderer: => DefnVarRenderer,
                                             defnDefTraverser: => DefnDefTraverser,
@@ -27,7 +25,6 @@ private[traversers] class DefnTraverserImpl(defnValTraverser: => DefnValTraverse
   import javaWriter._
 
   override def traverse(defn: Defn, context: StatContext = StatContext()): Unit = defn match {
-    case valDef: Defn.Val => traverseDefnVal(valDef, context)
     case varDef: Defn.Var => traverseDefnVar(varDef, context)
     case defDef: Defn.Def => defnDefTraverser.traverse(defDef, DefnDefContext(javaScope = context.javaScope))
     case typeDef: Defn.Type => defnTypeTraverser.traverse(typeDef, context)
@@ -35,12 +32,6 @@ private[traversers] class DefnTraverserImpl(defnValTraverser: => DefnValTraverse
     case traitDef: Trait => traitTraverser.traverse(traitDef, ClassOrTraitContext(context.javaScope))
     case objectDef: Defn.Object => objectTraverser.traverse(objectDef, context)
     case _ => writeComment(s"UNSUPPORTED: $defn")
-  }
-
-  private def traverseDefnVal(defnVal: Defn.Val, context: StatContext): Unit = {
-    val traversalResult = defnValTraverser.traverse(defnVal, context)
-    val renderContext = ValOrVarRenderContext(traversalResult.javaModifiers)
-    defnValRenderer.render(traversalResult.tree, renderContext)
   }
 
   private def traverseDefnVar(defnVar: Defn.Var, context: StatContext): Unit = {
