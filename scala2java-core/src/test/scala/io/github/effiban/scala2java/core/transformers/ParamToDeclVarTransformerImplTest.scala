@@ -8,11 +8,11 @@ import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import scala.meta.Mod.{Final, Private}
 import scala.meta.{Decl, Name, Pat, Term, Type}
 
-class ParamToDeclValTransformerImplTest extends UnitTestSuite {
+class ParamToDeclVarTransformerImplTest extends UnitTestSuite {
 
   private val typeByNameToSupplierTypeTransformer = mock[TypeByNameToSupplierTypeTransformer]
 
-  private val paramToDeclValTransformer = new ParamToDeclValTransformerImpl(typeByNameToSupplierTypeTransformer)
+  private val paramToDeclVarTransformer = new ParamToDeclVarTransformerImpl(typeByNameToSupplierTypeTransformer)
 
   test("transform when no declared type") {
     val paramName = Term.Name("x")
@@ -24,15 +24,15 @@ class ParamToDeclValTransformerImplTest extends UnitTestSuite {
       default = None
     )
 
-    val expectedDeclVal = Decl.Val(
+    val expectedDeclVar = Decl.Var(
       mods = List(Private(within = Name.Anonymous()), Final()),
       pats = List(Pat.Var(paramName)),
       decltpe = Type.Name(UnknownType)
     )
 
-    val actualDeclVal = paramToDeclValTransformer.transform(param)
+    val actualDeclVar = paramToDeclVarTransformer.transform(param)
 
-    actualDeclVal.structure shouldBe expectedDeclVal.structure
+    actualDeclVar.structure shouldBe expectedDeclVar.structure
   }
 
   test("transform when has declared regular type") {
@@ -45,15 +45,15 @@ class ParamToDeclValTransformerImplTest extends UnitTestSuite {
       default = None
     )
 
-    val expectedDeclVal = Decl.Val(
+    val expectedDeclVar = Decl.Var(
       mods = List(Private(within = Name.Anonymous()), Final()),
       pats = List(Pat.Var(paramName)),
       decltpe = TypeNames.Int
     )
 
-    val actualDeclVal = paramToDeclValTransformer.transform(param)
+    val actualDeclVal = paramToDeclVarTransformer.transform(param)
 
-    actualDeclVal.structure shouldBe expectedDeclVal.structure
+    actualDeclVal.structure shouldBe expectedDeclVar.structure
   }
 
   test("transform when has declared type by-name") {
@@ -69,7 +69,7 @@ class ParamToDeclValTransformerImplTest extends UnitTestSuite {
 
     val expectedSupplierType = Type.Apply(TypeNames.JavaSupplier, List(TypeNames.Int))
 
-    val expectedDeclVal = Decl.Val(
+    val expectedDeclVar = Decl.Var(
       mods = List(Private(within = Name.Anonymous()), Final()),
       pats = List(Pat.Var(paramName)),
       decltpe = expectedSupplierType
@@ -77,8 +77,8 @@ class ParamToDeclValTransformerImplTest extends UnitTestSuite {
 
     when(typeByNameToSupplierTypeTransformer.transform(eqTree(typeByName))).thenReturn(expectedSupplierType)
 
-    val actualDeclVal = paramToDeclValTransformer.transform(param)
+    val actualDeclVar = paramToDeclVarTransformer.transform(param)
 
-    actualDeclVal.structure shouldBe expectedDeclVal.structure
+    actualDeclVar.structure shouldBe expectedDeclVar.structure
   }
 }
