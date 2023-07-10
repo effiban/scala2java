@@ -3,13 +3,14 @@ package io.github.effiban.scala2java.core.desugarers.syntactic
 import io.github.effiban.scala2java.core.desugarers.SameTypeDesugarer
 
 import scala.meta.Term.{For, ForYield}
-import scala.meta.{Source, Term}
+import scala.meta.{Decl, Source, Term}
 
 trait SourceDesugarer extends SameTypeDesugarer[Source]
 
 private[syntactic] class SourceDesugarerImpl(termInterpolateDesugarer: TermInterpolateDesugarer,
                                              forDesugarer: ForDesugarer,
-                                             forYieldDesugarer: ForYieldDesugarer) extends SourceDesugarer {
+                                             forYieldDesugarer: ForYieldDesugarer,
+                                             declValToDeclVarDesugarer: DeclValToDeclVarDesugarer) extends SourceDesugarer {
 
   override def desugar(source: Source): Source = desugarInner(source) match {
     case desugaredSource: Source => desugaredSource
@@ -20,6 +21,7 @@ private[syntactic] class SourceDesugarerImpl(termInterpolateDesugarer: TermInter
     case termInterpolate: Term.Interpolate => termInterpolateDesugarer.desugar(termInterpolate)
     case `for`: For => forDesugarer.desugar(`for`)
     case forYield: ForYield => forYieldDesugarer.desugar(forYield)
+    case declVal: Decl.Val => declValToDeclVarDesugarer.desugar(declVal)
     case other => other
   }
 }
@@ -27,5 +29,6 @@ private[syntactic] class SourceDesugarerImpl(termInterpolateDesugarer: TermInter
 object SourceDesugarer extends SourceDesugarerImpl(
   TermInterpolateDesugarer,
   ForDesugarer,
-  ForYieldDesugarer
+  ForYieldDesugarer,
+  DeclValToDeclVarDesugarer
 )
