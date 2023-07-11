@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.classifiers.{DefnVarClassifier, JavaStatClassifier}
+import io.github.effiban.scala2java.core.classifiers.{DefnVarClassifier, JavaStatClassifier, TraitClassifier}
 import io.github.effiban.scala2java.core.contexts.{CtorContext, StatContext, TemplateChildContext}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
@@ -15,6 +15,7 @@ private[traversers] class TemplateChildTraverserImpl(ctorPrimaryTraverser: => Ct
                                                      enumConstantListTraverser: => EnumConstantListTraverser,
                                                      statTraverser: => StatTraverser,
                                                      defnVarClassifier: DefnVarClassifier,
+                                                     traitClassifier: TraitClassifier,
                                                      javaStatClassifier: JavaStatClassifier)
                                                     (implicit javaWriter: JavaWriter) extends TemplateChildTraverser {
 
@@ -26,7 +27,9 @@ private[traversers] class TemplateChildTraverserImpl(ctorPrimaryTraverser: => Ct
     case defnVar: Defn.Var if defnVarClassifier.isEnumConstantList(defnVar, context.javaScope) =>
       enumConstantListTraverser.traverse(defnVar)
       writeStatementEnd()
-    case stat: Stat => traverseNonConstructorStat(stat, context)
+    // The type definition in a Scala 2.x enumeration is redundant in Java - skip it
+    case defnTrait: Defn.Trait if traitClassifier.isEnumTypeDef(defnTrait, context.javaScope) =>
+    case stat: Stat => traverseRegularStat(stat, context)
     case unexpected: Tree => throw new IllegalStateException(s"Unexpected template child: $unexpected")
   }
 
@@ -44,7 +47,7 @@ private[traversers] class TemplateChildTraverserImpl(ctorPrimaryTraverser: => Ct
     }
   }
 
-  private def traverseNonConstructorStat(stat: Stat, context: TemplateChildContext): Unit = {
+  private def traverseRegularStat(stat: Stat, context: TemplateChildContext): Unit = {
     statTraverser.traverse(stat, StatContext(context.javaScope))
     if (javaStatClassifier.requiresEndDelimiter(stat)) {
       writeStatementEnd()

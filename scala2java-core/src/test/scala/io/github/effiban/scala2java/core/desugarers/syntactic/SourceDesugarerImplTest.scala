@@ -14,13 +14,15 @@ class SourceDesugarerImplTest extends UnitTestSuite {
   private val forYieldDesugarer = mock[ForYieldDesugarer]
   private val declValToDeclVarDesugarer = mock[DeclValToDeclVarDesugarer]
   private val defnValToDefnVarDesugarer = mock[DefnValToDefnVarDesugarer]
+  private val defnTypeToTraitDesugarer = mock[DefnTypeToTraitDesugarer]
 
   private val sourceDesugarer = new SourceDesugarerImpl(
     termInterpolateDesugarer,
     forDesugarer,
     forYieldDesugarer,
     declValToDeclVarDesugarer,
-    defnValToDefnVarDesugarer
+    defnValToDefnVarDesugarer,
+    defnTypeToTraitDesugarer
   )
 
   test("desugar when has a Term.Interpolate should return a desugared equivalent") {
@@ -175,6 +177,33 @@ class SourceDesugarerImplTest extends UnitTestSuite {
       """
 
     doReturn(expectedDefnVar).when(defnValToDefnVarDesugarer).desugar(eqTree(defnVal))
+
+    sourceDesugarer.desugar(source).structure shouldBe expectedDesugaredSource.structure
+  }
+
+  test("desugar when has a Defn.Type should return a corresponding Trait") {
+
+    val defnType = q"type MyType = List[Int]"
+    val source =
+      source"""
+      package dummy
+
+      class MyClass {
+        $defnType
+      }
+      """
+
+    val expectedTrait = q"trait MyType extends List[Int]()"
+    val expectedDesugaredSource =
+      source"""
+      package dummy
+
+      class MyClass {
+        $expectedTrait
+      }
+      """
+
+    doReturn(expectedTrait).when(defnTypeToTraitDesugarer).desugar(eqTree(defnType))
 
     sourceDesugarer.desugar(source).structure shouldBe expectedDesugaredSource.structure
   }
