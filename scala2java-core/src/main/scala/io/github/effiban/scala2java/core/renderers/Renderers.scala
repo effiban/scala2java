@@ -116,11 +116,11 @@ class Renderers(implicit javaWriter: JavaWriter) {
     termNameRenderer
   )
 
-  lazy val defnValOrVarTypeRenderer: DefnValOrVarTypeRenderer = new DefnValOrVarTypeRendererImpl(typeRenderer)
+  lazy val defnVarTypeRenderer: DefnVarTypeRenderer = new DefnVarTypeRendererImpl(typeRenderer)
 
   lazy val defnVarRenderer: DefnVarRenderer = new DefnVarRendererImpl(
     modListRenderer,
-    defnValOrVarTypeRenderer,
+    defnVarTypeRenderer,
     patListRenderer,
     expressionTermRenderer
   )

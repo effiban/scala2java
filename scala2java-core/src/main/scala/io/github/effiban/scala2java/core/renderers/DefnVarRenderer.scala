@@ -10,7 +10,7 @@ trait DefnVarRenderer {
 }
 
 private[renderers] class DefnVarRendererImpl(modListRenderer: => ModListRenderer,
-                                             defnValOrVarTypeRenderer: => DefnValOrVarTypeRenderer,
+                                             defnVarTypeRenderer: => DefnVarTypeRenderer,
                                              patListRenderer: => PatListRenderer,
                                              expressionTermRenderer: => ExpressionTermRenderer)
                                             (implicit javaWriter: JavaWriter) extends DefnVarRenderer {
@@ -23,7 +23,7 @@ private[renderers] class DefnVarRendererImpl(modListRenderer: => ModListRenderer
       javaModifiers = context.javaModifiers
     )
     modListRenderer.render(modifiersRenderContext)
-    defnValOrVarTypeRenderer.render(varDef.decltpe, context)
+    defnVarTypeRenderer.render(varDef.decltpe, context)
     write(" ")
     //TODO verify for non-simple cases
     patListRenderer.render(varDef.pats)

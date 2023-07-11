@@ -14,13 +14,13 @@ import scala.meta.{XtensionQuasiquoteCaseOrPattern, XtensionQuasiquoteTerm, Xten
 class DefnVarRendererImplTest extends UnitTestSuite {
 
   private val modListRenderer = mock[ModListRenderer]
-  private val defnValOrVarTypeRenderer = mock[DefnValOrVarTypeRenderer]
+  private val defnVarTypeRenderer = mock[DefnVarTypeRenderer]
   private val patListRenderer = mock[PatListRenderer]
   private val expressionTermRenderer = mock[ExpressionTermRenderer]
 
   private val defnVarRenderer = new DefnVarRendererImpl(
     modListRenderer,
-    defnValOrVarTypeRenderer,
+    defnVarTypeRenderer,
     patListRenderer,
     expressionTermRenderer
   )
@@ -40,7 +40,7 @@ class DefnVarRendererImplTest extends UnitTestSuite {
     doWrite("private ")
       .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doWrite("int")
-      .when(defnValOrVarTypeRenderer).render(eqSomeTree(t"Int"), eqTo(varRenderContext))
+      .when(defnVarTypeRenderer).render(eqSomeTree(t"Int"), eqTo(varRenderContext))
     doWrite("myVar").when(patListRenderer).render(eqTreeList(List(p"myVar")))
     doWrite("3").when(expressionTermRenderer).render(eqTree(q"3"))
 
@@ -64,7 +64,7 @@ class DefnVarRendererImplTest extends UnitTestSuite {
     doWrite("private ")
       .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doWrite("int")
-      .when(defnValOrVarTypeRenderer).render(eqSomeTree(t"Int"), eqTo(varRenderContext))
+      .when(defnVarTypeRenderer).render(eqSomeTree(t"Int"), eqTo(varRenderContext))
     doWrite("myVar").when(patListRenderer).render(eqTreeList(List(p"myVar")))
 
     defnVarRenderer.render(defnVar, varRenderContext)
@@ -81,7 +81,7 @@ class DefnVarRendererImplTest extends UnitTestSuite {
     doWrite("")
       .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doWrite("/* UnknownType */")
-      .when(defnValOrVarTypeRenderer).render(eqTo(None), eqTo(VarRenderContext()))
+      .when(defnVarTypeRenderer).render(eqTo(None), eqTo(VarRenderContext()))
     doWrite("myVar").when(patListRenderer).render(eqTreeList(List(p"myVar")))
     doWrite("3").when(expressionTermRenderer).render(eqTree(q"3"))
 
