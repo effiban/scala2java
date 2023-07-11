@@ -6,13 +6,13 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Type
 
-trait DefnValOrVarTypeRenderer {
+trait DefnVarTypeRenderer {
   def render(maybeDeclType: Option[Type],
              context: VarRenderContext = VarRenderContext()): Unit
 }
 
-private[renderers] class DefnValOrVarTypeRendererImpl(typeRenderer: => TypeRenderer)
-                                                     (implicit javaWriter: JavaWriter) extends DefnValOrVarTypeRenderer {
+private[renderers] class DefnVarTypeRendererImpl(typeRenderer: => TypeRenderer)
+                                                (implicit javaWriter: JavaWriter) extends DefnVarTypeRenderer {
 
   import javaWriter._
 

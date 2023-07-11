@@ -7,16 +7,16 @@ import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.XtensionQuasiquoteType
 
-class DefnValOrVarTypeRendererImplTest extends UnitTestSuite {
+class DefnVarTypeRendererImplTest extends UnitTestSuite {
 
   private val typeRenderer = mock[TypeRenderer]
 
-  private val defnValOrVarTypeRenderer = new DefnValOrVarTypeRendererImpl(typeRenderer)
+  private val defnVarTypeRenderer = new DefnVarTypeRendererImpl(typeRenderer)
 
   test("render when has declared type should render it") {
     doWrite("int").when(typeRenderer).render(eqTree(t"int"))
 
-    defnValOrVarTypeRenderer.render(
+    defnVarTypeRenderer.render(
       maybeDeclType = Some(t"int"),
       context = VarRenderContext()
     )
@@ -25,7 +25,7 @@ class DefnValOrVarTypeRendererImplTest extends UnitTestSuite {
   }
 
   test("render when has no declared type and not in block - should write 'UnknownType'") {
-    defnValOrVarTypeRenderer.render(
+    defnVarTypeRenderer.render(
       maybeDeclType = None,
       context = VarRenderContext()
     )
@@ -34,7 +34,7 @@ class DefnValOrVarTypeRendererImplTest extends UnitTestSuite {
   }
 
   test("render when has no declared type and in Block - should write 'var'") {
-    defnValOrVarTypeRenderer.render(
+    defnVarTypeRenderer.render(
       maybeDeclType = None,
       context = VarRenderContext(inBlock = true)
     )
