@@ -218,14 +218,14 @@ class ScalaTreeTraversers(implicit factories: Factories,
     JavaTreeTypeResolver
   )
 
-  private lazy val defnValOrVarTypeTraverser: DefnValOrVarTypeTraverser = new DefnValOrVarTypeTraverserImpl(
+  private lazy val defnVarTypeTraverser: DefnVarTypeTraverser = new DefnVarTypeTraverserImpl(
     typeTraverser,
     termTypeInferrer
   )
 
   private lazy val defnVarTraverser: DefnVarTraverser = new DefnVarTraverserImpl(
     modListTraverser,
-    defnValOrVarTypeTraverser,
+    defnVarTypeTraverser,
     patTraverser,
     expressionTermTraverser,
     declVarTraverser,

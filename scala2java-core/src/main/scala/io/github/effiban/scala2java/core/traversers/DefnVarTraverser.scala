@@ -12,14 +12,14 @@ trait DefnVarTraverser {
 }
 
 private[traversers] class DefnVarTraverserImpl(modListTraverser: => ModListTraverser,
-                                               defnValOrVarTypeTraverser: => DefnValOrVarTypeTraverser,
+                                               defnVarTypeTraverser: => DefnVarTypeTraverser,
                                                patTraverser: => PatTraverser,
                                                expressionTermTraverser: => ExpressionTermTraverser,
                                                declVarTraverser: => DeclVarTraverser,
                                                defnVarToDeclVarTransformer: DefnVarToDeclVarTransformer,
                                                defnVarTransformer: DefnVarTransformer) extends DefnVarTraverser {
 
-  //TODO replace mutable interface data member (invalid in Java) with accessor/mutator methods
+  //TODO replace interface data member (invalid in Java) with accessor method (+ mutator if not 'final')
   override def traverse(defnVar: Defn.Var, context: StatContext = StatContext()): StatWithJavaModifiersTraversalResult = {
     defnVarToDeclVarTransformer.transform(defnVar, context.javaScope) match {
       case Some(varDecl) => declVarTraverser.traverse(varDecl, context)
@@ -32,7 +32,7 @@ private[traversers] class DefnVarTraverserImpl(modListTraverser: => ModListTrave
     val modListResult = modListTraverser.traverse(ModifiersContext(transformedDefnVar, JavaTreeType.Variable, context.javaScope))
     //TODO - verify when not simple case
     val traversedPats = transformedDefnVar.pats.map(patTraverser.traverse)
-    val maybeTraversedType = defnValOrVarTypeTraverser.traverse(transformedDefnVar.decltpe, transformedDefnVar.rhs)
+    val maybeTraversedType = defnVarTypeTraverser.traverse(transformedDefnVar.decltpe, transformedDefnVar.rhs)
     val maybeTraversedRhs = transformedDefnVar.rhs.map(expressionTermTraverser.traverse)
 
     val traversedDefnVar = Defn.Var(
