@@ -43,6 +43,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
     expressionTermRenderer
   )
 
+  lazy val blockCoercingTermRenderer: BlockCoercingTermRenderer = new BlockCoercingTermRendererImpl(blockRenderer)
+
   lazy val blockRenderer: BlockRenderer = new BlockRendererImpl(blockStatRenderer)
 
   lazy val blockStatRenderer: BlockStatRenderer = new BlockStatRendererImpl(
@@ -114,6 +116,15 @@ class Renderers(implicit javaWriter: JavaWriter) {
   lazy val defaultTermSelectRenderer: DefaultTermSelectRenderer = new DefaultTermSelectRendererImpl(
     defaultTermRefRenderer,
     termNameRenderer
+  )
+
+  lazy val defnDefRenderer: DefnDefRenderer = new DefnDefRendererImpl(
+    modListRenderer,
+    typeParamListRenderer,
+    termNameRenderer,
+    typeRenderer,
+    termParamListRenderer,
+    blockCoercingTermRenderer
   )
 
   lazy val defnVarTypeRenderer: DefnVarTypeRenderer = new DefnVarTypeRendererImpl(typeRenderer)
