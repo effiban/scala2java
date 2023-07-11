@@ -10,8 +10,7 @@ import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
 
-import scala.meta.Type.Bounds
-import scala.meta.{Decl, Term, Type, XtensionQuasiquoteTerm}
+import scala.meta.{Decl, Term, XtensionQuasiquoteTerm}
 
 class DeclTraverserImplTest extends UnitTestSuite {
 
@@ -20,13 +19,11 @@ class DeclTraverserImplTest extends UnitTestSuite {
   private val declVarTraverser = mock[DeclVarTraverser]
   private val declVarRenderer = mock[DeclVarRenderer]
   private val declDefTraverser = mock[DeclDefTraverser]
-  private val declTypeTraverser = mock[DeclTypeTraverser]
 
   private val declTraverser = new DeclTraverserImpl(
     declVarTraverser,
     declVarRenderer,
-    declDefTraverser,
-    declTypeTraverser)
+    declDefTraverser)
 
   test("traverse() a Decl.Var") {
     val declVar = q"private var myVar: Int"
@@ -54,19 +51,5 @@ class DeclTraverserImplTest extends UnitTestSuite {
     declTraverser.traverse(declDef, TheStatContext)
 
     verify(declDefTraverser).traverse(eqTree(declDef), eqTo(TheStatContext))
-  }
-
-  test("traverse() a Decl.Type") {
-
-    val declType = Decl.Type(
-      mods = List(),
-      name = Type.Name("MyType"),
-      tparams = List(),
-      bounds = Bounds(lo = None, hi = None)
-    )
-
-    declTraverser.traverse(declType, TheStatContext)
-
-    verify(declTypeTraverser).traverse(eqTree(declType), eqTo(TheStatContext))
   }
 }

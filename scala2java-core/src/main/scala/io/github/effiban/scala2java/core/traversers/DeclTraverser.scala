@@ -12,8 +12,7 @@ trait DeclTraverser {
 
 private[traversers] class DeclTraverserImpl(declVarTraverser: => DeclVarTraverser,
                                             declVarRenderer: => DeclVarRenderer,
-                                            declDefTraverser: => DeclDefTraverser,
-                                            declTypeTraverser: => DeclTypeTraverser)
+                                            declDefTraverser: => DeclDefTraverser)
                                            (implicit javaWriter: JavaWriter) extends DeclTraverser {
 
   import javaWriter._
@@ -24,7 +23,6 @@ private[traversers] class DeclTraverserImpl(declVarTraverser: => DeclVarTraverse
       val renderContext = ValOrVarRenderContext(traversalResult.javaModifiers)
       declVarRenderer.render(traversalResult.tree, renderContext);
     case defDecl: Decl.Def => declDefTraverser.traverse(defDecl, context)
-    case typeDecl: Decl.Type => declTypeTraverser.traverse(typeDecl, context)
     case _ => writeComment(s"UNSUPPORTED: $decl")
   }
 }
