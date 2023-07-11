@@ -24,7 +24,6 @@ class DefnTraverserImplTest extends UnitTestSuite {
   private val defnVarTraverser = mock[DefnVarTraverser]
   private val defnVarRenderer = mock[DefnVarRenderer]
   private val defnDefTraverser = mock[DefnDefTraverser]
-  private val defnTypeTraverser = mock[DefnTypeTraverser]
   private val classTraverser = mock[ClassTraverser]
   private val traitTraverser = mock[TraitTraverser]
   private val objectTraverser = mock[ObjectTraverser]
@@ -34,7 +33,6 @@ class DefnTraverserImplTest extends UnitTestSuite {
     defnVarTraverser,
     defnVarRenderer,
     defnDefTraverser,
-    defnTypeTraverser,
     classTraverser,
     traitTraverser,
     objectTraverser)
@@ -87,20 +85,6 @@ class DefnTraverserImplTest extends UnitTestSuite {
       defnDef = eqTree(defnDef),
       eqDefnDefContext(DefnDefContext(javaScope = TheStatContext.javaScope))
     )
-  }
-
-  test("traverse() for Defn.Type") {
-
-    val defnType = Defn.Type(
-      mods = List(),
-      name = Type.Name("MyType"),
-      tparams = List(),
-      body = Type.Name("MyOtherType")
-    )
-
-    defnTraverser.traverse(defnType, TheStatContext)
-
-    verify(defnTypeTraverser).traverse(eqTree(defnType), eqTo(TheStatContext))
   }
 
   test("traverse() for Defn.Class") {

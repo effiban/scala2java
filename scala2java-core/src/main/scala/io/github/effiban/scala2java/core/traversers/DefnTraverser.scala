@@ -16,7 +16,6 @@ private[traversers] class DefnTraverserImpl(declVarRenderer: => DeclVarRenderer,
                                             defnVarTraverser: => DefnVarTraverser,
                                             defnVarRenderer: => DefnVarRenderer,
                                             defnDefTraverser: => DefnDefTraverser,
-                                            defnTypeTraverser: => DefnTypeTraverser,
                                             classTraverser: => ClassTraverser,
                                             traitTraverser: => TraitTraverser,
                                             objectTraverser: => ObjectTraverser)
@@ -27,7 +26,6 @@ private[traversers] class DefnTraverserImpl(declVarRenderer: => DeclVarRenderer,
   override def traverse(defn: Defn, context: StatContext = StatContext()): Unit = defn match {
     case varDef: Defn.Var => traverseDefnVar(varDef, context)
     case defDef: Defn.Def => defnDefTraverser.traverse(defDef, DefnDefContext(javaScope = context.javaScope))
-    case typeDef: Defn.Type => defnTypeTraverser.traverse(typeDef, context)
     case classDef: Defn.Class => classTraverser.traverse(classDef, ClassOrTraitContext(context.javaScope))
     case traitDef: Trait => traitTraverser.traverse(traitDef, ClassOrTraitContext(context.javaScope))
     case objectDef: Defn.Object => objectTraverser.traverse(objectDef, context)
