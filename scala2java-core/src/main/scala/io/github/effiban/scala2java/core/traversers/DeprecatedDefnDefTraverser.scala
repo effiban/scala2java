@@ -13,25 +13,27 @@ import io.github.effiban.scala2java.spi.transformers.DefnDefTransformer
 
 import scala.meta.{Defn, Type}
 
-trait DefnDefTraverser {
+@deprecated
+trait DeprecatedDefnDefTraverser {
   def traverse(defnDef: Defn.Def, context: DefnDefContext = DefnDefContext()): Unit
 }
 
-private[traversers] class DefnDefTraverserImpl(modListTraverser: => ModListTraverser,
-                                               modifiersRenderContextFactory: ModifiersRenderContextFactory,
-                                               modListRenderer: => ModListRenderer,
-                                               typeParamTraverser: => TypeParamTraverser,
-                                               typeParamListRenderer: => TypeParamListRenderer,
-                                               termNameRenderer: TermNameRenderer,
-                                               typeTraverser: => TypeTraverser,
-                                               typeRenderer: => TypeRenderer,
-                                               termParamTraverser: => TermParamTraverser,
-                                               termParamListRenderer: => TermParamListRenderer,
-                                               blockWrappingTermTraverser: => BlockWrappingTermTraverser,
-                                               blockRenderer: => BlockRenderer,
-                                               termTypeInferrer: => TermTypeInferrer,
-                                               defnDefTransformer: DefnDefTransformer)
-                                              (implicit javaWriter: JavaWriter) extends DefnDefTraverser {
+@deprecated
+private[traversers] class DeprecatedDefnDefTraverserImpl(modListTraverser: => ModListTraverser,
+                                                         modifiersRenderContextFactory: ModifiersRenderContextFactory,
+                                                         modListRenderer: => ModListRenderer,
+                                                         typeParamTraverser: => TypeParamTraverser,
+                                                         typeParamListRenderer: => TypeParamListRenderer,
+                                                         termNameRenderer: TermNameRenderer,
+                                                         typeTraverser: => TypeTraverser,
+                                                         typeRenderer: => TypeRenderer,
+                                                         termParamTraverser: => TermParamTraverser,
+                                                         termParamListRenderer: => TermParamListRenderer,
+                                                         blockWrappingTermTraverser: => BlockWrappingTermTraverser,
+                                                         blockRenderer: => BlockRenderer,
+                                                         termTypeInferrer: => TermTypeInferrer,
+                                                         defnDefTransformer: DefnDefTransformer)
+                                                        (implicit javaWriter: JavaWriter) extends DeprecatedDefnDefTraverser {
 
   import javaWriter._
 

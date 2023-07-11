@@ -24,7 +24,7 @@ import org.mockito.ArgumentMatchersSugar.{any, eqTo}
 import scala.meta.Term.Block
 import scala.meta.{Defn, Init, Mod, Name, Term, Type, XtensionQuasiquoteTermParam, XtensionQuasiquoteType, XtensionQuasiquoteTypeParam}
 
-class DefnDefTraverserImplTest extends UnitTestSuite {
+class DeprecatedDefnDefTraverserImplTest extends UnitTestSuite {
 
   private val MethodName = Term.Name("myMethod")
 
@@ -80,7 +80,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
   private val termTypeInferrer = mock[TermTypeInferrer]
   private val defnDefTransformer = mock[DefnDefTransformer]
 
-  private val defnDefTraverser = new DefnDefTraverserImpl(
+  private val defnDefTraverser = new DeprecatedDefnDefTraverserImpl(
     modListTraverser,
     modifiersRenderContextFactory,
     modListRenderer,

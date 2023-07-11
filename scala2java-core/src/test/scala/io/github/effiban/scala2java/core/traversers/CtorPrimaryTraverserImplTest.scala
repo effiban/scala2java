@@ -49,7 +49,7 @@ class CtorPrimaryTraverserImplTest extends UnitTestSuite {
   )
 
   private val ctorPrimaryTransformer = mock[CtorPrimaryTransformer]
-  private val defnDefTraverser = mock[DefnDefTraverser]
+  private val defnDefTraverser = mock[DeprecatedDefnDefTraverser]
 
   private val ctorPrimaryTraverser = new CtorPrimaryTraverserImpl(ctorPrimaryTransformer, defnDefTraverser)
 

@@ -23,7 +23,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
   private val declVarRenderer = mock[DeclVarRenderer]
   private val defnVarTraverser = mock[DefnVarTraverser]
   private val defnVarRenderer = mock[DefnVarRenderer]
-  private val defnDefTraverser = mock[DefnDefTraverser]
+  private val defnDefTraverser = mock[DeprecatedDefnDefTraverser]
   private val classTraverser = mock[ClassTraverser]
   private val traitTraverser = mock[TraitTraverser]
   private val objectTraverser = mock[ObjectTraverser]
