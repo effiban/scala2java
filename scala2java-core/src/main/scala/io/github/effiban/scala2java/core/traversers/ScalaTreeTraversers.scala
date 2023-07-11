@@ -96,7 +96,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
     new CompositeClassTransformer(),
   )
 
-  private lazy val ctorPrimaryTraverser: CtorPrimaryTraverser = new CtorPrimaryTraverserImpl(CtorPrimaryTransformer, defnDefTraverser)
+  private lazy val ctorPrimaryTraverser: CtorPrimaryTraverser = new CtorPrimaryTraverserImpl(CtorPrimaryTransformer, deprecatedDefnDefTraverser)
 
   private lazy val ctorSecondaryTraverser: CtorSecondaryTraverser = new CtorSecondaryTraverserImpl(
     modListTraverser,
@@ -177,7 +177,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
     termRepeatedTraverser
   )
 
-  private lazy val defnDefTraverser: DefnDefTraverser = new DefnDefTraverserImpl(
+  private lazy val deprecatedDefnDefTraverser: DeprecatedDefnDefTraverser = new DeprecatedDefnDefTraverserImpl(
     modListTraverser,
     ModifiersRenderContextFactory,
     modListRenderer,
@@ -198,7 +198,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
     declVarRenderer,
     defnVarTraverser,
     defnVarRenderer,
-    defnDefTraverser,
+    deprecatedDefnDefTraverser,
     classTraverser,
     traitTraverser,
     objectTraverser

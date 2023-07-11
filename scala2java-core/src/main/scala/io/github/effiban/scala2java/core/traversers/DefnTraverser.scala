@@ -15,7 +15,7 @@ trait DefnTraverser {
 private[traversers] class DefnTraverserImpl(declVarRenderer: => DeclVarRenderer,
                                             defnVarTraverser: => DefnVarTraverser,
                                             defnVarRenderer: => DefnVarRenderer,
-                                            defnDefTraverser: => DefnDefTraverser,
+                                            defnDefTraverser: => DeprecatedDefnDefTraverser,
                                             classTraverser: => ClassTraverser,
                                             traitTraverser: => TraitTraverser,
                                             objectTraverser: => ObjectTraverser)
