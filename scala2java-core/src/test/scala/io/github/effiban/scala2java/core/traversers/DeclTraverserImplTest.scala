@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.{StatContext, ValOrVarRenderContext}
+import io.github.effiban.scala2java.core.contexts.{StatContext, VarRenderContext}
 import io.github.effiban.scala2java.core.entities.JavaModifier
 import io.github.effiban.scala2java.core.renderers.DeclVarRenderer
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
@@ -35,7 +35,7 @@ class DeclTraverserImplTest extends UnitTestSuite {
     
     declTraverser.traverse(declVar, TheStatContext)
 
-    verify(declVarRenderer).render(eqTree(traversedDeclVar), eqTo(ValOrVarRenderContext(javaModifiers)))
+    verify(declVarRenderer).render(eqTree(traversedDeclVar), eqTo(VarRenderContext(javaModifiers)))
   }
 
   test("traverse() a Decl.Def") {
