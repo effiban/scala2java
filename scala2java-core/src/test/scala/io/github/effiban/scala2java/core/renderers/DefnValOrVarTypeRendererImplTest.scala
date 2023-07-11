@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.ValOrVarRenderContext
+import io.github.effiban.scala2java.core.contexts.VarRenderContext
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -18,7 +18,7 @@ class DefnValOrVarTypeRendererImplTest extends UnitTestSuite {
 
     defnValOrVarTypeRenderer.render(
       maybeDeclType = Some(t"int"),
-      context = ValOrVarRenderContext()
+      context = VarRenderContext()
     )
 
     outputWriter.toString shouldBe "int"
@@ -27,7 +27,7 @@ class DefnValOrVarTypeRendererImplTest extends UnitTestSuite {
   test("render when has no declared type and not in block - should write 'UnknownType'") {
     defnValOrVarTypeRenderer.render(
       maybeDeclType = None,
-      context = ValOrVarRenderContext()
+      context = VarRenderContext()
     )
 
     outputWriter.toString shouldBe "/* UnknownType */"
@@ -36,7 +36,7 @@ class DefnValOrVarTypeRendererImplTest extends UnitTestSuite {
   test("render when has no declared type and in Block - should write 'var'") {
     defnValOrVarTypeRenderer.render(
       maybeDeclType = None,
-      context = ValOrVarRenderContext(inBlock = true)
+      context = VarRenderContext(inBlock = true)
     )
 
     outputWriter.toString shouldBe "var"

@@ -1,12 +1,12 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.{ModifiersRenderContext, ValOrVarRenderContext}
+import io.github.effiban.scala2java.core.contexts.{ModifiersRenderContext, VarRenderContext}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Defn
 
 trait DefnVarRenderer {
-  def render(varDef: Defn.Var, context: ValOrVarRenderContext = ValOrVarRenderContext()): Unit
+  def render(varDef: Defn.Var, context: VarRenderContext = VarRenderContext()): Unit
 }
 
 private[renderers] class DefnVarRendererImpl(modListRenderer: => ModListRenderer,
@@ -17,7 +17,7 @@ private[renderers] class DefnVarRendererImpl(modListRenderer: => ModListRenderer
 
   import javaWriter._
 
-  override def render(varDef: Defn.Var, context: ValOrVarRenderContext = ValOrVarRenderContext()): Unit = {
+  override def render(varDef: Defn.Var, context: VarRenderContext = VarRenderContext()): Unit = {
     val modifiersRenderContext = ModifiersRenderContext(
       scalaMods = varDef.mods,
       javaModifiers = context.javaModifiers

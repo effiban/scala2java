@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.{ClassOrTraitContext, DefnDefContext, StatContext, ValOrVarRenderContext}
+import io.github.effiban.scala2java.core.contexts.{ClassOrTraitContext, DefnDefContext, StatContext, VarRenderContext}
 import io.github.effiban.scala2java.core.entities.JavaModifier
 import io.github.effiban.scala2java.core.matchers.DefnDefContextMatcher.eqDefnDefContext
 import io.github.effiban.scala2java.core.renderers.{DeclVarRenderer, DefnVarRenderer}
@@ -46,7 +46,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
     val traversedDefnVar = q"private var myTraversedVar: Int = 33"
     val javaModifiers = List(JavaModifier.Private)
     val traversalResult = DefnVarTraversalResult(traversedDefnVar, javaModifiers)
-    val renderContext = ValOrVarRenderContext(javaModifiers)
+    val renderContext = VarRenderContext(javaModifiers)
 
     doReturn(traversalResult).when(defnVarTraverser).traverse(eqTree(defnVar), eqTo(TheStatContext))
 
@@ -61,7 +61,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
     val declVar = q"private var myVar: Int"
     val javaModifiers = List(JavaModifier.Private)
     val traversalResult = DeclVarTraversalResult(declVar, javaModifiers)
-    val renderContext = ValOrVarRenderContext(javaModifiers)
+    val renderContext = VarRenderContext(javaModifiers)
 
     doReturn(traversalResult).when(defnVarTraverser).traverse(eqTree(defnVar), eqTo(TheStatContext))
 

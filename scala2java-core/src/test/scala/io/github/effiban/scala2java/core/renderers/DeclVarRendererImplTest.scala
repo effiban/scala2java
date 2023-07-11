@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.{ModifiersRenderContext, ValOrVarRenderContext}
+import io.github.effiban.scala2java.core.contexts.{ModifiersRenderContext, VarRenderContext}
 import io.github.effiban.scala2java.core.entities.JavaModifier.Private
 import io.github.effiban.scala2java.core.matchers.ModifiersRenderContextMatcher.eqModifiersRenderContext
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
@@ -31,14 +31,14 @@ class DeclVarRendererImplTest extends UnitTestSuite {
       scalaMods = declVar.mods,
       javaModifiers = javaModifiers
     )
-    val valOrVarRenderContext = ValOrVarRenderContext(javaModifiers = javaModifiers)
+    val varRenderContext = VarRenderContext(javaModifiers = javaModifiers)
 
     doWrite("private ")
       .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doWrite("int").when(typeRenderer).render(eqTree(t"Int"))
     doWrite("myVar").when(patListRenderer).render(eqTreeList(List(p"myVar")))
 
-    declVarRenderer.render(declVar, valOrVarRenderContext)
+    declVarRenderer.render(declVar, varRenderContext)
 
     outputWriter.toString shouldBe
       """private int myVar""".stripMargin

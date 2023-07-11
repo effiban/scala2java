@@ -92,9 +92,9 @@ class BlockStatRendererImplTest extends UnitTestSuite {
 
   test("render() Defn.Var when 'final'") {
     val defnVar = q"final var x: Int = 3"
-    val expectedValOrVarRenderContext = ValOrVarRenderContext(javaModifiers = List(JavaModifier.Final), inBlock = true)
+    val expectedRenderContext = VarRenderContext(javaModifiers = List(JavaModifier.Final), inBlock = true)
 
-    doWrite("final int x = 3").when(defnVarRenderer).render(eqTree(defnVar), eqTo(expectedValOrVarRenderContext))
+    doWrite("final int x = 3").when(defnVarRenderer).render(eqTree(defnVar), eqTo(expectedRenderContext))
     when(javaStatClassifier.requiresEndDelimiter(eqTree(defnVar))).thenReturn(true)
 
     blockStatRenderer.render(defnVar)
@@ -106,9 +106,9 @@ class BlockStatRendererImplTest extends UnitTestSuite {
 
   test("render() Defn.Var when not 'final'") {
     val defnVar = q"var x: Int = 3"
-    val expectedValOrVarRenderContext = ValOrVarRenderContext(inBlock = true)
+    val expectedRenderContext = VarRenderContext(inBlock = true)
 
-    doWrite("int x = 3").when(defnVarRenderer).render(eqTree(defnVar), eqTo(expectedValOrVarRenderContext))
+    doWrite("int x = 3").when(defnVarRenderer).render(eqTree(defnVar), eqTo(expectedRenderContext))
     when(javaStatClassifier.requiresEndDelimiter(eqTree(defnVar))).thenReturn(true)
 
     blockStatRenderer.render(defnVar)
@@ -120,9 +120,9 @@ class BlockStatRendererImplTest extends UnitTestSuite {
 
   test("render() Decl.Var") {
     val declVar = q"var x: Int"
-    val expectedValOrVarRenderContext = ValOrVarRenderContext(inBlock = true)
+    val expectedRenderContext = VarRenderContext(inBlock = true)
 
-    doWrite("int x").when(declVarRenderer).render(eqTree(declVar), eqTo(expectedValOrVarRenderContext))
+    doWrite("int x").when(declVarRenderer).render(eqTree(declVar), eqTo(expectedRenderContext))
     when(javaStatClassifier.requiresEndDelimiter(eqTree(declVar))).thenReturn(true)
 
     blockStatRenderer.render(declVar)
