@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.classifiers.{DefnVarClassifier, JavaStatClassifier}
+import io.github.effiban.scala2java.core.classifiers.{DefnVarClassifier, JavaStatClassifier, TraitClassifier}
 import io.github.effiban.scala2java.core.contexts.{CtorContext, StatContext, TemplateChildContext}
 import io.github.effiban.scala2java.core.matchers.CtorContextMatcher.eqCtorContext
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
@@ -8,9 +8,9 @@ import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
-import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchersSugar.eqTo
 
-import scala.meta.{Ctor, Defn, Init, Lit, Name, Pat, Term, Type}
+import scala.meta.{Ctor, Defn, Init, Lit, Name, Pat, Term, Type, XtensionQuasiquoteTerm}
 
 class TemplateChildTraverserImplTest extends UnitTestSuite {
 
@@ -69,12 +69,15 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
     decltpe = Some(TypeNames.Int),
     body = Term.Apply(Term.Name("foo"), Nil)
   )
+  
+  private val TheTrait = q"trait MyTrait { def foo(): Unit = doSomething() } "
 
   private val ctorPrimaryTraverser = mock[CtorPrimaryTraverser]
   private val ctorSecondaryTraverser = mock[CtorSecondaryTraverser]
   private val enumConstantListTraverser = mock[EnumConstantListTraverser]
   private val statTraverser = mock[StatTraverser]
   private val defnValClassifier = mock[DefnVarClassifier]
+  private val traitClassifier = mock[TraitClassifier]
   private val javaStatClassifier = mock[JavaStatClassifier]
 
   private val templateChildTraverser = new TemplateChildTraverserImpl(
@@ -83,6 +86,7 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
     enumConstantListTraverser,
     statTraverser,
     defnValClassifier,
+    traitClassifier,
     javaStatClassifier
   )
 
@@ -130,9 +134,9 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
 
   test("traverse() for Defn.Var which is not an enum constant list, and requires end delimiter") {
 
-    when(defnValClassifier.isEnumConstantList(eqTree(TheDefnVar), ArgumentMatchers.eq(JavaScope.Class))).thenReturn(false)
+    when(defnValClassifier.isEnumConstantList(eqTree(TheDefnVar), eqTo(JavaScope.Class))).thenReturn(false)
     doWrite("/* DATA MEMBER DEFINITION */")
-      .when(statTraverser).traverse(eqTree(TheDefnVar), ArgumentMatchers.eq(StatContext(JavaScope.Class)))
+      .when(statTraverser).traverse(eqTree(TheDefnVar), eqTo(StatContext(JavaScope.Class)))
     when(javaStatClassifier.requiresEndDelimiter(eqTree(TheDefnVar))).thenReturn(true)
 
     templateChildTraverser.traverse(child = TheDefnVar, context = TemplateChildContext(javaScope = JavaScope.Class))
@@ -144,7 +148,7 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
 
   test("traverse() for Defn.Var which is an enum constant list") {
 
-    when(defnValClassifier.isEnumConstantList(eqTree(TheDefnVar), ArgumentMatchers.eq(JavaScope.Class))).thenReturn(true)
+    when(defnValClassifier.isEnumConstantList(eqTree(TheDefnVar), eqTo(JavaScope.Class))).thenReturn(true)
     doWrite("/* ENUM CONSTANTS */".stripMargin).when(enumConstantListTraverser).traverse(eqTree(TheDefnVar))
     when(javaStatClassifier.requiresEndDelimiter(eqTree(TheDefnVar))).thenReturn(true)
 
@@ -155,13 +159,32 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
         |""".stripMargin
   }
 
+  test("traverse() for a Trait which is not an enum constant list") {
+    when(traitClassifier.isEnumTypeDef(eqTree(TheTrait), eqTo(JavaScope.Class))).thenReturn(false)
+    doWrite("/* TRAIT DEFINITION */")
+      .when(statTraverser).traverse(eqTree(TheTrait), eqTo(StatContext(JavaScope.Class)))
+    when(javaStatClassifier.requiresEndDelimiter(eqTree(TheTrait))).thenReturn(false)
+
+    templateChildTraverser.traverse(child = TheTrait, context = TemplateChildContext(javaScope = JavaScope.Class))
+
+    outputWriter.toString shouldBe "/* TRAIT DEFINITION */"
+  }
+
+  test("traverse() for a Trait which is an enum constant list, should skip it") {
+    when(traitClassifier.isEnumTypeDef(eqTree(TheTrait), eqTo(JavaScope.Enum))).thenReturn(true)
+
+    templateChildTraverser.traverse(child = TheTrait, context = TemplateChildContext(javaScope = JavaScope.Enum))
+
+    outputWriter.toString shouldBe ""
+  }
+
   test("traverse() for stat which does not require end delimiter") {
 
     doWrite(
       """{
         |    /* METHOD DEFINITION */
         |}""".stripMargin)
-      .when(statTraverser).traverse(eqTree(TheDefnDef), ArgumentMatchers.eq(StatContext(JavaScope.Class)))
+      .when(statTraverser).traverse(eqTree(TheDefnDef), eqTo(StatContext(JavaScope.Class)))
     when(javaStatClassifier.requiresEndDelimiter(eqTree(TheDefnDef))).thenReturn(false)
 
     templateChildTraverser.traverse(child = TheDefnDef, context = TemplateChildContext(javaScope = JavaScope.Class))

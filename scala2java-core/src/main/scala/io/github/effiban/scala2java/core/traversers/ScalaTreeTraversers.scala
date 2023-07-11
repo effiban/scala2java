@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.classifiers.{Classifiers, DefnVarClassifier, JavaStatClassifier}
+import io.github.effiban.scala2java.core.classifiers.{Classifiers, DefnVarClassifier, JavaStatClassifier, TraitClassifier}
 import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
 import io.github.effiban.scala2java.core.factories.{Factories, TemplateChildContextFactory}
 import io.github.effiban.scala2java.core.orderings.JavaTemplateChildOrdering
@@ -387,6 +387,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
     enumConstantListTraverser,
     statTraverser,
     DefnVarClassifier,
+    TraitClassifier,
     JavaStatClassifier
   )
 
