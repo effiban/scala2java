@@ -6,12 +6,12 @@ import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.{XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
-class DefnValOrVarTypeTraverserImplTest extends UnitTestSuite {
+class DefnVarTypeTraverserImplTest extends UnitTestSuite {
 
   private val typeTraverser = mock[TypeTraverser]
   private val termTypeInferrer = mock[TermTypeInferrer]
 
-  private val defnValOrVarTypeTraverser = new DefnValOrVarTypeTraverserImpl(
+  private val defnVarTypeTraverser = new DefnVarTypeTraverserImpl(
     typeTraverser,
     termTypeInferrer
   )
@@ -22,7 +22,7 @@ class DefnValOrVarTypeTraverserImplTest extends UnitTestSuite {
 
     doReturn(traversedType).when(typeTraverser).traverse(eqTree(tpe))
 
-    val maybeOutputType = defnValOrVarTypeTraverser.traverse(maybeDeclType = Some(tpe))
+    val maybeOutputType = defnVarTypeTraverser.traverse(maybeDeclType = Some(tpe))
     maybeOutputType.value.structure shouldBe traversedType.structure
   }
 
@@ -34,7 +34,7 @@ class DefnValOrVarTypeTraverserImplTest extends UnitTestSuite {
     when(termTypeInferrer.infer(eqTree(rhs))).thenReturn(Some(tpe))
     doReturn(traversedType).when(typeTraverser).traverse(eqTree(tpe))
 
-    val maybeOutputType = defnValOrVarTypeTraverser.traverse(maybeRhs = Some(rhs))
+    val maybeOutputType = defnVarTypeTraverser.traverse(maybeRhs = Some(rhs))
     maybeOutputType.value.structure shouldBe traversedType.structure
   }
 
@@ -43,10 +43,10 @@ class DefnValOrVarTypeTraverserImplTest extends UnitTestSuite {
 
     when(termTypeInferrer.infer(eqTree(rhs))).thenReturn(None)
 
-    defnValOrVarTypeTraverser.traverse(maybeRhs = Some(rhs)) shouldBe None
+    defnVarTypeTraverser.traverse(maybeRhs = Some(rhs)) shouldBe None
   }
 
   test("traverse when has no declared type and has no RHS - should return None") {
-    defnValOrVarTypeTraverser.traverse() shouldBe None
+    defnVarTypeTraverser.traverse() shouldBe None
   }
 }
