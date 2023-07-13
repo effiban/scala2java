@@ -39,12 +39,12 @@ class DeclVarTraverserImplTest extends UnitTestSuite {
   )
   private val TheDeclVarResult = DeclVarTraversalResult(TheTraversedDeclVar, TheJavaModifiers)
 
-  private val modListTraverser = mock[ModListTraverser]
+  private val statModListTraverser = mock[StatModListTraverser]
   private val typeTraverser = mock[TypeTraverser]
   private val patTraverser = mock[PatTraverser]
 
   private val declVarTraverser = new DeclVarTraverserImpl(
-    modListTraverser,
+    statModListTraverser,
     typeTraverser,
     patTraverser
   )
@@ -53,7 +53,7 @@ class DeclVarTraverserImplTest extends UnitTestSuite {
   test("traverse() when it is a class member") {
     val javaScope = JavaScope.Class
 
-    doReturn(TheModListResult).when(modListTraverser).traverse(eqExpectedModifiers(TheDeclVar, javaScope))
+    doReturn(TheModListResult).when(statModListTraverser).traverse(eqExpectedModifiers(TheDeclVar, javaScope))
     doReturn(TheTraversedType).when(typeTraverser).traverse(eqTree(TheType))
     doReturn(MyTraversedVarPat).when(patTraverser).traverse(eqTree(MyVarPat))
 
@@ -63,7 +63,7 @@ class DeclVarTraverserImplTest extends UnitTestSuite {
   test("traverse() when it is an interface member") {
     val javaScope = JavaScope.Interface
 
-    doReturn(TheModListResult).when(modListTraverser).traverse(eqExpectedModifiers(TheDeclVar, javaScope))
+    doReturn(TheModListResult).when(statModListTraverser).traverse(eqExpectedModifiers(TheDeclVar, javaScope))
     doReturn(TheTraversedType).when(typeTraverser).traverse(eqTree(TheType))
     doReturn(MyTraversedVarPat).when(patTraverser).traverse(eqTree(MyVarPat))
 

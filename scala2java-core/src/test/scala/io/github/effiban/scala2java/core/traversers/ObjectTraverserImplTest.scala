@@ -41,7 +41,7 @@ class ObjectTraverserImplTest extends UnitTestSuite {
     body = Block(List())
   )
 
-  private val modListTraverser = mock[ModListTraverser]
+  private val statModListTraverser = mock[StatModListTraverser]
   private val modifiersRenderContextFactory = mock[ModifiersRenderContextFactory]
   private val modListRenderer = mock[ModListRenderer]
   private val templateTraverser = mock[TemplateTraverser]
@@ -49,7 +49,7 @@ class ObjectTraverserImplTest extends UnitTestSuite {
   private val javaChildScopeResolver = mock[JavaChildScopeResolver]
 
   private val objectTraverser = new ObjectTraverserImpl(
-    modListTraverser,
+    statModListTraverser,
     modifiersRenderContextFactory,
     modListRenderer,
     templateTraverser,
@@ -79,7 +79,7 @@ class ObjectTraverserImplTest extends UnitTestSuite {
     val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = TheScalaMods, javaModifiers = List(JavaModifier.Public))
 
     whenResolveJavaTreeTypeThenReturnClass(objectDef, TheScalaMods)
-    doReturn(expectedModListTraversalResult).when(modListTraverser).traverse(eqExpectedScalaMods(objectDef))
+    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(objectDef))
     doReturn(expectedModifiersRenderContext)
       .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
     doWrite(
@@ -130,7 +130,7 @@ class ObjectTraverserImplTest extends UnitTestSuite {
 
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(objectDef, JavaTreeType.Class)))).thenReturn(JavaScope.Class)
 
-    doReturn(expectedModListTraversalResult).when(modListTraverser).traverse(eqExpectedScalaMods(objectDef))
+    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(objectDef))
     doReturn(expectedModifiersRenderContext)
       .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
     doWrite(

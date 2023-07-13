@@ -19,7 +19,7 @@ trait DeprecatedDefnDefTraverser {
 }
 
 @deprecated
-private[traversers] class DeprecatedDefnDefTraverserImpl(modListTraverser: => ModListTraverser,
+private[traversers] class DeprecatedDefnDefTraverserImpl(statModListTraverser: => StatModListTraverser,
                                                          modifiersRenderContextFactory: ModifiersRenderContextFactory,
                                                          modListRenderer: => ModListRenderer,
                                                          typeParamTraverser: => TypeParamTraverser,
@@ -40,7 +40,7 @@ private[traversers] class DeprecatedDefnDefTraverserImpl(modListTraverser: => Mo
   override def traverse(defnDef: Defn.Def, context: DefnDefContext = DefnDefContext()): Unit = {
     val transformedDefnDef = defnDefTransformer.transform(defnDef)
     writeLine()
-    val modListTraversalResult = modListTraverser.traverse(ModifiersContext(transformedDefnDef, JavaTreeType.Method, context.javaScope))
+    val modListTraversalResult = statModListTraverser.traverse(ModifiersContext(transformedDefnDef, JavaTreeType.Method, context.javaScope))
     val modifiersRenderContext = modifiersRenderContextFactory(modListTraversalResult)
     modListRenderer.render(modifiersRenderContext)
     traverseTypeParams(transformedDefnDef.tparams)

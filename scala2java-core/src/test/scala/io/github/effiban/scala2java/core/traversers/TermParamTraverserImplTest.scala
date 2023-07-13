@@ -31,13 +31,13 @@ class TermParamTraverserImplTest extends UnitTestSuite {
   private val TheDefault = q"3"
   private val TheTraversedDefault = q"33"
 
-  private val modListTraverser = mock[ModListTraverser]
+  private val statModListTraverser = mock[StatModListTraverser]
   private val nameTraverser = mock[NameTraverser]
   private val typeTraverser = mock[TypeTraverser]
   private val expressionTermTraverser = mock[ExpressionTermTraverser]
 
   private val termParamTraverser = new TermParamTraverserImpl(
-    modListTraverser,
+    statModListTraverser,
     nameTraverser,
     typeTraverser,
     expressionTermTraverser
@@ -59,7 +59,7 @@ class TermParamTraverserImplTest extends UnitTestSuite {
 
     val expectedResult = TermParamTraversalResult(traversedTermParam, TheJavaModifiers)
 
-    doReturn(TheModListTraversalResult).when(modListTraverser).traverse(eqExpectedModifiers(termParam))
+    doReturn(TheModListTraversalResult).when(statModListTraverser).traverse(eqExpectedModifiers(termParam))
     doReturn(TheTraversedParamName).when(nameTraverser).traverse(eqTree(TheParamName))
     doReturn(TheTraversedType).when(typeTraverser).traverse(eqTree(TheType))
     doReturn(TheTraversedDefault).when(expressionTermTraverser).traverse(eqTree(TheDefault))
@@ -83,7 +83,7 @@ class TermParamTraverserImplTest extends UnitTestSuite {
 
     val expectedResult = TermParamTraversalResult(traversedTermParam, TheJavaModifiers)
 
-    doReturn(TheModListTraversalResult).when(modListTraverser).traverse(eqExpectedModifiers(termParam))
+    doReturn(TheModListTraversalResult).when(statModListTraverser).traverse(eqExpectedModifiers(termParam))
     doReturn(TheTraversedParamName).when(nameTraverser).traverse(eqTree(TheParamName))
 
     termParamTraverser.traverse(termParam, TheStatContext)

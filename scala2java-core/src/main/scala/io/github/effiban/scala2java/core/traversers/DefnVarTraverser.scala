@@ -11,7 +11,7 @@ trait DefnVarTraverser {
   def traverse(varDef: Defn.Var, context: StatContext = StatContext()): StatWithJavaModifiersTraversalResult
 }
 
-private[traversers] class DefnVarTraverserImpl(modListTraverser: => ModListTraverser,
+private[traversers] class DefnVarTraverserImpl(statModListTraverser: => StatModListTraverser,
                                                defnVarTypeTraverser: => DefnVarTypeTraverser,
                                                patTraverser: => PatTraverser,
                                                expressionTermTraverser: => ExpressionTermTraverser,
@@ -29,7 +29,7 @@ private[traversers] class DefnVarTraverserImpl(modListTraverser: => ModListTrave
 
   private def traverseInner(defnVar: Defn.Var, context: StatContext = StatContext()) = {
     val transformedDefnVar = defnVarTransformer.transform(defnVar, context.javaScope)
-    val modListResult = modListTraverser.traverse(ModifiersContext(transformedDefnVar, JavaTreeType.Variable, context.javaScope))
+    val modListResult = statModListTraverser.traverse(ModifiersContext(transformedDefnVar, JavaTreeType.Variable, context.javaScope))
     //TODO - verify when not simple case
     val traversedPats = transformedDefnVar.pats.map(patTraverser.traverse)
     val maybeTraversedType = defnVarTypeTraverser.traverse(transformedDefnVar.decltpe, transformedDefnVar.rhs)

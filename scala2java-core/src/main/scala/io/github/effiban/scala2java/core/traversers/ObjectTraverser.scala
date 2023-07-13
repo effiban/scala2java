@@ -13,7 +13,7 @@ trait ObjectTraverser {
   def traverse(objectDef: Defn.Object, context: StatContext = StatContext()): Unit
 }
 
-private[traversers] class ObjectTraverserImpl(modListTraverser: => ModListTraverser,
+private[traversers] class ObjectTraverserImpl(statModListTraverser: => StatModListTraverser,
                                               modifiersRenderContextFactory: ModifiersRenderContextFactory,
                                               modListRenderer: => ModListRenderer,
                                               templateTraverser: => TemplateTraverser,
@@ -26,7 +26,7 @@ private[traversers] class ObjectTraverserImpl(modListTraverser: => ModListTraver
   override def traverse(objectDef: Defn.Object, context: StatContext = StatContext()): Unit = {
     writeLine()
     val javaTreeType = javaTreeTypeResolver.resolve(JavaTreeTypeContext(objectDef, objectDef.mods))
-    val modListTraversalResult = modListTraverser.traverse(ModifiersContext(objectDef, javaTreeType, context.javaScope))
+    val modListTraversalResult = statModListTraverser.traverse(ModifiersContext(objectDef, javaTreeType, context.javaScope))
     val modifiersRenderContext = modifiersRenderContextFactory(modListTraversalResult)
     modListRenderer.render(modifiersRenderContext)
     writeNamedType(JavaTreeTypeToKeywordMapping(javaTreeType), objectDef.name.value)

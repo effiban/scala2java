@@ -71,7 +71,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
   private lazy val blockWrappingTermTraverser: BlockWrappingTermTraverser = new BlockWrappingTermTraverserImpl(defaultBlockTraverser)
 
   private lazy val caseClassTraverser: CaseClassTraverser = new CaseClassTraverserImpl(
-    modListTraverser,
+    statModListTraverser,
     ModifiersRenderContextFactory,
     modListRenderer,
     typeParamTraverser,
@@ -99,7 +99,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
   private lazy val ctorPrimaryTraverser: CtorPrimaryTraverser = new CtorPrimaryTraverserImpl(CtorPrimaryTransformer, deprecatedDefnDefTraverser)
 
   private lazy val ctorSecondaryTraverser: CtorSecondaryTraverser = new CtorSecondaryTraverserImpl(
-    modListTraverser,
+    statModListTraverser,
     ModifiersRenderContextFactory,
     modListRenderer,
     typeNameTraverser,
@@ -113,7 +113,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
   )
 
   private lazy val declDefTraverser: DeclDefTraverser = new DeclDefTraverserImpl(
-    modListTraverser,
+    statModListTraverser,
     ModifiersRenderContextFactory,
     modListRenderer,
     typeParamTraverser,
@@ -131,7 +131,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
     declDefTraverser)
 
   private lazy val declVarTraverser: DeclVarTraverser = new DeclVarTraverserImpl(
-    modListTraverser,
+    statModListTraverser,
     typeTraverser,
     patTraverser
   )
@@ -178,7 +178,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
   )
 
   private lazy val deprecatedDefnDefTraverser: DeprecatedDefnDefTraverser = new DeprecatedDefnDefTraverserImpl(
-    modListTraverser,
+    statModListTraverser,
     ModifiersRenderContextFactory,
     modListRenderer,
     typeParamTraverser,
@@ -210,7 +210,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
   )
 
   private lazy val defnVarTraverser: DefnVarTraverser = new DefnVarTraverserImpl(
-    modListTraverser,
+    statModListTraverser,
     defnVarTypeTraverser,
     patTraverser,
     expressionTermTraverser,
@@ -266,7 +266,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val initTraverser: InitTraverser = new InitTraverserImpl(typeTraverser, expressionTermTraverser)
 
-  private lazy val modListTraverser: ModListTraverser = new ModListTraverserImpl(annotTraverser, JavaModifiersResolver)
+  private lazy val statModListTraverser: StatModListTraverser = new StatModListTraverserImpl(annotTraverser, JavaModifiersResolver)
 
   private lazy val nameTraverser: NameTraverser = new NameTraverserImpl(typeNameTraverser)
 
@@ -277,7 +277,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
   )
 
   private lazy val objectTraverser: ObjectTraverser = new ObjectTraverserImpl(
-    modListTraverser,
+    statModListTraverser,
     ModifiersRenderContextFactory,
     modListRenderer,
     templateTraverser,
@@ -321,7 +321,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
   )
 
   private lazy val regularClassTraverser: RegularClassTraverser = new RegularClassTraverserImpl(
-    modListTraverser,
+    statModListTraverser,
     ModifiersRenderContextFactory,
     modListRenderer,
     typeParamTraverser,
@@ -412,7 +412,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
   private lazy val termMatchTraverser: TermMatchTraverser = new TermMatchTraverserImpl(expressionTermTraverser, caseTraverser)
 
   private lazy val termParamTraverser: TermParamTraverser = new TermParamTraverserImpl(
-    modListTraverser,
+    statModListTraverser,
     nameTraverser,
     typeTraverser,
     expressionTermTraverser
@@ -427,7 +427,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
   private lazy val throwTraverser: ThrowTraverser = new ThrowTraverserImpl(expressionTermTraverser)
 
   private lazy val traitTraverser: TraitTraverser = new TraitTraverserImpl(
-    modListTraverser,
+    statModListTraverser,
     ModifiersRenderContextFactory,
     modListRenderer,
     typeParamTraverser,
