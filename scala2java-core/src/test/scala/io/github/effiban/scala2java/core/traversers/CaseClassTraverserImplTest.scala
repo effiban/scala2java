@@ -69,7 +69,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     )
   )
 
-  private val modListTraverser = mock[ModListTraverser]
+  private val statModListTraverser = mock[StatModListTraverser]
   private val modifiersRenderContextFactory = mock[ModifiersRenderContextFactory]
   private val modListRenderer = mock[ModListRenderer]
   private val typeParamTraverser = mock[TypeParamTraverser]
@@ -82,7 +82,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
 
 
   private val classTraverser = new CaseClassTraverserImpl(
-    modListTraverser,
+    statModListTraverser,
     modifiersRenderContextFactory,
     modListRenderer,
     typeParamTraverser,
@@ -119,7 +119,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = scalaMods, javaModifiers = List(JavaModifier.Public))
 
     whenResolveJavaTreeTypeThenReturnRecord(cls, scalaMods)
-    doReturn(expectedModListTraversalResult).when(modListTraverser).traverse(eqExpectedScalaMods(cls))
+    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(cls))
     doReturn(expectedModifiersRenderContext)
       .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
     doWrite(
@@ -193,7 +193,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = scalaMods, javaModifiers = List(JavaModifier.Public))
 
     whenResolveJavaTreeTypeThenReturnRecord(cls, scalaMods)
-    doReturn(expectedModListTraversalResult).when(modListTraverser).traverse(eqExpectedScalaMods(cls))
+    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(cls))
     doReturn(expectedModifiersRenderContext)
       .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
     doWrite(
@@ -263,7 +263,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = scalaMods, javaModifiers = List(JavaModifier.Public))
 
     whenResolveJavaTreeTypeThenReturnRecord(cls, scalaMods)
-    doReturn(expectedModListTraversalResult).when(modListTraverser).traverse(eqExpectedScalaMods(cls))
+    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(cls))
     doReturn(expectedModifiersRenderContext)
       .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
     doWrite(
@@ -339,7 +339,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
     val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = scalaMods, javaModifiers = List(JavaModifier.Public))
 
     whenResolveJavaTreeTypeThenReturnRecord(cls, scalaMods)
-    doReturn(expectedModListTraversalResult).when(modListTraverser).traverse(eqExpectedScalaMods(cls))
+    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(cls))
     doReturn(expectedModifiersRenderContext)
       .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
     doWrite(

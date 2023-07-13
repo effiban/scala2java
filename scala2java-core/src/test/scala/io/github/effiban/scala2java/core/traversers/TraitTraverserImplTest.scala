@@ -65,7 +65,7 @@ class TraitTraverserImplTest extends UnitTestSuite {
       )
     )
 
-  private val modListTraverser = mock[ModListTraverser]
+  private val statModListTraverser = mock[StatModListTraverser]
   private val modifiersRenderContextFactory = mock[ModifiersRenderContextFactory]
   private val modListRenderer = mock[ModListRenderer]
   private val typeParamTraverser = mock[TypeParamTraverser]
@@ -76,7 +76,7 @@ class TraitTraverserImplTest extends UnitTestSuite {
 
 
   private val traitTraverser = new TraitTraverserImpl(
-    modListTraverser,
+    statModListTraverser,
     modifiersRenderContextFactory,
     modListRenderer,
     typeParamTraverser,
@@ -102,7 +102,7 @@ class TraitTraverserImplTest extends UnitTestSuite {
     val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Public))
 
     whenResolveJavaTreeTypeThenReturnInterface(`trait`)
-    doReturn(expectedModListTraversalResult).when(modListTraverser).traverse(eqExpectedScalaMods(`trait`))
+    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(`trait`))
     doReturn(expectedModifiersRenderContext)
       .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
     doWrite(

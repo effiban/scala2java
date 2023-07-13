@@ -10,13 +10,13 @@ trait DeclVarTraverser {
   def traverse(varDecl: Decl.Var, context: StatContext = StatContext()): DeclVarTraversalResult
 }
 
-private[traversers] class DeclVarTraverserImpl(modListTraverser: => ModListTraverser,
+private[traversers] class DeclVarTraverserImpl(statModListTraverser: => StatModListTraverser,
                                                typeTraverser: => TypeTraverser,
                                                patTraverser: => PatTraverser) extends DeclVarTraverser {
 
   //TODO replace interface data member (invalid in Java) with accessor method (+ mutator if not final)
   override def traverse(declVar: Decl.Var, context: StatContext = StatContext()): DeclVarTraversalResult = {
-    val modListResult = modListTraverser.traverse(ModifiersContext(declVar, JavaTreeType.Variable, context.javaScope))
+    val modListResult = statModListTraverser.traverse(ModifiersContext(declVar, JavaTreeType.Variable, context.javaScope))
     //TODO - verify when not simple case
     val traversedPats = declVar.pats.map(patTraverser.traverse)
     val traversedType = typeTraverser.traverse(declVar.decltpe)

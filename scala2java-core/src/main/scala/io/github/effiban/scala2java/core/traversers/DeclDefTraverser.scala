@@ -13,7 +13,7 @@ trait DeclDefTraverser {
   def traverse(defDecl: Decl.Def, context: StatContext = StatContext()): Unit
 }
 
-private[traversers] class DeclDefTraverserImpl(modListTraverser: => ModListTraverser,
+private[traversers] class DeclDefTraverserImpl(statModListTraverser: => StatModListTraverser,
                                                modifiersRenderContextFactory: ModifiersRenderContextFactory,
                                                modListRenderer: => ModListRenderer,
                                                typeParamTraverser: => TypeParamTraverser,
@@ -29,7 +29,7 @@ private[traversers] class DeclDefTraverserImpl(modListTraverser: => ModListTrave
 
   override def traverse(defDecl: Decl.Def, context: StatContext = StatContext()): Unit = {
     writeLine()
-    val modListTraversalResult = modListTraverser.traverse(ModifiersContext(defDecl, JavaTreeType.Method, context.javaScope))
+    val modListTraversalResult = statModListTraverser.traverse(ModifiersContext(defDecl, JavaTreeType.Method, context.javaScope))
     val modifiersRenderContext = modifiersRenderContextFactory(modListTraversalResult)
     modListRenderer.render(modifiersRenderContext)
     traverseTypeParams(defDecl.tparams)

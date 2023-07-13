@@ -14,7 +14,7 @@ import org.mockito.ArgumentMatchersSugar.any
 import scala.meta.Mod.Annot
 import scala.meta.{Decl, Mod, Name, XtensionQuasiquoteCaseOrPattern, XtensionQuasiquoteMod}
 
-class ModListTraverserImplTest extends UnitTestSuite {
+class StatModListTraverserImplTest extends UnitTestSuite {
 
   private val Pats = List(p"x")
 
@@ -32,7 +32,7 @@ class ModListTraverserImplTest extends UnitTestSuite {
   private val annotTraverser = mock[AnnotTraverser]
   private val javaModifiersResolver = mock[JavaModifiersResolver]
 
-  private val modListTraverser = new ModListTraverserImpl(annotTraverser, javaModifiersResolver)
+  private val statModListTraverser = new StatModListTraverserImpl(annotTraverser, javaModifiersResolver)
 
   test("traverse when has only annotations") {
     val modifiersContext = modifiersContextOf(Annots)
@@ -46,7 +46,7 @@ class ModListTraverserImplTest extends UnitTestSuite {
 
     when(javaModifiersResolver.resolve(eqModifiersContext(modifiersContext))).thenReturn(Nil)
 
-    modListTraverser.traverse(modifiersContext) should equalModListTraversalResult(expectedResult)
+    statModListTraverser.traverse(modifiersContext) should equalModListTraversalResult(expectedResult)
   }
 
   test("traverse when has only visibility modifiers") {
@@ -56,7 +56,7 @@ class ModListTraverserImplTest extends UnitTestSuite {
 
     when(javaModifiersResolver.resolve(eqModifiersContext(modifiersContext))).thenReturn(JavaPrivateFinalMods)
 
-    modListTraverser.traverse(modifiersContext) should equalModListTraversalResult(expectedResult)
+    statModListTraverser.traverse(modifiersContext) should equalModListTraversalResult(expectedResult)
   }
 
   test("traverse when has annotations and visibility modifiers") {
@@ -73,7 +73,7 @@ class ModListTraverserImplTest extends UnitTestSuite {
 
     when(javaModifiersResolver.resolve(eqModifiersContext(modifiersContext))).thenReturn(JavaPrivateFinalMods)
 
-    modListTraverser.traverse(modifiersContext) should equalModListTraversalResult(expectedResult)
+    statModListTraverser.traverse(modifiersContext) should equalModListTraversalResult(expectedResult)
   }
 
   private def modifiersContextOf(mods: List[Mod]) = ModifiersContext(declValWith(mods), JavaTreeType.Variable, JavaScope.Class)

@@ -13,7 +13,7 @@ trait CtorSecondaryTraverser {
   def traverse(secondaryCtor: Ctor.Secondary, ctorContext: CtorContext): Unit
 }
 
-private[traversers] class CtorSecondaryTraverserImpl(modListTraverser: => ModListTraverser,
+private[traversers] class CtorSecondaryTraverserImpl(statModListTraverser: => StatModListTraverser,
                                                      modifiersRenderContextFactory: ModifiersRenderContextFactory,
                                                      modListRenderer: => ModListRenderer,
                                                      typeNameTraverser: => TypeNameTraverser,
@@ -38,7 +38,7 @@ private[traversers] class CtorSecondaryTraverserImpl(modListTraverser: => ModLis
   }
 
   private def traverseMods(secondaryCtor: Ctor.Secondary, context: CtorContext): Unit = {
-    val modListTraversalResult = modListTraverser.traverse(ModifiersContext(secondaryCtor, JavaTreeType.Method, context.javaScope))
+    val modListTraversalResult = statModListTraverser.traverse(ModifiersContext(secondaryCtor, JavaTreeType.Method, context.javaScope))
     val modifiersRenderContext = modifiersRenderContextFactory(modListTraversalResult)
     modListRenderer.render(modifiersRenderContext)
   }

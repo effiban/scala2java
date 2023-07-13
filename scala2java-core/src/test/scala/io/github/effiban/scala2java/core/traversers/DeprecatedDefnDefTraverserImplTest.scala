@@ -65,7 +65,7 @@ class DeprecatedDefnDefTraverserImplTest extends UnitTestSuite {
 
   private val InitialDefnDef = Defn.Def(Nil, Term.Name("foo"), Nil, List(Nil), Some(TypeNames.Int), Term.Apply(Term.Name("bar"), Nil))
 
-  private val modListTraverser = mock[ModListTraverser]
+  private val statModListTraverser = mock[StatModListTraverser]
   private val modifiersRenderContextFactory = mock[ModifiersRenderContextFactory]
   private val modListRenderer = mock[ModListRenderer]
   private val typeParamTraverser = mock[TypeParamTraverser]
@@ -81,7 +81,7 @@ class DeprecatedDefnDefTraverserImplTest extends UnitTestSuite {
   private val defnDefTransformer = mock[DefnDefTransformer]
 
   private val defnDefTraverser = new DeprecatedDefnDefTraverserImpl(
-    modListTraverser,
+    statModListTraverser,
     modifiersRenderContextFactory,
     modListRenderer,
     typeParamTraverser,
@@ -113,7 +113,7 @@ class DeprecatedDefnDefTraverserImplTest extends UnitTestSuite {
     val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Public))
 
     when(defnDefTransformer.transform(eqTree(InitialDefnDef))).thenReturn(transformedDefnDef)
-    doReturn(expectedModListTraversalResult).when(modListTraverser).traverse(eqExpectedScalaMods(transformedDefnDef, javaScope))
+    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(transformedDefnDef, javaScope))
     doReturn(expectedModifiersRenderContext)
       .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
     doWrite(
@@ -175,7 +175,7 @@ class DeprecatedDefnDefTraverserImplTest extends UnitTestSuite {
     val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Public))
 
     when(defnDefTransformer.transform(eqTree(InitialDefnDef))).thenReturn(transformedDefnDef)
-    doReturn(expectedModListTraversalResult).when(modListTraverser).traverse(eqExpectedScalaMods(transformedDefnDef, javaScope))
+    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(transformedDefnDef, javaScope))
     doReturn(expectedModifiersRenderContext)
       .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
     doWrite(
@@ -237,7 +237,7 @@ class DeprecatedDefnDefTraverserImplTest extends UnitTestSuite {
     val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Public))
 
     when(defnDefTransformer.transform(eqTree(InitialDefnDef))).thenReturn(transformedDefnDef)
-    doReturn(expectedModListTraversalResult).when(modListTraverser).traverse(eqExpectedScalaMods(transformedDefnDef, javaScope))
+    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(transformedDefnDef, javaScope))
     doReturn(expectedModifiersRenderContext)
       .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
     doWrite(
@@ -305,7 +305,7 @@ class DeprecatedDefnDefTraverserImplTest extends UnitTestSuite {
     val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Public))
 
     when(defnDefTransformer.transform(eqTree(InitialDefnDef))).thenReturn(transformedDefnDef)
-    doReturn(expectedModListTraversalResult).when(modListTraverser).traverse(eqExpectedScalaMods(transformedDefnDef, javaScope))
+    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(transformedDefnDef, javaScope))
     doReturn(expectedModifiersRenderContext)
       .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
     doWrite(
@@ -366,7 +366,7 @@ class DeprecatedDefnDefTraverserImplTest extends UnitTestSuite {
     val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Public))
 
     when(defnDefTransformer.transform(eqTree(InitialDefnDef))).thenReturn(transformedDefnDef)
-    doReturn(expectedModListTraversalResult).when(modListTraverser).traverse(eqExpectedScalaMods(transformedDefnDef, javaScope))
+    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(transformedDefnDef, javaScope))
     doReturn(expectedModifiersRenderContext)
       .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
     doWrite(
@@ -431,7 +431,7 @@ class DeprecatedDefnDefTraverserImplTest extends UnitTestSuite {
     val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Public))
 
     when(defnDefTransformer.transform(eqTree(InitialDefnDef))).thenReturn(transformedDefnDef)
-    doReturn(expectedModListTraversalResult).when(modListTraverser).traverse(eqExpectedScalaMods(transformedDefnDef, javaScope))
+    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(transformedDefnDef, javaScope))
     doReturn(expectedModifiersRenderContext)
       .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
     doWrite(
@@ -493,7 +493,7 @@ class DeprecatedDefnDefTraverserImplTest extends UnitTestSuite {
     val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Default))
 
     when(defnDefTransformer.transform(eqTree(InitialDefnDef))).thenReturn(transformedDefnDef)
-    doReturn(expectedModListTraversalResult).when(modListTraverser).traverse(eqExpectedScalaMods(transformedDefnDef, javaScope))
+    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(transformedDefnDef, javaScope))
     doReturn(expectedModifiersRenderContext)
       .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
     doWrite(
@@ -555,7 +555,7 @@ class DeprecatedDefnDefTraverserImplTest extends UnitTestSuite {
     val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Default))
 
     when(defnDefTransformer.transform(eqTree(InitialDefnDef))).thenReturn(transformedDefnDef)
-    doReturn(expectedModListTraversalResult).when(modListTraverser).traverse(eqExpectedScalaMods(transformedDefnDef, javaScope))
+    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(transformedDefnDef, javaScope))
     doReturn(expectedModifiersRenderContext)
       .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
     doWrite(

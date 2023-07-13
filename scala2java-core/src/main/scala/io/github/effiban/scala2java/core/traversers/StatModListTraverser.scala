@@ -6,12 +6,12 @@ import io.github.effiban.scala2java.core.traversers.results.ModListTraversalResu
 
 import scala.meta.Mod.Annot
 
-trait ModListTraverser {
+trait StatModListTraverser {
   def traverse(modifiersContext: ModifiersContext): ModListTraversalResult
 }
 
-class ModListTraverserImpl(annotTraverser: => AnnotTraverser,
-                           javaModifiersResolver: JavaModifiersResolver) extends ModListTraverser {
+class StatModListTraverserImpl(annotTraverser: => AnnotTraverser,
+                               javaModifiersResolver: JavaModifiersResolver) extends StatModListTraverser {
 
   override def traverse(modifiersContext: ModifiersContext): ModListTraversalResult = {
     import modifiersContext._

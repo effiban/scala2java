@@ -5,8 +5,8 @@ import io.github.effiban.scala2java.core.entities.{JavaModifier, JavaTreeType}
 import io.github.effiban.scala2java.core.matchers.ModListTraversalResultMockitoMatcher.eqModListTraversalResult
 import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
 import io.github.effiban.scala2java.core.matchers.ModifiersRenderContextMatcher.eqModifiersRenderContext
-import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
 import io.github.effiban.scala2java.core.renderers._
+import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.traversers.results.{ModListTraversalResult, TermParamTraversalResult}
@@ -61,7 +61,7 @@ class CtorSecondaryTraverserImplTest extends UnitTestSuite {
   private val TraversedStatement1 = q"doSomething11(param11)"
   private val TraversedStatement2 = q"doSomething22(param22)"
 
-  private val modListTraverser = mock[ModListTraverser]
+  private val statModListTraverser = mock[StatModListTraverser]
   private val modifiersRenderContextFactory = mock[ModifiersRenderContextFactory]
   private val modListRenderer = mock[ModListRenderer]
   private val typeNameTraverser = mock[TypeNameTraverser]
@@ -74,7 +74,7 @@ class CtorSecondaryTraverserImplTest extends UnitTestSuite {
   private val blockStatRenderer = mock[BlockStatRenderer]
 
   private val ctorSecondaryTraverser = new CtorSecondaryTraverserImpl(
-    modListTraverser,
+    statModListTraverser,
     modifiersRenderContextFactory,
     modListRenderer,
     typeNameTraverser,
@@ -101,7 +101,7 @@ class CtorSecondaryTraverserImplTest extends UnitTestSuite {
     val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TheScalaMods, javaModifiers = List(JavaModifier.Public))
     val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = TheScalaMods, javaModifiers = List(JavaModifier.Public))
 
-    doReturn(expectedModListTraversalResult).when(modListTraverser).traverse(eqExpectedScalaMods(ctorSecondary, javaScope))
+    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(ctorSecondary, javaScope))
     doReturn(expectedModifiersRenderContext)
       .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
     doWrite(
@@ -150,7 +150,7 @@ class CtorSecondaryTraverserImplTest extends UnitTestSuite {
     val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TheScalaMods, javaModifiers = List(JavaModifier.Public))
     val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = TheScalaMods, javaModifiers = List(JavaModifier.Public))
 
-    doReturn(expectedModListTraversalResult).when(modListTraverser).traverse(eqExpectedScalaMods(ctorSecondary, javaScope))
+    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(ctorSecondary, javaScope))
     doReturn(expectedModifiersRenderContext)
       .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
     doWrite(
@@ -213,7 +213,7 @@ class CtorSecondaryTraverserImplTest extends UnitTestSuite {
     val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TheScalaMods, javaModifiers = List(JavaModifier.Public))
     val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = TheScalaMods, javaModifiers = List(JavaModifier.Public))
 
-    doReturn(expectedModListTraversalResult).when(modListTraverser).traverse(eqExpectedScalaMods(ctorSecondary, javaScope))
+    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(ctorSecondary, javaScope))
     doReturn(expectedModifiersRenderContext)
       .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
     doWrite(

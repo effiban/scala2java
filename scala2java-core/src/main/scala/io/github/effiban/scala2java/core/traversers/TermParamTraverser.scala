@@ -10,7 +10,7 @@ trait TermParamTraverser {
   def traverse(termParam: Term.Param, context: StatContext): TermParamTraversalResult
 }
 
-private[traversers] class TermParamTraverserImpl(modListTraverser: => ModListTraverser,
+private[traversers] class TermParamTraverserImpl(statModListTraverser: => StatModListTraverser,
                                                  nameTraverser: NameTraverser,
                                                  typeTraverser: => TypeTraverser,
                                                  expressionTermTraverser: => ExpressionTermTraverser) extends TermParamTraverser {
@@ -20,7 +20,7 @@ private[traversers] class TermParamTraverserImpl(modListTraverser: => ModListTra
   // but that aspect will be handled by one of the parent traversers before this one is called
   override def traverse(termParam: Term.Param, context: StatContext): TermParamTraversalResult = {
     val modifiersContext = ModifiersContext(termParam, JavaTreeType.Parameter, context.javaScope)
-    val modListTraversalResult = modListTraverser.traverse(modifiersContext)
+    val modListTraversalResult = statModListTraverser.traverse(modifiersContext)
     val traversedName = nameTraverser.traverse(termParam.name)
     val maybeTraversedType = termParam.decltpe.map(typeTraverser.traverse)
     val maybeTraversedDefault = termParam.default.map(expressionTermTraverser.traverse)
