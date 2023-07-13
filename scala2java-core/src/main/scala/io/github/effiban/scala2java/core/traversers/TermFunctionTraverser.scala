@@ -18,10 +18,7 @@ private[traversers] class TermFunctionTraverserImpl(termParamTraverser: => TermP
   // lambda definition
   override def traverse(function: Term.Function, shouldBodyReturnValue: Decision = No): Term.Function = {
     val paramContext = StatContext(JavaScope.LambdaSignature)
-    val traversedParams = function.params
-      .map(param => termParamTraverser.traverse(param, paramContext))
-      // Ignoring the returned Java modifiers here, since there cannot be any Java modifiers for a lambda param
-      .map(_.tree)
+    val traversedParams = function.params.map(param => termParamTraverser.traverse(param, paramContext))
 
     function.body match {
       // Block of size 2 or more

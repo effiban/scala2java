@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.{ModifiersRenderContext, TermParamRenderContext}
-import io.github.effiban.scala2java.core.entities.JavaModifier.{Final, Private, Static}
+import io.github.effiban.scala2java.core.contexts.ModifiersRenderContext
+import io.github.effiban.scala2java.core.entities.JavaModifier.Final
 import io.github.effiban.scala2java.core.matchers.ModifiersRenderContextMatcher.eqModifiersRenderContext
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
@@ -38,14 +38,13 @@ class TermParamRendererImplTest extends UnitTestSuite {
     doWrite("").when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doWrite("myParam").when(nameRenderer).render(eqTree(ParamName))
 
-    termParamRenderer.render(termParam, TermParamRenderContext())
+    termParamRenderer.render(termParam)
 
     outputWriter.toString shouldBe "myParam"
   }
 
-  test("render with name and mods only") {
-    val scalaMods = List(Annot1, Annot2, mod"private")
-    val javaModifiers = List(Static, Private, Final)
+  test("render with name and annotations only") {
+    val scalaMods = List(Annot1, Annot2)
 
     val termParam = Term.Param(
       mods = scalaMods,
@@ -54,7 +53,31 @@ class TermParamRendererImplTest extends UnitTestSuite {
       default = None
     )
 
-    val termParamRenderContext = TermParamRenderContext(javaModifiers)
+    val expectedModifiersRenderContext = ModifiersRenderContext(
+      scalaMods = scalaMods,
+      annotsOnSameLine = true,
+      javaModifiers = Nil
+    )
+
+    doWrite("@Annot1 @Annot2 ")
+      .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
+    doWrite("myParam").when(nameRenderer).render(eqTree(ParamName))
+
+    termParamRenderer.render(termParam)
+
+    outputWriter.toString shouldBe "@Annot1 @Annot2 myParam"
+  }
+
+  test("render with name and annotations and 'final' modifier only") {
+    val scalaMods = List(Annot1, Annot2, mod"final")
+    val javaModifiers = List(Final)
+
+    val termParam = Term.Param(
+      mods = scalaMods,
+      name = ParamName,
+      decltpe = None,
+      default = None
+    )
 
     val expectedModifiersRenderContext = ModifiersRenderContext(
       scalaMods = scalaMods,
@@ -62,13 +85,13 @@ class TermParamRendererImplTest extends UnitTestSuite {
       javaModifiers = javaModifiers
     )
 
-    doWrite("@Annot1 @Annot2 private static final ")
+    doWrite("@Annot1 @Annot2 final ")
       .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doWrite("myParam").when(nameRenderer).render(eqTree(ParamName))
 
-    termParamRenderer.render(termParam, termParamRenderContext)
+    termParamRenderer.render(termParam)
 
-    outputWriter.toString shouldBe "@Annot1 @Annot2 private static final myParam"
+    outputWriter.toString shouldBe "@Annot1 @Annot2 final myParam"
   }
 
   test("render with name and type only") {
@@ -85,7 +108,7 @@ class TermParamRendererImplTest extends UnitTestSuite {
     doWrite("int").when(typeRenderer).render(eqTree(t"Int"))
     doWrite("myParam").when(nameRenderer).render(eqTree(ParamName))
 
-    termParamRenderer.render(termParam, TermParamRenderContext())
+    termParamRenderer.render(termParam)
 
     outputWriter.toString shouldBe "int myParam"
   }
@@ -103,14 +126,14 @@ class TermParamRendererImplTest extends UnitTestSuite {
     doWrite("").when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doWrite("myParam").when(nameRenderer).render(eqTree(ParamName))
 
-    termParamRenderer.render(termParam, TermParamRenderContext())
+    termParamRenderer.render(termParam)
 
     outputWriter.toString shouldBe "myParam/* = 3 */"
   }
 
   test("render with everything") {
-    val scalaMods = List(Annot1, Annot2, mod"private")
-    val javaModifiers = List(Static, Private, Final)
+    val scalaMods = List(Annot1, Annot2, mod"final")
+    val javaModifiers = List(Final)
 
     val termParam = Term.Param(
       mods = scalaMods,
@@ -119,22 +142,20 @@ class TermParamRendererImplTest extends UnitTestSuite {
       default = Some(q"3")
     )
 
-    val termParamRenderContext = TermParamRenderContext(javaModifiers)
-
     val expectedModifiersRenderContext = ModifiersRenderContext(
       scalaMods = scalaMods,
       annotsOnSameLine = true,
       javaModifiers = javaModifiers
     )
 
-    doWrite("@Annot1 @Annot2 private static final ")
+    doWrite("@Annot1 @Annot2 final ")
       .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doWrite("int").when(typeRenderer).render(eqTree(t"Int"))
     doWrite("myParam").when(nameRenderer).render(eqTree(ParamName))
 
-    termParamRenderer.render(termParam, termParamRenderContext)
+    termParamRenderer.render(termParam)
 
-    outputWriter.toString shouldBe "@Annot1 @Annot2 private static final int myParam/* = 3 */"
+    outputWriter.toString shouldBe "@Annot1 @Annot2 final int myParam/* = 3 */"
   }
 
 }

@@ -26,11 +26,11 @@ private[renderers] class DefnDefRendererImpl(modListRenderer: => ModListRenderer
     renderTypeParams(defnDef)
     renderMethodType(defnDef.decltpe)
     termNameRenderer.render(defnDef.name)
-    renderMethodParamsAndBody(defnDef, context)
+    renderMethodParamsAndBody(defnDef)
   }
 
   private def renderModifiers(defnDef: Defn.Def, context: DefnDefRenderContext): Unit = {
-    val modifiersRenderContext = ModifiersRenderContext(scalaMods = defnDef.mods, javaModifiers = context.methodJavaModifiers)
+    val modifiersRenderContext = ModifiersRenderContext(scalaMods = defnDef.mods, javaModifiers = context.javaModifiers)
     modListRenderer.render(modifiersRenderContext)
   }
 
@@ -53,9 +53,8 @@ private[renderers] class DefnDefRendererImpl(modListRenderer: => ModListRenderer
     }
   }
 
-  private def renderMethodParamsAndBody(defDef: Defn.Def, context: DefnDefRenderContext): Unit = {
-    val paramListRenderContext = TermParamListRenderContext(javaModifiers = context.paramJavaModifiers)
-    termParamListRenderer.render(defDef.paramss.flatten, paramListRenderContext)
+  private def renderMethodParamsAndBody(defDef: Defn.Def): Unit = {
+    termParamListRenderer.render(defDef.paramss.flatten, TermParamListRenderContext())
     blockCoercingTermRenderer.render(defDef.body, BlockRenderContext(uncertainReturn = defDef.decltpe.isEmpty))
   }
 }

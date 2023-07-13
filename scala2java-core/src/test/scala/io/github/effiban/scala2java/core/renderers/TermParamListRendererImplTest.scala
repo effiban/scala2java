@@ -2,7 +2,6 @@ package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.contexts.{ArgumentListContext, TermParamListRenderContext}
 import io.github.effiban.scala2java.core.entities.EnclosingDelimiter.Parentheses
-import io.github.effiban.scala2java.core.entities.JavaModifier.Final
 import io.github.effiban.scala2java.core.entities.ListTraversalOptions
 import io.github.effiban.scala2java.core.matchers.ArgumentListContextMatcher.eqArgumentListContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
@@ -24,16 +23,13 @@ class TermParamListRendererImplTest extends UnitTestSuite {
   )
 
   private val argumentListRenderer = mock[ArgumentListRenderer]
-  private val termParamArgRendererFactory = mock[TermParamArgRendererFactory]
-
   private val argumentRenderer = mock[ArgumentRenderer[Term.Param]]
 
-  private val termParamListRenderer = new TermParamListRendererImpl(argumentListRenderer, termParamArgRendererFactory)
+  private val termParamListRenderer = new TermParamListRendererImpl(argumentListRenderer, argumentRenderer)
 
 
   test("render() when no params") {
     val paramListContext = TermParamListRenderContext()
-    when(termParamArgRendererFactory(eqTo(paramListContext))).thenReturn(argumentRenderer)
 
     termParamListRenderer.render(termParams = Nil, context = paramListContext)
 
@@ -42,18 +38,15 @@ class TermParamListRendererImplTest extends UnitTestSuite {
 
   test("render() when one param and multi-line") {
     val param = termParam("x")
-    val paramListContext = TermParamListRenderContext(javaModifiers = List(Final))
-    when(termParamArgRendererFactory(eqTo(paramListContext))).thenReturn(argumentRenderer)
 
-    termParamListRenderer.render(termParams = List(param), context = paramListContext)
+    termParamListRenderer.render(termParams = List(param))
 
     verifyArgumentListRendererInvocation(List(param), ExpectedOptionsForMultiLine)
   }
 
   test("render() when one param and same line") {
     val param = termParam("x")
-    val paramListContext = TermParamListRenderContext(javaModifiers = List(Final), onSameLine = true)
-    when(termParamArgRendererFactory(eqTo(paramListContext))).thenReturn(argumentRenderer)
+    val paramListContext = TermParamListRenderContext(onSameLine = true)
 
     termParamListRenderer.render(termParams = List(param), context = paramListContext)
 
@@ -64,8 +57,7 @@ class TermParamListRendererImplTest extends UnitTestSuite {
     val param1 = termParam("x")
     val param2 = termParam("y")
     val params = List(param1, param2)
-    val paramListContext = TermParamListRenderContext(javaModifiers = List(Final))
-    when(termParamArgRendererFactory(eqTo(paramListContext))).thenReturn(argumentRenderer)
+    val paramListContext = TermParamListRenderContext()
 
     termParamListRenderer.render(termParams = params, context = paramListContext)
 
@@ -76,8 +68,7 @@ class TermParamListRendererImplTest extends UnitTestSuite {
     val param1 = termParam("x")
     val param2 = termParam("y")
     val params = List(param1, param2)
-    val paramListContext = TermParamListRenderContext(javaModifiers = List(Final), onSameLine = true)
-    when(termParamArgRendererFactory(eqTo(paramListContext))).thenReturn(argumentRenderer)
+    val paramListContext = TermParamListRenderContext(onSameLine = true)
 
     termParamListRenderer.render(termParams = params, context = paramListContext)
 

@@ -1,6 +1,3 @@
 package io.github.effiban.scala2java.core.contexts
 
-import io.github.effiban.scala2java.core.entities.JavaModifier
-
-case class TermParamListRenderContext(javaModifiers: List[JavaModifier] = Nil,
-                                      onSameLine: Boolean = false)
+case class TermParamListRenderContext(onSameLine: Boolean = false)

@@ -48,7 +48,7 @@ class JavaFinalModifierResolverTest extends UnitTestSuite {
     (TheDefnVar, DefnVarDesc, JavaTreeType.Variable, JavaScope.UtilityClass, false),
     (TheDefnVar, DefnVarDesc, JavaTreeType.Variable, JavaScope.Interface, false),
     (TheDefnVar, DefnVarDesc, JavaTreeType.Variable, JavaScope.Block, false),
-    (TheTermParam, TermParamDesc, JavaTreeType.Parameter, JavaScope.Class, true),
+    (TheTermParam, TermParamDesc, JavaTreeType.Parameter, JavaScope.Class, false),
     (TheTermParam, TermParamDesc, JavaTreeType.Parameter, JavaScope.MethodSignature, true),
     (TheTermParam, TermParamDesc, JavaTreeType.Parameter, JavaScope.LambdaSignature, false),
   )

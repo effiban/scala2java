@@ -63,13 +63,8 @@ class DefnDefRendererImplTest extends UnitTestSuite {
       decltpe = Some(t"int"),
       body = Body
     )
-    val defnDefRenderContext = DefnDefRenderContext(
-      methodJavaModifiers = List(JavaModifier.Public),
-      paramJavaModifiers = List(JavaModifier.Final)
-    )
-
+    val defnDefRenderContext = DefnDefRenderContext(javaModifiers = List(JavaModifier.Public))
     val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Public))
-    val expectedParamListRenderContext = TermParamListRenderContext(javaModifiers = List(JavaModifier.Final))
 
     doWrite(
       """@MyAnnotation
@@ -79,7 +74,7 @@ class DefnDefRendererImplTest extends UnitTestSuite {
     doWrite("myMethod").when(termNameRenderer).render(eqTree(MethodName))
     doWrite("(final int param1, final int param2)").when(termParamListRenderer).render(
       termParams = eqTreeList(MethodParamList1),
-      context = eqTo(expectedParamListRenderContext)
+      context = eqTo(TermParamListRenderContext())
     )
     doWrite(
       """ {
@@ -110,13 +105,8 @@ class DefnDefRendererImplTest extends UnitTestSuite {
       decltpe = Some(Type.AnonymousName()),
       body = Body
     )
-    val defnDefRenderContext = DefnDefRenderContext(
-      methodJavaModifiers = List(JavaModifier.Public),
-      paramJavaModifiers = List(JavaModifier.Final)
-    )
-
+    val defnDefRenderContext = DefnDefRenderContext(javaModifiers = List(JavaModifier.Public))
     val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Public))
-    val expectedParamListRenderContext = TermParamListRenderContext(javaModifiers = List(JavaModifier.Final))
 
     doWrite(
       """@MyAnnotation
@@ -125,7 +115,7 @@ class DefnDefRendererImplTest extends UnitTestSuite {
     doWrite("myMethod").when(termNameRenderer).render(eqTree(MethodName))
     doWrite("(final int param1, final int param2)").when(termParamListRenderer).render(
       termParams = eqTreeList(MethodParamList1),
-      context = eqTo(expectedParamListRenderContext)
+      context = eqTo(TermParamListRenderContext())
     )
     doWrite(
       """ {
@@ -156,13 +146,9 @@ class DefnDefRendererImplTest extends UnitTestSuite {
       decltpe = None,
       body = Body
     )
-    val defnDefRenderContext = DefnDefRenderContext(
-      methodJavaModifiers = List(JavaModifier.Public),
-      paramJavaModifiers = List(JavaModifier.Final)
-    )
-
+    val defnDefRenderContext = DefnDefRenderContext(javaModifiers = List(JavaModifier.Public))
     val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Public))
-    val expectedParamListRenderContext = TermParamListRenderContext(javaModifiers = List(JavaModifier.Final))
+
     doWrite(
       """@MyAnnotation
         |public """.stripMargin)
@@ -170,7 +156,7 @@ class DefnDefRendererImplTest extends UnitTestSuite {
     doWrite("myMethod").when(termNameRenderer).render(eqTree(MethodName))
     doWrite("(final int param1, final int param2)").when(termParamListRenderer).render(
       termParams = eqTreeList(MethodParamList1),
-      context = eqTo(expectedParamListRenderContext)
+      context = eqTo(TermParamListRenderContext())
     )
     doWrite(
       """ {
@@ -201,13 +187,9 @@ class DefnDefRendererImplTest extends UnitTestSuite {
       decltpe = Some(t"void"),
       body = Body
     )
-    val defnDefRenderContext = DefnDefRenderContext(
-      methodJavaModifiers = List(JavaModifier.Public),
-      paramJavaModifiers = List(JavaModifier.Final)
-    )
-
+    val defnDefRenderContext = DefnDefRenderContext(javaModifiers = List(JavaModifier.Public))
     val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Public))
-    val expectedParamListRenderContext = TermParamListRenderContext(javaModifiers = List(JavaModifier.Final))
+
     doWrite(
       """@MyAnnotation
         |public """.stripMargin)
@@ -217,7 +199,7 @@ class DefnDefRendererImplTest extends UnitTestSuite {
     doWrite("myMethod").when(termNameRenderer).render(eqTree(MethodName))
     doWrite("(final int param1, final int param2)").when(termParamListRenderer).render(
       termParams = eqTreeList(MethodParamList1),
-      context = eqTo(expectedParamListRenderContext)
+      context = eqTo(TermParamListRenderContext())
     )
     doWrite(
       """ {
@@ -248,7 +230,7 @@ class DefnDefRendererImplTest extends UnitTestSuite {
       decltpe = Some(t"int"),
       body = Body
     )
-    val defnDefRenderContext = DefnDefRenderContext(methodJavaModifiers = List(JavaModifier.Default))
+    val defnDefRenderContext = DefnDefRenderContext(javaModifiers = List(JavaModifier.Default))
 
     val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Default))
     doWrite(
@@ -290,7 +272,7 @@ class DefnDefRendererImplTest extends UnitTestSuite {
       decltpe = Some(t"int"),
       body = Body
     )
-    val defnDefRenderContext = DefnDefRenderContext(methodJavaModifiers = List(JavaModifier.Default))
+    val defnDefRenderContext = DefnDefRenderContext(javaModifiers = List(JavaModifier.Default))
 
     val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Default))
     doWrite(

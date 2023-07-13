@@ -8,7 +8,7 @@ import io.github.effiban.scala2java.core.renderers._
 import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
 import io.github.effiban.scala2java.core.typeinference.TermTypeInferrer
 import io.github.effiban.scala2java.core.writers.JavaWriter
-import io.github.effiban.scala2java.spi.entities.JavaScope
+import io.github.effiban.scala2java.spi.entities.JavaScope.MethodSignature
 import io.github.effiban.scala2java.spi.transformers.DefnDefTransformer
 
 import scala.meta.{Defn, Type}
@@ -51,10 +51,8 @@ private[traversers] class DeprecatedDefnDefTraverserImpl(statModListTraverser: =
   }
 
   private def traverseMethodParamsAndBody(defDef: Defn.Def, maybeMethodType: Option[Type]): Unit = {
-    val methodParamTraversalResults = defDef.paramss.flatten.map(param => termParamTraverser.traverse(param, StatContext(JavaScope.MethodSignature)))
-    // We can assume the Java modifiers in the results are all the same (all 'final') so we can combine them
-    val paramListRenderContext = TermParamListRenderContext(javaModifiers = methodParamTraversalResults.flatMap(_.javaModifiers).distinct)
-    termParamListRenderer.render(methodParamTraversalResults.map(_.tree), paramListRenderContext)
+    val traversedParams = defDef.paramss.flatten.map(param => termParamTraverser.traverse(param, StatContext(MethodSignature)))
+    termParamListRenderer.render(traversedParams)
     val shouldReturnValue = maybeMethodType match {
       case Some(Type.Name("Unit") | Type.AnonymousName()) => No
       case Some(_) => Yes

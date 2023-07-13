@@ -42,11 +42,10 @@ private[traversers] class CaseClassTraverserImpl(statModListTraverser: => StatMo
 
   private def traverseCtorAndTemplate(classDef: Defn.Class, javaTreeType: JavaTreeType, context: ClassOrTraitContext): Unit = {
     val javaChildScope = javaChildScopeResolver.resolve(JavaChildScopeContext(classDef, javaTreeType))
-    val traversedParamResults = classDef.ctor.paramss.flatten.map(param => termParamTraverser.traverse(param, StatContext(javaChildScope)))
-    // TODO We can usually ignore the returned Java modifiers, because Java record fields have no visibility modifiers (implicitly final)
-    // TODO However we also need to support the rare case of a 'var' Scala modifier in a case class ctor. arg
-    termParamListRenderer.render(traversedParamResults.map(_.tree))
+    val traversedParams = classDef.ctor.paramss.flatten.map(param => termParamTraverser.traverse(param, StatContext(javaChildScope)))
+    termParamListRenderer.render(traversedParams)
     // Even though the Java type is a Record, the constructor must still be explicitly declared if it has modifiers (annotations, visibility, etc.)
+    // TODO - an explicit ctor. and member will be needed also in the rare case that a param has a 'var' modifier
     val maybePrimaryCtor = if (classDef.ctor.mods.nonEmpty) Some(classDef.ctor) else None
     val templateContext = TemplateContext(
       javaScope = javaChildScope,

@@ -9,7 +9,7 @@ import io.github.effiban.scala2java.core.renderers._
 import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.{ModListTraversalResult, TermParamTraversalResult}
+import io.github.effiban.scala2java.core.traversers.results.ModListTraversalResult
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.spi.entities.JavaScope.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
@@ -103,16 +103,14 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     doReturn(TraversedMethodType).when(typeTraverser).traverse(eqTree(MethodType))
     doWrite("TraversedMethodType").when(typeRenderer).render(eqTree(TraversedMethodType))
     doWrite("myMethod").when(termNameRenderer).render(eqTree(MethodName))
-    doAnswer((param: Term.Param) => {
-      val traversedParam = param match {
-        case aParam if aParam.structure == MethodParam1.structure => TraversedMethodParam1
-        case aParam if aParam.structure == MethodParam2.structure => TraversedMethodParam2
-      }
-      TermParamTraversalResult(traversedParam, List(JavaModifier.Final))
+    doAnswer((param: Term.Param) => param match {
+      case aParam if aParam.structure == MethodParam1.structure => TraversedMethodParam1
+      case aParam if aParam.structure == MethodParam2.structure => TraversedMethodParam2
+      case aParam => aParam
     }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.MethodSignature)))
     doWrite("(final int param11, final int param22)").when(termParamListRenderer).render(
       termParams = eqTreeList(TraversedMethodParamList1),
-      context = eqTo(TermParamListRenderContext(List(JavaModifier.Final)))
+      context = eqTo(TermParamListRenderContext())
     )
 
     declDefTraverser.traverse(declDef, StatContext(javaScope))
@@ -153,16 +151,14 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     doReturn(TraversedMethodType).when(typeTraverser).traverse(eqTree(MethodType))
     doWrite("TraversedMethodType").when(typeRenderer).render(eqTree(TraversedMethodType))
     doWrite("myMethod").when(termNameRenderer).render(eqTree(MethodName))
-    doAnswer((param: Term.Param) => {
-      val traversedParam = param match {
-        case aParam if aParam.structure == MethodParam1.structure => TraversedMethodParam1
-        case aParam if aParam.structure == MethodParam2.structure => TraversedMethodParam2
-      }
-      TermParamTraversalResult(traversedParam, List(JavaModifier.Final))
+    doAnswer((param: Term.Param) => param match {
+      case aParam if aParam.structure == MethodParam1.structure => TraversedMethodParam1
+      case aParam if aParam.structure == MethodParam2.structure => TraversedMethodParam2
+      case aParam => aParam
     }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.MethodSignature)))
     doWrite("(final int param11, final int param22)").when(termParamListRenderer).render(
       termParams = eqTreeList(TraversedMethodParamList1),
-      context = eqTo(TermParamListRenderContext(List(JavaModifier.Final)))
+      context = eqTo(TermParamListRenderContext())
     )
 
     declDefTraverser.traverse(declDef, StatContext(javaScope))
@@ -197,12 +193,10 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     doReturn(TraversedMethodType).when(typeTraverser).traverse(eqTree(MethodType))
     doWrite("TraversedMethodType").when(typeRenderer).render(eqTree(TraversedMethodType))
     doWrite("myMethod").when(termNameRenderer).render(eqTree(MethodName))
-    doAnswer((param: Term.Param) => {
-      val traversedParam = param match {
-        case aParam if aParam.structure == MethodParam1.structure => TraversedMethodParam1
-        case aParam if aParam.structure == MethodParam2.structure => TraversedMethodParam2
-      }
-      TermParamTraversalResult(traversedParam)
+    doAnswer((param: Term.Param) => param match {
+      case aParam if aParam.structure == MethodParam1.structure => TraversedMethodParam1
+      case aParam if aParam.structure == MethodParam2.structure => TraversedMethodParam2
+      case aParam => aParam
     }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.MethodSignature)))
     doWrite("(int param11, int param22)").when(termParamListRenderer).render(
       termParams = eqTreeList(TraversedMethodParamList1),
@@ -241,14 +235,11 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
     doReturn(TraversedMethodType).when(typeTraverser).traverse(eqTree(MethodType))
     doWrite("TraversedMethodType").when(typeRenderer).render(eqTree(TraversedMethodType))
     doWrite("myMethod").when(termNameRenderer).render(eqTree(MethodName))
-    doAnswer((param: Term.Param) => {
-      val traversedParam = param match {
-        case aParam if aParam.structure == MethodParam1.structure => TraversedMethodParam1
-        case aParam if aParam.structure == MethodParam2.structure => TraversedMethodParam2
-        case aParam if aParam.structure == MethodParam3.structure => TraversedMethodParam3
-        case aParam if aParam.structure == MethodParam4.structure => TraversedMethodParam4
-      }
-      TermParamTraversalResult(traversedParam)
+    doAnswer((param: Term.Param) => param match {
+      case aParam if aParam.structure == MethodParam1.structure => TraversedMethodParam1
+      case aParam if aParam.structure == MethodParam2.structure => TraversedMethodParam2
+      case aParam if aParam.structure == MethodParam3.structure => TraversedMethodParam3
+      case aParam if aParam.structure == MethodParam4.structure => TraversedMethodParam4
     }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.MethodSignature)))
     doWrite("(int param11, int param22, int param33, int param44)").when(termParamListRenderer).render(
       termParams = eqTreeList(TraversedMethodParamList1 ++ TraversedMethodParamList2),
