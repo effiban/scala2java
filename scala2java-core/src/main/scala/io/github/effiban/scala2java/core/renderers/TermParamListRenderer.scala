@@ -11,7 +11,7 @@ trait TermParamListRenderer {
 }
 
 private[renderers] class TermParamListRendererImpl(argumentListRenderer: => ArgumentListRenderer,
-                                                   termParamArgRendererFactory: => TermParamArgRendererFactory)
+                                                   termParamArgumentRenderer: => ArgumentRenderer[Term.Param])
   extends TermParamListRenderer {
 
   override def render(termParams: List[Term.Param], context: TermParamListRenderContext = TermParamListRenderContext()): Unit = {
@@ -23,7 +23,7 @@ private[renderers] class TermParamListRendererImpl(argumentListRenderer: => Argu
 
     argumentListRenderer.render(
       args = termParams,
-      argRenderer = termParamArgRendererFactory(context),
+      argRenderer = termParamArgumentRenderer,
       context = ArgumentListContext(options = options)
     )
   }

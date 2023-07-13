@@ -9,7 +9,7 @@ import io.github.effiban.scala2java.core.renderers._
 import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.{ModListTraversalResult, TermParamTraversalResult}
+import io.github.effiban.scala2java.core.traversers.results.ModListTraversalResult
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.spi.entities.JavaScope.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
@@ -44,10 +44,10 @@ class CtorSecondaryTraverserImplTest extends UnitTestSuite {
   private val CtorArgList1 = List(CtorArg1, CtorArg2)
   private val CtorArgList2 = List(CtorArg3, CtorArg4)
 
-  private val TraversedCtorArg1 = param"param11: Int"
-  private val TraversedCtorArg2 = param"param22: Int"
-  private val TraversedCtorArg3 = param"param33: Int"
-  private val TraversedCtorArg4 = param"param44: Int"
+  private val TraversedCtorArg1 = param"final param11: Int"
+  private val TraversedCtorArg2 = param"final param22: Int"
+  private val TraversedCtorArg3 = param"final param33: Int"
+  private val TraversedCtorArg4 = param"final param44: Int"
 
   private val TraversedCtorArgList1 = List(TraversedCtorArg1, TraversedCtorArg2)
   private val TraversedCtorArgList2 = List(TraversedCtorArg3, TraversedCtorArg4)
@@ -79,7 +79,7 @@ class CtorSecondaryTraverserImplTest extends UnitTestSuite {
     modListRenderer,
     typeNameTraverser,
     typeNameRenderer,
-    termParamTraverser, 
+    termParamTraverser,
     termParamListRenderer,
     initTraverser,
     initRenderer,
@@ -110,17 +110,14 @@ class CtorSecondaryTraverserImplTest extends UnitTestSuite {
       .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doReturn(TraversedClassName).when(typeNameTraverser).traverse(eqTree(ClassName))
     doWrite("MyTraversedClass").when(typeNameRenderer).render(eqTree(TraversedClassName))
-    doAnswer((param: Term.Param) => {
-      val traversedParam = param match {
-        case aParam if aParam.structure == CtorArg1.structure => TraversedCtorArg1
-        case aParam if aParam.structure == CtorArg2.structure => TraversedCtorArg2
-        case aParam => aParam
-      }
-      TermParamTraversalResult(traversedParam, List(JavaModifier.Final))
+    doAnswer((param: Term.Param) => param match {
+      case aParam if aParam.structure == CtorArg1.structure => TraversedCtorArg1
+      case aParam if aParam.structure == CtorArg2.structure => TraversedCtorArg2
+      case aParam => aParam
     }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.MethodSignature)))
     doWrite("(final int param11, final int param22)").when(termParamListRenderer).render(
       termParams = eqTreeList(TraversedCtorArgList1),
-      context = eqTo(TermParamListRenderContext(List(JavaModifier.Final)))
+      context = eqTo(TermParamListRenderContext())
     )
     doReturn(TheTraversedSelfInit).when(initTraverser).traverse(eqTree(TheSelfInit))
     doWrite("  this(param11)").when(initRenderer).render(eqTree(TheTraversedSelfInit), eqTo(InitContext(argNameAsComment = true)))
@@ -159,17 +156,14 @@ class CtorSecondaryTraverserImplTest extends UnitTestSuite {
       .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doReturn(TraversedClassName).when(typeNameTraverser).traverse(eqTree(ClassName))
     doWrite("MyTraversedClass").when(typeNameRenderer).render(eqTree(TraversedClassName))
-    doAnswer((param: Term.Param) => {
-      val traversedParam = param match {
-        case aParam if aParam.structure == CtorArg1.structure => TraversedCtorArg1
-        case aParam if aParam.structure == CtorArg2.structure => TraversedCtorArg2
-        case aParam => aParam
-      }
-      TermParamTraversalResult(traversedParam, List(JavaModifier.Final))
+    doAnswer((param: Term.Param) => param match {
+      case aParam if aParam.structure == CtorArg1.structure => TraversedCtorArg1
+      case aParam if aParam.structure == CtorArg2.structure => TraversedCtorArg2
+      case aParam => aParam
     }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.MethodSignature)))
     doWrite("(final int param11, final int param22)").when(termParamListRenderer).render(
       termParams = eqTreeList(TraversedCtorArgList1),
-      context = eqTo(TermParamListRenderContext(List(JavaModifier.Final)))
+      context = eqTo(TermParamListRenderContext())
     )
     doReturn(TheTraversedSelfInit).when(initTraverser).traverse(eqTree(TheSelfInit))
     doWrite("  this(param11)").when(initRenderer).render(eqTree(TheTraversedSelfInit), eqTo(InitContext(argNameAsComment = true)))
@@ -222,20 +216,17 @@ class CtorSecondaryTraverserImplTest extends UnitTestSuite {
       .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doReturn(TraversedClassName).when(typeNameTraverser).traverse(eqTree(ClassName))
     doWrite("MyTraversedClass").when(typeNameRenderer).render(eqTree(TraversedClassName))
-    doAnswer((param: Term.Param) => {
-      val traversedParam = param match {
-        case aParam if aParam.structure == CtorArg1.structure => TraversedCtorArg1
-        case aParam if aParam.structure == CtorArg2.structure => TraversedCtorArg2
-        case aParam if aParam.structure == CtorArg3.structure => TraversedCtorArg3
-        case aParam if aParam.structure == CtorArg4.structure => TraversedCtorArg4
-        case aParam => aParam
-      }
-      TermParamTraversalResult(traversedParam, List(JavaModifier.Final))
+    doAnswer((param: Term.Param) => param match {
+      case aParam if aParam.structure == CtorArg1.structure => TraversedCtorArg1
+      case aParam if aParam.structure == CtorArg2.structure => TraversedCtorArg2
+      case aParam if aParam.structure == CtorArg3.structure => TraversedCtorArg3
+      case aParam if aParam.structure == CtorArg4.structure => TraversedCtorArg4
+      case aParam => aParam
     }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.MethodSignature)))
     doWrite("(final int param11, final int param22, final int param33, final int param44)")
       .when(termParamListRenderer).render(
       termParams = eqTreeList(TraversedCtorArgList1 ++ TraversedCtorArgList2),
-      context = eqTo(TermParamListRenderContext(List(JavaModifier.Final)))
+      context = eqTo(TermParamListRenderContext())
     )
     doReturn(TheTraversedSelfInit).when(initTraverser).traverse(eqTree(TheSelfInit))
     doWrite("  this(param11)").when(initRenderer).render(eqTree(TheTraversedSelfInit), eqTo(InitContext(argNameAsComment = true)))

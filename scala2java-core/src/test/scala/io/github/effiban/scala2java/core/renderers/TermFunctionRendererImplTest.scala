@@ -43,8 +43,7 @@ class TermFunctionRendererImplTest extends UnitTestSuite {
     val functionBody = Term.Apply(Term.Name("doSomething"), List(Term.Name("val1")))
     val function = Term.Function(params = List(param), body = functionBody)
 
-    doWrite("val1")
-      .when(termParamRenderer).render(termParam = eqTree(param), context = eqTo(TermParamRenderContext()))
+    doWrite("val1").when(termParamRenderer).render(termParam = eqTree(param))
     doWrite("doSomething(val1)").when(defaultTermRenderer).render(eqTree(functionBody))
 
     termFunctionRenderer.render(function)
@@ -79,8 +78,7 @@ class TermFunctionRendererImplTest extends UnitTestSuite {
     )
     val function = Term.Function(params = List(param), body = functionBody)
 
-    doWrite("val1")
-      .when(termParamRenderer).render(termParam = eqTree(param), context = eqTo(TermParamRenderContext()))
+    doWrite("val1").when(termParamRenderer).render(termParam = eqTree(param))
     doWrite(
       """ {
         |  /* BODY */
@@ -109,8 +107,7 @@ class TermFunctionRendererImplTest extends UnitTestSuite {
 
     val bodyContext = BlockRenderContext(uncertainReturn = true)
 
-    doWrite("val1")
-      .when(termParamRenderer).render(termParam = eqTree(param), context = eqTo(TermParamRenderContext()))
+    doWrite("val1").when(termParamRenderer).render(termParam = eqTree(param))
     doWrite(
       """ {
         |  /* BODY */

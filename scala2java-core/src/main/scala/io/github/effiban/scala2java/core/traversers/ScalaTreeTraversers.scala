@@ -266,8 +266,6 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val initTraverser: InitTraverser = new InitTraverserImpl(typeTraverser, expressionTermTraverser)
 
-  private lazy val statModListTraverser: StatModListTraverser = new StatModListTraverserImpl(annotTraverser, JavaModifiersResolver)
-
   private lazy val nameTraverser: NameTraverser = new NameTraverserImpl(typeNameTraverser)
 
   private lazy val newTraverser: NewTraverser = new NewTraverserImpl(
@@ -337,6 +335,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
   private lazy val selfTraverser: SelfTraverser = new SelfTraverserImpl(selfRenderer)
 
   lazy val sourceTraverser: SourceTraverser = new SourceTraverserImpl(statTraverser)
+
+  private lazy val statModListTraverser: StatModListTraverser = new StatModListTraverserImpl(annotTraverser, JavaModifiersResolver)
 
   private lazy val statTermTraverser: StatTermTraverser = new StatTermTraverserImpl(
     expressionTermRefTraverser,
@@ -411,8 +411,11 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val termMatchTraverser: TermMatchTraverser = new TermMatchTraverserImpl(expressionTermTraverser, caseTraverser)
 
+  private lazy val termParamModListTraverser: TermParamModListTraverser =
+    new TermParamModListTraverserImpl(annotTraverser, JavaFinalModifierResolver)
+
   private lazy val termParamTraverser: TermParamTraverser = new TermParamTraverserImpl(
-    statModListTraverser,
+    termParamModListTraverser,
     nameTraverser,
     typeTraverser,
     expressionTermTraverser
