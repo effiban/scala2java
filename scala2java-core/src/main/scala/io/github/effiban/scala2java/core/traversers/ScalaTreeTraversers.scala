@@ -98,8 +98,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val ctorPrimaryTraverser: CtorPrimaryTraverser = new CtorPrimaryTraverserImpl(
     CtorPrimaryTransformer,
-    defnDefTraverser,
-    defnDefRenderer
+    defnDefTraverser
   )
 
   private lazy val ctorSecondaryTraverser: CtorSecondaryTraverser = new CtorSecondaryTraverserImpl(
@@ -367,6 +366,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val templateChildTraverser: TemplateChildTraverser = new TemplateChildTraverserImpl(
     ctorPrimaryTraverser,
+    defnDefRenderer,
     ctorSecondaryTraverser,
     enumConstantListTraverser,
     statTraverser,

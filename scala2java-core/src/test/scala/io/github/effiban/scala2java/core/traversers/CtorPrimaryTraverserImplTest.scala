@@ -1,9 +1,9 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.{CtorContext, DefnDefContext, DefnDefRenderContext}
+import io.github.effiban.scala2java.core.contexts.{CtorContext, DefnDefContext}
 import io.github.effiban.scala2java.core.entities.JavaModifier
 import io.github.effiban.scala2java.core.matchers.CtorContextMatcher.eqCtorContext
-import io.github.effiban.scala2java.core.renderers.DefnDefRenderer
+import io.github.effiban.scala2java.core.matchers.DefnDefTraversalResultScalatestMatcher.equalDefnDefTraversalResult
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.core.transformers.CtorPrimaryTransformer
@@ -65,12 +65,10 @@ class CtorPrimaryTraverserImplTest extends UnitTestSuite {
 
   private val ctorPrimaryTransformer = mock[CtorPrimaryTransformer]
   private val defnDefTraverser = mock[DefnDefTraverser]
-  private val defnDefRenderer = mock[DefnDefRenderer]
 
   private val ctorPrimaryTraverser = new CtorPrimaryTraverserImpl(
     ctorPrimaryTransformer,
-    defnDefTraverser,
-    defnDefRenderer
+    defnDefTraverser
   )
 
   test("traverse") {
@@ -79,9 +77,7 @@ class CtorPrimaryTraverserImplTest extends UnitTestSuite {
     doReturn(ExpectedTraversalResult)
       .when(defnDefTraverser).traverse(eqTree(ExpectedTransformedDefnDef), eqTo(DefnDefContext(JavaScope.Class)))
 
-    ctorPrimaryTraverser.traverse(PrimaryCtor, TheCtorContext)
-
-    verify(defnDefRenderer).render(eqTree(ExpectedTraversedDefnDef), eqTo(DefnDefRenderContext(ExpectedJavaModifiers)))
+    ctorPrimaryTraverser.traverse(PrimaryCtor, TheCtorContext) should equalDefnDefTraversalResult(ExpectedTraversalResult)
   }
 
   private def termParam(name: String, typeName: String) = {

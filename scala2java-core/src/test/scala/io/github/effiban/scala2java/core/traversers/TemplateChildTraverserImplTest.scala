@@ -1,20 +1,24 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.classifiers.{DefnVarClassifier, JavaStatClassifier, TraitClassifier}
-import io.github.effiban.scala2java.core.contexts.{CtorContext, StatContext, TemplateChildContext}
+import io.github.effiban.scala2java.core.contexts.{CtorContext, DefnDefRenderContext, StatContext, TemplateChildContext}
+import io.github.effiban.scala2java.core.entities.JavaModifier
 import io.github.effiban.scala2java.core.matchers.CtorContextMatcher.eqCtorContext
+import io.github.effiban.scala2java.core.renderers.DefnDefRenderer
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
+import io.github.effiban.scala2java.core.traversers.results.DefnDefTraversalResult
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
 
-import scala.meta.{Ctor, Defn, Init, Lit, Name, Pat, Term, Type, XtensionQuasiquoteTerm}
+import scala.meta.{Ctor, Defn, Init, Lit, Name, Pat, Term, Type, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 class TemplateChildTraverserImplTest extends UnitTestSuite {
 
-  private val ClassName = Type.Name("MyClass")
+  private val ClassName = t"MyClass"
+  private val TermClassName = q"MyClass"
 
   private val TheInits = List(
     Init(tpe = Type.Name("Parent1"), name = Name.Anonymous(), argss = List()),
@@ -46,6 +50,15 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
     paramss = List(PrimaryCtorArgs)
   )
 
+  private val PrimaryCtorDefnDef = Defn.Def(
+    mods = Nil,
+    name = TermClassName,
+    tparams = Nil,
+    paramss = List(PrimaryCtorArgs),
+    decltpe = Some(Type.AnonymousName()),
+    body = Term.Apply(Term.Name("foo"), Nil)
+  )
+
   private val SecondaryCtor = Ctor.Secondary(
     mods = Nil,
     name = Name.Anonymous(),
@@ -73,6 +86,7 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
   private val TheTrait = q"trait MyTrait { def foo(): Unit = doSomething() } "
 
   private val ctorPrimaryTraverser = mock[CtorPrimaryTraverser]
+  private val defnDefRenderer = mock[DefnDefRenderer]
   private val ctorSecondaryTraverser = mock[CtorSecondaryTraverser]
   private val enumConstantListTraverser = mock[EnumConstantListTraverser]
   private val statTraverser = mock[StatTraverser]
@@ -82,6 +96,7 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
 
   private val templateChildTraverser = new TemplateChildTraverserImpl(
     ctorPrimaryTraverser,
+    defnDefRenderer,
     ctorSecondaryTraverser,
     enumConstantListTraverser,
     statTraverser,
@@ -91,11 +106,17 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
   )
 
   test("traverse() for primary ctor. when class name provided") {
+    val ctorJavaModifiers: List[JavaModifier] = List(JavaModifier.Public)
+    val traversalResult = DefnDefTraversalResult(PrimaryCtorDefnDef, ctorJavaModifiers)
+
+    doReturn(traversalResult)
+      .when(ctorPrimaryTraverser).traverse(primaryCtor = eqTree(PrimaryCtor), ctorContext = eqCtorContext(CtorContextWithClassName))
+
     doWrite(
       """{
         |   /* PRIMARY CTOR */
         |}""".stripMargin)
-      .when(ctorPrimaryTraverser).traverse(primaryCtor = eqTree(PrimaryCtor), ctorContext = eqCtorContext(CtorContextWithClassName))
+      .when(defnDefRenderer).render(eqTree(PrimaryCtorDefnDef), eqTo(DefnDefRenderContext(ctorJavaModifiers)))
 
     templateChildTraverser.traverse(child = PrimaryCtor, context = ChildContextWithClassName)
 
