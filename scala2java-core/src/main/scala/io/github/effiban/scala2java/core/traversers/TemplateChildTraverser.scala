@@ -1,7 +1,8 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.classifiers.{DefnVarClassifier, JavaStatClassifier, TraitClassifier}
-import io.github.effiban.scala2java.core.contexts.{CtorContext, StatContext, TemplateChildContext}
+import io.github.effiban.scala2java.core.contexts.{CtorContext, DefnDefRenderContext, StatContext, TemplateChildContext}
+import io.github.effiban.scala2java.core.renderers.DefnDefRenderer
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.{Ctor, Defn, Stat, Tree, Type}
@@ -11,6 +12,7 @@ trait TemplateChildTraverser {
 }
 
 private[traversers] class TemplateChildTraverserImpl(ctorPrimaryTraverser: => CtorPrimaryTraverser,
+                                                     defnDefRenderer: => DefnDefRenderer,
                                                      ctorSecondaryTraverser: => CtorSecondaryTraverser,
                                                      enumConstantListTraverser: => EnumConstantListTraverser,
                                                      statTraverser: => StatTraverser,
@@ -27,7 +29,7 @@ private[traversers] class TemplateChildTraverserImpl(ctorPrimaryTraverser: => Ct
     case defnVar: Defn.Var if defnVarClassifier.isEnumConstantList(defnVar, context.javaScope) =>
       enumConstantListTraverser.traverse(defnVar)
       writeStatementEnd()
-    // The type definition in a Scala 2.x enumeration is redundant in Java - skip it
+    // The type definition in a Scala Enumeration is redundant in Java - skip it
     case defnTrait: Defn.Trait if traitClassifier.isEnumTypeDef(defnTrait, context.javaScope) =>
     case stat: Stat => traverseRegularStat(stat, context)
     case unexpected: Tree => throw new IllegalStateException(s"Unexpected template child: $unexpected")
@@ -35,7 +37,10 @@ private[traversers] class TemplateChildTraverserImpl(ctorPrimaryTraverser: => Ct
 
   private def traversePrimaryCtor(primaryCtor: Ctor.Primary, context: TemplateChildContext): Unit = {
     context.maybeClassName match {
-      case Some(className) => ctorPrimaryTraverser.traverse(primaryCtor, toCtorContext(context, className))
+      case Some(className) =>
+        val traversalResult = ctorPrimaryTraverser.traverse(primaryCtor, toCtorContext(context, className))
+        val renderContext = DefnDefRenderContext(traversalResult.javaModifiers)
+        defnDefRenderer.render(traversalResult.tree, renderContext)
       case None => throw new IllegalStateException("Primary Ctor. exists but no context could be constructed for it")
     }
   }
