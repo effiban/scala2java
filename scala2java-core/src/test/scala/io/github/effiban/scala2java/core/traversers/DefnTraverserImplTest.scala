@@ -1,12 +1,11 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.{ClassOrTraitContext, DefnDefContext, StatContext, VarRenderContext}
+import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.entities.JavaModifier
-import io.github.effiban.scala2java.core.matchers.DefnDefContextMatcher.eqDefnDefContext
-import io.github.effiban.scala2java.core.renderers.{DeclVarRenderer, DefnVarRenderer}
+import io.github.effiban.scala2java.core.renderers.{DeclVarRenderer, DefnDefRenderer, DefnVarRenderer}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
-import io.github.effiban.scala2java.core.traversers.results.{DeclVarTraversalResult, DefnVarTraversalResult}
+import io.github.effiban.scala2java.core.traversers.results.{DeclVarTraversalResult, DefnDefTraversalResult, DefnVarTraversalResult}
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
@@ -23,7 +22,8 @@ class DefnTraverserImplTest extends UnitTestSuite {
   private val declVarRenderer = mock[DeclVarRenderer]
   private val defnVarTraverser = mock[DefnVarTraverser]
   private val defnVarRenderer = mock[DefnVarRenderer]
-  private val defnDefTraverser = mock[DeprecatedDefnDefTraverser]
+  private val defnDefTraverser = mock[DefnDefTraverser]
+  private val defnDefRenderer = mock[DefnDefRenderer]
   private val classTraverser = mock[ClassTraverser]
   private val traitTraverser = mock[TraitTraverser]
   private val objectTraverser = mock[ObjectTraverser]
@@ -33,6 +33,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
     defnVarTraverser,
     defnVarRenderer,
     defnDefTraverser,
+    defnDefRenderer,
     classTraverser,
     traitTraverser,
     objectTraverser)
@@ -69,22 +70,15 @@ class DefnTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for Defn.Def") {
+    val defnDef = q"def myMethod(x: Int) = doSomething(x)"
+    val traversedDefnDef = q"def myMethod2(xx: Int) = doSomething2(xx)"
+    val traversalResult = DefnDefTraversalResult(traversedDefnDef, List(JavaModifier.Public))
 
-    val defnDef = Defn.Def(
-      mods = List(),
-      name = Term.Name("myMethod"),
-      tparams = List(),
-      paramss = List(),
-      decltpe = Some(TypeNames.Int),
-      body = Term.Apply(Term.Name("doSomething"), List())
-    )
+    doReturn(traversalResult).when(defnDefTraverser).traverse(eqTree(defnDef), eqTo(DefnDefContext(TheStatContext.javaScope)))
 
     defnTraverser.traverse(defnDef, TheStatContext)
 
-    verify(defnDefTraverser).traverse(
-      defnDef = eqTree(defnDef),
-      eqDefnDefContext(DefnDefContext(javaScope = TheStatContext.javaScope))
-    )
+    verify(defnDefRenderer).render(eqTree(traversedDefnDef), eqTo(DefnDefRenderContext(traversalResult.javaModifiers)))
   }
 
   test("traverse() for Defn.Class") {

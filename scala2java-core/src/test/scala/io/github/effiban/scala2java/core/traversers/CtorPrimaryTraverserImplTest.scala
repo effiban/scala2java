@@ -1,13 +1,16 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.{CtorContext, DefnDefContext}
+import io.github.effiban.scala2java.core.contexts.{CtorContext, DefnDefContext, DefnDefRenderContext}
+import io.github.effiban.scala2java.core.entities.JavaModifier
 import io.github.effiban.scala2java.core.matchers.CtorContextMatcher.eqCtorContext
-import io.github.effiban.scala2java.core.matchers.DefnDefContextMatcher.eqDefnDefContext
+import io.github.effiban.scala2java.core.renderers.DefnDefRenderer
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.core.transformers.CtorPrimaryTransformer
+import io.github.effiban.scala2java.core.traversers.results.DefnDefTraversalResult
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
+import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.{Ctor, Defn, Init, Name, Term, Type}
 
@@ -38,8 +41,9 @@ class CtorPrimaryTraverserImplTest extends UnitTestSuite {
   )
 
   private val Statement = Term.Apply(fun = Term.Name("doSomething"), args = List(Term.Name("param1")))
+  private val TraversedStatement = Term.Apply(fun = Term.Name("doSomething2"), args = List(Term.Name("param11")))
 
-  private val ExpectedDefnDef = Defn.Def(
+  private val ExpectedTransformedDefnDef = Defn.Def(
     mods = Nil,
     name = Term.Name("myMethod"),
     tparams = Nil,
@@ -48,17 +52,36 @@ class CtorPrimaryTraverserImplTest extends UnitTestSuite {
     body = Statement
   )
 
-  private val ctorPrimaryTransformer = mock[CtorPrimaryTransformer]
-  private val defnDefTraverser = mock[DeprecatedDefnDefTraverser]
+  private val ExpectedTraversedDefnDef = Defn.Def(
+    mods = Nil,
+    name = Term.Name("myTraversedMethod"),
+    tparams = Nil,
+    paramss = List(List(termParam("traversedParam", "Int"))),
+    decltpe = Some(TypeNames.Int),
+    body = TraversedStatement
+  )
+  private val ExpectedJavaModifiers = List(JavaModifier.Public)
+  private val ExpectedTraversalResult = DefnDefTraversalResult(ExpectedTraversedDefnDef, ExpectedJavaModifiers)
 
-  private val ctorPrimaryTraverser = new CtorPrimaryTraverserImpl(ctorPrimaryTransformer, defnDefTraverser)
+  private val ctorPrimaryTransformer = mock[CtorPrimaryTransformer]
+  private val defnDefTraverser = mock[DefnDefTraverser]
+  private val defnDefRenderer = mock[DefnDefRenderer]
+
+  private val ctorPrimaryTraverser = new CtorPrimaryTraverserImpl(
+    ctorPrimaryTransformer,
+    defnDefTraverser,
+    defnDefRenderer
+  )
 
   test("traverse") {
-    when(ctorPrimaryTransformer.transform(eqTree(PrimaryCtor), eqCtorContext(TheCtorContext))).thenReturn(ExpectedDefnDef)
+    when(ctorPrimaryTransformer.transform(eqTree(PrimaryCtor), eqCtorContext(TheCtorContext))).thenReturn(ExpectedTransformedDefnDef)
+
+    doReturn(ExpectedTraversalResult)
+      .when(defnDefTraverser).traverse(eqTree(ExpectedTransformedDefnDef), eqTo(DefnDefContext(JavaScope.Class)))
 
     ctorPrimaryTraverser.traverse(PrimaryCtor, TheCtorContext)
 
-    verify(defnDefTraverser).traverse(eqTree(ExpectedDefnDef), eqDefnDefContext(DefnDefContext(javaScope = JavaScope.Class)))
+    verify(defnDefRenderer).render(eqTree(ExpectedTraversedDefnDef), eqTo(DefnDefRenderContext(ExpectedJavaModifiers)))
   }
 
   private def termParam(name: String, typeName: String) = {

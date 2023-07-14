@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.{ClassOrTraitContext, DefnDefContext, StatContext, VarRenderContext}
-import io.github.effiban.scala2java.core.renderers.{DeclVarRenderer, DefnVarRenderer}
+import io.github.effiban.scala2java.core.contexts._
+import io.github.effiban.scala2java.core.renderers.{DeclVarRenderer, DefnDefRenderer, DefnVarRenderer}
 import io.github.effiban.scala2java.core.traversers.results.{DeclVarTraversalResult, DefnVarTraversalResult}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
@@ -15,7 +15,8 @@ trait DefnTraverser {
 private[traversers] class DefnTraverserImpl(declVarRenderer: => DeclVarRenderer,
                                             defnVarTraverser: => DefnVarTraverser,
                                             defnVarRenderer: => DefnVarRenderer,
-                                            defnDefTraverser: => DeprecatedDefnDefTraverser,
+                                            defnDefTraverser: => DefnDefTraverser,
+                                            defnDefRenderer: => DefnDefRenderer,
                                             classTraverser: => ClassTraverser,
                                             traitTraverser: => TraitTraverser,
                                             objectTraverser: => ObjectTraverser)
@@ -25,7 +26,7 @@ private[traversers] class DefnTraverserImpl(declVarRenderer: => DeclVarRenderer,
 
   override def traverse(defn: Defn, context: StatContext = StatContext()): Unit = defn match {
     case varDef: Defn.Var => traverseDefnVar(varDef, context)
-    case defDef: Defn.Def => defnDefTraverser.traverse(defDef, DefnDefContext(javaScope = context.javaScope))
+    case defDef: Defn.Def => traverseDefnDef(context, defDef)
     case classDef: Defn.Class => classTraverser.traverse(classDef, ClassOrTraitContext(context.javaScope))
     case traitDef: Trait => traitTraverser.traverse(traitDef, ClassOrTraitContext(context.javaScope))
     case objectDef: Defn.Object => objectTraverser.traverse(objectDef, context)
@@ -42,4 +43,9 @@ private[traversers] class DefnTraverserImpl(declVarRenderer: => DeclVarRenderer,
     }
   }
 
+  private def traverseDefnDef(context: StatContext, defDef: Defn.Def): Unit = {
+    val traversalResult = defnDefTraverser.traverse(defDef, DefnDefContext(context.javaScope))
+    val renderContext = DefnDefRenderContext(traversalResult.javaModifiers)
+    defnDefRenderer.render(traversalResult.tree, renderContext)
+  }
 }
