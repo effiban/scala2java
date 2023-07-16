@@ -212,8 +212,6 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val doTraverser: DoTraverser = new DoTraverserImpl(blockWrappingTermTraverser, expressionTermTraverser)
 
-  private lazy val enumConstantListTraverser: EnumConstantListTraverser = new EnumConstantListTraverserImpl(argumentListRenderer)
-
   private lazy val etaTraverser: EtaTraverser = new EtaTraverserImpl(expressionTermTraverser)
 
   private lazy val expressionBlockTraverser: ExpressionBlockTraverser = new ExpressionBlockTraverserImpl(expressionTermTraverser)
@@ -363,7 +361,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
     defnDefRenderer,
     ctorSecondaryTraverser,
     ctorSecondaryRenderer,
-    enumConstantListTraverser,
+    enumConstantListRenderer,
     statTraverser,
     DefnVarClassifier,
     TraitClassifier,

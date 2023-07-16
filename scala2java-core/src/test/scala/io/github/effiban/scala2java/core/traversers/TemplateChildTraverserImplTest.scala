@@ -5,7 +5,7 @@ import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.entities.JavaModifier
 import io.github.effiban.scala2java.core.matchers.CtorContextMatcher.eqCtorContext
 import io.github.effiban.scala2java.core.matchers.CtorSecondaryRenderContextMatcher.eqCtorSecondaryRenderContext
-import io.github.effiban.scala2java.core.renderers.{CtorSecondaryRenderer, DefnDefRenderer}
+import io.github.effiban.scala2java.core.renderers.{CtorSecondaryRenderer, DefnDefRenderer, EnumConstantListRenderer}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
@@ -104,7 +104,7 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
   private val defnDefRenderer = mock[DefnDefRenderer]
   private val ctorSecondaryTraverser = mock[CtorSecondaryTraverser]
   private val ctorSecondaryRenderer = mock[CtorSecondaryRenderer]
-  private val enumConstantListTraverser = mock[EnumConstantListTraverser]
+  private val enumConstantListRenderer = mock[EnumConstantListRenderer]
   private val statTraverser = mock[StatTraverser]
   private val defnValClassifier = mock[DefnVarClassifier]
   private val traitClassifier = mock[TraitClassifier]
@@ -115,7 +115,7 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
     defnDefRenderer,
     ctorSecondaryTraverser,
     ctorSecondaryRenderer,
-    enumConstantListTraverser,
+    enumConstantListRenderer,
     statTraverser,
     defnValClassifier,
     traitClassifier,
@@ -198,7 +198,7 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
   test("traverse() for Defn.Var which is an enum constant list") {
 
     when(defnValClassifier.isEnumConstantList(eqTree(TheDefnVar), eqTo(JavaScope.Class))).thenReturn(true)
-    doWrite("/* ENUM CONSTANTS */".stripMargin).when(enumConstantListTraverser).traverse(eqTree(TheDefnVar))
+    doWrite("/* ENUM CONSTANTS */".stripMargin).when(enumConstantListRenderer).render(eqTree(TheDefnVar))
     when(javaStatClassifier.requiresEndDelimiter(eqTree(TheDefnVar))).thenReturn(true)
 
     templateChildTraverser.traverse(child = TheDefnVar, context = TemplateChildContext(javaScope = JavaScope.Class))

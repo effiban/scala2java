@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.classifiers.{DefnVarClassifier, JavaStatClassifier, TraitClassifier}
 import io.github.effiban.scala2java.core.contexts._
-import io.github.effiban.scala2java.core.renderers.{CtorSecondaryRenderer, DefnDefRenderer}
+import io.github.effiban.scala2java.core.renderers.{CtorSecondaryRenderer, DefnDefRenderer, EnumConstantListRenderer}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.{Ctor, Defn, Stat, Tree, Type}
@@ -15,7 +15,7 @@ private[traversers] class TemplateChildTraverserImpl(ctorPrimaryTraverser: => Ct
                                                      defnDefRenderer: => DefnDefRenderer,
                                                      ctorSecondaryTraverser: => CtorSecondaryTraverser,
                                                      ctorSecondaryRenderer: => CtorSecondaryRenderer,
-                                                     enumConstantListTraverser: => EnumConstantListTraverser,
+                                                     enumConstantListRenderer: => EnumConstantListRenderer,
                                                      statTraverser: => StatTraverser,
                                                      defnVarClassifier: DefnVarClassifier,
                                                      traitClassifier: TraitClassifier,
@@ -28,7 +28,7 @@ private[traversers] class TemplateChildTraverserImpl(ctorPrimaryTraverser: => Ct
     case primaryCtor: Ctor.Primary => traversePrimaryCtor(primaryCtor, context)
     case secondaryCtor: Ctor.Secondary => traverseSecondaryCtor(secondaryCtor, context)
     case defnVar: Defn.Var if defnVarClassifier.isEnumConstantList(defnVar, context.javaScope) =>
-      enumConstantListTraverser.traverse(defnVar)
+      enumConstantListRenderer.render(defnVar)
       writeStatementEnd()
     // The type definition in a Scala Enumeration is redundant in Java - skip it
     case defnTrait: Defn.Trait if traitClassifier.isEnumTypeDef(defnTrait, context.javaScope) =>
