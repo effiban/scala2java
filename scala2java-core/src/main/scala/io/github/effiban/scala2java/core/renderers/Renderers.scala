@@ -90,6 +90,11 @@ class Renderers(implicit javaWriter: JavaWriter) {
     patListRenderer
   )
 
+  lazy val defaultStatRenderer: DefaultStatRenderer = new DefaultStatRendererImpl(
+    statTermRenderer,
+    importRenderer
+  )
+
   lazy val defaultTermRefRenderer: DefaultTermRefRenderer = new DefaultTermRefRendererImpl(
     thisRenderer,
     superRenderer,
