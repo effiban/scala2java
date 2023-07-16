@@ -1,13 +1,12 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.StatContext
+import io.github.effiban.scala2java.core.contexts.ImportRenderContext
 import io.github.effiban.scala2java.core.writers.JavaWriter
-import io.github.effiban.scala2java.spi.entities.JavaScope
 
 import scala.meta.Import
 
 trait ImportRenderer {
-  def render(`import`: Import, context: StatContext = StatContext()): Unit
+  def render(`import`: Import, context: ImportRenderContext = ImportRenderContext()): Unit
 }
 
 private[renderers] class ImportRendererImpl(importerRenderer: => ImporterRenderer)
@@ -15,16 +14,11 @@ private[renderers] class ImportRendererImpl(importerRenderer: => ImporterRendere
 
   import javaWriter._
 
-  override def render(`import`: Import, context: StatContext = StatContext()): Unit = {
-    context.javaScope match {
-      case JavaScope.Package => traverseInner(`import`)
-      case _ =>
-        // Java doesn't support imports below package scope
-        writeComment(s"${`import`.toString()}")
-    }
+  override def render(`import`: Import, context: ImportRenderContext = ImportRenderContext()): Unit = {
+    if (context.asComment) writeComment(s"${`import`.toString()}") else renderInner(`import`)
   }
 
-  private def traverseInner(`import`: Import): Unit = {
+  private def renderInner(`import`: Import): Unit = {
     `import`.importers.foreach(importerRenderer.render)
   }
 }
