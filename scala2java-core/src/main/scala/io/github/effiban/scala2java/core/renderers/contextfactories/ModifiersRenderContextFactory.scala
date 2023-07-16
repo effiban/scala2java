@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.renderers.contextfactories
 
-import io.github.effiban.scala2java.core.contexts.ModifiersRenderContext
+import io.github.effiban.scala2java.core.renderers.contexts.ModifiersRenderContext
 import io.github.effiban.scala2java.core.traversers.results.ModListTraversalResult
 
 trait ModifiersRenderContextFactory {

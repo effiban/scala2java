@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.resolvers
 
-import io.github.effiban.scala2java.core.contexts.{ArrayInitializerSizeRenderContext, ArrayInitializerValuesRenderContext}
 import io.github.effiban.scala2java.core.entities.{TermNameValues, TypeNameValues}
+import io.github.effiban.scala2java.core.renderers.contexts.{ArrayInitializerSizeRenderContext, ArrayInitializerValuesRenderContext}
 
 import scala.meta.{Init, Lit, Term, Type}
 

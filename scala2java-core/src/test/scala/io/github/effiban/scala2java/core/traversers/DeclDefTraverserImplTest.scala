@@ -1,12 +1,13 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.{ModifiersContext, ModifiersRenderContext, StatContext, TermParamListRenderContext}
+import io.github.effiban.scala2java.core.contexts.{ModifiersContext, StatContext}
 import io.github.effiban.scala2java.core.entities.{JavaModifier, JavaTreeType}
 import io.github.effiban.scala2java.core.matchers.ModListTraversalResultMockitoMatcher.eqModListTraversalResult
 import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
 import io.github.effiban.scala2java.core.matchers.ModifiersRenderContextMatcher.eqModifiersRenderContext
 import io.github.effiban.scala2java.core.renderers._
 import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
+import io.github.effiban.scala2java.core.renderers.contexts.{ModifiersRenderContext, TermParamListRenderContext}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.traversers.results.ModListTraversalResult

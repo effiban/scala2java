@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.BlockRenderContext
+import io.github.effiban.scala2java.core.renderers.contexts.BlockRenderContext
 
 import scala.meta.Term
 import scala.meta.Term.Block

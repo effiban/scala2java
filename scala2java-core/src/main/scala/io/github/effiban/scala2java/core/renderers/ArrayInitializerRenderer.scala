@@ -1,9 +1,10 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.{ArgumentListContext, ArrayInitializerSizeRenderContext, ArrayInitializerValuesRenderContext}
+import io.github.effiban.scala2java.core.contexts.ArgumentListContext
 import io.github.effiban.scala2java.core.entities.EnclosingDelimiter.{CurlyBrace, SquareBracket}
 import io.github.effiban.scala2java.core.entities.JavaKeyword.New
 import io.github.effiban.scala2java.core.entities.ListTraversalOptions
+import io.github.effiban.scala2java.core.renderers.contexts.{ArrayInitializerSizeRenderContext, ArrayInitializerValuesRenderContext}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.{Term, Type}

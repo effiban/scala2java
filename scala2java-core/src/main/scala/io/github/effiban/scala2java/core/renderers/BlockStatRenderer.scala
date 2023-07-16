@@ -1,9 +1,9 @@
 package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.classifiers.{JavaStatClassifier, TermTreeClassifier}
-import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.entities.JavaModifier
 import io.github.effiban.scala2java.core.entities.TraversalConstants.UncertainReturn
+import io.github.effiban.scala2java.core.renderers.contexts.{BlockStatRenderContext, IfRenderContext, TryRenderContext, VarRenderContext}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Mod.Final

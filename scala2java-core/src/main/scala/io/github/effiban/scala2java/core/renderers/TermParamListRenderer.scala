@@ -1,8 +1,9 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.{ArgumentListContext, TermParamListRenderContext}
+import io.github.effiban.scala2java.core.contexts.ArgumentListContext
 import io.github.effiban.scala2java.core.entities.EnclosingDelimiter.Parentheses
 import io.github.effiban.scala2java.core.entities.ListTraversalOptions
+import io.github.effiban.scala2java.core.renderers.contexts.TermParamListRenderContext
 
 import scala.meta.Term
 

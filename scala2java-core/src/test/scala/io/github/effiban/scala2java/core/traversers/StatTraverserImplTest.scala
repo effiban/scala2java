@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.{ImportRenderContext, StatContext}
+import io.github.effiban.scala2java.core.contexts.StatContext
+import io.github.effiban.scala2java.core.renderers.contexts.ImportRenderContext
 import io.github.effiban.scala2java.core.renderers.{ImportRenderer, StatTermRenderer}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite

@@ -1,7 +1,8 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.{StatContext, VarRenderContext}
+import io.github.effiban.scala2java.core.contexts.StatContext
 import io.github.effiban.scala2java.core.renderers.DeclVarRenderer
+import io.github.effiban.scala2java.core.renderers.contexts.VarRenderContext
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Decl

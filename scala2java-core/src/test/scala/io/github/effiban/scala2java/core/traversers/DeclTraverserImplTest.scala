@@ -1,8 +1,9 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.{StatContext, VarRenderContext}
+import io.github.effiban.scala2java.core.contexts.StatContext
 import io.github.effiban.scala2java.core.entities.JavaModifier
 import io.github.effiban.scala2java.core.renderers.DeclVarRenderer
+import io.github.effiban.scala2java.core.renderers.contexts.VarRenderContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.core.traversers.results.DeclVarTraversalResult

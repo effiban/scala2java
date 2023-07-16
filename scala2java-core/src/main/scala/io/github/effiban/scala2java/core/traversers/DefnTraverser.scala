@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts._
+import io.github.effiban.scala2java.core.renderers.contexts.{DefnDefRenderContext, VarRenderContext}
 import io.github.effiban.scala2java.core.renderers.{DeclVarRenderer, DefnDefRenderer, DefnVarRenderer}
 import io.github.effiban.scala2java.core.traversers.results.{DeclVarTraversalResult, DefnVarTraversalResult}
 import io.github.effiban.scala2java.core.writers.JavaWriter

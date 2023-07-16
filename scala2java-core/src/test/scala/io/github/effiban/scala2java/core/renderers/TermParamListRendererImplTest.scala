@@ -1,9 +1,10 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.{ArgumentListContext, TermParamListRenderContext}
+import io.github.effiban.scala2java.core.contexts.ArgumentListContext
 import io.github.effiban.scala2java.core.entities.EnclosingDelimiter.Parentheses
 import io.github.effiban.scala2java.core.entities.ListTraversalOptions
 import io.github.effiban.scala2java.core.matchers.ArgumentListContextMatcher.eqArgumentListContext
+import io.github.effiban.scala2java.core.renderers.contexts.TermParamListRenderContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import org.mockito.ArgumentMatchersSugar.eqTo
