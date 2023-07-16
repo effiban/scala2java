@@ -1,8 +1,8 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.classifiers.{DefnVarClassifier, JavaStatClassifier, TraitClassifier}
-import io.github.effiban.scala2java.core.contexts.{CtorContext, DefnDefRenderContext, StatContext, TemplateChildContext}
-import io.github.effiban.scala2java.core.renderers.DefnDefRenderer
+import io.github.effiban.scala2java.core.contexts._
+import io.github.effiban.scala2java.core.renderers.{CtorSecondaryRenderer, DefnDefRenderer}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.{Ctor, Defn, Stat, Tree, Type}
@@ -14,6 +14,7 @@ trait TemplateChildTraverser {
 private[traversers] class TemplateChildTraverserImpl(ctorPrimaryTraverser: => CtorPrimaryTraverser,
                                                      defnDefRenderer: => DefnDefRenderer,
                                                      ctorSecondaryTraverser: => CtorSecondaryTraverser,
+                                                     ctorSecondaryRenderer: => CtorSecondaryRenderer,
                                                      enumConstantListTraverser: => EnumConstantListTraverser,
                                                      statTraverser: => StatTraverser,
                                                      defnVarClassifier: DefnVarClassifier,
@@ -47,7 +48,10 @@ private[traversers] class TemplateChildTraverserImpl(ctorPrimaryTraverser: => Ct
 
   private def traverseSecondaryCtor(secondaryCtor: Ctor.Secondary, context: TemplateChildContext): Unit = {
     context.maybeClassName match {
-      case Some(className) => ctorSecondaryTraverser.traverse(secondaryCtor, toCtorContext(context, className))
+      case Some(className) =>
+        val traversalResult = ctorSecondaryTraverser.traverse(secondaryCtor, toCtorContext(context, className))
+        val renderContext = CtorSecondaryRenderContext(traversalResult.className, traversalResult.javaModifiers)
+        ctorSecondaryRenderer.render(traversalResult.tree, renderContext)
       case None => throw new IllegalStateException("Secondary Ctor. exists but no context could be constructed for it")
     }
   }
