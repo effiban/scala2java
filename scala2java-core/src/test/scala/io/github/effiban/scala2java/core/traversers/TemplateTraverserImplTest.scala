@@ -3,7 +3,7 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.{InitContext, TemplateBodyContext, TemplateContext}
 import io.github.effiban.scala2java.core.entities.JavaKeyword.Implements
 import io.github.effiban.scala2java.core.matchers.TemplateBodyContextMatcher.eqTemplateBodyContext
-import io.github.effiban.scala2java.core.renderers.InitListRenderer
+import io.github.effiban.scala2java.core.renderers.{InitListRenderer, SelfRenderer}
 import io.github.effiban.scala2java.core.resolvers.JavaInheritanceKeywordResolver
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
@@ -16,7 +16,7 @@ import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchersSugar.eqTo
 
-import scala.meta.{Ctor, Defn, Init, Lit, Name, Pat, Self, Stat, Template, Term, Type, XtensionQuasiquoteInit}
+import scala.meta.{Ctor, Defn, Init, Lit, Name, Pat, Self, Stat, Template, Term, Type, XtensionQuasiquoteInit, XtensionQuasiquoteType}
 
 class TemplateTraverserImplTest extends UnitTestSuite {
 
@@ -32,7 +32,8 @@ class TemplateTraverserImplTest extends UnitTestSuite {
 
   private val ExcludedInits = List(init"Product()", init"Serializable()", init"Enumeration()")
 
-  private val NonEmptySelf = Self(name = Name.Indeterminate("SelfName"), decltpe = Some(Type.Name("SelfType")))
+  private val NonEmptySelf = Self(name = Name.Indeterminate("SelfName"), decltpe = Some(t"SelfType"))
+  private val TraversedNonEmptySelf = Self(name = Name.Indeterminate("TraversedSelfName"), decltpe = Some(t"SelfType"))
 
   private val PermittedSubTypeNames = List(Type.Name("Child1"), Term.Name("Child2"))
 
@@ -69,6 +70,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
   private val initTraverser = mock[InitTraverser]
   private val initListRenderer = mock[InitListRenderer]
   private val selfTraverser = mock[SelfTraverser]
+  private val selfRenderer = mock[SelfRenderer]
   private val javaInheritanceKeywordResolver = mock[JavaInheritanceKeywordResolver]
   private val templateBodyTraverser = mock[TemplateBodyTraverser]
   private val permittedSubTypeNameListTraverser = mock[PermittedSubTypeNameListTraverser]
@@ -78,6 +80,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     initTraverser,
     initListRenderer,
     selfTraverser,
+    selfRenderer,
     templateBodyTraverser,
     permittedSubTypeNameListTraverser,
     javaInheritanceKeywordResolver,
@@ -152,7 +155,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       stats = Nil
     )
 
-    expectWriteSelf(NonEmptySelf)
+    expectWriteSelf(NonEmptySelf, TraversedNonEmptySelf)
     expectTraverseBody(stats = Nil)
 
     templateTraverser.traverse(template, context = TemplateContext(javaScope = JavaScope.Class))
@@ -174,6 +177,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       stats = Nil
     )
 
+    expectWriteSelf()
     expectTraversePermittedSubTypeNames()
     expectTraverseBody(stats = Nil)
 
@@ -263,7 +267,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
 
     expectFilterInits()
     expectWriteInits(JavaScope.Class)
-    expectWriteSelf(NonEmptySelf)
+    expectWriteSelf(NonEmptySelf, TraversedNonEmptySelf)
     expectTraversePermittedSubTypeNames()
     expectTraverseBody(stats = stats, context = TemplateBodyContext(
       javaScope = JavaScope.Class,
@@ -302,12 +306,13 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       .when(initListRenderer).render(eqTreeList(TraversedIncludedInits), eqTo(InitContext(ignoreArgs = true)))
   }
 
-  private def expectWriteSelf(self: Self = Selfs.Empty): Unit = {
-    val selfStr = self match {
+  private def expectWriteSelf(self: Self = Selfs.Empty, traversedSelf: Self = Selfs.Empty): Unit = {
+    doReturn(traversedSelf).when(selfTraverser).traverse(eqTree(self))
+    val selfStr = traversedSelf match {
       case slf if slf.structure == Selfs.Empty.structure => ""
       case _ => "/* extends SelfName: SelfType */"
     }
-    doWrite(selfStr).when(selfTraverser).traverse(eqTree(self))
+    doWrite(selfStr).when(selfRenderer).render(eqTree(traversedSelf))
   }
 
   private def expectTraversePermittedSubTypeNames(): Unit = {

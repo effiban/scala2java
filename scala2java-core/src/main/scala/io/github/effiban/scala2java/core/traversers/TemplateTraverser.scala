@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{InitContext, TemplateBodyContext, TemplateContext}
-import io.github.effiban.scala2java.core.renderers.InitListRenderer
+import io.github.effiban.scala2java.core.renderers.{InitListRenderer, SelfRenderer}
 import io.github.effiban.scala2java.core.resolvers.JavaInheritanceKeywordResolver
 import io.github.effiban.scala2java.core.writers.JavaWriter
 import io.github.effiban.scala2java.spi.entities.JavaScope.JavaScope
@@ -17,6 +17,7 @@ trait TemplateTraverser {
 private[traversers] class TemplateTraverserImpl(initTraverser: => InitTraverser,
                                                 initListRenderer: => InitListRenderer,
                                                 selfTraverser: => SelfTraverser,
+                                                selfRenderer: SelfRenderer,
                                                 templateBodyTraverser: => TemplateBodyTraverser,
                                                 permittedSubTypeNameListTraverser: PermittedSubTypeNameListTraverser,
                                                 javaInheritanceKeywordResolver: JavaInheritanceKeywordResolver,
@@ -28,7 +29,8 @@ private[traversers] class TemplateTraverserImpl(initTraverser: => InitTraverser,
   def traverse(template: Template, context: TemplateContext): Unit = {
     val includedInits = template.inits.filterNot(templateInitExcludedPredicate)
     traverseTemplateInits(includedInits, context.javaScope)
-    selfTraverser.traverse(template.self)
+    val traversedSelf = selfTraverser.traverse(template.self)
+    selfRenderer.render(traversedSelf)
     if (context.permittedSubTypeNames.nonEmpty) {
       write(" ")
       permittedSubTypeNameListTraverser.traverse(context.permittedSubTypeNames)

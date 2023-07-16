@@ -1,21 +1,30 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.SelfRenderer
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
+import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.{Name, Self, Type}
+import scala.meta.{Name, Self, XtensionQuasiquoteType}
 
 class SelfTraverserImplTest extends UnitTestSuite {
 
-  private val selfRenderer = mock[SelfRenderer]
+  private val typeTraverser = mock[TypeTraverser]
 
-  private val selfTraverser = new SelfTraverserImpl(selfRenderer)
+  private val selfTraverser = new SelfTraverserImpl(typeTraverser)
 
-  test("traverse") {
-    val `self` = Self(name = Name.Indeterminate("SelfName"), decltpe = Some(Type.Name("SelfType")))
+  test("traverse when has no type") {
+    val `self` = Self(name = Name.Indeterminate("SelfName"), decltpe = None)
+    selfTraverser.traverse(`self`).structure shouldBe `self`.structure
+  }
 
-    selfTraverser.traverse(`self`)
+  test("traverse when has a type") {
+    val selfName = Name.Indeterminate("SelfName")
+    val selfType = t"SelfType"
+    val traversedSelfType = t"TraversedSelfType"
+    val `self` = Self(name = selfName, decltpe = Some(selfType))
+    val traversedSelf = Self(name = selfName, decltpe = Some(traversedSelfType))
 
-    verify(selfRenderer).render(`self`)
+    doReturn(traversedSelfType).when(typeTraverser).traverse(eqTree(selfType))
+
+    selfTraverser.traverse(`self`).structure shouldBe traversedSelf.structure
   }
 }
