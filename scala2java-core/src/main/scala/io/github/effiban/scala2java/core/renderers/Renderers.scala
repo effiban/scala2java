@@ -76,6 +76,14 @@ class Renderers(implicit javaWriter: JavaWriter) {
     expressionTermRenderer
   )
 
+  lazy val ctorSecondaryRenderer: CtorSecondaryRenderer = new CtorSecondaryRendererImpl(
+    modListRenderer,
+    typeNameRenderer,
+    termParamListRenderer,
+    initRenderer,
+    blockStatRenderer
+  )
+
   lazy val declVarRenderer: DeclVarRenderer = new DeclVarRendererImpl(
     modListRenderer,
     typeRenderer,
