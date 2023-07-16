@@ -1,24 +1,23 @@
-package io.github.effiban.scala2java.core.traversers
+package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.contexts.ArgumentListContext
 import io.github.effiban.scala2java.core.entities.JavaKeyword.Permits
 import io.github.effiban.scala2java.core.entities.ListTraversalOptions
-import io.github.effiban.scala2java.core.renderers.ArgumentListRenderer
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Name
 
-trait PermittedSubTypeNameListTraverser {
+trait PermittedSubTypeNameListRenderer {
 
-  def traverse(permittedSubTypeNames: List[Name]): Unit
+  def render(permittedSubTypeNames: List[Name]): Unit
 }
 
-private[traversers] class PermittedSubTypeNameListTraverserImpl(argumentListRenderer: => ArgumentListRenderer)
-                                                               (implicit javaWriter: JavaWriter) extends PermittedSubTypeNameListTraverser {
+private[renderers] class PermittedSubTypeNameListRendererImpl(argumentListRenderer: => ArgumentListRenderer)
+                                                             (implicit javaWriter: JavaWriter) extends PermittedSubTypeNameListRenderer {
 
   import javaWriter._
 
-  def traverse(permittedSubTypeNames: List[Name]): Unit = {
+  def render(permittedSubTypeNames: List[Name]): Unit = {
     writeKeyword(Permits)
     write(" ")
     argumentListRenderer.render(
