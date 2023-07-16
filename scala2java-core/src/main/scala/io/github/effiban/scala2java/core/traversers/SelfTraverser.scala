@@ -1,15 +1,13 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.renderers.SelfRenderer
-
 import scala.meta.Self
 
-trait SelfTraverser extends ScalaTreeTraverser[Self]
+trait SelfTraverser extends ScalaTreeTraverser1[Self]
 
-private[traversers] class SelfTraverserImpl(selfRenderer: SelfRenderer) extends SelfTraverser {
+private[traversers] class SelfTraverserImpl(typeTraverser: => TypeTraverser) extends SelfTraverser {
 
-  override def traverse(`self`: Self): Unit = {
+  override def traverse(`self`: Self): Self = {
     //TODO - consider translating the 'self' type into a Java parent
-    selfRenderer.render(`self`)
+    `self`.copy(decltpe = `self`.decltpe.map(typeTraverser.traverse))
   }
 }

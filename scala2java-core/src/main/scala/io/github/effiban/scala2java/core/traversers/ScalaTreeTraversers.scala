@@ -321,7 +321,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val returnTraverser: ReturnTraverser = new ReturnTraverserImpl(expressionTermTraverser)
 
-  private lazy val selfTraverser: SelfTraverser = new SelfTraverserImpl(selfRenderer)
+  private lazy val selfTraverser: SelfTraverser = new SelfTraverserImpl(typeTraverser)
 
   lazy val sourceTraverser: SourceTraverser = new SourceTraverserImpl(statTraverser)
 
@@ -372,6 +372,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
     initTraverser,
     initListRenderer,
     selfTraverser,
+    selfRenderer,
     templateBodyTraverser,
     permittedSubTypeNameListTraverser,
     JavaInheritanceKeywordResolver,
