@@ -235,6 +235,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   val patWildcardRenderer: PatWildcardRenderer = new PatWildcardRendererImpl()
 
+  lazy val permittedSubTypeNameListRenderer = new PermittedSubTypeNameListRendererImpl(argumentListRenderer)
+
   lazy val returnRenderer: ReturnRenderer = new ReturnRendererImpl(expressionTermRenderer)
 
   val selfRenderer: SelfRenderer = new SelfRendererImpl()

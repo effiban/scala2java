@@ -3,7 +3,7 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.{InitContext, TemplateBodyContext, TemplateContext}
 import io.github.effiban.scala2java.core.entities.JavaKeyword.Implements
 import io.github.effiban.scala2java.core.matchers.TemplateBodyContextMatcher.eqTemplateBodyContext
-import io.github.effiban.scala2java.core.renderers.{InitListRenderer, SelfRenderer}
+import io.github.effiban.scala2java.core.renderers.{InitListRenderer, PermittedSubTypeNameListRenderer, SelfRenderer}
 import io.github.effiban.scala2java.core.resolvers.JavaInheritanceKeywordResolver
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
@@ -73,7 +73,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
   private val selfRenderer = mock[SelfRenderer]
   private val javaInheritanceKeywordResolver = mock[JavaInheritanceKeywordResolver]
   private val templateBodyTraverser = mock[TemplateBodyTraverser]
-  private val permittedSubTypeNameListTraverser = mock[PermittedSubTypeNameListTraverser]
+  private val permittedSubTypeNameListRenderer = mock[PermittedSubTypeNameListRenderer]
   private val templateInitExcludedPredicate = mock[TemplateInitExcludedPredicate]
 
   private val templateTraverser = new TemplateTraverserImpl(
@@ -82,7 +82,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     selfTraverser,
     selfRenderer,
     templateBodyTraverser,
-    permittedSubTypeNameListTraverser,
+    permittedSubTypeNameListRenderer,
     javaInheritanceKeywordResolver,
     templateInitExcludedPredicate
   )
@@ -178,7 +178,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     )
 
     expectWriteSelf()
-    expectTraversePermittedSubTypeNames()
+    expectRenderPermittedSubTypeNames()
     expectTraverseBody(stats = Nil)
 
     templateTraverser.traverse(template, context = TemplateContext(javaScope = JavaScope.Class, permittedSubTypeNames = PermittedSubTypeNames))
@@ -268,7 +268,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     expectFilterInits()
     expectWriteInits(JavaScope.Class)
     expectWriteSelf(NonEmptySelf, TraversedNonEmptySelf)
-    expectTraversePermittedSubTypeNames()
+    expectRenderPermittedSubTypeNames()
     expectTraverseBody(stats = stats, context = TemplateBodyContext(
       javaScope = JavaScope.Class,
       maybeClassName = Some(ClassName),
@@ -315,9 +315,9 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     doWrite(selfStr).when(selfRenderer).render(eqTree(traversedSelf))
   }
 
-  private def expectTraversePermittedSubTypeNames(): Unit = {
+  private def expectRenderPermittedSubTypeNames(): Unit = {
     doWrite("permits Child1, Child2")
-      .when(permittedSubTypeNameListTraverser).traverse(eqTreeList(PermittedSubTypeNames))
+      .when(permittedSubTypeNameListRenderer).render(eqTreeList(PermittedSubTypeNames))
   }
 
   private def expectTraverseBody(stats: List[Stat], context: TemplateBodyContext = TemplateBodyContext(javaScope = JavaScope.Class)): Unit = {

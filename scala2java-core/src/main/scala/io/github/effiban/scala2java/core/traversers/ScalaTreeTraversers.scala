@@ -286,8 +286,6 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val patTypedTraverser: PatTypedTraverser = new PatTypedTraverserImpl(patTraverser, typeTraverser)
 
-  private lazy val permittedSubTypeNameListTraverser = new PermittedSubTypeNameListTraverserImpl(argumentListRenderer)
-
   private lazy val pkgStatTraverser: PkgStatTraverser = new PkgStatTraverserImpl(
     classTraverser,
     traitTraverser,
@@ -374,7 +372,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
     selfTraverser,
     selfRenderer,
     templateBodyTraverser,
-    permittedSubTypeNameListTraverser,
+    permittedSubTypeNameListRenderer,
     JavaInheritanceKeywordResolver,
     new CompositeTemplateInitExcludedPredicate(CoreTemplateInitExcludedPredicate)
   )

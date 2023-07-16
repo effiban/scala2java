@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{InitContext, TemplateBodyContext, TemplateContext}
-import io.github.effiban.scala2java.core.renderers.{InitListRenderer, SelfRenderer}
+import io.github.effiban.scala2java.core.renderers.{InitListRenderer, PermittedSubTypeNameListRenderer, SelfRenderer}
 import io.github.effiban.scala2java.core.resolvers.JavaInheritanceKeywordResolver
 import io.github.effiban.scala2java.core.writers.JavaWriter
 import io.github.effiban.scala2java.spi.entities.JavaScope.JavaScope
@@ -19,7 +19,7 @@ private[traversers] class TemplateTraverserImpl(initTraverser: => InitTraverser,
                                                 selfTraverser: => SelfTraverser,
                                                 selfRenderer: SelfRenderer,
                                                 templateBodyTraverser: => TemplateBodyTraverser,
-                                                permittedSubTypeNameListTraverser: PermittedSubTypeNameListTraverser,
+                                                permittedSubTypeNameListRenderer: => PermittedSubTypeNameListRenderer,
                                                 javaInheritanceKeywordResolver: JavaInheritanceKeywordResolver,
                                                 templateInitExcludedPredicate: TemplateInitExcludedPredicate)
                                                (implicit javaWriter: JavaWriter) extends TemplateTraverser {
@@ -33,7 +33,7 @@ private[traversers] class TemplateTraverserImpl(initTraverser: => InitTraverser,
     selfRenderer.render(traversedSelf)
     if (context.permittedSubTypeNames.nonEmpty) {
       write(" ")
-      permittedSubTypeNameListTraverser.traverse(context.permittedSubTypeNames)
+      permittedSubTypeNameListRenderer.render(context.permittedSubTypeNames)
     }
     val bodyContext = TemplateBodyContext(
       javaScope = context.javaScope,
