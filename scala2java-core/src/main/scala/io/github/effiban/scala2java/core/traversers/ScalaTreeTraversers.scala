@@ -103,16 +103,10 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val ctorSecondaryTraverser: CtorSecondaryTraverser = new CtorSecondaryTraverserImpl(
     statModListTraverser,
-    ModifiersRenderContextFactory,
-    modListRenderer,
     typeNameTraverser,
-    typeNameRenderer,
     termParamTraverser,
-    termParamListRenderer,
     initTraverser,
-    initRenderer,
-    blockStatTraverser,
-    blockStatRenderer
+    blockStatTraverser
   )
 
   private lazy val declDefTraverser: DeclDefTraverser = new DeclDefTraverserImpl(
@@ -368,6 +362,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
     ctorPrimaryTraverser,
     defnDefRenderer,
     ctorSecondaryTraverser,
+    ctorSecondaryRenderer,
     enumConstantListTraverser,
     statTraverser,
     DefnVarClassifier,

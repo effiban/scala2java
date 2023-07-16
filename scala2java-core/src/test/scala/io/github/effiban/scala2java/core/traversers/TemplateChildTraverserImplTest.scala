@@ -1,29 +1,36 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.classifiers.{DefnVarClassifier, JavaStatClassifier, TraitClassifier}
-import io.github.effiban.scala2java.core.contexts.{CtorContext, DefnDefRenderContext, StatContext, TemplateChildContext}
+import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.entities.JavaModifier
 import io.github.effiban.scala2java.core.matchers.CtorContextMatcher.eqCtorContext
-import io.github.effiban.scala2java.core.renderers.DefnDefRenderer
+import io.github.effiban.scala2java.core.matchers.CtorSecondaryRenderContextMatcher.eqCtorSecondaryRenderContext
+import io.github.effiban.scala2java.core.renderers.{CtorSecondaryRenderer, DefnDefRenderer}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
-import io.github.effiban.scala2java.core.traversers.results.DefnDefTraversalResult
+import io.github.effiban.scala2java.core.traversers.results.{CtorSecondaryTraversalResult, DefnDefTraversalResult}
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
 
-import scala.meta.{Ctor, Defn, Init, Lit, Name, Pat, Term, Type, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
+import scala.meta.{Ctor, Defn, Init, Lit, Name, Pat, Term, Type, XtensionQuasiquoteMod, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 class TemplateChildTraverserImplTest extends UnitTestSuite {
 
   private val ClassName = t"MyClass"
+  private val TraversedClassName = t"MyTraversedClass"
   private val TermClassName = q"MyClass"
 
   private val TheInits = List(
     Init(tpe = Type.Name("Parent1"), name = Name.Anonymous(), argss = List()),
     Init(tpe = Type.Name("Parent2"), name = Name.Anonymous(), argss = List())
   )
+
+  private val TheAnnot = mod"@MyAnnotation"
+  private val TheTraversedAnnot = mod"@MyTraversedAnnotation"
+  private val TheScalaMods = List(TheAnnot)
+  private val TheTraversedScalaMods = List(TheTraversedAnnot)
 
   private val CtorContextWithClassName = CtorContext(
     javaScope = JavaScope.Class,
@@ -60,11 +67,19 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
   )
 
   private val SecondaryCtor = Ctor.Secondary(
-    mods = Nil,
+    mods = TheScalaMods,
     name = Name.Anonymous(),
     paramss = List(SecondaryCtorArgs),
     init = Init(tpe = Type.Singleton(Term.This(Name.Anonymous())), name = Name.Anonymous(), argss = List(Nil)),
-    stats = Nil
+    stats = List(q"foo(1)", q"bar(2)")
+  )
+
+  private val TraversedSecondaryCtor = Ctor.Secondary(
+    mods = TheTraversedScalaMods,
+    name = Name.Anonymous(),
+    paramss = List(SecondaryCtorArgs),
+    init = Init(tpe = Type.Singleton(Term.This(Name.Anonymous())), name = Name.Anonymous(), argss = List(Nil)),
+    stats = List(q"foo(11)", q"bar(22)")
   )
 
   private val TheDefnVar = Defn.Var(
@@ -88,6 +103,7 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
   private val ctorPrimaryTraverser = mock[CtorPrimaryTraverser]
   private val defnDefRenderer = mock[DefnDefRenderer]
   private val ctorSecondaryTraverser = mock[CtorSecondaryTraverser]
+  private val ctorSecondaryRenderer = mock[CtorSecondaryRenderer]
   private val enumConstantListTraverser = mock[EnumConstantListTraverser]
   private val statTraverser = mock[StatTraverser]
   private val defnValClassifier = mock[DefnVarClassifier]
@@ -98,6 +114,7 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
     ctorPrimaryTraverser,
     defnDefRenderer,
     ctorSecondaryTraverser,
+    ctorSecondaryRenderer,
     enumConstantListTraverser,
     statTraverser,
     defnValClassifier,
@@ -133,11 +150,22 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for secondary ctor. when class name provided") {
+    val ctorJavaModifiers = List(JavaModifier.Public)
+    val traversalResult = CtorSecondaryTraversalResult(
+      tree = TraversedSecondaryCtor,
+      className = TraversedClassName,
+      javaModifiers = ctorJavaModifiers
+    )
+    doReturn(traversalResult)
+      .when(ctorSecondaryTraverser).traverse(eqTree(SecondaryCtor), eqCtorContext(CtorContextWithClassName))
+
+    val expectedRenderContext = CtorSecondaryRenderContext(TraversedClassName, ctorJavaModifiers)
+
     doWrite(
       """{
         |   /* SECONDARY CTOR */
         |}""".stripMargin)
-      .when(ctorSecondaryTraverser).traverse(secondaryCtor = eqTree(SecondaryCtor), ctorContext = eqCtorContext(CtorContextWithClassName))
+      .when(ctorSecondaryRenderer).render(eqTree(TraversedSecondaryCtor), eqCtorSecondaryRenderContext(expectedRenderContext))
 
     templateChildTraverser.traverse(child = SecondaryCtor, context = ChildContextWithClassName)
 

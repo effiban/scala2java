@@ -2,70 +2,61 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.entities.JavaTreeType
-import io.github.effiban.scala2java.core.renderers._
-import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
-import io.github.effiban.scala2java.core.writers.JavaWriter
+import io.github.effiban.scala2java.core.traversers.results.CtorSecondaryTraversalResult
 import io.github.effiban.scala2java.spi.entities.JavaScope.MethodSignature
 
-import scala.meta.{Ctor, Stat}
+import scala.meta.{Ctor, Name}
 
 trait CtorSecondaryTraverser {
-  def traverse(secondaryCtor: Ctor.Secondary, ctorContext: CtorContext): Unit
+  def traverse(secondaryCtor: Ctor.Secondary, ctorContext: CtorContext): CtorSecondaryTraversalResult
 }
 
 private[traversers] class CtorSecondaryTraverserImpl(statModListTraverser: => StatModListTraverser,
-                                                     modifiersRenderContextFactory: ModifiersRenderContextFactory,
-                                                     modListRenderer: => ModListRenderer,
                                                      typeNameTraverser: => TypeNameTraverser,
-                                                     typeNameRenderer: TypeNameRenderer,
                                                      termParamTraverser: => TermParamTraverser,
-                                                     termParamListRenderer: => TermParamListRenderer,
                                                      initTraverser: => InitTraverser,
-                                                     initRenderer: => InitRenderer,
-                                                     blockStatTraverser: => BlockStatTraverser,
-                                                     blockStatRenderer: => BlockStatRenderer)
-                                                    (implicit javaWriter: JavaWriter)
-  extends CtorSecondaryTraverser {
+                                                     blockStatTraverser: => BlockStatTraverser) extends CtorSecondaryTraverser {
 
-  import javaWriter._
+  override def traverse(secondaryCtor: Ctor.Secondary, context: CtorContext): CtorSecondaryTraversalResult = {
+    val modsTraversalResult = traverseMods(secondaryCtor, context)
+    val traversedClassName = traverseClassName(context)
+    val traversedParams = traverseParams(secondaryCtor)
+    val traversedInit = traverseInit(secondaryCtor)
+    val traversedStats = traverseStats(secondaryCtor)
 
-  override def traverse(secondaryCtor: Ctor.Secondary, context: CtorContext): Unit = {
-    writeLine()
-    traverseMods(secondaryCtor, context)
-    traverseClassName(context)
-    traverseParams(secondaryCtor)
-    traverseBody(secondaryCtor)
+    val traversedCtorSecondary = Ctor.Secondary(
+      mods = modsTraversalResult.scalaMods,
+      name = Name.Anonymous(),
+      paramss = traversedParams,
+      init = traversedInit,
+      stats = traversedStats
+    )
+
+    CtorSecondaryTraversalResult(
+      tree = traversedCtorSecondary,
+      className = traversedClassName,
+      javaModifiers = modsTraversalResult.javaModifiers
+    )
   }
 
-  private def traverseMods(secondaryCtor: Ctor.Secondary, context: CtorContext): Unit = {
-    val modListTraversalResult = statModListTraverser.traverse(ModifiersContext(secondaryCtor, JavaTreeType.Method, context.javaScope))
-    val modifiersRenderContext = modifiersRenderContextFactory(modListTraversalResult)
-    modListRenderer.render(modifiersRenderContext)
+  private def traverseMods(secondaryCtor: Ctor.Secondary, context: CtorContext) = {
+    statModListTraverser.traverse(ModifiersContext(secondaryCtor, JavaTreeType.Method, context.javaScope))
   }
 
-  private def traverseClassName(context: CtorContext): Unit = {
-    val traversedClassName = typeNameTraverser.traverse(context.className)
-    typeNameRenderer.render(traversedClassName)
+  private def traverseClassName(context: CtorContext) = {
+    typeNameTraverser.traverse(context.className)
   }
 
-  private def traverseParams(secondaryCtor: Ctor.Secondary): Unit = {
-    val traversedParams = secondaryCtor.paramss.flatten.map(param => termParamTraverser.traverse(param, StatContext(MethodSignature)))
-    termParamListRenderer.render(traversedParams, TermParamListRenderContext())
+  private def traverseParams(secondaryCtor: Ctor.Secondary) = {
+    secondaryCtor.paramss.map(_.map(param => termParamTraverser.traverse(param, StatContext(MethodSignature))))
   }
 
-  private def traverseBody(secondaryCtor: Ctor.Secondary): Unit = {
-    writeBlockStart()
-    val traversedInit = initTraverser.traverse(secondaryCtor.init)
-    initRenderer.render(traversedInit, InitContext(argNameAsComment = true))
-    writeStatementEnd()
-    traverseContents(secondaryCtor.stats)
-    writeBlockEnd()
+  private def traverseInit(secondaryCtor: Ctor.Secondary) = {
+    initTraverser.traverse(secondaryCtor.init)
   }
 
-  private def traverseContents(stats: List[Stat]): Unit = {
-    if (stats.nonEmpty) {
-      val traversedStats = stats.map(blockStatTraverser.traverse)
-      traversedStats.foreach(blockStatRenderer.render)
-    }
+
+  private def traverseStats(secondaryCtor: Ctor.Secondary) = {
+    secondaryCtor.stats.map(blockStatTraverser.traverse)
   }
 }
