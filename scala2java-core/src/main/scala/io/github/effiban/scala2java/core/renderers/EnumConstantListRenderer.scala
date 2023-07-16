@@ -1,18 +1,17 @@
-package io.github.effiban.scala2java.core.traversers
+package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.renderers.ArgumentListRenderer
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.{Defn, Pat}
 
-trait EnumConstantListTraverser extends ScalaTreeTraverser[Defn.Var]
+trait EnumConstantListRenderer extends JavaTreeRenderer[Defn.Var]
 
-private[traversers] class EnumConstantListTraverserImpl(argumentListRenderer: => ArgumentListRenderer)
-                                                       (implicit javaWriter: JavaWriter) extends EnumConstantListTraverser {
+private[renderers] class EnumConstantListRendererImpl(argumentListRenderer: => ArgumentListRenderer)
+                                                      (implicit javaWriter: JavaWriter) extends EnumConstantListRenderer {
 
   import javaWriter._
 
-  def traverse(enumConstantsVar: Defn.Var): Unit = {
+  def render(enumConstantsVar: Defn.Var): Unit = {
     val enumConstants = enumConstantsVar.pats.collect { case patVar: Pat.Var => patVar }
     val invalid = enumConstantsVar.pats.filterNot(_.isInstanceOf[Pat.Var])
 
