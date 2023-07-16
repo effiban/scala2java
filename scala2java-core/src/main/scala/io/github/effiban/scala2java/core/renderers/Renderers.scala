@@ -252,6 +252,12 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   val superRenderer: SuperRenderer = new SuperRendererImpl(nameRenderer)
 
+  lazy val templateStatRenderer: TemplateStatRenderer = new TemplateStatRendererImpl(
+    enumConstantListRenderer,
+    defaultStatRenderer,
+    JavaStatClassifier
+  )
+
   lazy val termAnnotateRenderer: TermAnnotateRenderer = new TermAnnotateRendererImpl(annotListRenderer, expressionTermRenderer)
 
   lazy val termApplyInfixRenderer: TermApplyInfixRenderer = new TermApplyInfixRendererImpl(
