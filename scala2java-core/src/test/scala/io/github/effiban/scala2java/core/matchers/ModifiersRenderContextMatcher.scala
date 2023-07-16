@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.matchers
 
-import io.github.effiban.scala2java.core.contexts.ModifiersRenderContext
+import io.github.effiban.scala2java.core.renderers.contexts.ModifiersRenderContext
 import io.github.effiban.scala2java.test.utils.matchers.{ListMatcher, TreeMatcher}
 import org.mockito.ArgumentMatcher
 import org.mockito.ArgumentMatchers.argThat

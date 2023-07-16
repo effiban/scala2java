@@ -5,6 +5,7 @@ import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.entities.JavaModifier
 import io.github.effiban.scala2java.core.matchers.CtorContextMatcher.eqCtorContext
 import io.github.effiban.scala2java.core.matchers.CtorSecondaryRenderContextMatcher.eqCtorSecondaryRenderContext
+import io.github.effiban.scala2java.core.renderers.contexts.{CtorSecondaryRenderContext, DefnDefRenderContext}
 import io.github.effiban.scala2java.core.renderers.{CtorSecondaryRenderer, DefnDefRenderer, EnumConstantListRenderer}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite

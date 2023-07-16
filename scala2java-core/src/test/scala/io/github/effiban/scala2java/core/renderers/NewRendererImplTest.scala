@@ -1,7 +1,8 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.{ArrayInitializerSizeRenderContext, InitContext}
+import io.github.effiban.scala2java.core.contexts.InitContext
 import io.github.effiban.scala2java.core.matchers.ArrayInitializerSizeRenderContextMockitoMatcher.eqArrayInitializerSizeRenderContext
+import io.github.effiban.scala2java.core.renderers.contexts.ArrayInitializerSizeRenderContext
 import io.github.effiban.scala2java.core.resolvers.ArrayInitializerRenderContextResolver
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite

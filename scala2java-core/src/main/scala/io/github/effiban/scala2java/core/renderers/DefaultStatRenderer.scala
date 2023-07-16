@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.{DefaultStatRenderContext, ImportRenderContext}
+import io.github.effiban.scala2java.core.renderers.contexts.{DefaultStatRenderContext, ImportRenderContext}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.{Decl, Defn, Import, Pkg, Stat, Term}

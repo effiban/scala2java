@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.matchers
 
-import io.github.effiban.scala2java.core.contexts.ArrayInitializerValuesRenderContext
+import io.github.effiban.scala2java.core.renderers.contexts.ArrayInitializerValuesRenderContext
 import org.scalatest.matchers.{MatchResult, Matcher}
 
 class ArrayInitializerValuesRenderContextScalatestMatcher(expectedContext: ArrayInitializerValuesRenderContext)

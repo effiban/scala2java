@@ -1,9 +1,9 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.ModifiersRenderContext
 import io.github.effiban.scala2java.core.entities.JavaModifier
 import io.github.effiban.scala2java.core.entities.JavaModifier.{Final, Private, Static}
 import io.github.effiban.scala2java.core.orderings.JavaModifierOrdering
+import io.github.effiban.scala2java.core.renderers.contexts.ModifiersRenderContext
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList

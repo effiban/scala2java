@@ -1,10 +1,11 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.{ArgumentListContext, ArrayInitializerValuesRenderContext}
+import io.github.effiban.scala2java.core.contexts.ArgumentListContext
 import io.github.effiban.scala2java.core.entities.EnclosingDelimiter.Parentheses
 import io.github.effiban.scala2java.core.entities.ListTraversalOptions
 import io.github.effiban.scala2java.core.matchers.ArgumentListContextMatcher.eqArgumentListContext
 import io.github.effiban.scala2java.core.matchers.ArrayInitializerValuesRenderContextMockitoMatcher.eqArrayInitializerValuesRenderContext
+import io.github.effiban.scala2java.core.renderers.contexts.ArrayInitializerValuesRenderContext
 import io.github.effiban.scala2java.core.resolvers.ArrayInitializerRenderContextResolver
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite

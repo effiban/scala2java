@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.VarRenderContext
 import io.github.effiban.scala2java.core.entities.TraversalConstants.UnknownType
+import io.github.effiban.scala2java.core.renderers.contexts.VarRenderContext
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Type

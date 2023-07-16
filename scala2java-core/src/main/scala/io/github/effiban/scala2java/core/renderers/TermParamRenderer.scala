@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.ModifiersRenderContext
 import io.github.effiban.scala2java.core.entities.JavaModifier
+import io.github.effiban.scala2java.core.renderers.contexts.ModifiersRenderContext
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.{Mod, Term}

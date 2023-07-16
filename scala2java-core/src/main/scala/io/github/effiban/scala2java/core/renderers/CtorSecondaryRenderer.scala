@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.contexts._
+import io.github.effiban.scala2java.core.renderers.contexts.{CtorSecondaryRenderContext, ModifiersRenderContext}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Ctor
