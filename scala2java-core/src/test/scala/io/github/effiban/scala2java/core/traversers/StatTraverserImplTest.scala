@@ -1,7 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.StatContext
-import io.github.effiban.scala2java.core.matchers.StatContextMatcher.eqStatContext
+import io.github.effiban.scala2java.core.contexts.{ImportRenderContext, StatContext}
 import io.github.effiban.scala2java.core.renderers.{ImportRenderer, StatTermRenderer}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
@@ -10,6 +9,7 @@ import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.spi.entities.JavaScope.Package
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchers
+import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.Ctor.Primary
 import scala.meta.{Decl, Defn, Lit, Name, Pat, Pkg, Self, Template, Term, Type, XtensionQuasiquoteTerm}
@@ -48,7 +48,7 @@ class StatTraverserImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe "myTraversedName"
   }
 
-  test("traverse Import when traverser returns an import") {
+  test("traverse Import when traverser returns an import and Java scope is 'Package'") {
     val `import` = q"import somepackage1.SomeClass1"
     val traversedImport = q"import somepackage2.SomeClass2"
 
@@ -56,7 +56,18 @@ class StatTraverserImplTest extends UnitTestSuite {
 
     statTraverser.traverse(`import`, StatContext(Package))
 
-    verify(importRenderer).render(eqTree(traversedImport), eqStatContext(StatContext(Package)))
+    verify(importRenderer).render(eqTree(traversedImport), eqTo(ImportRenderContext()))
+  }
+
+  test("traverse Import when traverser returns an import and Java scope is 'Class'") {
+    val `import` = q"import somepackage1.SomeClass1"
+    val traversedImport = q"import somepackage2.SomeClass2"
+
+    doReturn(Some(traversedImport)).when(importTraverser).traverse(eqTree(`import`))
+
+    statTraverser.traverse(`import`, StatContext(JavaScope.Class))
+
+    verify(importRenderer).render(eqTree(traversedImport), eqTo(ImportRenderContext(asComment = true)))
   }
 
   test("traverse Import when traverser returns None") {
