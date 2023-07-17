@@ -1,8 +1,7 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.InitContext
 import io.github.effiban.scala2java.core.matchers.ArrayInitializerSizeRenderContextMockitoMatcher.eqArrayInitializerSizeRenderContext
-import io.github.effiban.scala2java.core.renderers.contexts.ArrayInitializerSizeRenderContext
+import io.github.effiban.scala2java.core.renderers.contexts.{ArrayInitializerSizeRenderContext, InitRenderContext}
 import io.github.effiban.scala2java.core.resolvers.ArrayInitializerRenderContextResolver
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
@@ -37,7 +36,7 @@ class NewRendererImplTest extends UnitTestSuite {
 
     when(arrayInitializerRenderContextResolver.tryResolve(`new`.init)).thenReturn(None)
     doWrite("MyClass(val1, val2)")
-      .when(initRenderer).render(eqTree(init), ArgumentMatchers.eq(InitContext(traverseEmpty = true, argNameAsComment = true)))
+      .when(initRenderer).render(eqTree(init), ArgumentMatchers.eq(InitRenderContext(renderEmpty = true, argNameAsComment = true)))
 
     newRenderer.render(`new`)
 

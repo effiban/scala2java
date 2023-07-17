@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.InitContext
 import io.github.effiban.scala2java.core.entities.JavaKeyword
+import io.github.effiban.scala2java.core.renderers.contexts.InitRenderContext
 import io.github.effiban.scala2java.core.resolvers.ArrayInitializerRenderContextResolver
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
@@ -26,6 +26,6 @@ private[renderers] class NewRendererImpl(initRenderer: => InitRenderer,
   private def renderRegular(`new`: New): Unit = {
     writeKeyword(JavaKeyword.New)
     write(" ")
-    initRenderer.render(`new`.init, InitContext(traverseEmpty = true, argNameAsComment = true))
+    initRenderer.render(`new`.init, InitRenderContext(renderEmpty = true, argNameAsComment = true))
   }
 }

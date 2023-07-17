@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.{InitContext, TemplateBodyContext, TemplateContext}
+import io.github.effiban.scala2java.core.contexts.{TemplateBodyContext, TemplateContext}
+import io.github.effiban.scala2java.core.renderers.contexts.InitRenderContext
 import io.github.effiban.scala2java.core.renderers.{InitListRenderer, PermittedSubTypeNameListRenderer, SelfRenderer}
 import io.github.effiban.scala2java.core.resolvers.JavaInheritanceKeywordResolver
 import io.github.effiban.scala2java.core.writers.JavaWriter
@@ -51,7 +52,7 @@ private[traversers] class TemplateTraverserImpl(initTraverser: => InitTraverser,
       writeKeyword(inheritanceKeyword)
       write(" ")
       val traversedInits = inits.map(initTraverser.traverse)
-      initListRenderer.render(traversedInits, InitContext(ignoreArgs = true))
+      initListRenderer.render(traversedInits, InitRenderContext(ignoreArgs = true))
     }
   }
 }

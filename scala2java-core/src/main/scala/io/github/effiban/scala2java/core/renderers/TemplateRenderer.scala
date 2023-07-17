@@ -1,7 +1,6 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.InitContext
-import io.github.effiban.scala2java.core.renderers.contexts.TemplateRenderContext
+import io.github.effiban.scala2java.core.renderers.contexts.{InitRenderContext, TemplateRenderContext}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.{Init, Template}
@@ -33,7 +32,7 @@ private[renderers] class TemplateRendererImpl(initListRenderer: => InitListRende
       write(" ")
       writeKeyword(inheritanceKeyword)
       write(" ")
-      initListRenderer.render(inits, InitContext(ignoreArgs = true))
+      initListRenderer.render(inits, InitRenderContext(ignoreArgs = true))
     }
   }
 

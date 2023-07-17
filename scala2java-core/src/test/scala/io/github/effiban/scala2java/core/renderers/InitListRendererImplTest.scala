@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.{ArgumentListContext, InitContext}
+import io.github.effiban.scala2java.core.contexts.ArgumentListContext
+import io.github.effiban.scala2java.core.renderers.contexts.InitRenderContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import org.mockito.ArgumentMatchersSugar.eqTo
@@ -17,7 +18,7 @@ class InitListRendererImplTest extends UnitTestSuite {
 
 
   test("render() when no inits") {
-    when(initArgRendererFactory(InitContext())).thenReturn(initArgRenderer)
+    when(initArgRendererFactory(InitRenderContext())).thenReturn(initArgRenderer)
 
     initListRenderer.render(Nil)
 
@@ -28,7 +29,7 @@ class InitListRendererImplTest extends UnitTestSuite {
     val init1 = init"MyType1(arg1, arg2)"
     val init2 = init"MyType2(arg3, arg4)"
 
-    when(initArgRendererFactory(InitContext())).thenReturn(initArgRenderer)
+    when(initArgRendererFactory(InitRenderContext())).thenReturn(initArgRenderer)
 
     initListRenderer.render(List(init1, init2))
 
