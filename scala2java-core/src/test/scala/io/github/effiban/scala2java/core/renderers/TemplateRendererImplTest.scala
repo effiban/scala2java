@@ -2,8 +2,8 @@ package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.contexts.InitContext
 import io.github.effiban.scala2java.core.entities.JavaKeyword
-import io.github.effiban.scala2java.core.matchers.TemplateBodyRenderContextMatcher.eqTemplateBodyRenderContext
 import io.github.effiban.scala2java.core.renderers.contexts.{TemplateBodyRenderContext, TemplateRenderContext, TemplateStatRenderContext}
+import io.github.effiban.scala2java.core.renderers.matchers.TemplateBodyRenderContextMatcher.eqTemplateBodyRenderContext
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{Selfs, Templates}

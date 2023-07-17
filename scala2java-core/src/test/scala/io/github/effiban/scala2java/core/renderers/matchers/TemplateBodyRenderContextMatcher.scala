@@ -1,4 +1,4 @@
-package io.github.effiban.scala2java.core.matchers
+package io.github.effiban.scala2java.core.renderers.matchers
 
 import io.github.effiban.scala2java.core.renderers.contexts.TemplateBodyRenderContext
 import org.mockito.ArgumentMatcher
