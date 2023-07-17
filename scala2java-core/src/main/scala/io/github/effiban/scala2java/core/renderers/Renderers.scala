@@ -256,6 +256,13 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   lazy val templateBodyRenderer: TemplateBodyRenderer = new TemplateBodyRendererImpl(templateStatRenderer)
 
+  lazy val templateRenderer: TemplateRenderer = new TemplateRendererImpl(
+    initListRenderer,
+    selfRenderer,
+    templateBodyRenderer,
+    permittedSubTypeNameListRenderer
+  )
+
   lazy val templateStatRenderer: TemplateStatRenderer = new TemplateStatRendererImpl(
     enumConstantListRenderer,
     defaultStatRenderer,
