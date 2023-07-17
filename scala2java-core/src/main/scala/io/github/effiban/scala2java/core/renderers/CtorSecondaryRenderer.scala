@@ -1,7 +1,6 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts._
-import io.github.effiban.scala2java.core.renderers.contexts.{CtorSecondaryRenderContext, ModifiersRenderContext}
+import io.github.effiban.scala2java.core.renderers.contexts.{CtorSecondaryRenderContext, InitRenderContext, ModifiersRenderContext}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Ctor
@@ -43,7 +42,7 @@ private[renderers] class CtorSecondaryRendererImpl(modListRenderer: => ModListRe
 
   private def renderBody(secondaryCtor: Ctor.Secondary): Unit = {
     writeBlockStart()
-    initRenderer.render(secondaryCtor.init, InitContext(argNameAsComment = true))
+    initRenderer.render(secondaryCtor.init, InitRenderContext(argNameAsComment = true))
     writeStatementEnd()
     secondaryCtor.stats.foreach(blockStatRenderer.render)
     writeBlockEnd()

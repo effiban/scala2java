@@ -1,8 +1,7 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.InitContext
 import io.github.effiban.scala2java.core.entities.JavaKeyword
-import io.github.effiban.scala2java.core.renderers.contexts.{TemplateBodyRenderContext, TemplateRenderContext, TemplateStatRenderContext}
+import io.github.effiban.scala2java.core.renderers.contexts.{InitRenderContext, TemplateBodyRenderContext, TemplateRenderContext, TemplateStatRenderContext}
 import io.github.effiban.scala2java.core.renderers.matchers.TemplateBodyRenderContextMatcher.eqTemplateBodyRenderContext
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
@@ -193,7 +192,7 @@ class TemplateRendererImplTest extends UnitTestSuite {
 
   private def expectRenderInits(): Unit = {
     doWrite("Parent1, Parent2")
-      .when(initListRenderer).render(eqTreeList(TheInits), eqTo(InitContext(ignoreArgs = true)))
+      .when(initListRenderer).render(eqTreeList(TheInits), eqTo(InitRenderContext(ignoreArgs = true)))
   }
 
 

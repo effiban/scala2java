@@ -1,9 +1,10 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.{ArgumentListContext, InitContext}
+import io.github.effiban.scala2java.core.contexts.ArgumentListContext
 import io.github.effiban.scala2java.core.entities.EnclosingDelimiter.Parentheses
 import io.github.effiban.scala2java.core.entities.ListTraversalOptions
 import io.github.effiban.scala2java.core.matchers.ArgumentListContextMatcher.eqArgumentListContext
+import io.github.effiban.scala2java.core.renderers.contexts.InitRenderContext
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
@@ -52,7 +53,7 @@ class InitRendererImplTest extends UnitTestSuite {
 
     doWrite("MyType()").when(typeRenderer).render(eqTree(TypeName))
 
-    initRenderer.render(init, InitContext(traverseEmpty = true))
+    initRenderer.render(init, InitRenderContext(renderEmpty = true))
 
     val expectedOptions = ListTraversalOptions(
       traverseEmpty = true,
@@ -74,7 +75,7 @@ class InitRendererImplTest extends UnitTestSuite {
 
     doWrite("MyType").when(typeRenderer).render(eqTree(TypeName))
 
-    initRenderer.render(init, InitContext(ignoreArgs = true))
+    initRenderer.render(init, InitRenderContext(ignoreArgs = true))
 
     outputWriter.toString shouldBe "MyType"
 
@@ -120,7 +121,7 @@ class InitRendererImplTest extends UnitTestSuite {
       eqArgumentListContext(expectedArgListContext)
     )
 
-    initRenderer.render(init, InitContext(argNameAsComment = true))
+    initRenderer.render(init, InitRenderContext(argNameAsComment = true))
 
     outputWriter.toString shouldBe
       """MyType(/*arg1Name = */arg1,
@@ -132,7 +133,7 @@ class InitRendererImplTest extends UnitTestSuite {
 
     doWrite("MyType").when(typeRenderer).render(eqTree(TypeName))
 
-    initRenderer.render(init, InitContext(ignoreArgs = true))
+    initRenderer.render(init, InitRenderContext(ignoreArgs = true))
 
     outputWriter.toString shouldBe "MyType"
 

@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.InitContext
+import io.github.effiban.scala2java.core.renderers.contexts.InitRenderContext
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -25,7 +25,7 @@ class AnnotRendererImplTest extends UnitTestSuite {
     )
 
     doWrite("""MyAnnot1(arg1 = "val1", arg2 = "val2")""")
-      .when(initRenderer).render(eqTree(init), ArgumentMatchers.eq(InitContext()))
+      .when(initRenderer).render(eqTree(init), ArgumentMatchers.eq(InitRenderContext()))
 
     annotRenderer.render(Annot(init))
 

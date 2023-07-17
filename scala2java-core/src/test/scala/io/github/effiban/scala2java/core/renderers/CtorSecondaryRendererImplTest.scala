@@ -1,8 +1,7 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.contexts.InitContext
 import io.github.effiban.scala2java.core.entities.JavaModifier
-import io.github.effiban.scala2java.core.renderers.contexts.{CtorSecondaryRenderContext, ModifiersRenderContext, TermParamListRenderContext}
+import io.github.effiban.scala2java.core.renderers.contexts.{CtorSecondaryRenderContext, InitRenderContext, ModifiersRenderContext, TermParamListRenderContext}
 import io.github.effiban.scala2java.core.renderers.matchers.ModifiersRenderContextMatcher.eqModifiersRenderContext
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
@@ -76,7 +75,7 @@ class CtorSecondaryRendererImplTest extends UnitTestSuite {
       termParams = eqTreeList(CtorArgList1),
       context = eqTo(TermParamListRenderContext())
     )
-    doWrite("  this(param1)").when(initRenderer).render(eqTree(TheSelfInit), eqTo(InitContext(argNameAsComment = true)))
+    doWrite("  this(param1)").when(initRenderer).render(eqTree(TheSelfInit), eqTo(InitRenderContext(argNameAsComment = true)))
 
     ctorSecondaryRenderer.render(ctorSecondary, TheContext)
 
@@ -109,7 +108,7 @@ class CtorSecondaryRendererImplTest extends UnitTestSuite {
       termParams = eqTreeList(CtorArgList1),
       context = eqTo(TermParamListRenderContext())
     )
-    doWrite("  this(param1)").when(initRenderer).render(eqTree(TheSelfInit), eqTo(InitContext(argNameAsComment = true)))
+    doWrite("  this(param1)").when(initRenderer).render(eqTree(TheSelfInit), eqTo(InitRenderContext(argNameAsComment = true)))
     doWrite(
       """  doSomething1(param1);
         |""".stripMargin).when(blockStatRenderer).render(eqTree(Statement1))
@@ -150,7 +149,7 @@ class CtorSecondaryRendererImplTest extends UnitTestSuite {
       termParams = eqTreeList(CtorArgList1 ++ CtorArgList2),
       context = eqTo(TermParamListRenderContext())
     )
-    doWrite("  this(param1)").when(initRenderer).render(eqTree(TheSelfInit), eqTo(InitContext(argNameAsComment = true)))
+    doWrite("  this(param1)").when(initRenderer).render(eqTree(TheSelfInit), eqTo(InitRenderContext(argNameAsComment = true)))
 
     ctorSecondaryRenderer.render(ctorSecondary, TheContext)
 

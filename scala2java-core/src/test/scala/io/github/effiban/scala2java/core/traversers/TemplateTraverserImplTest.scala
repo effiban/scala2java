@@ -1,8 +1,9 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.{InitContext, TemplateBodyContext, TemplateContext}
+import io.github.effiban.scala2java.core.contexts.{TemplateBodyContext, TemplateContext}
 import io.github.effiban.scala2java.core.entities.JavaKeyword.Implements
 import io.github.effiban.scala2java.core.matchers.TemplateBodyContextMatcher.eqTemplateBodyContext
+import io.github.effiban.scala2java.core.renderers.contexts.InitRenderContext
 import io.github.effiban.scala2java.core.renderers.{InitListRenderer, PermittedSubTypeNameListRenderer, SelfRenderer}
 import io.github.effiban.scala2java.core.resolvers.JavaInheritanceKeywordResolver
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
@@ -303,7 +304,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       case anInit => anInit
     }).when(initTraverser).traverse(any[Init])
     doWrite("TraversedParent1, TraversedParent2")
-      .when(initListRenderer).render(eqTreeList(TraversedIncludedInits), eqTo(InitContext(ignoreArgs = true)))
+      .when(initListRenderer).render(eqTreeList(TraversedIncludedInits), eqTo(InitRenderContext(ignoreArgs = true)))
   }
 
   private def expectWriteSelf(self: Self = Selfs.Empty, traversedSelf: Self = Selfs.Empty): Unit = {
