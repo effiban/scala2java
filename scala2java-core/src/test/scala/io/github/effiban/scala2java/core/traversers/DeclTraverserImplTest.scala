@@ -2,16 +2,15 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.StatContext
 import io.github.effiban.scala2java.core.entities.JavaModifier
-import io.github.effiban.scala2java.core.renderers.DeclVarRenderer
-import io.github.effiban.scala2java.core.renderers.contexts.VarRenderContext
+import io.github.effiban.scala2java.core.renderers.contexts.{DefRenderContext, VarRenderContext}
+import io.github.effiban.scala2java.core.renderers.{DeclDefRenderer, DeclVarRenderer}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.testtrees.TypeNames
-import io.github.effiban.scala2java.core.traversers.results.DeclVarTraversalResult
+import io.github.effiban.scala2java.core.traversers.results.{DeclDefTraversalResult, DeclVarTraversalResult}
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
 
-import scala.meta.{Decl, Term, XtensionQuasiquoteTerm}
+import scala.meta.XtensionQuasiquoteTerm
 
 class DeclTraverserImplTest extends UnitTestSuite {
 
@@ -20,11 +19,13 @@ class DeclTraverserImplTest extends UnitTestSuite {
   private val declVarTraverser = mock[DeclVarTraverser]
   private val declVarRenderer = mock[DeclVarRenderer]
   private val declDefTraverser = mock[DeclDefTraverser]
+  private val declDefRenderer = mock[DeclDefRenderer]
 
   private val declTraverser = new DeclTraverserImpl(
     declVarTraverser,
     declVarRenderer,
-    declDefTraverser)
+    declDefTraverser,
+    declDefRenderer)
 
   test("traverse() a Decl.Var") {
     val declVar = q"private var myVar: Int"
@@ -40,17 +41,15 @@ class DeclTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() a Decl.Def") {
+    val declDef = q"private def myMethod(param1: Int, param2: Int): String"
+    val traversedDeclDef = q"private def myMethod(param11: Int, param22: Int): String"
+    val javaModifiers = List(JavaModifier.Private)
+    val traversalResult = DeclDefTraversalResult(traversedDeclDef, javaModifiers)
 
-    val declDef = Decl.Def(
-      mods = List(),
-      name = Term.Name("myMethod"),
-      tparams = List(),
-      paramss = List(),
-      decltpe = TypeNames.Int
-    )
+    doReturn(traversalResult).when(declDefTraverser).traverse(eqTree(declDef), eqTo(TheStatContext))
 
     declTraverser.traverse(declDef, TheStatContext)
 
-    verify(declDefTraverser).traverse(eqTree(declDef), eqTo(TheStatContext))
+    verify(declDefRenderer).render(eqTree(traversedDeclDef), eqTo(DefRenderContext(javaModifiers)))
   }
 }

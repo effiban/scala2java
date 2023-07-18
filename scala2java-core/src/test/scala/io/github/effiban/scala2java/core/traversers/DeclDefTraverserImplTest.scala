@@ -2,22 +2,16 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{ModifiersContext, StatContext}
 import io.github.effiban.scala2java.core.entities.{JavaModifier, JavaTreeType}
-import io.github.effiban.scala2java.core.matchers.ModListTraversalResultMockitoMatcher.eqModListTraversalResult
+import io.github.effiban.scala2java.core.matchers.DeclDefTraversalResultScalatestMatcher.equalDeclDefTraversalResult
 import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
-import io.github.effiban.scala2java.core.renderers._
-import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
-import io.github.effiban.scala2java.core.renderers.contexts.{ModifiersRenderContext, TermParamListRenderContext}
-import io.github.effiban.scala2java.core.renderers.matchers.ModifiersRenderContextMatcher.eqModifiersRenderContext
-import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.ModListTraversalResult
+import io.github.effiban.scala2java.core.traversers.results.{DeclDefTraversalResult, ModListTraversalResult}
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.spi.entities.JavaScope.JavaScope
-import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.{any, eqTo}
 
-import scala.meta.{Decl, Init, Mod, Name, Term, Type, XtensionQuasiquoteTermParam, XtensionQuasiquoteType, XtensionQuasiquoteTypeParam}
+import scala.meta.{Decl, Mod, Term, Type, XtensionQuasiquoteMod, XtensionQuasiquoteTermParam, XtensionQuasiquoteType, XtensionQuasiquoteTypeParam}
 
 class DeclDefTraverserImplTest extends UnitTestSuite {
 
@@ -25,11 +19,8 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
   private val TraversedMethodType = t"TraversedMethodType"
   private val MethodName: Term.Name = Term.Name("myMethod")
 
-  private val ScalaMods: List[Mod] = List(
-    Mod.Annot(
-      Init(tpe = Type.Name("MyAnnotation"), name = Name.Anonymous(), argss = List())
-    )
-  )
+  private val ScalaMods: List[Mod] = List(mod"@MyAnnotation")
+  private val TraversedScalaMods: List[Mod] = List(mod"@MyTraversedAnnotation")
 
   private val TypeParam1 = tparam"T1"
   private val TypeParam2 = tparam"T2"
@@ -56,27 +47,15 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
   private val TraversedMethodParamList2 = List(TraversedMethodParam3, TraversedMethodParam4)
 
   private val statModListTraverser = mock[StatModListTraverser]
-  private val modifiersRenderContextFactory = mock[ModifiersRenderContextFactory]
-  private val modListRenderer = mock[ModListRenderer]
   private val typeTraverser = mock[TypeTraverser]
-  private val typeRenderer = mock[TypeRenderer]
   private val typeParamTraverser = mock[TypeParamTraverser]
-  private val typeParamListRenderer = mock[TypeParamListRenderer]
-  private val termNameRenderer = mock[TermNameRenderer]
   private val termParamTraverser = mock[TermParamTraverser]
-  private val termParamListRenderer = mock[TermParamListRenderer]
 
   private val declDefTraverser = new DeclDefTraverserImpl(
     statModListTraverser,
-    modifiersRenderContextFactory,
-    modListRenderer,
     typeParamTraverser,
-    typeParamListRenderer,
     typeTraverser,
-    typeRenderer,
-    termNameRenderer,
-    termParamTraverser,
-    termParamListRenderer
+    termParamTraverser
   )
 
 
@@ -91,35 +70,28 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
       decltpe = MethodType
     )
 
-    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Public))
-    val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Public))
+    val expectedTraversedDeclDef = Decl.Def(
+      mods = TraversedScalaMods,
+      name = MethodName,
+      tparams = Nil,
+      paramss = List(TraversedMethodParamList1),
+      decltpe = TraversedMethodType
+    )
+
+    val javaModifiers = List(JavaModifier.Public)
+    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TraversedScalaMods, javaModifiers = javaModifiers)
+    val expectedDeclDefTraversalResult = DeclDefTraversalResult(tree = expectedTraversedDeclDef, javaModifiers = javaModifiers)
 
     doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(declDef, javaScope))
-    doReturn(expectedModifiersRenderContext)
-      .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
-    doWrite(
-      """@MyAnnotation
-        |public """.stripMargin)
-      .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doReturn(TraversedMethodType).when(typeTraverser).traverse(eqTree(MethodType))
-    doWrite("TraversedMethodType").when(typeRenderer).render(eqTree(TraversedMethodType))
-    doWrite("myMethod").when(termNameRenderer).render(eqTree(MethodName))
     doAnswer((param: Term.Param) => param match {
       case aParam if aParam.structure == MethodParam1.structure => TraversedMethodParam1
       case aParam if aParam.structure == MethodParam2.structure => TraversedMethodParam2
       case aParam => aParam
     }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.MethodSignature)))
-    doWrite("(final int param11, final int param22)").when(termParamListRenderer).render(
-      termParams = eqTreeList(TraversedMethodParamList1),
-      context = eqTo(TermParamListRenderContext())
-    )
 
-    declDefTraverser.traverse(declDef, StatContext(javaScope))
-
-    outputWriter.toString shouldBe
-      """
-        |@MyAnnotation
-        |public TraversedMethodType myMethod(final int param11, final int param22)""".stripMargin
+    val actualTraversalResult = declDefTraverser.traverse(declDef, StatContext(javaScope))
+    actualTraversalResult should equalDeclDefTraversalResult(expectedDeclDefTraversalResult)
   }
 
   test("traverse() for class method when has type params") {
@@ -133,41 +105,33 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
       decltpe = MethodType
     )
 
-    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Public))
-    val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Public))
+    val expectedTraversedDeclDef = Decl.Def(
+      mods = TraversedScalaMods,
+      name = MethodName,
+      tparams = TraversedTypeParams,
+      paramss = List(TraversedMethodParamList1),
+      decltpe = TraversedMethodType
+    )
+
+    val javaModifiers = List(JavaModifier.Public)
+    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TraversedScalaMods, javaModifiers = javaModifiers)
+    val expectedDeclDefTraversalResult = DeclDefTraversalResult(tree = expectedTraversedDeclDef, javaModifiers = javaModifiers)
 
     doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(declDef, javaScope))
-    doReturn(expectedModifiersRenderContext)
-      .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
-    doWrite(
-      """@MyAnnotation
-        |public """.stripMargin)
-      .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doAnswer((tparam: Type.Param) => tparam match {
       case aTypeParam if aTypeParam.structure == TypeParam1.structure => TraversedTypeParam1
       case aTypeParam if aTypeParam.structure == TypeParam2.structure => TraversedTypeParam2
       case aTypeParam => aTypeParam
     }).when(typeParamTraverser).traverse(any[Type.Param])
-    doWrite("<T11, T22>").when(typeParamListRenderer).render(eqTreeList(TraversedTypeParams))
     doReturn(TraversedMethodType).when(typeTraverser).traverse(eqTree(MethodType))
-    doWrite("TraversedMethodType").when(typeRenderer).render(eqTree(TraversedMethodType))
-    doWrite("myMethod").when(termNameRenderer).render(eqTree(MethodName))
     doAnswer((param: Term.Param) => param match {
       case aParam if aParam.structure == MethodParam1.structure => TraversedMethodParam1
       case aParam if aParam.structure == MethodParam2.structure => TraversedMethodParam2
       case aParam => aParam
     }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.MethodSignature)))
-    doWrite("(final int param11, final int param22)").when(termParamListRenderer).render(
-      termParams = eqTreeList(TraversedMethodParamList1),
-      context = eqTo(TermParamListRenderContext())
-    )
 
-    declDefTraverser.traverse(declDef, StatContext(javaScope))
-
-    outputWriter.toString shouldBe
-      """
-        |@MyAnnotation
-        |public <T11, T22> TraversedMethodType myMethod(final int param11, final int param22)""".stripMargin
+    val actualTraversalResult = declDefTraverser.traverse(declDef, StatContext(javaScope))
+    actualTraversalResult should equalDeclDefTraversalResult(expectedDeclDefTraversalResult)
   }
 
   test("traverse() for interface method when has one list of params") {
@@ -181,35 +145,27 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
       decltpe = MethodType
     )
 
-    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = ScalaMods)
-    val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods)
+    val expectedTraversedDeclDef = Decl.Def(
+      mods = TraversedScalaMods,
+      name = MethodName,
+      tparams = Nil,
+      paramss = List(TraversedMethodParamList1),
+      decltpe = TraversedMethodType
+    )
+
+    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TraversedScalaMods)
+    val expectedDeclDefTraversalResult = DeclDefTraversalResult(tree = expectedTraversedDeclDef)
 
     doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(declDef, javaScope))
-    doReturn(expectedModifiersRenderContext)
-      .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
-    doWrite(
-      """@MyAnnotation
-        |""".stripMargin)
-      .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doReturn(TraversedMethodType).when(typeTraverser).traverse(eqTree(MethodType))
-    doWrite("TraversedMethodType").when(typeRenderer).render(eqTree(TraversedMethodType))
-    doWrite("myMethod").when(termNameRenderer).render(eqTree(MethodName))
     doAnswer((param: Term.Param) => param match {
       case aParam if aParam.structure == MethodParam1.structure => TraversedMethodParam1
       case aParam if aParam.structure == MethodParam2.structure => TraversedMethodParam2
       case aParam => aParam
     }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.MethodSignature)))
-    doWrite("(int param11, int param22)").when(termParamListRenderer).render(
-      termParams = eqTreeList(TraversedMethodParamList1),
-      context = eqTo(TermParamListRenderContext())
-    )
 
-    declDefTraverser.traverse(declDef, StatContext(javaScope))
-
-    outputWriter.toString shouldBe
-      """
-        |@MyAnnotation
-        |TraversedMethodType myMethod(int param11, int param22)""".stripMargin
+    val actualTraversalResult = declDefTraverser.traverse(declDef, StatContext(javaScope))
+    actualTraversalResult should equalDeclDefTraversalResult(expectedDeclDefTraversalResult)
   }
 
   test("traverse() for interface method when has two lists of params") {
@@ -223,36 +179,29 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
       decltpe = MethodType
     )
 
-    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = ScalaMods)
-    val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods)
+    val expectedTraversedDeclDef = Decl.Def(
+      mods = TraversedScalaMods,
+      name = MethodName,
+      tparams = Nil,
+      paramss = List(TraversedMethodParamList1, TraversedMethodParamList2),
+      decltpe = TraversedMethodType
+    )
+
+    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TraversedScalaMods)
+    val expectedDeclDefTraversalResult = DeclDefTraversalResult(tree = expectedTraversedDeclDef)
 
     doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(declDef, javaScope))
-    doReturn(expectedModifiersRenderContext)
-      .when(modifiersRenderContextFactory)(eqModListTraversalResult(expectedModListTraversalResult), annotsOnSameLine = eqTo(false))
-    doWrite(
-      """@MyAnnotation
-        |""".stripMargin)
-      .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersRenderContext))
     doReturn(TraversedMethodType).when(typeTraverser).traverse(eqTree(MethodType))
-    doWrite("TraversedMethodType").when(typeRenderer).render(eqTree(TraversedMethodType))
-    doWrite("myMethod").when(termNameRenderer).render(eqTree(MethodName))
     doAnswer((param: Term.Param) => param match {
       case aParam if aParam.structure == MethodParam1.structure => TraversedMethodParam1
       case aParam if aParam.structure == MethodParam2.structure => TraversedMethodParam2
       case aParam if aParam.structure == MethodParam3.structure => TraversedMethodParam3
       case aParam if aParam.structure == MethodParam4.structure => TraversedMethodParam4
+      case aParam => aParam
     }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.MethodSignature)))
-    doWrite("(int param11, int param22, int param33, int param44)").when(termParamListRenderer).render(
-      termParams = eqTreeList(TraversedMethodParamList1 ++ TraversedMethodParamList2),
-      context = eqTo(TermParamListRenderContext())
-    )
 
-    declDefTraverser.traverse(declDef, StatContext(javaScope))
-
-    outputWriter.toString shouldBe
-      """
-        |@MyAnnotation
-        |TraversedMethodType myMethod(int param11, int param22, int param33, int param44)""".stripMargin
+    val actualTraversalResult = declDefTraverser.traverse(declDef, StatContext(javaScope))
+    actualTraversalResult should equalDeclDefTraversalResult(expectedDeclDefTraversalResult)
   }
 
   private def eqExpectedScalaMods(declDef: Decl.Def, javaScope: JavaScope) = {
