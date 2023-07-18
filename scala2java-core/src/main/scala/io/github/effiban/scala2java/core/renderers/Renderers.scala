@@ -58,6 +58,13 @@ class Renderers(implicit javaWriter: JavaWriter) {
     JavaStatClassifier
   )
 
+  lazy val caseClassRenderer: CaseClassRenderer = new CaseClassRendererImpl(
+    modListRenderer,
+    typeParamListRenderer,
+    termParamListRenderer,
+    templateRenderer
+  )
+
   lazy val caseRenderer: CaseRenderer = new CaseRendererImpl(patRenderer, expressionTermRenderer)
 
   lazy val catchArgumentRenderer: CatchArgumentRenderer = new CatchArgumentRendererImpl(patRenderer)
