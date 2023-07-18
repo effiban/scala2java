@@ -246,6 +246,12 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   lazy val permittedSubTypeNameListRenderer = new PermittedSubTypeNameListRendererImpl(argumentListRenderer)
 
+  lazy val regularClassRenderer: RegularClassRenderer = new RegularClassRendererImpl(
+    modListRenderer,
+    typeParamListRenderer,
+    templateRenderer
+  )
+
   lazy val returnRenderer: ReturnRenderer = new ReturnRendererImpl(expressionTermRenderer)
 
   val selfRenderer: SelfRenderer = new SelfRendererImpl()
