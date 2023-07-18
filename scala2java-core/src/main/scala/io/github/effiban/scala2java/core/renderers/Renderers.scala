@@ -314,6 +314,12 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   lazy val throwRenderer: ThrowRenderer = new ThrowRendererImpl(expressionTermRenderer)
 
+  lazy val traitRenderer: TraitRenderer = new TraitRendererImpl(
+    modListRenderer,
+    typeParamListRenderer,
+    templateRenderer
+  )
+
   lazy val tryRenderer: TryRenderer = new TryRendererImpl(
     blockRenderer,
     catchHandlerRenderer,
