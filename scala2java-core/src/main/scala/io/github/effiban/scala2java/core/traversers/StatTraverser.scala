@@ -1,8 +1,8 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.StatContext
-import io.github.effiban.scala2java.core.renderers.contexts.ImportRenderContext
-import io.github.effiban.scala2java.core.renderers.{ImportRenderer, StatTermRenderer}
+import io.github.effiban.scala2java.core.renderers.contexts.{DeclRenderContext, ImportRenderContext}
+import io.github.effiban.scala2java.core.renderers.{DeclRenderer, ImportRenderer, StatTermRenderer}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 import io.github.effiban.scala2java.spi.entities.JavaScope
 
@@ -18,7 +18,8 @@ private[traversers] class StatTraverserImpl(statTermTraverser: => StatTermTraver
                                             importRenderer: => ImportRenderer,
                                             pkgTraverser: => PkgTraverser,
                                             defnTraverser: => DefnTraverser,
-                                            declTraverser: => DeclTraverser)
+                                            declTraverser: => DeclTraverser,
+                                            declRenderer: => DeclRenderer)
                                            (implicit javaWriter: JavaWriter) extends StatTraverser {
 
   import javaWriter._
@@ -32,7 +33,9 @@ private[traversers] class StatTraverserImpl(statTermTraverser: => StatTermTraver
         .foreach(traversedImport => importRenderer.render(traversedImport, toImportRenderContext(statContext)))
     case pkg: Pkg => pkgTraverser.traverse(pkg)
     case defn: Defn => defnTraverser.traverse(defn, statContext)
-    case decl: Decl => declTraverser.traverse(decl, statContext)
+    case decl: Decl =>
+      val traversalResult = declTraverser.traverse(decl, statContext)
+      declRenderer.render(traversalResult.tree, DeclRenderContext(traversalResult.javaModifiers))
     case other => writeComment(s"UNSUPPORTED: $other")
   }
 

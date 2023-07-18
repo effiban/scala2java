@@ -1,15 +1,16 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.StatContext
-import io.github.effiban.scala2java.core.renderers.contexts.ImportRenderContext
-import io.github.effiban.scala2java.core.renderers.{ImportRenderer, StatTermRenderer}
+import io.github.effiban.scala2java.core.entities.JavaModifier
+import io.github.effiban.scala2java.core.renderers.contexts.{DeclRenderContext, ImportRenderContext}
+import io.github.effiban.scala2java.core.renderers.{DeclRenderer, ImportRenderer, StatTermRenderer}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
+import io.github.effiban.scala2java.core.traversers.results.DeclVarTraversalResult
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.spi.entities.JavaScope.Package
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
-import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.Ctor.Primary
@@ -24,6 +25,7 @@ class StatTraverserImplTest extends UnitTestSuite {
   private val pkgTraverser = mock[PkgTraverser]
   private val defnTraverser = mock[DefnTraverser]
   private val declTraverser = mock[DeclTraverser]
+  private val declRenderer = mock[DeclRenderer]
 
   private val statTraverser = new StatTraverserImpl(
     statTermTraverser,
@@ -32,7 +34,8 @@ class StatTraverserImplTest extends UnitTestSuite {
     importRenderer,
     pkgTraverser,
     defnTraverser,
-    declTraverser
+    declTraverser,
+    declRenderer
   )
 
   private val pkg = pkgDefinition()
@@ -96,33 +99,33 @@ class StatTraverserImplTest extends UnitTestSuite {
         |*/""".stripMargin
   }
 
-  test("traverse Defn.Val") {
-    val defnVal = Defn.Val(
+  test("traverse Defn.Var") {
+    val defnVar = Defn.Var(
       mods = List(),
-      pats = List(Pat.Var(Term.Name("myVal"))),
+      pats = List(Pat.Var(Term.Name("myVar"))),
       decltpe = Some(Type.Name("int")),
-      rhs = Lit.Int(3)
+      rhs = Some(Lit.Int(3))
     )
 
-    doWrite("int myVal = 3").when(defnTraverser).traverse(eqTree(defnVal), ArgumentMatchers.eq(StatContext(JavaScope.Block)))
+    doWrite("int myVar = 3").when(defnTraverser).traverse(eqTree(defnVar), eqTo(StatContext(JavaScope.Block)))
 
-    statTraverser.traverse(defnVal, StatContext(JavaScope.Block))
+    statTraverser.traverse(defnVar, StatContext(JavaScope.Block))
 
-    outputWriter.toString shouldBe "int myVal = 3"
+    outputWriter.toString shouldBe "int myVar = 3"
   }
 
-  test("traverse Decl.Val") {
-    val declVal = Decl.Val(
-      mods = List(),
-      pats = List(Pat.Var(Term.Name("myVal"))),
-      decltpe = Type.Name("int")
-    )
+  test("traverse Decl.Var") {
+    val declVar = q"private var myVar: Int"
+    val traversedDeclVar = q"private var myTraversedVar: Int"
+    val javaModifiers = List(JavaModifier.Private)
+    val traversalResult = DeclVarTraversalResult(traversedDeclVar, javaModifiers)
 
-    doWrite("int myVal").when(declTraverser).traverse(eqTree(declVal), ArgumentMatchers.eq(StatContext(JavaScope.Block)))
+    doReturn(traversalResult).when(declTraverser).traverse(eqTree(declVar), eqTo(StatContext(JavaScope.Block)))
+    doWrite("private int myVar").when(declRenderer).render(eqTree(traversedDeclVar), eqTo(DeclRenderContext(javaModifiers)))
 
-    statTraverser.traverse(declVal, StatContext(JavaScope.Block))
+    statTraverser.traverse(declVar, StatContext(JavaScope.Block))
 
-    outputWriter.toString shouldBe "int myVal"
+    outputWriter.toString shouldBe "private int myVar"
   }
 
   private def pkgDefinition() = {
