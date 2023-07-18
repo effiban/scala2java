@@ -65,7 +65,7 @@ class TraitRendererImplTest extends UnitTestSuite {
     )
     val traitContext = TraitRenderContext(javaModifiers, PermittedSubTypeNames, templateBodyContext)
 
-    val expectedModifiersContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Public))
+    val expectedModifiersContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = javaModifiers)
     val expectedTemplateContext = TemplateRenderContext(
       maybeInheritanceKeyword = Some(JavaKeyword.Extends),
       permittedSubTypeNames = PermittedSubTypeNames,

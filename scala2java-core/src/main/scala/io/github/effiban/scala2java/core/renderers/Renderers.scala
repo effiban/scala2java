@@ -215,6 +215,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
     ArrayInitializerRenderContextResolver
   )
 
+  lazy val objectRenderer: ObjectRenderer = new ObjectRendererImpl(modListRenderer, templateRenderer)
+
   lazy val patListRenderer: PatListRenderer = new PatListRendererImpl(
     argumentListRenderer,
     new SimpleArgumentRenderer(patRenderer)
