@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.entities.JavaModifier
-import io.github.effiban.scala2java.core.renderers.contexts.{DefnDefRenderContext, VarRenderContext}
+import io.github.effiban.scala2java.core.renderers.contexts.{DefRenderContext, VarRenderContext}
 import io.github.effiban.scala2java.core.renderers.{DeclVarRenderer, DefnDefRenderer, DefnVarRenderer}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
@@ -79,7 +79,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
 
     defnTraverser.traverse(defnDef, TheStatContext)
 
-    verify(defnDefRenderer).render(eqTree(traversedDefnDef), eqTo(DefnDefRenderContext(traversalResult.javaModifiers)))
+    verify(defnDefRenderer).render(eqTree(traversedDefnDef), eqTo(DefRenderContext(traversalResult.javaModifiers)))
   }
 
   test("traverse() for Defn.Class") {

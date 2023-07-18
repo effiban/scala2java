@@ -91,6 +91,14 @@ class Renderers(implicit javaWriter: JavaWriter) {
     blockStatRenderer
   )
 
+  lazy val declDefRenderer: DeclDefRenderer = new DeclDefRendererImpl(
+    modListRenderer,
+    typeParamListRenderer,
+    termNameRenderer,
+    typeRenderer,
+    termParamListRenderer
+  )
+
   lazy val declVarRenderer: DeclVarRenderer = new DeclVarRendererImpl(
     modListRenderer,
     typeRenderer,
