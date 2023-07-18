@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.classifiers.{DefnVarClassifier, JavaStatClassifier, TraitClassifier}
 import io.github.effiban.scala2java.core.contexts._
-import io.github.effiban.scala2java.core.renderers.contexts.{CtorSecondaryRenderContext, DefnDefRenderContext}
+import io.github.effiban.scala2java.core.renderers.contexts.{CtorSecondaryRenderContext, DefRenderContext}
 import io.github.effiban.scala2java.core.renderers.{CtorSecondaryRenderer, DefnDefRenderer, EnumConstantListRenderer}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
@@ -41,7 +41,7 @@ private[traversers] class TemplateChildTraverserImpl(ctorPrimaryTraverser: => Ct
     context.maybeClassName match {
       case Some(className) =>
         val traversalResult = ctorPrimaryTraverser.traverse(primaryCtor, toCtorContext(context, className))
-        val renderContext = DefnDefRenderContext(traversalResult.javaModifiers)
+        val renderContext = DefRenderContext(traversalResult.javaModifiers)
         defnDefRenderer.render(traversalResult.tree, renderContext)
       case None => throw new IllegalStateException("Primary Ctor. exists but no context could be constructed for it")
     }

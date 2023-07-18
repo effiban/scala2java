@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.classifiers.{DefnVarClassifier, JavaSta
 import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.entities.JavaModifier
 import io.github.effiban.scala2java.core.matchers.CtorContextMatcher.eqCtorContext
-import io.github.effiban.scala2java.core.renderers.contexts.{CtorSecondaryRenderContext, DefnDefRenderContext}
+import io.github.effiban.scala2java.core.renderers.contexts.{CtorSecondaryRenderContext, DefRenderContext}
 import io.github.effiban.scala2java.core.renderers.matchers.CtorSecondaryRenderContextMatcher.eqCtorSecondaryRenderContext
 import io.github.effiban.scala2java.core.renderers.{CtorSecondaryRenderer, DefnDefRenderer, EnumConstantListRenderer}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
@@ -134,7 +134,7 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
       """{
         |   /* PRIMARY CTOR */
         |}""".stripMargin)
-      .when(defnDefRenderer).render(eqTree(PrimaryCtorDefnDef), eqTo(DefnDefRenderContext(ctorJavaModifiers)))
+      .when(defnDefRenderer).render(eqTree(PrimaryCtorDefnDef), eqTo(DefRenderContext(ctorJavaModifiers)))
 
     templateChildTraverser.traverse(child = PrimaryCtor, context = ChildContextWithClassName)
 

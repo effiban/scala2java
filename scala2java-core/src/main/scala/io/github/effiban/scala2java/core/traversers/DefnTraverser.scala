@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts._
-import io.github.effiban.scala2java.core.renderers.contexts.{DefnDefRenderContext, VarRenderContext}
+import io.github.effiban.scala2java.core.renderers.contexts.{DefRenderContext, VarRenderContext}
 import io.github.effiban.scala2java.core.renderers.{DeclVarRenderer, DefnDefRenderer, DefnVarRenderer}
 import io.github.effiban.scala2java.core.traversers.results.{DeclVarTraversalResult, DefnVarTraversalResult}
 import io.github.effiban.scala2java.core.writers.JavaWriter
@@ -46,7 +46,7 @@ private[traversers] class DefnTraverserImpl(declVarRenderer: => DeclVarRenderer,
 
   private def traverseDefnDef(context: StatContext, defDef: Defn.Def): Unit = {
     val traversalResult = defnDefTraverser.traverse(defDef, DefnDefContext(context.javaScope))
-    val renderContext = DefnDefRenderContext(traversalResult.javaModifiers)
+    val renderContext = DefRenderContext(traversalResult.javaModifiers)
     defnDefRenderer.render(traversalResult.tree, renderContext)
   }
 }

@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.entities.JavaModifier
-import io.github.effiban.scala2java.core.renderers.contexts.{BlockRenderContext, DefnDefRenderContext, ModifiersRenderContext, TermParamListRenderContext}
+import io.github.effiban.scala2java.core.renderers.contexts.{BlockRenderContext, DefRenderContext, ModifiersRenderContext, TermParamListRenderContext}
 import io.github.effiban.scala2java.core.renderers.matchers.ModifiersRenderContextMatcher.eqModifiersRenderContext
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
@@ -63,7 +63,7 @@ class DefnDefRendererImplTest extends UnitTestSuite {
       decltpe = Some(t"int"),
       body = Body
     )
-    val defnDefRenderContext = DefnDefRenderContext(javaModifiers = List(JavaModifier.Public))
+    val defRenderContext = DefRenderContext(javaModifiers = List(JavaModifier.Public))
     val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Public))
 
     doWrite(
@@ -85,7 +85,7 @@ class DefnDefRendererImplTest extends UnitTestSuite {
       context = eqTo(BlockRenderContext())
     )
 
-    defnDefRenderer.render(defnDef, defnDefRenderContext)
+    defnDefRenderer.render(defnDef, defRenderContext)
 
     outputWriter.toString shouldBe
       """
@@ -105,7 +105,7 @@ class DefnDefRendererImplTest extends UnitTestSuite {
       decltpe = Some(Type.AnonymousName()),
       body = Body
     )
-    val defnDefRenderContext = DefnDefRenderContext(javaModifiers = List(JavaModifier.Public))
+    val defRenderContext = DefRenderContext(javaModifiers = List(JavaModifier.Public))
     val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Public))
 
     doWrite(
@@ -126,7 +126,7 @@ class DefnDefRendererImplTest extends UnitTestSuite {
       context = eqTo(BlockRenderContext())
     )
 
-    defnDefRenderer.render(defnDef, defnDefRenderContext)
+    defnDefRenderer.render(defnDef, defRenderContext)
 
     outputWriter.toString shouldBe
       """
@@ -146,7 +146,7 @@ class DefnDefRendererImplTest extends UnitTestSuite {
       decltpe = None,
       body = Body
     )
-    val defnDefRenderContext = DefnDefRenderContext(javaModifiers = List(JavaModifier.Public))
+    val defRenderContext = DefRenderContext(javaModifiers = List(JavaModifier.Public))
     val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Public))
 
     doWrite(
@@ -167,7 +167,7 @@ class DefnDefRendererImplTest extends UnitTestSuite {
       context = eqTo(BlockRenderContext(uncertainReturn = true))
     )
 
-    defnDefRenderer.render(defnDef, defnDefRenderContext)
+    defnDefRenderer.render(defnDef, defRenderContext)
 
     outputWriter.toString shouldBe
       """
@@ -187,7 +187,7 @@ class DefnDefRendererImplTest extends UnitTestSuite {
       decltpe = Some(t"void"),
       body = Body
     )
-    val defnDefRenderContext = DefnDefRenderContext(javaModifiers = List(JavaModifier.Public))
+    val defRenderContext = DefRenderContext(javaModifiers = List(JavaModifier.Public))
     val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Public))
 
     doWrite(
@@ -210,7 +210,7 @@ class DefnDefRendererImplTest extends UnitTestSuite {
       context = eqTo(BlockRenderContext())
     )
 
-    defnDefRenderer.render(defnDef, defnDefRenderContext)
+    defnDefRenderer.render(defnDef, defRenderContext)
 
     outputWriter.toString shouldBe
       """
@@ -230,7 +230,7 @@ class DefnDefRendererImplTest extends UnitTestSuite {
       decltpe = Some(t"int"),
       body = Body
     )
-    val defnDefRenderContext = DefnDefRenderContext(javaModifiers = List(JavaModifier.Default))
+    val defRenderContext = DefRenderContext(javaModifiers = List(JavaModifier.Default))
 
     val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Default))
     doWrite(
@@ -252,7 +252,7 @@ class DefnDefRendererImplTest extends UnitTestSuite {
       context = eqTo(BlockRenderContext())
     )
 
-    defnDefRenderer.render(defnDef, defnDefRenderContext)
+    defnDefRenderer.render(defnDef, defRenderContext)
 
     outputWriter.toString shouldBe
       """
@@ -272,7 +272,7 @@ class DefnDefRendererImplTest extends UnitTestSuite {
       decltpe = Some(t"int"),
       body = Body
     )
-    val defnDefRenderContext = DefnDefRenderContext(javaModifiers = List(JavaModifier.Default))
+    val defRenderContext = DefRenderContext(javaModifiers = List(JavaModifier.Default))
 
     val expectedModifiersRenderContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = List(JavaModifier.Default))
     doWrite(
@@ -294,7 +294,7 @@ class DefnDefRendererImplTest extends UnitTestSuite {
       context = eqTo(BlockRenderContext())
     )
 
-    defnDefRenderer.render(defnDef, defnDefRenderContext)
+    defnDefRenderer.render(defnDef, defRenderContext)
 
     outputWriter.toString shouldBe
       """

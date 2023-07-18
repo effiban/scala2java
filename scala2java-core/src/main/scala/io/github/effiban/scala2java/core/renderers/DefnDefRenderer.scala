@@ -1,13 +1,13 @@
 package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.entities.TraversalConstants.UnknownType
-import io.github.effiban.scala2java.core.renderers.contexts.{BlockRenderContext, DefnDefRenderContext, ModifiersRenderContext, TermParamListRenderContext}
+import io.github.effiban.scala2java.core.renderers.contexts.{BlockRenderContext, DefRenderContext, ModifiersRenderContext, TermParamListRenderContext}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.{Defn, Type}
 
 trait DefnDefRenderer {
-  def render(defnDef: Defn.Def, context: DefnDefRenderContext = DefnDefRenderContext()): Unit
+  def render(defnDef: Defn.Def, context: DefRenderContext = DefRenderContext()): Unit
 }
 
 private[renderers] class DefnDefRendererImpl(modListRenderer: => ModListRenderer,
@@ -20,7 +20,7 @@ private[renderers] class DefnDefRendererImpl(modListRenderer: => ModListRenderer
 
   import javaWriter._
 
-  override def render(defnDef: Defn.Def, context: DefnDefRenderContext = DefnDefRenderContext()): Unit = {
+  override def render(defnDef: Defn.Def, context: DefRenderContext = DefRenderContext()): Unit = {
     writeLine()
     renderModifiers(defnDef, context)
     renderTypeParams(defnDef)
@@ -29,7 +29,7 @@ private[renderers] class DefnDefRendererImpl(modListRenderer: => ModListRenderer
     renderMethodParamsAndBody(defnDef)
   }
 
-  private def renderModifiers(defnDef: Defn.Def, context: DefnDefRenderContext): Unit = {
+  private def renderModifiers(defnDef: Defn.Def, context: DefRenderContext): Unit = {
     val modifiersRenderContext = ModifiersRenderContext(scalaMods = defnDef.mods, javaModifiers = context.javaModifiers)
     modListRenderer.render(modifiersRenderContext)
   }
