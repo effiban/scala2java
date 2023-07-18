@@ -29,13 +29,12 @@ class TraitRendererImplTest extends UnitTestSuite {
   private val Statement1 = q"def myMethod1(x: Int): String"
   private val Statement2 = q"def myMethod2(y: Int): String"
 
-  private val TheTemplate =
-    Template(
-      early = List(),
-      inits = Inits,
-      self = Selfs.Empty,
-      stats = List(Statement1, Statement2)
-    )
+  private val TheTemplate = Template(
+    early = List(),
+    inits = Inits,
+    self = Selfs.Empty,
+    stats = List(Statement1, Statement2)
+  )
 
   private val modListRenderer = mock[ModListRenderer]
   private val typeParamListRenderer = mock[TypeParamListRenderer]
@@ -48,7 +47,59 @@ class TraitRendererImplTest extends UnitTestSuite {
     templateRenderer
   )
 
-  test("render()") {
+  test("render() without permitted sub-types") {
+    val `trait` = Defn.Trait(
+      mods = ScalaMods,
+      name = TraitName,
+      tparams = TypeParams,
+      ctor = PrimaryCtors.Empty,
+      templ = TheTemplate
+    )
+    val javaModifiers = List(JavaModifier.Public)
+    val templateBodyContext = TemplateBodyRenderContext(
+      Map(
+        Statement1 -> TemplateStatRenderContext(),
+        Statement2 -> TemplateStatRenderContext()
+      )
+    )
+    val traitContext = TraitRenderContext(
+      javaModifiers = javaModifiers,
+      bodyContext = templateBodyContext
+    )
+
+    val expectedModifiersContext = ModifiersRenderContext(scalaMods = ScalaMods, javaModifiers = javaModifiers)
+    val expectedTemplateContext = TemplateRenderContext(
+      maybeInheritanceKeyword = Some(JavaKeyword.Extends),
+      bodyContext = templateBodyContext
+    )
+
+    doWrite(
+      """@MyAnnotation
+        |public """.stripMargin)
+      .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersContext))
+    doWrite("<T1, T2>").when(typeParamListRenderer).render(eqTreeList(TypeParams))
+    doWrite(
+      """ extends Parent1, Parent2 {
+        |  /* BODY */
+        |}
+        |""".stripMargin)
+      .when(templateRenderer).render(
+      eqTree(TheTemplate),
+      eqTemplateRenderContext(expectedTemplateContext)
+    )
+
+    traitRenderer.render(`trait`, traitContext)
+
+    outputWriter.toString shouldBe
+      """
+        |@MyAnnotation
+        |public interface MyTrait<T1, T2> extends Parent1, Parent2 {
+        |  /* BODY */
+        |}
+        |""".stripMargin
+  }
+
+  test("render() with permitted sub-types") {
     val `trait` = Defn.Trait(
       mods = ScalaMods,
       name = TraitName,
@@ -76,7 +127,7 @@ class TraitRendererImplTest extends UnitTestSuite {
       """@MyAnnotation
         |public """.stripMargin)
       .when(modListRenderer).render(eqModifiersRenderContext(expectedModifiersContext))
-    doWrite("<T11, T22>").when(typeParamListRenderer).render(eqTreeList(TypeParams))
+    doWrite("<T1, T2>").when(typeParamListRenderer).render(eqTreeList(TypeParams))
     doWrite(
       """ extends Parent1, Parent2 permits Child1, Child2 {
         |  /* BODY */
@@ -92,7 +143,7 @@ class TraitRendererImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe
       """
         |@MyAnnotation
-        |public interface MyTrait<T11, T22> extends Parent1, Parent2 permits Child1, Child2 {
+        |public interface MyTrait<T1, T2> extends Parent1, Parent2 permits Child1, Child2 {
         |  /* BODY */
         |}
         |""".stripMargin
