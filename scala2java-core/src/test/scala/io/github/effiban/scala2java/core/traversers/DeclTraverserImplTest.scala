@@ -2,8 +2,7 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.StatContext
 import io.github.effiban.scala2java.core.entities.JavaModifier
-import io.github.effiban.scala2java.core.renderers.contexts.{DefRenderContext, VarRenderContext}
-import io.github.effiban.scala2java.core.renderers.{DeclDefRenderer, DeclVarRenderer}
+import io.github.effiban.scala2java.core.matchers.DeclTraversalResultScalatestMatcher.equalDeclTraversalResult
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.traversers.results.{DeclDefTraversalResult, DeclVarTraversalResult}
 import io.github.effiban.scala2java.spi.entities.JavaScope
@@ -17,15 +16,9 @@ class DeclTraverserImplTest extends UnitTestSuite {
   private val TheStatContext = StatContext(JavaScope.Class)
 
   private val declVarTraverser = mock[DeclVarTraverser]
-  private val declVarRenderer = mock[DeclVarRenderer]
   private val declDefTraverser = mock[DeclDefTraverser]
-  private val declDefRenderer = mock[DeclDefRenderer]
 
-  private val declTraverser = new DeclTraverserImpl(
-    declVarTraverser,
-    declVarRenderer,
-    declDefTraverser,
-    declDefRenderer)
+  private val declTraverser = new DeclTraverserImpl(declVarTraverser, declDefTraverser)
 
   test("traverse() a Decl.Var") {
     val declVar = q"private var myVar: Int"
@@ -35,9 +28,7 @@ class DeclTraverserImplTest extends UnitTestSuite {
 
     doReturn(traversalResult).when(declVarTraverser).traverse(eqTree(declVar), eqTo(TheStatContext))
     
-    declTraverser.traverse(declVar, TheStatContext)
-
-    verify(declVarRenderer).render(eqTree(traversedDeclVar), eqTo(VarRenderContext(javaModifiers)))
+    declTraverser.traverse(declVar, TheStatContext) should equalDeclTraversalResult(traversalResult)
   }
 
   test("traverse() a Decl.Def") {
@@ -48,8 +39,6 @@ class DeclTraverserImplTest extends UnitTestSuite {
 
     doReturn(traversalResult).when(declDefTraverser).traverse(eqTree(declDef), eqTo(TheStatContext))
 
-    declTraverser.traverse(declDef, TheStatContext)
-
-    verify(declDefRenderer).render(eqTree(traversedDeclDef), eqTo(DefRenderContext(javaModifiers)))
+    declTraverser.traverse(declDef, TheStatContext) should equalDeclTraversalResult(traversalResult)
   }
 }

@@ -116,11 +116,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
     termParamTraverser
   )
 
-  private lazy val declTraverser: DeclTraverser = new DeclTraverserImpl(
-    declVarTraverser,
-    declVarRenderer,
-    declDefTraverser,
-    declDefRenderer)
+  private lazy val declTraverser: DeclTraverser = new DeclTraverserImpl(declVarTraverser, declDefTraverser)
 
   private lazy val declVarTraverser: DeclVarTraverser = new DeclVarTraverserImpl(
     statModListTraverser,
@@ -332,7 +328,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
     importRenderer,
     pkgTraverser,
     defnTraverser,
-    declTraverser
+    declTraverser,
+    declRenderer
   )
 
   private lazy val superTraverser: SuperTraverser = new SuperTraverserImpl(nameTraverser)
