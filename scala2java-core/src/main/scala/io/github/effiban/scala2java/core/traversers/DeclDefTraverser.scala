@@ -2,52 +2,40 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{ModifiersContext, StatContext}
 import io.github.effiban.scala2java.core.entities.JavaTreeType
-import io.github.effiban.scala2java.core.renderers._
-import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
-import io.github.effiban.scala2java.core.writers.JavaWriter
+import io.github.effiban.scala2java.core.traversers.results.DeclDefTraversalResult
 import io.github.effiban.scala2java.spi.entities.JavaScope.MethodSignature
 
-import scala.meta.{Decl, Type}
+import scala.meta.Decl
 
 trait DeclDefTraverser {
-  def traverse(defDecl: Decl.Def, context: StatContext = StatContext()): Unit
+  def traverse(defDecl: Decl.Def, context: StatContext = StatContext()): DeclDefTraversalResult
 }
 
 private[traversers] class DeclDefTraverserImpl(statModListTraverser: => StatModListTraverser,
-                                               modifiersRenderContextFactory: ModifiersRenderContextFactory,
-                                               modListRenderer: => ModListRenderer,
                                                typeParamTraverser: => TypeParamTraverser,
-                                               typeParamListRenderer: => TypeParamListRenderer,
                                                typeTraverser: => TypeTraverser,
-                                               typeRenderer: => TypeRenderer,
-                                               termNameRenderer: TermNameRenderer,
-                                               termParamTraverser: => TermParamTraverser,
-                                               termParamListRenderer: => TermParamListRenderer)
-                                              (implicit javaWriter: JavaWriter) extends DeclDefTraverser {
+                                               termParamTraverser: => TermParamTraverser) extends DeclDefTraverser {
 
-  import javaWriter._
+  override def traverse(declDef: Decl.Def, context: StatContext = StatContext()): DeclDefTraversalResult = {
+    val modListTraversalResult = traverseMods(declDef, context)
+    val traversedTypeParams = declDef.tparams.map(typeParamTraverser.traverse)
+    val traversedType = typeTraverser.traverse(declDef.decltpe)
+    val traversedMethodParamss = traverseMethodParams(declDef)
 
-  override def traverse(defDecl: Decl.Def, context: StatContext = StatContext()): Unit = {
-    writeLine()
-    val modListTraversalResult = statModListTraverser.traverse(ModifiersContext(defDecl, JavaTreeType.Method, context.javaScope))
-    val modifiersRenderContext = modifiersRenderContextFactory(modListTraversalResult)
-    modListRenderer.render(modifiersRenderContext)
-    traverseTypeParams(defDecl.tparams)
-    val traversedType = typeTraverser.traverse(defDecl.decltpe)
-    typeRenderer.render(traversedType)
-    write(" ")
-    termNameRenderer.render(defDecl.name)
-    val traversedParams = defDecl.paramss.flatten.map(param => termParamTraverser.traverse(param, StatContext(MethodSignature)))
-    termParamListRenderer.render(traversedParams)
+    val traversedDeclDef = Decl.Def(
+      mods = modListTraversalResult.scalaMods,
+      name = declDef.name,
+      tparams = traversedTypeParams,
+      paramss = traversedMethodParamss,
+      decltpe = traversedType)
+
+    DeclDefTraversalResult(tree = traversedDeclDef, javaModifiers = modListTraversalResult.javaModifiers)
   }
 
-  private def traverseTypeParams(tparams: List[Type.Param]): Unit = {
-    tparams match {
-      case Nil =>
-      case typeParams =>
-        val traversedTypeParams = typeParams.map(typeParamTraverser.traverse)
-        typeParamListRenderer.render(traversedTypeParams)
-        write(" ")
-    }
+  private def traverseMods(declDef: Decl.Def, context: StatContext) = {
+    statModListTraverser.traverse(ModifiersContext(declDef, JavaTreeType.Method, context.javaScope))
+  }
+  private def traverseMethodParams(declDef: Decl.Def) = {
+    declDef.paramss.map(params => params.map(param => termParamTraverser.traverse(param, StatContext(MethodSignature))))
   }
 }

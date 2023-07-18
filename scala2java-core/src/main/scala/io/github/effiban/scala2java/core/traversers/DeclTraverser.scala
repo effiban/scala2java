@@ -1,8 +1,8 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.StatContext
-import io.github.effiban.scala2java.core.renderers.DeclVarRenderer
-import io.github.effiban.scala2java.core.renderers.contexts.VarRenderContext
+import io.github.effiban.scala2java.core.renderers.contexts.{DefRenderContext, VarRenderContext}
+import io.github.effiban.scala2java.core.renderers.{DeclDefRenderer, DeclVarRenderer}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Decl
@@ -13,7 +13,8 @@ trait DeclTraverser {
 
 private[traversers] class DeclTraverserImpl(declVarTraverser: => DeclVarTraverser,
                                             declVarRenderer: => DeclVarRenderer,
-                                            declDefTraverser: => DeclDefTraverser)
+                                            declDefTraverser: => DeclDefTraverser,
+                                            declDefRenderer: => DeclDefRenderer)
                                            (implicit javaWriter: JavaWriter) extends DeclTraverser {
 
   import javaWriter._
@@ -23,7 +24,10 @@ private[traversers] class DeclTraverserImpl(declVarTraverser: => DeclVarTraverse
       val traversalResult = declVarTraverser.traverse(varDecl, context)
       val renderContext = VarRenderContext(traversalResult.javaModifiers)
       declVarRenderer.render(traversalResult.tree, renderContext);
-    case defDecl: Decl.Def => declDefTraverser.traverse(defDecl, context)
+    case defDecl: Decl.Def =>
+      val traversalResult = declDefTraverser.traverse(defDecl, context)
+      val renderContext = DefRenderContext(traversalResult.javaModifiers)
+      declDefRenderer.render(traversalResult.tree, renderContext)
     case _ => writeComment(s"UNSUPPORTED: $decl")
   }
 }
