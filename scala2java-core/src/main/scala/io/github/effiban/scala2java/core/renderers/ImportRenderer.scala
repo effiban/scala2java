@@ -1,24 +1,12 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.renderers.contexts.ImportRenderContext
-import io.github.effiban.scala2java.core.writers.JavaWriter
-
 import scala.meta.Import
 
-trait ImportRenderer {
-  def render(`import`: Import, context: ImportRenderContext = ImportRenderContext()): Unit
-}
+trait ImportRenderer extends JavaTreeRenderer[Import]
 
-private[renderers] class ImportRendererImpl(importerRenderer: => ImporterRenderer)
-                                           (implicit javaWriter: JavaWriter) extends ImportRenderer {
+private[renderers] class ImportRendererImpl(importerRenderer: => ImporterRenderer) extends ImportRenderer {
 
-  import javaWriter._
-
-  override def render(`import`: Import, context: ImportRenderContext = ImportRenderContext()): Unit = {
-    if (context.asComment) writeComment(s"${`import`.toString()}") else renderInner(`import`)
-  }
-
-  private def renderInner(`import`: Import): Unit = {
+  override def render(`import`: Import): Unit = {
     `import`.importers.foreach(importerRenderer.render)
   }
 }
