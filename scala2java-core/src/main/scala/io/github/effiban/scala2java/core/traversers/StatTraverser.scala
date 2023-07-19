@@ -29,8 +29,11 @@ private[traversers] class StatTraverserImpl(statTermTraverser: => StatTermTraver
       val traversedStat = statTermTraverser.traverse(term)
       statTermRenderer.render(traversedStat)
     case `import`: Import =>
-      importTraverser.traverse(`import`)
-        .foreach(traversedImport => importRenderer.render(traversedImport, toImportRenderContext(statContext)))
+      importTraverser.traverse(`import`).foreach(traversedImport =>
+        statContext.javaScope match {
+          case JavaScope.Package => importRenderer.render(traversedImport)
+          case _ => writeComment(traversedImport.toString())
+        })
     case pkg: Pkg => pkgTraverser.traverse(pkg)
     case defn: Defn => defnTraverser.traverse(defn, statContext)
     case decl: Decl =>

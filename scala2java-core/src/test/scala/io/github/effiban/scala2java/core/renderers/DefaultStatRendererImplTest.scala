@@ -1,9 +1,7 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.renderers.contexts.{DefaultStatRenderContext, ImportRenderContext}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
-import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.XtensionQuasiquoteTerm
 
@@ -20,15 +18,9 @@ class DefaultStatRendererImplTest extends UnitTestSuite {
     verify(statTermRenderer).render(eqTree(termApply))
   }
 
-  test("render() for Import when importAsComment=false") {
+  test("render() for Import") {
     val `import` = q"import a.b.c"
     defaultStatRenderer.render(`import`)
-    verify(importRenderer).render(eqTree(`import`), eqTo(ImportRenderContext()))
-  }
-
-  test("render() for Import when importAsComment=true") {
-    val `import` = q"import a.b.c"
-    defaultStatRenderer.render(`import`, DefaultStatRenderContext(importAsComment = true))
-    verify(importRenderer).render(eqTree(`import`), eqTo(ImportRenderContext(asComment = true)))
+    verify(importRenderer).render(eqTree(`import`))
   }
 }

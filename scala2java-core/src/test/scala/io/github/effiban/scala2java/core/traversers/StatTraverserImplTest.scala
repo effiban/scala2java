@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.StatContext
 import io.github.effiban.scala2java.core.entities.JavaModifier
-import io.github.effiban.scala2java.core.renderers.contexts.{DeclRenderContext, ImportRenderContext}
+import io.github.effiban.scala2java.core.renderers.contexts.DeclRenderContext
 import io.github.effiban.scala2java.core.renderers.{DeclRenderer, ImportRenderer, StatTermRenderer}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
@@ -60,7 +60,7 @@ class StatTraverserImplTest extends UnitTestSuite {
 
     statTraverser.traverse(`import`, StatContext(Package))
 
-    verify(importRenderer).render(eqTree(traversedImport), eqTo(ImportRenderContext()))
+    verify(importRenderer).render(eqTree(traversedImport))
   }
 
   test("traverse Import when traverser returns an import and Java scope is 'Class'") {
@@ -71,7 +71,7 @@ class StatTraverserImplTest extends UnitTestSuite {
 
     statTraverser.traverse(`import`, StatContext(JavaScope.Class))
 
-    verify(importRenderer).render(eqTree(traversedImport), eqTo(ImportRenderContext(asComment = true)))
+    outputWriter.toString shouldBe "/* import somepackage2.SomeClass2 */"
   }
 
   test("traverse Import when traverser returns None") {
