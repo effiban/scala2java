@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.renderers
 
+import io.github.effiban.scala2java.core.entities.TreeKeyedMaps
 import io.github.effiban.scala2java.core.renderers.contexts.TemplateBodyRenderContext
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
@@ -23,13 +24,9 @@ private[renderers] class TemplateBodyRendererImpl(templateStatRenderer: => Templ
 
   private def renderContents(stats: List[Stat], context: TemplateBodyRenderContext): Unit = {
     if (stats.nonEmpty) {
-      stats.foreach(stat => templateStatRenderer.render(stat, statContextOf(context, stat)))
+      stats.foreach(stat =>
+        templateStatRenderer.render(stat, TreeKeyedMaps.get(context.statContextMap, stat))
+      )
     }
-  }
-
-  private def statContextOf(context: TemplateBodyRenderContext, stat: Stat) = {
-    context.statContextMap.find { case (aStat, _) => aStat.structure == stat.structure }
-      .map(_._2)
-      .getOrElse(throw new IllegalStateException(s"No context defined for template body stat: $stat"))
   }
 }
