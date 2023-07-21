@@ -69,8 +69,8 @@ class CaseClassRendererImplTest extends UnitTestSuite {
     val javaModifiers = List(JavaModifier.Public)
     val templateBodyContext = TemplateBodyRenderContext(
       Map(
-        Statement1 -> DeclRenderContext(),
-        Statement2 -> DeclRenderContext()
+        Statement1 -> DefRenderContext(),
+        Statement2 -> DefRenderContext()
       )
     )
     val caseClassContext = CaseClassRenderContext(
@@ -125,8 +125,8 @@ class CaseClassRendererImplTest extends UnitTestSuite {
     val inheritanceKeyword = JavaKeyword.Implements
     val templateBodyContext = TemplateBodyRenderContext(
       Map(
-        Statement1 -> DeclRenderContext(),
-        Statement2 -> DeclRenderContext()
+        Statement1 -> DefRenderContext(),
+        Statement2 -> DefRenderContext()
       )
     )
     val caseClassContext = CaseClassRenderContext(
@@ -183,8 +183,8 @@ class CaseClassRendererImplTest extends UnitTestSuite {
     val javaModifiers = List(JavaModifier.Public)
     val templateBodyContext = TemplateBodyRenderContext(
       Map(
-        Statement1 -> DeclRenderContext(),
-        Statement2 -> DeclRenderContext()
+        Statement1 -> DefRenderContext(),
+        Statement2 -> DefRenderContext()
       )
     )
     val caseClassContext = CaseClassRenderContext(

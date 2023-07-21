@@ -2,12 +2,12 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.StatContext
 import io.github.effiban.scala2java.core.entities.JavaModifier
-import io.github.effiban.scala2java.core.renderers.contexts.DeclRenderContext
+import io.github.effiban.scala2java.core.renderers.contexts.{DefRenderContext, VarRenderContext}
 import io.github.effiban.scala2java.core.renderers.{DeclRenderer, ImportRenderer, StatTermRenderer}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
-import io.github.effiban.scala2java.core.traversers.results.DeclVarTraversalResult
+import io.github.effiban.scala2java.core.traversers.results.{DeclDefTraversalResult, DeclVarTraversalResult}
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.spi.entities.JavaScope.Package
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -121,11 +121,25 @@ class StatTraverserImplTest extends UnitTestSuite {
     val traversalResult = DeclVarTraversalResult(traversedDeclVar, javaModifiers)
 
     doReturn(traversalResult).when(declTraverser).traverse(eqTree(declVar), eqTo(StatContext(JavaScope.Block)))
-    doWrite("private int myVar").when(declRenderer).render(eqTree(traversedDeclVar), eqTo(DeclRenderContext(javaModifiers)))
+    doWrite("private int myVar").when(declRenderer).render(eqTree(traversedDeclVar), eqTo(VarRenderContext(javaModifiers)))
 
     statTraverser.traverse(declVar, StatContext(JavaScope.Block))
 
     outputWriter.toString shouldBe "private int myVar"
+  }
+
+  test("traverse Decl.Def") {
+    val declDef = q"private def foo(x: Int): Int"
+    val traversedDeclDef = q"private def traversedFoo(xx: Int): Int"
+    val javaModifiers = List(JavaModifier.Private)
+    val traversalResult = DeclDefTraversalResult(traversedDeclDef, javaModifiers)
+
+    doReturn(traversalResult).when(declTraverser).traverse(eqTree(declDef), eqTo(StatContext(JavaScope.Block)))
+    doWrite("private int traversedFoo(int xx)").when(declRenderer).render(eqTree(traversedDeclDef), eqTo(DefRenderContext(javaModifiers)))
+
+    statTraverser.traverse(declDef, StatContext(JavaScope.Block))
+
+    outputWriter.toString shouldBe "private int traversedFoo(int xx)"
   }
 
   private def pkgDefinition() = {

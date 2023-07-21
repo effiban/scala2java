@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.classifiers.JavaStatClassifier
-import io.github.effiban.scala2java.core.renderers.contexts.{DeclRenderContext, DefRenderContext, EnumConstantListRenderContext, VarRenderContext}
+import io.github.effiban.scala2java.core.renderers.contexts.{DefRenderContext, EnumConstantListRenderContext, VarRenderContext}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -23,11 +23,12 @@ class TemplateStatRendererImplTest extends UnitTestSuite {
 
   test("render() for Decl.Var") {
     val declVar = q"var x: int"
+    val context = VarRenderContext()
 
-    doWrite("int x").when(defaultStatRenderer).render(eqTree(declVar), eqTo(DeclRenderContext()))
+    doWrite("int x").when(defaultStatRenderer).render(eqTree(declVar), eqTo(context))
     when(javaStatClassifier.requiresEndDelimiter(eqTree(declVar))).thenReturn(true)
 
-    templateStatRenderer.render(declVar, DeclRenderContext())
+    templateStatRenderer.render(declVar, context)
 
     outputWriter.toString shouldBe
       """int x;
