@@ -266,6 +266,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   val patWildcardRenderer: PatWildcardRenderer = new PatWildcardRendererImpl()
 
+  lazy val pkgRenderer: PkgRenderer = new PkgRendererImpl(defaultTermRefRenderer, defaultStatRenderer)
+
   lazy val permittedSubTypeNameListRenderer = new PermittedSubTypeNameListRendererImpl(argumentListRenderer)
 
   lazy val regularClassRenderer: RegularClassRenderer = new RegularClassRendererImpl(
