@@ -1,7 +1,8 @@
 package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.entities.JavaModifier
-import io.github.effiban.scala2java.core.renderers.contexts.{DefRenderContext, VarRenderContext}
+import io.github.effiban.scala2java.core.renderers.contexts.{DefRenderContext, PkgRenderContext, RegularClassRenderContext, VarRenderContext}
+import io.github.effiban.scala2java.core.renderers.matchers.PkgRenderContextMatcher.eqPkgRenderContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
@@ -12,12 +13,14 @@ class DefaultStatRendererImplTest extends UnitTestSuite {
 
   private val statTermRenderer: StatTermRenderer = mock[StatTermRenderer]
   private val importRenderer: ImportRenderer = mock[ImportRenderer]
+  private val pkgRenderer: PkgRenderer = mock[PkgRenderer]
   private val declRenderer: DeclRenderer = mock[DeclRenderer]
   private val defnRenderer: DefnRenderer = mock[DefnRenderer]
 
   private val defaultStatRenderer: DefaultStatRenderer = new DefaultStatRendererImpl(
     statTermRenderer,
     importRenderer,
+    pkgRenderer,
     declRenderer,
     defnRenderer
   )
@@ -32,6 +35,44 @@ class DefaultStatRendererImplTest extends UnitTestSuite {
     val `import` = q"import a.b.c"
     defaultStatRenderer.render(`import`)
     verify(importRenderer).render(eqTree(`import`))
+  }
+
+  test("render() for Pkg when has correct context") {
+    val cls =
+      q"""
+      class D {
+      }
+      """
+
+    val pkg =
+      q"""
+      package a.b.c {
+        class D {
+        }
+      }
+      """
+
+    val context = PkgRenderContext(
+      Map(cls -> RegularClassRenderContext())
+    )
+
+    defaultStatRenderer.render(pkg, context)
+
+    verify(pkgRenderer).render(eqTree(pkg), eqPkgRenderContext(context))
+  }
+
+  test("render() for Pkg when has incorrect context should throw exception") {
+    val pkg =
+      q"""
+      package a.b.c {
+        class D {
+        }
+      }
+      """
+
+    intercept[IllegalStateException] {
+      defaultStatRenderer.render(pkg, RegularClassRenderContext())
+    }
   }
 
   test("render() for Decl.Var when has correct context") {

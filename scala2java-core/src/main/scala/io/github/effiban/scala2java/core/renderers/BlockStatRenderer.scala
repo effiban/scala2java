@@ -36,8 +36,8 @@ private[renderers] class BlockStatRendererImpl(statTermRenderer: => StatTermRend
         val javaModifiers = resolveDefnVarJavaModifiers(defnVar)
         defnVarRenderer.render(defnVar, VarRenderContext(javaModifiers, inBlock = true))
       case declVar: Decl.Var => declVarRenderer.render(declVar, VarRenderContext(inBlock = true))
-      // TODO support other stats once renderers are ready
-      case aStat: Stat => throw new UnsupportedOperationException(s"Rendering of $aStat in a block is not supported yet")
+      // TODO support Trait, Class, and Object with context info (requires major refactoring)
+      case aStat: Stat => writeComment(s"UNSUPPORTED in a block: $aStat")
     }
     writeStatEnd(stat)
   }
