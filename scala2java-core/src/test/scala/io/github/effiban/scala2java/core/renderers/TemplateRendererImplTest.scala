@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.entities.JavaKeyword
-import io.github.effiban.scala2java.core.renderers.contexts.{EmptyStatRenderContext, InitRenderContext, TemplateBodyRenderContext, TemplateRenderContext}
+import io.github.effiban.scala2java.core.renderers.contexts._
 import io.github.effiban.scala2java.core.renderers.matchers.TemplateBodyRenderContextMatcher.eqTemplateBodyRenderContext
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
@@ -10,7 +10,7 @@ import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeL
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
 
-import scala.meta.{Defn, Name, Self, Stat, Template, XtensionQuasiquoteCaseOrPattern, XtensionQuasiquoteInit, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
+import scala.meta.{Name, Self, Stat, Template, XtensionQuasiquoteInit, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 class TemplateRendererImplTest extends UnitTestSuite {
   private val Init1 = init"Parent1()"
@@ -21,14 +21,9 @@ class TemplateRendererImplTest extends UnitTestSuite {
 
   private val PermittedSubTypeNames = List(t"Child1", q"Child2")
 
-  private val DataMemberDefn = Defn.Val(
-    mods = Nil,
-    pats = List(p"y"),
-    decltpe = None,
-    rhs = q"4"
-  )
+  private val DefnVar = q"var y = 4"
 
-  private val MethodDefn = q"def myMethod(x: Int) = doSomething(x)"
+  private val DefnDef = q"def myMethod(x: Int) = doSomething(x)"
 
   private val initListRenderer = mock[InitListRenderer]
   private val selfRenderer = mock[SelfRenderer]
@@ -121,8 +116,8 @@ class TemplateRendererImplTest extends UnitTestSuite {
 
   test("traverse when has stats only") {
     val stats = List(
-      DataMemberDefn,
-      MethodDefn,
+      DefnVar,
+      DefnDef,
     )
 
     val template = Template(
@@ -133,8 +128,8 @@ class TemplateRendererImplTest extends UnitTestSuite {
     )
     val bodyContext = TemplateBodyRenderContext(
       Map(
-        DataMemberDefn -> EmptyStatRenderContext,
-        MethodDefn -> EmptyStatRenderContext
+        DefnVar -> VarRenderContext(),
+        DefnDef -> DefRenderContext()
       )
     )
     val context = TemplateRenderContext(bodyContext = bodyContext)
@@ -153,8 +148,8 @@ class TemplateRendererImplTest extends UnitTestSuite {
 
   test("render when has everything") {
     val stats = List(
-      DataMemberDefn,
-      MethodDefn,
+      DefnVar,
+      DefnDef,
     )
 
     val template = Template(
@@ -165,8 +160,8 @@ class TemplateRendererImplTest extends UnitTestSuite {
     )
     val bodyContext = TemplateBodyRenderContext(
       Map(
-        DataMemberDefn -> EmptyStatRenderContext,
-        MethodDefn -> EmptyStatRenderContext
+        DefnVar -> VarRenderContext(),
+        DefnDef -> DefRenderContext()
       )
     )
     val context = TemplateRenderContext(
