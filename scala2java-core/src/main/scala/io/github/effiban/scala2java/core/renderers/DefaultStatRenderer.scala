@@ -1,12 +1,12 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.renderers.contexts.{DeclRenderContext, DefaultStatRenderContext, DefnRenderContext, EmptyStatRenderContext}
+import io.github.effiban.scala2java.core.renderers.contexts.{DeclRenderContext, DefnRenderContext, EmptyStatRenderContext, StatRenderContext}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.{Decl, Defn, Import, Pkg, Stat, Term}
 
 trait DefaultStatRenderer {
-  def render(stat: Stat, context: DefaultStatRenderContext = EmptyStatRenderContext): Unit
+  def render(stat: Stat, context: StatRenderContext = EmptyStatRenderContext): Unit
 }
 
 private[renderers] class DefaultStatRendererImpl(statTermRenderer: => StatTermRenderer,
@@ -17,7 +17,7 @@ private[renderers] class DefaultStatRendererImpl(statTermRenderer: => StatTermRe
 
   import javaWriter._
 
-  override def render(stat: Stat, context: DefaultStatRenderContext = EmptyStatRenderContext): Unit =
+  override def render(stat: Stat, context: StatRenderContext = EmptyStatRenderContext): Unit =
     (stat, context) match {
     case (term: Term, _) => statTermRenderer.render(term)
     case (`import`: Import, _) => importRenderer.render(`import`)
@@ -32,7 +32,7 @@ private[renderers] class DefaultStatRendererImpl(statTermRenderer: => StatTermRe
     case (other, _) => writeComment(s"UNSUPPORTED: $other")
   }
 
-  private def handleInvalidContext(stat: Stat, aContext: DefaultStatRenderContext): Unit = {
+  private def handleInvalidContext(stat: Stat, aContext: StatRenderContext): Unit = {
     throw new IllegalStateException(s"Got an invalid context $aContext for: $stat")
   }
 }

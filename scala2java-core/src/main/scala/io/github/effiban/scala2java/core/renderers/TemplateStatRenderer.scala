@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.classifiers.JavaStatClassifier
-import io.github.effiban.scala2java.core.renderers.contexts.{DefaultStatRenderContext, EmptyStatRenderContext, EnumConstantListRenderContext, TemplateStatRenderContext}
+import io.github.effiban.scala2java.core.renderers.contexts.{EmptyStatRenderContext, EnumConstantListRenderContext, StatRenderContext, TemplateStatRenderContext}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.{Defn, Import, Stat}
@@ -29,7 +29,7 @@ private[renderers] class TemplateStatRendererImpl(enumConstantListRenderer: => E
     writeStatementEnd()
   }
 
-  private def renderDefaultStat(stat: Stat, context: DefaultStatRenderContext): Unit = {
+  private def renderDefaultStat(stat: Stat, context: StatRenderContext): Unit = {
     defaultStatRenderer.render(stat, context)
     if (javaStatClassifier.requiresEndDelimiter(stat)) {
       writeStatementEnd()
