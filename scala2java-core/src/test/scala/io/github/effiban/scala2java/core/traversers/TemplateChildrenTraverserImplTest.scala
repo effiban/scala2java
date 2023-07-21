@@ -3,8 +3,8 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.TemplateChildContext
 import io.github.effiban.scala2java.core.orderings.JavaTemplateChildOrdering
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.matchers.MultiStatTraversalResultScalatestMatcher.equalMultiStatTraversalResult
 import io.github.effiban.scala2java.core.traversers.results._
+import io.github.effiban.scala2java.core.traversers.results.matchers.MultiStatTraversalResultScalatestMatcher.equalMultiStatTraversalResult
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchersSugar.eqTo
@@ -16,6 +16,8 @@ class TemplateChildrenTraverserImplTest extends UnitTestSuite {
   private val TheDeclVar = q"var x: Int"
   private val TheTraversedDeclVar = q"var xx: Int"
   private val TheDeclVarTraversalResult = DeclVarTraversalResult(TheTraversedDeclVar)
+
+  private val TheEnumTypeDef = q"var One, Two = Value"
 
   private val TheDefnVar = q"var x = 4"
   private val TheTraversedDefnVar = q"var xx = 44"
@@ -89,7 +91,7 @@ class TemplateChildrenTraverserImplTest extends UnitTestSuite {
 
   private val childrenTraverser = new TemplateChildrenTraverserImpl(childTraverser, javaChildOrdering)
 
-  test("traverse") {
+  test("traverse() should return traversed results in order") {
 
     val children = List[Tree](
       TheDefnDef,
@@ -99,7 +101,7 @@ class TemplateChildrenTraverserImplTest extends UnitTestSuite {
       PrimaryCtor
     )
 
-    val expectedChildTraversalResults = List[StatTraversalResult](
+    val expectedChildTraversalResults = List[PopulatedStatTraversalResult](
       TheDeclVarTraversalResult,
       TheDefnVarTraversalResult,
       PrimaryCtorTraversalResult,
@@ -109,7 +111,7 @@ class TemplateChildrenTraverserImplTest extends UnitTestSuite {
     val expectedTraversalResult = MultiStatTraversalResult(expectedChildTraversalResults)
 
     expectTraverseDeclVar()
-    expectTraverseDefnVar()
+    expectTraverseRegularDefnVar()
     expectTraversePrimaryCtor()
     expectTraverseSecondaryCtor()
     expectTraverseDefnDef()
@@ -118,6 +120,25 @@ class TemplateChildrenTraverserImplTest extends UnitTestSuite {
 
     childrenTraverser.traverse(children, childContext) should equalMultiStatTraversalResult(expectedTraversalResult)
   }
+
+  test("traverse() should skip empty results") {
+
+    val children = List[Tree](
+      TheDefnDef,
+      TheEnumTypeDef
+    )
+
+    val expectedChildTraversalResults = List[PopulatedStatTraversalResult](TheDefnDefTraversalResult)
+    val expectedTraversalResult = MultiStatTraversalResult(expectedChildTraversalResults)
+
+    expectTraverseEnumTypeDef()
+    expectTraverseDefnDef()
+
+    expectChildOrdering()
+
+    childrenTraverser.traverse(children, childContext) should equalMultiStatTraversalResult(expectedTraversalResult)
+  }
+
 
   private def expectChildOrdering() = {
     when(javaChildOrdering.compare(any[Tree], any[Tree]))
@@ -129,9 +150,14 @@ class TemplateChildrenTraverserImplTest extends UnitTestSuite {
       .when(childTraverser).traverse(eqTree(TheDeclVar), eqTo(childContext))
   }
 
-  private def expectTraverseDefnVar(): Unit = {
+  private def expectTraverseRegularDefnVar(): Unit = {
     doReturn(TheDefnVarTraversalResult)
       .when(childTraverser).traverse(eqTree(TheDefnVar), eqTo(childContext))
+  }
+
+  private def expectTraverseEnumTypeDef(): Unit = {
+    doReturn(EmptyStatTraversalResult)
+      .when(childTraverser).traverse(eqTree(TheEnumTypeDef), eqTo(childContext))
   }
 
   private def expectTraversePrimaryCtor(): Unit = {
