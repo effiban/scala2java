@@ -8,4 +8,4 @@ case class RegularClassRenderContext(javaModifiers: List[JavaModifier] = Nil,
                                      javaTypeKeyword: JavaKeyword = JavaKeyword.Class,
                                      maybeInheritanceKeyword: Option[JavaKeyword] = None,
                                      permittedSubTypeNames: List[Name] = Nil,
-                                     bodyContext: TemplateBodyRenderContext = TemplateBodyRenderContext())
+                                     bodyContext: TemplateBodyRenderContext = TemplateBodyRenderContext()) extends DefnRenderContext
