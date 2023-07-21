@@ -10,6 +10,8 @@ class StatRenderContextMatcher(expectedContext: StatRenderContext) extends Argum
     (actualContext, expectedContext) match {
       case (actualTemplateStatContext: TemplateStatRenderContext, expectedTemplateStatContext: TemplateStatRenderContext) =>
         new TemplateStatRenderContextMatcher(expectedTemplateStatContext).matches(actualTemplateStatContext)
+      case (actualPkgContext: PkgRenderContext, expectedPkgContext: PkgRenderContext) =>
+        new PkgRenderContextMatcher(expectedPkgContext).matches(actualPkgContext)
       case (anActualContext, anExpectedContext) => anActualContext == anExpectedContext
     }
   }

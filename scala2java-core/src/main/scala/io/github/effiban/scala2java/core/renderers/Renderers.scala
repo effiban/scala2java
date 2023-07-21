@@ -110,6 +110,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
   lazy val defaultStatRenderer: DefaultStatRenderer = new DefaultStatRendererImpl(
     statTermRenderer,
     importRenderer,
+    pkgRenderer,
     declRenderer,
     defnRenderer
   )
