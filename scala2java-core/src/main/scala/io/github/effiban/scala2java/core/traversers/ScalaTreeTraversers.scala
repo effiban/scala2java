@@ -351,8 +351,16 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val superTraverser: SuperTraverser = new SuperTraverserImpl(nameTraverser)
 
+  @deprecated
   private lazy val deprecatedTemplateBodyTraverser: DeprecatedTemplateBodyTraverser = new DeprecatedTemplateBodyTraverserImpl(
     deprecatedTemplateChildrenTraverser,
+    new TemplateStatTransformerImpl(new CompositeTemplateTermApplyInfixToDefnTransformer, new CompositeTemplateTermApplyToDefnTransformer),
+    TemplateChildrenResolver,
+    TemplateChildContextFactory
+  )
+
+  private lazy val templateBodyTraverser: TemplateBodyTraverser = new TemplateBodyTraverserImpl(
+    templateChildrenTraverser,
     new TemplateStatTransformerImpl(new CompositeTemplateTermApplyInfixToDefnTransformer, new CompositeTemplateTermApplyToDefnTransformer),
     TemplateChildrenResolver,
     TemplateChildContextFactory
