@@ -1,4 +1,4 @@
-package io.github.effiban.scala2java.core.matchers
+package io.github.effiban.scala2java.core.traversers.results.matchers
 
 import io.github.effiban.scala2java.core.traversers.results.ModListTraversalResult
 import org.mockito.ArgumentMatcher
