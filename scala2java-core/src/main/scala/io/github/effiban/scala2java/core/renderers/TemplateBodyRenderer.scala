@@ -23,11 +23,13 @@ private[renderers] class TemplateBodyRendererImpl(templateStatRenderer: => Templ
 
   private def renderContents(stats: List[Stat], context: TemplateBodyRenderContext): Unit = {
     if (stats.nonEmpty) {
-      stats.foreach(stat => {
-        val statContext = context.statContextMap
-          .getOrElse(stat, throw new IllegalStateException(s"No render context defined for template stat: $stat"))
-        templateStatRenderer.render(stat, statContext)
-      })
+      stats.foreach(stat => templateStatRenderer.render(stat, statContextOf(context, stat)))
     }
+  }
+
+  private def statContextOf(context: TemplateBodyRenderContext, stat: Stat) = {
+    context.statContextMap.find { case (aStat, _) => aStat.structure == stat.structure }
+      .map(_._2)
+      .getOrElse(throw new IllegalStateException(s"No context defined for template body stat: $stat"))
   }
 }
