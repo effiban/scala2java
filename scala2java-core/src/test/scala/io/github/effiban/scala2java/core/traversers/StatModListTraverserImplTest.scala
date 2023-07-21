@@ -2,12 +2,12 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.ModifiersContext
 import io.github.effiban.scala2java.core.entities.{JavaModifier, JavaTreeType}
-import io.github.effiban.scala2java.core.matchers.ModListTraversalResultScalatestMatcher.equalModListTraversalResult
 import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
 import io.github.effiban.scala2java.core.resolvers.JavaModifiersResolver
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.core.traversers.results.ModListTraversalResult
+import io.github.effiban.scala2java.core.traversers.results.matchers.ModListTraversalResultScalatestMatcher.equalModListTraversalResult
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import org.mockito.ArgumentMatchersSugar.any
 

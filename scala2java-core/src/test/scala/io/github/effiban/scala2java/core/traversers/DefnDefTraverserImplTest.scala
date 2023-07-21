@@ -4,9 +4,9 @@ import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.entities.Decision.{Uncertain, Yes}
 import io.github.effiban.scala2java.core.entities.{JavaModifier, JavaTreeType}
 import io.github.effiban.scala2java.core.matchers.BlockContextMatcher.eqBlockContext
-import io.github.effiban.scala2java.core.matchers.DefnDefTraversalResultScalatestMatcher.equalDefnDefTraversalResult
 import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
+import io.github.effiban.scala2java.core.traversers.results.matchers.DefnDefTraversalResultScalatestMatcher.equalDefnDefTraversalResult
 import io.github.effiban.scala2java.core.traversers.results.{DefnDefTraversalResult, ModListTraversalResult}
 import io.github.effiban.scala2java.core.typeinference.TermTypeInferrer
 import io.github.effiban.scala2java.spi.entities.JavaScope
