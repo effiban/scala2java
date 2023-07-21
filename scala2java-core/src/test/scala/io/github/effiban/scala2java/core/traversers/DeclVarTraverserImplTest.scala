@@ -2,8 +2,8 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{ModifiersContext, StatContext}
 import io.github.effiban.scala2java.core.entities.{JavaModifier, JavaTreeType}
+import io.github.effiban.scala2java.core.matchers.DeclVarTraversalResultScalatestMatcher.equalDeclVarTraversalResult
 import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
-import io.github.effiban.scala2java.core.matchers.WithJavaModifiersTraversalResultScalatestMatcher.equalWithJavaModifiersTraversalResult
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.traversers.results.{DeclVarTraversalResult, ModListTraversalResult}
 import io.github.effiban.scala2java.spi.entities.JavaScope
@@ -57,7 +57,7 @@ class DeclVarTraverserImplTest extends UnitTestSuite {
     doReturn(TheTraversedType).when(typeTraverser).traverse(eqTree(TheType))
     doReturn(MyTraversedVarPat).when(patTraverser).traverse(eqTree(MyVarPat))
 
-    declVarTraverser.traverse(TheDeclVar, StatContext(javaScope)) should equalWithJavaModifiersTraversalResult(TheDeclVarResult)
+    declVarTraverser.traverse(TheDeclVar, StatContext(javaScope)) should equalDeclVarTraversalResult(TheDeclVarResult)
   }
 
   test("traverse() when it is an interface member") {
@@ -67,7 +67,7 @@ class DeclVarTraverserImplTest extends UnitTestSuite {
     doReturn(TheTraversedType).when(typeTraverser).traverse(eqTree(TheType))
     doReturn(MyTraversedVarPat).when(patTraverser).traverse(eqTree(MyVarPat))
 
-    declVarTraverser.traverse(TheDeclVar, StatContext(javaScope)) should equalWithJavaModifiersTraversalResult(TheDeclVarResult)
+    declVarTraverser.traverse(TheDeclVar, StatContext(javaScope)) should equalDeclVarTraversalResult(TheDeclVarResult)
   }
 
   private def eqExpectedModifiers(declVar: Decl.Var, javaScope: JavaScope) = {
