@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.renderers.contexts.{EmptyStatRenderContext, TemplateBodyRenderContext}
+import io.github.effiban.scala2java.core.renderers.contexts.{DefRenderContext, TemplateBodyRenderContext, VarRenderContext}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -33,21 +33,21 @@ class TemplateBodyRendererImplTest extends UnitTestSuite {
       """
     val context = TemplateBodyRenderContext(
       Map(
-        stat1 -> EmptyStatRenderContext,
-        stat2 -> EmptyStatRenderContext
+        stat1 -> VarRenderContext(),
+        stat2 -> DefRenderContext()
       )
     )
 
     doWrite(
       """  private final int myConst = 3;
         |""".stripMargin)
-      .when(templateStatRenderer).render(eqTree(stat1), eqTo(EmptyStatRenderContext))
+      .when(templateStatRenderer).render(eqTree(stat1), eqTo(VarRenderContext()))
     doWrite(
       """  public int myFunc(final int y) {
         |    return y * 2;
         |  }
         |""".stripMargin)
-      .when(templateStatRenderer).render(eqTree(stat2), eqTo(EmptyStatRenderContext))
+      .when(templateStatRenderer).render(eqTree(stat2), eqTo(DefRenderContext()))
 
     templateBodyRenderer.render(List(stat1, stat2), context)
 

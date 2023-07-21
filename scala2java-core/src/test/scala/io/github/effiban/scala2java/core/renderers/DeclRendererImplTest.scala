@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.entities.JavaModifier
-import io.github.effiban.scala2java.core.renderers.contexts.{DeclRenderContext, DefRenderContext, VarRenderContext}
+import io.github.effiban.scala2java.core.renderers.contexts.{DefRenderContext, VarRenderContext}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
@@ -18,20 +18,40 @@ class DeclRendererImplTest extends UnitTestSuite {
   test("render() a Decl.Var") {
     val declVar = q"private final var x: Int"
     val javaModifiers = List(JavaModifier.Private, JavaModifier.Final)
-    val context = DeclRenderContext(javaModifiers)
+    val context = VarRenderContext(javaModifiers)
 
     declRenderer.render(declVar, context)
 
-    verify(declVarRenderer).render(eqTree(declVar), eqTo(VarRenderContext(javaModifiers)))
+    verify(declVarRenderer).render(eqTree(declVar), eqTo(context))
+  }
+
+  test("render() a Decl.Var with incorrect context should throw an exception") {
+    val declVar = q"private final var x: Int"
+    val javaModifiers = List(JavaModifier.Private, JavaModifier.Final)
+    val context = DefRenderContext(javaModifiers)
+
+    intercept[IllegalStateException] {
+      declRenderer.render(declVar, context)
+    }
   }
 
   test("render() a Decl.Def") {
     val declDef = q"private def foo(x: Int)"
     val javaModifiers = List(JavaModifier.Private)
-    val context = DeclRenderContext(javaModifiers)
+    val context = DefRenderContext(javaModifiers)
 
     declRenderer.render(declDef, context)
 
     verify(declDefRenderer).render(eqTree(declDef), eqTo(DefRenderContext(javaModifiers)))
+  }
+
+  test("render() a Decl.Def with incorrect context should throw an exception") {
+    val declDef = q"private def foo(x: Int)"
+    val javaModifiers = List(JavaModifier.Private)
+    val context = VarRenderContext(javaModifiers)
+
+    intercept[IllegalStateException] {
+      declRenderer.render(declDef, context)
+    }
   }
 }
