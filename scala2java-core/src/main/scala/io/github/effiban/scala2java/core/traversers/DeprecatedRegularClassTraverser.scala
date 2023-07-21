@@ -11,20 +11,22 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Defn
 
-trait RegularClassTraverser {
+@deprecated
+trait DeprecatedRegularClassTraverser {
   def traverse(classDef: Defn.Class, context: ClassOrTraitContext = ClassOrTraitContext()): Unit
 }
 
-private[traversers] class RegularClassTraverserImpl(statModListTraverser: => StatModListTraverser,
-                                                    modifiersRenderContextFactory: ModifiersRenderContextFactory,
-                                                    modListRenderer: => ModListRenderer,
-                                                    typeParamTraverser: => TypeParamTraverser,
-                                                    typeParamListRenderer: => TypeParamListRenderer,
-                                                    templateTraverser: => TemplateTraverser,
-                                                    paramToDeclVarTransformer: ParamToDeclVarTransformer,
-                                                    javaTreeTypeResolver: JavaTreeTypeResolver,
-                                                    javaChildScopeResolver: JavaChildScopeResolver)
-                                                   (implicit javaWriter: JavaWriter) extends RegularClassTraverser {
+@deprecated
+private[traversers] class DeprecatedRegularClassTraverserImpl(statModListTraverser: => StatModListTraverser,
+                                                              modifiersRenderContextFactory: ModifiersRenderContextFactory,
+                                                              modListRenderer: => ModListRenderer,
+                                                              typeParamTraverser: => TypeParamTraverser,
+                                                              typeParamListRenderer: => TypeParamListRenderer,
+                                                              templateTraverser: => DeprecatedTemplateTraverser,
+                                                              paramToDeclVarTransformer: ParamToDeclVarTransformer,
+                                                              javaTreeTypeResolver: JavaTreeTypeResolver,
+                                                              javaChildScopeResolver: JavaChildScopeResolver)
+                                                             (implicit javaWriter: JavaWriter) extends DeprecatedRegularClassTraverser {
 
   import javaWriter._
 

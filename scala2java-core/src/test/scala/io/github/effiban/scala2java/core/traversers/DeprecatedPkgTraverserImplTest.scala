@@ -10,7 +10,8 @@ import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.{Decl, Defn, Import, Importee, Importer, Name, Pat, Pkg, Self, Template, Term, Type, XtensionQuasiquoteTerm}
 
-class PkgTraverserImplTest extends UnitTestSuite {
+@deprecated
+class DeprecatedPkgTraverserImplTest extends UnitTestSuite {
 
   private val ArbitraryImport = Import(
     List(
@@ -43,10 +44,10 @@ class PkgTraverserImplTest extends UnitTestSuite {
 
   private val defaultTermRefTraverser = mock[DefaultTermRefTraverser]
   private val defaultTermRefRenderer = mock[DefaultTermRefRenderer]
-  private val pkgStatListTraverser = mock[PkgStatListTraverser]
+  private val pkgStatListTraverser = mock[DeprecatedPkgStatListTraverser]
   private val additionalImportersProvider = mock[AdditionalImportersProvider]
 
-  private val pkgTraverser = new PkgTraverserImpl(
+  private val pkgTraverser = new DeprecatedPkgTraverserImpl(
     defaultTermRefTraverser,
     defaultTermRefRenderer,
     pkgStatListTraverser,

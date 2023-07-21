@@ -6,14 +6,16 @@ import io.github.effiban.scala2java.spi.entities.JavaScope
 
 import scala.meta.{Defn, Member, Name, Stat}
 
-trait PkgStatTraverser {
+@deprecated
+trait DeprecatedPkgStatTraverser {
   def traverse(stat: Stat, sealedHierarchies: SealedHierarchies): Unit
 }
 
-private[traversers] class PkgStatTraverserImpl(classTraverser: => ClassTraverser,
-                                               traitTraverser: => TraitTraverser,
-                                               objectTraverser: => ObjectTraverser,
-                                               statTraverser: => StatTraverser) extends PkgStatTraverser {
+@deprecated
+private[traversers] class DeprecatedPkgStatTraverserImpl(classTraverser: => DeprecatedClassTraverser,
+                                                         traitTraverser: => DeprecatedTraitTraverser,
+                                                         objectTraverser: => DeprecatedObjectTraverser,
+                                                         statTraverser: => DeprecatedStatTraverser) extends DeprecatedPkgStatTraverser {
 
   override def traverse(stat: Stat, sealedHierarchies: SealedHierarchies): Unit = {
     stat match {

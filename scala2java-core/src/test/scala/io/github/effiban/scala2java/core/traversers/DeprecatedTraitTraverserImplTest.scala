@@ -26,7 +26,8 @@ import scala.meta.Defn.Trait
 import scala.meta.Term.Block
 import scala.meta.{Defn, Init, Mod, Name, Self, Template, Term, Type, XtensionQuasiquoteTypeParam}
 
-class TraitTraverserImplTest extends UnitTestSuite {
+@deprecated
+class DeprecatedTraitTraverserImplTest extends UnitTestSuite {
 
   private val TraitName = Type.Name("MyTrait")
 
@@ -71,12 +72,12 @@ class TraitTraverserImplTest extends UnitTestSuite {
   private val modListRenderer = mock[ModListRenderer]
   private val typeParamTraverser = mock[TypeParamTraverser]
   private val typeParamListRenderer = mock[TypeParamListRenderer]
-  private val templateTraverser = mock[TemplateTraverser]
+  private val templateTraverser = mock[DeprecatedTemplateTraverser]
   private val javaTreeTypeResolver = mock[JavaTreeTypeResolver]
   private val javaChildScopeResolver = mock[JavaChildScopeResolver]
 
 
-  private val traitTraverser = new TraitTraverserImpl(
+  private val traitTraverser = new DeprecatedTraitTraverserImpl(
     statModListTraverser,
     modifiersRenderContextFactory,
     modListRenderer,

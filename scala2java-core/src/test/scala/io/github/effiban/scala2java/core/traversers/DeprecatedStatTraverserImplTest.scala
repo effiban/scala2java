@@ -16,18 +16,19 @@ import org.mockito.ArgumentMatchersSugar.eqTo
 import scala.meta.Ctor.Primary
 import scala.meta.{Decl, Defn, Lit, Name, Pat, Pkg, Self, Template, Term, Type, XtensionQuasiquoteTerm}
 
-class StatTraverserImplTest extends UnitTestSuite {
+@deprecated
+class DeprecatedStatTraverserImplTest extends UnitTestSuite {
 
   private val statTermTraverser = mock[StatTermTraverser]
   private val statTermRenderer = mock[StatTermRenderer]
   private val importTraverser = mock[ImportTraverser]
   private val importRenderer = mock[ImportRenderer]
-  private val pkgTraverser = mock[PkgTraverser]
-  private val defnTraverser = mock[DefnTraverser]
+  private val pkgTraverser = mock[DeprecatedPkgTraverser]
+  private val defnTraverser = mock[DeprecatedDefnTraverser]
   private val declTraverser = mock[DeclTraverser]
   private val declRenderer = mock[DeclRenderer]
 
-  private val statTraverser = new StatTraverserImpl(
+  private val statTraverser = new DeprecatedStatTraverserImpl(
     statTermTraverser,
     statTermRenderer,
     importTraverser,

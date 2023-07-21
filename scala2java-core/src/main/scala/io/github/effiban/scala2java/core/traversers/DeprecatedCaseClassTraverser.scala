@@ -10,21 +10,23 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Defn
 
-trait CaseClassTraverser {
+@deprecated
+trait DeprecatedCaseClassTraverser {
   def traverse(classDef: Defn.Class, context: ClassOrTraitContext = ClassOrTraitContext()): Unit
 }
 
-private[traversers] class CaseClassTraverserImpl(statModListTraverser: => StatModListTraverser,
-                                                 modifiersRenderContextFactory: ModifiersRenderContextFactory,
-                                                 modListRenderer: => ModListRenderer,
-                                                 typeParamTraverser: => TypeParamTraverser,
-                                                 typeParamListRenderer: => TypeParamListRenderer,
-                                                 termParamTraverser: => TermParamTraverser,
-                                                 termParamListRenderer: => TermParamListRenderer,
-                                                 templateTraverser: => TemplateTraverser,
-                                                 javaTreeTypeResolver: JavaTreeTypeResolver,
-                                                 javaChildScopeResolver: JavaChildScopeResolver)
-                                                (implicit javaWriter: JavaWriter) extends CaseClassTraverser {
+@deprecated
+private[traversers] class DeprecatedCaseClassTraverserImpl(statModListTraverser: => StatModListTraverser,
+                                                           modifiersRenderContextFactory: ModifiersRenderContextFactory,
+                                                           modListRenderer: => ModListRenderer,
+                                                           typeParamTraverser: => TypeParamTraverser,
+                                                           typeParamListRenderer: => TypeParamListRenderer,
+                                                           termParamTraverser: => TermParamTraverser,
+                                                           termParamListRenderer: => TermParamListRenderer,
+                                                           templateTraverser: => DeprecatedTemplateTraverser,
+                                                           javaTreeTypeResolver: JavaTreeTypeResolver,
+                                                           javaChildScopeResolver: JavaChildScopeResolver)
+                                                          (implicit javaWriter: JavaWriter) extends DeprecatedCaseClassTraverser {
 
   import javaWriter._
 

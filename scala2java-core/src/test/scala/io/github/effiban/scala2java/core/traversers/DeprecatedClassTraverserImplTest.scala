@@ -11,14 +11,15 @@ import org.mockito.ArgumentMatchers
 
 import scala.meta.{Defn, Mod, Type}
 
-class ClassTraverserImplTest extends UnitTestSuite {
+@deprecated
+class DeprecatedClassTraverserImplTest extends UnitTestSuite {
 
-  private val caseClassTraverser = mock[CaseClassTraverser]
-  private val regularClassTraverser = mock[RegularClassTraverser]
+  private val caseClassTraverser = mock[DeprecatedCaseClassTraverser]
+  private val regularClassTraverser = mock[DeprecatedRegularClassTraverser]
   private val classTransformer = mock[ClassTransformer]
   private val classClassifier = mock[ClassClassifier]
 
-  private val classTraverser = new ClassTraverserImpl(
+  private val classTraverser = new DeprecatedClassTraverserImpl(
     caseClassTraverser,
     regularClassTraverser,
     classTransformer,

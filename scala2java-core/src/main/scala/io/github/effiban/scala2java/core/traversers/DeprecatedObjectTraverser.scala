@@ -9,17 +9,19 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Defn
 
-trait ObjectTraverser {
+@deprecated
+trait DeprecatedObjectTraverser {
   def traverse(objectDef: Defn.Object, context: StatContext = StatContext()): Unit
 }
 
-private[traversers] class ObjectTraverserImpl(statModListTraverser: => StatModListTraverser,
-                                              modifiersRenderContextFactory: ModifiersRenderContextFactory,
-                                              modListRenderer: => ModListRenderer,
-                                              templateTraverser: => TemplateTraverser,
-                                              javaTreeTypeResolver: JavaTreeTypeResolver,
-                                              javaChildScopeResolver: JavaChildScopeResolver)
-                                             (implicit javaWriter: JavaWriter) extends ObjectTraverser {
+@deprecated
+private[traversers] class DeprecatedObjectTraverserImpl(statModListTraverser: => StatModListTraverser,
+                                                        modifiersRenderContextFactory: ModifiersRenderContextFactory,
+                                                        modListRenderer: => ModListRenderer,
+                                                        templateTraverser: => DeprecatedTemplateTraverser,
+                                                        javaTreeTypeResolver: JavaTreeTypeResolver,
+                                                        javaChildScopeResolver: JavaChildScopeResolver)
+                                                       (implicit javaWriter: JavaWriter) extends DeprecatedObjectTraverser {
 
   import javaWriter._
 

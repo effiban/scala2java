@@ -24,7 +24,8 @@ import org.mockito.ArgumentMatchersSugar.{any, eqTo}
 import scala.meta.Term.Block
 import scala.meta.{Ctor, Defn, Init, Mod, Name, Self, Template, Term, Type, XtensionQuasiquoteTermParam, XtensionQuasiquoteTypeParam}
 
-class CaseClassTraverserImplTest extends UnitTestSuite {
+@deprecated
+class DeprecatedCaseClassTraverserImplTest extends UnitTestSuite {
 
   private val AnnotationName = "MyAnnotation"
 
@@ -77,12 +78,12 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
   private val typeParamListRenderer = mock[TypeParamListRenderer]
   private val termParamTraverser = mock[TermParamTraverser]
   private val termParamListRenderer = mock[TermParamListRenderer]
-  private val templateTraverser = mock[TemplateTraverser]
+  private val templateTraverser = mock[DeprecatedTemplateTraverser]
   private val javaTreeTypeResolver = mock[JavaTreeTypeResolver]
   private val javaChildScopeResolver = mock[JavaChildScopeResolver]
 
 
-  private val classTraverser = new CaseClassTraverserImpl(
+  private val classTraverser = new DeprecatedCaseClassTraverserImpl(
     statModListTraverser,
     modifiersRenderContextFactory,
     modListRenderer,

@@ -11,7 +11,8 @@ import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.{Ctor, Defn, Name, Tree, XtensionQuasiquoteInit, XtensionQuasiquoteTerm, XtensionQuasiquoteTermParam}
 
-class TemplateChildrenTraverserImplTest extends UnitTestSuite {
+@deprecated
+class DeprecatedTemplateChildrenTraverserImplTest extends UnitTestSuite {
 
   private val TheDeclVal = q"val x: Int"
 
@@ -61,10 +62,10 @@ class TemplateChildrenTraverserImplTest extends UnitTestSuite {
 
   private val childContext = mock[TemplateChildContext]
 
-  private val childTraverser = mock[TemplateChildTraverser]
+  private val childTraverser = mock[DeprecatedTemplateChildTraverser]
   private val javaChildOrdering = mock[JavaTemplateChildOrdering]
 
-  private val childrenTraverser = new TemplateChildrenTraverserImpl(childTraverser, javaChildOrdering)
+  private val childrenTraverser = new DeprecatedTemplateChildrenTraverserImpl(childTraverser, javaChildOrdering)
   
   test("traverse") {
 

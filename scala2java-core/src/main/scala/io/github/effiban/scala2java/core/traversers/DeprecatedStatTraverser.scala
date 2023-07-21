@@ -9,19 +9,21 @@ import io.github.effiban.scala2java.spi.entities.JavaScope
 
 import scala.meta.{Decl, Defn, Import, Pkg, Stat, Term}
 
-trait StatTraverser {
+@deprecated
+trait DeprecatedStatTraverser {
   def traverse(stat: Stat, statContext: StatContext = StatContext()): Unit
 }
 
-private[traversers] class StatTraverserImpl(statTermTraverser: => StatTermTraverser,
-                                            statTermRenderer: => StatTermRenderer,
-                                            importTraverser: => ImportTraverser,
-                                            importRenderer: => ImportRenderer,
-                                            pkgTraverser: => PkgTraverser,
-                                            defnTraverser: => DefnTraverser,
-                                            declTraverser: => DeclTraverser,
-                                            declRenderer: => DeclRenderer)
-                                           (implicit javaWriter: JavaWriter) extends StatTraverser {
+@deprecated
+private[traversers] class DeprecatedStatTraverserImpl(statTermTraverser: => StatTermTraverser,
+                                                      statTermRenderer: => StatTermRenderer,
+                                                      importTraverser: => ImportTraverser,
+                                                      importRenderer: => ImportRenderer,
+                                                      pkgTraverser: => DeprecatedPkgTraverser,
+                                                      defnTraverser: => DeprecatedDefnTraverser,
+                                                      declTraverser: => DeclTraverser,
+                                                      declRenderer: => DeclRenderer)
+                                                     (implicit javaWriter: JavaWriter) extends DeprecatedStatTraverser {
 
   import javaWriter._
 

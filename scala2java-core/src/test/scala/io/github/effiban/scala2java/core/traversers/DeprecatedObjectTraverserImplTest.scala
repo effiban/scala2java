@@ -23,7 +23,8 @@ import org.mockito.ArgumentMatchersSugar.eqTo
 import scala.meta.Term.Block
 import scala.meta.{Defn, Init, Mod, Name, Self, Template, Term, Type}
 
-class ObjectTraverserImplTest extends UnitTestSuite {
+@deprecated
+class DeprecatedObjectTraverserImplTest extends UnitTestSuite {
 
   private val AnnotationName = "MyAnnotation"
 
@@ -45,11 +46,11 @@ class ObjectTraverserImplTest extends UnitTestSuite {
   private val statModListTraverser = mock[StatModListTraverser]
   private val modifiersRenderContextFactory = mock[ModifiersRenderContextFactory]
   private val modListRenderer = mock[ModListRenderer]
-  private val templateTraverser = mock[TemplateTraverser]
+  private val templateTraverser = mock[DeprecatedTemplateTraverser]
   private val javaTreeTypeResolver = mock[JavaTreeTypeResolver]
   private val javaChildScopeResolver = mock[JavaChildScopeResolver]
 
-  private val objectTraverser = new ObjectTraverserImpl(
+  private val objectTraverser = new DeprecatedObjectTraverserImpl(
     statModListTraverser,
     modifiersRenderContextFactory,
     modListRenderer,
