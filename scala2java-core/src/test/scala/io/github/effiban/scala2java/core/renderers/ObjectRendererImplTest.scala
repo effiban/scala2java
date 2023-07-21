@@ -49,8 +49,8 @@ class ObjectRendererImplTest extends UnitTestSuite {
     val inheritanceKeyword = JavaKeyword.Extends
     val templateBodyContext = TemplateBodyRenderContext(
       Map(
-        Statement1 -> TemplateStatRenderContext(),
-        Statement2 -> TemplateStatRenderContext()
+        Statement1 -> EmptyStatRenderContext,
+        Statement2 -> EmptyStatRenderContext
       )
     )
     val objectContext = ObjectRenderContext(
@@ -108,8 +108,8 @@ class ObjectRendererImplTest extends UnitTestSuite {
     val javaModifiers = List(JavaModifier.Public, JavaModifier.Final)
     val templateBodyContext = TemplateBodyRenderContext(
       Map(
-        Statement1 -> TemplateStatRenderContext(),
-        Statement2 -> TemplateStatRenderContext()
+        Statement1 -> EmptyStatRenderContext,
+        Statement2 -> EmptyStatRenderContext
       )
     )
     val objectContext = ObjectRenderContext(
@@ -165,8 +165,8 @@ class ObjectRendererImplTest extends UnitTestSuite {
     val javaModifiers = List(JavaModifier.Public)
     val templateBodyContext = TemplateBodyRenderContext(
       Map(
-        enumTypeDef -> TemplateStatRenderContext(),
-        enumConstantListDef -> TemplateStatRenderContext(enumConstantList = true)
+        enumTypeDef -> EmptyStatRenderContext,
+        enumConstantListDef -> EnumConstantListRenderContext
       )
     )
     val objectContext = ObjectRenderContext(

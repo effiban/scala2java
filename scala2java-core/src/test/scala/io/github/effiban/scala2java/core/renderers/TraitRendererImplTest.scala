@@ -58,8 +58,8 @@ class TraitRendererImplTest extends UnitTestSuite {
     val javaModifiers = List(JavaModifier.Public)
     val templateBodyContext = TemplateBodyRenderContext(
       Map(
-        Statement1 -> TemplateStatRenderContext(),
-        Statement2 -> TemplateStatRenderContext()
+        Statement1 -> EmptyStatRenderContext,
+        Statement2 -> EmptyStatRenderContext
       )
     )
     val traitContext = TraitRenderContext(
@@ -110,8 +110,8 @@ class TraitRendererImplTest extends UnitTestSuite {
     val javaModifiers = List(JavaModifier.Public)
     val templateBodyContext = TemplateBodyRenderContext(
       Map(
-        Statement1 -> TemplateStatRenderContext(),
-        Statement2 -> TemplateStatRenderContext()
+        Statement1 -> EmptyStatRenderContext,
+        Statement2 -> EmptyStatRenderContext
       )
     )
     val traitContext = TraitRenderContext(javaModifiers, PermittedSubTypeNames, templateBodyContext)

@@ -1,13 +1,13 @@
 package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.classifiers.JavaStatClassifier
-import io.github.effiban.scala2java.core.renderers.contexts.TemplateStatRenderContext
+import io.github.effiban.scala2java.core.renderers.contexts.{DefaultStatRenderContext, EmptyStatRenderContext, EnumConstantListRenderContext, TemplateStatRenderContext}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.{Defn, Import, Stat}
 
 trait TemplateStatRenderer {
-  def render(stat: Stat, context: TemplateStatRenderContext = TemplateStatRenderContext()): Unit
+  def render(stat: Stat, context: TemplateStatRenderContext = EmptyStatRenderContext): Unit
 }
 
 private[renderers] class TemplateStatRendererImpl(enumConstantListRenderer: => EnumConstantListRenderer,
@@ -17,11 +17,11 @@ private[renderers] class TemplateStatRendererImpl(enumConstantListRenderer: => E
 
   import javaWriter._
 
-  override def render(stat: Stat, context: TemplateStatRenderContext = TemplateStatRenderContext()): Unit =
-    stat match {
-      case defnVar: Defn.Var if context.enumConstantList => renderEnumConstantList(defnVar)
-      case anImport: Import => writeComment(s"$anImport")
-      case aStat => renderDefaultStat(aStat)
+  override def render(stat: Stat, context: TemplateStatRenderContext = EmptyStatRenderContext): Unit =
+    (stat, context) match {
+      case (defnVar: Defn.Var, EnumConstantListRenderContext) => renderEnumConstantList(defnVar)
+      case (anImport: Import, _) => writeComment(s"$anImport")
+      case (aStat, ctx) => renderDefaultStat(aStat, ctx)
     }
 
   private def renderEnumConstantList(defnVar: Defn.Var): Unit = {
@@ -29,8 +29,8 @@ private[renderers] class TemplateStatRendererImpl(enumConstantListRenderer: => E
     writeStatementEnd()
   }
 
-  private def renderDefaultStat(stat: Stat): Unit = {
-    defaultStatRenderer.render(stat)
+  private def renderDefaultStat(stat: Stat, context: DefaultStatRenderContext): Unit = {
+    defaultStatRenderer.render(stat, context)
     if (javaStatClassifier.requiresEndDelimiter(stat)) {
       writeStatementEnd()
     }
