@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.renderers.contexts.{DeclRenderContext, DefaultStatRenderContext, EmptyStatRenderContext}
+import io.github.effiban.scala2java.core.renderers.contexts.{DeclRenderContext, DefaultStatRenderContext, DefnRenderContext, EmptyStatRenderContext}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.{Decl, Defn, Import, Pkg, Stat, Term}
@@ -11,7 +11,8 @@ trait DefaultStatRenderer {
 
 private[renderers] class DefaultStatRendererImpl(statTermRenderer: => StatTermRenderer,
                                                  importRenderer: => ImportRenderer,
-                                                 declRenderer: => DeclRenderer)
+                                                 declRenderer: => DeclRenderer,
+                                                 defnRenderer: => DefnRenderer)
                                                 (implicit javaWriter: JavaWriter) extends DefaultStatRenderer {
 
   import javaWriter._
@@ -21,9 +22,17 @@ private[renderers] class DefaultStatRendererImpl(statTermRenderer: => StatTermRe
     case (term: Term, _) => statTermRenderer.render(term)
     case (`import`: Import, _) => importRenderer.render(`import`)
     case (pkg: Pkg, _) => //TODO
-    case (defn: Defn, _) => //TODO
+
     case (decl: Decl, declContext: DeclRenderContext) => declRenderer.render(decl, declContext)
-    case (decl: Decl, aContext) => throw new IllegalStateException(s"Mismatching context $aContext for $decl")
+    case (decl: Decl, aContext) => handleInvalidContext(decl, aContext)
+
+    case (defn: Defn, defnContext: DefnRenderContext) => defnRenderer.render(defn, defnContext)
+    case (defn: Defn, aContext) => handleInvalidContext(defn, aContext)
+
     case (other, _) => writeComment(s"UNSUPPORTED: $other")
+  }
+
+  private def handleInvalidContext(stat: Stat, aContext: DefaultStatRenderContext): Unit = {
+    throw new IllegalStateException(s"Got an invalid context $aContext for: $stat")
   }
 }

@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.classifiers.JavaStatClassifier
-import io.github.effiban.scala2java.core.renderers.contexts.{DeclRenderContext, EmptyStatRenderContext, EnumConstantListRenderContext}
+import io.github.effiban.scala2java.core.renderers.contexts.{DeclRenderContext, DefRenderContext, EnumConstantListRenderContext, VarRenderContext}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -36,11 +36,12 @@ class TemplateStatRendererImplTest extends UnitTestSuite {
 
   test("render() for Defn.Var which is not an enum constant list") {
     val defnVar = q"var x: int = 3"
+    val context = VarRenderContext()
 
-    doWrite("int x = 3").when(defaultStatRenderer).render(eqTree(defnVar), eqTo(EmptyStatRenderContext))
+    doWrite("int x = 3").when(defaultStatRenderer).render(eqTree(defnVar), eqTo(context))
     when(javaStatClassifier.requiresEndDelimiter(eqTree(defnVar))).thenReturn(true)
 
-    templateStatRenderer.render(defnVar)
+    templateStatRenderer.render(defnVar, context)
 
     outputWriter.toString shouldBe
       """int x = 3;
@@ -70,16 +71,17 @@ class TemplateStatRendererImplTest extends UnitTestSuite {
 
   test("render() for Defn.Def") {
     val defnDef = q"def foo(x: int): int = x + 1"
+    val context = DefRenderContext()
 
     doWrite(
       """int foo(int x) {
         |  return x + 1;
         |}
         |""".stripMargin)
-      .when(defaultStatRenderer).render(eqTree(defnDef), eqTo(EmptyStatRenderContext))
+      .when(defaultStatRenderer).render(eqTree(defnDef), eqTo(context))
     when(javaStatClassifier.requiresEndDelimiter(eqTree(defnDef))).thenReturn(false)
 
-    templateStatRenderer.render(defnDef)
+    templateStatRenderer.render(defnDef, context)
 
     outputWriter.toString shouldBe
       """int foo(int x) {
