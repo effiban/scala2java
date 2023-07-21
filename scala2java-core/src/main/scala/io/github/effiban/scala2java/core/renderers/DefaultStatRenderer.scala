@@ -1,12 +1,12 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.renderers.contexts.{DefaultStatRenderContext, EmptyDefaultStatRenderContext}
+import io.github.effiban.scala2java.core.renderers.contexts.{DefaultStatRenderContext, EmptyStatRenderContext}
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.{Decl, Defn, Import, Pkg, Stat, Term}
 
 trait DefaultStatRenderer {
-  def render(stat: Stat, context: DefaultStatRenderContext = EmptyDefaultStatRenderContext): Unit
+  def render(stat: Stat, context: DefaultStatRenderContext = EmptyStatRenderContext): Unit
 }
 
 private[renderers] class DefaultStatRendererImpl(statTermRenderer: => StatTermRenderer,
@@ -15,7 +15,7 @@ private[renderers] class DefaultStatRendererImpl(statTermRenderer: => StatTermRe
 
   import javaWriter._
 
-  override def render(stat: Stat, context: DefaultStatRenderContext = EmptyDefaultStatRenderContext): Unit = stat match {
+  override def render(stat: Stat, context: DefaultStatRenderContext = EmptyStatRenderContext): Unit = stat match {
     case term: Term => statTermRenderer.render(term)
     case `import`: Import => importRenderer.render(`import`)
     case pkg: Pkg => //TODO

@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.entities.JavaKeyword
-import io.github.effiban.scala2java.core.renderers.contexts.{InitRenderContext, TemplateBodyRenderContext, TemplateRenderContext, TemplateStatRenderContext}
+import io.github.effiban.scala2java.core.renderers.contexts.{EmptyStatRenderContext, InitRenderContext, TemplateBodyRenderContext, TemplateRenderContext}
 import io.github.effiban.scala2java.core.renderers.matchers.TemplateBodyRenderContextMatcher.eqTemplateBodyRenderContext
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
@@ -133,8 +133,8 @@ class TemplateRendererImplTest extends UnitTestSuite {
     )
     val bodyContext = TemplateBodyRenderContext(
       Map(
-        DataMemberDefn -> TemplateStatRenderContext(),
-        MethodDefn -> TemplateStatRenderContext()
+        DataMemberDefn -> EmptyStatRenderContext,
+        MethodDefn -> EmptyStatRenderContext
       )
     )
     val context = TemplateRenderContext(bodyContext = bodyContext)
@@ -165,8 +165,8 @@ class TemplateRendererImplTest extends UnitTestSuite {
     )
     val bodyContext = TemplateBodyRenderContext(
       Map(
-        DataMemberDefn -> TemplateStatRenderContext(),
-        MethodDefn -> TemplateStatRenderContext()
+        DataMemberDefn -> EmptyStatRenderContext,
+        MethodDefn -> EmptyStatRenderContext
       )
     )
     val context = TemplateRenderContext(
