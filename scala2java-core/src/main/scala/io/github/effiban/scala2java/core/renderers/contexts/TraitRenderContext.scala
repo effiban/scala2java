@@ -6,4 +6,4 @@ import scala.meta.Name
 
 case class TraitRenderContext(javaModifiers: List[JavaModifier] = Nil,
                               permittedSubTypeNames: List[Name] = Nil,
-                              bodyContext: TemplateBodyRenderContext = TemplateBodyRenderContext())
+                              bodyContext: TemplateBodyRenderContext = TemplateBodyRenderContext()) extends DefnRenderContext

@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.classifiers.ClassClassifier
 import io.github.effiban.scala2java.core.contexts.ClassOrTraitContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{PrimaryCtors, Templates}
@@ -15,11 +16,13 @@ class ClassTraverserImplTest extends UnitTestSuite {
   private val caseClassTraverser = mock[CaseClassTraverser]
   private val regularClassTraverser = mock[RegularClassTraverser]
   private val classTransformer = mock[ClassTransformer]
+  private val classClassifier = mock[ClassClassifier]
 
   private val classTraverser = new ClassTraverserImpl(
     caseClassTraverser,
     regularClassTraverser,
-    classTransformer
+    classTransformer,
+    classClassifier
   )
 
   test("traverse when case class") {
@@ -27,6 +30,7 @@ class ClassTraverserImplTest extends UnitTestSuite {
     val transformedClassDef = classDefOf("MyTransformedClass", List(Mod.Case()))
 
     when(classTransformer.transform(eqTree(classDef))).thenReturn(transformedClassDef)
+    when(classClassifier.isCase(eqTree(transformedClassDef))).thenReturn(true)
 
     classTraverser.traverse(classDef, ClassOrTraitContext(JavaScope.Package))
 
@@ -36,6 +40,7 @@ class ClassTraverserImplTest extends UnitTestSuite {
   test("traverse when regular class") {
     val classDef = classDefOf("MyClass")
     val transformedClassDef = classDefOf("MyTransformedClass")
+    when(classClassifier.isCase(eqTree(transformedClassDef))).thenReturn(false)
 
     when(classTransformer.transform(eqTree(classDef))).thenReturn(transformedClassDef)
 

@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.classifiers.{JavaStatClassifier, TermTreeClassifier}
+import io.github.effiban.scala2java.core.classifiers.{ClassClassifier, JavaStatClassifier, TermTreeClassifier}
 import io.github.effiban.scala2java.core.orderings.JavaModifierOrdering
 import io.github.effiban.scala2java.core.resolvers.ArrayInitializerRenderContextResolver
 import io.github.effiban.scala2java.core.writers.JavaWriter
@@ -156,6 +156,16 @@ class Renderers(implicit javaWriter: JavaWriter) {
     typeRenderer,
     termParamListRenderer,
     blockCoercingTermRenderer
+  )
+
+  lazy val defnRenderer: DefnRenderer = new DefnRendererImpl(
+    defnVarRenderer,
+    defnDefRenderer,
+    caseClassRenderer,
+    regularClassRenderer,
+    traitRenderer,
+    objectRenderer,
+    ClassClassifier
   )
 
   lazy val defnVarTypeRenderer: DefnVarTypeRenderer = new DefnVarTypeRendererImpl(typeRenderer)
