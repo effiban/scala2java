@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.TemplateChildContext
 import io.github.effiban.scala2java.core.orderings.JavaTemplateChildOrdering
-import io.github.effiban.scala2java.core.traversers.results.MultiStatTraversalResult
+import io.github.effiban.scala2java.core.traversers.results.{MultiStatTraversalResult, PopulatedStatTraversalResult}
 
 import scala.meta.Tree
 
@@ -18,6 +18,7 @@ private[traversers] class TemplateChildrenTraverserImpl(templateChildTraverser: 
   def traverse(children: List[Tree], childContext: TemplateChildContext): MultiStatTraversalResult = {
     val statResults = children.sorted(javaTemplateChildOrdering)
       .map(child => templateChildTraverser.traverse(child, childContext))
+      .collect { case result: PopulatedStatTraversalResult => result }
     MultiStatTraversalResult(statResults)
   }
 }
