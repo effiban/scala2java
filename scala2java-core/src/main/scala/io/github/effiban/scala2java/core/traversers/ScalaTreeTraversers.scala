@@ -364,6 +364,11 @@ class ScalaTreeTraversers(implicit factories: Factories,
     JavaTemplateChildOrdering
   )
 
+  private lazy val templateChildrenTraverser: TemplateChildrenTraverser = new TemplateChildrenTraverserImpl(
+    templateChildTraverser,
+    JavaTemplateChildOrdering
+  )
+
   @deprecated
   private lazy val deprecatedTemplateChildTraverser: DeprecatedTemplateChildTraverser = new DeprecatedTemplateChildTraverserImpl(
     ctorPrimaryTraverser,
