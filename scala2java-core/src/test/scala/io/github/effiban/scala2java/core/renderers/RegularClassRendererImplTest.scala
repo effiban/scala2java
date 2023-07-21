@@ -63,8 +63,8 @@ class RegularClassRendererImplTest extends UnitTestSuite {
     val javaModifiers = List(JavaModifier.Public)
     val templateBodyContext = TemplateBodyRenderContext(
       Map(
-        Statement1 -> EmptyStatRenderContext,
-        Statement2 -> EmptyStatRenderContext
+        Statement1 -> DeclRenderContext(),
+        Statement2 -> DeclRenderContext()
       )
     )
     val regularClassContext = RegularClassRenderContext(
@@ -120,8 +120,8 @@ class RegularClassRendererImplTest extends UnitTestSuite {
     val inheritanceKeyword = JavaKeyword.Implements
     val templateBodyContext = TemplateBodyRenderContext(
       Map(
-        Statement1 -> EmptyStatRenderContext,
-        Statement2 -> EmptyStatRenderContext
+        Statement1 -> DeclRenderContext(),
+        Statement2 -> DeclRenderContext()
       )
     )
     val regularClassContext = RegularClassRenderContext(
