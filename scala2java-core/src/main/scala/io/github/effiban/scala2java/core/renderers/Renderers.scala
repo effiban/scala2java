@@ -305,6 +305,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   lazy val templateStatRenderer: TemplateStatRenderer = new TemplateStatRendererImpl(
     enumConstantListRenderer,
+    ctorSecondaryRenderer,
     defaultStatRenderer,
     JavaStatClassifier
   )

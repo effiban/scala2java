@@ -1,22 +1,24 @@
 package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.classifiers.JavaStatClassifier
-import io.github.effiban.scala2java.core.renderers.contexts.{DefRenderContext, EnumConstantListRenderContext, VarRenderContext}
+import io.github.effiban.scala2java.core.renderers.contexts.{CtorSecondaryRenderContext, DefRenderContext, EnumConstantListRenderContext, VarRenderContext}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
 
-import scala.meta.XtensionQuasiquoteTerm
+import scala.meta.{XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 class TemplateStatRendererImplTest extends UnitTestSuite {
 
   private val enumConstantListRenderer = mock[EnumConstantListRenderer]
+  private val ctorSecondaryRenderer = mock[CtorSecondaryRenderer]
   private val defaultStatRenderer = mock[DefaultStatRenderer]
   private val javaStatClassifier = mock[JavaStatClassifier]
 
   private val templateStatRenderer = new TemplateStatRendererImpl(
     enumConstantListRenderer,
+    ctorSecondaryRenderer,
     defaultStatRenderer,
     javaStatClassifier
   )
@@ -68,6 +70,49 @@ class TemplateStatRendererImplTest extends UnitTestSuite {
     templateStatRenderer.render(`import`)
 
     outputWriter.toString shouldBe "/* import a.b.c */"
+  }
+
+  test("render() for Ctor.Secondary which has a correct context") {
+    val ctorSecondary =
+      q"""
+      def this(x: int) = {
+         this()
+         this.x = x
+      }
+      """
+    val context = CtorSecondaryRenderContext(t"MyClass")
+
+    doWrite(
+      """MyClass(final int x) {
+        |  this();
+        |  this.x = x;
+        |}
+        |""".stripMargin)
+      .when(ctorSecondaryRenderer).render(eqTree(ctorSecondary), eqTo(context))
+    when(javaStatClassifier.requiresEndDelimiter(eqTree(ctorSecondary))).thenReturn(false)
+
+    templateStatRenderer.render(ctorSecondary, context)
+
+    outputWriter.toString shouldBe
+      """MyClass(final int x) {
+        |  this();
+        |  this.x = x;
+        |}
+        |""".stripMargin
+  }
+
+  test("render() for Ctor.Secondary which has an incorrect context should throw exception") {
+    val ctorSecondary =
+      q"""
+      def this(x: int) = {
+         this()
+         this.x = x
+      }
+      """
+
+    intercept[IllegalStateException] {
+      templateStatRenderer.render(ctorSecondary)
+    }
   }
 
   test("render() for Defn.Def") {

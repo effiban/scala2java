@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.traversers.results.matchers
 
-import io.github.effiban.scala2java.core.traversers.results.{DeclTraversalResult, DefnDefTraversalResult, DefnVarTraversalResult, StatWithJavaModifiersTraversalResult}
+import io.github.effiban.scala2java.core.traversers.results._
 import org.scalatest.matchers.{MatchResult, Matcher}
 
 class StatWithJavaModifiersTraversalResultScalatestMatcher(expectedTraversalResult: StatWithJavaModifiersTraversalResult)
@@ -14,7 +14,9 @@ class StatWithJavaModifiersTraversalResultScalatestMatcher(expectedTraversalResu
         new DefnVarTraversalResultScalatestMatcher(expectedResult)(actualResult).matches
       case (actualResult: DefnDefTraversalResult, expectedResult: DefnDefTraversalResult) =>
         new DefnDefTraversalResultScalatestMatcher(expectedResult)(actualResult).matches
-      // TODO call other Defn + CtorSecondary matchers when available
+      case (actualResult: CtorSecondaryTraversalResult, expectedResult: CtorSecondaryTraversalResult) =>
+        new CtorSecondaryTraversalResultScalatestMatcher(expectedResult)(actualResult).matches
+      // TODO call other Defn matchers when available
       case (anActualTraversalResult, anExpectedTraversalResult) => anActualTraversalResult == anExpectedTraversalResult
     }
 

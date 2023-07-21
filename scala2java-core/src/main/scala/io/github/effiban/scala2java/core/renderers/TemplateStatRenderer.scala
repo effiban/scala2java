@@ -1,16 +1,17 @@
 package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.classifiers.JavaStatClassifier
-import io.github.effiban.scala2java.core.renderers.contexts.{EmptyStatRenderContext, EnumConstantListRenderContext, StatRenderContext, TemplateStatRenderContext}
+import io.github.effiban.scala2java.core.renderers.contexts._
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
-import scala.meta.{Defn, Import, Stat}
+import scala.meta.{Ctor, Defn, Import, Stat}
 
 trait TemplateStatRenderer {
   def render(stat: Stat, context: TemplateStatRenderContext = EmptyStatRenderContext): Unit
 }
 
 private[renderers] class TemplateStatRendererImpl(enumConstantListRenderer: => EnumConstantListRenderer,
+                                                  ctorSecondaryRenderer: => CtorSecondaryRenderer,
                                                   defaultStatRenderer: => DefaultStatRenderer,
                                                   javaStatClassifier: JavaStatClassifier)
                                                  (implicit javaWriter: JavaWriter) extends TemplateStatRenderer {
@@ -20,7 +21,13 @@ private[renderers] class TemplateStatRendererImpl(enumConstantListRenderer: => E
   override def render(stat: Stat, context: TemplateStatRenderContext = EmptyStatRenderContext): Unit =
     (stat, context) match {
       case (defnVar: Defn.Var, EnumConstantListRenderContext) => renderEnumConstantList(defnVar)
+
       case (anImport: Import, _) => writeComment(s"$anImport")
+
+      case (ctorSecondary: Ctor.Secondary, ctorContext: CtorSecondaryRenderContext) =>
+        ctorSecondaryRenderer.render(ctorSecondary, ctorContext)
+      case (ctorSecondary: Ctor.Secondary, aContext) => handleInvalidContext(ctorSecondary, aContext)
+
       case (aStat, ctx) => renderDefaultStat(aStat, ctx)
     }
 
@@ -34,5 +41,9 @@ private[renderers] class TemplateStatRendererImpl(enumConstantListRenderer: => E
     if (javaStatClassifier.requiresEndDelimiter(stat)) {
       writeStatementEnd()
     }
+  }
+
+  private def handleInvalidContext(stat: Stat, aContext: TemplateStatRenderContext): Unit = {
+    throw new IllegalStateException(s"Got an invalid context type $aContext for: $stat")
   }
 }
