@@ -134,6 +134,12 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val defaultIfTraverser: DefaultIfTraverser = new DefaultIfTraverserImpl(expressionTermTraverser, blockWrappingTermTraverser)
 
+  private lazy val defaultStatTraverser: DefaultStatTraverser = new DefaultStatTraverserImpl(
+    statTermTraverser,
+    importTraverser,
+    declTraverser
+  )
+
   private lazy val defaultTermRefTraverser: DefaultTermRefTraverser = new DefaultTermRefTraverserImpl(
     thisTraverser,
     superTraverser,
