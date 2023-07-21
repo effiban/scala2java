@@ -6,14 +6,16 @@ import io.github.effiban.scala2java.spi.transformers.ClassTransformer
 
 import scala.meta.Defn
 
-trait ClassTraverser {
+@deprecated
+trait DeprecatedClassTraverser {
   def traverse(classDef: Defn.Class, context: ClassOrTraitContext = ClassOrTraitContext()): Unit
 }
 
-private[traversers] class ClassTraverserImpl(caseClassTraverser: => CaseClassTraverser,
-                                             regularClassTraverser: => RegularClassTraverser,
-                                             classTransformer: ClassTransformer,
-                                             classClassifier: ClassClassifier) extends ClassTraverser {
+@deprecated
+private[traversers] class DeprecatedClassTraverserImpl(caseClassTraverser: => DeprecatedCaseClassTraverser,
+                                                       regularClassTraverser: => DeprecatedRegularClassTraverser,
+                                                       classTransformer: ClassTransformer,
+                                                       classClassifier: ClassClassifier) extends DeprecatedClassTraverser {
 
   def traverse(classDef: Defn.Class, context: ClassOrTraitContext = ClassOrTraitContext()): Unit = {
     val transformedClassDef = classTransformer.transform(classDef)

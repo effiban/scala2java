@@ -11,7 +11,8 @@ import org.mockito.ArgumentMatchers
 
 import scala.meta.{Decl, Defn, Import, Importee, Importer, Name, Pat, Self, Template, Term, Type}
 
-class PkgStatTraverserImplTest extends UnitTestSuite {
+@deprecated
+class DeprecatedPkgStatTraverserImplTest extends UnitTestSuite {
 
   private val TheImport = Import(
     List(
@@ -66,12 +67,12 @@ class PkgStatTraverserImplTest extends UnitTestSuite {
   )
 
 
-  private val classTraverser = mock[ClassTraverser]
-  private val traitTraverser = mock[TraitTraverser]
-  private val objectTraverser = mock[ObjectTraverser]
-  private val statTraverser = mock[StatTraverser]
+  private val classTraverser = mock[DeprecatedClassTraverser]
+  private val traitTraverser = mock[DeprecatedTraitTraverser]
+  private val objectTraverser = mock[DeprecatedObjectTraverser]
+  private val statTraverser = mock[DeprecatedStatTraverser]
 
-  private val pkgStatTraverser = new PkgStatTraverserImpl(
+  private val pkgStatTraverser = new DeprecatedPkgStatTraverserImpl(
     classTraverser,
     traitTraverser,
     objectTraverser,

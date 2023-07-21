@@ -8,11 +8,12 @@ import org.mockito.ArgumentMatchers
 
 import scala.meta.{Ctor, Defn, Mod, Name, Pkg, Self, Source, Template, Term, Type}
 
-class SourceTraverserImplTest extends UnitTestSuite {
+@deprecated
+class DeprecatedSourceTraverserImplTest extends UnitTestSuite {
 
-  private val statTraverser = mock[StatTraverser]
+  private val statTraverser = mock[DeprecatedStatTraverser]
 
-  private val sourceTraverser = new SourceTraverserImpl(statTraverser)
+  private val sourceTraverser = new DeprecatedSourceTraverserImpl(statTraverser)
 
   test("traverse()") {
     val pkg1 = Pkg(ref = Term.Name("mypackage1"),

@@ -8,20 +8,22 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.{Ctor, Defn, Stat, Tree, Type}
 
-trait TemplateChildTraverser {
+@deprecated
+trait DeprecatedTemplateChildTraverser {
   def traverse(child: Tree, context: TemplateChildContext): Unit
 }
 
-private[traversers] class TemplateChildTraverserImpl(ctorPrimaryTraverser: => CtorPrimaryTraverser,
-                                                     defnDefRenderer: => DefnDefRenderer,
-                                                     ctorSecondaryTraverser: => CtorSecondaryTraverser,
-                                                     ctorSecondaryRenderer: => CtorSecondaryRenderer,
-                                                     enumConstantListRenderer: => EnumConstantListRenderer,
-                                                     statTraverser: => StatTraverser,
-                                                     defnVarClassifier: DefnVarClassifier,
-                                                     traitClassifier: TraitClassifier,
-                                                     javaStatClassifier: JavaStatClassifier)
-                                                    (implicit javaWriter: JavaWriter) extends TemplateChildTraverser {
+@deprecated
+private[traversers] class DeprecatedTemplateChildTraverserImpl(ctorPrimaryTraverser: => CtorPrimaryTraverser,
+                                                               defnDefRenderer: => DefnDefRenderer,
+                                                               ctorSecondaryTraverser: => CtorSecondaryTraverser,
+                                                               ctorSecondaryRenderer: => CtorSecondaryRenderer,
+                                                               enumConstantListRenderer: => EnumConstantListRenderer,
+                                                               statTraverser: => DeprecatedStatTraverser,
+                                                               defnVarClassifier: DefnVarClassifier,
+                                                               traitClassifier: TraitClassifier,
+                                                               javaStatClassifier: JavaStatClassifier)
+                                                              (implicit javaWriter: JavaWriter) extends DeprecatedTemplateChildTraverser {
 
   import javaWriter._
 

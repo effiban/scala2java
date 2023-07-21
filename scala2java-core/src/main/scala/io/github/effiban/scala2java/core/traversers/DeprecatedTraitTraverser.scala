@@ -9,19 +9,21 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 
 import scala.meta.Defn.Trait
 
-trait TraitTraverser {
+@deprecated
+trait DeprecatedTraitTraverser {
   def traverse(traitDef: Trait, context: ClassOrTraitContext = ClassOrTraitContext()): Unit
 }
 
-private[traversers] class TraitTraverserImpl(statModListTraverser: => StatModListTraverser,
-                                             modifiersRenderContextFactory: ModifiersRenderContextFactory,
-                                             modListRenderer: => ModListRenderer,
-                                             typeParamTraverser: => TypeParamTraverser,
-                                             typeParamListRenderer: => TypeParamListRenderer,
-                                             templateTraverser: => TemplateTraverser,
-                                             javaTreeTypeResolver: JavaTreeTypeResolver,
-                                             javaChildScopeResolver: JavaChildScopeResolver)
-                                            (implicit javaWriter: JavaWriter) extends TraitTraverser {
+@deprecated
+private[traversers] class DeprecatedTraitTraverserImpl(statModListTraverser: => StatModListTraverser,
+                                                       modifiersRenderContextFactory: ModifiersRenderContextFactory,
+                                                       modListRenderer: => ModListRenderer,
+                                                       typeParamTraverser: => TypeParamTraverser,
+                                                       typeParamListRenderer: => TypeParamListRenderer,
+                                                       templateTraverser: => DeprecatedTemplateTraverser,
+                                                       javaTreeTypeResolver: JavaTreeTypeResolver,
+                                                       javaChildScopeResolver: JavaChildScopeResolver)
+                                                      (implicit javaWriter: JavaWriter) extends DeprecatedTraitTraverser {
 
   import javaWriter._
 

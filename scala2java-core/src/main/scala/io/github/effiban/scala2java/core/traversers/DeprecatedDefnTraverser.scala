@@ -9,19 +9,21 @@ import io.github.effiban.scala2java.core.writers.JavaWriter
 import scala.meta.Defn
 import scala.meta.Defn.Trait
 
-trait DefnTraverser {
+@deprecated
+trait DeprecatedDefnTraverser {
   def traverse(defn: Defn, context: StatContext = StatContext()): Unit
 }
 
-private[traversers] class DefnTraverserImpl(declVarRenderer: => DeclVarRenderer,
-                                            defnVarTraverser: => DefnVarTraverser,
-                                            defnVarRenderer: => DefnVarRenderer,
-                                            defnDefTraverser: => DefnDefTraverser,
-                                            defnDefRenderer: => DefnDefRenderer,
-                                            classTraverser: => ClassTraverser,
-                                            traitTraverser: => TraitTraverser,
-                                            objectTraverser: => ObjectTraverser)
-                                           (implicit javaWriter: JavaWriter) extends DefnTraverser {
+@deprecated
+private[traversers] class DeprecatedDefnTraverserImpl(declVarRenderer: => DeclVarRenderer,
+                                                      defnVarTraverser: => DefnVarTraverser,
+                                                      defnVarRenderer: => DefnVarRenderer,
+                                                      defnDefTraverser: => DefnDefTraverser,
+                                                      defnDefRenderer: => DefnDefRenderer,
+                                                      classTraverser: => DeprecatedClassTraverser,
+                                                      traitTraverser: => DeprecatedTraitTraverser,
+                                                      objectTraverser: => DeprecatedObjectTraverser)
+                                                     (implicit javaWriter: JavaWriter) extends DeprecatedDefnTraverser {
 
   import javaWriter._
 

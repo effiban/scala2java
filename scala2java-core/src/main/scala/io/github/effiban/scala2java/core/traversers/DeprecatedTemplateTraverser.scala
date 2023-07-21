@@ -10,20 +10,22 @@ import io.github.effiban.scala2java.spi.predicates.TemplateInitExcludedPredicate
 
 import scala.meta.{Init, Template}
 
-trait TemplateTraverser {
+@deprecated
+trait DeprecatedTemplateTraverser {
 
   def traverse(template: Template, context: TemplateContext): Unit
 }
 
-private[traversers] class TemplateTraverserImpl(initTraverser: => InitTraverser,
-                                                initListRenderer: => InitListRenderer,
-                                                selfTraverser: => SelfTraverser,
-                                                selfRenderer: SelfRenderer,
-                                                templateBodyTraverser: => TemplateBodyTraverser,
-                                                permittedSubTypeNameListRenderer: => PermittedSubTypeNameListRenderer,
-                                                javaInheritanceKeywordResolver: JavaInheritanceKeywordResolver,
-                                                templateInitExcludedPredicate: TemplateInitExcludedPredicate)
-                                               (implicit javaWriter: JavaWriter) extends TemplateTraverser {
+@deprecated
+private[traversers] class DeprecatedTemplateTraverserImpl(initTraverser: => InitTraverser,
+                                                          initListRenderer: => InitListRenderer,
+                                                          selfTraverser: => SelfTraverser,
+                                                          selfRenderer: SelfRenderer,
+                                                          templateBodyTraverser: => DeprecatedTemplateBodyTraverser,
+                                                          permittedSubTypeNameListRenderer: => PermittedSubTypeNameListRenderer,
+                                                          javaInheritanceKeywordResolver: JavaInheritanceKeywordResolver,
+                                                          templateInitExcludedPredicate: TemplateInitExcludedPredicate)
+                                                         (implicit javaWriter: JavaWriter) extends DeprecatedTemplateTraverser {
 
   import javaWriter._
 

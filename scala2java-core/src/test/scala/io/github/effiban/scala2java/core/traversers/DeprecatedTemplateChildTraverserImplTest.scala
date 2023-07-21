@@ -17,7 +17,8 @@ import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.{Ctor, Defn, Init, Lit, Name, Pat, Term, Type, XtensionQuasiquoteMod, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
-class TemplateChildTraverserImplTest extends UnitTestSuite {
+@deprecated
+class DeprecatedTemplateChildTraverserImplTest extends UnitTestSuite {
 
   private val ClassName = t"MyClass"
   private val TraversedClassName = t"MyTraversedClass"
@@ -106,12 +107,12 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
   private val ctorSecondaryTraverser = mock[CtorSecondaryTraverser]
   private val ctorSecondaryRenderer = mock[CtorSecondaryRenderer]
   private val enumConstantListRenderer = mock[EnumConstantListRenderer]
-  private val statTraverser = mock[StatTraverser]
+  private val statTraverser = mock[DeprecatedStatTraverser]
   private val defnValClassifier = mock[DefnVarClassifier]
   private val traitClassifier = mock[TraitClassifier]
   private val javaStatClassifier = mock[JavaStatClassifier]
 
-  private val templateChildTraverser = new TemplateChildTraverserImpl(
+  private val templateChildTraverser = new DeprecatedTemplateChildTraverserImpl(
     ctorPrimaryTraverser,
     defnDefRenderer,
     ctorSecondaryTraverser,

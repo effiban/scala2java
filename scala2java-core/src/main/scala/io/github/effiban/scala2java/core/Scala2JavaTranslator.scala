@@ -40,7 +40,7 @@ object Scala2JavaTranslator {
       implicit lazy val factories: Factories = new Factories(typeInferrers)
       implicit lazy val typeInferrers: TypeInferrers = new TypeInferrers(factories, predicates)
       val semanticDesugaredSource = new SemanticDesugarers().sourceDesugarer.desugar(syntacticDesugaredSource)
-      new ScalaTreeTraversers().sourceTraverser.traverse(semanticDesugaredSource)
+      new ScalaTreeTraversers().deprecatedSourceTraverser.traverse(semanticDesugaredSource)
     } finally {
       javaWriter.close()
     }

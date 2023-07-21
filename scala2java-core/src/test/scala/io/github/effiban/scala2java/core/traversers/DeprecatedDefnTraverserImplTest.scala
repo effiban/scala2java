@@ -15,7 +15,8 @@ import scala.meta.Ctor.Primary
 import scala.meta.Term.Apply
 import scala.meta.{Decl, Defn, Lit, Name, Pat, Self, Template, Term, Type, XtensionQuasiquoteTerm}
 
-class DefnTraverserImplTest extends UnitTestSuite {
+@deprecated
+class DeprecatedDefnTraverserImplTest extends UnitTestSuite {
 
   private val TheStatContext = StatContext(JavaScope.Class)
   private val TheClassOrTraitContext = ClassOrTraitContext(JavaScope.Class)
@@ -25,11 +26,11 @@ class DefnTraverserImplTest extends UnitTestSuite {
   private val defnVarRenderer = mock[DefnVarRenderer]
   private val defnDefTraverser = mock[DefnDefTraverser]
   private val defnDefRenderer = mock[DefnDefRenderer]
-  private val classTraverser = mock[ClassTraverser]
-  private val traitTraverser = mock[TraitTraverser]
-  private val objectTraverser = mock[ObjectTraverser]
+  private val classTraverser = mock[DeprecatedClassTraverser]
+  private val traitTraverser = mock[DeprecatedTraitTraverser]
+  private val objectTraverser = mock[DeprecatedObjectTraverser]
 
-  private val defnTraverser = new DefnTraverserImpl(
+  private val defnTraverser = new DeprecatedDefnTraverserImpl(
     declVarRenderer,
     defnVarTraverser,
     defnVarRenderer,

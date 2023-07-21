@@ -19,7 +19,8 @@ import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.{Ctor, Defn, Init, Lit, Name, Pat, Self, Stat, Template, Term, Type, XtensionQuasiquoteInit, XtensionQuasiquoteType}
 
-class TemplateTraverserImplTest extends UnitTestSuite {
+@deprecated
+class DeprecatedTemplateTraverserImplTest extends UnitTestSuite {
 
   private val ClassName = Type.Name("MyClass")
 
@@ -73,11 +74,11 @@ class TemplateTraverserImplTest extends UnitTestSuite {
   private val selfTraverser = mock[SelfTraverser]
   private val selfRenderer = mock[SelfRenderer]
   private val javaInheritanceKeywordResolver = mock[JavaInheritanceKeywordResolver]
-  private val templateBodyTraverser = mock[TemplateBodyTraverser]
+  private val templateBodyTraverser = mock[DeprecatedTemplateBodyTraverser]
   private val permittedSubTypeNameListRenderer = mock[PermittedSubTypeNameListRenderer]
   private val templateInitExcludedPredicate = mock[TemplateInitExcludedPredicate]
 
-  private val templateTraverser = new TemplateTraverserImpl(
+  private val templateTraverser = new DeprecatedTemplateTraverserImpl(
     initTraverser,
     initListRenderer,
     selfTraverser,

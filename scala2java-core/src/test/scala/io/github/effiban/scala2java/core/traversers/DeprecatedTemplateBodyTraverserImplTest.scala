@@ -11,7 +11,8 @@ import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.{Stat, XtensionQuasiquoteTerm}
 
-class TemplateBodyTraverserImplTest extends UnitTestSuite {
+@deprecated
+class DeprecatedTemplateBodyTraverserImplTest extends UnitTestSuite {
 
   private val TermApply1A = q"doSomething1(param1A)"
   private val TermApply1B = q"doSomething1(param1B)"
@@ -27,7 +28,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
   private val DefnVal3A = q"""val third = "A""""
   private val DefnVal3B = q"""val third = "B""""
 
-  private val templateChildrenTraverser = mock[TemplateChildrenTraverser]
+  private val templateChildrenTraverser = mock[DeprecatedTemplateChildrenTraverser]
   private val templateStatTransformer = mock[TemplateStatTransformer]
   private val templateChildrenResolver = mock[TemplateChildrenResolver]
   private val templateChildContextFactory = mock[TemplateChildContextFactory]
@@ -35,7 +36,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
   private val bodyContext = mock[TemplateBodyContext]
   private val childContext = mock[TemplateChildContext]
 
-  private val templateBodyTraverser = new TemplateBodyTraverserImpl(
+  private val templateBodyTraverser = new DeprecatedTemplateBodyTraverserImpl(
     templateChildrenTraverser,
     templateStatTransformer,
     templateChildrenResolver,

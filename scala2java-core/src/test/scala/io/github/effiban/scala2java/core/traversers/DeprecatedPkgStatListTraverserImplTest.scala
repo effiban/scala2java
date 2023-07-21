@@ -11,7 +11,8 @@ import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.{Decl, Defn, Name, Pat, Self, Template, Term, Type}
 
-class PkgStatListTraverserImplTest extends UnitTestSuite {
+@deprecated
+class DeprecatedPkgStatListTraverserImplTest extends UnitTestSuite {
 
   private val TheTrait = Defn.Trait(
     mods = List(),
@@ -42,10 +43,10 @@ class PkgStatListTraverserImplTest extends UnitTestSuite {
   )
 
 
-  private val pkgStatTraverser = mock[PkgStatTraverser]
+  private val pkgStatTraverser = mock[DeprecatedPkgStatTraverser]
   private val sealedHierarchiesResolver = mock[SealedHierarchiesResolver]
 
-  private val pkgStatListTraverser = new PkgStatListTraverserImpl(
+  private val pkgStatListTraverser = new DeprecatedPkgStatListTraverserImpl(
     pkgStatTraverser,
     sealedHierarchiesResolver
   )

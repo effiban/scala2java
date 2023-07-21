@@ -70,7 +70,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val blockWrappingTermTraverser: BlockWrappingTermTraverser = new BlockWrappingTermTraverserImpl(defaultBlockTraverser)
 
-  private lazy val caseClassTraverser: CaseClassTraverser = new CaseClassTraverserImpl(
+  @deprecated
+  private lazy val deprecatedCaseClassTraverser: DeprecatedCaseClassTraverser = new DeprecatedCaseClassTraverserImpl(
     statModListTraverser,
     ModifiersRenderContextFactory,
     modListRenderer,
@@ -78,7 +79,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
     typeParamListRenderer,
     termParamTraverser,
     termParamListRenderer,
-    templateTraverser,
+    deprecatedTemplateTraverser,
     JavaTreeTypeResolver,
     JavaChildScopeResolver
   )
@@ -90,9 +91,10 @@ class ScalaTreeTraversers(implicit factories: Factories,
     blockWrappingTermTraverser
   )
 
-  private lazy val classTraverser: ClassTraverser = new ClassTraverserImpl(
-    caseClassTraverser,
-    regularClassTraverser,
+  @deprecated
+  private lazy val deprecatedClassTraverser: DeprecatedClassTraverser = new DeprecatedClassTraverserImpl(
+    deprecatedCaseClassTraverser,
+    deprecatedRegularClassTraverser,
     new CompositeClassTransformer(),
     ClassClassifier
   )
@@ -176,15 +178,16 @@ class ScalaTreeTraversers(implicit factories: Factories,
     new CompositeDefnDefTransformer()
   )
 
-  private lazy val defnTraverser: DefnTraverser = new DefnTraverserImpl(
+  @deprecated
+  private lazy val deprecatedDefnTraverser: DeprecatedDefnTraverser = new DeprecatedDefnTraverserImpl(
     declVarRenderer,
     defnVarTraverser,
     defnVarRenderer,
     defnDefTraverser,
     defnDefRenderer,
-    classTraverser,
-    traitTraverser,
-    objectTraverser
+    deprecatedClassTraverser,
+    deprecatedTraitTraverser,
+    deprecatedObjectTraverser
   )
 
   private lazy val defnVarTypeTraverser: DefnVarTypeTraverser = new DefnVarTypeTraverserImpl(
@@ -255,11 +258,12 @@ class ScalaTreeTraversers(implicit factories: Factories,
     ArrayInitializerContextResolver
   )
 
-  private lazy val objectTraverser: ObjectTraverser = new ObjectTraverserImpl(
+  @deprecated
+  private lazy val deprecatedObjectTraverser: DeprecatedObjectTraverser = new DeprecatedObjectTraverserImpl(
     statModListTraverser,
     ModifiersRenderContextFactory,
     modListRenderer,
-    templateTraverser,
+    deprecatedTemplateTraverser,
     JavaTreeTypeResolver,
     JavaChildScopeResolver)
 
@@ -278,32 +282,36 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val patTypedTraverser: PatTypedTraverser = new PatTypedTraverserImpl(patTraverser, typeTraverser)
 
-  private lazy val pkgStatTraverser: PkgStatTraverser = new PkgStatTraverserImpl(
-    classTraverser,
-    traitTraverser,
-    objectTraverser,
-    statTraverser
+  @deprecated
+  private lazy val deprecatedPkgStatTraverser: DeprecatedPkgStatTraverser = new DeprecatedPkgStatTraverserImpl(
+    deprecatedClassTraverser,
+    deprecatedTraitTraverser,
+    deprecatedObjectTraverser,
+    deprecatedStatTraverser
   )
 
-  private lazy val pkgStatListTraverser: PkgStatListTraverser = new PkgStatListTraverserImpl(
-    pkgStatTraverser,
+  @deprecated
+  private lazy val deprecatedPkgStatListTraverser: DeprecatedPkgStatListTraverser = new DeprecatedPkgStatListTraverserImpl(
+    deprecatedPkgStatTraverser,
     SealedHierarchiesResolver
   )
 
-  private lazy val pkgTraverser: PkgTraverser = new PkgTraverserImpl(
+  @deprecated
+  private lazy val deprecatedPkgTraverser: DeprecatedPkgTraverser = new DeprecatedPkgTraverserImpl(
     defaultTermRefTraverser,
     defaultTermRefRenderer,
-    pkgStatListTraverser,
+    deprecatedPkgStatListTraverser,
     new CompositeAdditionalImportersProvider(CoreAdditionalImportersProvider)
   )
 
-  private lazy val regularClassTraverser: RegularClassTraverser = new RegularClassTraverserImpl(
+  @deprecated
+  private lazy val deprecatedRegularClassTraverser: DeprecatedRegularClassTraverser = new DeprecatedRegularClassTraverserImpl(
     statModListTraverser,
     ModifiersRenderContextFactory,
     modListRenderer,
     typeParamTraverser,
     typeParamListRenderer,
-    templateTraverser,
+    deprecatedTemplateTraverser,
     ParamToDeclVarTransformer,
     JavaTreeTypeResolver,
     JavaChildScopeResolver
@@ -313,7 +321,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val selfTraverser: SelfTraverser = new SelfTraverserImpl(typeTraverser)
 
-  lazy val sourceTraverser: SourceTraverser = new SourceTraverserImpl(statTraverser)
+  @deprecated
+  lazy val deprecatedSourceTraverser: DeprecatedSourceTraverser = new DeprecatedSourceTraverserImpl(deprecatedStatTraverser)
 
   private lazy val statModListTraverser: StatModListTraverser = new StatModListTraverserImpl(annotTraverser, JavaModifiersResolver)
 
@@ -322,49 +331,53 @@ class ScalaTreeTraversers(implicit factories: Factories,
     defaultTermTraverser
   )
 
-  private lazy val statTraverser: StatTraverser = new StatTraverserImpl(
+  @deprecated
+  private lazy val deprecatedStatTraverser: DeprecatedStatTraverser = new DeprecatedStatTraverserImpl(
     statTermTraverser,
     statTermRenderer,
     importTraverser,
     importRenderer,
-    pkgTraverser,
-    defnTraverser,
+    deprecatedPkgTraverser,
+    deprecatedDefnTraverser,
     declTraverser,
     declRenderer
   )
 
   private lazy val superTraverser: SuperTraverser = new SuperTraverserImpl(nameTraverser)
 
-  private lazy val templateBodyTraverser: TemplateBodyTraverser = new TemplateBodyTraverserImpl(
-    templateChildrenTraverser,
+  private lazy val deprecatedTemplateBodyTraverser: DeprecatedTemplateBodyTraverser = new DeprecatedTemplateBodyTraverserImpl(
+    deprecatedTemplateChildrenTraverser,
     new TemplateStatTransformerImpl(new CompositeTemplateTermApplyInfixToDefnTransformer, new CompositeTemplateTermApplyToDefnTransformer),
     TemplateChildrenResolver,
     TemplateChildContextFactory
   )
 
-  private lazy val templateChildrenTraverser: TemplateChildrenTraverser = new TemplateChildrenTraverserImpl(
-    templateChildTraverser,
+  @deprecated
+  private lazy val deprecatedTemplateChildrenTraverser: DeprecatedTemplateChildrenTraverser = new DeprecatedTemplateChildrenTraverserImpl(
+    deprecatedTemplateChildTraverser,
     JavaTemplateChildOrdering
   )
 
-  private lazy val templateChildTraverser: TemplateChildTraverser = new TemplateChildTraverserImpl(
+  @deprecated
+  private lazy val deprecatedTemplateChildTraverser: DeprecatedTemplateChildTraverser = new DeprecatedTemplateChildTraverserImpl(
     ctorPrimaryTraverser,
     defnDefRenderer,
     ctorSecondaryTraverser,
     ctorSecondaryRenderer,
     enumConstantListRenderer,
-    statTraverser,
+    deprecatedStatTraverser,
     DefnVarClassifier,
     TraitClassifier,
     JavaStatClassifier
   )
 
-  private lazy val templateTraverser: TemplateTraverser = new TemplateTraverserImpl(
+  @deprecated
+  private lazy val deprecatedTemplateTraverser: DeprecatedTemplateTraverser = new DeprecatedTemplateTraverserImpl(
     initTraverser,
     initListRenderer,
     selfTraverser,
     selfRenderer,
-    templateBodyTraverser,
+    deprecatedTemplateBodyTraverser,
     permittedSubTypeNameListRenderer,
     JavaInheritanceKeywordResolver,
     new CompositeTemplateInitExcludedPredicate(CoreTemplateInitExcludedPredicate)
@@ -412,13 +425,14 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val throwTraverser: ThrowTraverser = new ThrowTraverserImpl(expressionTermTraverser)
 
-  private lazy val traitTraverser: TraitTraverser = new TraitTraverserImpl(
+  @deprecated
+  private lazy val deprecatedTraitTraverser: DeprecatedTraitTraverser = new DeprecatedTraitTraverserImpl(
     statModListTraverser,
     ModifiersRenderContextFactory,
     modListRenderer,
     typeParamTraverser,
     typeParamListRenderer,
-    templateTraverser,
+    deprecatedTemplateTraverser,
     JavaTreeTypeResolver,
     JavaChildScopeResolver
   )

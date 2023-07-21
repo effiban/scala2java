@@ -6,13 +6,15 @@ import io.github.effiban.scala2java.spi.providers.AdditionalImportersProvider
 
 import scala.meta.{Import, Pkg}
 
-trait PkgTraverser extends ScalaTreeTraverser[Pkg]
+@deprecated
+trait DeprecatedPkgTraverser extends ScalaTreeTraverser[Pkg]
 
-private[traversers] class PkgTraverserImpl(defaultTermRefTraverser: => DefaultTermRefTraverser,
-                                           defaultTermRefRenderer: => DefaultTermRefRenderer,
-                                           pkgStatListTraverser: => PkgStatListTraverser,
-                                           additionalImportersProvider: AdditionalImportersProvider)
-                                          (implicit javaWriter: JavaWriter) extends PkgTraverser {
+@deprecated
+private[traversers] class DeprecatedPkgTraverserImpl(defaultTermRefTraverser: => DefaultTermRefTraverser,
+                                                     defaultTermRefRenderer: => DefaultTermRefRenderer,
+                                                     pkgStatListTraverser: => DeprecatedPkgStatListTraverser,
+                                                     additionalImportersProvider: AdditionalImportersProvider)
+                                                    (implicit javaWriter: JavaWriter) extends DeprecatedPkgTraverser {
 
   import javaWriter._
 

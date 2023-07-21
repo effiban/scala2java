@@ -26,7 +26,8 @@ import scala.meta.Mod.{Final, Private}
 import scala.meta.Term.Block
 import scala.meta.{Ctor, Decl, Defn, Init, Mod, Name, Pat, Self, Template, Term, Type, XtensionQuasiquoteTypeParam}
 
-class RegularClassTraverserImplTest extends UnitTestSuite {
+@deprecated
+class DeprecatedRegularClassTraverserImplTest extends UnitTestSuite {
 
   private val ClassName = Type.Name("MyClass")
 
@@ -83,12 +84,12 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
   private val modListRenderer = mock[ModListRenderer]
   private val typeParamTraverser = mock[TypeParamTraverser]
   private val typeParamListRenderer = mock[TypeParamListRenderer]
-  private val templateTraverser = mock[TemplateTraverser]
+  private val templateTraverser = mock[DeprecatedTemplateTraverser]
   private val paramToDeclVarTransformer = mock[ParamToDeclVarTransformer]
   private val javaTreeTypeResolver = mock[JavaTreeTypeResolver]
   private val javaChildScopeResolver = mock[JavaChildScopeResolver]
 
-  private val classTraverser = new RegularClassTraverserImpl(
+  private val classTraverser = new DeprecatedRegularClassTraverserImpl(
     statModListTraverser,
     modifiersRenderContextFactory,
     modListRenderer,

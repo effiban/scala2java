@@ -7,16 +7,18 @@ import io.github.effiban.scala2java.core.transformers.TemplateStatTransformer
 
 import scala.meta.{Stat, Term}
 
-trait TemplateBodyTraverser {
+@deprecated
+trait DeprecatedTemplateBodyTraverser {
 
   def traverse(statements: List[Stat], context: TemplateBodyContext): Unit
 }
 
-private[traversers] class TemplateBodyTraverserImpl(templateChildrenTraverser: => TemplateChildrenTraverser,
-                                                    templateStatTransformer: TemplateStatTransformer,
-                                                    templateChildrenResolver: TemplateChildrenResolver,
-                                                    templateChildContextFactory: TemplateChildContextFactory)
-  extends TemplateBodyTraverser {
+@deprecated
+private[traversers] class DeprecatedTemplateBodyTraverserImpl(templateChildrenTraverser: => DeprecatedTemplateChildrenTraverser,
+                                                              templateStatTransformer: TemplateStatTransformer,
+                                                              templateChildrenResolver: TemplateChildrenResolver,
+                                                              templateChildContextFactory: TemplateChildContextFactory)
+  extends DeprecatedTemplateBodyTraverser {
 
   def traverse(stats: List[Stat], context: TemplateBodyContext): Unit = {
     val transformedStats = stats.map(templateStatTransformer.transform)
