@@ -10,6 +10,8 @@ class TemplateStatRenderContextMatcher(expectedContext: TemplateStatRenderContex
     (actualContext, expectedContext) match {
       case (actualDefnContext: DefnRenderContext, expectedDefnContext: DefnRenderContext) =>
         new DefnRenderContextMatcher(expectedDefnContext).matches(actualDefnContext)
+      case (actualCtorContext: CtorSecondaryRenderContext, expectedCtorContext: CtorSecondaryRenderContext) =>
+        new CtorSecondaryRenderContextMatcher(expectedCtorContext).matches(actualCtorContext)
       case (anActualContext, anExpectedContext) => anActualContext == anExpectedContext
     }
   }
