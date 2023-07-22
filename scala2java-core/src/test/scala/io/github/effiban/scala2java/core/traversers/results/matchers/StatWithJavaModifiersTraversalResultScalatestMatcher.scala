@@ -10,13 +10,8 @@ class StatWithJavaModifiersTraversalResultScalatestMatcher(expectedTraversalResu
     val matches = (actualTraversalResult, expectedTraversalResult) match {
       case (actualResult: DeclTraversalResult, expectedResult: DeclTraversalResult) =>
         new DeclTraversalResultScalatestMatcher(expectedResult)(actualResult).matches
-      case (actualResult: DefnVarTraversalResult, expectedResult: DefnVarTraversalResult) =>
-        new DefnVarTraversalResultScalatestMatcher(expectedResult)(actualResult).matches
-      case (actualResult: DefnDefTraversalResult, expectedResult: DefnDefTraversalResult) =>
-        new DefnDefTraversalResultScalatestMatcher(expectedResult)(actualResult).matches
-      case (actualResult: CtorSecondaryTraversalResult, expectedResult: CtorSecondaryTraversalResult) =>
-        new CtorSecondaryTraversalResultScalatestMatcher(expectedResult)(actualResult).matches
-      // TODO call other Defn matchers when available
+      case (actualResult: DefnTraversalResult, expectedResult: DefnTraversalResult) =>
+        new DefnTraversalResultScalatestMatcher(expectedResult)(actualResult).matches
       case (anActualTraversalResult, anExpectedTraversalResult) => anActualTraversalResult == anExpectedTraversalResult
     }
 

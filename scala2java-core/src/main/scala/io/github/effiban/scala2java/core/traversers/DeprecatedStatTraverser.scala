@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.StatContext
-import io.github.effiban.scala2java.core.renderers.contexts.{DefRenderContext, ImportRenderContext, UnsupportedDeclRenderContext, VarRenderContext}
+import io.github.effiban.scala2java.core.renderers.contexts.{DefRenderContext, UnsupportedDeclRenderContext, VarRenderContext}
 import io.github.effiban.scala2java.core.renderers.{DeclRenderer, ImportRenderer, StatTermRenderer}
 import io.github.effiban.scala2java.core.traversers.results.{DeclDefTraversalResult, DeclVarTraversalResult}
 import io.github.effiban.scala2java.core.writers.JavaWriter
@@ -48,9 +48,5 @@ private[traversers] class DeprecatedStatTraverserImpl(statTermTraverser: => Stat
       }
       declRenderer.render(traversalResult.tree, renderContext)
     case other => writeComment(s"UNSUPPORTED: $other")
-  }
-
-  private def toImportRenderContext(statContext: StatContext): ImportRenderContext = {
-    ImportRenderContext(asComment = statContext.javaScope != JavaScope.Package)
   }
 }

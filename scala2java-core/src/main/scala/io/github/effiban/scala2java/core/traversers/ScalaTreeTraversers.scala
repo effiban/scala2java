@@ -196,6 +196,12 @@ class ScalaTreeTraversers(implicit factories: Factories,
     deprecatedObjectTraverser
   )
 
+  private lazy val defnTraverser: DefnTraverser = new DefnTraverserImpl(
+    defnVarTraverser,
+    defnDefTraverser,
+    traitTraverser
+  )
+
   private lazy val defnVarTypeTraverser: DefnVarTypeTraverser = new DefnVarTypeTraverserImpl(
     typeTraverser,
     termTypeInferrer
