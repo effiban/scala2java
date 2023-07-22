@@ -1,0 +1,503 @@
+package io.github.effiban.scala2java.core.traversers
+
+import io.github.effiban.scala2java.core.contexts._
+import io.github.effiban.scala2java.core.entities.JavaTreeType.JavaTreeType
+import io.github.effiban.scala2java.core.entities.{JavaKeyword, JavaModifier, JavaTreeType}
+import io.github.effiban.scala2java.core.matchers.JavaChildScopeContextMatcher.eqJavaChildScopeContext
+import io.github.effiban.scala2java.core.matchers.JavaTreeTypeContextMatcher.eqJavaTreeTypeContext
+import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
+import io.github.effiban.scala2java.core.matchers.TemplateContextMatcher.eqTemplateContext
+import io.github.effiban.scala2java.core.resolvers.{JavaChildScopeResolver, JavaTreeTypeResolver}
+import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
+import io.github.effiban.scala2java.core.testtrees.{PrimaryCtors, Selfs}
+import io.github.effiban.scala2java.core.transformers.ParamToDeclVarTransformer
+import io.github.effiban.scala2java.core.traversers.results._
+import io.github.effiban.scala2java.core.traversers.results.matchers.RegularClassTraversalResultScalatestMatcher.equalRegularClassTraversalResult
+import io.github.effiban.scala2java.spi.entities.JavaScope
+import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
+import org.mockito.ArgumentMatchers.any
+
+import scala.meta.{Ctor, Defn, Mod, Name, Self, Template, Term, Type, XtensionQuasiquoteInit, XtensionQuasiquoteMod, XtensionQuasiquoteTerm, XtensionQuasiquoteTermParam, XtensionQuasiquoteType, XtensionQuasiquoteTypeParam}
+
+class RegularClassTraverserImplTest extends UnitTestSuite {
+
+  private val TheParentJavaScope = JavaScope.Package
+
+  private val TheClassName = t"MyClass"
+
+  private val TheScalaMods = List(mod"@MyAnnotation1", mod"@MyAnnotation2")
+  private val TheTraversedScalaMods = List(mod"@MyTraversedAnnotation1", mod"@MyTraversedAnnotation2")
+
+  private val TheClassJavaModifiers = List(JavaModifier.Public)
+
+  private val TypeParam1 = tparam"T1"
+  private val TypeParam2 = tparam"T2"
+  private val TheTypeParams = List(TypeParam1, TypeParam2)
+
+  private val TraversedTypeParam1 = tparam"T11"
+  private val TraversedTypeParam2 = tparam"T22"
+  private val TheTraversedTypeParams = List(TraversedTypeParam1, TraversedTypeParam2)
+
+  private val CtorArg1 = param"arg1: Int"
+  private val CtorArg2 = param"arg2: Int"
+  private val CtorArg3 = param"arg3: Int"
+  private val CtorArg4 = param"arg4: Int"
+
+  private val CtorArgList1 = List(CtorArg1, CtorArg2)
+  private val CtorArgList2 = List(CtorArg3, CtorArg4)
+
+  private val Init1 = init"Parent1()"
+  private val Init2 = init"Parent2()"
+  private val TheInits = List(Init1, Init2)
+
+  private val TraversedInit1 = init"TraversedParent1()"
+  private val TraversedInit2 = init"TraversedParent2()"
+  private val TheTraversedInits = List(TraversedInit1, TraversedInit2)
+
+  private val TheSelf = Self(name = Name.Indeterminate("SelfName"), decltpe = Some(t"SelfType"))
+  private val TheTraversedSelf = Self(name = Name.Indeterminate("TraversedSelfName"), decltpe = Some(t"SelfType"))
+
+  private val SyntheticDeclVar1 = q"private final var arg1: Int"
+  private val SyntheticDeclVar2 = q"private final var arg2: Int"
+  private val SyntheticDeclVar3 = q"private final var arg3: Int"
+  private val SyntheticDeclVar4 = q"private final var arg4: Int"
+
+  private val SyntheticDeclVarTraversalResult1 = DeclVarTraversalResult(SyntheticDeclVar1)
+  private val SyntheticDeclVarTraversalResult2 = DeclVarTraversalResult(SyntheticDeclVar2)
+  private val SyntheticDeclVarTraversalResult3 = DeclVarTraversalResult(SyntheticDeclVar3)
+  private val SyntheticDeclVarTraversalResult4 = DeclVarTraversalResult(SyntheticDeclVar4)
+
+  private val DefnDef1 = q"def myMethod1(param: Int): Int = doSomething1(param)"
+  private val DefnDef2 = q"def myMethod2(param: Int): Int = doSomething2(param)"
+
+  private val TraversedDefnDef1 = q"def myTraversedMethod1(param: Int): Int = doSomething11(param)"
+  private val TraversedDefnDef2 = q"def myTraversedMethod2(param: Int): Int = doSomething22(param)"
+
+  private val DefnDefTraversalResult1 = DefnDefTraversalResult(TraversedDefnDef1)
+  private val DefnDefTraversalResult2 = DefnDefTraversalResult(TraversedDefnDef2)
+
+  private val TheStats = List(DefnDef1, DefnDef2)
+  private val TheStatTraversalResults = List(DefnDefTraversalResult1, DefnDefTraversalResult2)
+
+
+  private val statModListTraverser = mock[StatModListTraverser]
+  private val typeParamTraverser = mock[TypeParamTraverser]
+  private val templateTraverser = mock[TemplateTraverser]
+  private val paramToDeclVarTransformer = mock[ParamToDeclVarTransformer]
+  private val javaTreeTypeResolver = mock[JavaTreeTypeResolver]
+  private val javaChildScopeResolver = mock[JavaChildScopeResolver]
+
+  private val classTraverser = new RegularClassTraverserImpl(
+    statModListTraverser,
+    typeParamTraverser,
+    templateTraverser,
+    paramToDeclVarTransformer,
+    javaTreeTypeResolver,
+    javaChildScopeResolver
+  )
+
+  test("traverse() when resolves to Java class and has one list of ctor args - should create synthetic vars") {
+    val ctorPrimary = ctorPrimaryOf(List(CtorArgList1))
+    val initialTemplate = Template(
+      early = List(),
+      inits = Nil,
+      self = TheSelf,
+      stats = Nil
+    )
+    val cls = Defn.Class(
+      mods = TheScalaMods,
+      name = TheClassName,
+      tparams = Nil,
+      ctor = ctorPrimary,
+      templ = initialTemplate
+    )
+
+    val expectedJavaTreeType = JavaTreeType.Class
+    val expectedChildJavaScope = JavaScope.Class
+    val expectedTemplateContext = TemplateContext(
+      javaScope = expectedChildJavaScope,
+      maybeClassName = Some(TheClassName),
+      maybePrimaryCtor = Some(ctorPrimary)
+    )
+    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TheTraversedScalaMods, javaModifiers = TheClassJavaModifiers)
+    val expectedSyntheticDeclVars = List(SyntheticDeclVar1, SyntheticDeclVar2)
+    val expectedAdjustedTemplate = initialTemplate.copy(stats = expectedSyntheticDeclVars)
+    val expectedTemplateTraversalResult = TemplateTraversalResult(
+      self = TheTraversedSelf,
+      statResults = List(SyntheticDeclVarTraversalResult1, SyntheticDeclVarTraversalResult2)
+    )
+    val expectedRegularClassTraversalResult = RegularClassTraversalResult(
+      scalaMods = TheTraversedScalaMods,
+      javaModifiers = TheClassJavaModifiers,
+      name = TheClassName,
+      ctor = ctorPrimary,
+      self = TheTraversedSelf,
+      statResults = List(SyntheticDeclVarTraversalResult1, SyntheticDeclVarTraversalResult2)
+    )
+
+    expectResolveJavaTreeType(cls, TheScalaMods, expectedJavaTreeType)
+    doReturn(expectedModListTraversalResult)
+      .when(statModListTraverser).traverse(eqExpectedScalaMods(cls, expectedJavaTreeType))
+    when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, expectedJavaTreeType))))
+      .thenReturn(expectedChildJavaScope)
+
+    when(paramToDeclVarTransformer.transform(any[Term.Param])).thenAnswer( (ctorArg: Term.Param) => ctorArg match {
+      case arg1 if arg1.structure == CtorArg1.structure => SyntheticDeclVar1
+      case arg2 if arg2.structure == CtorArg2.structure => SyntheticDeclVar2
+    })
+
+    doReturn(expectedTemplateTraversalResult)
+      .when(templateTraverser).traverse(eqTree(expectedAdjustedTemplate), eqTemplateContext(expectedTemplateContext))
+
+    classTraverser.traverse(cls, ClassOrTraitContext(TheParentJavaScope)) should
+      equalRegularClassTraversalResult(expectedRegularClassTraversalResult)
+  }
+
+  test("traverse() when resolves to Java class and has type params") {
+    val ctorPrimary = PrimaryCtors.Empty
+    val template = Template(
+      early = List(),
+      inits = Nil,
+      self = TheSelf,
+      stats = Nil
+    )
+    val cls = Defn.Class(
+      mods = TheScalaMods,
+      name = TheClassName,
+      tparams = TheTypeParams,
+      ctor = ctorPrimary,
+      templ = template
+    )
+
+    val expectedJavaTreeType = JavaTreeType.Class
+    val expectedChildJavaScope = JavaScope.Class
+    val expectedTemplateContext = TemplateContext(
+      javaScope = expectedChildJavaScope,
+      maybeClassName = Some(TheClassName),
+      maybePrimaryCtor = Some(ctorPrimary)
+    )
+    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TheTraversedScalaMods, javaModifiers = TheClassJavaModifiers)
+    val expectedTemplateTraversalResult = TemplateTraversalResult(self = TheTraversedSelf)
+    val expectedRegularClassTraversalResult = RegularClassTraversalResult(
+      scalaMods = TheTraversedScalaMods,
+      javaModifiers = TheClassJavaModifiers,
+      name = TheClassName,
+      tparams = TheTraversedTypeParams,
+      ctor = ctorPrimary,
+      self = TheTraversedSelf
+    )
+
+    expectResolveJavaTreeType(cls, TheScalaMods, expectedJavaTreeType)
+    doReturn(expectedModListTraversalResult)
+      .when(statModListTraverser).traverse(eqExpectedScalaMods(cls, expectedJavaTreeType))
+    doAnswer((tparam: Type.Param) => tparam match {
+      case aTypeParam if aTypeParam.structure == TypeParam1.structure => TraversedTypeParam1
+      case aTypeParam if aTypeParam.structure == TypeParam2.structure => TraversedTypeParam2
+      case aTypeParam => aTypeParam
+    }).when(typeParamTraverser).traverse(any[Type.Param])
+    when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, expectedJavaTreeType))))
+      .thenReturn(expectedChildJavaScope)
+
+    doReturn(expectedTemplateTraversalResult)
+      .when(templateTraverser).traverse(eqTree(template), eqTemplateContext(expectedTemplateContext))
+
+    classTraverser.traverse(cls, ClassOrTraitContext(TheParentJavaScope)) should
+      equalRegularClassTraversalResult(expectedRegularClassTraversalResult)
+  }
+
+  test("traverse() when resolves to Java class with inits - should also return inheritance keyword") {
+    val ctorPrimary = PrimaryCtors.Empty
+    val template = Template(
+      early = List(),
+      inits = TheInits,
+      self = TheSelf,
+      stats = Nil
+    )
+    val cls = Defn.Class(
+      mods = TheScalaMods,
+      name = TheClassName,
+      tparams = Nil,
+      ctor = ctorPrimary,
+      templ = template
+    )
+
+    val expectedJavaTreeType = JavaTreeType.Class
+    val expectedChildJavaScope = JavaScope.Class
+    val expectedTemplateContext = TemplateContext(
+      javaScope = expectedChildJavaScope,
+      maybeClassName = Some(TheClassName),
+      maybePrimaryCtor = Some(ctorPrimary)
+    )
+    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TheTraversedScalaMods, javaModifiers = TheClassJavaModifiers)
+    val expectedTemplateTraversalResult = TemplateTraversalResult(
+      maybeInheritanceKeyword = Some(JavaKeyword.Implements),
+      inits = TheTraversedInits,
+      self = TheTraversedSelf
+    )
+    val expectedRegularClassTraversalResult = RegularClassTraversalResult(
+      scalaMods = TheTraversedScalaMods,
+      javaModifiers = TheClassJavaModifiers,
+      name = TheClassName,
+      ctor = ctorPrimary,
+      maybeInheritanceKeyword = Some(JavaKeyword.Implements),
+      inits = TheTraversedInits,
+      self = TheTraversedSelf
+    )
+
+    expectResolveJavaTreeType(cls, TheScalaMods, expectedJavaTreeType)
+    doReturn(expectedModListTraversalResult)
+      .when(statModListTraverser).traverse(eqExpectedScalaMods(cls, expectedJavaTreeType))
+    when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, expectedJavaTreeType))))
+      .thenReturn(expectedChildJavaScope)
+
+    doReturn(expectedTemplateTraversalResult)
+      .when(templateTraverser).traverse(eqTree(template), eqTemplateContext(expectedTemplateContext))
+
+    classTraverser.traverse(cls, ClassOrTraitContext(TheParentJavaScope)) should
+      equalRegularClassTraversalResult(expectedRegularClassTraversalResult)
+  }
+
+  test("traverse() when resolves to Java class and has stats") {
+    val ctorPrimary = PrimaryCtors.Empty
+
+    val template = Template(
+      early = List(),
+      inits = Nil,
+      self = TheSelf,
+      stats = TheStats
+    )
+    val cls = Defn.Class(
+      mods = TheScalaMods,
+      name = TheClassName,
+      tparams = Nil,
+      ctor = ctorPrimary,
+      templ = template
+    )
+
+    val expectedJavaTreeType = JavaTreeType.Class
+    val expectedChildJavaScope = JavaScope.Class
+    val expectedTemplateContext = TemplateContext(
+      javaScope = expectedChildJavaScope,
+      maybeClassName = Some(TheClassName),
+      maybePrimaryCtor = Some(ctorPrimary)
+    )
+    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TheTraversedScalaMods, javaModifiers = TheClassJavaModifiers)
+    val expectedTemplateTraversalResult = TemplateTraversalResult(
+      self = TheTraversedSelf,
+      statResults = TheStatTraversalResults
+    )
+    val expectedRegularClassTraversalResult = RegularClassTraversalResult(
+      scalaMods = TheTraversedScalaMods,
+      javaModifiers = TheClassJavaModifiers,
+      name = TheClassName,
+      ctor = ctorPrimary,
+      self = TheTraversedSelf,
+      statResults = TheStatTraversalResults
+    )
+
+    expectResolveJavaTreeType(cls, TheScalaMods, expectedJavaTreeType)
+    doReturn(expectedModListTraversalResult)
+      .when(statModListTraverser).traverse(eqExpectedScalaMods(cls, expectedJavaTreeType))
+    when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, expectedJavaTreeType))))
+      .thenReturn(expectedChildJavaScope)
+
+    doReturn(expectedTemplateTraversalResult)
+      .when(templateTraverser).traverse(eqTree(template), eqTemplateContext(expectedTemplateContext))
+
+    classTraverser.traverse(cls, ClassOrTraitContext(TheParentJavaScope)) should
+      equalRegularClassTraversalResult(expectedRegularClassTraversalResult)
+  }
+
+  test("traverse() when resolves to Java class and has one ctor arg list + stats") {
+    val ctorPrimary = ctorPrimaryOf(List(CtorArgList1))
+    val initialTemplate = Template(
+      early = List(),
+      inits = Nil,
+      self = TheSelf,
+      stats = TheStats
+    )
+    val cls = Defn.Class(
+      mods = TheScalaMods,
+      name = TheClassName,
+      tparams = Nil,
+      ctor = ctorPrimary,
+      templ = initialTemplate
+    )
+
+    val expectedJavaTreeType = JavaTreeType.Class
+    val expectedChildJavaScope = JavaScope.Class
+    val expectedTemplateContext = TemplateContext(
+      javaScope = expectedChildJavaScope,
+      maybeClassName = Some(TheClassName),
+      maybePrimaryCtor = Some(ctorPrimary)
+    )
+    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TheTraversedScalaMods, javaModifiers = TheClassJavaModifiers)
+    val expectedSyntheticDeclVars = List(SyntheticDeclVar1, SyntheticDeclVar2)
+    val expectedAdjustedTemplate = initialTemplate.copy(stats = expectedSyntheticDeclVars ++ TheStats)
+    val expectedSyntheticDeclVarResults = List(SyntheticDeclVarTraversalResult1, SyntheticDeclVarTraversalResult2)
+    val expectedTemplateTraversalResult = TemplateTraversalResult(
+      self = TheTraversedSelf,
+      statResults = expectedSyntheticDeclVarResults ++ TheStatTraversalResults
+    )
+    val expectedRegularClassTraversalResult = RegularClassTraversalResult(
+      scalaMods = TheTraversedScalaMods,
+      javaModifiers = TheClassJavaModifiers,
+      name = TheClassName,
+      ctor = ctorPrimary,
+      self = TheTraversedSelf,
+      statResults = expectedSyntheticDeclVarResults ++ TheStatTraversalResults
+    )
+
+    expectResolveJavaTreeType(cls, TheScalaMods, expectedJavaTreeType)
+    doReturn(expectedModListTraversalResult)
+      .when(statModListTraverser).traverse(eqExpectedScalaMods(cls, expectedJavaTreeType))
+    when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, expectedJavaTreeType))))
+      .thenReturn(expectedChildJavaScope)
+
+    when(paramToDeclVarTransformer.transform(any[Term.Param])).thenAnswer((ctorArg: Term.Param) => ctorArg match {
+      case arg if arg.structure == CtorArg1.structure => SyntheticDeclVar1
+      case arg if arg.structure == CtorArg2.structure => SyntheticDeclVar2
+    })
+
+    doReturn(expectedTemplateTraversalResult)
+      .when(templateTraverser).traverse(eqTree(expectedAdjustedTemplate), eqTemplateContext(expectedTemplateContext))
+
+    classTraverser.traverse(cls, ClassOrTraitContext(TheParentJavaScope)) should
+      equalRegularClassTraversalResult(expectedRegularClassTraversalResult)
+  }
+
+  test("traverse() when resolves to Java class and has two list of ctor args - should create all synthetic vars") {
+    val ctorPrimary = ctorPrimaryOf(List(CtorArgList1, CtorArgList2))
+    val initialTemplate = Template(
+      early = List(),
+      inits = Nil,
+      self = TheSelf,
+      stats = Nil
+    )
+    val cls = Defn.Class(
+      mods = TheScalaMods,
+      name = TheClassName,
+      tparams = Nil,
+      ctor = ctorPrimary,
+      templ = initialTemplate
+    )
+
+    val expectedJavaTreeType = JavaTreeType.Class
+    val expectedChildJavaScope = JavaScope.Class
+    val expectedTemplateContext = TemplateContext(
+      javaScope = expectedChildJavaScope,
+      maybeClassName = Some(TheClassName),
+      maybePrimaryCtor = Some(ctorPrimary)
+    )
+    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TheTraversedScalaMods, javaModifiers = TheClassJavaModifiers)
+    val expectedSyntheticDeclVars = List(
+      SyntheticDeclVar1,
+      SyntheticDeclVar2,
+      SyntheticDeclVar3,
+      SyntheticDeclVar4
+    )
+    val expectedSyntheticVarResults = List(
+      SyntheticDeclVarTraversalResult1,
+      SyntheticDeclVarTraversalResult2,
+      SyntheticDeclVarTraversalResult3,
+      SyntheticDeclVarTraversalResult4
+    )
+    val expectedAdjustedTemplate = initialTemplate.copy(stats = expectedSyntheticDeclVars)
+    val expectedTemplateTraversalResult = TemplateTraversalResult(
+      self = TheTraversedSelf,
+      statResults = expectedSyntheticVarResults
+    )
+    val expectedRegularClassTraversalResult = RegularClassTraversalResult(
+      scalaMods = TheTraversedScalaMods,
+      javaModifiers = TheClassJavaModifiers,
+      name = TheClassName,
+      ctor = ctorPrimary,
+      self = TheTraversedSelf,
+      statResults = expectedSyntheticVarResults
+    )
+
+    expectResolveJavaTreeType(cls, TheScalaMods, expectedJavaTreeType)
+    doReturn(expectedModListTraversalResult)
+      .when(statModListTraverser).traverse(eqExpectedScalaMods(cls, expectedJavaTreeType))
+    when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, expectedJavaTreeType))))
+      .thenReturn(expectedChildJavaScope)
+
+    when(paramToDeclVarTransformer.transform(any[Term.Param])).thenAnswer((ctorArg: Term.Param) => ctorArg match {
+      case arg if arg.structure == CtorArg1.structure => SyntheticDeclVar1
+      case arg if arg.structure == CtorArg2.structure => SyntheticDeclVar2
+      case arg if arg.structure == CtorArg3.structure => SyntheticDeclVar3
+      case arg if arg.structure == CtorArg4.structure => SyntheticDeclVar4
+    })
+
+    doReturn(expectedTemplateTraversalResult)
+      .when(templateTraverser).traverse(eqTree(expectedAdjustedTemplate), eqTemplateContext(expectedTemplateContext))
+
+    classTraverser.traverse(cls, ClassOrTraitContext(TheParentJavaScope)) should
+      equalRegularClassTraversalResult(expectedRegularClassTraversalResult)
+  }
+
+  test("traverse() when resolves to Java enum") {
+    val ctorPrimary = PrimaryCtors.Empty
+    val enumConstantVar = q"final var First, Second = Value"
+    val template = Template(
+      early = List(),
+      inits = Nil,
+      self = Selfs.Empty,
+      stats = List(enumConstantVar)
+    )
+    val cls = Defn.Class(
+      mods = TheScalaMods,
+      name = TheClassName,
+      tparams = Nil,
+      ctor = ctorPrimary,
+      templ = template
+    )
+
+    val expectedJavaTreeType = JavaTreeType.Enum
+    val expectedChildJavaScope = JavaScope.Enum
+    val expectedTemplateContext = TemplateContext(
+      javaScope = expectedChildJavaScope,
+      maybeClassName = Some(TheClassName),
+      maybePrimaryCtor = Some(ctorPrimary)
+    )
+    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TheTraversedScalaMods, javaModifiers = TheClassJavaModifiers)
+    val expectedTemplateTraversalResult = TemplateTraversalResult(statResults = List(EnumConstantListTraversalResult(enumConstantVar)))
+    val expectedRegularClassTraversalResult = RegularClassTraversalResult(
+      scalaMods = TheTraversedScalaMods,
+      javaModifiers = TheClassJavaModifiers,
+      javaTypeKeyword = JavaKeyword.Enum,
+      name = TheClassName,
+      ctor = ctorPrimary,
+      statResults = List(EnumConstantListTraversalResult(enumConstantVar))
+    )
+
+    expectResolveJavaTreeType(cls, TheScalaMods, expectedJavaTreeType)
+    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(cls, expectedJavaTreeType))
+    when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(cls, expectedJavaTreeType))))
+      .thenReturn(expectedChildJavaScope)
+
+    doReturn(expectedTemplateTraversalResult)
+      .when(templateTraverser).traverse(eqTree(template), eqTemplateContext(expectedTemplateContext))
+
+    classTraverser.traverse(cls, ClassOrTraitContext(TheParentJavaScope)) should
+      equalRegularClassTraversalResult(expectedRegularClassTraversalResult)
+  }
+
+  private def ctorPrimaryOf(paramss: List[List[Term.Param]] = Nil) = {
+    Ctor.Primary(
+      mods = Nil,
+      name = Name.Anonymous(),
+      paramss = paramss
+    )
+  }
+
+  private def expectResolveJavaTreeType(defnClass: Defn.Class, scalaMods: List[Mod], expectedJavaTreeType: JavaTreeType): Unit = {
+    val expectedJavaTreeTypeContext = JavaTreeTypeContext(defnClass, scalaMods)
+    when(javaTreeTypeResolver.resolve(eqJavaTreeTypeContext(expectedJavaTreeTypeContext))).thenReturn(expectedJavaTreeType)
+  }
+
+  private def eqExpectedScalaMods(defnClass: Defn.Class, javaTreeType: JavaTreeType) = {
+    val expectedModifiersContext = ModifiersContext(defnClass, javaTreeType, TheParentJavaScope)
+    eqModifiersContext(expectedModifiersContext)
+  }
+}
