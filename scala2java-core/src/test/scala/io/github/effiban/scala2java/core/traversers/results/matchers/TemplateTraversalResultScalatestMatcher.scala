@@ -1,10 +1,7 @@
 package io.github.effiban.scala2java.core.traversers.results.matchers
 
 import io.github.effiban.scala2java.core.traversers.results.TemplateTraversalResult
-import io.github.effiban.scala2java.test.utils.matchers.{ListMatcher, TreeMatcher}
 import org.scalatest.matchers.{MatchResult, Matcher}
-
-import scala.meta.Init
 
 class TemplateTraversalResultScalatestMatcher(expectedTraversalResult: TemplateTraversalResult)
   extends Matcher[TemplateTraversalResult] {
@@ -34,7 +31,7 @@ class TemplateTraversalResultScalatestMatcher(expectedTraversalResult: TemplateT
   }
 
   private def initsMatch(actualTraversalResult: TemplateTraversalResult) = {
-    new ListMatcher(expectedTraversalResult.inits, new TreeMatcher[Init](_)).matches(actualTraversalResult.inits)
+    actualTraversalResult.inits.structure == expectedTraversalResult.inits.structure
   }
 
   private def selfMatches(actualTraversalResult: TemplateTraversalResult) = {

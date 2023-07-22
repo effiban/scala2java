@@ -280,6 +280,13 @@ class ScalaTreeTraversers(implicit factories: Factories,
     JavaTreeTypeResolver,
     JavaChildScopeResolver)
 
+  private lazy val objectTraverser: ObjectTraverser = new ObjectTraverserImpl(
+    statModListTraverser,
+    templateTraverser,
+    JavaTreeTypeResolver,
+    JavaChildScopeResolver
+  )
+
   private lazy val partialFunctionTraverser: PartialFunctionTraverser = new PartialFunctionTraverserImpl(termFunctionTraverser)
 
   private lazy val patTraverser: PatTraverser = new PatTraverserImpl(
