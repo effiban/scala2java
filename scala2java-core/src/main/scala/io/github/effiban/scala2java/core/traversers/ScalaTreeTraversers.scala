@@ -137,6 +137,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
   private lazy val defaultStatTraverser: DefaultStatTraverser = new DefaultStatTraverserImpl(
     statTermTraverser,
     importTraverser,
+    defnTraverser,
     declTraverser
   )
 
