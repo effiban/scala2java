@@ -200,7 +200,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
   private lazy val defnTraverser: DefnTraverser = new DefnTraverserImpl(
     defnVarTraverser,
     defnDefTraverser,
-    traitTraverser
+    traitTraverser,
+    objectTraverser
   )
 
   private lazy val defnVarTypeTraverser: DefnVarTypeTraverser = new DefnVarTypeTraverserImpl(
