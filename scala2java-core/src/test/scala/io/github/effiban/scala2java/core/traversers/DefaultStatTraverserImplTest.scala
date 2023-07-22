@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.contexts.StatContext
 import io.github.effiban.scala2java.core.entities.JavaModifier
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.traversers.results.matchers.StatTraversalResultScalatestMatcher.equalStatTraversalResult
-import io.github.effiban.scala2java.core.traversers.results.{DeclDefTraversalResult, DeclVarTraversalResult, EmptyStatTraversalResult, SimpleStatTraversalResult}
+import io.github.effiban.scala2java.core.traversers.results._
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.spi.entities.JavaScope.Package
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -16,11 +16,13 @@ class DefaultStatTraverserImplTest extends UnitTestSuite {
 
   private val statTermTraverser = mock[StatTermTraverser]
   private val importTraverser = mock[ImportTraverser]
+  private val defnTraverser = mock[DefnTraverser]
   private val declTraverser = mock[DeclTraverser]
 
   private val defaultStatTraverser = new DefaultStatTraverserImpl(
     statTermTraverser,
     importTraverser,
+    defnTraverser,
     declTraverser
   )
 
@@ -72,5 +74,27 @@ class DefaultStatTraverserImplTest extends UnitTestSuite {
     doReturn(traversalResult).when(declTraverser).traverse(eqTree(declDef), eqTo(StatContext(JavaScope.Block)))
 
     defaultStatTraverser.traverse(declDef, StatContext(JavaScope.Block)) should equalStatTraversalResult(traversalResult)
+  }
+
+  test("traverse Defn.Var") {
+    val defnVar = q"private var myVar: Int = 3"
+    val traversedDefnVar = q"private var myTraversedVar: Int = 3"
+    val javaModifiers = List(JavaModifier.Private)
+    val traversalResult = DefnVarTraversalResult(traversedDefnVar, javaModifiers)
+
+    doReturn(traversalResult).when(defnTraverser).traverse(eqTree(defnVar), eqTo(StatContext(JavaScope.Block)))
+
+    defaultStatTraverser.traverse(defnVar, StatContext(JavaScope.Block)) should equalStatTraversalResult(traversalResult)
+  }
+
+  test("traverse Defn.Def") {
+    val defnDef = q"private def foo(x: Int): Int = doSomething(x)"
+    val traversedDefnDef = q"private def traversedFoo(xx: Int): Int = doSomethingElse(x)"
+    val javaModifiers = List(JavaModifier.Private)
+    val traversalResult = DefnDefTraversalResult(traversedDefnDef, javaModifiers)
+
+    doReturn(traversalResult).when(defnTraverser).traverse(eqTree(defnDef), eqTo(StatContext(JavaScope.Block)))
+
+    defaultStatTraverser.traverse(defnDef, StatContext(JavaScope.Block)) should equalStatTraversalResult(traversalResult)
   }
 }

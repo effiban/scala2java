@@ -11,13 +11,14 @@ trait DefaultStatTraverser {
 
 private[traversers] class DefaultStatTraverserImpl(statTermTraverser: => StatTermTraverser,
                                                    importTraverser: => ImportTraverser,
+                                                   defnTraverser: => DefnTraverser,
                                                    declTraverser: => DeclTraverser) extends DefaultStatTraverser {
 
   override def traverse(stat: Stat, statContext: StatContext = StatContext()): StatTraversalResult = stat match {
     case term: Term => SimpleStatTraversalResult(statTermTraverser.traverse(term))
     case `import`: Import => traverseImport(`import`)
     case pkg: Pkg => EmptyStatTraversalResult //TODO
-    case defn: Defn => EmptyStatTraversalResult //TODO
+    case defn: Defn => defnTraverser.traverse(defn, statContext)
     case decl: Decl => declTraverser.traverse(decl, statContext)
     case other => SimpleStatTraversalResult(other)
   }
