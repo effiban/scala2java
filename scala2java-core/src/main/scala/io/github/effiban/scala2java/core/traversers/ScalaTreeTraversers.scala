@@ -411,6 +411,14 @@ class ScalaTreeTraversers(implicit factories: Factories,
     new CompositeTemplateInitExcludedPredicate(CoreTemplateInitExcludedPredicate)
   )
 
+  private lazy val templateTraverser: TemplateTraverser = new TemplateTraverserImpl(
+    initTraverser,
+    selfTraverser,
+    templateBodyTraverser,
+    JavaInheritanceKeywordResolver,
+    new CompositeTemplateInitExcludedPredicate(CoreTemplateInitExcludedPredicate)
+  )
+
   private lazy val termAnnotateTraverser: TermAnnotateTraverser = new TermAnnotateTraverserImpl(expressionTermTraverser, annotTraverser)
 
   private lazy val termApplyInfixTraverser: TermApplyInfixTraverser = new TermApplyInfixTraverserImpl(

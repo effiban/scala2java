@@ -7,5 +7,6 @@ import scala.meta.{Ctor, Name, Type}
 case class TemplateContext(override val javaScope: JavaScope,
                            maybeClassName: Option[Type.Name] = None,
                            maybePrimaryCtor: Option[Ctor.Primary] = None,
+                           // TODO - remove once deprecated traversers are gone
                            override val permittedSubTypeNames: List[Name] = Nil)
   extends JavaScopeAware with PermittedSubTypeNamesHolder
