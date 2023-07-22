@@ -84,6 +84,14 @@ class ScalaTreeTraversers(implicit factories: Factories,
     JavaChildScopeResolver
   )
 
+  private lazy val caseClassTraverser: CaseClassTraverser = new CaseClassTraverserImpl(
+    statModListTraverser,
+    typeParamTraverser,
+    termParamTraverser,
+    templateTraverser,
+    JavaChildScopeResolver
+  )
+
   private lazy val caseTraverser: CaseTraverser = new CaseTraverserImpl(patTraverser, expressionTermTraverser)
 
   private lazy val catchHandlerTraverser: CatchHandlerTraverser = new CatchHandlerTraverserImpl(
