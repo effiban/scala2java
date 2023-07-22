@@ -346,6 +346,15 @@ class ScalaTreeTraversers(implicit factories: Factories,
     JavaChildScopeResolver
   )
 
+  private lazy val regularClassTraverser: RegularClassTraverser = new RegularClassTraverserImpl(
+    statModListTraverser,
+    typeParamTraverser,
+    templateTraverser,
+    ParamToDeclVarTransformer,
+    JavaTreeTypeResolver,
+    JavaChildScopeResolver
+  )
+
   private lazy val returnTraverser: ReturnTraverser = new ReturnTraverserImpl(expressionTermTraverser)
 
   private lazy val selfTraverser: SelfTraverser = new SelfTraverserImpl(typeTraverser)

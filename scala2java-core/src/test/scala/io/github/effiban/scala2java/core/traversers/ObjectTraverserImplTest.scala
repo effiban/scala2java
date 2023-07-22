@@ -12,7 +12,6 @@ import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.traversers.results._
 import io.github.effiban.scala2java.core.traversers.results.matchers.ObjectTraversalResultScalatestMatcher.equalObjectTraversalResult
 import io.github.effiban.scala2java.spi.entities.JavaScope
-import io.github.effiban.scala2java.spi.entities.JavaScope.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.{Defn, Mod, Name, Self, Template, XtensionQuasiquoteInit, XtensionQuasiquoteMod, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
@@ -61,7 +60,7 @@ class ObjectTraverserImplTest extends UnitTestSuite {
   )
 
 
-  test("traverse() when resolves to a utility class") {
+  test("traverse() when resolves to a Java utility class") {
     val template = Template(
       early = List(),
       inits = Nil,
@@ -95,7 +94,7 @@ class ObjectTraverserImplTest extends UnitTestSuite {
 
     expectResolveJavaTreeType(objectDef, TheScalaMods, expectedJavaTreeType)
     doReturn(expectedModListTraversalResult)
-      .when(statModListTraverser).traverse(eqExpectedScalaMods(objectDef, expectedJavaTreeType, TheParentJavaScope))
+      .when(statModListTraverser).traverse(eqExpectedScalaMods(objectDef, expectedJavaTreeType))
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(objectDef, expectedJavaTreeType))))
       .thenReturn(expectedChildJavaScope)
     doReturn(expectedTemplateTraversalResult)
@@ -104,7 +103,7 @@ class ObjectTraverserImplTest extends UnitTestSuite {
     objectTraverser.traverse(objectDef, StatContext(TheParentJavaScope)) should equalObjectTraversalResult(expectedObjectTraversalResult)
   }
 
-  test("traverse() when resolves to a regular class with inheritance") {
+  test("traverse() when resolves to a regular Java class with inheritance") {
     val template = Template(
       early = List(),
       inits = TheInits,
@@ -146,14 +145,14 @@ class ObjectTraverserImplTest extends UnitTestSuite {
 
     expectResolveJavaTreeType(objectDef, TheScalaMods, expectedJavaTreeType)
     doReturn(expectedModListTraversalResult)
-      .when(statModListTraverser).traverse(eqExpectedScalaMods(objectDef, expectedJavaTreeType, TheParentJavaScope))
+      .when(statModListTraverser).traverse(eqExpectedScalaMods(objectDef, expectedJavaTreeType))
     doReturn(expectedTemplateTraversalResult)
       .when(templateTraverser).traverse(eqTree(template), eqTemplateContext(expectedTemplateContext))
 
     objectTraverser.traverse(objectDef, StatContext(TheParentJavaScope)) should equalObjectTraversalResult(expectedObjectTraversalResult)
   }
 
-  test("traverse() when resolves to an enum") {
+  test("traverse() when resolves to a Java enum") {
     val template = Template(
       early = List(),
       inits = Nil,
@@ -187,7 +186,7 @@ class ObjectTraverserImplTest extends UnitTestSuite {
 
     expectResolveJavaTreeType(objectDef, TheScalaMods, expectedJavaTreeType)
     doReturn(expectedModListTraversalResult)
-      .when(statModListTraverser).traverse(eqExpectedScalaMods(objectDef, expectedJavaTreeType, TheParentJavaScope))
+      .when(statModListTraverser).traverse(eqExpectedScalaMods(objectDef, expectedJavaTreeType))
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(objectDef, expectedJavaTreeType))))
       .thenReturn(expectedChildJavaScope)
     doReturn(expectedTemplateTraversalResult)
@@ -201,8 +200,8 @@ class ObjectTraverserImplTest extends UnitTestSuite {
     when(javaTreeTypeResolver.resolve(eqJavaTreeTypeContext(expectedJavaTreeTypeContext))).thenReturn(expectedJavaTreeType)
   }
 
-  private def eqExpectedScalaMods(obj: Defn.Object, javaTreeType: JavaTreeType, javaScope: JavaScope) = {
-    val expectedModifiersContext = ModifiersContext(obj, javaTreeType, javaScope)
+  private def eqExpectedScalaMods(obj: Defn.Object, javaTreeType: JavaTreeType) = {
+    val expectedModifiersContext = ModifiersContext(obj, javaTreeType, TheParentJavaScope)
     eqModifiersContext(expectedModifiersContext)
   }
 }
