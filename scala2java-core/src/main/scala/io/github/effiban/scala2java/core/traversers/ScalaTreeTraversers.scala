@@ -473,6 +473,12 @@ class ScalaTreeTraversers(implicit factories: Factories,
     JavaChildScopeResolver
   )
 
+  private lazy val traitTraverser: TraitTraverser = new TraitTraverserImpl(
+    statModListTraverser,
+    typeParamTraverser,
+    templateTraverser
+  )
+
   private lazy val tryTraverser: TryTraverser = new TryTraverserImpl(
     blockWrappingTermTraverser,
     catchHandlerTraverser,
