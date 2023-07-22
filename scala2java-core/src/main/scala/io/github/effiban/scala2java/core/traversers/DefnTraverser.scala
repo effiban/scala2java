@@ -12,14 +12,15 @@ trait DefnTraverser {
 
 private[traversers] class DefnTraverserImpl(defnVarTraverser: => DefnVarTraverser,
                                             defnDefTraverser: => DefnDefTraverser,
-                                            traitTraverser: => TraitTraverser) extends DefnTraverser {
+                                            traitTraverser: => TraitTraverser,
+                                            objectTraverser: => ObjectTraverser) extends DefnTraverser {
 
   override def traverse(defn: Defn, context: StatContext = StatContext()): StatWithJavaModifiersTraversalResult = defn match {
     case defnVar: Defn.Var => defnVarTraverser.traverse(defnVar, context)
     case defnDef: Defn.Def => defnDefTraverser.traverse(defnDef, DefnDefContext(context.javaScope))
     case defnTrait: Trait => traitTraverser.traverse(defnTrait, ClassOrTraitContext(context.javaScope))
     case defnClass: Defn.Class => UnsupportedDefnTraversalResult(defnClass) // TODO
-    case defnObject: Defn.Object => UnsupportedDefnTraversalResult(defnObject) // TODO
+    case defnObject: Defn.Object => objectTraverser.traverse(defnObject, context)
     case unsupported => UnsupportedDefnTraversalResult(unsupported)
   }
 }

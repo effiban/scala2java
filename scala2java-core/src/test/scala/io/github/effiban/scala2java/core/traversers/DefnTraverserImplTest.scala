@@ -1,10 +1,10 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts._
-import io.github.effiban.scala2java.core.entities.JavaModifier
+import io.github.effiban.scala2java.core.entities.{JavaKeyword, JavaModifier}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.traversers.results.matchers.StatWithJavaModifiersTraversalResultScalatestMatcher.equalStatWithJavaModifiersTraversalResult
-import io.github.effiban.scala2java.core.traversers.results.{DeclVarTraversalResult, DefnDefTraversalResult, DefnVarTraversalResult, TraitTraversalResult}
+import io.github.effiban.scala2java.core.traversers.results._
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
@@ -19,11 +19,13 @@ class DefnTraverserImplTest extends UnitTestSuite {
   private val defnVarTraverser = mock[DefnVarTraverser]
   private val defnDefTraverser = mock[DefnDefTraverser]
   private val traitTraverser = mock[TraitTraverser]
+  private val objectTraverser = mock[ObjectTraverser]
 
   private val defnTraverser = new DefnTraverserImpl(
     defnVarTraverser,
     defnDefTraverser,
-    traitTraverser
+    traitTraverser,
+    objectTraverser
   )
 
 
@@ -77,5 +79,24 @@ class DefnTraverserImplTest extends UnitTestSuite {
     doReturn(traversalResult).when(traitTraverser).traverse(eqTree(defnTrait), eqTo(TheClassOrTraitContext))
 
     defnTraverser.traverse(defnTrait, TheStatContext) should equalStatWithJavaModifiersTraversalResult(traversalResult)
+  }
+
+  test("traverse() for Defn.Object") {
+    val defnObject =
+      q"""
+      object MyObject {
+        final var x: Int = 3
+      }
+      """
+    val traversalResult = ObjectTraversalResult(
+      javaModifiers = List(JavaModifier.Public, JavaModifier.Final),
+      javaTypeKeyword = JavaKeyword.Class,
+      name = q"MyObject",
+      statResults = List(DefnVarTraversalResult(q"final var xx: Int = 33"))
+    )
+
+    doReturn(traversalResult).when(objectTraverser).traverse(eqTree(defnObject), eqTo(TheStatContext))
+
+    defnTraverser.traverse(defnObject, TheStatContext) should equalStatWithJavaModifiersTraversalResult(traversalResult)
   }
 }
