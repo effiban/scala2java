@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.StatContext
-import io.github.effiban.scala2java.core.renderers.contexts.{DefRenderContext, ImportRenderContext, VarRenderContext}
+import io.github.effiban.scala2java.core.renderers.contexts.{DefRenderContext, ImportRenderContext, UnsupportedDeclRenderContext, VarRenderContext}
 import io.github.effiban.scala2java.core.renderers.{DeclRenderer, ImportRenderer, StatTermRenderer}
 import io.github.effiban.scala2java.core.traversers.results.{DeclDefTraversalResult, DeclVarTraversalResult}
 import io.github.effiban.scala2java.core.writers.JavaWriter
@@ -44,7 +44,7 @@ private[traversers] class DeprecatedStatTraverserImpl(statTermTraverser: => Stat
       val renderContext = traversalResult match {
         case aTraversalResult : DeclVarTraversalResult => VarRenderContext(aTraversalResult.javaModifiers)
         case aTraversalResult : DeclDefTraversalResult => DefRenderContext(aTraversalResult.javaModifiers)
-        case _ => throw new IllegalStateException(s"No render context can be constructed for traversal result: $traversalResult")
+        case _ => UnsupportedDeclRenderContext
       }
       declRenderer.render(traversalResult.tree, renderContext)
     case other => writeComment(s"UNSUPPORTED: $other")
