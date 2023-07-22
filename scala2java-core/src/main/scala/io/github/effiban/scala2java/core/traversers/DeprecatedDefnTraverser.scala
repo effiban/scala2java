@@ -42,7 +42,7 @@ private[traversers] class DeprecatedDefnTraverserImpl(declVarRenderer: => DeclVa
     traversalResult match {
       case declVarResult: DeclVarTraversalResult => declVarRenderer.render(declVarResult.tree, renderContext)
       case defnVarResult: DefnVarTraversalResult => defnVarRenderer.render(defnVarResult.tree, renderContext)
-      case unsupportedResult => throw new IllegalStateException(s"Unsupported result tree for Defn.Val traversal: ${unsupportedResult.tree}")
+      case _ => writeComment(s"UNSUPPORTED: ${traversalResult.tree}")
     }
   }
 
