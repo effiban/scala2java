@@ -389,6 +389,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
   @deprecated
   lazy val deprecatedSourceTraverser: DeprecatedSourceTraverser = new DeprecatedSourceTraverserImpl(deprecatedStatTraverser)
 
+  lazy val sourceTraverser: SourceTraverser = new SourceTraverserImpl(defaultStatTraverser)
+
   private lazy val statModListTraverser: StatModListTraverser = new StatModListTraverserImpl(annotTraverser, JavaModifiersResolver)
 
   private lazy val statTermTraverser: StatTermTraverser = new StatTermTraverserImpl(
