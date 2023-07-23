@@ -16,9 +16,10 @@ class DefnTraversalResultScalatestMatcher(expectedTraversalResult: DefnTraversal
         new CtorSecondaryTraversalResultScalatestMatcher(expectedResult)(actualResult).matches
       case (actualTraitResult: TraitTraversalResult, expectedTraitResult: TraitTraversalResult) =>
         new TraitTraversalResultScalatestMatcher(expectedTraitResult)(actualTraitResult).matches
+      case (actualClassResult: ClassTraversalResult, expectedClassResult: ClassTraversalResult) =>
+        new ClassTraversalResultScalatestMatcher(expectedClassResult)(actualClassResult).matches
       case (actualObjectResult: ObjectTraversalResult, expectedObjectResult: ObjectTraversalResult) =>
         new ObjectTraversalResultScalatestMatcher(expectedObjectResult)(actualObjectResult).matches
-      // TODO support additional Defn-s
       case (actualResult: UnsupportedDefnTraversalResult, expectedResult: UnsupportedDefnTraversalResult) =>
         actualResult.tree.structure == expectedResult.tree.structure
       case (anActualTraversalResult, anExpectedTraversalResult) => anActualTraversalResult == anExpectedTraversalResult

@@ -216,6 +216,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
     defnVarTraverser,
     defnDefTraverser,
     traitTraverser,
+    classTraverser,
     objectTraverser
   )
 
