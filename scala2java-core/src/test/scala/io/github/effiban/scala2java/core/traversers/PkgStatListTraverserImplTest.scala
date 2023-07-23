@@ -72,9 +72,9 @@ class PkgStatListTraverserImplTest extends UnitTestSuite {
     when(sealedHierarchiesResolver.traverse(eqTreeList(stats))).thenReturn(expectedSealedHierarchies)
 
     doAnswer((stat: Stat, _: SealedHierarchies) => stat match {
-      case IncludedImport => IncludedImportTraversalResult
-      case TheTrait => TheTraitTraversalResult
-      case TheObject => TheObjectTraversalResult
+      case aStat if aStat.structure == IncludedImport.structure => IncludedImportTraversalResult
+      case aStat if aStat.structure == TheTrait.structure => TheTraitTraversalResult
+      case aStat if aStat.structure == TheObject.structure => TheObjectTraversalResult
     }).when(pkgStatTraverser).traverse(any[Stat], eqSealedHierarchies(expectedSealedHierarchies))
 
     pkgStatListTraverser.traverse(stats) should equalPkgStatListTraversalResult(expectedPkgStatListResult)
@@ -101,10 +101,11 @@ class PkgStatListTraverserImplTest extends UnitTestSuite {
     when(sealedHierarchiesResolver.traverse(eqTreeList(stats))).thenReturn(expectedSealedHierarchies)
 
     doAnswer((stat: Stat, _: SealedHierarchies) => stat match {
-      case ExcludedImport1 | ExcludedImport2 => EmptyStatTraversalResult
-      case IncludedImport => IncludedImportTraversalResult
-      case TheTrait => TheTraitTraversalResult
-      case TheObject => TheObjectTraversalResult
+      case aStat if aStat.structure == ExcludedImport1.structure => EmptyStatTraversalResult
+      case aStat if aStat.structure == ExcludedImport2.structure => EmptyStatTraversalResult
+      case aStat if aStat.structure == IncludedImport.structure => IncludedImportTraversalResult
+      case aStat if aStat.structure == TheTrait.structure => TheTraitTraversalResult
+      case aStat if aStat.structure == TheObject.structure => TheObjectTraversalResult
     }).when(pkgStatTraverser).traverse(any[Stat], eqSealedHierarchies(expectedSealedHierarchies))
 
     pkgStatListTraverser.traverse(stats) should equalPkgStatListTraversalResult(expectedPkgStatListResult)
