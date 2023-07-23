@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.entities.SealedHierarchies
-import io.github.effiban.scala2java.core.matchers.SealedHierarchiesMatcher.eqSealedHierarchies
+import io.github.effiban.scala2java.core.matchers.SealedHierarchiesMockitoMatcher.eqSealedHierarchies
 import io.github.effiban.scala2java.core.resolvers.SealedHierarchiesResolver
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite

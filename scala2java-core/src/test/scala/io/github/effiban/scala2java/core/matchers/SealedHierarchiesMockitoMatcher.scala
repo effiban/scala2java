@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.entities.SealedHierarchies
 import org.mockito.ArgumentMatcher
 import org.mockito.ArgumentMatchers.argThat
 
-class SealedHierarchiesMatcher(expectedSealedHierarchies: SealedHierarchies) extends ArgumentMatcher[SealedHierarchies] {
+class SealedHierarchiesMockitoMatcher(expectedSealedHierarchies: SealedHierarchies) extends ArgumentMatcher[SealedHierarchies] {
 
   override def matches(actualSealedHierarchies: SealedHierarchies): Boolean = {
     actualSealedHierarchies.asStringMap() == expectedSealedHierarchies.asStringMap()
@@ -13,8 +13,8 @@ class SealedHierarchiesMatcher(expectedSealedHierarchies: SealedHierarchies) ext
   override def toString: String = s"Matcher for: $expectedSealedHierarchies"
 }
 
-object SealedHierarchiesMatcher {
+object SealedHierarchiesMockitoMatcher {
   def eqSealedHierarchies(expectedSealedHierarchies: SealedHierarchies): SealedHierarchies =
-    argThat(new SealedHierarchiesMatcher(expectedSealedHierarchies))
+    argThat(new SealedHierarchiesMockitoMatcher(expectedSealedHierarchies))
 }
 
