@@ -152,6 +152,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
   private lazy val defaultStatTraverser: DefaultStatTraverser = new DefaultStatTraverserImpl(
     statTermTraverser,
     importTraverser,
+    pkgTraverser,
     defnTraverser,
     declTraverser
   )
@@ -350,6 +351,12 @@ class ScalaTreeTraversers(implicit factories: Factories,
     defaultTermRefTraverser,
     defaultTermRefRenderer,
     deprecatedPkgStatListTraverser,
+    new CompositeAdditionalImportersProvider(CoreAdditionalImportersProvider)
+  )
+
+  private lazy val pkgTraverser: PkgTraverser = new PkgTraverserImpl(
+    defaultTermRefTraverser,
+    pkgStatListTraverser,
     new CompositeAdditionalImportersProvider(CoreAdditionalImportersProvider)
   )
 

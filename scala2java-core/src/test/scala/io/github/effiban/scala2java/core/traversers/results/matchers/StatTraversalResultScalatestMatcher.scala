@@ -1,16 +1,14 @@
 package io.github.effiban.scala2java.core.traversers.results.matchers
 
-import io.github.effiban.scala2java.core.traversers.results.{PopulatedStatTraversalResult, StatTraversalResult, StatWithJavaModifiersTraversalResult}
+import io.github.effiban.scala2java.core.traversers.results.{PopulatedStatTraversalResult, StatTraversalResult}
 import org.scalatest.matchers.{MatchResult, Matcher}
 
 class StatTraversalResultScalatestMatcher(expectedTraversalResult: StatTraversalResult) extends Matcher[StatTraversalResult] {
 
   override def apply(actualTraversalResult: StatTraversalResult): MatchResult = {
     val matches = (actualTraversalResult, expectedTraversalResult) match {
-      case (actualResult: StatWithJavaModifiersTraversalResult, expectedResult: StatWithJavaModifiersTraversalResult) =>
-        new StatWithJavaModifiersTraversalResultScalatestMatcher(expectedResult)(actualResult).matches
       case  (actualResult: PopulatedStatTraversalResult, expectedResult: PopulatedStatTraversalResult) =>
-        actualResult.tree.structure == expectedResult.tree.structure
+        new PopulatedStatTraversalResultScalatestMatcher(expectedResult)(actualResult).matches
       case (anActualTraversalResult, anExpectedTraversalResult) => anActualTraversalResult == anExpectedTraversalResult
     }
 
