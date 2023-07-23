@@ -3,8 +3,9 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.entities.{JavaKeyword, JavaModifier}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.matchers.StatWithJavaModifiersTraversalResultScalatestMatcher.equalStatWithJavaModifiersTraversalResult
+import io.github.effiban.scala2java.core.testtrees.PrimaryCtors
 import io.github.effiban.scala2java.core.traversers.results._
+import io.github.effiban.scala2java.core.traversers.results.matchers.StatWithJavaModifiersTraversalResultScalatestMatcher.equalStatWithJavaModifiersTraversalResult
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
@@ -19,12 +20,14 @@ class DefnTraverserImplTest extends UnitTestSuite {
   private val defnVarTraverser = mock[DefnVarTraverser]
   private val defnDefTraverser = mock[DefnDefTraverser]
   private val traitTraverser = mock[TraitTraverser]
+  private val classTraverser = mock[ClassTraverser]
   private val objectTraverser = mock[ObjectTraverser]
 
   private val defnTraverser = new DefnTraverserImpl(
     defnVarTraverser,
     defnDefTraverser,
     traitTraverser,
+    classTraverser,
     objectTraverser
   )
 
@@ -79,6 +82,25 @@ class DefnTraverserImplTest extends UnitTestSuite {
     doReturn(traversalResult).when(traitTraverser).traverse(eqTree(defnTrait), eqTo(TheClassOrTraitContext))
 
     defnTraverser.traverse(defnTrait, TheStatContext) should equalStatWithJavaModifiersTraversalResult(traversalResult)
+  }
+
+  test("traverse() for Defn.Class") {
+    val defnClass =
+      q"""
+      class MyClass {
+        def foo(x: Int) = x + 1
+      }
+      """
+    val traversalResult = RegularClassTraversalResult(
+      javaModifiers = List(JavaModifier.Public),
+      name = t"MyTraversedClass",
+      ctor = PrimaryCtors.Empty,
+      statResults = List(DefnDefTraversalResult(q"def traversedFoo(xx: Int) = xx + 1"))
+    )
+
+    doReturn(traversalResult).when(classTraverser).traverse(eqTree(defnClass), eqTo(TheClassOrTraitContext))
+
+    defnTraverser.traverse(defnClass, TheStatContext) should equalStatWithJavaModifiersTraversalResult(traversalResult)
   }
 
   test("traverse() for Defn.Object") {
