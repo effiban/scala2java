@@ -107,6 +107,13 @@ class ScalaTreeTraversers(implicit factories: Factories,
     ClassClassifier
   )
 
+  private lazy val classTraverser: ClassTraverser = new ClassTraverserImpl(
+    caseClassTraverser,
+    regularClassTraverser,
+    new CompositeClassTransformer(),
+    ClassClassifier
+  )
+
   private lazy val ctorPrimaryTraverser: CtorPrimaryTraverser = new CtorPrimaryTraverserImpl(
     CtorPrimaryTransformer,
     defnDefTraverser

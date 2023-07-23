@@ -13,7 +13,7 @@ case class RegularClassTraversalResult(scalaMods: List[Mod] = Nil,
                                        maybeInheritanceKeyword: Option[JavaKeyword] = None,
                                        inits: List[Init] = Nil,
                                        self: Self = Self(Name.Anonymous(), None),
-                                       statResults: List[PopulatedStatTraversalResult] = Nil) extends DefnTraversalResult {
+                                       statResults: List[PopulatedStatTraversalResult] = Nil) extends ClassTraversalResult {
 
   override val tree: Defn.Class = Defn.Class(
     mods = scalaMods,
