@@ -3,8 +3,8 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.StatContext
 import io.github.effiban.scala2java.core.entities.JavaModifier
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.matchers.StatTraversalResultScalatestMatcher.equalStatTraversalResult
 import io.github.effiban.scala2java.core.traversers.results._
+import io.github.effiban.scala2java.core.traversers.results.matchers.StatTraversalResultScalatestMatcher.equalStatTraversalResult
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.spi.entities.JavaScope.Package
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -16,12 +16,14 @@ class DefaultStatTraverserImplTest extends UnitTestSuite {
 
   private val statTermTraverser = mock[StatTermTraverser]
   private val importTraverser = mock[ImportTraverser]
+  private val pkgTraverser = mock[PkgTraverser]
   private val defnTraverser = mock[DefnTraverser]
   private val declTraverser = mock[DeclTraverser]
 
   private val defaultStatTraverser = new DefaultStatTraverserImpl(
     statTermTraverser,
     importTraverser,
+    pkgTraverser,
     defnTraverser,
     declTraverser
   )
@@ -52,6 +54,15 @@ class DefaultStatTraverserImplTest extends UnitTestSuite {
     doReturn(None).when(importTraverser).traverse(eqTree(`import`))
 
     defaultStatTraverser.traverse(`import`, StatContext(Package)) should equalStatTraversalResult(EmptyStatTraversalResult)
+  }
+
+  test("traverse Pkg") {
+    val pkg = q"package a.b"
+    val traversalResult = PkgTraversalResult(pkgRef = q"aa.bb")
+
+    doReturn(traversalResult).when(pkgTraverser).traverse(eqTree(pkg))
+
+    defaultStatTraverser.traverse(pkg) should equalStatTraversalResult(traversalResult)
   }
 
   test("traverse Decl.Var") {
