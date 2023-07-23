@@ -1,10 +1,11 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.entities.SealedHierarchies
-import io.github.effiban.scala2java.core.matchers.SealedHierarchiesMatcher.eqSealedHierarchies
+import io.github.effiban.scala2java.core.entities.{JavaModifier, SealedHierarchies}
+import io.github.effiban.scala2java.core.matchers.SealedHierarchiesMockitoMatcher.eqSealedHierarchies
 import io.github.effiban.scala2java.core.resolvers.SealedHierarchiesResolver
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.traversers.results._
+import io.github.effiban.scala2java.core.traversers.results.matchers.PkgStatListTraversalResultScalatestMatcher.equalPkgStatListTraversalResult
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import org.mockito.ArgumentMatchersSugar.any
 
@@ -18,25 +19,34 @@ class PkgStatListTraverserImplTest extends UnitTestSuite {
       final var x: Int
     }
     """
+  private val TheTraitTraversalResult = TestableTraitTraversalResult(
+    defnTrait = TheTrait,
+    javaModifiers = List(JavaModifier.Public),
+    statResults = List(DeclVarTraversalResult(q"final var x: Int"))
+  )
+
 
   private val TheObject =
     q"""
     object MyObject {
-      val x: Int = 3
+      final var x: Int = 3
     }
     """
+  private val TheObjectTraversalResult = TestableObjectTraversalResult(
+    defnObject = TheObject,
+    javaModifiers = List(JavaModifier.Public),
+    statResults = List(DefnVarTraversalResult(q"final var x: Int = 3"))
+  )
 
   private val IncludedImport = q"import a.b.c"
+  private val IncludedImportTraversalResult = SimpleStatTraversalResult(IncludedImport)
+
   private val ExcludedImport1 = q"import d.e.f"
   private val ExcludedImport2 = q"import g.h.i"
 
 
   private val pkgStatTraverser = mock[PkgStatTraverser]
   private val sealedHierarchiesResolver = mock[SealedHierarchiesResolver]
-
-  private val importTraversalResult = mock[SimpleStatTraversalResult]
-  private val traitTraversalResult = mock[TraitTraversalResult]
-  private val objectTraversalResult = mock[ObjectTraversalResult]
 
   private val pkgStatListTraverser = new PkgStatListTraverserImpl(
     pkgStatTraverser,
@@ -50,21 +60,24 @@ class PkgStatListTraverserImplTest extends UnitTestSuite {
       TheObject
     )
     val expectedSealedHierarchies = SealedHierarchies(Map(t"A" -> List(Name.Indeterminate("B"))))
-    val expectedMultiResult = MultiStatTraversalResult(List(
-      importTraversalResult,
-      traitTraversalResult,
-      objectTraversalResult)
+    val expectedPkgStatListResult = PkgStatListTraversalResult(
+      statResults = List(
+        IncludedImportTraversalResult,
+        TheTraitTraversalResult,
+        TheObjectTraversalResult
+      ),
+      sealedHierarchies = expectedSealedHierarchies
     )
 
     when(sealedHierarchiesResolver.traverse(eqTreeList(stats))).thenReturn(expectedSealedHierarchies)
 
     doAnswer((stat: Stat, _: SealedHierarchies) => stat match {
-      case IncludedImport => importTraversalResult
-      case TheTrait => traitTraversalResult
-      case TheObject => objectTraversalResult
+      case IncludedImport => IncludedImportTraversalResult
+      case TheTrait => TheTraitTraversalResult
+      case TheObject => TheObjectTraversalResult
     }).when(pkgStatTraverser).traverse(any[Stat], eqSealedHierarchies(expectedSealedHierarchies))
 
-    pkgStatListTraverser.traverse(stats) shouldBe expectedMultiResult
+    pkgStatListTraverser.traverse(stats) should equalPkgStatListTraversalResult(expectedPkgStatListResult)
   }
 
   test("traverse() when there are empty results should skip them") {
@@ -76,21 +89,24 @@ class PkgStatListTraverserImplTest extends UnitTestSuite {
       TheObject
     )
     val expectedSealedHierarchies = SealedHierarchies(Map(t"A" -> List(Name.Indeterminate("B"))))
-    val expectedMultiResult = MultiStatTraversalResult(List(
-      importTraversalResult,
-      traitTraversalResult,
-      objectTraversalResult)
+    val expectedPkgStatListResult = PkgStatListTraversalResult(
+      statResults = List(
+        IncludedImportTraversalResult,
+        TheTraitTraversalResult,
+        TheObjectTraversalResult
+      ),
+      sealedHierarchies = expectedSealedHierarchies
     )
 
     when(sealedHierarchiesResolver.traverse(eqTreeList(stats))).thenReturn(expectedSealedHierarchies)
 
     doAnswer((stat: Stat, _: SealedHierarchies) => stat match {
       case ExcludedImport1 | ExcludedImport2 => EmptyStatTraversalResult
-      case IncludedImport => importTraversalResult
-      case TheTrait => traitTraversalResult
-      case TheObject => objectTraversalResult
+      case IncludedImport => IncludedImportTraversalResult
+      case TheTrait => TheTraitTraversalResult
+      case TheObject => TheObjectTraversalResult
     }).when(pkgStatTraverser).traverse(any[Stat], eqSealedHierarchies(expectedSealedHierarchies))
 
-    pkgStatListTraverser.traverse(stats) shouldBe expectedMultiResult
+    pkgStatListTraverser.traverse(stats) should equalPkgStatListTraversalResult(expectedPkgStatListResult)
   }
 }
