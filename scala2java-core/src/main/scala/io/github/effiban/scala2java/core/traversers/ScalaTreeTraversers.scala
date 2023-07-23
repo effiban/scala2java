@@ -327,6 +327,13 @@ class ScalaTreeTraversers(implicit factories: Factories,
     deprecatedStatTraverser
   )
 
+  private lazy val pkgStatTraverser: PkgStatTraverser = new PkgStatTraverserImpl(
+    classTraverser,
+    traitTraverser,
+    objectTraverser,
+    defaultStatTraverser
+  )
+
   @deprecated
   private lazy val deprecatedPkgStatListTraverser: DeprecatedPkgStatListTraverser = new DeprecatedPkgStatListTraverserImpl(
     deprecatedPkgStatTraverser,
