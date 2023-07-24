@@ -4,14 +4,14 @@ import io.github.effiban.scala2java.core.renderers.contexts._
 import org.mockito.ArgumentMatcher
 import org.mockito.ArgumentMatchers.argThat
 
-class TemplateStatRenderContextMatcher(expectedContext: TemplateStatRenderContext) extends ArgumentMatcher[TemplateStatRenderContext] {
+class TemplateStatRenderContextMockitoMatcher(expectedContext: TemplateStatRenderContext) extends ArgumentMatcher[TemplateStatRenderContext] {
 
   override def matches(actualContext: TemplateStatRenderContext): Boolean = {
     (actualContext, expectedContext) match {
       case (actualDefnContext: DefnRenderContext, expectedDefnContext: DefnRenderContext) =>
-        new DefnRenderContextMatcher(expectedDefnContext).matches(actualDefnContext)
+        new DefnRenderContextMockitoMatcher(expectedDefnContext).matches(actualDefnContext)
       case (actualCtorContext: CtorSecondaryRenderContext, expectedCtorContext: CtorSecondaryRenderContext) =>
-        new CtorSecondaryRenderContextMatcher(expectedCtorContext).matches(actualCtorContext)
+        new CtorSecondaryRenderContextMockitoMatcher(expectedCtorContext).matches(actualCtorContext)
       case (anActualContext, anExpectedContext) => anActualContext == anExpectedContext
     }
   }
@@ -19,8 +19,8 @@ class TemplateStatRenderContextMatcher(expectedContext: TemplateStatRenderContex
   override def toString: String = s"Matcher for: $expectedContext"
 }
 
-object TemplateStatRenderContextMatcher {
+object TemplateStatRenderContextMockitoMatcher {
   def eqTemplateStatRenderContext(expectedContext: TemplateStatRenderContext): TemplateStatRenderContext =
-    argThat(new TemplateStatRenderContextMatcher(expectedContext))
+    argThat(new TemplateStatRenderContextMockitoMatcher(expectedContext))
 }
 

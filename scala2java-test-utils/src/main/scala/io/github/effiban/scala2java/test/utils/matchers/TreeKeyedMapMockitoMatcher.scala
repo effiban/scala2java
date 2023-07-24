@@ -5,8 +5,8 @@ import org.mockito.matchers.EqTo
 
 import scala.meta.Tree
 
-class TreeKeyedMapMatcher[K <: Tree, V](expectedMap: Map[K, V],
-                                        valueMatcher: V => ArgumentMatcher[V] = (elem: V) => EqTo[V](elem))
+class TreeKeyedMapMockitoMatcher[K <: Tree, V](expectedMap: Map[K, V],
+                                               valueMatcher: V => ArgumentMatcher[V] = (elem: V) => EqTo[V](elem))
   extends ArgumentMatcher[Map[K, V]] {
 
   override def matches(actualMap: Map[K, V]): Boolean = {

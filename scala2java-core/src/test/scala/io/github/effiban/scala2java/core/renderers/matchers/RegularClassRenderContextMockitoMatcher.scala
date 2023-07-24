@@ -7,7 +7,7 @@ import org.mockito.ArgumentMatchers.argThat
 
 import scala.meta.Name
 
-class RegularClassRenderContextMatcher(expectedContext: RegularClassRenderContext) extends ArgumentMatcher[RegularClassRenderContext] {
+class RegularClassRenderContextMockitoMatcher(expectedContext: RegularClassRenderContext) extends ArgumentMatcher[RegularClassRenderContext] {
 
   override def matches(actualContext: RegularClassRenderContext): Boolean = {
     javaModifiersMatch(actualContext) &&
@@ -36,13 +36,13 @@ class RegularClassRenderContextMatcher(expectedContext: RegularClassRenderContex
   }
 
   private def bodyContextsMatch(actualContext: RegularClassRenderContext): Boolean = {
-    new TemplateBodyRenderContextMatcher(expectedContext.bodyContext).matches(actualContext.bodyContext)
+    new TemplateBodyRenderContextMockitoMatcher(expectedContext.bodyContext).matches(actualContext.bodyContext)
   }
 
 }
 
-object RegularClassRenderContextMatcher {
+object RegularClassRenderContextMockitoMatcher {
   def eqRegularClassRenderContext(expectedContext: RegularClassRenderContext): RegularClassRenderContext =
-    argThat(new RegularClassRenderContextMatcher(expectedContext))
+    argThat(new RegularClassRenderContextMockitoMatcher(expectedContext))
 }
 

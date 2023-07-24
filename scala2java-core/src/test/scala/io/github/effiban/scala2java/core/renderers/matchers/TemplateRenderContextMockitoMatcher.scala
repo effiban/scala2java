@@ -7,7 +7,7 @@ import org.mockito.ArgumentMatchers.argThat
 
 import scala.meta.Name
 
-class TemplateRenderContextMatcher(expectedContext: TemplateRenderContext) extends ArgumentMatcher[TemplateRenderContext] {
+class TemplateRenderContextMockitoMatcher(expectedContext: TemplateRenderContext) extends ArgumentMatcher[TemplateRenderContext] {
 
   override def matches(actualContext: TemplateRenderContext): Boolean = {
     maybeInheritanceKeywordMatches(actualContext) &&
@@ -26,13 +26,13 @@ class TemplateRenderContextMatcher(expectedContext: TemplateRenderContext) exten
   }
 
   private def bodyContextsMatch(actualContext: TemplateRenderContext): Boolean = {
-    new TemplateBodyRenderContextMatcher(expectedContext.bodyContext).matches(actualContext.bodyContext)
+    new TemplateBodyRenderContextMockitoMatcher(expectedContext.bodyContext).matches(actualContext.bodyContext)
   }
 
 }
 
-object TemplateRenderContextMatcher {
+object TemplateRenderContextMockitoMatcher {
   def eqTemplateRenderContext(expectedContext: TemplateRenderContext): TemplateRenderContext =
-    argThat(new TemplateRenderContextMatcher(expectedContext))
+    argThat(new TemplateRenderContextMockitoMatcher(expectedContext))
 }
 

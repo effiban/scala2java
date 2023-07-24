@@ -4,18 +4,18 @@ import io.github.effiban.scala2java.core.renderers.contexts._
 import org.mockito.ArgumentMatcher
 import org.mockito.ArgumentMatchers.argThat
 
-class DefnRenderContextMatcher(expectedContext: DefnRenderContext) extends ArgumentMatcher[DefnRenderContext] {
+class DefnRenderContextMockitoMatcher(expectedContext: DefnRenderContext) extends ArgumentMatcher[DefnRenderContext] {
 
   override def matches(actualContext: DefnRenderContext): Boolean = {
     (actualContext, expectedContext) match {
       case (actualTraitContext: TraitRenderContext, expectedTraitContext: TraitRenderContext) =>
-        new TraitRenderContextMatcher(expectedTraitContext).matches(actualTraitContext)
+        new TraitRenderContextMockitoMatcher(expectedTraitContext).matches(actualTraitContext)
       case (actualCaseClassContext: CaseClassRenderContext, expectedCaseClassContext: CaseClassRenderContext) =>
-        new CaseClassRenderContextMatcher(expectedCaseClassContext).matches(actualCaseClassContext)
+        new CaseClassRenderContextMockitoMatcher(expectedCaseClassContext).matches(actualCaseClassContext)
       case (actualRegularClassContext: RegularClassRenderContext, expectedRegularClassContext: RegularClassRenderContext) =>
-        new RegularClassRenderContextMatcher(expectedRegularClassContext).matches(actualRegularClassContext)
+        new RegularClassRenderContextMockitoMatcher(expectedRegularClassContext).matches(actualRegularClassContext)
       case (actualObjectContext: ObjectRenderContext, expectedObjectContext: ObjectRenderContext) =>
-        new ObjectRenderContextMatcher(expectedObjectContext).matches(actualObjectContext)
+        new ObjectRenderContextMockitoMatcher(expectedObjectContext).matches(actualObjectContext)
       case (anActualContext, anExpectedContext) => anActualContext == anExpectedContext
     }
   }
@@ -23,8 +23,8 @@ class DefnRenderContextMatcher(expectedContext: DefnRenderContext) extends Argum
   override def toString: String = s"Matcher for: $expectedContext"
 }
 
-object DefnRenderContextMatcher {
+object DefnRenderContextMockitoMatcher {
   def eqDefnRenderContext(expectedContext: DefnRenderContext): DefnRenderContext =
-    argThat(new DefnRenderContextMatcher(expectedContext))
+    argThat(new DefnRenderContextMockitoMatcher(expectedContext))
 }
 

@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.renderers.contexts.CaseClassRenderConte
 import org.mockito.ArgumentMatcher
 import org.mockito.ArgumentMatchers.argThat
 
-class CaseClassRenderContextMatcher(expectedContext: CaseClassRenderContext) extends ArgumentMatcher[CaseClassRenderContext] {
+class CaseClassRenderContextMockitoMatcher(expectedContext: CaseClassRenderContext) extends ArgumentMatcher[CaseClassRenderContext] {
 
   override def matches(actualContext: CaseClassRenderContext): Boolean = {
     javaModifiersMatch(actualContext) &&
@@ -23,13 +23,13 @@ class CaseClassRenderContextMatcher(expectedContext: CaseClassRenderContext) ext
   }
 
   private def bodyContextsMatch(actualContext: CaseClassRenderContext): Boolean = {
-    new TemplateBodyRenderContextMatcher(expectedContext.bodyContext).matches(actualContext.bodyContext)
+    new TemplateBodyRenderContextMockitoMatcher(expectedContext.bodyContext).matches(actualContext.bodyContext)
   }
 
 }
 
-object CaseClassRenderContextMatcher {
+object CaseClassRenderContextMockitoMatcher {
   def eqCaseClassRenderContext(expectedContext: CaseClassRenderContext): CaseClassRenderContext =
-    argThat(new CaseClassRenderContextMatcher(expectedContext))
+    argThat(new CaseClassRenderContextMockitoMatcher(expectedContext))
 }
 
