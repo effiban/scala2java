@@ -2,8 +2,8 @@ package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.entities.{JavaKeyword, JavaModifier}
 import io.github.effiban.scala2java.core.renderers.contexts._
-import io.github.effiban.scala2java.core.renderers.matchers.ModifiersRenderContextMatcher.eqModifiersRenderContext
-import io.github.effiban.scala2java.core.renderers.matchers.TemplateRenderContextMatcher.eqTemplateRenderContext
+import io.github.effiban.scala2java.core.renderers.matchers.ModifiersRenderContextMockitoMatcher.eqModifiersRenderContext
+import io.github.effiban.scala2java.core.renderers.matchers.TemplateRenderContextMockitoMatcher.eqTemplateRenderContext
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.Selfs

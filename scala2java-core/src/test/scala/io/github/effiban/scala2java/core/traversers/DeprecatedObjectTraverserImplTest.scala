@@ -9,7 +9,7 @@ import io.github.effiban.scala2java.core.matchers.TemplateContextMatcher.eqTempl
 import io.github.effiban.scala2java.core.renderers.ModListRenderer
 import io.github.effiban.scala2java.core.renderers.contextfactories.ModifiersRenderContextFactory
 import io.github.effiban.scala2java.core.renderers.contexts.ModifiersRenderContext
-import io.github.effiban.scala2java.core.renderers.matchers.ModifiersRenderContextMatcher.eqModifiersRenderContext
+import io.github.effiban.scala2java.core.renderers.matchers.ModifiersRenderContextMockitoMatcher.eqModifiersRenderContext
 import io.github.effiban.scala2java.core.resolvers.{JavaChildScopeResolver, JavaTreeTypeResolver}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite

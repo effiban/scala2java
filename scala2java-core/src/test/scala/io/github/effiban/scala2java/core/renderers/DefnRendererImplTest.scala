@@ -3,10 +3,10 @@ package io.github.effiban.scala2java.core.renderers
 import io.github.effiban.scala2java.core.classifiers.ClassClassifier
 import io.github.effiban.scala2java.core.entities.JavaModifier
 import io.github.effiban.scala2java.core.renderers.contexts._
-import io.github.effiban.scala2java.core.renderers.matchers.CaseClassRenderContextMatcher.eqCaseClassRenderContext
-import io.github.effiban.scala2java.core.renderers.matchers.ObjectRenderContextMatcher.eqObjectRenderContext
-import io.github.effiban.scala2java.core.renderers.matchers.RegularClassRenderContextMatcher.eqRegularClassRenderContext
-import io.github.effiban.scala2java.core.renderers.matchers.TraitRenderContextMatcher.eqTraitRenderContext
+import io.github.effiban.scala2java.core.renderers.matchers.CaseClassRenderContextMockitoMatcher.eqCaseClassRenderContext
+import io.github.effiban.scala2java.core.renderers.matchers.ObjectRenderContextMockitoMatcher.eqObjectRenderContext
+import io.github.effiban.scala2java.core.renderers.matchers.RegularClassRenderContextMockitoMatcher.eqRegularClassRenderContext
+import io.github.effiban.scala2java.core.renderers.matchers.TraitRenderContextMockitoMatcher.eqTraitRenderContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo

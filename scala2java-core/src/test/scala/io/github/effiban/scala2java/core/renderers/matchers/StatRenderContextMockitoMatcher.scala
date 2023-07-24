@@ -4,14 +4,14 @@ import io.github.effiban.scala2java.core.renderers.contexts._
 import org.mockito.ArgumentMatcher
 import org.mockito.ArgumentMatchers.argThat
 
-class StatRenderContextMatcher(expectedContext: StatRenderContext) extends ArgumentMatcher[StatRenderContext] {
+class StatRenderContextMockitoMatcher(expectedContext: StatRenderContext) extends ArgumentMatcher[StatRenderContext] {
 
   override def matches(actualContext: StatRenderContext): Boolean = {
     (actualContext, expectedContext) match {
       case (actualTemplateStatContext: TemplateStatRenderContext, expectedTemplateStatContext: TemplateStatRenderContext) =>
-        new TemplateStatRenderContextMatcher(expectedTemplateStatContext).matches(actualTemplateStatContext)
+        new TemplateStatRenderContextMockitoMatcher(expectedTemplateStatContext).matches(actualTemplateStatContext)
       case (actualPkgContext: PkgRenderContext, expectedPkgContext: PkgRenderContext) =>
-        new PkgRenderContextMatcher(expectedPkgContext).matches(actualPkgContext)
+        new PkgRenderContextMockitoMatcher(expectedPkgContext).matches(actualPkgContext)
       case (anActualContext, anExpectedContext) => anActualContext == anExpectedContext
     }
   }
@@ -19,8 +19,8 @@ class StatRenderContextMatcher(expectedContext: StatRenderContext) extends Argum
   override def toString: String = s"Matcher for: $expectedContext"
 }
 
-object StatRenderContextMatcher {
+object StatRenderContextMockitoMatcher {
   def eqStatRenderContext(expectedContext: StatRenderContext): StatRenderContext =
-    argThat(new StatRenderContextMatcher(expectedContext))
+    argThat(new StatRenderContextMockitoMatcher(expectedContext))
 }
 

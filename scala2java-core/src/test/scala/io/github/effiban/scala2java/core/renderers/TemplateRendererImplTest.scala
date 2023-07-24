@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.entities.JavaKeyword
 import io.github.effiban.scala2java.core.renderers.contexts._
-import io.github.effiban.scala2java.core.renderers.matchers.TemplateBodyRenderContextMatcher.eqTemplateBodyRenderContext
+import io.github.effiban.scala2java.core.renderers.matchers.TemplateBodyRenderContextMockitoMatcher.eqTemplateBodyRenderContext
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{Selfs, Templates}

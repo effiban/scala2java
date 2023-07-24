@@ -7,7 +7,7 @@ import org.mockito.ArgumentMatchers.argThat
 
 import scala.meta.Name
 
-class TraitRenderContextMatcher(expectedContext: TraitRenderContext) extends ArgumentMatcher[TraitRenderContext] {
+class TraitRenderContextMockitoMatcher(expectedContext: TraitRenderContext) extends ArgumentMatcher[TraitRenderContext] {
 
   override def matches(actualContext: TraitRenderContext): Boolean = {
     javaModifiersMatch(actualContext) &&
@@ -26,13 +26,13 @@ class TraitRenderContextMatcher(expectedContext: TraitRenderContext) extends Arg
   }
 
   private def bodyContextsMatch(actualContext: TraitRenderContext): Boolean = {
-    new TemplateBodyRenderContextMatcher(expectedContext.bodyContext).matches(actualContext.bodyContext)
+    new TemplateBodyRenderContextMockitoMatcher(expectedContext.bodyContext).matches(actualContext.bodyContext)
   }
 
 }
 
-object TraitRenderContextMatcher {
+object TraitRenderContextMockitoMatcher {
   def eqTraitRenderContext(expectedContext: TraitRenderContext): TraitRenderContext =
-    argThat(new TraitRenderContextMatcher(expectedContext))
+    argThat(new TraitRenderContextMockitoMatcher(expectedContext))
 }
 

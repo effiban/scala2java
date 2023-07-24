@@ -7,7 +7,7 @@ import org.mockito.ArgumentMatchers.argThat
 
 import scala.meta.Mod
 
-class ModifiersRenderContextMatcher(expectedContext: ModifiersRenderContext) extends ArgumentMatcher[ModifiersRenderContext] {
+class ModifiersRenderContextMockitoMatcher(expectedContext: ModifiersRenderContext) extends ArgumentMatcher[ModifiersRenderContext] {
 
   override def matches(actualContext: ModifiersRenderContext): Boolean = {
 
@@ -23,8 +23,8 @@ class ModifiersRenderContextMatcher(expectedContext: ModifiersRenderContext) ext
   override def toString: String = s"Matcher for: $expectedContext"
 }
 
-object ModifiersRenderContextMatcher {
+object ModifiersRenderContextMockitoMatcher {
   def eqModifiersRenderContext(expectedContext: ModifiersRenderContext): ModifiersRenderContext =
-    argThat(new ModifiersRenderContextMatcher(expectedContext))
+    argThat(new ModifiersRenderContextMockitoMatcher(expectedContext))
 }
 
