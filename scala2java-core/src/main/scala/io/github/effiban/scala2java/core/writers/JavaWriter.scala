@@ -5,7 +5,7 @@ import io.github.effiban.scala2java.core.entities.{JavaKeyword, JavaModifier}
 
 import java.io.Writer
 
-trait JavaWriter {
+trait JavaWriter extends AutoCloseable {
 
   def writeTypeDeclaration(modifiers: List[JavaModifier], typeKeyword: JavaKeyword, name: String): Unit
 

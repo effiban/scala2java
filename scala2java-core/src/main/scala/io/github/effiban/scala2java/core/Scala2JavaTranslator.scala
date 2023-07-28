@@ -12,13 +12,14 @@ import io.github.effiban.scala2java.core.resolvers.JavaFileResolverImpl
 import io.github.effiban.scala2java.core.transformers.CompositeFileNameTransformer
 import io.github.effiban.scala2java.core.traversers.ScalaTreeTraversers
 import io.github.effiban.scala2java.core.typeinference.TypeInferrers
-import io.github.effiban.scala2java.core.writers.{ConsoleJavaWriter, JavaWriter, JavaWriterImpl}
+import io.github.effiban.scala2java.core.writers.{ConsoleJavaWriter, JavaWriterImpl}
 import io.github.effiban.scala2java.spi.transformers.FileNameTransformer
 
 import java.io.FileWriter
 import java.nio.file.{Files, Path}
 import scala.meta.Source
 import scala.meta.inputs.Input
+import scala.util.Using
 
 object Scala2JavaTranslator {
 
@@ -37,16 +38,20 @@ object Scala2JavaTranslator {
     // Run the translation flow
     val syntacticDesugaredSource = SourceDesugarer.desugar(sourceTree)
     val semanticDesugaredSource = new SemanticDesugarers().sourceDesugarer.desugar(syntacticDesugaredSource)
-    implicit val javaWriter: JavaWriter = maybeOutputJavaBasePath match {
+    val sourceTraversalResult = new ScalaTreeTraversers().sourceTraverser.traverse(semanticDesugaredSource)
+    val sourceRenderContext = RenderContextFactories.sourceRenderContextFactory(sourceTraversalResult)
+    Using(createJavaWriter(scalaPath, maybeOutputJavaBasePath, sourceTree)) { implicit writer =>
+      new Renderers().sourceRenderer.render(sourceTraversalResult.source, sourceRenderContext)
+    }
+  }
+
+  private def createJavaWriter(scalaPath: Path,
+                               maybeOutputJavaBasePath: Option[Path],
+                               sourceTree: Source)
+                              (implicit fileNameTransformer: FileNameTransformer)= {
+    maybeOutputJavaBasePath match {
       case Some(outputJavaBasePath) => createJavaFileWriter(scalaPath, sourceTree, outputJavaBasePath)
       case None => ConsoleJavaWriter
-    }
-    try {
-      val sourceTraversalResult = new ScalaTreeTraversers().sourceTraverser.traverse(semanticDesugaredSource)
-      val sourceRenderContext = RenderContextFactories.sourceRenderContextFactory(sourceTraversalResult)
-      new Renderers().sourceRenderer.render(sourceTraversalResult.source, sourceRenderContext)
-    } finally {
-      javaWriter.close()
     }
   }
 
