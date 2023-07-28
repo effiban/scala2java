@@ -9,11 +9,9 @@ class StatRenderContextScalatestMatcher(expectedContext: StatRenderContext) exte
     val matches = (actualContext, expectedContext) match {
       case (actualPkgContext: PkgRenderContext, expectedPkgContext: PkgRenderContext) =>
         new PkgRenderContextScalatestMatcher(expectedPkgContext)(actualPkgContext).matches
-      case (actualDeclContext: DeclRenderContext, expectedDeclContext: DeclRenderContext) =>
-        new DeclRenderContextScalatestMatcher(expectedDeclContext)(actualDeclContext).matches
       case (actualDefnContext: DefnRenderContext, expectedDefnContext: DefnRenderContext) =>
         new DefnRenderContextScalatestMatcher(expectedDefnContext)(actualDefnContext).matches
-      // TODO support the rest of the hierarchy
+      // TODO support the rest of the non-trivial hierarchy
       case (anActualContext, anExpectedContext) => anActualContext == anExpectedContext
     }
 
