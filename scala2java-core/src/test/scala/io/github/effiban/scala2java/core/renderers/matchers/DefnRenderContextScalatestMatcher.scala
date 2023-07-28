@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.renderers.matchers
 
-import io.github.effiban.scala2java.core.renderers.contexts.{DefnRenderContext, TraitRenderContext}
+import io.github.effiban.scala2java.core.renderers.contexts._
 import org.scalatest.matchers.{MatchResult, Matcher}
 
 class DefnRenderContextScalatestMatcher(expectedContext: DefnRenderContext) extends Matcher[DefnRenderContext] {
@@ -8,7 +8,13 @@ class DefnRenderContextScalatestMatcher(expectedContext: DefnRenderContext) exte
     val matches = (actualContext, expectedContext) match {
       case (actualTraitContext: TraitRenderContext, expectedTraitContext: TraitRenderContext) =>
         new TraitRenderContextScalatestMatcher(expectedTraitContext)(actualTraitContext).matches
-      // TODO support the rest of the non-trivial hierarchy
+      case (actualCaseClassContext: CaseClassRenderContext, expectedCaseClassContext: CaseClassRenderContext) =>
+        new CaseClassRenderContextScalatestMatcher(expectedCaseClassContext)(actualCaseClassContext).matches
+      case (actualRegularClassContext: RegularClassRenderContext, expectedRegularClassContext: RegularClassRenderContext) =>
+        new RegularClassRenderContextScalatestMatcher(expectedRegularClassContext)(actualRegularClassContext).matches
+      case (actualObjectContext: ObjectRenderContext, expectedObjectContext: ObjectRenderContext) =>
+        new ObjectRenderContextScalatestMatcher(expectedObjectContext)(actualObjectContext).matches
+      // TODO support CtorSecondaryRenderContext
       case (anActualContext, anExpectedContext) => anActualContext == anExpectedContext
     }
 

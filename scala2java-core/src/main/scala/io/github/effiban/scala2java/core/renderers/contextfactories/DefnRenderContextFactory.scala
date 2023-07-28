@@ -10,6 +10,7 @@ trait DefnRenderContextFactory {
 
 private[contextfactories] class DefnRenderContextFactoryImpl(traitRenderContextFactory: => TraitRenderContextFactory,
                                                              caseClassRenderContextFactory: => CaseClassRenderContextFactory,
+                                                             regularClassRenderContextFactory: => RegularClassRenderContextFactory,
                                                              objectRenderContextFactory: => ObjectRenderContextFactory)
   extends DefnRenderContextFactory {
 
@@ -17,11 +18,21 @@ private[contextfactories] class DefnRenderContextFactoryImpl(traitRenderContextF
                      sealedHierarchies: SealedHierarchies = SealedHierarchies()): DefnRenderContext = defnTraversalResult match {
     case defnVarTraversalResult: DefnVarTraversalResult => VarRenderContext(defnVarTraversalResult.javaModifiers)
     case defnDefTraversalResult: DefnDefTraversalResult => DefRenderContext(defnDefTraversalResult.javaModifiers)
-    case traitTraversalResult: TraitTraversalResult =>
-      val permittedSubTypeNames = sealedHierarchies.getSubTypeNames(traitTraversalResult.name)
-      traitRenderContextFactory(traitTraversalResult, permittedSubTypeNames)
+    case traitTraversalResult: TraitTraversalResult => createTraitContext(traitTraversalResult, sealedHierarchies)
     case caseClassTraversalResult: CaseClassTraversalResult => caseClassRenderContextFactory(caseClassTraversalResult)
+    case regularClassTraversalResult: RegularClassTraversalResult =>
+      createRegularClassContext(regularClassTraversalResult, sealedHierarchies)
     case objectTraversalResult: ObjectTraversalResult => objectRenderContextFactory(objectTraversalResult)
-    case _ => UnsupportedDefnRenderContext // TODO
+    case _ => UnsupportedDefnRenderContext
+  }
+
+  private def createRegularClassContext(regularClassTraversalResult: RegularClassTraversalResult, sealedHierarchies: SealedHierarchies) = {
+    val permittedSubTypeNames = sealedHierarchies.getSubTypeNames(regularClassTraversalResult.name)
+    regularClassRenderContextFactory(regularClassTraversalResult, permittedSubTypeNames)
+  }
+
+  private def createTraitContext(traitTraversalResult: TraitTraversalResult, sealedHierarchies: SealedHierarchies) = {
+    val permittedSubTypeNames = sealedHierarchies.getSubTypeNames(traitTraversalResult.name)
+    traitRenderContextFactory(traitTraversalResult, permittedSubTypeNames)
   }
 }
