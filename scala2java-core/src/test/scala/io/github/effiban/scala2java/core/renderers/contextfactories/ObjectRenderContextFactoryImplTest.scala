@@ -48,7 +48,7 @@ class ObjectRenderContextFactoryImplTest extends UnitTestSuite {
   }
 
   test("apply() when input has mandatory Java-specific attributes only") {
-    val expectedTraitRenderContext = ObjectRenderContext(
+    val expectedObjectRenderContext = ObjectRenderContext(
       javaTypeKeyword = TheJavaTypeKeyword,
       bodyContext = TheTemplateBodyRenderContext
     )
@@ -56,6 +56,6 @@ class ObjectRenderContextFactoryImplTest extends UnitTestSuite {
     when(objectTraversalResult.javaModifiers).thenReturn(Nil)
     when(objectTraversalResult.maybeInheritanceKeyword).thenReturn(None)
 
-    objectRenderContextFactory(objectTraversalResult) should equalObjectRenderContext(expectedTraitRenderContext)
+    objectRenderContextFactory(objectTraversalResult) should equalObjectRenderContext(expectedObjectRenderContext)
   }
 }
