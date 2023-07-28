@@ -14,7 +14,6 @@ class DefnRenderContextScalatestMatcher(expectedContext: DefnRenderContext) exte
         new RegularClassRenderContextScalatestMatcher(expectedRegularClassContext)(actualRegularClassContext).matches
       case (actualObjectContext: ObjectRenderContext, expectedObjectContext: ObjectRenderContext) =>
         new ObjectRenderContextScalatestMatcher(expectedObjectContext)(actualObjectContext).matches
-      // TODO support CtorSecondaryRenderContext
       case (anActualContext, anExpectedContext) => anActualContext == anExpectedContext
     }
 

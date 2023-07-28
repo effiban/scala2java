@@ -6,4 +6,4 @@ import scala.meta.{Ctor, Type}
 
 case class CtorSecondaryTraversalResult(tree: Ctor.Secondary,
                                         className: Type.Name,
-                                        javaModifiers: List[JavaModifier] = Nil) extends DefnTraversalResult
+                                        javaModifiers: List[JavaModifier] = Nil) extends StatWithJavaModifiersTraversalResult

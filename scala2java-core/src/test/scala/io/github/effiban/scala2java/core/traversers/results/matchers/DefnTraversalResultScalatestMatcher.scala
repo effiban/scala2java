@@ -12,8 +12,6 @@ class DefnTraversalResultScalatestMatcher(expectedTraversalResult: DefnTraversal
         new DefnVarTraversalResultScalatestMatcher(expectedDefnVarResult)(actualDefnVarResult).matches
       case (actualDefnDefResult: DefnDefTraversalResult, expectedDefnDefResult: DefnDefTraversalResult) =>
         new DefnDefTraversalResultScalatestMatcher(expectedDefnDefResult)(actualDefnDefResult).matches
-      case (actualResult: CtorSecondaryTraversalResult, expectedResult: CtorSecondaryTraversalResult) =>
-        new CtorSecondaryTraversalResultScalatestMatcher(expectedResult)(actualResult).matches
       case (actualTraitResult: TraitTraversalResult, expectedTraitResult: TraitTraversalResult) =>
         new TraitTraversalResultScalatestMatcher(expectedTraitResult)(actualTraitResult).matches
       case (actualClassResult: ClassTraversalResult, expectedClassResult: ClassTraversalResult) =>
