@@ -1,3 +1,7 @@
 package io.github.effiban.scala2java.core.traversers.results
 
-case class SourceTraversalResult(statResults: List[PopulatedStatTraversalResult] = Nil)
+import scala.meta.Source
+
+case class SourceTraversalResult(statResults: List[PopulatedStatTraversalResult] = Nil) {
+  val source: Source = Source(statResults.map(_.tree))
+}
