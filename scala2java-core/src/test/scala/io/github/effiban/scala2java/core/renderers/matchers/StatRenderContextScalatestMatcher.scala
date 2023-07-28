@@ -11,6 +11,8 @@ class StatRenderContextScalatestMatcher(expectedContext: StatRenderContext) exte
         new PkgRenderContextScalatestMatcher(expectedPkgContext)(actualPkgContext).matches
       case (actualDeclContext: DeclRenderContext, expectedDeclContext: DeclRenderContext) =>
         new DeclRenderContextScalatestMatcher(expectedDeclContext)(actualDeclContext).matches
+      case (actualDefnContext: DefnRenderContext, expectedDefnContext: DefnRenderContext) =>
+        new DefnRenderContextScalatestMatcher(expectedDefnContext)(actualDefnContext).matches
       // TODO support the rest of the hierarchy
       case (anActualContext, anExpectedContext) => anActualContext == anExpectedContext
     }
