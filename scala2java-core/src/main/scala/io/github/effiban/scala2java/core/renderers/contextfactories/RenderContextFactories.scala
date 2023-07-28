@@ -9,8 +9,12 @@ object RenderContextFactories {
       defnRenderContextFactory
     )
 
-  private[contextfactories] lazy val defnRenderContextFactory: DefnRenderContextFactory =
-    new DefnRenderContextFactoryImpl(traitRenderContextFactory)
+  private[contextfactories] lazy val defnRenderContextFactory: DefnRenderContextFactory = new DefnRenderContextFactoryImpl(
+    traitRenderContextFactory,
+    objectRenderContextFactory
+  )
+
+  private[contextfactories] lazy val objectRenderContextFactory = new ObjectRenderContextFactoryImpl(templateBodyRenderContextFactory)
 
   private[contextfactories] lazy val pkgRenderContextFactory: PkgRenderContextFactory =
     new PkgRenderContextFactoryImpl(defaultStatRenderContextFactory)

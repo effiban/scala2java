@@ -27,12 +27,19 @@ class TraitRenderContextFactoryImplTest extends UnitTestSuite {
 
   private val traitRenderContextFactory = new TraitRenderContextFactoryImpl(templateBodyRenderContextFactory)
 
-  test("apply() when input has all the Java-specific attributes") {
-    val expectedTraitRenderContext = TraitRenderContext(TheJavaModifiers, ThePermittedSubTypeNames, TheTemplateBodyRenderContext)
-
+  override protected def beforeEach(): Unit = {
     when(traitTraversalResult.templateResult).thenReturn(templateTraversalResult)
-    when(traitTraversalResult.javaModifiers).thenReturn(TheJavaModifiers)
     when(templateBodyRenderContextFactory(templateTraversalResult)).thenReturn(TheTemplateBodyRenderContext)
+  }
+
+  test("apply() when input has all the Java-specific attributes") {
+    val expectedTraitRenderContext = TraitRenderContext(
+      TheJavaModifiers,
+      ThePermittedSubTypeNames,
+      TheTemplateBodyRenderContext
+    )
+
+    when(traitTraversalResult.javaModifiers).thenReturn(TheJavaModifiers)
 
     traitRenderContextFactory(traitTraversalResult, ThePermittedSubTypeNames) should equalTraitRenderContext(expectedTraitRenderContext)
   }
@@ -40,9 +47,7 @@ class TraitRenderContextFactoryImplTest extends UnitTestSuite {
   test("apply() when input has no Java-specific attributes") {
     val expectedTraitRenderContext = TraitRenderContext(bodyContext = TheTemplateBodyRenderContext)
 
-    when(traitTraversalResult.templateResult).thenReturn(templateTraversalResult)
     when(traitTraversalResult.javaModifiers).thenReturn(Nil)
-    when(templateBodyRenderContextFactory(templateTraversalResult)).thenReturn(TheTemplateBodyRenderContext)
 
     traitRenderContextFactory(traitTraversalResult) should equalTraitRenderContext(expectedTraitRenderContext)
   }
