@@ -7,7 +7,7 @@ import io.github.effiban.scala2java.core.extensions.{ExtensionRegistry, Extensio
 import io.github.effiban.scala2java.core.factories.Factories
 import io.github.effiban.scala2java.core.predicates.Predicates
 import io.github.effiban.scala2java.core.renderers.Renderers
-import io.github.effiban.scala2java.core.renderers.contextfactories.RenderContextFactories
+import io.github.effiban.scala2java.core.renderers.contextfactories.RenderContextFactories.sourceRenderContextFactory
 import io.github.effiban.scala2java.core.resolvers.JavaFileResolverImpl
 import io.github.effiban.scala2java.core.transformers.CompositeFileNameTransformer
 import io.github.effiban.scala2java.core.traversers.ScalaTreeTraversers
@@ -39,7 +39,7 @@ object Scala2JavaTranslator {
     val syntacticDesugaredSource = SourceDesugarer.desugar(sourceTree)
     val semanticDesugaredSource = new SemanticDesugarers().sourceDesugarer.desugar(syntacticDesugaredSource)
     val sourceTraversalResult = new ScalaTreeTraversers().sourceTraverser.traverse(semanticDesugaredSource)
-    val sourceRenderContext = RenderContextFactories.sourceRenderContextFactory(sourceTraversalResult)
+    val sourceRenderContext = sourceRenderContextFactory(sourceTraversalResult)
     Using(createJavaWriter(scalaPath, maybeOutputJavaBasePath, sourceTree)) { implicit writer =>
       new Renderers().sourceRenderer.render(sourceTraversalResult.source, sourceRenderContext)
     }
