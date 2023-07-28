@@ -13,8 +13,8 @@ private[contextfactories] class ObjectRenderContextFactoryImpl(templateBodyRende
   def apply(objectTraversalResult: ObjectTraversalResult): ObjectRenderContext = {
     val templateBodyContext = templateBodyRenderContextFactory(objectTraversalResult.templateResult)
     ObjectRenderContext(
-      javaTypeKeyword = objectTraversalResult.javaTypeKeyword,
       javaModifiers = objectTraversalResult.javaModifiers,
+      javaTypeKeyword = objectTraversalResult.javaTypeKeyword,
       maybeInheritanceKeyword = objectTraversalResult.maybeInheritanceKeyword,
       bodyContext = templateBodyContext
     )

@@ -11,7 +11,7 @@ import scala.meta.XtensionQuasiquoteTerm
 class ObjectRenderContextFactoryImplTest extends UnitTestSuite {
 
   private val TheJavaModifiers = List(JavaModifier.Public)
-  private val TheJavaTypeKeyword = JavaKeyword.Class
+  private val TheJavaTypeKeyword = JavaKeyword.Enum
   private val TheJavaInheritanceKeyword = JavaKeyword.Implements
 
   private val TheTemplateBodyRenderContext = TemplateBodyRenderContext(
@@ -28,9 +28,9 @@ class ObjectRenderContextFactoryImplTest extends UnitTestSuite {
   private val objectRenderContextFactory = new ObjectRenderContextFactoryImpl(templateBodyRenderContextFactory)
 
   override protected def beforeEach(): Unit = {
+    when(objectTraversalResult.javaTypeKeyword).thenReturn(TheJavaTypeKeyword)
     when(objectTraversalResult.templateResult).thenReturn(templateTraversalResult)
     when(templateBodyRenderContextFactory(templateTraversalResult)).thenReturn(TheTemplateBodyRenderContext)
-    when(objectTraversalResult.javaTypeKeyword).thenReturn(TheJavaTypeKeyword)
   }
 
   test("apply() when input has all Java-specific attributes") {

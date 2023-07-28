@@ -15,6 +15,7 @@ class DefnRenderContextFactoryImplTest extends UnitTestSuite {
 
   private val TheTraitName = t"MyTrait"
   private val TheCaseClassName = t"MyCaseClass"
+  private val TheRegularClassName = t"MyRegularClass"
   private val TheObjectName = q"MyObject"
 
   private val ThePermittedSubTypeNames = List(t"Sub1", t"Sub2")
@@ -23,25 +24,30 @@ class DefnRenderContextFactoryImplTest extends UnitTestSuite {
   private val defnDefTraversalResult = mock[DefnDefTraversalResult]
   private val traitTraversalResult = mock[TraitTraversalResult]
   private val caseClassTraversalResult = mock[CaseClassTraversalResult]
+  private val regularClassTraversalResult = mock[RegularClassTraversalResult]
   private val objectTraversalResult = mock[ObjectTraversalResult]
 
   private val traitRenderContext = mock[TraitRenderContext]
   private val caseClassRenderContext = mock[CaseClassRenderContext]
+  private val regularClassRenderContext = mock[RegularClassRenderContext]
   private val objectRenderContext = mock[ObjectRenderContext]
 
   private val traitRenderContextFactory = mock[TraitRenderContextFactory]
   private val caseClassRenderContextFactory = mock[CaseClassRenderContextFactory]
+  private val regularClassRenderContextFactory = mock[RegularClassRenderContextFactory]
   private val objectRenderContextFactory = mock[ObjectRenderContextFactory]
 
   private val defnRenderContextFactory = new DefnRenderContextFactoryImpl(
     traitRenderContextFactory,
     caseClassRenderContextFactory,
+    regularClassRenderContextFactory,
     objectRenderContextFactory
   )
 
   override def beforeEach(): Unit = {
     when(traitTraversalResult.name).thenReturn(TheTraitName)
     when(caseClassTraversalResult.name).thenReturn(TheCaseClassName)
+    when(regularClassTraversalResult.name).thenReturn(TheRegularClassName)
     when(objectTraversalResult.name).thenReturn(TheObjectName)
   }
 
@@ -93,6 +99,26 @@ class DefnRenderContextFactoryImplTest extends UnitTestSuite {
 
     defnRenderContextFactory(caseClassTraversalResult) shouldBe caseClassRenderContext
   }
+
+  test("apply() for RegularClassTraversalResult when class has permitted sub-types") {
+    val sealedHierarchies = SealedHierarchies(
+      Map(TheRegularClassName -> ThePermittedSubTypeNames)
+    )
+    when(regularClassRenderContextFactory(eqTo(regularClassTraversalResult), eqTreeList(ThePermittedSubTypeNames)))
+      .thenReturn(regularClassRenderContext)
+
+    defnRenderContextFactory(regularClassTraversalResult, sealedHierarchies) shouldBe regularClassRenderContext
+  }
+
+  test("apply() for RegularClassTraversalResult when class has no permitted sub-types") {
+    val sealedHierarchies = SealedHierarchies(
+      Map(t"Blabla" -> ThePermittedSubTypeNames)
+    )
+    when(regularClassRenderContextFactory(eqTo(regularClassTraversalResult), eqTo(Nil))).thenReturn(regularClassRenderContext)
+
+    defnRenderContextFactory(regularClassTraversalResult, sealedHierarchies) shouldBe regularClassRenderContext
+  }
+
 
   test("apply() for ObjectTraversalResult") {
     when(objectRenderContextFactory(eqTo(objectTraversalResult))).thenReturn(objectRenderContext)
