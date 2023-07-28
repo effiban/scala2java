@@ -4,11 +4,12 @@ object RenderContextFactories {
 
   private[contextfactories] lazy val declRenderContextFactory: DeclRenderContextFactory = new DeclRenderContextFactoryImpl()
 
+  private[contextfactories] lazy val defaultStatRenderContextFactory: DefaultStatRenderContextFactory =
+    new DefaultStatRenderContextFactoryImpl(pkgRenderContextFactory, declRenderContextFactory)
+
   private[contextfactories] lazy val pkgRenderContextFactory: PkgRenderContextFactory =
-    new PkgRenderContextFactoryImpl(statRenderContextFactory)
+    new PkgRenderContextFactoryImpl(defaultStatRenderContextFactory)
 
-  lazy val sourceRenderContextFactory: SourceRenderContextFactory = new SourceRenderContextFactoryImpl(statRenderContextFactory)
+  lazy val sourceRenderContextFactory: SourceRenderContextFactory = new SourceRenderContextFactoryImpl(defaultStatRenderContextFactory)
 
-  private[contextfactories] lazy val statRenderContextFactory: StatRenderContextFactory =
-    new StatRenderContextFactoryImpl(pkgRenderContextFactory, declRenderContextFactory)
 }
