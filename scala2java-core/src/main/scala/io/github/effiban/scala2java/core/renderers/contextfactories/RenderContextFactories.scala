@@ -33,7 +33,7 @@ object RenderContextFactories {
      new TemplateBodyRenderContextFactoryImpl(templateStatRenderContextFactory)
 
   private lazy val templateStatRenderContextFactory: TemplateStatRenderContextFactory =
-    new TemplateStatRenderContextFactoryImpl(CtorSecondaryRenderContextFactory)
+    new TemplateStatRenderContextFactoryImpl(CtorSecondaryRenderContextFactory, defaultStatRenderContextFactory)
 
   private[contextfactories] lazy val traitRenderContextFactory = new TraitRenderContextFactoryImpl(templateBodyRenderContextFactory)
 
