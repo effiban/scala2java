@@ -1,5 +1,7 @@
 package io.github.effiban.scala2java.core.renderers.contextfactories
 
+import io.github.effiban.scala2java.core.entities.SealedHierarchies
+import io.github.effiban.scala2java.core.matchers.SealedHierarchiesMockitoMatcher.eqSealedHierarchies
 import io.github.effiban.scala2java.core.renderers.contexts.{SourceRenderContext, StatRenderContext}
 import io.github.effiban.scala2java.core.renderers.matchers.SourceRenderContextScalatestMatcher.equalSourceRenderContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
@@ -10,9 +12,9 @@ import scala.meta.XtensionQuasiquoteTerm
 
 class SourceRenderContextFactoryImplTest extends UnitTestSuite {
 
-  private val statRenderContextFactory = mock[StatRenderContextFactory]
+  private val pkgStatRenderContextFactory = mock[DefaultStatRenderContextFactory]
 
-  private val sourceRenderContextFactory = new SourceRenderContextFactoryImpl(statRenderContextFactory)
+  private val sourceRenderContextFactory = new SourceRenderContextFactoryImpl(pkgStatRenderContextFactory)
 
   test("apply") {
     val statResult1 = mock[PopulatedStatTraversalResult]
@@ -33,7 +35,7 @@ class SourceRenderContextFactoryImplTest extends UnitTestSuite {
     doAnswer((statResult: StatTraversalResult) => statResult match {
       case aStatResult if aStatResult == statResult1 => statRenderContext1
       case aStatResult if aStatResult == statResult2 => statRenderContext2
-    }).when(statRenderContextFactory)(any[StatTraversalResult])
+    }).when(pkgStatRenderContextFactory)(any[StatTraversalResult], eqSealedHierarchies(SealedHierarchies()))
 
     sourceRenderContextFactory(traversalResult) should equalSourceRenderContext(expectedRenderContext)
   }

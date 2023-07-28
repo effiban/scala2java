@@ -7,13 +7,13 @@ trait SourceRenderContextFactory {
   def apply(traversalResult: SourceTraversalResult): SourceRenderContext
 }
 
-private[contextfactories] class SourceRenderContextFactoryImpl(statRenderContextFactory: => StatRenderContextFactory)
+private[contextfactories] class SourceRenderContextFactoryImpl(defaultStatRenderContextFactory: => DefaultStatRenderContextFactory)
   extends SourceRenderContextFactory {
 
   def apply(traversalResult: SourceTraversalResult): SourceRenderContext = {
     val statRenderContextMap = traversalResult.statResults
       .map(statResult => (statResult.tree, statResult))
-      .map { case (stat, statResult) => (stat, statRenderContextFactory(statResult)) }
+      .map { case (stat, statResult) => (stat, defaultStatRenderContextFactory(statResult)) }
       .toMap
     SourceRenderContext(statRenderContextMap)
   }
