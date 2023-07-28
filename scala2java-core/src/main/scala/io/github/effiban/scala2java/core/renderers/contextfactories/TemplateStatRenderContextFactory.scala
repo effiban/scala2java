@@ -1,14 +1,17 @@
 package io.github.effiban.scala2java.core.renderers.contextfactories
 
-import io.github.effiban.scala2java.core.renderers.contexts.TemplateStatRenderContext
-import io.github.effiban.scala2java.core.traversers.results.StatTraversalResult
+import io.github.effiban.scala2java.core.renderers.contexts.{EmptyStatRenderContext, TemplateStatRenderContext}
+import io.github.effiban.scala2java.core.traversers.results.{CtorSecondaryTraversalResult, StatTraversalResult}
 
 trait TemplateStatRenderContextFactory {
   def apply(statTraversalResult: StatTraversalResult): TemplateStatRenderContext
 }
 
-private[contextfactories] class TemplateStatRenderContextFactoryImpl extends TemplateStatRenderContextFactory {
+private[contextfactories] class TemplateStatRenderContextFactoryImpl(ctorSecondaryRenderContextFactory: CtorSecondaryRenderContextFactory)
+  extends TemplateStatRenderContextFactory {
 
-  override def apply(statTraversalResult: StatTraversalResult): TemplateStatRenderContext =
-    new TemplateStatRenderContext() {} // TODO
+  override def apply(statTraversalResult: StatTraversalResult): TemplateStatRenderContext = statTraversalResult match {
+    case ctorSecondaryTraversalResult: CtorSecondaryTraversalResult => ctorSecondaryRenderContextFactory(ctorSecondaryTraversalResult)
+    case _ => EmptyStatRenderContext // TODO
+  }
 }

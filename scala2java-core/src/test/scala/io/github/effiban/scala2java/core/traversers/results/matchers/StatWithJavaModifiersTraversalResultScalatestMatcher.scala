@@ -12,6 +12,8 @@ class StatWithJavaModifiersTraversalResultScalatestMatcher(expectedTraversalResu
         new DeclTraversalResultScalatestMatcher(expectedResult)(actualResult).matches
       case (actualResult: DefnTraversalResult, expectedResult: DefnTraversalResult) =>
         new DefnTraversalResultScalatestMatcher(expectedResult)(actualResult).matches
+      case (actualResult: CtorSecondaryTraversalResult, expectedResult: CtorSecondaryTraversalResult) =>
+        new CtorSecondaryTraversalResultScalatestMatcher(expectedResult)(actualResult).matches
       case (anActualTraversalResult, anExpectedTraversalResult) => anActualTraversalResult == anExpectedTraversalResult
     }
 

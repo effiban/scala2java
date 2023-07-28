@@ -6,7 +6,13 @@ import org.scalatest.matchers.{MatchResult, Matcher}
 class TemplateStatRenderContextScalatestMatcher(expectedContext: TemplateStatRenderContext) extends Matcher[TemplateStatRenderContext] {
 
   override def apply(actualContext: TemplateStatRenderContext): MatchResult = {
-    val matches = true // TODO
+    val matches = (actualContext, expectedContext) match {
+      case (actualDefnContext: DefnRenderContext, expectedDefnContext: DefnRenderContext) =>
+        new DefnRenderContextScalatestMatcher(expectedDefnContext)(actualDefnContext).matches
+      case (actualCtorSecondaryContext: CtorSecondaryRenderContext, expectedCtorSecondaryContext: CtorSecondaryRenderContext) =>
+        new CtorSecondaryRenderContextScalatestMatcher(expectedCtorSecondaryContext)(actualCtorSecondaryContext).matches
+      case (anActualContext, anExpectedContext) => anActualContext == anExpectedContext
+    }
 
     MatchResult(matches,
       s"Actual context: $actualContext is NOT the same as expected context: $expectedContext",
