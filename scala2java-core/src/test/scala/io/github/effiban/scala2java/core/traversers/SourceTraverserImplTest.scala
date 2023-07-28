@@ -2,6 +2,7 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.StatContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
+import io.github.effiban.scala2java.core.traversers.results.matchers.SourceTraversalResultScalatestMatcher.equalSourceTraversalResult
 import io.github.effiban.scala2java.core.traversers.results.{EmptyStatTraversalResult, PkgTraversalResult, SourceTraversalResult}
 import org.mockito.ArgumentMatchersSugar.{any, eqTo}
 
@@ -24,8 +25,8 @@ class SourceTraverserImplTest extends UnitTestSuite {
 
   private val ExcludedImport = q"import scala.abc"
 
-  private val pkg1TraversalResult = mock[PkgTraversalResult]
-  private val pkg2TraversalResult = mock[PkgTraversalResult]
+  private val pkg1TraversalResult = PkgTraversalResult(pkgRef = q"package1")
+  private val pkg2TraversalResult = PkgTraversalResult(pkgRef = q"package2")
 
   private val defaultStatTraverser = mock[DefaultStatTraverser]
 
@@ -50,7 +51,7 @@ class SourceTraverserImplTest extends UnitTestSuite {
       case aStat if aStat.structure == Pkg2.structure => pkg2TraversalResult
     }).when(defaultStatTraverser).traverse(any[Stat], eqTo(StatContext()))
 
-    sourceTraverser.traverse(TheSource) shouldBe expectedSourceTraversalResult
+    sourceTraverser.traverse(TheSource) should equalSourceTraversalResult(expectedSourceTraversalResult)
   }
 
   test("traverse() when there are empty results should skip them") {
@@ -75,6 +76,6 @@ class SourceTraverserImplTest extends UnitTestSuite {
     }).when(defaultStatTraverser).traverse(any[Stat], eqTo(StatContext()))
 
 
-    sourceTraverser.traverse(TheSource) shouldBe expectedSourceTraversalResult
+    sourceTraverser.traverse(TheSource) should equalSourceTraversalResult(expectedSourceTraversalResult)
   }
 }
