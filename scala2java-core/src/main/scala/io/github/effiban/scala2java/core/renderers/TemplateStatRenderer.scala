@@ -22,7 +22,7 @@ private[renderers] class TemplateStatRendererImpl(enumConstantListRenderer: => E
     (stat, context) match {
       case (defnVar: Defn.Var, EnumConstantListRenderContext) => renderEnumConstantList(defnVar)
 
-      case (anImport: Import, _) => writeComment(s"$anImport")
+      case (anImport: Import, _) => renderImportAsComment(anImport)
 
       case (ctorSecondary: Ctor.Secondary, ctorContext: CtorSecondaryRenderContext) =>
         ctorSecondaryRenderer.render(ctorSecondary, ctorContext)
@@ -33,6 +33,11 @@ private[renderers] class TemplateStatRendererImpl(enumConstantListRenderer: => E
 
   private def renderEnumConstantList(defnVar: Defn.Var): Unit = {
     enumConstantListRenderer.render(defnVar)
+    writeStatementEnd()
+  }
+
+  private def renderImportAsComment(anImport: Import): Unit = {
+    writeComment(s"$anImport")
     writeStatementEnd()
   }
 
