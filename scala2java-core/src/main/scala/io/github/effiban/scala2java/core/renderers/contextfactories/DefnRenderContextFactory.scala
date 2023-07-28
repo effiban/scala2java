@@ -9,6 +9,7 @@ trait DefnRenderContextFactory {
 }
 
 private[contextfactories] class DefnRenderContextFactoryImpl(traitRenderContextFactory: => TraitRenderContextFactory,
+                                                             caseClassRenderContextFactory: => CaseClassRenderContextFactory,
                                                              objectRenderContextFactory: => ObjectRenderContextFactory)
   extends DefnRenderContextFactory {
 
@@ -19,6 +20,7 @@ private[contextfactories] class DefnRenderContextFactoryImpl(traitRenderContextF
     case traitTraversalResult: TraitTraversalResult =>
       val permittedSubTypeNames = sealedHierarchies.getSubTypeNames(traitTraversalResult.name)
       traitRenderContextFactory(traitTraversalResult, permittedSubTypeNames)
+    case caseClassTraversalResult: CaseClassTraversalResult => caseClassRenderContextFactory(caseClassTraversalResult)
     case objectTraversalResult: ObjectTraversalResult => objectRenderContextFactory(objectTraversalResult)
     case _ => UnsupportedDefnRenderContext // TODO
   }

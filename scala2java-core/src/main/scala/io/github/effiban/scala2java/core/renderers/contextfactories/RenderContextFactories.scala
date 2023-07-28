@@ -2,6 +2,8 @@ package io.github.effiban.scala2java.core.renderers.contextfactories
 
 object RenderContextFactories {
 
+  private[contextfactories] lazy val caseClassRenderContextFactory = new CaseClassRenderContextFactoryImpl(templateBodyRenderContextFactory)
+
   private[contextfactories] lazy val defaultStatRenderContextFactory: DefaultStatRenderContextFactory =
     new DefaultStatRenderContextFactoryImpl(
       pkgRenderContextFactory,
@@ -11,6 +13,7 @@ object RenderContextFactories {
 
   private[contextfactories] lazy val defnRenderContextFactory: DefnRenderContextFactory = new DefnRenderContextFactoryImpl(
     traitRenderContextFactory,
+    caseClassRenderContextFactory,
     objectRenderContextFactory
   )
 

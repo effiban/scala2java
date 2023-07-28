@@ -1,9 +1,9 @@
 package io.github.effiban.scala2java.core.renderers.contextfactories
 
 import io.github.effiban.scala2java.core.entities.{JavaModifier, SealedHierarchies}
-import io.github.effiban.scala2java.core.renderers.contexts.{DefRenderContext, ObjectRenderContext, TraitRenderContext, VarRenderContext}
+import io.github.effiban.scala2java.core.renderers.contexts._
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.{DefnDefTraversalResult, DefnVarTraversalResult, ObjectTraversalResult, TraitTraversalResult}
+import io.github.effiban.scala2java.core.traversers.results._
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import org.mockito.ArgumentMatchersSugar.eqTo
 
@@ -14,6 +14,7 @@ class DefnRenderContextFactoryImplTest extends UnitTestSuite {
   private val TheJavaModifiers = List(JavaModifier.Public, JavaModifier.Final)
 
   private val TheTraitName = t"MyTrait"
+  private val TheCaseClassName = t"MyCaseClass"
   private val TheObjectName = q"MyObject"
 
   private val ThePermittedSubTypeNames = List(t"Sub1", t"Sub2")
@@ -21,18 +22,26 @@ class DefnRenderContextFactoryImplTest extends UnitTestSuite {
   private val defnVarTraversalResult = mock[DefnVarTraversalResult]
   private val defnDefTraversalResult = mock[DefnDefTraversalResult]
   private val traitTraversalResult = mock[TraitTraversalResult]
+  private val caseClassTraversalResult = mock[CaseClassTraversalResult]
   private val objectTraversalResult = mock[ObjectTraversalResult]
 
   private val traitRenderContext = mock[TraitRenderContext]
+  private val caseClassRenderContext = mock[CaseClassRenderContext]
   private val objectRenderContext = mock[ObjectRenderContext]
 
   private val traitRenderContextFactory = mock[TraitRenderContextFactory]
+  private val caseClassRenderContextFactory = mock[CaseClassRenderContextFactory]
   private val objectRenderContextFactory = mock[ObjectRenderContextFactory]
 
-  private val defnRenderContextFactory = new DefnRenderContextFactoryImpl(traitRenderContextFactory, objectRenderContextFactory)
+  private val defnRenderContextFactory = new DefnRenderContextFactoryImpl(
+    traitRenderContextFactory,
+    caseClassRenderContextFactory,
+    objectRenderContextFactory
+  )
 
   override def beforeEach(): Unit = {
     when(traitTraversalResult.name).thenReturn(TheTraitName)
+    when(caseClassTraversalResult.name).thenReturn(TheCaseClassName)
     when(objectTraversalResult.name).thenReturn(TheObjectName)
   }
 
@@ -77,6 +86,12 @@ class DefnRenderContextFactoryImplTest extends UnitTestSuite {
     when(traitRenderContextFactory(eqTo(traitTraversalResult), eqTo(Nil))).thenReturn(traitRenderContext)
 
     defnRenderContextFactory(traitTraversalResult, sealedHierarchies) shouldBe traitRenderContext
+  }
+
+  test("apply() for CaseClassTraversalResult") {
+    when(caseClassRenderContextFactory(eqTo(caseClassTraversalResult))).thenReturn(caseClassRenderContext)
+
+    defnRenderContextFactory(caseClassTraversalResult) shouldBe caseClassRenderContext
   }
 
   test("apply() for ObjectTraversalResult") {

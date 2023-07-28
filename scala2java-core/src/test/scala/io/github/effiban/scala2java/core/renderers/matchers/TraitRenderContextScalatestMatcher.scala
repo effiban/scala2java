@@ -27,7 +27,7 @@ class TraitRenderContextScalatestMatcher(expectedContext: TraitRenderContext) ex
   }
 
   private def bodyContextsMatch(actualContext: TraitRenderContext): Boolean = {
-    true // TODO
+    new TemplateBodyRenderContextScalatestMatcher(expectedContext.bodyContext)(actualContext.bodyContext).matches
   }
 
 }

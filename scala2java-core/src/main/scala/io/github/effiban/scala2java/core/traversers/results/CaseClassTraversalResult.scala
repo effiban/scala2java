@@ -26,4 +26,11 @@ case class CaseClassTraversalResult(scalaMods: List[Mod] = Nil,
       stats = statResults.map(_.tree)
     )
   )
+
+  val templateResult: TemplateTraversalResult = TemplateTraversalResult(
+    maybeInheritanceKeyword = maybeInheritanceKeyword,
+    inits = inits,
+    self = self,
+    statResults = statResults
+  )
 }

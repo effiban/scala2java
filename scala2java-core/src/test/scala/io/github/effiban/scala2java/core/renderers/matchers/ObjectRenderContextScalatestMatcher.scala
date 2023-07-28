@@ -33,7 +33,7 @@ class ObjectRenderContextScalatestMatcher(expectedContext: ObjectRenderContext) 
   }
 
   private def bodyContextsMatch(actualContext: ObjectRenderContext): Boolean = {
-    true // TODO
+    new TemplateBodyRenderContextScalatestMatcher(expectedContext.bodyContext)(actualContext.bodyContext).matches
   }
 
 }
