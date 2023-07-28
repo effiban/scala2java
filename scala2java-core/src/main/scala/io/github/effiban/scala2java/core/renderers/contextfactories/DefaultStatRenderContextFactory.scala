@@ -18,6 +18,6 @@ private[contextfactories] class DefaultStatRenderContextFactoryImpl(pkgRenderCon
       case pkgTraversalResult: PkgTraversalResult => pkgRenderContextFactory(pkgTraversalResult)
       case declTraversalResult: DeclTraversalResult => declRenderContextFactory(declTraversalResult)
       case defnTraversalResult: DefnTraversalResult => defnRenderContextFactory(defnTraversalResult, sealedHierarchies)
-      case _ => EmptyStatRenderContext // TODO
+      case _ => EmptyStatRenderContext
     }
 }
