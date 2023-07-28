@@ -9,7 +9,9 @@ class StatRenderContextScalatestMatcher(expectedContext: StatRenderContext) exte
     val matches = (actualContext, expectedContext) match {
       case (actualPkgContext: PkgRenderContext, expectedPkgContext: PkgRenderContext) =>
         new PkgRenderContextScalatestMatcher(expectedPkgContext)(actualPkgContext).matches
-      // TODO support matching of TemplateRenderContext
+      case (actualDeclContext: DeclRenderContext, expectedDeclContext: DeclRenderContext) =>
+        new DeclRenderContextScalatestMatcher(expectedDeclContext)(actualDeclContext).matches
+      // TODO support the rest of the hierarchy
       case (anActualContext, anExpectedContext) => anActualContext == anExpectedContext
     }
 
