@@ -12,8 +12,7 @@ class TemplateContextMatcher(expectedTemplateContext: TemplateContext) extends A
   override def matches(actualTemplateContext: TemplateContext): Boolean = {
     actualTemplateContext.javaScope == expectedTemplateContext.javaScope &&
       classNameMatches(actualTemplateContext) &&
-      explicitPrimaryCtorMatches(actualTemplateContext) &&
-      actualTemplateContext.permittedSubTypeNames == expectedTemplateContext.permittedSubTypeNames
+      explicitPrimaryCtorMatches(actualTemplateContext)
   }
 
   private def classNameMatches(actualTemplateContext: TemplateContext) = {

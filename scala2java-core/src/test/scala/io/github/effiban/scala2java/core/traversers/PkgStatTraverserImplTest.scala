@@ -2,7 +2,6 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{ClassOrTraitContext, StatContext}
 import io.github.effiban.scala2java.core.entities.SealedHierarchies
-import io.github.effiban.scala2java.core.matchers.ClassOrTraitContextMatcher.eqClassOrTraitContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.traversers.results.{ClassTraversalResult, ObjectTraversalResult, SimpleStatTraversalResult, TraitTraversalResult}
 import io.github.effiban.scala2java.spi.entities.JavaScope
@@ -67,7 +66,7 @@ class PkgStatTraverserImplTest extends UnitTestSuite {
 
     doReturn(traitTraversalResult).when(traitTraverser).traverse(
       eqTree(TheTrait),
-      eqClassOrTraitContext(ClassOrTraitContext(javaScope = JavaScope.Package))
+      eqTo(ClassOrTraitContext(javaScope = JavaScope.Package))
     )
 
     pkgStatTraverser.traverse(TheTrait, SealedHierarchies(Map(TheTrait.name -> childNames))) shouldBe traitTraversalResult
@@ -78,7 +77,7 @@ class PkgStatTraverserImplTest extends UnitTestSuite {
 
     doReturn(traitTraversalResult).when(traitTraverser).traverse(
       eqTree(TheTrait),
-      eqClassOrTraitContext(ClassOrTraitContext(javaScope = JavaScope.Sealed))
+      eqTo(ClassOrTraitContext(javaScope = JavaScope.Sealed))
     )
 
     pkgStatTraverser.traverse(TheTrait, SealedHierarchies(Map(t"Parent" -> childNames))) shouldBe traitTraversalResult
@@ -89,7 +88,7 @@ class PkgStatTraverserImplTest extends UnitTestSuite {
 
     doReturn(traitTraversalResult).when(traitTraverser).traverse(
       eqTree(TheTrait),
-      eqClassOrTraitContext(ClassOrTraitContext(javaScope = JavaScope.Sealed))
+      eqTo(ClassOrTraitContext(javaScope = JavaScope.Sealed))
     )
 
     val actualResult = pkgStatTraverser.traverse(TheTrait, SealedHierarchies(
@@ -114,7 +113,7 @@ class PkgStatTraverserImplTest extends UnitTestSuite {
 
     doReturn(classTraversalResult).when(classTraverser).traverse(
       eqTree(TheClass),
-      eqClassOrTraitContext(ClassOrTraitContext(javaScope = JavaScope.Package))
+      eqTo(ClassOrTraitContext(javaScope = JavaScope.Package))
     )
 
     pkgStatTraverser.traverse(TheClass, SealedHierarchies(Map(TheClass.name -> childNames))) shouldBe classTraversalResult
@@ -125,7 +124,7 @@ class PkgStatTraverserImplTest extends UnitTestSuite {
 
     doReturn(classTraversalResult).when(classTraverser).traverse(
       eqTree(TheClass),
-      eqClassOrTraitContext(ClassOrTraitContext(javaScope = JavaScope.Sealed))
+      eqTo(ClassOrTraitContext(javaScope = JavaScope.Sealed))
     )
 
     pkgStatTraverser.traverse(TheClass, SealedHierarchies(Map(t"Parent" -> childNames))) shouldBe classTraversalResult
@@ -135,7 +134,7 @@ class PkgStatTraverserImplTest extends UnitTestSuite {
     val traitChildNames = List(t"Child1", t"Child2")
     doReturn(classTraversalResult).when(classTraverser).traverse(
       eqTree(TheClass),
-      eqClassOrTraitContext(ClassOrTraitContext(javaScope = JavaScope.Sealed))
+      eqTo(ClassOrTraitContext(javaScope = JavaScope.Sealed))
     )
 
     val actualResult = pkgStatTraverser.traverse(TheClass, SealedHierarchies(
