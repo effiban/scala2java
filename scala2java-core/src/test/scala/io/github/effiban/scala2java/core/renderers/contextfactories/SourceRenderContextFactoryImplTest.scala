@@ -12,9 +12,9 @@ import scala.meta.XtensionQuasiquoteTerm
 
 class SourceRenderContextFactoryImplTest extends UnitTestSuite {
 
-  private val pkgStatRenderContextFactory = mock[DefaultStatRenderContextFactory]
+  private val defaultStatRenderContextFactory = mock[DefaultStatRenderContextFactory]
 
-  private val sourceRenderContextFactory = new SourceRenderContextFactoryImpl(pkgStatRenderContextFactory)
+  private val sourceRenderContextFactory = new SourceRenderContextFactoryImpl(defaultStatRenderContextFactory)
 
   test("apply") {
     val statResult1 = mock[PopulatedStatTraversalResult]
@@ -35,7 +35,7 @@ class SourceRenderContextFactoryImplTest extends UnitTestSuite {
     doAnswer((statResult: StatTraversalResult) => statResult match {
       case aStatResult if aStatResult == statResult1 => statRenderContext1
       case aStatResult if aStatResult == statResult2 => statRenderContext2
-    }).when(pkgStatRenderContextFactory)(any[StatTraversalResult], eqSealedHierarchies(SealedHierarchies()))
+    }).when(defaultStatRenderContextFactory)(any[StatTraversalResult], eqSealedHierarchies(SealedHierarchies()))
 
     sourceRenderContextFactory(traversalResult) should equalSourceRenderContext(expectedRenderContext)
   }
