@@ -1,12 +1,14 @@
 package io.github.effiban.scala2java.core.renderers.matchers
 
 import io.github.effiban.scala2java.core.renderers.contexts.TemplateBodyRenderContext
+import io.github.effiban.scala2java.test.utils.matchers.TreeKeyedMapScalatestMatcher
 import org.scalatest.matchers.{MatchResult, Matcher}
 
 class TemplateBodyRenderContextScalatestMatcher(expectedContext: TemplateBodyRenderContext) extends Matcher[TemplateBodyRenderContext] {
 
   override def apply(actualContext: TemplateBodyRenderContext): MatchResult = {
-    val matches = true //TODO
+    val mapMatcher = new TreeKeyedMapScalatestMatcher(expectedContext.statContextMap, new TemplateStatRenderContextScalatestMatcher(_))
+    val matches = mapMatcher(actualContext.statContextMap).matches
 
     MatchResult(matches,
       s"Actual context: $actualContext is NOT the same as expected context: $expectedContext",

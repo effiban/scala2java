@@ -7,7 +7,14 @@ trait TemplateBodyRenderContextFactory {
   def apply(templateTraversalResult: TemplateTraversalResult): TemplateBodyRenderContext
 }
 
-private[contextfactories] class TemplateBodyRenderContextFactoryImpl extends TemplateBodyRenderContextFactory {
-  override def apply(templateTraversalResult: TemplateTraversalResult): TemplateBodyRenderContext =
-    TemplateBodyRenderContext() //TODO
+private[contextfactories] class TemplateBodyRenderContextFactoryImpl(templateStatRenderContextFactory: => TemplateStatRenderContextFactory)
+  extends TemplateBodyRenderContextFactory {
+
+  override def apply(templateTraversalResult: TemplateTraversalResult): TemplateBodyRenderContext = {
+    val statRenderContextMap = templateTraversalResult.statResults
+      .map(statResult => (statResult.tree, statResult))
+      .map { case (stat, statResult) => (stat, templateStatRenderContextFactory(statResult)) }
+      .toMap
+    TemplateBodyRenderContext(statRenderContextMap)
+  }
 }
