@@ -64,12 +64,14 @@ class TemplateStatRendererImplTest extends UnitTestSuite {
         |""".stripMargin
   }
 
-  test("render() for Import should write a comment") {
+  test("render() for Import should write a commented statement") {
     val `import` = q"import a.b.c"
 
     templateStatRenderer.render(`import`)
 
-    outputWriter.toString shouldBe "/* import a.b.c */"
+    outputWriter.toString shouldBe
+      """/* import a.b.c */;
+        |""".stripMargin
   }
 
   test("render() for Ctor.Secondary which has a correct context") {
