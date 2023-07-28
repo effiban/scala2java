@@ -281,6 +281,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   val selfRenderer: SelfRenderer = new SelfRendererImpl()
 
+  val sourceRenderer: SourceRenderer = new SourceRendererImpl(defaultStatRenderer)
+
   lazy val standardApplyTypeRenderer: StandardApplyTypeRenderer = new StandardApplyTypeRendererImpl(
     expressionTermSelectRenderer,
     typeListRenderer,
