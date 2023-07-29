@@ -7,7 +7,7 @@ plugins {
 }
 
 group 'io.github.effiban'
-version '7.0.0'
+version '8.0.0'
 
 project.ext.scalaMajorVersion = "2.13"
 
