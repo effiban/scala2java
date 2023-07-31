@@ -27,12 +27,13 @@ private[renderers] class TemplateRendererImpl(initListRenderer: => InitListRende
 
   private def renderTemplateInits(inits: List[Init], context: TemplateRenderContext): Unit = {
     if (inits.nonEmpty) {
-      val inheritanceKeyword = context.maybeInheritanceKeyword
-        .getOrElse(throw new IllegalStateException("The template contains inits but no Java inheritance keyword was specified"))
       write(" ")
-      writeKeyword(inheritanceKeyword)
-      write(" ")
-      initListRenderer.render(inits, InitRenderContext(ignoreArgs = true))
+      context.maybeInheritanceKeyword.foreach(inheritanceKeyword => {
+        writeKeyword(inheritanceKeyword)
+        write(" ")
+      })
+      val initContext = InitRenderContext(ignoreArgs = !context.renderInitArgs, renderEmpty = context.renderInitArgs)
+      initListRenderer.render(inits, initContext)
     }
   }
 
