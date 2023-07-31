@@ -50,23 +50,67 @@ class TemplateRendererImplTest extends UnitTestSuite {
         |""".stripMargin
   }
 
-  test("render when has inits only") {
+  test("render when has inits only with inheritance keyword and renderInitArgs=false") {
     val template = Template(
       early = Nil,
       inits = TheInits,
       self = Selfs.Empty,
       stats = Nil
     )
-    val context = TemplateRenderContext(maybeInheritanceKeyword = Some(JavaKeyword.Implements))
+    val templateContext = TemplateRenderContext(maybeInheritanceKeyword = Some(JavaKeyword.Implements))
 
-    expectRenderInits()
+    expectRenderInits(InitRenderContext(ignoreArgs = true))
+    expectRenderSelf()
+    expectRenderBody(context = templateContext)
+
+    templateRenderer.render(template, templateContext)
+
+    outputWriter.toString shouldBe
+      """ implements Parent1, Parent2 {
+        |  /* BODY */
+        |}
+        |""".stripMargin
+  }
+
+  test("render when has inits only without inheritance keyword and renderInitArgs=false") {
+    val template = Template(
+      early = Nil,
+      inits = TheInits,
+      self = Selfs.Empty,
+      stats = Nil
+    )
+    val context = TemplateRenderContext()
+
+    expectRenderInits(InitRenderContext(ignoreArgs = true))
     expectRenderSelf()
     expectRenderBody(context = context)
 
     templateRenderer.render(template, context)
 
     outputWriter.toString shouldBe
-      """ implements Parent1, Parent2 {
+      """ Parent1, Parent2 {
+        |  /* BODY */
+        |}
+        |""".stripMargin
+  }
+
+  test("render when has inits only without inheritance keyword and renderInitArgs=true") {
+    val template = Template(
+      early = Nil,
+      inits = TheInits,
+      self = Selfs.Empty,
+      stats = Nil
+    )
+    val context = TemplateRenderContext(renderInitArgs = true)
+
+    expectRenderInits(InitRenderContext(renderEmpty = true))
+    expectRenderSelf()
+    expectRenderBody(context = context)
+
+    templateRenderer.render(template, context)
+
+    outputWriter.toString shouldBe
+      """ Parent1(), Parent2() {
         |  /* BODY */
         |}
         |""".stripMargin
@@ -170,7 +214,7 @@ class TemplateRendererImplTest extends UnitTestSuite {
       bodyContext = bodyContext
     )
 
-    expectRenderInits()
+    expectRenderInits(InitRenderContext(ignoreArgs = true))
     expectRenderSelf(NonEmptySelf)
     expectRenderPermittedSubTypeNames()
     expectRenderBody(stats, context)
@@ -185,9 +229,9 @@ class TemplateRendererImplTest extends UnitTestSuite {
 
   }
 
-  private def expectRenderInits(): Unit = {
-    doWrite("Parent1, Parent2")
-      .when(initListRenderer).render(eqTreeList(TheInits), eqTo(InitRenderContext(ignoreArgs = true)))
+  private def expectRenderInits(initContext: InitRenderContext): Unit = {
+    val initsOutput = if (initContext.renderEmpty) "Parent1(), Parent2()" else "Parent1, Parent2"
+    doWrite(initsOutput).when(initListRenderer).render(eqTreeList(TheInits), eqTo(initContext))
   }
 
 
