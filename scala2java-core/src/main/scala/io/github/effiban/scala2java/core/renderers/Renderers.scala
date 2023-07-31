@@ -141,6 +141,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
     whileRenderer,
     doRenderer,
     newRenderer,
+    newAnonymousRenderer,
     termPlaceholderRenderer,
     etaRenderer,
     litRenderer
@@ -238,6 +239,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
     termNameRenderer,
     typeNameRenderer
   )
+
+  private[renderers] lazy val newAnonymousRenderer: NewAnonymousRenderer = new NewAnonymousRendererImpl(templateRenderer)
 
   private[renderers] lazy val newRenderer: NewRenderer = new NewRendererImpl(
     initRenderer,

@@ -25,6 +25,7 @@ private[renderers] class DefaultTermRendererImpl(defaultTermRefRenderer: => Defa
                                                  whileRenderer: => WhileRenderer,
                                                  doRenderer: => DoRenderer,
                                                  newRenderer: => NewRenderer,
+                                                 newAnonymousRenderer: => NewAnonymousRenderer,
                                                  termPlaceholderRenderer: => TermPlaceholderRenderer,
                                                  etaRenderer: => EtaRenderer,
                                                  litRenderer: LitRenderer)
@@ -51,7 +52,7 @@ private[renderers] class DefaultTermRendererImpl(defaultTermRefRenderer: => Defa
     case `while`: While => whileRenderer.render(`while`)
     case `do`: Do => doRenderer.render(`do`)
     case `new`: New => newRenderer.render(`new`)
-    case newAnonymous: NewAnonymous => //TODO once TemplateRenderer is ready
+    case newAnonymous: NewAnonymous => newAnonymousRenderer.render(newAnonymous)
     case termPlaceholder: Term.Placeholder => termPlaceholderRenderer.render(termPlaceholder)
     case eta: Eta => etaRenderer.render(eta)
     case literal: Lit => litRenderer.render(literal)

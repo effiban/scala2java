@@ -159,6 +159,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
     whileTraverser,
     doTraverser,
     newTraverser,
+    newAnonymousTraverser,
     etaTraverser,
     termRepeatedTraverser
   )
@@ -242,6 +243,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
   private lazy val initTraverser: InitTraverser = new InitTraverserImpl(typeTraverser, expressionTermTraverser)
 
   private lazy val nameTraverser: NameTraverser = new NameTraverserImpl(typeNameTraverser)
+
+  private lazy val newAnonymousTraverser: NewAnonymousTraverser = new NewAnonymousTraverserImpl(templateTraverser)
 
   private lazy val newTraverser: NewTraverser = new NewTraverserImpl(
     initTraverser,

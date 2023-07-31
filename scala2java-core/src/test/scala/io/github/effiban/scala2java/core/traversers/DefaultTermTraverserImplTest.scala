@@ -33,6 +33,7 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
   private val whileTraverser = mock[WhileTraverser]
   private val doTraverser = mock[DoTraverser]
   private val newTraverser = mock[NewTraverser]
+  private val newAnonymousTraverser = mock[NewAnonymousTraverser]
   private val etaTraverser = mock[EtaTraverser]
   private val termRepeatedTraverser = mock[TermRepeatedTraverser]
 
@@ -58,6 +59,7 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
     whileTraverser,
     doTraverser,
     newTraverser,
+    newAnonymousTraverser,
     etaTraverser,
     termRepeatedTraverser
   )
@@ -318,6 +320,15 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
     doReturn(traversedNew).when(newTraverser).traverse(eqTree(`new`))
 
     defaultTermTraverser.traverse(`new`).structure shouldBe traversedNew.structure
+  }
+
+  test("traverse() for NewAnonymous") {
+    val newAnonymous = q"new MyTrait { override def foo(x: Int) = x + 1 }"
+    val traversedNewAnonymous = q"new MyTraversedTrait { override def traversedFoo(x: Int) = x + 1 }"
+
+    doReturn(traversedNewAnonymous).when(newAnonymousTraverser).traverse(eqTree(newAnonymous))
+
+    defaultTermTraverser.traverse(newAnonymous).structure shouldBe traversedNewAnonymous.structure
   }
 
   test("traverse() for Eta") {
