@@ -34,13 +34,21 @@ class DefnRendererImplTest extends UnitTestSuite {
   )
 
 
-  test("render() for Defn.Var") {
+  test("render() for Defn.Var with correct non-empty context") {
     val defnVar = q"private var myVar: Int = 3"
     val context = VarRenderContext(List(JavaModifier.Private))
 
     defnRenderer.render(defnVar, context)
 
     verify(defnVarRenderer).render(eqTree(defnVar), eqTo(context))
+  }
+
+  test("render() for Defn.Var with empty context should use default 'var' context") {
+    val defnVar = q"private var myVar: Int = 3"
+
+    defnRenderer.render(defnVar)
+
+    verify(defnVarRenderer).render(eqTree(defnVar), eqTo(VarRenderContext()))
   }
 
   test("render() for Defn.Var with incorrect context should throw exception") {
@@ -52,13 +60,21 @@ class DefnRendererImplTest extends UnitTestSuite {
     }
   }
 
-  test("render() for Defn.Def") {
+  test("render() for Defn.Def with correct non-empty context") {
     val defnDef = q"def myMethod(x: Int) = doSomething(x)"
     val context = DefRenderContext(List(JavaModifier.Public))
 
     defnRenderer.render(defnDef, context)
 
     verify(defnDefRenderer).render(eqTree(defnDef), eqTo(context))
+  }
+
+  test("render() for Defn.Def with empty context should use default 'def' context") {
+    val defnDef = q"def myMethod(x: Int) = doSomething(x)"
+
+    defnRenderer.render(defnDef)
+
+    verify(defnDefRenderer).render(eqTree(defnDef), eqTo(DefRenderContext()))
   }
 
   test("render() for Defn.Def with incorrect context should throw exception") {

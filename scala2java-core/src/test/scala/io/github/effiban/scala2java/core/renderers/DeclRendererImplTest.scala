@@ -15,7 +15,7 @@ class DeclRendererImplTest extends UnitTestSuite {
 
   private val declRenderer = new DeclRendererImpl(declVarRenderer, declDefRenderer)
 
-  test("render() a Decl.Var") {
+  test("render() a Decl.Var with correct non-empty context") {
     val declVar = q"private final var x: Int"
     val javaModifiers = List(JavaModifier.Private, JavaModifier.Final)
     val context = VarRenderContext(javaModifiers)
@@ -23,6 +23,14 @@ class DeclRendererImplTest extends UnitTestSuite {
     declRenderer.render(declVar, context)
 
     verify(declVarRenderer).render(eqTree(declVar), eqTo(context))
+  }
+
+  test("render() a Decl.Var with empty context should use default var context") {
+    val declVar = q"private final var x: Int"
+
+    declRenderer.render(declVar)
+
+    verify(declVarRenderer).render(eqTree(declVar), eqTo(VarRenderContext()))
   }
 
   test("render() a Decl.Var with incorrect context should throw an exception") {
@@ -35,7 +43,7 @@ class DeclRendererImplTest extends UnitTestSuite {
     }
   }
 
-  test("render() a Decl.Def") {
+  test("render() a Decl.Def with correct non-empty context") {
     val declDef = q"private def foo(x: Int)"
     val javaModifiers = List(JavaModifier.Private)
     val context = DefRenderContext(javaModifiers)
@@ -43,6 +51,14 @@ class DeclRendererImplTest extends UnitTestSuite {
     declRenderer.render(declDef, context)
 
     verify(declDefRenderer).render(eqTree(declDef), eqTo(DefRenderContext(javaModifiers)))
+  }
+
+  test("render() a Decl.Def with empty context should use default 'def' context") {
+    val declDef = q"private def foo(x: Int)"
+
+    declRenderer.render(declDef)
+
+    verify(declDefRenderer).render(eqTree(declDef), eqTo(DefRenderContext()))
   }
 
   test("render() a Decl.Def with incorrect context should throw an exception") {

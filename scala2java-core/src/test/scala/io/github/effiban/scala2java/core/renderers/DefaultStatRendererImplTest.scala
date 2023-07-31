@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.entities.JavaModifier
-import io.github.effiban.scala2java.core.renderers.contexts.{DefRenderContext, PkgRenderContext, RegularClassRenderContext, VarRenderContext}
+import io.github.effiban.scala2java.core.renderers.contexts._
 import io.github.effiban.scala2java.core.renderers.matchers.PkgRenderContextMockitoMatcher.eqPkgRenderContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -75,31 +75,43 @@ class DefaultStatRendererImplTest extends UnitTestSuite {
     }
   }
 
-  test("render() for Decl.Var when has correct context") {
+  test("render() for Decl.Var when has correct non-empty context") {
     val declVar = q"private var x: Int"
     val context = VarRenderContext(javaModifiers = List(JavaModifier.Private))
     defaultStatRenderer.render(declVar, context)
     verify(declRenderer).render(eqTree(declVar), eqTo(context))
   }
 
+  test("render() for Decl.Var when has empty context") {
+    val declVar = q"private var x: Int"
+    defaultStatRenderer.render(declVar)
+    verify(declRenderer).render(eqTree(declVar), eqTo(EmptyStatRenderContext))
+  }
+
   test("render() for Decl.Var when has incorrect context should throw exception") {
     val declVar = q"private var x: Int"
     intercept[IllegalStateException] {
-      defaultStatRenderer.render(declVar)
+      defaultStatRenderer.render(declVar, RegularClassRenderContext())
     }
   }
 
-  test("render() for Defn.Var when has correct context") {
+  test("render() for Defn.Var when has correct non-empty context") {
     val defnVar = q"private var x: Int = 3"
     val context = DefRenderContext(javaModifiers = List(JavaModifier.Private))
     defaultStatRenderer.render(defnVar, context)
     verify(defnRenderer).render(eqTree(defnVar), eqTo(context))
   }
 
+  test("render() for Defn.Var when has empty context") {
+    val defnVar = q"private var x: Int = 3"
+    defaultStatRenderer.render(defnVar)
+    verify(defnRenderer).render(eqTree(defnVar), eqTo(EmptyStatRenderContext))
+  }
+
   test("render() for Defn.Var when has incorrect context should throw exception") {
     val defnVar = q"private var x: Int = 3"
     intercept[IllegalStateException] {
-      defaultStatRenderer.render(defnVar)
+      defaultStatRenderer.render(defnVar, PkgRenderContext())
     }
   }
 }

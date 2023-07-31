@@ -8,7 +8,7 @@ import scala.meta.Defn
 import scala.meta.Defn.Trait
 
 trait DefnRenderer {
-  def render(defn: Defn, context: DefnRenderContext): Unit
+  def render(defn: Defn, context: DefnRenderContext = EmptyStatRenderContext): Unit
 }
 
 private[renderers] class DefnRendererImpl(defnVarRenderer: => DefnVarRenderer,
@@ -22,12 +22,14 @@ private[renderers] class DefnRendererImpl(defnVarRenderer: => DefnVarRenderer,
 
   import javaWriter._
 
-  override def render(defn: Defn, context: DefnRenderContext): Unit =
+  override def render(defn: Defn, context: DefnRenderContext = EmptyStatRenderContext): Unit =
     (defn, context) match {
       case (defnVar: Defn.Var, varContext: VarRenderContext) => defnVarRenderer.render(defnVar, varContext)
+      case (defnVar: Defn.Var, EmptyStatRenderContext) => defnVarRenderer.render(defnVar)
       case (defnVar: Defn.Var, aContext) => handleInvalidContext(defnVar, aContext)
 
       case (defDef: Defn.Def, defContext: DefRenderContext) => defnDefRenderer.render(defDef, defContext)
+      case (defDef: Defn.Def, EmptyStatRenderContext) => defnDefRenderer.render(defDef)
       case (defDef: Defn.Def, aContext) => handleInvalidContext(defDef, aContext)
 
       case (defnClass: Defn.Class, caseClassContext: CaseClassRenderContext) if classClassifier.isCase(defnClass) =>
