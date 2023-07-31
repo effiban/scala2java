@@ -27,6 +27,7 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
   private val whileRenderer = mock[WhileRenderer]
   private val doRenderer = mock[DoRenderer]
   private val newRenderer = mock[NewRenderer]
+  private val newAnonymousRenderer = mock[NewAnonymousRenderer]
   private val termPlaceholderRenderer = mock[TermPlaceholderRenderer]
   private val etaRenderer = mock[EtaRenderer]
   private val litRenderer = mock[LitRenderer]
@@ -50,6 +51,7 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
     whileRenderer,
     doRenderer,
     newRenderer,
+    newAnonymousRenderer,
     termPlaceholderRenderer,
     etaRenderer,
     litRenderer
@@ -232,6 +234,14 @@ class DefaultTermRendererImplTest extends UnitTestSuite {
     defaultTermRenderer.render(`new`)
 
     verify(newRenderer).render(eqTree(`new`))
+  }
+
+  test("render NewAnonymous") {
+    val newAnonymous = q"new MyTrait { override def foo(x: Int) = x + 1 }"
+
+    defaultTermRenderer.render(newAnonymous)
+
+    verify(newAnonymousRenderer).render(eqTree(newAnonymous))
   }
 
   test("render Term.Placeholder") {
