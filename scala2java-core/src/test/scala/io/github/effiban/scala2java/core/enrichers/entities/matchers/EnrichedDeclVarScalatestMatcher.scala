@@ -3,8 +3,7 @@ package io.github.effiban.scala2java.core.enrichers.entities.matchers
 import io.github.effiban.scala2java.core.enrichers.entities.EnrichedDeclVar
 import org.scalatest.matchers.{MatchResult, Matcher}
 
-class EnrichedDeclVarScalatestMatcher(expectedEnrichedDeclVar: EnrichedDeclVar)
-  extends Matcher[EnrichedDeclVar] {
+class EnrichedDeclVarScalatestMatcher(expectedEnrichedDeclVar: EnrichedDeclVar) extends Matcher[EnrichedDeclVar] {
 
   override def apply(actualEnrichedDeclVar: EnrichedDeclVar): MatchResult = {
     val matches = declVarMatches(actualEnrichedDeclVar) && javaModifiersMatch(actualEnrichedDeclVar)
