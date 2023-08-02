@@ -1,0 +1,3 @@
+package io.github.effiban.scala2java.core.enrichers.entities
+
+trait EnrichedStatWithJavaModifiers extends EnrichedStat with EnrichedWithJavaModifiers
