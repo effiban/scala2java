@@ -4,5 +4,5 @@ import io.github.effiban.scala2java.core.entities.JavaModifier
 
 import scala.meta.Decl
 
-case class EnrichedDeclDef(override val stat: Decl.Def, override val javaModifiers: List[JavaModifier] = Nil)
+case class EnrichedUnsupportedDecl(override val stat: Decl, override val javaModifiers: List[JavaModifier] = Nil)
   extends EnrichedDecl
