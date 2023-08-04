@@ -2,9 +2,10 @@ package io.github.effiban.scala2java.core.enrichers
 
 import io.github.effiban.scala2java.core.contexts.StatContext
 import io.github.effiban.scala2java.core.enrichers.entities.matchers.EnrichedDefnScalatestMatcher.equalEnrichedDefn
-import io.github.effiban.scala2java.core.enrichers.entities.{EnrichedDefnDef, EnrichedDefnVar, EnrichedTrait}
+import io.github.effiban.scala2java.core.enrichers.entities.{EnrichedDefnDef, EnrichedDefnVar, EnrichedRegularClass, EnrichedTrait}
 import io.github.effiban.scala2java.core.entities.JavaModifier
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
+import io.github.effiban.scala2java.core.testtrees.PrimaryCtors
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
@@ -18,11 +19,13 @@ class DefnEnricherImplTest extends UnitTestSuite {
   private val defnVarEnricher = mock[DefnVarEnricher]
   private val defnDefEnricher = mock[DefnDefEnricher]
   private val traitEnricher = mock[TraitEnricher]
+  private val classEnricher = mock[ClassEnricher]
 
   private val defnEnricher = new DefnEnricherImpl(
     defnVarEnricher,
     defnDefEnricher,
-    traitEnricher
+    traitEnricher,
+    classEnricher
   )
 
   test("enrich() a Defn.Var") {
@@ -55,5 +58,18 @@ class DefnEnricherImplTest extends UnitTestSuite {
     doReturn(enrichedTrait).when(traitEnricher).enrich(eqTree(defnTrait), eqTo(TheStatContext))
 
     defnEnricher.enrich(defnTrait, TheStatContext) should equalEnrichedDefn(enrichedTrait)
+  }
+
+  test("enrich() a Defn.Class") {
+    val defnClass = q"class MyClass { def myMethod(param1: Int, param2: Int): String = param1 + param2 }"
+    val enrichedClass = EnrichedRegularClass(
+      name = t"MyClass",
+      ctor = PrimaryCtors.Empty,
+      enrichedStats = List(EnrichedDefnDef(q"def myMethod(param1: Int, param2: Int): String = param1 + param2"))
+    )
+
+    doReturn(enrichedClass).when(classEnricher).enrich(eqTree(defnClass), eqTo(TheStatContext))
+
+    defnEnricher.enrich(defnClass, TheStatContext) should equalEnrichedDefn(enrichedClass)
   }
 }
