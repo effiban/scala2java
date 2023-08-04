@@ -3,6 +3,7 @@ package io.github.effiban.scala2java.core.enrichers
 import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.enrichers.contexts.TemplateEnrichmentContext
 import io.github.effiban.scala2java.core.enrichers.entities.EnrichedRegularClass
+import io.github.effiban.scala2java.core.entities.JavaTreeTypeToKeywordMapping
 import io.github.effiban.scala2java.core.resolvers.{JavaChildScopeResolver, JavaModifiersResolver, JavaTreeTypeResolver}
 
 import scala.meta.Defn
@@ -20,12 +21,14 @@ private[enrichers] class RegularClassEnricherImpl(templateEnricher: => TemplateE
     val javaTreeType = javaTreeTypeResolver.resolve(JavaTreeTypeContext(defnClass, defnClass.mods))
     val javaModifiers = javaModifiersResolver.resolve(ModifiersContext(defnClass, javaTreeType, context.javaScope))
     val javaChildScope = javaChildScopeResolver.resolve(JavaChildScopeContext(defnClass, javaTreeType))
+    val javaTypeKeyword = JavaTreeTypeToKeywordMapping(javaTreeType)
     val templateContext = TemplateEnrichmentContext(javaScope = javaChildScope, maybeClassName = Some(defnClass.name))
     val enrichedTemplate = templateEnricher.enrich(defnClass.templ, templateContext)
 
     EnrichedRegularClass(
       scalaMods = defnClass.mods,
       javaModifiers = javaModifiers,
+      javaTypeKeyword = javaTypeKeyword,
       name = defnClass.name,
       tparams = defnClass.tparams,
       ctor = defnClass.ctor,
