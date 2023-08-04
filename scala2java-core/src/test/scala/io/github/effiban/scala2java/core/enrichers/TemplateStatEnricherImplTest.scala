@@ -3,7 +3,7 @@ package io.github.effiban.scala2java.core.enrichers
 import io.github.effiban.scala2java.core.classifiers.DefnVarClassifier
 import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.enrichers.contexts.matchers.CtorSecondaryEnrichmentContextMockitoMatcher.eqCtorSecondaryEnrichmentContext
-import io.github.effiban.scala2java.core.enrichers.contexts.{CtorSecondaryEnrichmentContext, TemplateStatEnrichmentContext}
+import io.github.effiban.scala2java.core.enrichers.contexts.{CtorSecondaryEnrichmentContext, TemplateBodyEnrichmentContext}
 import io.github.effiban.scala2java.core.enrichers.entities.matchers.EnrichedStatScalatestMatcher.equalEnrichedStat
 import io.github.effiban.scala2java.core.enrichers.entities.{EnrichedCtorSecondary, EnrichedDefnDef, EnrichedDefnVar, EnrichedEnumConstantList}
 import io.github.effiban.scala2java.core.entities.JavaModifier
@@ -22,7 +22,7 @@ class TemplateStatEnricherImplTest extends UnitTestSuite {
   private val TheScalaMods = List(TheAnnot)
 
   private val CtorSecondaryContext = CtorSecondaryEnrichmentContext(JavaScope.Class, ClassName)
-  private val TemplaeStatContextWithClassName = TemplateStatEnrichmentContext(JavaScope.Class, Some(ClassName))
+  private val TemplateBodyContextWithClassName = TemplateBodyEnrichmentContext(JavaScope.Class, Some(ClassName))
 
   private val SecondaryCtorArgs = List(param"arg3: Int", param"arg4: Int")
 
@@ -58,13 +58,13 @@ class TemplateStatEnricherImplTest extends UnitTestSuite {
     doReturn(expectedEnrichedCtorSecondary)
       .when(ctorSecondaryEnricher).enrich(eqTree(SecondaryCtor), eqCtorSecondaryEnrichmentContext(CtorSecondaryContext))
 
-    val actualEnrichedCtorSecondary = templateStatEnricher.enrich(stat = SecondaryCtor, context = TemplaeStatContextWithClassName)
+    val actualEnrichedCtorSecondary = templateStatEnricher.enrich(stat = SecondaryCtor, context = TemplateBodyContextWithClassName)
     actualEnrichedCtorSecondary should equalEnrichedStat(expectedEnrichedCtorSecondary)
   }
 
   test("enrich() for secondary ctor. without class name should throw exception") {
     intercept[IllegalStateException] {
-      templateStatEnricher.enrich(stat = SecondaryCtor, context = TemplateStatEnrichmentContext(javaScope = JavaScope.Class))
+      templateStatEnricher.enrich(stat = SecondaryCtor, context = TemplateBodyEnrichmentContext(javaScope = JavaScope.Class))
     }
   }
 
@@ -77,7 +77,7 @@ class TemplateStatEnricherImplTest extends UnitTestSuite {
 
     val actualEnrichedDefnVar = templateStatEnricher.enrich(
       stat = TheDefnVar,
-      context = TemplateStatEnrichmentContext(javaScope = JavaScope.Class)
+      context = TemplateBodyEnrichmentContext(javaScope = JavaScope.Class)
     )
     actualEnrichedDefnVar should equalEnrichedStat(expectedEnrichedDefnVar)
   }
@@ -89,7 +89,7 @@ class TemplateStatEnricherImplTest extends UnitTestSuite {
 
     val actualEnrichedDefnVar = templateStatEnricher.enrich(
       stat = TheDefnVar,
-      context = TemplateStatEnrichmentContext(javaScope = JavaScope.Class)
+      context = TemplateBodyEnrichmentContext(javaScope = JavaScope.Class)
     )
     actualEnrichedDefnVar should equalEnrichedStat(expectedEnrichedDefnVar)
   }
@@ -102,7 +102,7 @@ class TemplateStatEnricherImplTest extends UnitTestSuite {
 
     val actualResult = templateStatEnricher.enrich(
       stat = TheDefnDef,
-      context = TemplateStatEnrichmentContext(javaScope = JavaScope.Class)
+      context = TemplateBodyEnrichmentContext(javaScope = JavaScope.Class)
     )
     actualResult should equalEnrichedStat(expectedEnrichedDefnDef)
   }
