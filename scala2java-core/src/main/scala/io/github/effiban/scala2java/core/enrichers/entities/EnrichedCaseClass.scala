@@ -4,12 +4,12 @@ import io.github.effiban.scala2java.core.entities.{JavaKeyword, JavaModifier}
 
 import scala.meta.{Ctor, Init, Mod, Name, Self, Type}
 
-case class EnrichedCaseClass(scalaMods: List[Mod] = Nil,
-                             javaModifiers: List[JavaModifier] = Nil,
-                             name: Type.Name,
-                             tparams: List[Type.Param] = Nil,
-                             ctor: Ctor.Primary,
-                             maybeInheritanceKeyword: Option[JavaKeyword] = None,
-                             inits: List[Init] = Nil,
-                             self: Self = Self(Name.Anonymous(), None),
-                             enrichedStats: List[EnrichedStat] = Nil) extends EnrichedClass
+case class EnrichedCaseClass(override val scalaMods: List[Mod] = Nil,
+                             override val javaModifiers: List[JavaModifier] = Nil,
+                             override val name: Type.Name,
+                             override val tparams: List[Type.Param] = Nil,
+                             override val ctor: Ctor.Primary,
+                             override val maybeInheritanceKeyword: Option[JavaKeyword] = None,
+                             override val inits: List[Init] = Nil,
+                             override val self: Self = Self(Name.Anonymous(), None),
+                             override val enrichedStats: List[EnrichedStat] = Nil) extends EnrichedClass

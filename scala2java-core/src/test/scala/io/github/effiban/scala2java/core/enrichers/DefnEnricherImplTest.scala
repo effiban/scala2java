@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.enrichers
 
 import io.github.effiban.scala2java.core.contexts.StatContext
 import io.github.effiban.scala2java.core.enrichers.entities.matchers.EnrichedDefnScalatestMatcher.equalEnrichedDefn
-import io.github.effiban.scala2java.core.enrichers.entities.{EnrichedDefnDef, EnrichedDefnVar, EnrichedRegularClass, EnrichedTrait}
+import io.github.effiban.scala2java.core.enrichers.entities._
 import io.github.effiban.scala2java.core.entities.JavaModifier
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.PrimaryCtors
@@ -20,12 +20,14 @@ class DefnEnricherImplTest extends UnitTestSuite {
   private val defnDefEnricher = mock[DefnDefEnricher]
   private val traitEnricher = mock[TraitEnricher]
   private val classEnricher = mock[ClassEnricher]
+  private val objectEnricher = mock[ObjectEnricher]
 
   private val defnEnricher = new DefnEnricherImpl(
     defnVarEnricher,
     defnDefEnricher,
     traitEnricher,
-    classEnricher
+    classEnricher,
+    objectEnricher
   )
 
   test("enrich() a Defn.Var") {
@@ -71,5 +73,17 @@ class DefnEnricherImplTest extends UnitTestSuite {
     doReturn(enrichedClass).when(classEnricher).enrich(eqTree(defnClass), eqTo(TheStatContext))
 
     defnEnricher.enrich(defnClass, TheStatContext) should equalEnrichedDefn(enrichedClass)
+  }
+
+  test("enrich() a Defn.Object") {
+    val defnObject = q"object MyObject { def myMethod(param1: Int, param2: Int): String = param1 + param2 }"
+    val enrichedObject = EnrichedObject(
+      name = q"MyObject",
+      enrichedStats = List(EnrichedDefnDef(q"def myMethod(param1: Int, param2: Int): String = param1 + param2"))
+    )
+
+    doReturn(enrichedObject).when(objectEnricher).enrich(eqTree(defnObject), eqTo(TheStatContext))
+
+    defnEnricher.enrich(defnObject, TheStatContext) should equalEnrichedDefn(enrichedObject)
   }
 }

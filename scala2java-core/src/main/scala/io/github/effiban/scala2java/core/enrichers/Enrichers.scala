@@ -26,7 +26,15 @@ object Enrichers {
     DefnVarEnricher,
     DefnDefEnricher,
     traitEnricher,
-    classEnricher
+    classEnricher,
+    objectEnricher
+  )
+
+  private[enrichers] lazy val objectEnricher: ObjectEnricher = new ObjectEnricherImpl(
+    templateEnricher,
+    JavaModifiersResolver,
+    JavaTreeTypeResolver,
+    JavaChildScopeResolver
   )
 
   private[enrichers] lazy val regularClassEnricher: RegularClassEnricher = new RegularClassEnricherImpl(
