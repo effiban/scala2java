@@ -6,5 +6,5 @@ import io.github.effiban.scala2java.spi.entities.JavaScope.JavaScope
 
 import scala.meta.Type
 
-case class TemplateBodyEnrichmentContext(override val javaScope: JavaScope = JavaScope.Unknown,
-                                         maybeClassName: Option[Type.Name] = None) extends JavaScopeAware
+case class TemplateEnrichmentContext(override val javaScope: JavaScope = JavaScope.Unknown,
+                                     maybeClassName: Option[Type.Name] = None) extends JavaScopeAware
