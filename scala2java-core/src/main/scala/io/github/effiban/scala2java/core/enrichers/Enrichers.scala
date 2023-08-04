@@ -1,9 +1,15 @@
 package io.github.effiban.scala2java.core.enrichers
 
 import io.github.effiban.scala2java.core.classifiers.DefnVarClassifier
-import io.github.effiban.scala2java.core.resolvers.{JavaInheritanceKeywordResolver, JavaModifiersResolver}
+import io.github.effiban.scala2java.core.resolvers.{JavaChildScopeResolver, JavaInheritanceKeywordResolver, JavaModifiersResolver}
 
 object Enrichers {
+
+  private[enrichers] lazy val caseClassEnricher: CaseClassEnricher = new CaseClassEnricherImpl(
+    templateEnricher,
+    JavaModifiersResolver,
+    JavaChildScopeResolver
+  )
 
   private[enrichers] lazy val defaultStatEnricher: DefaultStatEnricher = new DefaultStatEnricherImpl(
     defnEnricher,
