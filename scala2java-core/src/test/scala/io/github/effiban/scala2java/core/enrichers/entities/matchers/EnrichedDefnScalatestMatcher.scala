@@ -15,7 +15,8 @@ class EnrichedDefnScalatestMatcher(expectedEnrichedDefn: EnrichedDefn) extends M
         new EnrichedTraitScalatestMatcher(expectedEnrichedDefn)(actualEnrichedDefn).matches
       case (actualEnrichedDefn: EnrichedClass, expectedEnrichedDefn: EnrichedClass) =>
         new EnrichedClassScalatestMatcher(expectedEnrichedDefn)(actualEnrichedDefn).matches
-      // TODO handle Object
+      case (actualEnrichedDefn: EnrichedObject, expectedEnrichedDefn: EnrichedObject) =>
+        new EnrichedObjectScalatestMatcher(expectedEnrichedDefn)(actualEnrichedDefn).matches
       case (actualEnrichedDefn: EnrichedUnsupportedDefn, expectedEnrichedDefn: EnrichedUnsupportedDefn) =>
         actualEnrichedDefn.stat.structure == expectedEnrichedDefn.stat.structure
       case (anActualEnrichedDefn, anExpectedEnrichedDefn) => anActualEnrichedDefn == anExpectedEnrichedDefn
