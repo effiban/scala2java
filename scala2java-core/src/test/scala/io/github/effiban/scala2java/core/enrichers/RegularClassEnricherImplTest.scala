@@ -3,8 +3,8 @@ package io.github.effiban.scala2java.core.enrichers
 import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.enrichers.contexts.TemplateEnrichmentContext
 import io.github.effiban.scala2java.core.enrichers.contexts.matchers.TemplateEnrichmentContextMockitoMatcher.eqTemplateEnrichmentContext
-import io.github.effiban.scala2java.core.enrichers.entities.matchers.EnrichedRegularClassScalatestMatcher.equalEnrichedRegularClass
 import io.github.effiban.scala2java.core.enrichers.entities._
+import io.github.effiban.scala2java.core.enrichers.entities.matchers.EnrichedRegularClassScalatestMatcher.equalEnrichedRegularClass
 import io.github.effiban.scala2java.core.entities.JavaTreeType.JavaTreeType
 import io.github.effiban.scala2java.core.entities.{JavaKeyword, JavaModifier, JavaTreeType}
 import io.github.effiban.scala2java.core.matchers.JavaChildScopeContextMatcher.eqJavaChildScopeContext
@@ -216,6 +216,7 @@ class RegularClassEnricherImplTest extends UnitTestSuite {
     val expectedEnrichedRegularClass = EnrichedRegularClass(
       scalaMods = TheScalaMods,
       javaModifiers = TheJavaModifiers,
+      javaTypeKeyword = JavaKeyword.Enum,
       name = TheClassName,
       tparams = Nil,
       ctor = PrimaryCtors.Empty,
