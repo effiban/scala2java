@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.enrichers
 
 import io.github.effiban.scala2java.core.classifiers.{ClassClassifier, DefnVarClassifier}
-import io.github.effiban.scala2java.core.resolvers.{JavaChildScopeResolver, JavaInheritanceKeywordResolver, JavaModifiersResolver, JavaTreeTypeResolver}
+import io.github.effiban.scala2java.core.resolvers._
 
 object Enrichers {
 
@@ -44,6 +44,10 @@ object Enrichers {
     defaultStatEnricher
   )
 
+  private[enrichers] lazy val pkgStatListEnricher: PkgStatListEnricher = new PkgStatListEnricherImpl(
+    pkgStatEnricher,
+    SealedHierarchiesResolver
+  )
 
   private[enrichers] lazy val regularClassEnricher: RegularClassEnricher = new RegularClassEnricherImpl(
     templateEnricher,
