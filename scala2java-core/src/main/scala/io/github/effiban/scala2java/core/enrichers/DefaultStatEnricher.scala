@@ -10,7 +10,7 @@ trait DefaultStatEnricher {
 }
 
 private[enrichers] class DefaultStatEnricherImpl(defnEnricher: => DefnEnricher,
-                                                 declEnricher: => DeclEnricher) extends DefaultStatEnricher {
+                                                 declEnricher: DeclEnricher) extends DefaultStatEnricher {
 
   override def enrich(stat: Stat, statContext: StatContext = StatContext()): EnrichedStat = stat match {
     case pkg: Pkg => EnrichedSimpleStat(pkg) // TODO

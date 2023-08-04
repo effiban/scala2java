@@ -2,14 +2,14 @@ package io.github.effiban.scala2java.core.enrichers
 
 import io.github.effiban.scala2java.core.contexts.StatContext
 import io.github.effiban.scala2java.core.enrichers.entities.matchers.EnrichedDefnScalatestMatcher.equalEnrichedDefn
-import io.github.effiban.scala2java.core.enrichers.entities.{EnrichedDefnDef, EnrichedDefnVar}
+import io.github.effiban.scala2java.core.enrichers.entities.{EnrichedDefnDef, EnrichedDefnVar, EnrichedTrait}
 import io.github.effiban.scala2java.core.entities.JavaModifier
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
 
-import scala.meta.XtensionQuasiquoteTerm
+import scala.meta.{XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 class DefnEnricherImplTest extends UnitTestSuite {
 
@@ -17,8 +17,13 @@ class DefnEnricherImplTest extends UnitTestSuite {
 
   private val defnVarEnricher = mock[DefnVarEnricher]
   private val defnDefEnricher = mock[DefnDefEnricher]
+  private val traitEnricher = mock[TraitEnricher]
 
-  private val defnEnricher = new DefnEnricherImpl(defnVarEnricher, defnDefEnricher)
+  private val defnEnricher = new DefnEnricherImpl(
+    defnVarEnricher,
+    defnDefEnricher,
+    traitEnricher
+  )
 
   test("enrich() a Defn.Var") {
     val defnVar = q"private var myVar: Int = 3"
@@ -38,5 +43,17 @@ class DefnEnricherImplTest extends UnitTestSuite {
     doReturn(enrichedDefnDef).when(defnDefEnricher).enrich(eqTree(defnDef), eqTo(TheStatContext))
 
     defnEnricher.enrich(defnDef, TheStatContext) should equalEnrichedDefn(enrichedDefnDef)
+  }
+
+  test("enrich() a Defn.Trait") {
+    val defnTrait = q"trait MyTrait { def myMethod(param1: Int, param2: Int): String = param1 + param2 }"
+    val enrichedTrait = EnrichedTrait(
+      name = t"MyTrait",
+      enrichedStats = List(EnrichedDefnDef(q"def myMethod(param1: Int, param2: Int): String = param1 + param2"))
+    )
+
+    doReturn(enrichedTrait).when(traitEnricher).enrich(eqTree(defnTrait), eqTo(TheStatContext))
+
+    defnEnricher.enrich(defnTrait, TheStatContext) should equalEnrichedDefn(enrichedTrait)
   }
 }

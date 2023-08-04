@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.enrichers.entities.matchers
 
-import io.github.effiban.scala2java.core.enrichers.entities.{EnrichedDefn, EnrichedDefnDef, EnrichedDefnVar, EnrichedUnsupportedDefn}
+import io.github.effiban.scala2java.core.enrichers.entities._
 import org.scalatest.matchers.{MatchResult, Matcher}
 
 class EnrichedDefnScalatestMatcher(expectedEnrichedDefn: EnrichedDefn) extends Matcher[EnrichedDefn] {
@@ -11,7 +11,9 @@ class EnrichedDefnScalatestMatcher(expectedEnrichedDefn: EnrichedDefn) extends M
         new EnrichedDefnVarScalatestMatcher(expectedEnrichedDefn)(actualEnrichedDefn).matches
       case (actualEnrichedDefn: EnrichedDefnDef, expectedEnrichedDefn: EnrichedDefnDef) =>
         new EnrichedDefnDefScalatestMatcher(expectedEnrichedDefn)(actualEnrichedDefn).matches
-        // TODO handle trait / class / object
+      case (actualEnrichedDefn: EnrichedTrait, expectedEnrichedDefn: EnrichedTrait) =>
+        new EnrichedTraitScalatestMatcher(expectedEnrichedDefn)(actualEnrichedDefn).matches
+      // TODO handle class / object
       case (actualEnrichedDefn: EnrichedUnsupportedDefn, expectedEnrichedDefn: EnrichedUnsupportedDefn) =>
         actualEnrichedDefn.stat.structure == expectedEnrichedDefn.stat.structure
       case (anActualEnrichedDefn, anExpectedEnrichedDefn) => anActualEnrichedDefn == anExpectedEnrichedDefn
