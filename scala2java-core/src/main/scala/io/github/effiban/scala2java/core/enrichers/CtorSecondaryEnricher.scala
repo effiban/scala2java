@@ -23,3 +23,5 @@ private[enrichers] class CtorSecondaryEnricherImpl(javaModifiersResolver: JavaMo
     )
   }
 }
+
+object CtorSecondaryEnricher extends CtorSecondaryEnricherImpl(JavaModifiersResolver)

@@ -6,5 +6,5 @@ import io.github.effiban.scala2java.spi.entities.JavaScope.JavaScope
 
 import scala.meta.Type
 
-case class CtorSecondaryEnrichmentContext(override val javaScope: JavaScope = JavaScope.Unknown,
-                                          className: Type.Name) extends JavaScopeAware
+case class TemplateStatEnrichmentContext(override val javaScope: JavaScope = JavaScope.Unknown,
+                                         maybeClassName: Option[Type.Name] = None) extends JavaScopeAware
