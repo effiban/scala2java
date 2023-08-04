@@ -14,7 +14,7 @@ class EnrichedStatWithJavaModifiersScalatestMatcher(expectedEnriched: EnrichedSt
         new EnrichedDefnScalatestMatcher(expectedEnriched)(actualEnriched).matches
       case (actualEnriched: EnrichedCtorSecondary, expectedEnriched: EnrichedCtorSecondary) =>
         new EnrichedCtorSecondaryScalatestMatcher(expectedEnriched)(actualEnriched).matches
-      case (anActualEnriched, anExpectedEnriched) => anActualEnriched == anExpectedEnriched
+      case (anActualEnriched, anExpectedEnriched) => anActualEnriched.stat.structure == anExpectedEnriched.stat.structure
     }
 
     MatchResult(matches,
