@@ -9,6 +9,8 @@ object Enrichers {
     DeclEnricher
   )
 
+  private[enrichers] lazy val templateBodyEnricher: TemplateBodyEnricher = new TemplateBodyEnricherImpl(templateStatEnricher)
+
   private[enrichers] lazy val templateStatEnricher: TemplateStatEnricher = new TemplateStatEnricherImpl(
     CtorSecondaryEnricher,
     defaultStatEnricher,
