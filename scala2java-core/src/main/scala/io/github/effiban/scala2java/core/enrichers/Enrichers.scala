@@ -37,6 +37,14 @@ object Enrichers {
     JavaChildScopeResolver
   )
 
+  private[enrichers] lazy val pkgStatEnricher: PkgStatEnricher = new PkgStatEnricherImpl(
+    classEnricher,
+    traitEnricher,
+    objectEnricher,
+    defaultStatEnricher
+  )
+
+
   private[enrichers] lazy val regularClassEnricher: RegularClassEnricher = new RegularClassEnricherImpl(
     templateEnricher,
     JavaModifiersResolver,
