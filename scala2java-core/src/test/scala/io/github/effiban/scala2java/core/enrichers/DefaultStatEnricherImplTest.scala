@@ -14,10 +14,12 @@ import scala.meta.XtensionQuasiquoteTerm
 
 class DefaultStatEnricherImplTest extends UnitTestSuite {
 
+  private val pkgEnricher = mock[PkgEnricher]
   private val defnEnricher = mock[DefnEnricher]
   private val declEnricher = mock[DeclEnricher]
 
   private val defaultStatEnricher = new DefaultStatEnricherImpl(
+    pkgEnricher,
     defnEnricher,
     declEnricher
   )
@@ -74,5 +76,14 @@ class DefaultStatEnricherImplTest extends UnitTestSuite {
     doReturn(enriched).when(defnEnricher).enrich(eqTree(defnDef), eqTo(StatContext(JavaScope.Block)))
 
     defaultStatEnricher.enrich(defnDef, StatContext(JavaScope.Block)) should equalEnrichedStat(enriched)
+  }
+
+  test("enrich Pkg") {
+    val pkg = q"package a.b"
+    val enrichedPkg = EnrichedPkg(q"a.b")
+
+    doReturn(enrichedPkg).when(pkgEnricher).enrich(eqTree(pkg))
+
+    defaultStatEnricher.enrich(pkg) should equalEnrichedStat(enrichedPkg)
   }
 }
