@@ -1,39 +1,27 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{ClassOrTraitContext, StatContext}
-import io.github.effiban.scala2java.core.entities.SealedHierarchies
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.{ClassTraversalResult, ObjectTraversalResult, SimpleStatTraversalResult, TraitTraversalResult}
+import io.github.effiban.scala2java.core.traversers.results._
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
 
-import scala.meta.{Type, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
+import scala.meta.XtensionQuasiquoteTerm
 
 class PkgStatTraverserImplTest extends UnitTestSuite {
 
   private val TheImport = q"import extpkg.ExtClass"
+  private val TheTraversedImport = q"import extpkg2.ExtClass2"
 
-  private val TheTrait =
-    q"""
-    trait MyTrait {
-      final var x: Int
-    }
-    """
+  private val TheTrait = q"trait MyTrait { final var x: Int }"
+  private val TheTraversedTrait = q"trait MyTraversedTrait { final var xx: Int }"
 
-  private val TheClass =
-    q"""
-    class MyClass {
-      def foo(x: Int) = x + 1
-    }
-    """
+  private val TheClass = q"class MyClass { def foo(x: Int) = x + 1 }"
+  private val TheTraversedClass = q"class MyTraversedClass { def foo(xx: Int) = xx + 1 }"
 
-  private val TheObject =
-    q"""
-    object MyObject {
-      val x: Int = 3
-    }
-    """
+  private val TheObject = q"object MyObject { val x: Int = 3 } "
+  private val TheTraversedObject = q"object MyTraversedObject { val xx: Int = 3 } "
 
   private val classTraverser = mock[ClassTraverser]
   private val traitTraverser = mock[TraitTraverser]
@@ -52,123 +40,48 @@ class PkgStatTraverserImplTest extends UnitTestSuite {
     defaultStatTraverser
   )
 
-  test("traverse() for trait which is not sealed or child of sealed") {
+  test("traverse() for trait") {
     doReturn(traitTraversalResult).when(traitTraverser).traverse(
       eqTree(TheTrait),
       eqTo(ClassOrTraitContext(javaScope = JavaScope.Package))
     )
+    when(traitTraversalResult.tree).thenReturn(TheTraversedTrait)
 
-    pkgStatTraverser.traverse(TheTrait, SealedHierarchies()) shouldBe traitTraversalResult
+    pkgStatTraverser.traverse(TheTrait).value.structure shouldBe TheTraversedTrait.structure
   }
 
-  test("traverse() for sealed trait which is not child of sealed") {
-    val childNames = List(t"Child1", t"Child2")
-
-    doReturn(traitTraversalResult).when(traitTraverser).traverse(
-      eqTree(TheTrait),
-      eqTo(ClassOrTraitContext(javaScope = JavaScope.Package))
-    )
-
-    pkgStatTraverser.traverse(TheTrait, SealedHierarchies(Map(TheTrait.name -> childNames))) shouldBe traitTraversalResult
-  }
-
-  test("traverse() for non-sealed trait which is a child of sealed") {
-    val childNames = List(TheTrait.name, t"Other")
-
-    doReturn(traitTraversalResult).when(traitTraverser).traverse(
-      eqTree(TheTrait),
-      eqTo(ClassOrTraitContext(javaScope = JavaScope.Sealed))
-    )
-
-    pkgStatTraverser.traverse(TheTrait, SealedHierarchies(Map(t"Parent" -> childNames))) shouldBe traitTraversalResult
-  }
-
-  test("traverse() for sealed trait which is also a child of sealed") {
-    val traitChildNames = List(t"Child1", t"Child2")
-
-    doReturn(traitTraversalResult).when(traitTraverser).traverse(
-      eqTree(TheTrait),
-      eqTo(ClassOrTraitContext(javaScope = JavaScope.Sealed))
-    )
-
-    val actualResult = pkgStatTraverser.traverse(TheTrait, SealedHierarchies(
-      Map(
-        t"Parent" -> List(TheTrait.name, t"Other"),
-        TheTrait.name -> traitChildNames))
-    )
-    actualResult shouldBe traitTraversalResult
-  }
-
-  test("traverse() for class which is not sealed or child of sealed") {
+  test("traverse() for class") {
     doReturn(classTraversalResult).when(classTraverser).traverse(
       eqTree(TheClass),
       eqTo(ClassOrTraitContext(javaScope = JavaScope.Package))
     )
+    when(classTraversalResult.tree).thenReturn(TheTraversedClass)
 
-    pkgStatTraverser.traverse(TheClass, SealedHierarchies()) shouldBe classTraversalResult
+    pkgStatTraverser.traverse(TheClass).value.structure shouldBe TheTraversedClass.structure
   }
 
-  test("traverse() for sealed class which is not child of sealed") {
-    val childNames = List(t"Child1", t"Child2")
-
-    doReturn(classTraversalResult).when(classTraverser).traverse(
-      eqTree(TheClass),
-      eqTo(ClassOrTraitContext(javaScope = JavaScope.Package))
-    )
-
-    pkgStatTraverser.traverse(TheClass, SealedHierarchies(Map(TheClass.name -> childNames))) shouldBe classTraversalResult
-  }
-
-  test("traverse() for non-sealed class which is a child of sealed") {
-    val childNames = List(TheClass.name, t"Other")
-
-    doReturn(classTraversalResult).when(classTraverser).traverse(
-      eqTree(TheClass),
-      eqTo(ClassOrTraitContext(javaScope = JavaScope.Sealed))
-    )
-
-    pkgStatTraverser.traverse(TheClass, SealedHierarchies(Map(t"Parent" -> childNames))) shouldBe classTraversalResult
-  }
-
-  test("traverse() for sealed class which is also a child of sealed") {
-    val traitChildNames = List(t"Child1", t"Child2")
-    doReturn(classTraversalResult).when(classTraverser).traverse(
-      eqTree(TheClass),
-      eqTo(ClassOrTraitContext(javaScope = JavaScope.Sealed))
-    )
-
-    val actualResult = pkgStatTraverser.traverse(TheClass, SealedHierarchies(
-      Map(
-        t"Parent" -> List(TheClass.name, t"Other"),
-        TheClass.name -> traitChildNames))
-    )
-    actualResult shouldBe classTraversalResult
-  }
-
-  test("traverse() for object which is not a child of sealed") {
+  test("traverse() for object") {
     doReturn(objectTraversalResult).when(objectTraverser).traverse(
       eqTree(TheObject),
       eqTo(StatContext(javaScope = JavaScope.Package))
     )
+    when(objectTraversalResult.tree).thenReturn(TheTraversedObject)
 
-    pkgStatTraverser.traverse(TheObject, SealedHierarchies()) shouldBe objectTraversalResult
+    pkgStatTraverser.traverse(TheObject).value.structure shouldBe TheTraversedObject.structure
   }
 
-  test("traverse() for object which is a child of sealed") {
-    val childNames = List(TheObject.name, Type.Name("Other"))
-
-    doReturn(objectTraversalResult).when(objectTraverser).traverse(
-      eqTree(TheObject),
-      eqTo(StatContext(javaScope = JavaScope.Sealed))
-    )
-
-    pkgStatTraverser.traverse(TheObject, SealedHierarchies(Map(Type.Name("Parent") -> childNames))) shouldBe objectTraversalResult
-  }
-
-  test("traverse() for import") {
+  test("traverse() for included import") {
     doReturn(importTraversalResult)
       .when(defaultStatTraverser).traverse(eqTree(TheImport), eqTo(StatContext(javaScope = JavaScope.Package)))
+    when(importTraversalResult.tree).thenReturn(TheTraversedImport)
 
-    pkgStatTraverser.traverse(TheImport, SealedHierarchies()) shouldBe importTraversalResult
+    pkgStatTraverser.traverse(TheImport).value.structure shouldBe TheTraversedImport.structure
+  }
+
+  test("traverse() for excluded import") {
+    doReturn(EmptyStatTraversalResult)
+      .when(defaultStatTraverser).traverse(eqTree(TheImport), eqTo(StatContext(javaScope = JavaScope.Package)))
+
+    pkgStatTraverser.traverse(TheImport) shouldBe None
   }
 }
