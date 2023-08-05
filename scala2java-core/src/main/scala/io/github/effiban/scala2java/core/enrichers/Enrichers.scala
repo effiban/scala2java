@@ -57,6 +57,8 @@ object Enrichers {
     JavaChildScopeResolver
   )
 
+  lazy val sourceEnricher: SourceEnricher = new SourceEnricherImpl(defaultStatEnricher)
+
   private[enrichers] lazy val templateBodyEnricher: TemplateBodyEnricher = new TemplateBodyEnricherImpl(templateStatEnricher)
 
   private[enrichers] lazy val templateEnricher: TemplateEnricher = new TemplateEnricherImpl(
