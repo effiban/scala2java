@@ -38,7 +38,7 @@ private[contextfactories] class DefnRenderContextFactoryImpl(traitRenderContextF
     case enrichedTrait: EnrichedTrait => createTraitContext(enrichedTrait, sealedHierarchies)
     case enrichedCaseClass: EnrichedCaseClass => caseClassRenderContextFactory(enrichedCaseClass)
     case enrichedRegularClass: EnrichedRegularClass => createRegularClassContext(enrichedRegularClass, sealedHierarchies)
-    case enrichedObject: EnrichedObject => UnsupportedDefnRenderContext // TODO
+    case enrichedObject: EnrichedObject => objectRenderContextFactory(enrichedObject)
     case _ => UnsupportedDefnRenderContext
   }
 
