@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.enrichers.entities.matchers
 
+import io.github.effiban.scala2java.core.enrichers.EnrichedPkg
 import io.github.effiban.scala2java.core.enrichers.entities.{EnrichedSimpleStat, EnrichedStat, EnrichedStatWithJavaModifiers}
 import org.scalatest.matchers.{MatchResult, Matcher}
 
@@ -7,9 +8,10 @@ class EnrichedStatScalatestMatcher(expectedEnriched: EnrichedStat) extends Match
 
   override def apply(actualEnriched: EnrichedStat): MatchResult = {
     val matches = (actualEnriched, expectedEnriched) match {
+      case (actualEnriched: EnrichedPkg, expectedEnriched: EnrichedPkg) =>
+        new EnrichedPkgScalatestMatcher(expectedEnriched)(actualEnriched).matches
       case (actualEnriched: EnrichedStatWithJavaModifiers, expectedEnriched: EnrichedStatWithJavaModifiers) =>
         new EnrichedStatWithJavaModifiersScalatestMatcher(expectedEnriched)(actualEnriched).matches
-      // TODO handle Pkg
       case (actualEnriched: EnrichedSimpleStat, expectedEnriched: EnrichedSimpleStat) =>
         actualEnriched.stat.structure == expectedEnriched.stat.structure
       case (anActualEnriched, anExpectedEnriched) => anActualEnriched == anExpectedEnriched
