@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.renderers.contextfactories
 
-import io.github.effiban.scala2java.core.enrichers.entities.{EnrichedDefnDef, EnrichedDefnVar, EnrichedTrait}
+import io.github.effiban.scala2java.core.enrichers.entities.{EnrichedCaseClass, EnrichedDefnDef, EnrichedDefnVar, EnrichedTrait}
 import io.github.effiban.scala2java.core.entities.{JavaModifier, SealedHierarchies}
 import io.github.effiban.scala2java.core.renderers.contexts._
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
@@ -37,6 +37,7 @@ class DefnRenderContextFactoryImplTest extends UnitTestSuite {
   private val enrichedDefnVar = mock[EnrichedDefnVar]
   private val enrichedDefnDef = mock[EnrichedDefnDef]
   private val enrichedTrait = mock[EnrichedTrait]
+  private val enrichedCaseClass = mock[EnrichedCaseClass]
 
   private val traitRenderContext = mock[TraitRenderContext]
   private val caseClassRenderContext = mock[CaseClassRenderContext]
@@ -60,6 +61,8 @@ class DefnRenderContextFactoryImplTest extends UnitTestSuite {
     when(enrichedTrait.name).thenReturn(TheTraitName)
 
     when(caseClassTraversalResult.name).thenReturn(TheCaseClassName)
+    when(enrichedCaseClass.name).thenReturn(TheCaseClassName)
+
     when(regularClassTraversalResult.name).thenReturn(TheRegularClassName)
     when(objectTraversalResult.name).thenReturn(TheObjectName)
   }
@@ -154,6 +157,12 @@ class DefnRenderContextFactoryImplTest extends UnitTestSuite {
     when(caseClassRenderContextFactory(eqTo(caseClassTraversalResult))).thenReturn(caseClassRenderContext)
 
     defnRenderContextFactory(caseClassTraversalResult) shouldBe caseClassRenderContext
+  }
+
+  test("apply() for EnrichedCaseClass") {
+    when(caseClassRenderContextFactory(eqTo(enrichedCaseClass))).thenReturn(caseClassRenderContext)
+
+    defnRenderContextFactory(enrichedCaseClass, SealedHierarchies()) shouldBe caseClassRenderContext
   }
 
   test("apply() for RegularClassTraversalResult when class has permitted sub-types") {
