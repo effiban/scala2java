@@ -15,11 +15,8 @@ private[traversers] class PkgTraverserImpl(defaultTermRefTraverser: => DefaultTe
   override def traverse(pkg: Pkg): Pkg = {
     val traversedPkgRef = defaultTermRefTraverser.traverse(pkg.ref)
     val enrichedPkgStats = Import(additionalImportersProvider.provide()) +: pkg.stats
-    val pkgStatListResult = pkgStatListTraverser.traverse(enrichedPkgStats)
+    val traversedPkgStats = pkgStatListTraverser.traverse(enrichedPkgStats)
 
-    Pkg(
-      ref = traversedPkgRef,
-      stats = pkgStatListResult.statResults.map(_.tree)
-    )
+    Pkg(ref = traversedPkgRef, stats = traversedPkgStats)
   }
 }

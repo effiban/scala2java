@@ -23,44 +23,44 @@ class SealedHierarchiesResolverImplTest extends UnitTestSuite {
     when(modsClassifier.includeSealed(eqTreeList(SealedMods))).thenReturn(true)
   }
 
-  test("traverse for import and class") {
+  test("resolve for import and class") {
     val importDef = Import(List(Importer(Term.Name("A"), List(Importee.Name(Name.Indeterminate("a"))))))
     val classDef = defnClass(Type.Name("B"))
     val stats = List(importDef, classDef)
 
     when(modsClassifier.includeSealed(Nil)).thenReturn(false)
 
-    sealedHierarchiesResolver.traverse(stats) shouldBe SealedHierarchies()
+    sealedHierarchiesResolver.resolve(stats) shouldBe SealedHierarchies()
   }
 
-  test("traverse for trait and object, no inheritance") {
+  test("resolve for trait and object, no inheritance") {
     val traitDef = defnTrait(Type.Name("A"))
     val objectDef = defnObject(Term.Name("B"))
     val stats = List(traitDef, objectDef)
 
     when(modsClassifier.includeSealed(Nil)).thenReturn(false)
 
-    sealedHierarchiesResolver.traverse(stats) shouldBe SealedHierarchies()
+    sealedHierarchiesResolver.resolve(stats) shouldBe SealedHierarchies()
   }
 
-  test("traverse for not-sealed class and extending object") {
+  test("resolve for not-sealed class and extending object") {
     val classDef = defnClass(Type.Name("A"))
     val objectDef = defnObject(name = Term.Name("B"), parentNames = List(Type.Name("A")))
     val stats = List(classDef, objectDef)
 
-    sealedHierarchiesResolver.traverse(stats) shouldBe SealedHierarchies()
+    sealedHierarchiesResolver.resolve(stats) shouldBe SealedHierarchies()
   }
 
-  test("traverse for not-sealed trait and 2 extending objects") {
+  test("resolve for not-sealed trait and 2 extending objects") {
     val traitDef = defnTrait(Type.Name("A"))
     val objectDef1 = defnObject(name = Term.Name("B"), parentNames = List(Type.Name("A")))
     val objectDef2 = defnObject(name = Term.Name("C"), parentNames = List(Type.Name("A")))
     val stats = List(traitDef, objectDef1, objectDef2)
 
-    sealedHierarchiesResolver.traverse(stats) shouldBe SealedHierarchies()
+    sealedHierarchiesResolver.resolve(stats) shouldBe SealedHierarchies()
   }
 
-  test("traverse for sealed trait and 2 extending objects") {
+  test("resolve for sealed trait and 2 extending objects") {
     val traitDef = defnTrait(name = Type.Name("A"), mods = SealedMods)
     val objectDef1 = defnObject(name = Term.Name("B"), parentNames = List(Type.Name("A")))
     val objectDef2 = defnObject(name = Term.Name("C"), parentNames = List(Type.Name("A")))
@@ -68,10 +68,10 @@ class SealedHierarchiesResolverImplTest extends UnitTestSuite {
 
     val expectedSealedHierarchies = SealedHierarchies(Map(Type.Name("A") -> List(Term.Name("B"), Term.Name("C"))))
 
-    sealedHierarchiesResolver.traverse(stats).asStringMap() shouldBe expectedSealedHierarchies.asStringMap()
+    sealedHierarchiesResolver.resolve(stats).asStringMap() shouldBe expectedSealedHierarchies.asStringMap()
   }
 
-  test("traverse for sealed trait and 2 extending classes") {
+  test("resolve for sealed trait and 2 extending classes") {
     val traitDef = defnTrait(name = Type.Name("A"), mods = SealedMods)
     val classDef1 = defnClass(name = Type.Name("B"), parentNames = List(Type.Name("A")))
     val classDef2 = defnClass(name = Type.Name("C"), parentNames = List(Type.Name("A")))
@@ -79,10 +79,10 @@ class SealedHierarchiesResolverImplTest extends UnitTestSuite {
 
     val expectedSealedHierarchies = SealedHierarchies(Map(Type.Name("A") -> List(Term.Name("B"), Term.Name("C"))))
 
-    sealedHierarchiesResolver.traverse(stats).asStringMap() shouldBe expectedSealedHierarchies.asStringMap()
+    sealedHierarchiesResolver.resolve(stats).asStringMap() shouldBe expectedSealedHierarchies.asStringMap()
   }
 
-  test("traverse for sealed class and 2 extending objects") {
+  test("resolve for sealed class and 2 extending objects") {
     val classDef = defnClass(name = Type.Name("A"), mods = SealedMods)
     val objectDef1 = defnObject(name = Term.Name("B"), parentNames = List(Type.Name("A")))
     val objectDef2 = defnObject(name = Term.Name("C"), parentNames = List(Type.Name("A")))
@@ -90,10 +90,10 @@ class SealedHierarchiesResolverImplTest extends UnitTestSuite {
 
     val expectedSealedHierarchies = SealedHierarchies(Map(Type.Name("A") -> List(Term.Name("B"), Term.Name("C"))))
 
-    sealedHierarchiesResolver.traverse(stats).asStringMap() shouldBe expectedSealedHierarchies.asStringMap()
+    sealedHierarchiesResolver.resolve(stats).asStringMap() shouldBe expectedSealedHierarchies.asStringMap()
   }
 
-  test("traverse for sealed class and 2 extending objects, plus one extra object") {
+  test("resolve for sealed class and 2 extending objects, plus one extra object") {
     val classDef = defnClass(name = Type.Name("A"), mods = SealedMods)
     val objectDef1 = defnObject(name = Term.Name("B"), parentNames = List(Type.Name("A")))
     val objectDef2 = defnObject(name = Term.Name("C"), parentNames = List(Type.Name("A")))
@@ -102,10 +102,10 @@ class SealedHierarchiesResolverImplTest extends UnitTestSuite {
 
     val expectedSealedHierarchies = SealedHierarchies(Map(Type.Name("A") -> List(Term.Name("B"), Term.Name("C"))))
 
-    sealedHierarchiesResolver.traverse(stats).asStringMap() shouldBe expectedSealedHierarchies.asStringMap()
+    sealedHierarchiesResolver.resolve(stats).asStringMap() shouldBe expectedSealedHierarchies.asStringMap()
   }
 
-  test("traverse for two separate sealed hierarchies") {
+  test("resolve for two separate sealed hierarchies") {
     val traitDefA = defnTrait(name = Type.Name("A"), mods = SealedMods)
     val objectDefA1 = defnObject(name = Term.Name("A1"), parentNames = List(Type.Name("A")))
     val objectDefA2 = defnObject(name = Term.Name("A2"), parentNames = List(Type.Name("A")))
@@ -127,10 +127,10 @@ class SealedHierarchiesResolverImplTest extends UnitTestSuite {
       Type.Name("B") -> List(Term.Name("B1"), Term.Name("B2")))
     )
 
-    sealedHierarchiesResolver.traverse(stats).asStringMap() shouldBe expectedSealedHierarchies.asStringMap()
+    sealedHierarchiesResolver.resolve(stats).asStringMap() shouldBe expectedSealedHierarchies.asStringMap()
   }
 
-  test("traverse for two nested sealed hierarchies") {
+  test("resolve for two nested sealed hierarchies") {
     val traitDefA = defnTrait(name = Type.Name("A"), mods = SealedMods)
     val objectDefA1 = defnObject(name = Term.Name("A1"), parentNames = List(Type.Name("A")))
     val objectDefA2 = defnObject(name = Term.Name("A2"), parentNames = List(Type.Name("A")))
@@ -152,7 +152,7 @@ class SealedHierarchiesResolverImplTest extends UnitTestSuite {
       Type.Name("B") -> List(Term.Name("B1"), Term.Name("B2")))
     )
 
-    sealedHierarchiesResolver.traverse(stats).asStringMap() shouldBe expectedSealedHierarchies.asStringMap()
+    sealedHierarchiesResolver.resolve(stats).asStringMap() shouldBe expectedSealedHierarchies.asStringMap()
   }
 
   private def defnTrait(name: Type.Name, parentNames: List[Type.Name] = Nil, mods: List[Mod] = Nil): Defn.Trait = {
