@@ -3,7 +3,6 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.entities.{JavaModifier, SealedHierarchies}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.traversers.results._
-import io.github.effiban.scala2java.core.traversers.results.matchers.PkgTraversalResultScalatestMatcher.equalPkgTraversalResult
 import io.github.effiban.scala2java.spi.providers.AdditionalImportersProvider
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -63,16 +62,15 @@ class PkgTraverserImplTest extends UnitTestSuite {
       statResults = expectedStatResults,
       sealedHierarchies = TheSealedHierarchies
     )
-    val expectedPkgTraversalResult = PkgTraversalResult(
-      pkgRef = traversedPkgRef,
-      statResults = expectedStatResults,
-      sealedHierarchies = TheSealedHierarchies
+    val expectedPkg = Pkg(
+      ref = traversedPkgRef,
+      stats = expectedStatResults.map(_.tree),
     )
 
     doReturn(traversedPkgRef).when(defaultTermRefTraverser).traverse(eqTree(pkgRef))
     when(additionalImportersProvider.provide()).thenReturn(CoreImporters)
     doReturn(expectedPkgStatListTraversalResult).when(pkgStatListTraverser).traverse(eqTreeList(expectedEnrichedStats))
 
-    pkgTraverser.traverse(pkg) should equalPkgTraversalResult(expectedPkgTraversalResult)
+    pkgTraverser.traverse(pkg).structure shouldBe expectedPkg.structure
   }
 }

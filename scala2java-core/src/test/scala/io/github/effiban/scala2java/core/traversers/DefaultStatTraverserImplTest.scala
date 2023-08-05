@@ -58,9 +58,10 @@ class DefaultStatTraverserImplTest extends UnitTestSuite {
 
   test("traverse Pkg") {
     val pkg = q"package a.b"
-    val traversalResult = PkgTraversalResult(pkgRef = q"aa.bb")
+    val traversedPkg = q"package aa.bb"
+    val traversalResult = SimpleStatTraversalResult(traversedPkg)
 
-    doReturn(traversalResult).when(pkgTraverser).traverse(eqTree(pkg))
+    doReturn(traversedPkg).when(pkgTraverser).traverse(eqTree(pkg))
 
     defaultStatTraverser.traverse(pkg) should equalStatTraversalResult(traversalResult)
   }
