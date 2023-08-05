@@ -18,7 +18,7 @@ private[traversers] class DefaultStatTraverserImpl(statTermTraverser: => StatTer
   override def traverse(stat: Stat, statContext: StatContext = StatContext()): StatTraversalResult = stat match {
     case term: Term => SimpleStatTraversalResult(statTermTraverser.traverse(term))
     case `import`: Import => traverseImport(`import`)
-    case pkg: Pkg => pkgTraverser.traverse(pkg)
+    case pkg: Pkg => SimpleStatTraversalResult(pkgTraverser.traverse(pkg))
     case defn: Defn => defnTraverser.traverse(defn, statContext)
     case decl: Decl => declTraverser.traverse(decl, statContext)
     case other => SimpleStatTraversalResult(other)
