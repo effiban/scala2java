@@ -24,8 +24,8 @@ private[matchers] object FileMismatchMessageGenerator {
   private def generate(expectedLines: Seq[String], actualLines: Seq[String], mismatchingLineNum: Int): String = {
     val maxNumLines = max(actualLines.size, expectedLines.size)
     val maxLineNumDigits = numDigitsOf(maxNumLines)
-    val maxExpectedLineLength = expectedLines.map(_.length).max
-    val maxActualLineLength = actualLines.map(_.length).max
+    val maxExpectedLineLength = maxOrZero(expectedLines)
+    val maxActualLineLength = maxOrZero(actualLines)
     val maxRowLength = maxLineNumDigits + maxExpectedLineLength + maxActualLineLength + (2 * Divider.length)
 
     val diffBuilder = new mutable.StringBuilder(500)
@@ -92,5 +92,9 @@ private[matchers] object FileMismatchMessageGenerator {
   }
 
   private def numDigitsOf(num: Int) = floor(log10(num)).toInt + 1
+
+  private def maxOrZero(expectedLines: Seq[String]) = {
+    if (expectedLines.isEmpty) 0 else expectedLines.map(_.length).max
+  }
 }
 

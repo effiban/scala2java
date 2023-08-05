@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.enrichers
 
+import io.github.effiban.scala2java.core.classifiers.InitClassifier
 import io.github.effiban.scala2java.core.enrichers.contexts.TemplateEnrichmentContext
 import io.github.effiban.scala2java.core.enrichers.contexts.matchers.TemplateEnrichmentContextMockitoMatcher.eqTemplateEnrichmentContext
 import io.github.effiban.scala2java.core.enrichers.entities.matchers.EnrichedTemplateScalatestMatcher.equalEnrichedTemplate
@@ -9,9 +10,9 @@ import io.github.effiban.scala2java.core.resolvers.JavaInheritanceKeywordResolve
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
-import org.mockito.ArgumentMatchersSugar.eqTo
+import org.mockito.ArgumentMatchersSugar.{any, eqTo}
 
-import scala.meta.{Name, Self, Template, Type, XtensionQuasiquoteInit, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
+import scala.meta.{Init, Name, Self, Template, Type, XtensionQuasiquoteInit, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 class TemplateEnricherImplTest extends UnitTestSuite {
 
@@ -25,7 +26,8 @@ class TemplateEnricherImplTest extends UnitTestSuite {
 
   private val Init1 = init"Parent1()"
   private val Init2 = init"Parent2()"
-  private val TheInits = List(Init1, Init2)
+  private val EnumInit = init"Enumeration()"
+  private val TheNonEnumInits = List(Init1, Init2)
 
   private val TheSelf = Self(name = Name.Indeterminate("SelfName"), decltpe = Some(t"SelfType"))
 
@@ -41,27 +43,69 @@ class TemplateEnricherImplTest extends UnitTestSuite {
 
   private val javaInheritanceKeywordResolver = mock[JavaInheritanceKeywordResolver]
   private val templateBodyEnricher = mock[TemplateBodyEnricher]
+  private val initClassifier = mock[InitClassifier]
 
   private val templateEnricher = new TemplateEnricherImpl(
     templateBodyEnricher,
-    javaInheritanceKeywordResolver
+    javaInheritanceKeywordResolver,
+    initClassifier
   )
 
-  test("enrich when has inits") {
+  test("enrich when has non-enum inits only") {
     val template = Template(
       early = Nil,
-      inits = TheInits,
+      inits = TheNonEnumInits,
       self = TheSelf,
       stats = TheStats
     )
     val expectedEnrichedTemplate = EnrichedTemplate(
       maybeInheritanceKeyword = Some(Implements),
-      inits = TheInits,
+      inits = TheNonEnumInits,
       self = TheSelf,
       enrichedStats = TheEnrichedStats
     )
 
-    when(javaInheritanceKeywordResolver.resolve(eqTo(TheJavaScope), eqTreeList(TheInits))).thenReturn(Implements)
+    expectClassifyInits()
+    expectResolveInheritanceKeyword()
+    expectEnrichBody()
+
+    templateEnricher.enrich(template, TheContext) should equalEnrichedTemplate(expectedEnrichedTemplate)
+  }
+
+  test("enrich when has non-enum inits and enum inits") {
+    val template = Template(
+      early = Nil,
+      inits = TheNonEnumInits :+ EnumInit,
+      self = TheSelf,
+      stats = TheStats
+    )
+    val expectedEnrichedTemplate = EnrichedTemplate(
+      maybeInheritanceKeyword = Some(Implements),
+      inits = TheNonEnumInits,
+      self = TheSelf,
+      enrichedStats = TheEnrichedStats
+    )
+
+    expectClassifyInits()
+    expectResolveInheritanceKeyword()
+    expectEnrichBody()
+
+    templateEnricher.enrich(template, TheContext) should equalEnrichedTemplate(expectedEnrichedTemplate)
+  }
+
+  test("enrich when has enum inits only") {
+    val template = Template(
+      early = Nil,
+      inits = List(EnumInit),
+      self = TheSelf,
+      stats = TheStats
+    )
+    val expectedEnrichedTemplate = EnrichedTemplate(
+      self = TheSelf,
+      enrichedStats = TheEnrichedStats
+    )
+
+    expectClassifyInits()
     expectEnrichBody()
 
     templateEnricher.enrich(template, TheContext) should equalEnrichedTemplate(expectedEnrichedTemplate)
@@ -83,6 +127,18 @@ class TemplateEnricherImplTest extends UnitTestSuite {
     expectEnrichBody()
 
     templateEnricher.enrich(template, TheContext) should equalEnrichedTemplate(expectedEnrichedTemplate)
+  }
+
+
+  private def expectClassifyInits(): Unit = {
+    doAnswer((init: Init) => init match {
+      case anInit if anInit.structure == EnumInit.structure => true
+      case _ => false
+    }).when(initClassifier).isEnum(any[Init])
+  }
+
+  private def expectResolveInheritanceKeyword() = {
+    when(javaInheritanceKeywordResolver.resolve(eqTo(TheJavaScope), eqTreeList(TheNonEnumInits))).thenReturn(Implements)
   }
 
   private def expectEnrichBody(): Unit = {

@@ -8,8 +8,7 @@ object CoreTemplateInitExcludedPredicate extends TemplateInitExcludedPredicate {
 
   private val TypesToExclude = Set[Type](
     Type.Name("Product"),
-    Type.Name("Serializable"),
-    Type.Name("Enumeration")
+    Type.Name("Serializable")
   )
 
   override def apply(init: Init): Boolean = TypesToExclude.exists(_.structure == init.tpe.structure)

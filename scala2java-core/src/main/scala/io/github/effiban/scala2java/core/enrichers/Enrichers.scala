@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.enrichers
 
-import io.github.effiban.scala2java.core.classifiers.{ClassClassifier, DefnVarClassifier}
+import io.github.effiban.scala2java.core.classifiers.{ClassClassifier, DefnVarClassifier, InitClassifier}
 import io.github.effiban.scala2java.core.resolvers._
 
 object Enrichers {
@@ -63,7 +63,8 @@ object Enrichers {
 
   private[enrichers] lazy val templateEnricher: TemplateEnricher = new TemplateEnricherImpl(
     templateBodyEnricher,
-    JavaInheritanceKeywordResolver
+    JavaInheritanceKeywordResolver,
+    InitClassifier
   )
 
   private[enrichers] lazy val templateStatEnricher: TemplateStatEnricher = new TemplateStatEnricherImpl(
