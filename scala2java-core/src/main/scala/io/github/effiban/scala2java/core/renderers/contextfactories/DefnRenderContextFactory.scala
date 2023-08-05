@@ -37,7 +37,7 @@ private[contextfactories] class DefnRenderContextFactoryImpl(traitRenderContextF
     case enrichedDefnDef: EnrichedDefnDef => DefRenderContext(enrichedDefnDef.javaModifiers)
     case enrichedTrait: EnrichedTrait => createTraitContext(enrichedTrait, sealedHierarchies)
     case enrichedCaseClass: EnrichedCaseClass => caseClassRenderContextFactory(enrichedCaseClass)
-    case enrichedRegularClass: EnrichedRegularClass => UnsupportedDefnRenderContext // TODO
+    case enrichedRegularClass: EnrichedRegularClass => createRegularClassContext(enrichedRegularClass, sealedHierarchies)
     case enrichedObject: EnrichedObject => UnsupportedDefnRenderContext // TODO
     case _ => UnsupportedDefnRenderContext
   }
@@ -46,6 +46,11 @@ private[contextfactories] class DefnRenderContextFactoryImpl(traitRenderContextF
   private def createRegularClassContext(regularClassTraversalResult: RegularClassTraversalResult, sealedHierarchies: SealedHierarchies) = {
     val permittedSubTypeNames = sealedHierarchies.getSubTypeNames(regularClassTraversalResult.name)
     regularClassRenderContextFactory(regularClassTraversalResult, permittedSubTypeNames)
+  }
+
+  private def createRegularClassContext(enrichedRegularClass: EnrichedRegularClass, sealedHierarchies: SealedHierarchies) = {
+    val permittedSubTypeNames = sealedHierarchies.getSubTypeNames(enrichedRegularClass.name)
+    regularClassRenderContextFactory(enrichedRegularClass, permittedSubTypeNames)
   }
 
   @deprecated

@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.renderers.contextfactories
 
+import io.github.effiban.scala2java.core.enrichers.entities.{EnrichedRegularClass, EnrichedTemplate}
 import io.github.effiban.scala2java.core.entities.{JavaKeyword, JavaModifier}
 import io.github.effiban.scala2java.core.renderers.contexts.{RegularClassRenderContext, TemplateBodyRenderContext, VarRenderContext}
 import io.github.effiban.scala2java.core.renderers.matchers.RegularClassRenderContextScalatestMatcher.equalRegularClassRenderContext
@@ -21,8 +22,13 @@ class RegularClassRenderContextFactoryImplTest extends UnitTestSuite {
     )
   )
 
+  @deprecated
   private val templateTraversalResult = mock[TemplateTraversalResult]
+  @deprecated
   private val regularClassTraversalResult = mock[RegularClassTraversalResult]
+
+  private val enrichedTemplate = mock[EnrichedTemplate]
+  private val enrichedRegularClass = mock[EnrichedRegularClass]
 
   private val templateBodyRenderContextFactory = mock[TemplateBodyRenderContextFactory]
 
@@ -32,9 +38,13 @@ class RegularClassRenderContextFactoryImplTest extends UnitTestSuite {
     when(regularClassTraversalResult.javaTypeKeyword).thenReturn(TheJavaTypeKeyword)
     when(regularClassTraversalResult.templateResult).thenReturn(templateTraversalResult)
     when(templateBodyRenderContextFactory(templateTraversalResult)).thenReturn(TheTemplateBodyRenderContext)
+
+    when(enrichedRegularClass.javaTypeKeyword).thenReturn(TheJavaTypeKeyword)
+    when(enrichedRegularClass.enrichedTemplate).thenReturn(enrichedTemplate)
+    when(templateBodyRenderContextFactory(enrichedTemplate)).thenReturn(TheTemplateBodyRenderContext)
   }
 
-  test("apply() when input has all Java-specific attributes") {
+  test("apply() to RegularClassTraversalResult when input has all Java-specific attributes") {
     val expectedRegularClassRenderContext = RegularClassRenderContext(
       javaModifiers = TheJavaModifiers,
       javaTypeKeyword = TheJavaTypeKeyword,
@@ -50,7 +60,23 @@ class RegularClassRenderContextFactoryImplTest extends UnitTestSuite {
     actualRegularClassRenderContext should equalRegularClassRenderContext(expectedRegularClassRenderContext)
   }
 
-  test("apply() when input has mandatory Java-specific attributes only") {
+  test("apply() to EnrichedRegularClass when input has all Java-specific attributes") {
+    val expectedRegularClassRenderContext = RegularClassRenderContext(
+      javaModifiers = TheJavaModifiers,
+      javaTypeKeyword = TheJavaTypeKeyword,
+      maybeInheritanceKeyword = Some(TheJavaInheritanceKeyword),
+      permittedSubTypeNames = ThePermittedSubTypeNames,
+      bodyContext = TheTemplateBodyRenderContext
+    )
+
+    when(enrichedRegularClass.javaModifiers).thenReturn(TheJavaModifiers)
+    when(enrichedRegularClass.maybeInheritanceKeyword).thenReturn(Some(TheJavaInheritanceKeyword))
+
+    val actualRegularClassRenderContext = regularClassRenderContextFactory(enrichedRegularClass, ThePermittedSubTypeNames)
+    actualRegularClassRenderContext should equalRegularClassRenderContext(expectedRegularClassRenderContext)
+  }
+
+  test("apply() to RegularClassTraversalResult when input has mandatory Java-specific attributes only") {
     val expectedRegularClassRenderContext = RegularClassRenderContext(
       javaTypeKeyword = TheJavaTypeKeyword,
       bodyContext = TheTemplateBodyRenderContext
@@ -60,5 +86,17 @@ class RegularClassRenderContextFactoryImplTest extends UnitTestSuite {
     when(regularClassTraversalResult.maybeInheritanceKeyword).thenReturn(None)
 
     regularClassRenderContextFactory(regularClassTraversalResult) should equalRegularClassRenderContext(expectedRegularClassRenderContext)
+  }
+
+  test("apply() to EnrichedRegularClass when input has mandatory Java-specific attributes only") {
+    val expectedRegularClassRenderContext = RegularClassRenderContext(
+      javaTypeKeyword = TheJavaTypeKeyword,
+      bodyContext = TheTemplateBodyRenderContext
+    )
+
+    when(enrichedRegularClass.javaModifiers).thenReturn(Nil)
+    when(enrichedRegularClass.maybeInheritanceKeyword).thenReturn(None)
+
+    regularClassRenderContextFactory(enrichedRegularClass, Nil) should equalRegularClassRenderContext(expectedRegularClassRenderContext)
   }
 }
