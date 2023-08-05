@@ -4,6 +4,7 @@ import io.github.effiban.scala2java.core.entities.{JavaKeyword, JavaModifier}
 
 import scala.meta.{Ctor, Defn, Init, Mod, Name, Self, Template, Type}
 
+@deprecated
 case class RegularClassTraversalResult(scalaMods: List[Mod] = Nil,
                                        javaModifiers: List[JavaModifier] = Nil,
                                        javaTypeKeyword: JavaKeyword = JavaKeyword.Class,

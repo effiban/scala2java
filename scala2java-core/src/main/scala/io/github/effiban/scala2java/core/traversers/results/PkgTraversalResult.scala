@@ -4,6 +4,7 @@ import io.github.effiban.scala2java.core.entities.SealedHierarchies
 
 import scala.meta.{Pkg, Stat, Term}
 
+@deprecated
 case class PkgTraversalResult(pkgRef: Term.Ref,
                               statResults: List[PopulatedStatTraversalResult] = Nil,
                               sealedHierarchies: SealedHierarchies = SealedHierarchies()) extends PopulatedStatTraversalResult {
