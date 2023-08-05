@@ -50,6 +50,12 @@ class DefaultStatRenderContextFactoryImplTest extends UnitTestSuite {
     defaultStatRenderContextFactory(pkgTraversalResult, TheSealedHierarchies) shouldBe pkgRenderContext
   }
 
+  test("apply() for an EnrichedPkg") {
+    when(pkgRenderContextFactory(enrichedPkg)).thenReturn(pkgRenderContext)
+
+    defaultStatRenderContextFactory(enrichedPkg, TheSealedHierarchies) shouldBe pkgRenderContext
+  }
+
   test("apply() for a DeclTraversalResult") {
     when(declRenderContextFactory(declTraversalResult)).thenReturn(declRenderContext)
 

@@ -29,7 +29,7 @@ private[contextfactories] class DefaultStatRenderContextFactoryImpl(pkgRenderCon
 
   override def apply(enrichedStat: EnrichedStat, sealedHierarchies: SealedHierarchies): StatRenderContext =
     enrichedStat match {
-      case enrichedPkg: EnrichedPkg => EmptyStatRenderContext // TODO
+      case enrichedPkg: EnrichedPkg => pkgRenderContextFactory(enrichedPkg)
       case enrichedDecl: EnrichedDecl => declRenderContextFactory(enrichedDecl)
       case enrichedDefn: EnrichedDefn => defnRenderContextFactory(enrichedDefn, sealedHierarchies)
       case _ => EmptyStatRenderContext
