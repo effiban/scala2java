@@ -5,7 +5,6 @@ import io.github.effiban.scala2java.core.entities.{JavaKeyword, JavaModifier}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.PrimaryCtors
 import io.github.effiban.scala2java.core.traversers.results._
-import io.github.effiban.scala2java.core.traversers.results.matchers.StatWithJavaModifiersTraversalResultScalatestMatcher.equalStatWithJavaModifiersTraversalResult
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
@@ -41,7 +40,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
 
     doReturn(traversalResult).when(defnVarTraverser).traverse(eqTree(defnVar), eqTo(TheStatContext))
 
-    defnTraverser.traverse(defnVar, TheStatContext) should equalStatWithJavaModifiersTraversalResult(traversalResult)
+    defnTraverser.traverse(defnVar, TheStatContext).structure shouldBe traversedDefnVar.structure
   }
 
   test("traverse() for Defn.Var when Decl.Var returned") {
@@ -53,7 +52,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
 
     doReturn(traversalResult).when(defnVarTraverser).traverse(eqTree(defnVar), eqTo(TheStatContext))
 
-    defnTraverser.traverse(defnVar, TheStatContext) should equalStatWithJavaModifiersTraversalResult(traversalResult)
+    defnTraverser.traverse(defnVar, TheStatContext).structure shouldBe declVar.structure
   }
 
   test("traverse() for Defn.Def") {
@@ -63,7 +62,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
 
     doReturn(traversalResult).when(defnDefTraverser).traverse(eqTree(defnDef), eqTo(DefnDefContext(TheStatContext.javaScope)))
 
-    defnTraverser.traverse(defnDef, TheStatContext) should equalStatWithJavaModifiersTraversalResult(traversalResult)
+    defnTraverser.traverse(defnDef, TheStatContext).structure shouldBe traversedDefnDef.structure
   }
 
   test("traverse() for Trait") {
@@ -81,7 +80,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
 
     doReturn(traversalResult).when(traitTraverser).traverse(eqTree(defnTrait), eqTo(TheClassOrTraitContext))
 
-    defnTraverser.traverse(defnTrait, TheStatContext) should equalStatWithJavaModifiersTraversalResult(traversalResult)
+    defnTraverser.traverse(defnTrait, TheStatContext).structure shouldBe traversalResult.tree.structure
   }
 
   test("traverse() for Defn.Class") {
@@ -100,7 +99,7 @@ class DefnTraverserImplTest extends UnitTestSuite {
 
     doReturn(traversalResult).when(classTraverser).traverse(eqTree(defnClass), eqTo(TheClassOrTraitContext))
 
-    defnTraverser.traverse(defnClass, TheStatContext) should equalStatWithJavaModifiersTraversalResult(traversalResult)
+    defnTraverser.traverse(defnClass, TheStatContext).structure shouldBe traversalResult.tree.structure
   }
 
   test("traverse() for Defn.Object") {
@@ -119,6 +118,6 @@ class DefnTraverserImplTest extends UnitTestSuite {
 
     doReturn(traversalResult).when(objectTraverser).traverse(eqTree(defnObject), eqTo(TheStatContext))
 
-    defnTraverser.traverse(defnObject, TheStatContext) should equalStatWithJavaModifiersTraversalResult(traversalResult)
+    defnTraverser.traverse(defnObject, TheStatContext).structure shouldBe traversalResult.tree.structure
   }
 }
