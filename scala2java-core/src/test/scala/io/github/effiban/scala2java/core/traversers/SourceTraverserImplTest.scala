@@ -2,11 +2,10 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.StatContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.matchers.SourceTraversalResultScalatestMatcher.equalSourceTraversalResult
-import io.github.effiban.scala2java.core.traversers.results.{EmptyStatTraversalResult, PkgTraversalResult, SourceTraversalResult}
+import io.github.effiban.scala2java.core.traversers.results.{EmptyStatTraversalResult, PkgTraversalResult}
 import org.mockito.ArgumentMatchersSugar.{any, eqTo}
 
-import scala.meta.{Stat, XtensionQuasiquoteSource, XtensionQuasiquoteTerm}
+import scala.meta.{Source, Stat, XtensionQuasiquoteSource, XtensionQuasiquoteTerm}
 
 class SourceTraverserImplTest extends UnitTestSuite {
 
@@ -44,14 +43,14 @@ class SourceTraverserImplTest extends UnitTestSuite {
       }
       """
 
-    val expectedSourceTraversalResult = SourceTraversalResult(List(pkg1TraversalResult, pkg2TraversalResult))
+    val expectedSource = Source(List(pkg1TraversalResult.tree, pkg2TraversalResult.tree))
 
     doAnswer((stat: Stat, _: StatContext) => stat match {
       case aStat if aStat.structure == Pkg1.structure => pkg1TraversalResult
       case aStat if aStat.structure == Pkg2.structure => pkg2TraversalResult
     }).when(defaultStatTraverser).traverse(any[Stat], eqTo(StatContext()))
 
-    sourceTraverser.traverse(TheSource) should equalSourceTraversalResult(expectedSourceTraversalResult)
+    sourceTraverser.traverse(TheSource).structure shouldBe expectedSource.structure
   }
 
   test("traverse() when there are empty results should skip them") {
@@ -67,7 +66,7 @@ class SourceTraverserImplTest extends UnitTestSuite {
       }
       """
 
-    val expectedSourceTraversalResult = SourceTraversalResult(List(pkg1TraversalResult, pkg2TraversalResult))
+    val expectedSource = Source(List(pkg1TraversalResult.tree, pkg2TraversalResult.tree))
 
     doAnswer((stat: Stat, _: StatContext) => stat match {
       case aStat if aStat.structure == ExcludedImport.structure => EmptyStatTraversalResult
@@ -76,6 +75,6 @@ class SourceTraverserImplTest extends UnitTestSuite {
     }).when(defaultStatTraverser).traverse(any[Stat], eqTo(StatContext()))
 
 
-    sourceTraverser.traverse(TheSource) should equalSourceTraversalResult(expectedSourceTraversalResult)
+    sourceTraverser.traverse(TheSource).structure shouldBe expectedSource.structure
   }
 }

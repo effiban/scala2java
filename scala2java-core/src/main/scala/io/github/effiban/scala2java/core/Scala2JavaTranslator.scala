@@ -39,8 +39,8 @@ object Scala2JavaTranslator {
     // Run the translation flow
     val syntacticDesugaredSource = SourceDesugarer.desugar(sourceTree)
     val semanticDesugaredSource = new SemanticDesugarers().sourceDesugarer.desugar(syntacticDesugaredSource)
-    val sourceTraversalResult = new ScalaTreeTraversers().sourceTraverser.traverse(semanticDesugaredSource)
-    val enrichedSource = Enrichers.sourceEnricher.enrich(sourceTraversalResult.source)
+    val traversedSource = new ScalaTreeTraversers().sourceTraverser.traverse(semanticDesugaredSource)
+    val enrichedSource = Enrichers.sourceEnricher.enrich(traversedSource)
     val sourceRenderContext = sourceRenderContextFactory(enrichedSource)
     Using(createJavaWriter(scalaPath, maybeOutputJavaBasePath, sourceTree)) { implicit writer =>
       new Renderers().sourceRenderer.render(enrichedSource.source, sourceRenderContext)
