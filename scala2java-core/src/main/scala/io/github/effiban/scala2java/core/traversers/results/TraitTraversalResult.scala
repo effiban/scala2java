@@ -5,6 +5,7 @@ import io.github.effiban.scala2java.core.entities.JavaModifier
 import scala.meta.Defn.Trait
 import scala.meta.{Ctor, Init, Mod, Name, Self, Template, Type}
 
+@deprecated
 case class TraitTraversalResult(scalaMods: List[Mod] = Nil,
                                 javaModifiers: List[JavaModifier] = Nil,
                                 name: Type.Name,

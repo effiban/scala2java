@@ -4,6 +4,7 @@ import io.github.effiban.scala2java.core.entities.JavaKeyword
 
 import scala.meta.{Init, Name, Self, Template}
 
+@deprecated
 case class TemplateTraversalResult(maybeInheritanceKeyword: Option[JavaKeyword] = None,
                                    inits: List[Init] = Nil,
                                    self: Self = Self(Name.Anonymous(), None),
