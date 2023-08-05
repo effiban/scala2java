@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.renderers.contextfactories
 
-import io.github.effiban.scala2java.core.enrichers.entities.{EnrichedDefnDef, EnrichedDefnVar}
+import io.github.effiban.scala2java.core.enrichers.entities.{EnrichedDefnDef, EnrichedDefnVar, EnrichedTrait}
 import io.github.effiban.scala2java.core.entities.{JavaModifier, SealedHierarchies}
 import io.github.effiban.scala2java.core.renderers.contexts._
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
@@ -36,6 +36,7 @@ class DefnRenderContextFactoryImplTest extends UnitTestSuite {
 
   private val enrichedDefnVar = mock[EnrichedDefnVar]
   private val enrichedDefnDef = mock[EnrichedDefnDef]
+  private val enrichedTrait = mock[EnrichedTrait]
 
   private val traitRenderContext = mock[TraitRenderContext]
   private val caseClassRenderContext = mock[CaseClassRenderContext]
@@ -56,6 +57,8 @@ class DefnRenderContextFactoryImplTest extends UnitTestSuite {
 
   override def beforeEach(): Unit = {
     when(traitTraversalResult.name).thenReturn(TheTraitName)
+    when(enrichedTrait.name).thenReturn(TheTraitName)
+
     when(caseClassTraversalResult.name).thenReturn(TheCaseClassName)
     when(regularClassTraversalResult.name).thenReturn(TheRegularClassName)
     when(objectTraversalResult.name).thenReturn(TheObjectName)
@@ -119,6 +122,16 @@ class DefnRenderContextFactoryImplTest extends UnitTestSuite {
     defnRenderContextFactory(traitTraversalResult, sealedHierarchies) shouldBe traitRenderContext
   }
 
+  test("apply() for EnrichedTrait when trait has permitted sub-types") {
+    val sealedHierarchies = SealedHierarchies(
+      Map(TheTraitName -> ThePermittedSubTypeNames)
+    )
+    when(traitRenderContextFactory(eqTo(enrichedTrait), eqTreeList(ThePermittedSubTypeNames)))
+      .thenReturn(traitRenderContext)
+
+    defnRenderContextFactory(enrichedTrait, sealedHierarchies) shouldBe traitRenderContext
+  }
+
   test("apply() for TraitTraversalResult when trait has no permitted sub-types") {
     val sealedHierarchies = SealedHierarchies(
       Map(t"Blabla" -> ThePermittedSubTypeNames)
@@ -126,6 +139,15 @@ class DefnRenderContextFactoryImplTest extends UnitTestSuite {
     when(traitRenderContextFactory(eqTo(traitTraversalResult), eqTo(Nil))).thenReturn(traitRenderContext)
 
     defnRenderContextFactory(traitTraversalResult, sealedHierarchies) shouldBe traitRenderContext
+  }
+
+  test("apply() for EnrichedTrait when trait has no permitted sub-types") {
+    val sealedHierarchies = SealedHierarchies(
+      Map(t"Blabla" -> ThePermittedSubTypeNames)
+    )
+    when(traitRenderContextFactory(eqTo(enrichedTrait), eqTo(Nil))).thenReturn(traitRenderContext)
+
+    defnRenderContextFactory(enrichedTrait, sealedHierarchies) shouldBe traitRenderContext
   }
 
   test("apply() for CaseClassTraversalResult") {

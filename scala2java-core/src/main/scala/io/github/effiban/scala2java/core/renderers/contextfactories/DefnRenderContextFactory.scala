@@ -35,20 +35,27 @@ private[contextfactories] class DefnRenderContextFactoryImpl(traitRenderContextF
                      sealedHierarchies: SealedHierarchies): DefnRenderContext = enrichedDefn match {
     case enrichedDefnVar: EnrichedDefnVar => VarRenderContext(enrichedDefnVar.javaModifiers)
     case enrichedDefnDef: EnrichedDefnDef => DefRenderContext(enrichedDefnDef.javaModifiers)
-    case enrichedTrait: EnrichedTrait => UnsupportedDefnRenderContext // TODO
+    case enrichedTrait: EnrichedTrait => createTraitContext(enrichedTrait, sealedHierarchies)
     case enrichedCaseClass: EnrichedCaseClass => UnsupportedDefnRenderContext // TODO
     case enrichedRegularClass: EnrichedRegularClass => UnsupportedDefnRenderContext // TODO
     case enrichedObject: EnrichedObject => UnsupportedDefnRenderContext // TODO
     case _ => UnsupportedDefnRenderContext
   }
 
+  @deprecated
   private def createRegularClassContext(regularClassTraversalResult: RegularClassTraversalResult, sealedHierarchies: SealedHierarchies) = {
     val permittedSubTypeNames = sealedHierarchies.getSubTypeNames(regularClassTraversalResult.name)
     regularClassRenderContextFactory(regularClassTraversalResult, permittedSubTypeNames)
   }
 
+  @deprecated
   private def createTraitContext(traitTraversalResult: TraitTraversalResult, sealedHierarchies: SealedHierarchies) = {
     val permittedSubTypeNames = sealedHierarchies.getSubTypeNames(traitTraversalResult.name)
     traitRenderContextFactory(traitTraversalResult, permittedSubTypeNames)
+  }
+
+  private def createTraitContext(enrichedTrait: EnrichedTrait, sealedHierarchies: SealedHierarchies) = {
+    val permittedSubTypeNames = sealedHierarchies.getSubTypeNames(enrichedTrait.name)
+    traitRenderContextFactory(enrichedTrait, permittedSubTypeNames)
   }
 }
