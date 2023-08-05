@@ -1,12 +1,11 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.StatContext
-import io.github.effiban.scala2java.core.traversers.results._
 
 import scala.meta.{Decl, Defn, Import, Pkg, Stat, Term}
 
 trait DefaultStatTraverser {
-  def traverse(stat: Stat, statContext: StatContext = StatContext()): StatTraversalResult
+  def traverse(stat: Stat, statContext: StatContext = StatContext()): Option[Stat]
 }
 
 private[traversers] class DefaultStatTraverserImpl(statTermTraverser: => StatTermTraverser,
@@ -15,18 +14,12 @@ private[traversers] class DefaultStatTraverserImpl(statTermTraverser: => StatTer
                                                    defnTraverser: => DefnTraverser,
                                                    declTraverser: => DeclTraverser) extends DefaultStatTraverser {
 
-  override def traverse(stat: Stat, statContext: StatContext = StatContext()): StatTraversalResult = stat match {
-    case term: Term => SimpleStatTraversalResult(statTermTraverser.traverse(term))
-    case `import`: Import => traverseImport(`import`)
-    case pkg: Pkg => SimpleStatTraversalResult(pkgTraverser.traverse(pkg))
-    case defn: Defn => SimpleStatTraversalResult(defnTraverser.traverse(defn, statContext))
-    case decl: Decl => SimpleStatTraversalResult(declTraverser.traverse(decl, statContext))
-    case other => SimpleStatTraversalResult(other)
-  }
-
-  private def traverseImport(`import`: Import) = {
-    importTraverser.traverse(`import`)
-      .map(SimpleStatTraversalResult)
-      .getOrElse(EmptyStatTraversalResult)
+  override def traverse(stat: Stat, statContext: StatContext = StatContext()): Option[Stat] = stat match {
+    case term: Term => Some(statTermTraverser.traverse(term))
+    case `import`: Import => importTraverser.traverse(`import`)
+    case pkg: Pkg => Some(pkgTraverser.traverse(pkg))
+    case defn: Defn => Some(defnTraverser.traverse(defn, statContext))
+    case decl: Decl => Some(declTraverser.traverse(decl, statContext))
+    case other => Some(other)
   }
 }

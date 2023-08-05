@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.classifiers.{DefnVarClassifier, TraitClassifier}
 import io.github.effiban.scala2java.core.contexts._
-import io.github.effiban.scala2java.core.traversers.results.{EmptyStatTraversalResult, EnumConstantListTraversalResult, StatTraversalResult}
+import io.github.effiban.scala2java.core.traversers.results.{EmptyStatTraversalResult, EnumConstantListTraversalResult, SimpleStatTraversalResult, StatTraversalResult}
 
 import scala.meta.{Ctor, Defn, Stat, Tree, Type}
 
@@ -42,6 +42,8 @@ private[traversers] class TemplateChildTraverserImpl(ctorPrimaryTraverser: => Ct
 
   private def traverseRegularStat(stat: Stat, context: TemplateChildContext) = {
     defaultStatTraverser.traverse(stat, StatContext(context.javaScope))
+      .map(SimpleStatTraversalResult(_))
+      .getOrElse(EmptyStatTraversalResult)
   }
 
   private def toCtorContext(childContext: TemplateChildContext, className: Type.Name) = {

@@ -71,15 +71,14 @@ class PkgStatTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for included import") {
-    doReturn(importTraversalResult)
+    doReturn(Some(TheTraversedImport))
       .when(defaultStatTraverser).traverse(eqTree(TheImport), eqTo(StatContext(javaScope = JavaScope.Package)))
-    when(importTraversalResult.tree).thenReturn(TheTraversedImport)
 
     pkgStatTraverser.traverse(TheImport).value.structure shouldBe TheTraversedImport.structure
   }
 
   test("traverse() for excluded import") {
-    doReturn(EmptyStatTraversalResult)
+    doReturn(None)
       .when(defaultStatTraverser).traverse(eqTree(TheImport), eqTo(StatContext(javaScope = JavaScope.Package)))
 
     pkgStatTraverser.traverse(TheImport) shouldBe None
