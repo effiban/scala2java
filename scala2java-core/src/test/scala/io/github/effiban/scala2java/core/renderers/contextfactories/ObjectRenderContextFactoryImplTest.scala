@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.renderers.contextfactories
 
+import io.github.effiban.scala2java.core.enrichers.entities.{EnrichedObject, EnrichedTemplate}
 import io.github.effiban.scala2java.core.entities.{JavaKeyword, JavaModifier}
 import io.github.effiban.scala2java.core.renderers.contexts.{ObjectRenderContext, TemplateBodyRenderContext, VarRenderContext}
 import io.github.effiban.scala2java.core.renderers.matchers.ObjectRenderContextScalatestMatcher.equalObjectRenderContext
@@ -20,8 +21,13 @@ class ObjectRenderContextFactoryImplTest extends UnitTestSuite {
     )
   )
 
+  @deprecated
   private val templateTraversalResult = mock[TemplateTraversalResult]
+  @deprecated
   private val objectTraversalResult = mock[ObjectTraversalResult]
+
+  private val enrichedTemplate = mock[EnrichedTemplate]
+  private val enrichedObject = mock[EnrichedObject]
 
   private val templateBodyRenderContextFactory = mock[TemplateBodyRenderContextFactory]
 
@@ -31,9 +37,13 @@ class ObjectRenderContextFactoryImplTest extends UnitTestSuite {
     when(objectTraversalResult.javaTypeKeyword).thenReturn(TheJavaTypeKeyword)
     when(objectTraversalResult.templateResult).thenReturn(templateTraversalResult)
     when(templateBodyRenderContextFactory(templateTraversalResult)).thenReturn(TheTemplateBodyRenderContext)
+
+    when(enrichedObject.javaTypeKeyword).thenReturn(TheJavaTypeKeyword)
+    when(enrichedObject.enrichedTemplate).thenReturn(enrichedTemplate)
+    when(templateBodyRenderContextFactory(enrichedTemplate)).thenReturn(TheTemplateBodyRenderContext)
   }
 
-  test("apply() when input has all Java-specific attributes") {
+  test("apply() to ObjectTraversalResult when input has all Java-specific attributes") {
     val expectedObjectRenderContext = ObjectRenderContext(
       javaModifiers = TheJavaModifiers,
       javaTypeKeyword = TheJavaTypeKeyword,
@@ -47,7 +57,21 @@ class ObjectRenderContextFactoryImplTest extends UnitTestSuite {
     objectRenderContextFactory(objectTraversalResult) should equalObjectRenderContext(expectedObjectRenderContext)
   }
 
-  test("apply() when input has mandatory Java-specific attributes only") {
+  test("apply() to EnrichedObject when input has all Java-specific attributes") {
+    val expectedObjectRenderContext = ObjectRenderContext(
+      javaModifiers = TheJavaModifiers,
+      javaTypeKeyword = TheJavaTypeKeyword,
+      maybeInheritanceKeyword = Some(TheJavaInheritanceKeyword),
+      bodyContext = TheTemplateBodyRenderContext
+    )
+
+    when(enrichedObject.javaModifiers).thenReturn(TheJavaModifiers)
+    when(enrichedObject.maybeInheritanceKeyword).thenReturn(Some(TheJavaInheritanceKeyword))
+
+    objectRenderContextFactory(enrichedObject) should equalObjectRenderContext(expectedObjectRenderContext)
+  }
+
+  test("apply() to ObjectTraversalResult when input has mandatory Java-specific attributes only") {
     val expectedObjectRenderContext = ObjectRenderContext(
       javaTypeKeyword = TheJavaTypeKeyword,
       bodyContext = TheTemplateBodyRenderContext
@@ -57,5 +81,17 @@ class ObjectRenderContextFactoryImplTest extends UnitTestSuite {
     when(objectTraversalResult.maybeInheritanceKeyword).thenReturn(None)
 
     objectRenderContextFactory(objectTraversalResult) should equalObjectRenderContext(expectedObjectRenderContext)
+  }
+
+  test("apply() to EnrichedObject when input has mandatory Java-specific attributes only") {
+    val expectedObjectRenderContext = ObjectRenderContext(
+      javaTypeKeyword = TheJavaTypeKeyword,
+      bodyContext = TheTemplateBodyRenderContext
+    )
+
+    when(enrichedObject.javaModifiers).thenReturn(Nil)
+    when(enrichedObject.maybeInheritanceKeyword).thenReturn(None)
+
+    objectRenderContextFactory(enrichedObject) should equalObjectRenderContext(expectedObjectRenderContext)
   }
 }

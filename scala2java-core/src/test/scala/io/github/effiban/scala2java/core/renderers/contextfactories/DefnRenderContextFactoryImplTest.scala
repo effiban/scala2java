@@ -39,6 +39,7 @@ class DefnRenderContextFactoryImplTest extends UnitTestSuite {
   private val enrichedTrait = mock[EnrichedTrait]
   private val enrichedCaseClass = mock[EnrichedCaseClass]
   private val enrichedRegularClass = mock[EnrichedRegularClass]
+  private val enrichedObject = mock[EnrichedObject]
 
   private val traitRenderContext = mock[TraitRenderContext]
   private val caseClassRenderContext = mock[CaseClassRenderContext]
@@ -68,6 +69,7 @@ class DefnRenderContextFactoryImplTest extends UnitTestSuite {
     when(enrichedRegularClass.name).thenReturn(TheRegularClassName)
 
     when(objectTraversalResult.name).thenReturn(TheObjectName)
+    when(enrichedObject.name).thenReturn(TheObjectName)
   }
 
   test("apply() for DefnVarTraversalResult when has Java modifiers") {
@@ -210,5 +212,11 @@ class DefnRenderContextFactoryImplTest extends UnitTestSuite {
     when(objectRenderContextFactory(eqTo(objectTraversalResult))).thenReturn(objectRenderContext)
 
     defnRenderContextFactory(objectTraversalResult) shouldBe objectRenderContext
+  }
+
+  test("apply() for EnrichedObject") {
+    when(objectRenderContextFactory(eqTo(enrichedObject))).thenReturn(objectRenderContext)
+
+    defnRenderContextFactory(enrichedObject, SealedHierarchies()) shouldBe objectRenderContext
   }
 }
