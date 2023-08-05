@@ -5,7 +5,6 @@ import io.github.effiban.scala2java.core.matchers.SealedHierarchiesMockitoMatche
 import io.github.effiban.scala2java.core.resolvers.SealedHierarchiesResolver
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.traversers.results._
-import io.github.effiban.scala2java.core.traversers.results.matchers.PkgStatListTraversalResultScalatestMatcher.equalPkgStatListTraversalResult
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import org.mockito.ArgumentMatchersSugar.any
 
@@ -60,16 +59,13 @@ class PkgStatListTraverserImplTest extends UnitTestSuite {
       TheObject
     )
     val expectedSealedHierarchies = SealedHierarchies(Map(t"A" -> List(Name.Indeterminate("B"))))
-    val expectedPkgStatListResult = PkgStatListTraversalResult(
-      statResults = List(
-        IncludedImportTraversalResult,
-        TheTraitTraversalResult,
-        TheObjectTraversalResult
-      ),
-      sealedHierarchies = expectedSealedHierarchies
+    val expectedPkgStats = List(
+      IncludedImportTraversalResult.tree,
+      TheTraitTraversalResult.tree,
+      TheObjectTraversalResult.tree
     )
 
-    when(sealedHierarchiesResolver.traverse(eqTreeList(stats))).thenReturn(expectedSealedHierarchies)
+    when(sealedHierarchiesResolver.resolve(eqTreeList(stats))).thenReturn(expectedSealedHierarchies)
 
     doAnswer((stat: Stat, _: SealedHierarchies) => stat match {
       case aStat if aStat.structure == IncludedImport.structure => IncludedImportTraversalResult
@@ -77,7 +73,7 @@ class PkgStatListTraverserImplTest extends UnitTestSuite {
       case aStat if aStat.structure == TheObject.structure => TheObjectTraversalResult
     }).when(pkgStatTraverser).traverse(any[Stat], eqSealedHierarchies(expectedSealedHierarchies))
 
-    pkgStatListTraverser.traverse(stats) should equalPkgStatListTraversalResult(expectedPkgStatListResult)
+    pkgStatListTraverser.traverse(stats).structure shouldBe expectedPkgStats.structure
   }
 
   test("traverse() when there are empty results should skip them") {
@@ -89,16 +85,13 @@ class PkgStatListTraverserImplTest extends UnitTestSuite {
       TheObject
     )
     val expectedSealedHierarchies = SealedHierarchies(Map(t"A" -> List(Name.Indeterminate("B"))))
-    val expectedPkgStatListResult = PkgStatListTraversalResult(
-      statResults = List(
-        IncludedImportTraversalResult,
-        TheTraitTraversalResult,
-        TheObjectTraversalResult
-      ),
-      sealedHierarchies = expectedSealedHierarchies
+    val expectedPkgStats = List(
+      IncludedImportTraversalResult.tree,
+      TheTraitTraversalResult.tree,
+      TheObjectTraversalResult.tree
     )
 
-    when(sealedHierarchiesResolver.traverse(eqTreeList(stats))).thenReturn(expectedSealedHierarchies)
+    when(sealedHierarchiesResolver.resolve(eqTreeList(stats))).thenReturn(expectedSealedHierarchies)
 
     doAnswer((stat: Stat, _: SealedHierarchies) => stat match {
       case aStat if aStat.structure == ExcludedImport1.structure => EmptyStatTraversalResult
@@ -108,6 +101,6 @@ class PkgStatListTraverserImplTest extends UnitTestSuite {
       case aStat if aStat.structure == TheObject.structure => TheObjectTraversalResult
     }).when(pkgStatTraverser).traverse(any[Stat], eqSealedHierarchies(expectedSealedHierarchies))
 
-    pkgStatListTraverser.traverse(stats) should equalPkgStatListTraversalResult(expectedPkgStatListResult)
+    pkgStatListTraverser.traverse(stats).structure shouldBe expectedPkgStats.structure
   }
 }

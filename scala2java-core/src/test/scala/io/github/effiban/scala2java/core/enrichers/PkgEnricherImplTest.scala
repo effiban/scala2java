@@ -69,7 +69,7 @@ class PkgEnricherImplTest extends UnitTestSuite {
       sealedHierarchies = expectedSealedHierarchies
     )
 
-    when(sealedHierarchiesResolver.traverse(eqTreeList(stats))).thenReturn(expectedSealedHierarchies)
+    when(sealedHierarchiesResolver.resolve(eqTreeList(stats))).thenReturn(expectedSealedHierarchies)
 
     doAnswer((stat: Stat, _: SealedHierarchies) => stat match {
       case aStat if aStat.structure == TheImport.structure => TheEnrichedImport

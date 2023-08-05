@@ -6,12 +6,12 @@ import io.github.effiban.scala2java.core.entities.SealedHierarchies
 import scala.meta.{Defn, Member, Name, Stat, Template}
 
 trait SealedHierarchiesResolver {
-  def traverse(stats: List[Stat]): SealedHierarchies
+  def resolve(stats: List[Stat]): SealedHierarchies
 }
 
 private[resolvers] class SealedHierarchiesResolverImpl(modsClassifier: ModsClassifier) extends SealedHierarchiesResolver {
 
-  override def traverse(stats: List[Stat]): SealedHierarchies = {
+  override def resolve(stats: List[Stat]): SealedHierarchies = {
     val sealedTypes: List[Member.Type] = stats.collect {
       case defnClass: Defn.Class if modsClassifier.includeSealed(defnClass.mods) => defnClass
       case defnTrait: Defn.Trait if modsClassifier.includeSealed(defnTrait.mods) => defnTrait

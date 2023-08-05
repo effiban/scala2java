@@ -13,7 +13,7 @@ private[enrichers] class PkgEnricherImpl(pkgStatEnricher: => PkgStatEnricher,
 
   // TODO handle multiple definitions which are illegal in Java (such as 2 public classes in the same file)
   override def enrich(pkg: Pkg): EnrichedPkg = {
-    val sealedHierarchies = sealedHierarchiesResolver.traverse(pkg.stats)
+    val sealedHierarchies = sealedHierarchiesResolver.resolve(pkg.stats)
     val statResults = pkg.stats.map(stat => pkgStatEnricher.enrich(stat, sealedHierarchies))
     EnrichedPkg(pkg.ref, statResults, sealedHierarchies)
   }
