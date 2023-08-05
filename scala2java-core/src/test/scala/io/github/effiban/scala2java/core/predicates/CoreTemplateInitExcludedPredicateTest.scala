@@ -10,7 +10,7 @@ class CoreTemplateInitExcludedPredicateTest extends UnitTestSuite {
     ("Name", "ExpectedExcluded"),
     ("Product", true),
     ("Serializable", true),
-    ("Enumeration", true),
+    ("Enumeration", false),
     ("Other", false)
   )
 
