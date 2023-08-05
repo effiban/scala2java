@@ -2,7 +2,6 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.StatContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.{EmptyStatTraversalResult, PkgTraversalResult}
 import org.mockito.ArgumentMatchersSugar.{any, eqTo}
 
 import scala.meta.{Source, Stat, XtensionQuasiquoteSource, XtensionQuasiquoteTerm}
@@ -22,10 +21,20 @@ class SourceTraverserImplTest extends UnitTestSuite {
     }
     """
 
-  private val ExcludedImport = q"import scala.abc"
+  private val TraversedPkg1 =
+    q"""
+    package tpkg1 {
+      case class TClass1(xx: Int)
+    }
+    """
+  private val TraversedPkg2 =
+    q"""
+    package tpkg2 {
+      case class TClass2(yy: Int)
+    }
+    """
 
-  private val pkg1TraversalResult = PkgTraversalResult(pkgRef = q"package1")
-  private val pkg2TraversalResult = PkgTraversalResult(pkgRef = q"package2")
+  private val ExcludedImport = q"import scala.abc"
 
   private val defaultStatTraverser = mock[DefaultStatTraverser]
 
@@ -33,7 +42,7 @@ class SourceTraverserImplTest extends UnitTestSuite {
 
 
   test("traverse() when there are no empty results") {
-     val TheSource =
+     val theSource =
       source"""
       package pkg1 {
         case class Class1(x: Int)
@@ -43,18 +52,15 @@ class SourceTraverserImplTest extends UnitTestSuite {
       }
       """
 
-    val expectedSource = Source(List(pkg1TraversalResult.tree, pkg2TraversalResult.tree))
+    val expectedSource = Source(List(TraversedPkg1, TraversedPkg2))
 
-    doAnswer((stat: Stat, _: StatContext) => stat match {
-      case aStat if aStat.structure == Pkg1.structure => pkg1TraversalResult
-      case aStat if aStat.structure == Pkg2.structure => pkg2TraversalResult
-    }).when(defaultStatTraverser).traverse(any[Stat], eqTo(StatContext()))
+    expectTraverseStat()
 
-    sourceTraverser.traverse(TheSource).structure shouldBe expectedSource.structure
+    sourceTraverser.traverse(theSource).structure shouldBe expectedSource.structure
   }
 
   test("traverse() when there are empty results should skip them") {
-    val TheSource =
+    val theSource =
       source"""
       import scala.abc
 
@@ -66,15 +72,19 @@ class SourceTraverserImplTest extends UnitTestSuite {
       }
       """
 
-    val expectedSource = Source(List(pkg1TraversalResult.tree, pkg2TraversalResult.tree))
+    val expectedSource = Source(List(TraversedPkg1, TraversedPkg2))
 
+    expectTraverseStat()
+
+    sourceTraverser.traverse(theSource).structure shouldBe expectedSource.structure
+  }
+
+  private def expectTraverseStat() = {
     doAnswer((stat: Stat, _: StatContext) => stat match {
-      case aStat if aStat.structure == ExcludedImport.structure => EmptyStatTraversalResult
-      case aStat if aStat.structure == Pkg1.structure => pkg1TraversalResult
-      case aStat if aStat.structure == Pkg2.structure => pkg2TraversalResult
+      case aStat if aStat.structure == Pkg1.structure => Some(TraversedPkg1)
+      case aStat if aStat.structure == Pkg2.structure => Some(TraversedPkg2)
+      case aStat if aStat.structure == ExcludedImport.structure => None
+      case aStat => aStat
     }).when(defaultStatTraverser).traverse(any[Stat], eqTo(StatContext()))
-
-
-    sourceTraverser.traverse(TheSource).structure shouldBe expectedSource.structure
   }
 }

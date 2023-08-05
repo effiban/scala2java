@@ -78,6 +78,7 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
   private val TheTraversedDefnDef = q"def myTraversedMethod(param: Int) = traversedFoo(param)"
 
   private val TheTrait = q"trait MyTrait { def foo(): Unit = doSomething() } "
+  private val TheTraversedTrait = q"trait MyTraversedTrait { def tFoo(): Unit = doSomething() } "
 
   private val ctorPrimaryTraverser = mock[CtorPrimaryTraverser]
   private val ctorSecondaryTraverser = mock[CtorSecondaryTraverser]
@@ -130,11 +131,11 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
     }
   }
 
-  test("traverse() for Defn.Var which is not an enum constant list, and requires end delimiter") {
-    val traversalResult = DefnVarTraversalResult(TheTraversedDefnVar)
+  test("traverse() for Defn.Var which is not an enum constant list") {
+    val traversalResult = SimpleStatTraversalResult(TheTraversedDefnVar)
 
     when(defnValClassifier.isEnumConstantList(eqTree(TheDefnVar), eqTo(JavaScope.Class))).thenReturn(false)
-    doReturn(traversalResult)
+    doReturn(Some(TheTraversedDefnVar))
       .when(defaultStatTraverser).traverse(eqTree(TheDefnVar), eqTo(StatContext(JavaScope.Class)))
 
     val actualTraversalResult = templateChildTraverser.traverse(
@@ -154,7 +155,17 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for a Trait which is not an enum type def") {
-    // TODO - once the TraitTraversalResult class is available
+    val traversalResult = SimpleStatTraversalResult(TheTraversedTrait)
+
+    when(traitClassifier.isEnumTypeDef(eqTree(TheTrait), eqTo(JavaScope.Enum))).thenReturn(false)
+    doReturn(Some(TheTraversedTrait))
+      .when(defaultStatTraverser).traverse(eqTree(TheTrait), eqTo(StatContext(JavaScope.Class)))
+
+    val actualTraversalResult = templateChildTraverser.traverse(
+      child = TheTrait,
+      context = TemplateChildContext(javaScope = JavaScope.Class)
+    )
+    actualTraversalResult should equalStatTraversalResult(traversalResult)
   }
 
   test("traverse() for a Trait which is an enum type def, should skip it") {
@@ -165,9 +176,9 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for a Defn.Def") {
-    val traversalResult = DefnDefTraversalResult(TheTraversedDefnDef)
+    val traversalResult = SimpleStatTraversalResult(TheTraversedDefnDef)
 
-    doReturn(traversalResult)
+    doReturn(Some(TheTraversedDefnDef))
       .when(defaultStatTraverser).traverse(eqTree(TheDefnDef), eqTo(StatContext(JavaScope.Class)))
 
     val actualResult = templateChildTraverser.traverse(child = TheDefnDef, context = TemplateChildContext(javaScope = JavaScope.Class))
