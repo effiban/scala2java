@@ -1,11 +1,16 @@
 package io.github.effiban.scala2java.core.renderers.contextfactories
 
+import io.github.effiban.scala2java.core.enrichers.entities._
 import io.github.effiban.scala2java.core.entities.SealedHierarchies
 import io.github.effiban.scala2java.core.renderers.contexts.{DefRenderContext, DefnRenderContext, UnsupportedDefnRenderContext, VarRenderContext}
 import io.github.effiban.scala2java.core.traversers.results._
 
 trait DefnRenderContextFactory {
+
+  @deprecated
   def apply(DefnTraversalResult: DefnTraversalResult, sealedHierarchies: SealedHierarchies = SealedHierarchies()): DefnRenderContext
+
+  def apply(enrichedDefn: EnrichedDefn, sealedHierarchies: SealedHierarchies): DefnRenderContext
 }
 
 private[contextfactories] class DefnRenderContextFactoryImpl(traitRenderContextFactory: => TraitRenderContextFactory,
@@ -23,6 +28,17 @@ private[contextfactories] class DefnRenderContextFactoryImpl(traitRenderContextF
     case regularClassTraversalResult: RegularClassTraversalResult =>
       createRegularClassContext(regularClassTraversalResult, sealedHierarchies)
     case objectTraversalResult: ObjectTraversalResult => objectRenderContextFactory(objectTraversalResult)
+    case _ => UnsupportedDefnRenderContext
+  }
+
+  override def apply(enrichedDefn: EnrichedDefn,
+                     sealedHierarchies: SealedHierarchies): DefnRenderContext = enrichedDefn match {
+    case enrichedDefnVar: EnrichedDefnVar => VarRenderContext(enrichedDefnVar.javaModifiers)
+    case enrichedDefnDef: EnrichedDefnDef => DefRenderContext(enrichedDefnDef.javaModifiers)
+    case enrichedTrait: EnrichedTrait => UnsupportedDefnRenderContext // TODO
+    case enrichedCaseClass: EnrichedCaseClass => UnsupportedDefnRenderContext // TODO
+    case enrichedRegularClass: EnrichedRegularClass => UnsupportedDefnRenderContext // TODO
+    case enrichedObject: EnrichedObject => UnsupportedDefnRenderContext // TODO
     case _ => UnsupportedDefnRenderContext
   }
 
