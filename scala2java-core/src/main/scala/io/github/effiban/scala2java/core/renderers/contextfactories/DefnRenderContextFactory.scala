@@ -36,7 +36,7 @@ private[contextfactories] class DefnRenderContextFactoryImpl(traitRenderContextF
     case enrichedDefnVar: EnrichedDefnVar => VarRenderContext(enrichedDefnVar.javaModifiers)
     case enrichedDefnDef: EnrichedDefnDef => DefRenderContext(enrichedDefnDef.javaModifiers)
     case enrichedTrait: EnrichedTrait => createTraitContext(enrichedTrait, sealedHierarchies)
-    case enrichedCaseClass: EnrichedCaseClass => UnsupportedDefnRenderContext // TODO
+    case enrichedCaseClass: EnrichedCaseClass => caseClassRenderContextFactory(enrichedCaseClass)
     case enrichedRegularClass: EnrichedRegularClass => UnsupportedDefnRenderContext // TODO
     case enrichedObject: EnrichedObject => UnsupportedDefnRenderContext // TODO
     case _ => UnsupportedDefnRenderContext

@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.renderers.contextfactories
 
+import io.github.effiban.scala2java.core.enrichers.entities.{EnrichedCaseClass, EnrichedTemplate}
 import io.github.effiban.scala2java.core.entities.{JavaKeyword, JavaModifier}
 import io.github.effiban.scala2java.core.renderers.contexts.{CaseClassRenderContext, TemplateBodyRenderContext, VarRenderContext}
 import io.github.effiban.scala2java.core.renderers.matchers.CaseClassRenderContextScalatestMatcher.equalCaseClassRenderContext
@@ -19,8 +20,13 @@ class CaseClassRenderContextFactoryImplTest extends UnitTestSuite {
     )
   )
 
+  @deprecated
   private val templateTraversalResult = mock[TemplateTraversalResult]
+  @deprecated
   private val caseClassTraversalResult = mock[CaseClassTraversalResult]
+
+  private val enrichedTemplate = mock[EnrichedTemplate]
+  private val enrichedCaseClass = mock[EnrichedCaseClass]
 
   private val templateBodyRenderContextFactory = mock[TemplateBodyRenderContextFactory]
 
@@ -29,9 +35,12 @@ class CaseClassRenderContextFactoryImplTest extends UnitTestSuite {
   override protected def beforeEach(): Unit = {
     when(caseClassTraversalResult.templateResult).thenReturn(templateTraversalResult)
     when(templateBodyRenderContextFactory(templateTraversalResult)).thenReturn(TheTemplateBodyRenderContext)
+
+    when(enrichedCaseClass.enrichedTemplate).thenReturn(enrichedTemplate)
+    when(templateBodyRenderContextFactory(enrichedTemplate)).thenReturn(TheTemplateBodyRenderContext)
   }
 
-  test("apply() when input has all Java-specific attributes") {
+  test("apply() to CaseClassTraversalResult when input has all Java-specific attributes") {
     val expectedCaseClassRenderContext = CaseClassRenderContext(
       javaModifiers = TheJavaModifiers,
       maybeInheritanceKeyword = Some(TheJavaInheritanceKeyword),
@@ -44,12 +53,34 @@ class CaseClassRenderContextFactoryImplTest extends UnitTestSuite {
     caseClassRenderContextFactory(caseClassTraversalResult) should equalCaseClassRenderContext(expectedCaseClassRenderContext)
   }
 
-  test("apply() when input has no Java-specific attributes") {
+  test("apply() to EnrichedCaseClass when input has all Java-specific attributes") {
+    val expectedCaseClassRenderContext = CaseClassRenderContext(
+      javaModifiers = TheJavaModifiers,
+      maybeInheritanceKeyword = Some(TheJavaInheritanceKeyword),
+      bodyContext = TheTemplateBodyRenderContext
+    )
+
+    when(enrichedCaseClass.javaModifiers).thenReturn(TheJavaModifiers)
+    when(enrichedCaseClass.maybeInheritanceKeyword).thenReturn(Some(TheJavaInheritanceKeyword))
+
+    caseClassRenderContextFactory(enrichedCaseClass) should equalCaseClassRenderContext(expectedCaseClassRenderContext)
+  }
+
+  test("apply() to CaseClassTraversalResult when input has no Java-specific attributes") {
     val expectedCaseClassRenderContext = CaseClassRenderContext(bodyContext = TheTemplateBodyRenderContext)
 
     when(caseClassTraversalResult.javaModifiers).thenReturn(Nil)
     when(caseClassTraversalResult.maybeInheritanceKeyword).thenReturn(None)
 
     caseClassRenderContextFactory(caseClassTraversalResult) should equalCaseClassRenderContext(expectedCaseClassRenderContext)
+  }
+
+  test("apply() to EnrichedCaseClass when input has no Java-specific attributes") {
+    val expectedCaseClassRenderContext = CaseClassRenderContext(bodyContext = TheTemplateBodyRenderContext)
+
+    when(enrichedCaseClass.javaModifiers).thenReturn(Nil)
+    when(enrichedCaseClass.maybeInheritanceKeyword).thenReturn(None)
+
+    caseClassRenderContextFactory(enrichedCaseClass) should equalCaseClassRenderContext(expectedCaseClassRenderContext)
   }
 }
