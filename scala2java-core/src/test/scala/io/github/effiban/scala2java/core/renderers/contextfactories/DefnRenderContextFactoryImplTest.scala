@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.renderers.contextfactories
 
+import io.github.effiban.scala2java.core.enrichers.entities.{EnrichedDefnDef, EnrichedDefnVar}
 import io.github.effiban.scala2java.core.entities.{JavaModifier, SealedHierarchies}
 import io.github.effiban.scala2java.core.renderers.contexts._
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
@@ -20,12 +21,21 @@ class DefnRenderContextFactoryImplTest extends UnitTestSuite {
 
   private val ThePermittedSubTypeNames = List(t"Sub1", t"Sub2")
 
+  @deprecated
   private val defnVarTraversalResult = mock[DefnVarTraversalResult]
+  @deprecated
   private val defnDefTraversalResult = mock[DefnDefTraversalResult]
+  @deprecated
   private val traitTraversalResult = mock[TraitTraversalResult]
+  @deprecated
   private val caseClassTraversalResult = mock[CaseClassTraversalResult]
+  @deprecated
   private val regularClassTraversalResult = mock[RegularClassTraversalResult]
+  @deprecated
   private val objectTraversalResult = mock[ObjectTraversalResult]
+
+  private val enrichedDefnVar = mock[EnrichedDefnVar]
+  private val enrichedDefnDef = mock[EnrichedDefnDef]
 
   private val traitRenderContext = mock[TraitRenderContext]
   private val caseClassRenderContext = mock[CaseClassRenderContext]
@@ -57,10 +67,22 @@ class DefnRenderContextFactoryImplTest extends UnitTestSuite {
     defnRenderContextFactory(defnVarTraversalResult) shouldBe VarRenderContext(TheJavaModifiers)
   }
 
+  test("apply() for EnrichedDefnVar when has Java modifiers") {
+    when(enrichedDefnVar.javaModifiers).thenReturn(TheJavaModifiers)
+
+    defnRenderContextFactory(enrichedDefnVar, SealedHierarchies()) shouldBe VarRenderContext(TheJavaModifiers)
+  }
+
   test("apply() for DefnVarTraversalResult when has no Java modifiers") {
     when(defnVarTraversalResult.javaModifiers).thenReturn(Nil)
 
     defnRenderContextFactory(defnVarTraversalResult) shouldBe VarRenderContext()
+  }
+
+  test("apply() for EnrichedDefnVar when has no Java modifiers") {
+    when(enrichedDefnVar.javaModifiers).thenReturn(Nil)
+
+    defnRenderContextFactory(enrichedDefnVar, SealedHierarchies()) shouldBe VarRenderContext()
   }
 
   test("apply() for DefnDefTraversalResult when has Java modifiers") {
@@ -69,10 +91,22 @@ class DefnRenderContextFactoryImplTest extends UnitTestSuite {
     defnRenderContextFactory(defnDefTraversalResult) shouldBe DefRenderContext(TheJavaModifiers)
   }
 
+  test("apply() for EnrichedDefnDef when has Java modifiers") {
+    when(enrichedDefnDef.javaModifiers).thenReturn(TheJavaModifiers)
+
+    defnRenderContextFactory(enrichedDefnDef, SealedHierarchies()) shouldBe DefRenderContext(TheJavaModifiers)
+  }
+
   test("apply() for DefnDefTraversalResult when has no Java modifiers") {
     when(defnDefTraversalResult.javaModifiers).thenReturn(Nil)
 
     defnRenderContextFactory(defnDefTraversalResult) shouldBe DefRenderContext()
+  }
+
+  test("apply() for EnrichedDefnDef when has no Java modifiers") {
+    when(enrichedDefnDef.javaModifiers).thenReturn(Nil)
+
+    defnRenderContextFactory(enrichedDefnDef, SealedHierarchies()) shouldBe DefRenderContext()
   }
 
   test("apply() for TraitTraversalResult when trait has permitted sub-types") {
