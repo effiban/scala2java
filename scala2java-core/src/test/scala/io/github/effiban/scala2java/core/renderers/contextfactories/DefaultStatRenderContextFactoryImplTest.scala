@@ -6,7 +6,6 @@ import io.github.effiban.scala2java.core.entities.SealedHierarchies
 import io.github.effiban.scala2java.core.matchers.SealedHierarchiesMockitoMatcher.eqSealedHierarchies
 import io.github.effiban.scala2java.core.renderers.contexts.{DeclRenderContext, DefnRenderContext, PkgRenderContext}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.{DeclTraversalResult, DefnTraversalResult, PkgTraversalResult}
 import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.XtensionQuasiquoteType
@@ -18,13 +17,6 @@ class DefaultStatRenderContextFactoryImplTest extends UnitTestSuite {
     )
   )
 
-
-  @deprecated
-  private val pkgTraversalResult = mock[PkgTraversalResult]
-  @deprecated
-  private val declTraversalResult = mock[DeclTraversalResult]
-  @deprecated
-  private val defnTraversalResult = mock[DefnTraversalResult]
 
   private val enrichedPkg = mock[EnrichedPkg]
   private val enrichedDecl = mock[EnrichedDecl]
@@ -44,39 +36,21 @@ class DefaultStatRenderContextFactoryImplTest extends UnitTestSuite {
     defnRenderContextFactory
   )
 
-  test("apply() for a PkgTraversalResult") {
-    when(pkgRenderContextFactory(pkgTraversalResult)).thenReturn(pkgRenderContext)
-
-    defaultStatRenderContextFactory(pkgTraversalResult, TheSealedHierarchies) shouldBe pkgRenderContext
-  }
-
   test("apply() for an EnrichedPkg") {
     when(pkgRenderContextFactory(enrichedPkg)).thenReturn(pkgRenderContext)
 
     defaultStatRenderContextFactory(enrichedPkg, TheSealedHierarchies) shouldBe pkgRenderContext
   }
 
-  test("apply() for a DeclTraversalResult") {
-    when(declRenderContextFactory(declTraversalResult)).thenReturn(declRenderContext)
-
-    defaultStatRenderContextFactory(declTraversalResult, TheSealedHierarchies) shouldBe declRenderContext
-  }
-
   test("apply() for an EnrichedDecl") {
     when(declRenderContextFactory(enrichedDecl)).thenReturn(declRenderContext)
 
-    defaultStatRenderContextFactory(enrichedDecl, TheSealedHierarchies) shouldBe declRenderContext
-  }
-
-  test("apply() for a DefnTraversalResult") {
-    when(defnRenderContextFactory(eqTo(defnTraversalResult), eqSealedHierarchies(TheSealedHierarchies))).thenReturn(defnRenderContext)
-
-    defaultStatRenderContextFactory(defnTraversalResult, TheSealedHierarchies) shouldBe defnRenderContext
+    defaultStatRenderContextFactory(enrichedDecl) shouldBe declRenderContext
   }
 
   test("apply() for an EnrichedDefn") {
-    when(defnRenderContextFactory(eqTo(enrichedDefn), eqSealedHierarchies(TheSealedHierarchies))).thenReturn(defnRenderContext)
+    when(defnRenderContextFactory(eqTo(enrichedDefn), eqSealedHierarchies(SealedHierarchies()))).thenReturn(defnRenderContext)
 
-    defaultStatRenderContextFactory(enrichedDefn, TheSealedHierarchies) shouldBe defnRenderContext
+    defaultStatRenderContextFactory(enrichedDefn) shouldBe defnRenderContext
   }
 }
