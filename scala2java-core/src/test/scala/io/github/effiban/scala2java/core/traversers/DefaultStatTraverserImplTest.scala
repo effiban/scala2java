@@ -69,10 +69,9 @@ class DefaultStatTraverserImplTest extends UnitTestSuite {
   test("traverse Decl.Var") {
     val declVar = q"private var myVar: Int"
     val traversedDeclVar = q"private var myTraversedVar: Int"
-    val javaModifiers = List(JavaModifier.Private)
-    val traversalResult = DeclVarTraversalResult(traversedDeclVar, javaModifiers)
+    val traversalResult = SimpleStatTraversalResult(traversedDeclVar)
 
-    doReturn(traversalResult).when(declTraverser).traverse(eqTree(declVar), eqTo(StatContext(JavaScope.Block)))
+    doReturn(traversedDeclVar).when(declTraverser).traverse(eqTree(declVar), eqTo(StatContext(JavaScope.Block)))
 
     defaultStatTraverser.traverse(declVar, StatContext(JavaScope.Block)) should equalStatTraversalResult(traversalResult)
   }
@@ -80,10 +79,9 @@ class DefaultStatTraverserImplTest extends UnitTestSuite {
   test("traverse Decl.Def") {
     val declDef = q"private def foo(x: Int): Int"
     val traversedDeclDef = q"private def traversedFoo(xx: Int): Int"
-    val javaModifiers = List(JavaModifier.Private)
-    val traversalResult = DeclDefTraversalResult(traversedDeclDef, javaModifiers)
+    val traversalResult = SimpleStatTraversalResult(traversedDeclDef)
 
-    doReturn(traversalResult).when(declTraverser).traverse(eqTree(declDef), eqTo(StatContext(JavaScope.Block)))
+    doReturn(traversedDeclDef).when(declTraverser).traverse(eqTree(declDef), eqTo(StatContext(JavaScope.Block)))
 
     defaultStatTraverser.traverse(declDef, StatContext(JavaScope.Block)) should equalStatTraversalResult(traversalResult)
   }

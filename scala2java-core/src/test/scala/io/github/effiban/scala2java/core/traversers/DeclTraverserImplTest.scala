@@ -3,7 +3,6 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.StatContext
 import io.github.effiban.scala2java.core.entities.JavaModifier
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.matchers.DeclTraversalResultScalatestMatcher.equalDeclTraversalResult
 import io.github.effiban.scala2java.core.traversers.results.{DeclDefTraversalResult, DeclVarTraversalResult}
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -28,7 +27,7 @@ class DeclTraverserImplTest extends UnitTestSuite {
 
     doReturn(traversalResult).when(declVarTraverser).traverse(eqTree(declVar), eqTo(TheStatContext))
     
-    declTraverser.traverse(declVar, TheStatContext) should equalDeclTraversalResult(traversalResult)
+    declTraverser.traverse(declVar, TheStatContext).structure shouldBe traversedDeclVar.structure
   }
 
   test("traverse() a Decl.Def") {
@@ -39,6 +38,6 @@ class DeclTraverserImplTest extends UnitTestSuite {
 
     doReturn(traversalResult).when(declDefTraverser).traverse(eqTree(declDef), eqTo(TheStatContext))
 
-    declTraverser.traverse(declDef, TheStatContext) should equalDeclTraversalResult(traversalResult)
+    declTraverser.traverse(declDef, TheStatContext).structure shouldBe traversedDeclDef.structure
   }
 }
