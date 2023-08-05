@@ -66,21 +66,12 @@ class DefnTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for Trait") {
-    val defnTrait =
-      q"""
-      trait MyTrait {
-        var x: Int
-      }
-      """
-    val traversalResult = TraitTraversalResult(
-      javaModifiers = List(JavaModifier.Public),
-      name = t"MyTraversedTrait",
-      statResults = List(DeclVarTraversalResult(q"var xx: Int"))
-    )
+    val defnTrait = q"trait MyTrait { var x: Int }"
+    val traversedTrait = q"trait MyTraversedTrait { var xx: Int }"
 
-    doReturn(traversalResult).when(traitTraverser).traverse(eqTree(defnTrait), eqTo(TheClassOrTraitContext))
+    doReturn(traversedTrait).when(traitTraverser).traverse(eqTree(defnTrait))
 
-    defnTraverser.traverse(defnTrait, TheStatContext).structure shouldBe traversalResult.tree.structure
+    defnTraverser.traverse(defnTrait, TheStatContext).structure shouldBe traversedTrait.structure
   }
 
   test("traverse() for Defn.Class") {

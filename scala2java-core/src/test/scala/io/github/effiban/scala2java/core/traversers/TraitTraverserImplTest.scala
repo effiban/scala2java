@@ -1,13 +1,10 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts._
-import io.github.effiban.scala2java.core.entities.{JavaModifier, JavaTreeType}
-import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
 import io.github.effiban.scala2java.core.matchers.TemplateContextMatcher.eqTemplateContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.PrimaryCtors
-import io.github.effiban.scala2java.core.traversers.results.matchers.TraitTraversalResultScalatestMatcher.equalTraitTraversalResult
-import io.github.effiban.scala2java.core.traversers.results._
+import io.github.effiban.scala2java.core.traversers.results.{SimpleStatTraversalResult, TemplateTraversalResult}
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.any
@@ -43,14 +40,12 @@ class TraitTraverserImplTest extends UnitTestSuite {
 
   private val DefnVar = q"var y = 4"
   private val TraversedDefnVar = q"var yy = 44"
-  private val TheDefnVarTraversalResult = DefnVarTraversalResult(TraversedDefnVar)
 
   private val DefnDef = q"def myMethod(param: Int): Int = doSomething(param)"
   private val TraversedDefnDef = q"def myTraversedMethod(param2: Int): Int = doSomething(param2)"
-  private val TheDefnDefTraversalResult = DefnDefTraversalResult(TraversedDefnDef)
 
   private val TheStats = List(DefnVar, DefnDef)
-  private val TheTraversedStatResults = List(TheDefnVarTraversalResult, TheDefnDefTraversalResult)
+  private val TheTraversedStats = List(TraversedDefnVar, TraversedDefnDef)
 
   private val TheTemplate =
     Template(
@@ -81,24 +76,20 @@ class TraitTraverserImplTest extends UnitTestSuite {
       templ = TheTemplate
     )
 
-    val expectedJavaModifiers = List(JavaModifier.Public)
-    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TraversedScalaMods, javaModifiers = expectedJavaModifiers)
     val expectedTemplateTraversalResult = TemplateTraversalResult(
       inits = TraversedInits,
       self = TheTraversedSelf,
-      statResults = TheTraversedStatResults
+      statResults = TheTraversedStats.map(SimpleStatTraversalResult(_))
     )
-    val expectedTraitTraversalResult = TraitTraversalResult(
-      scalaMods = TraversedScalaMods,
-      javaModifiers = expectedJavaModifiers,
+    val expectedTraversedTrait = Trait(
+      mods = TraversedScalaMods,
       name = TraitName,
+      ctor = PrimaryCtors.Empty,
       tparams = TraversedTypeParams,
-      inits = TraversedInits,
-      self = TheTraversedSelf,
-      statResults = TheTraversedStatResults
+      templ = expectedTemplateTraversalResult.template
     )
 
-    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(`trait`))
+    doReturn(TraversedScalaMods).when(statModListTraverser).traverse(`trait`.mods)
     doAnswer((tparam: Type.Param) => tparam match {
       case aTypeParam if aTypeParam.structure == TypeParam1.structure => TraversedTypeParam1
       case aTypeParam if aTypeParam.structure == TypeParam2.structure => TraversedTypeParam2
@@ -110,12 +101,6 @@ class TraitTraverserImplTest extends UnitTestSuite {
         eqTemplateContext(TemplateContext(javaScope = JavaScope.Interface)))
 
 
-    val context = ClassOrTraitContext(javaScope = JavaScope.Package)
-    traitTraverser.traverse(`trait`, context) should equalTraitTraversalResult(expectedTraitTraversalResult)
-  }
-
-  private def eqExpectedScalaMods(`trait`: Trait) = {
-    val expectedModifiersContext = ModifiersContext(`trait`, JavaTreeType.Interface, JavaScope.Package)
-    eqModifiersContext(expectedModifiersContext)
+    traitTraverser.traverse(`trait`).structure shouldBe expectedTraversedTrait.structure
   }
 }

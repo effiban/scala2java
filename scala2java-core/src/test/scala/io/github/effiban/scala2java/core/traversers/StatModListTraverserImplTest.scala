@@ -34,22 +34,30 @@ class StatModListTraverserImplTest extends UnitTestSuite {
 
   private val statModListTraverser = new StatModListTraverserImpl(annotTraverser, javaModifiersResolver)
 
-  test("traverse when has only annotations") {
+  test("traverse ModifiersContext when has only annotations") {
     val modifiersContext = modifiersContextOf(Annots)
 
     val expectedResult = ModListTraversalResult(scalaMods = TraversedAnnots)
 
-    doAnswer((annot: Annot) => annot match {
-      case anAnnot if anAnnot.structure == Annot1.structure => TraversedAnnot1
-      case anAnnot if anAnnot.structure == Annot2.structure => TraversedAnnot2
-    }).when(annotTraverser).traverse(any[Annot])
-
+    expectTraverseAnnot()
     when(javaModifiersResolver.resolve(eqModifiersContext(modifiersContext))).thenReturn(Nil)
 
     statModListTraverser.traverse(modifiersContext) should equalModListTraversalResult(expectedResult)
   }
 
-  test("traverse when has only visibility modifiers") {
+  test("traverse List[Mod] when has only annotations") {
+    expectTraverseAnnot()
+    statModListTraverser.traverse(Annots).structure shouldBe TraversedAnnots.structure
+  }
+
+  private def expectTraverseAnnot() = {
+    doAnswer((annot: Annot) => annot match {
+      case anAnnot if anAnnot.structure == Annot1.structure => TraversedAnnot1
+      case anAnnot if anAnnot.structure == Annot2.structure => TraversedAnnot2
+    }).when(annotTraverser).traverse(any[Annot])
+  }
+
+  test("traverse ModifiersContext when has only visibility modifiers") {
     val modifiersContext = modifiersContextOf(PrivateFinalMods)
 
     val expectedResult = ModListTraversalResult(scalaMods = PrivateFinalMods, javaModifiers = JavaPrivateFinalMods)
@@ -59,21 +67,29 @@ class StatModListTraverserImplTest extends UnitTestSuite {
     statModListTraverser.traverse(modifiersContext) should equalModListTraversalResult(expectedResult)
   }
 
-  test("traverse when has annotations and visibility modifiers") {
+  test("traverse List[Mod] when has only visibility modifiers") {
+    statModListTraverser.traverse(PrivateFinalMods).structure shouldBe PrivateFinalMods.structure
+  }
+
+  test("traverse ModifiersContext when has annotations and visibility modifiers") {
     val scalaMods = Annots ++ PrivateFinalMods
     val traversedScalaMods = TraversedAnnots ++ PrivateFinalMods
     val modifiersContext = modifiersContextOf(scalaMods)
 
     val expectedResult = ModListTraversalResult(scalaMods = traversedScalaMods, javaModifiers = JavaPrivateFinalMods)
-
-    doAnswer((annot: Annot) => annot match {
-      case anAnnot if anAnnot.structure == Annot1.structure => TraversedAnnot1
-      case anAnnot if anAnnot.structure == Annot2.structure => TraversedAnnot2
-    }).when(annotTraverser).traverse(any[Annot])
+    expectTraverseAnnot()
 
     when(javaModifiersResolver.resolve(eqModifiersContext(modifiersContext))).thenReturn(JavaPrivateFinalMods)
 
     statModListTraverser.traverse(modifiersContext) should equalModListTraversalResult(expectedResult)
+  }
+
+  test("traverse List[Mod] when has annotations and visibility modifiers") {
+    val mods = Annots ++ PrivateFinalMods
+
+    expectTraverseAnnot()
+
+    statModListTraverser.traverse(mods).structure shouldBe (TraversedAnnots ++ PrivateFinalMods).structure
   }
 
   private def modifiersContextOf(mods: List[Mod]) = ModifiersContext(declValWith(mods), JavaTreeType.Variable, JavaScope.Class)
