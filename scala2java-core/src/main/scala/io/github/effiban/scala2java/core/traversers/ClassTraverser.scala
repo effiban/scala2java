@@ -20,7 +20,7 @@ private[traversers] class ClassTraverserImpl(caseClassTraverser: => CaseClassTra
     if (classClassifier.isCase(transformedClassDef)) {
       caseClassTraverser.traverse(transformedClassDef, context)
     } else {
-      regularClassTraverser.traverse(transformedClassDef, context).tree
+      regularClassTraverser.traverse(transformedClassDef, context)
     }
   }
 }
