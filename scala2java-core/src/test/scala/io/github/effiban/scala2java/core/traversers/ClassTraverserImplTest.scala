@@ -5,7 +5,6 @@ import io.github.effiban.scala2java.core.contexts.ClassOrTraitContext
 import io.github.effiban.scala2java.core.entities.JavaModifier
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{PrimaryCtors, Templates}
-import io.github.effiban.scala2java.core.traversers.results.matchers.ClassTraversalResultScalatestMatcher.equalClassTraversalResult
 import io.github.effiban.scala2java.core.traversers.results.{CaseClassTraversalResult, RegularClassTraversalResult}
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.spi.transformers.ClassTransformer
@@ -42,7 +41,7 @@ class ClassTraverserImplTest extends UnitTestSuite {
     doReturn(expectedTraversalResult)
       .when(caseClassTraverser).traverse(eqTree(transformedClassDef), eqTo(ClassOrTraitContext(JavaScope.Package)))
 
-    classTraverser.traverse(classDef, ClassOrTraitContext(JavaScope.Package)) should equalClassTraversalResult(expectedTraversalResult)
+    classTraverser.traverse(classDef, ClassOrTraitContext(JavaScope.Package)).structure shouldBe expectedTraversalResult.tree.structure
   }
 
   test("traverse when regular class") {
@@ -59,7 +58,7 @@ class ClassTraverserImplTest extends UnitTestSuite {
     doReturn(expectedTraversalResult)
       .when(regularClassTraverser).traverse(eqTree(transformedClassDef), eqTo(ClassOrTraitContext(JavaScope.Package)))
 
-    classTraverser.traverse(classDef, ClassOrTraitContext(JavaScope.Package)) should equalClassTraversalResult(expectedTraversalResult)
+    classTraverser.traverse(classDef, ClassOrTraitContext(JavaScope.Package)).structure shouldBe expectedTraversalResult.tree.structure
   }
 
   private def classDefOf(name: String, mods: List[Mod] = Nil) = {
