@@ -2,16 +2,15 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.entities.JavaTreeType.JavaTreeType
-import io.github.effiban.scala2java.core.entities.{JavaKeyword, JavaModifier, JavaTreeType}
+import io.github.effiban.scala2java.core.entities.{JavaKeyword, JavaTreeType}
 import io.github.effiban.scala2java.core.matchers.JavaChildScopeContextMatcher.eqJavaChildScopeContext
 import io.github.effiban.scala2java.core.matchers.JavaTreeTypeContextMatcher.eqJavaTreeTypeContext
-import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
 import io.github.effiban.scala2java.core.matchers.TemplateContextMatcher.eqTemplateContext
 import io.github.effiban.scala2java.core.resolvers.{JavaChildScopeResolver, JavaTreeTypeResolver}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.traversers.results._
-import io.github.effiban.scala2java.core.traversers.results.matchers.ObjectTraversalResultScalatestMatcher.equalObjectTraversalResult
 import io.github.effiban.scala2java.spi.entities.JavaScope
+import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.{Defn, Mod, Name, Self, Template, XtensionQuasiquoteInit, XtensionQuasiquoteMod, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
@@ -77,30 +76,24 @@ class ObjectTraverserImplTest extends UnitTestSuite {
     val expectedJavaTreeType = JavaTreeType.Class
     val expectedChildJavaScope = JavaScope.UtilityClass
     val expectedTemplateContext = TemplateContext(javaScope = expectedChildJavaScope)
-    val expectedJavaModifiers = List(JavaModifier.Public)
-    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TheTraversedScalaMods, javaModifiers = expectedJavaModifiers)
     val expectedTemplateTraversalResult = TemplateTraversalResult(
       self = TheTraversedSelf,
       statResults = TheTraversedStatResults
     )
-    val expectedObjectTraversalResult = ObjectTraversalResult(
-      scalaMods = TheTraversedScalaMods,
-      javaModifiers = expectedJavaModifiers,
-      javaTypeKeyword = JavaKeyword.Class,
+    val expectedTraversedObject = Defn.Object(
+      mods = TheTraversedScalaMods,
       name = TheObjectName,
-      self = TheTraversedSelf,
-      statResults = TheTraversedStatResults
+      templ = expectedTemplateTraversalResult.template
     )
 
     expectResolveJavaTreeType(objectDef, TheScalaMods, expectedJavaTreeType)
-    doReturn(expectedModListTraversalResult)
-      .when(statModListTraverser).traverse(eqExpectedScalaMods(objectDef, expectedJavaTreeType))
+    doReturn(TheTraversedScalaMods).when(statModListTraverser).traverse(eqTreeList(TheScalaMods))
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(objectDef, expectedJavaTreeType))))
       .thenReturn(expectedChildJavaScope)
     doReturn(expectedTemplateTraversalResult)
       .when(templateTraverser).traverse(eqTree(template), eqTemplateContext(expectedTemplateContext))
 
-    objectTraverser.traverse(objectDef, StatContext(TheParentJavaScope)) should equalObjectTraversalResult(expectedObjectTraversalResult)
+    objectTraverser.traverse(objectDef, StatContext(TheParentJavaScope)).structure shouldBe expectedTraversedObject.structure
   }
 
   test("traverse() when resolves to a regular Java class with inheritance") {
@@ -121,35 +114,26 @@ class ObjectTraverserImplTest extends UnitTestSuite {
     val expectedChildJavaScope = JavaScope.Class
     val expectedInheritanceKeyword = JavaKeyword.Implements
     val expectedTemplateContext = TemplateContext(javaScope = expectedChildJavaScope)
-    val expectedJavaModifiers = List(JavaModifier.Public)
-    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TheTraversedScalaMods, javaModifiers = expectedJavaModifiers)
     val expectedTemplateTraversalResult = TemplateTraversalResult(
       maybeInheritanceKeyword = Some(expectedInheritanceKeyword),
       inits = TheTraversedInits,
       self = TheTraversedSelf,
       statResults = TheTraversedStatResults
     )
-    val expectedObjectTraversalResult = ObjectTraversalResult(
-      scalaMods = TheTraversedScalaMods,
-      javaModifiers = expectedJavaModifiers,
-      javaTypeKeyword = JavaKeyword.Class,
+    val expectedTraversedObject = Defn.Object(
+      mods = TheTraversedScalaMods,
       name = TheObjectName,
-      maybeInheritanceKeyword = Some(expectedInheritanceKeyword),
-      inits = TheTraversedInits,
-      self = TheTraversedSelf,
-      statResults = TheTraversedStatResults
+      templ = expectedTemplateTraversalResult.template
     )
 
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(objectDef, expectedJavaTreeType))))
       .thenReturn(expectedChildJavaScope)
-
     expectResolveJavaTreeType(objectDef, TheScalaMods, expectedJavaTreeType)
-    doReturn(expectedModListTraversalResult)
-      .when(statModListTraverser).traverse(eqExpectedScalaMods(objectDef, expectedJavaTreeType))
+    doReturn(TheTraversedScalaMods).when(statModListTraverser).traverse(eqTreeList(TheScalaMods))
     doReturn(expectedTemplateTraversalResult)
       .when(templateTraverser).traverse(eqTree(template), eqTemplateContext(expectedTemplateContext))
 
-    objectTraverser.traverse(objectDef, StatContext(TheParentJavaScope)) should equalObjectTraversalResult(expectedObjectTraversalResult)
+    objectTraverser.traverse(objectDef, StatContext(TheParentJavaScope)).structure shouldBe expectedTraversedObject.structure
   }
 
   test("traverse() when resolves to a Java enum") {
@@ -169,39 +153,28 @@ class ObjectTraverserImplTest extends UnitTestSuite {
     val expectedJavaTreeType = JavaTreeType.Enum
     val expectedChildJavaScope = JavaScope.Enum
     val expectedTemplateContext = TemplateContext(javaScope = expectedChildJavaScope)
-    val expectedJavaModifiers = List(JavaModifier.Public)
-    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TheTraversedScalaMods, javaModifiers = expectedJavaModifiers)
     val expectedTemplateTraversalResult = TemplateTraversalResult(
       self = TheTraversedSelf,
       statResults = TheTraversedStatResults
     )
-    val expectedObjectTraversalResult = ObjectTraversalResult(
-      scalaMods = TheTraversedScalaMods,
-      javaModifiers = expectedJavaModifiers,
-      javaTypeKeyword = JavaKeyword.Enum,
+    val expectedTraversedObject = Defn.Object(
+      mods = TheTraversedScalaMods,
       name = TheObjectName,
-      self = TheTraversedSelf,
-      statResults = TheTraversedStatResults
+      templ = expectedTemplateTraversalResult.template
     )
 
     expectResolveJavaTreeType(objectDef, TheScalaMods, expectedJavaTreeType)
-    doReturn(expectedModListTraversalResult)
-      .when(statModListTraverser).traverse(eqExpectedScalaMods(objectDef, expectedJavaTreeType))
+    doReturn(TheTraversedScalaMods).when(statModListTraverser).traverse(eqTreeList(TheScalaMods))
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(objectDef, expectedJavaTreeType))))
       .thenReturn(expectedChildJavaScope)
     doReturn(expectedTemplateTraversalResult)
       .when(templateTraverser).traverse(eqTree(template), eqTemplateContext(expectedTemplateContext))
 
-    objectTraverser.traverse(objectDef, StatContext(TheParentJavaScope)) should equalObjectTraversalResult(expectedObjectTraversalResult)
+    objectTraverser.traverse(objectDef, StatContext(TheParentJavaScope)).structure shouldBe expectedTraversedObject.structure
   }
 
   private def expectResolveJavaTreeType(obj: Defn.Object, modifiers: List[Mod], expectedJavaTreeType: JavaTreeType): Unit = {
     val expectedJavaTreeTypeContext = JavaTreeTypeContext(obj, modifiers)
     when(javaTreeTypeResolver.resolve(eqJavaTreeTypeContext(expectedJavaTreeTypeContext))).thenReturn(expectedJavaTreeType)
-  }
-
-  private def eqExpectedScalaMods(obj: Defn.Object, javaTreeType: JavaTreeType) = {
-    val expectedModifiersContext = ModifiersContext(obj, javaTreeType, TheParentJavaScope)
-    eqModifiersContext(expectedModifiersContext)
   }
 }
