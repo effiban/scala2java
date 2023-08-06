@@ -31,7 +31,6 @@ class PkgStatTraverserImplTest extends UnitTestSuite {
   private val traitTraversalResult = mock[TraitTraversalResult]
   private val classTraversalResult = mock[ClassTraversalResult]
   private val objectTraversalResult = mock[ObjectTraversalResult]
-  private val importTraversalResult = mock[SimpleStatTraversalResult]
 
   private val pkgStatTraverser = new PkgStatTraverserImpl(
     classTraverser,
@@ -41,11 +40,7 @@ class PkgStatTraverserImplTest extends UnitTestSuite {
   )
 
   test("traverse() for trait") {
-    doReturn(traitTraversalResult).when(traitTraverser).traverse(
-      eqTree(TheTrait),
-      eqTo(ClassOrTraitContext(javaScope = JavaScope.Package))
-    )
-    when(traitTraversalResult.tree).thenReturn(TheTraversedTrait)
+    doReturn(TheTraversedTrait).when(traitTraverser).traverse(eqTree(TheTrait))
 
     pkgStatTraverser.traverse(TheTrait).value.structure shouldBe TheTraversedTrait.structure
   }
