@@ -18,7 +18,7 @@ private[traversers] class ClassTraverserImpl(caseClassTraverser: => CaseClassTra
   def traverse(classDef: Defn.Class, context: ClassOrTraitContext = ClassOrTraitContext()): Defn.Class = {
     val transformedClassDef = classTransformer.transform(classDef)
     if (classClassifier.isCase(transformedClassDef)) {
-      caseClassTraverser.traverse(transformedClassDef, context).tree
+      caseClassTraverser.traverse(transformedClassDef, context)
     } else {
       regularClassTraverser.traverse(transformedClassDef, context).tree
     }
