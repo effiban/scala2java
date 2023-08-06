@@ -5,7 +5,7 @@ import io.github.effiban.scala2java.core.contexts.ClassOrTraitContext
 import io.github.effiban.scala2java.core.entities.JavaModifier
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{PrimaryCtors, Templates}
-import io.github.effiban.scala2java.core.traversers.results.{CaseClassTraversalResult, RegularClassTraversalResult}
+import io.github.effiban.scala2java.core.traversers.results.RegularClassTraversalResult
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.spi.transformers.ClassTransformer
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -30,18 +30,14 @@ class ClassTraverserImplTest extends UnitTestSuite {
   test("traverse when case class") {
     val classDef = classDefOf("MyClass", List(Mod.Case()))
     val transformedClassDef = classDefOf("MyTransformedClass", List(Mod.Case()))
-    val expectedTraversalResult = CaseClassTraversalResult(
-      javaModifiers = List(JavaModifier.Public),
-      name = t"MyTransformedClass",
-      ctor = PrimaryCtors.Empty
-    )
+    val expectedTraversedCaseClass = classDefOf("MyTraversedClass", List(Mod.Case()))
 
     when(classTransformer.transform(eqTree(classDef))).thenReturn(transformedClassDef)
     when(classClassifier.isCase(eqTree(transformedClassDef))).thenReturn(true)
-    doReturn(expectedTraversalResult)
+    doReturn(expectedTraversedCaseClass)
       .when(caseClassTraverser).traverse(eqTree(transformedClassDef), eqTo(ClassOrTraitContext(JavaScope.Package)))
 
-    classTraverser.traverse(classDef, ClassOrTraitContext(JavaScope.Package)).structure shouldBe expectedTraversalResult.tree.structure
+    classTraverser.traverse(classDef, ClassOrTraitContext(JavaScope.Package)).structure shouldBe expectedTraversedCaseClass.structure
   }
 
   test("traverse when regular class") {

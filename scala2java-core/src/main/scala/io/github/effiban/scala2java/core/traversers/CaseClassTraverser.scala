@@ -1,42 +1,34 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts._
-import io.github.effiban.scala2java.core.entities.JavaTreeType
-import io.github.effiban.scala2java.core.resolvers.JavaChildScopeResolver
-import io.github.effiban.scala2java.core.traversers.results.CaseClassTraversalResult
+import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.spi.entities.JavaScope.JavaScope
 
 import scala.meta.Defn
 
 trait CaseClassTraverser {
-  def traverse(classDef: Defn.Class, context: ClassOrTraitContext = ClassOrTraitContext()): CaseClassTraversalResult
+  def traverse(classDef: Defn.Class, context: ClassOrTraitContext = ClassOrTraitContext()): Defn.Class
 }
 
 private[traversers] class CaseClassTraverserImpl(statModListTraverser: => StatModListTraverser,
                                                  typeParamTraverser: => TypeParamTraverser,
                                                  termParamTraverser: => TermParamTraverser,
-                                                 templateTraverser: => TemplateTraverser,
-                                                 javaChildScopeResolver: JavaChildScopeResolver) extends CaseClassTraverser {
+                                                 templateTraverser: => TemplateTraverser) extends CaseClassTraverser {
 
-  override def traverse(classDef: Defn.Class, context: ClassOrTraitContext = ClassOrTraitContext()): CaseClassTraversalResult = {
-    val modListTraversalResult = statModListTraverser.traverse(ModifiersContext(classDef, JavaTreeType.Record, context.javaScope))
+  override def traverse(classDef: Defn.Class, context: ClassOrTraitContext = ClassOrTraitContext()): Defn.Class = {
+    val traversedMods = statModListTraverser.traverse(classDef.mods)
     val traversedTypeParams = classDef.tparams.map(typeParamTraverser.traverse)
-    val javaChildScope = javaChildScopeResolver.resolve(JavaChildScopeContext(classDef, JavaTreeType.Record))
     val traversedCtorParamss = classDef.ctor.paramss.map(_.map(
-      param => termParamTraverser.traverse(param, StatContext(javaChildScope)))
+      param => termParamTraverser.traverse(param, StatContext(JavaScope.Class)))
     )
-    val templateTraversalResult = traverseTemplate(classDef, javaChildScope)
+    val templateTraversalResult = traverseTemplate(classDef, JavaScope.Class)
 
-    CaseClassTraversalResult(
-      scalaMods = modListTraversalResult.scalaMods,
-      javaModifiers = modListTraversalResult.javaModifiers,
+    Defn.Class(
+      mods = traversedMods,
       name = classDef.name,
       tparams = traversedTypeParams,
       ctor = classDef.ctor.copy(paramss = traversedCtorParamss),
-      maybeInheritanceKeyword = templateTraversalResult.maybeInheritanceKeyword,
-      inits = templateTraversalResult.inits,
-      self = templateTraversalResult.self,
-      statResults = templateTraversalResult.statResults
+      templ = templateTraversalResult.template
     )
   }
 
