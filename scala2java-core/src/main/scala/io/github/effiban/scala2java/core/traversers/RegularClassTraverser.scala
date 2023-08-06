@@ -2,15 +2,13 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.entities.JavaTreeType.JavaTreeType
-import io.github.effiban.scala2java.core.entities.JavaTreeTypeToKeywordMapping
 import io.github.effiban.scala2java.core.resolvers.{JavaChildScopeResolver, JavaTreeTypeResolver}
 import io.github.effiban.scala2java.core.transformers.ParamToDeclVarTransformer
-import io.github.effiban.scala2java.core.traversers.results.RegularClassTraversalResult
 
 import scala.meta.Defn
 
 trait RegularClassTraverser {
-  def traverse(classDef: Defn.Class, context: ClassOrTraitContext = ClassOrTraitContext()): RegularClassTraversalResult
+  def traverse(classDef: Defn.Class, context: ClassOrTraitContext = ClassOrTraitContext()): Defn.Class
 }
 
 private[traversers] class RegularClassTraverserImpl(statModListTraverser: => StatModListTraverser,
@@ -20,24 +18,18 @@ private[traversers] class RegularClassTraverserImpl(statModListTraverser: => Sta
                                                     javaTreeTypeResolver: JavaTreeTypeResolver,
                                                     javaChildScopeResolver: JavaChildScopeResolver) extends RegularClassTraverser {
 
-  def traverse(classDef: Defn.Class, context: ClassOrTraitContext = ClassOrTraitContext()): RegularClassTraversalResult = {
+  def traverse(classDef: Defn.Class, context: ClassOrTraitContext = ClassOrTraitContext()): Defn.Class = {
     val javaTreeType = javaTreeTypeResolver.resolve(JavaTreeTypeContext(classDef, classDef.mods))
-    val modListTraversalResult = statModListTraverser.traverse(ModifiersContext(classDef, javaTreeType, context.javaScope))
-    val javaTypeKeyword = JavaTreeTypeToKeywordMapping(javaTreeType)
+    val traversedMods = statModListTraverser.traverse(classDef.mods)
     val traversedTypeParams = classDef.tparams.map(typeParamTraverser.traverse)
     val templateTraversalResult = traverseCtorAndTemplate(classDef, javaTreeType)
 
-    RegularClassTraversalResult(
-      scalaMods = modListTraversalResult.scalaMods,
-      javaModifiers = modListTraversalResult.javaModifiers,
-      javaTypeKeyword = javaTypeKeyword,
+    Defn.Class(
+      mods = traversedMods,
       name = classDef.name,
       tparams = traversedTypeParams,
       ctor = classDef.ctor,
-      maybeInheritanceKeyword = templateTraversalResult.maybeInheritanceKeyword,
-      inits = templateTraversalResult.inits,
-      self = templateTraversalResult.self,
-      statResults = templateTraversalResult.statResults
+      templ = templateTraversalResult.template
     )
   }
 

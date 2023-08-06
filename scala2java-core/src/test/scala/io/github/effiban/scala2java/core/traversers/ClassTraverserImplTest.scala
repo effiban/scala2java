@@ -2,16 +2,14 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.classifiers.ClassClassifier
 import io.github.effiban.scala2java.core.contexts.ClassOrTraitContext
-import io.github.effiban.scala2java.core.entities.JavaModifier
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{PrimaryCtors, Templates}
-import io.github.effiban.scala2java.core.traversers.results.RegularClassTraversalResult
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.spi.transformers.ClassTransformer
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
 
-import scala.meta.{Defn, Mod, Type, XtensionQuasiquoteType}
+import scala.meta.{Defn, Mod, Type}
 
 class ClassTraverserImplTest extends UnitTestSuite {
 
@@ -43,18 +41,14 @@ class ClassTraverserImplTest extends UnitTestSuite {
   test("traverse when regular class") {
     val classDef = classDefOf("MyClass")
     val transformedClassDef = classDefOf("MyTransformedClass")
-    val expectedTraversalResult = RegularClassTraversalResult(
-      javaModifiers = List(JavaModifier.Public),
-      name = t"MyTransformedClass",
-      ctor = PrimaryCtors.Empty
-    )
+    val expectedTraversedClassDef = classDefOf(name = "MyTraversedClass")
 
     when(classClassifier.isCase(eqTree(transformedClassDef))).thenReturn(false)
     when(classTransformer.transform(eqTree(classDef))).thenReturn(transformedClassDef)
-    doReturn(expectedTraversalResult)
+    doReturn(expectedTraversedClassDef)
       .when(regularClassTraverser).traverse(eqTree(transformedClassDef), eqTo(ClassOrTraitContext(JavaScope.Package)))
 
-    classTraverser.traverse(classDef, ClassOrTraitContext(JavaScope.Package)).structure shouldBe expectedTraversalResult.tree.structure
+    classTraverser.traverse(classDef, ClassOrTraitContext(JavaScope.Package)).structure shouldBe expectedTraversedClassDef.structure
   }
 
   private def classDefOf(name: String, mods: List[Mod] = Nil) = {
