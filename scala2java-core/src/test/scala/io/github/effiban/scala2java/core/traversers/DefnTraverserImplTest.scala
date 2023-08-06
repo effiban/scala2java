@@ -3,13 +3,12 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.entities.{JavaKeyword, JavaModifier}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.testtrees.PrimaryCtors
 import io.github.effiban.scala2java.core.traversers.results._
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
 
-import scala.meta.{XtensionQuasiquoteTerm, XtensionQuasiquoteType}
+import scala.meta.XtensionQuasiquoteTerm
 
 class DefnTraverserImplTest extends UnitTestSuite {
 
@@ -75,22 +74,12 @@ class DefnTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for Defn.Class") {
-    val defnClass =
-      q"""
-      class MyClass {
-        def foo(x: Int) = x + 1
-      }
-      """
-    val traversalResult = RegularClassTraversalResult(
-      javaModifiers = List(JavaModifier.Public),
-      name = t"MyTraversedClass",
-      ctor = PrimaryCtors.Empty,
-      statResults = List(DefnDefTraversalResult(q"def traversedFoo(xx: Int) = xx + 1"))
-    )
+    val defnClass = q"class MyClass { def foo(x: Int) = x + 1 }"
+    val traversedClass = q"class MyTraversedClass { def traversedFoo(xx: Int) = xx + 1 }"
 
-    doReturn(traversalResult).when(classTraverser).traverse(eqTree(defnClass), eqTo(TheClassOrTraitContext))
+    doReturn(traversedClass).when(classTraverser).traverse(eqTree(defnClass), eqTo(TheClassOrTraitContext))
 
-    defnTraverser.traverse(defnClass, TheStatContext).structure shouldBe traversalResult.tree.structure
+    defnTraverser.traverse(defnClass, TheStatContext).structure shouldBe traversedClass.structure
   }
 
   test("traverse() for Defn.Object") {
