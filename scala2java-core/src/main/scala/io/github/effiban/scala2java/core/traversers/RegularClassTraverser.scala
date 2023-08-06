@@ -22,14 +22,14 @@ private[traversers] class RegularClassTraverserImpl(statModListTraverser: => Sta
     val javaTreeType = javaTreeTypeResolver.resolve(JavaTreeTypeContext(classDef, classDef.mods))
     val traversedMods = statModListTraverser.traverse(classDef.mods)
     val traversedTypeParams = classDef.tparams.map(typeParamTraverser.traverse)
-    val templateTraversalResult = traverseCtorAndTemplate(classDef, javaTreeType)
+    val traversedTemplate = traverseCtorAndTemplate(classDef, javaTreeType)
 
     Defn.Class(
       mods = traversedMods,
       name = classDef.name,
       tparams = traversedTypeParams,
       ctor = classDef.ctor,
-      templ = templateTraversalResult.template
+      templ = traversedTemplate
     )
   }
 

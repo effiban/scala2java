@@ -18,14 +18,14 @@ private[traversers] class TraitTraverserImpl(statModListTraverser: => StatModLis
     val traversedMods = statModListTraverser.traverse(traitDef.mods)
     val traversedTypeParams = traitDef.tparams.map(typeParamTraverser.traverse)
     val templateContext = TemplateContext(javaScope = JavaScope.Interface)
-    val templateTraversalResult = templateTraverser.traverse(traitDef.templ, templateContext)
+    val traversedTemplate = templateTraverser.traverse(traitDef.templ, templateContext)
 
     Trait(
       mods = traversedMods,
       name = traitDef.name,
       tparams = traversedTypeParams,
       ctor = Ctor.Primary(mods = Nil, name = Name.Anonymous(), paramss = Nil),
-      templ = templateTraversalResult.template
+      templ = traversedTemplate
     )
   }
 }

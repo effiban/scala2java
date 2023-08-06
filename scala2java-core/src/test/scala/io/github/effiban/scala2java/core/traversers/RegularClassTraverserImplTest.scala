@@ -1,17 +1,15 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts._
+import io.github.effiban.scala2java.core.entities.JavaTreeType
 import io.github.effiban.scala2java.core.entities.JavaTreeType.JavaTreeType
-import io.github.effiban.scala2java.core.entities.{JavaKeyword, JavaTreeType}
 import io.github.effiban.scala2java.core.matchers.JavaChildScopeContextMatcher.eqJavaChildScopeContext
 import io.github.effiban.scala2java.core.matchers.JavaTreeTypeContextMatcher.eqJavaTreeTypeContext
-import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
 import io.github.effiban.scala2java.core.matchers.TemplateContextMatcher.eqTemplateContext
 import io.github.effiban.scala2java.core.resolvers.{JavaChildScopeResolver, JavaTreeTypeResolver}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{PrimaryCtors, Selfs}
 import io.github.effiban.scala2java.core.transformers.ParamToDeclVarTransformer
-import io.github.effiban.scala2java.core.traversers.results._
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -60,22 +58,14 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
   private val SyntheticDeclVar3 = q"private final var arg3: Int"
   private val SyntheticDeclVar4 = q"private final var arg4: Int"
 
-  private val SyntheticDeclVarTraversalResult1 = DeclVarTraversalResult(SyntheticDeclVar1)
-  private val SyntheticDeclVarTraversalResult2 = DeclVarTraversalResult(SyntheticDeclVar2)
-  private val SyntheticDeclVarTraversalResult3 = DeclVarTraversalResult(SyntheticDeclVar3)
-  private val SyntheticDeclVarTraversalResult4 = DeclVarTraversalResult(SyntheticDeclVar4)
-
   private val DefnDef1 = q"def myMethod1(param: Int): Int = doSomething1(param)"
   private val DefnDef2 = q"def myMethod2(param: Int): Int = doSomething2(param)"
 
   private val TraversedDefnDef1 = q"def myTraversedMethod1(param: Int): Int = doSomething11(param)"
   private val TraversedDefnDef2 = q"def myTraversedMethod2(param: Int): Int = doSomething22(param)"
 
-  private val DefnDefTraversalResult1 = DefnDefTraversalResult(TraversedDefnDef1)
-  private val DefnDefTraversalResult2 = DefnDefTraversalResult(TraversedDefnDef2)
-
   private val TheStats = List(DefnDef1, DefnDef2)
-  private val TheStatTraversalResults = List(DefnDefTraversalResult1, DefnDefTraversalResult2)
+  private val TheTraversedStats = List(TraversedDefnDef1, TraversedDefnDef2)
 
 
   private val statModListTraverser = mock[StatModListTraverser]
@@ -119,16 +109,18 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
     )
     val expectedSyntheticDeclVars = List(SyntheticDeclVar1, SyntheticDeclVar2)
     val expectedAdjustedTemplate = initialTemplate.copy(stats = expectedSyntheticDeclVars)
-    val expectedTemplateTraversalResult = TemplateTraversalResult(
+    val expectedTraversedTemplate = Template(
+      early = Nil,
+      inits = Nil,
       self = TheTraversedSelf,
-      statResults = List(SyntheticDeclVarTraversalResult1, SyntheticDeclVarTraversalResult2)
+      stats = List(SyntheticDeclVar1, SyntheticDeclVar2)
     )
     val expectedTraversedRegularClass = Defn.Class(
       mods = TheTraversedScalaMods,
       name = TheClassName,
       tparams = Nil,
       ctor = ctorPrimary,
-      templ = expectedTemplateTraversalResult.template
+      templ = expectedTraversedTemplate
     )
 
     expectResolveJavaTreeType(regularClass, TheScalaMods, expectedJavaTreeType)
@@ -141,7 +133,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       case arg2 if arg2.structure == CtorArg2.structure => SyntheticDeclVar2
     })
 
-    doReturn(expectedTemplateTraversalResult)
+    doReturn(expectedTraversedTemplate)
       .when(templateTraverser).traverse(eqTree(expectedAdjustedTemplate), eqTemplateContext(expectedTemplateContext))
 
     classTraverser.traverse(regularClass, ClassOrTraitContext(TheParentJavaScope)).structure shouldBe expectedTraversedRegularClass.structure
@@ -171,13 +163,18 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       maybePrimaryCtor = Some(ctorPrimary)
     )
     doReturn(TheTraversedScalaMods).when(statModListTraverser).traverse(eqTreeList(TheScalaMods))
-    val expectedTemplateTraversalResult = TemplateTraversalResult(self = TheTraversedSelf)
+    val expectedTraversedTemplate = Template(
+      early = Nil,
+      inits = Nil,
+      self = TheTraversedSelf,
+      stats = Nil,
+    )
     val expectedTraversedRegularClass = Defn.Class(
       mods = TheTraversedScalaMods,
       name = TheClassName,
       tparams = TheTraversedTypeParams,
       ctor = ctorPrimary,
-      templ = expectedTemplateTraversalResult.template
+      templ = expectedTraversedTemplate
     )
 
     expectResolveJavaTreeType(regularClass, TheScalaMods, expectedJavaTreeType)
@@ -190,7 +187,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(regularClass, expectedJavaTreeType))))
       .thenReturn(expectedChildJavaScope)
 
-    doReturn(expectedTemplateTraversalResult)
+    doReturn(expectedTraversedTemplate)
       .when(templateTraverser).traverse(eqTree(template), eqTemplateContext(expectedTemplateContext))
 
     classTraverser.traverse(regularClass, ClassOrTraitContext(TheParentJavaScope)).structure shouldBe expectedTraversedRegularClass.structure
@@ -220,17 +217,18 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       maybePrimaryCtor = Some(ctorPrimary)
     )
     doReturn(TheTraversedScalaMods).when(statModListTraverser).traverse(eqTreeList(TheScalaMods))
-    val expectedTemplateTraversalResult = TemplateTraversalResult(
-      maybeInheritanceKeyword = Some(JavaKeyword.Implements),
+    val expectedTraversedTemplate = Template(
+      early = Nil,
       inits = TheTraversedInits,
-      self = TheTraversedSelf
+      self = TheTraversedSelf,
+      stats = Nil
     )
     val expectedTraversedRegularClass = Defn.Class(
       mods = TheTraversedScalaMods,
       name = TheClassName,
       tparams = Nil,
       ctor = ctorPrimary,
-      templ = expectedTemplateTraversalResult.template
+      templ = expectedTraversedTemplate
     )
 
     expectResolveJavaTreeType(regularClass, TheScalaMods, expectedJavaTreeType)
@@ -238,7 +236,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(regularClass, expectedJavaTreeType))))
       .thenReturn(expectedChildJavaScope)
 
-    doReturn(expectedTemplateTraversalResult)
+    doReturn(expectedTraversedTemplate)
       .when(templateTraverser).traverse(eqTree(template), eqTemplateContext(expectedTemplateContext))
 
     classTraverser.traverse(regularClass, ClassOrTraitContext(TheParentJavaScope)).structure shouldBe expectedTraversedRegularClass.structure
@@ -268,16 +266,18 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       maybeClassName = Some(TheClassName),
       maybePrimaryCtor = Some(ctorPrimary)
     )
-    val expectedTemplateTraversalResult = TemplateTraversalResult(
+    val expectedTraversedTemplate = Template(
+      early = Nil,
+      inits = Nil,
       self = TheTraversedSelf,
-      statResults = TheStatTraversalResults
+      stats = TheTraversedStats
     )
     val expectedTraversedRegularClass = Defn.Class(
       mods = TheTraversedScalaMods,
       name = TheClassName,
       tparams = Nil,
       ctor = ctorPrimary,
-      templ = expectedTemplateTraversalResult.template
+      templ = expectedTraversedTemplate
     )
 
     expectResolveJavaTreeType(regularClass, TheScalaMods, expectedJavaTreeType)
@@ -285,7 +285,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(regularClass, expectedJavaTreeType))))
       .thenReturn(expectedChildJavaScope)
 
-    doReturn(expectedTemplateTraversalResult)
+    doReturn(expectedTraversedTemplate)
       .when(templateTraverser).traverse(eqTree(template), eqTemplateContext(expectedTemplateContext))
 
     classTraverser.traverse(regularClass, ClassOrTraitContext(TheParentJavaScope)).structure shouldBe expectedTraversedRegularClass.structure
@@ -316,17 +316,19 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
     )
     val expectedSyntheticDeclVars = List(SyntheticDeclVar1, SyntheticDeclVar2)
     val expectedAdjustedTemplate = initialTemplate.copy(stats = expectedSyntheticDeclVars ++ TheStats)
-    val expectedSyntheticDeclVarResults = List(SyntheticDeclVarTraversalResult1, SyntheticDeclVarTraversalResult2)
-    val expectedTemplateTraversalResult = TemplateTraversalResult(
+    val expectedSyntheticDeclVarResults = List(SyntheticDeclVar1, SyntheticDeclVar2)
+    val expectedTraversedTemplate = Template(
+      early = Nil,
+      inits = Nil,
       self = TheTraversedSelf,
-      statResults = expectedSyntheticDeclVarResults ++ TheStatTraversalResults
+      stats = expectedSyntheticDeclVarResults ++ TheTraversedStats
     )
     val expectedTraversedRegularClass = Defn.Class(
       mods = TheTraversedScalaMods,
       name = TheClassName,
       tparams = Nil,
       ctor = ctorPrimary,
-      templ = expectedTemplateTraversalResult.template
+      templ = expectedTraversedTemplate
     )
 
     expectResolveJavaTreeType(regularClass, TheScalaMods, expectedJavaTreeType)
@@ -339,7 +341,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       case arg if arg.structure == CtorArg2.structure => SyntheticDeclVar2
     })
 
-    doReturn(expectedTemplateTraversalResult)
+    doReturn(expectedTraversedTemplate)
       .when(templateTraverser).traverse(eqTree(expectedAdjustedTemplate), eqTemplateContext(expectedTemplateContext))
 
     classTraverser.traverse(regularClass, ClassOrTraitContext(TheParentJavaScope)).structure shouldBe expectedTraversedRegularClass.structure
@@ -374,23 +376,19 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       SyntheticDeclVar3,
       SyntheticDeclVar4
     )
-    val expectedSyntheticVarResults = List(
-      SyntheticDeclVarTraversalResult1,
-      SyntheticDeclVarTraversalResult2,
-      SyntheticDeclVarTraversalResult3,
-      SyntheticDeclVarTraversalResult4
-    )
     val expectedAdjustedTemplate = initialTemplate.copy(stats = expectedSyntheticDeclVars)
-    val expectedTemplateTraversalResult = TemplateTraversalResult(
+    val expectedTraversedTemplate = Template(
+      early = Nil,
+      inits = Nil,
       self = TheTraversedSelf,
-      statResults = expectedSyntheticVarResults
+      stats = expectedSyntheticDeclVars
     )
     val expectedTraversedRegularClass = Defn.Class(
       mods = TheTraversedScalaMods,
       name = TheClassName,
       tparams = Nil,
       ctor = ctorPrimary,
-      templ = expectedTemplateTraversalResult.template
+      templ = expectedTraversedTemplate
     )
 
     expectResolveJavaTreeType(regularClass, TheScalaMods, expectedJavaTreeType)
@@ -405,7 +403,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       case arg if arg.structure == CtorArg4.structure => SyntheticDeclVar4
     })
 
-    doReturn(expectedTemplateTraversalResult)
+    doReturn(expectedTraversedTemplate)
       .when(templateTraverser).traverse(eqTree(expectedAdjustedTemplate), eqTemplateContext(expectedTemplateContext))
 
     classTraverser.traverse(regularClass, ClassOrTraitContext(TheParentJavaScope)).structure shouldBe expectedTraversedRegularClass.structure
@@ -435,13 +433,18 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       maybeClassName = Some(TheClassName),
       maybePrimaryCtor = Some(ctorPrimary)
     )
-    val expectedTemplateTraversalResult = TemplateTraversalResult(statResults = List(EnumConstantListTraversalResult(enumConstantVar)))
+    val expectedTraversedTemplate = Template(
+      early = Nil,
+      inits = Nil,
+      self = Selfs.Empty,
+      stats = List(enumConstantVar)
+    )
     val expectedTraversedRegularClass = Defn.Class(
       mods = TheTraversedScalaMods,
       name = TheClassName,
       tparams = Nil,
       ctor = ctorPrimary,
-      templ = expectedTemplateTraversalResult.template
+      templ = expectedTraversedTemplate
     )
 
     expectResolveJavaTreeType(regularClass, TheScalaMods, expectedJavaTreeType)
@@ -449,7 +452,7 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(regularClass, expectedJavaTreeType))))
       .thenReturn(expectedChildJavaScope)
 
-    doReturn(expectedTemplateTraversalResult)
+    doReturn(expectedTraversedTemplate)
       .when(templateTraverser).traverse(eqTree(template), eqTemplateContext(expectedTemplateContext))
 
     classTraverser.traverse(regularClass, ClassOrTraitContext(TheParentJavaScope)).structure shouldBe expectedTraversedRegularClass.structure
@@ -466,10 +469,5 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
   private def expectResolveJavaTreeType(defnClass: Defn.Class, scalaMods: List[Mod], expectedJavaTreeType: JavaTreeType): Unit = {
     val expectedJavaTreeTypeContext = JavaTreeTypeContext(defnClass, scalaMods)
     when(javaTreeTypeResolver.resolve(eqJavaTreeTypeContext(expectedJavaTreeTypeContext))).thenReturn(expectedJavaTreeType)
-  }
-
-  private def eqExpectedScalaMods(defnClass: Defn.Class, javaTreeType: JavaTreeType) = {
-    val expectedModifiersContext = ModifiersContext(defnClass, javaTreeType, TheParentJavaScope)
-    eqModifiersContext(expectedModifiersContext)
   }
 }
