@@ -25,13 +25,13 @@ private[traversers] class TemplateTraverserImpl(initTraverser: => InitTraverser,
       maybePrimaryCtor = context.maybePrimaryCtor,
       inits = includedInits
     )
-    val multiStatResult = templateBodyTraverser.traverse(statements = template.stats, context = bodyContext)
+    val traversedStats = templateBodyTraverser.traverse(statements = template.stats, context = bodyContext)
 
     Template(
       early = Nil,
       inits = traversedInits,
       self = traversedSelf,
-      stats = multiStatResult.statResults.map(_.tree)
+      stats = traversedStats
     )
   }
 }
