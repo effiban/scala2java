@@ -6,7 +6,6 @@ import io.github.effiban.scala2java.core.matchers.TemplateBodyContextMatcher.eqT
 import io.github.effiban.scala2java.core.resolvers.JavaInheritanceKeywordResolver
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{Selfs, Templates}
-import io.github.effiban.scala2java.core.traversers.results._
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.spi.entities.JavaScope.JavaScope
 import io.github.effiban.scala2java.spi.predicates.TemplateInitExcludedPredicate
@@ -36,7 +35,6 @@ class TemplateTraverserImplTest extends UnitTestSuite {
 
   private val DefnVar = q"var y = 4"
   private val TraversedDefnVar = q"var yy = 44"
-  private val TheDefnVarTraversalResult = DefnVarTraversalResult(TraversedDefnVar)
 
   private val PrimaryCtorArgs = List(param"arg1: Int", param"arg2: String")
 
@@ -48,7 +46,6 @@ class TemplateTraverserImplTest extends UnitTestSuite {
 
   private val DefnDef = q"def myMethod(param: Int): Int = doSomething(param)"
   private val TraversedDefnDef = q"def myTraversedMethod(param2: Int): Int = doSomething(param2)"
-  private val TheDefnDefTraversalResult = DefnDefTraversalResult(TraversedDefnDef)
 
   private val initTraverser = mock[InitTraverser]
   private val selfTraverser = mock[SelfTraverser]
@@ -162,8 +159,8 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       DefnDef,
     )
     val expectedStats = List(
-      TheDefnVarTraversalResult,
-      TheDefnDefTraversalResult
+      TraversedDefnVar,
+      TraversedDefnDef
     )
 
     val template = Template(
@@ -176,7 +173,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       early = Nil,
       inits = Nil,
       self = Selfs.Empty,
-      stats = expectedStats.map(_.tree)
+      stats = expectedStats
     )
 
     expectTraverseSelf()
@@ -192,8 +189,8 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       DefnVar,
     )
     val expectedStats = List(
-      TheDefnVarTraversalResult,
-      TheDefnDefTraversalResult
+      TraversedDefnVar,
+      TraversedDefnDef
     )
 
     val template = Template(
@@ -206,7 +203,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       early = Nil,
       inits = TraversedIncludedInits,
       self = TraversedNonEmptySelf,
-      stats = expectedStats.map(_.tree)
+      stats = expectedStats
     )
 
     val context = TemplateContext(
@@ -258,10 +255,8 @@ class TemplateTraverserImplTest extends UnitTestSuite {
 
   private def expectTraverseBody(stats: List[Stat] = Nil,
                                  context: TemplateBodyContext = TemplateBodyContext(javaScope = JavaScope.Class),
-                                 expectedStats: List[PopulatedStatTraversalResult] = Nil): Unit = {
-    doReturn(MultiStatTraversalResult(expectedStats))
-      .when(templateBodyTraverser).traverse(
-        eqTreeList(stats),
-        eqTemplateBodyContext(context))
+                                 expectedStats: List[Stat] = Nil): Unit = {
+    doReturn(expectedStats)
+      .when(templateBodyTraverser).traverse(eqTreeList(stats), eqTemplateBodyContext(context))
   }
 }

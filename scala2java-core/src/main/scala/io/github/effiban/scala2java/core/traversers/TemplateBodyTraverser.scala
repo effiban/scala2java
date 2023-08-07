@@ -4,13 +4,12 @@ import io.github.effiban.scala2java.core.contexts.TemplateBodyContext
 import io.github.effiban.scala2java.core.factories.TemplateChildContextFactory
 import io.github.effiban.scala2java.core.resolvers.TemplateChildrenResolver
 import io.github.effiban.scala2java.core.transformers.TemplateStatTransformer
-import io.github.effiban.scala2java.core.traversers.results.MultiStatTraversalResult
 
 import scala.meta.{Stat, Term}
 
 trait TemplateBodyTraverser {
 
-  def traverse(statements: List[Stat], context: TemplateBodyContext): MultiStatTraversalResult
+  def traverse(statements: List[Stat], context: TemplateBodyContext): List[Stat]
 }
 
 private[traversers] class TemplateBodyTraverserImpl(templateChildrenTraverser: => TemplateChildrenTraverser,
@@ -19,12 +18,12 @@ private[traversers] class TemplateBodyTraverserImpl(templateChildrenTraverser: =
                                                     templateChildContextFactory: TemplateChildContextFactory)
   extends TemplateBodyTraverser {
 
-  def traverse(stats: List[Stat], context: TemplateBodyContext): MultiStatTraversalResult = {
+  def traverse(stats: List[Stat], context: TemplateBodyContext): List[Stat] = {
     val transformedStats = stats.map(templateStatTransformer.transform)
     val (terms, nonTerms) = splitStats(transformedStats)
     val children = templateChildrenResolver.resolve(terms, nonTerms, context)
     val childContext = templateChildContextFactory.create(context, terms)
-    templateChildrenTraverser.traverse(children, childContext)
+    templateChildrenTraverser.traverse(children, childContext).statResults.map(_.tree)
   }
 
   private def splitStats(stats: List[Stat]) = {
