@@ -6,7 +6,6 @@ import io.github.effiban.scala2java.core.matchers.TemplateBodyContextMatcher.eqT
 import io.github.effiban.scala2java.core.resolvers.JavaInheritanceKeywordResolver
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{Selfs, Templates}
-import io.github.effiban.scala2java.core.traversers.results.matchers.TemplateTraversalResultScalatestMatcher.equalTemplateTraversalResult
 import io.github.effiban.scala2java.core.traversers.results._
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.spi.entities.JavaScope.JavaScope
@@ -61,18 +60,15 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     initTraverser,
     selfTraverser,
     templateBodyTraverser,
-    javaInheritanceKeywordResolver,
     templateInitExcludedPredicate
   )
 
   test("traverse when empty") {
-    val expectedTraversalResult = TemplateTraversalResult()
-
     expectTraverseSelf()
     expectTraverseBody()
 
-    val actualTraversalResult = templateTraverser.traverse(template = Templates.Empty, context = TemplateContext(JavaScope.Class))
-    actualTraversalResult should equalTemplateTraversalResult(expectedTraversalResult)
+    val actualTraversedTemplate = templateTraverser.traverse(template = Templates.Empty, context = TemplateContext(JavaScope.Class))
+    actualTraversedTemplate.structure shouldBe Templates.Empty.structure
   }
 
   test("traverse when has inits only, nothing to skip") {
@@ -82,11 +78,11 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       self = Selfs.Empty,
       stats = Nil
     )
-    val expectedTraversalResult = TemplateTraversalResult(
-      maybeInheritanceKeyword = Some(Implements),
+    val expectedTraversedTemplate = Template(
+      early = Nil,
       inits = TraversedIncludedInits,
       self = Selfs.Empty,
-      statResults = Nil
+      stats = Nil
     )
 
     expectFilterInits()
@@ -94,8 +90,8 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     expectTraverseSelf()
     expectTraverseBody(context = TemplateBodyContext(javaScope = JavaScope.Class, inits = IncludedInits))
 
-    val actualTraversalResult = templateTraverser.traverse(template, context = TemplateContext(javaScope = JavaScope.Class))
-    actualTraversalResult should equalTemplateTraversalResult(expectedTraversalResult)
+    val actualTraversedTemplate = templateTraverser.traverse(template, context = TemplateContext(javaScope = JavaScope.Class))
+    actualTraversedTemplate.structure shouldBe expectedTraversedTemplate.structure
   }
 
   test("traverse when has inits only and some should be skipped") {
@@ -105,9 +101,11 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       self = Selfs.Empty,
       stats = Nil
     )
-    val expectedTraversalResult = TemplateTraversalResult(
-      maybeInheritanceKeyword = Some(Implements),
-      inits = TraversedIncludedInits
+    val expectedTraversedTemplate = Template(
+      early = Nil,
+      inits = TraversedIncludedInits,
+      self = Selfs.Empty,
+      stats = Nil
     )
 
     expectFilterInits()
@@ -115,8 +113,8 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     expectResolveInheritanceKeywordAndTraverseInits(JavaScope.Class)
     expectTraverseBody(context = TemplateBodyContext(javaScope = JavaScope.Class, inits = IncludedInits))
 
-    val actualTraversalResult = templateTraverser.traverse(template, context = TemplateContext(javaScope = JavaScope.Class))
-    actualTraversalResult should equalTemplateTraversalResult(expectedTraversalResult)
+    val actualTraversedTemplate = templateTraverser.traverse(template, context = TemplateContext(javaScope = JavaScope.Class))
+    actualTraversedTemplate.structure shouldBe expectedTraversedTemplate.structure
   }
 
   test("traverse when has self only") {
@@ -126,13 +124,18 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       self = NonEmptySelf,
       stats = Nil
     )
-    val expectedTraversalResult = TemplateTraversalResult(self = TraversedNonEmptySelf)
+    val expectedTraversedTemplate = Template(
+      early = Nil,
+      inits = Nil,
+      self = TraversedNonEmptySelf,
+      stats = Nil
+    )
 
     expectTraverseSelf(NonEmptySelf, TraversedNonEmptySelf)
     expectTraverseBody()
 
-    val actualTraversalResult = templateTraverser.traverse(template, context = TemplateContext(javaScope = JavaScope.Class))
-    actualTraversalResult should equalTemplateTraversalResult(expectedTraversalResult)
+    val actualTraversedTemplate = templateTraverser.traverse(template, context = TemplateContext(javaScope = JavaScope.Class))
+    actualTraversedTemplate.structure shouldBe expectedTraversedTemplate.structure
   }
 
   test("traverse when has primary ctor only") {
@@ -141,7 +144,6 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       maybeClassName = Some(ClassName),
       maybePrimaryCtor = Some(PrimaryCtor)
     )
-    val expectedTraversalResult = TemplateTraversalResult()
 
     expectTraverseSelf()
     expectTraverseBody(context = TemplateBodyContext(
@@ -150,8 +152,8 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       maybePrimaryCtor = context.maybePrimaryCtor)
     )
 
-    val actualTraversalResult = templateTraverser.traverse(template = Templates.Empty, context = context)
-    actualTraversalResult should equalTemplateTraversalResult(expectedTraversalResult)
+    val actualTraversedTemplate = templateTraverser.traverse(template = Templates.Empty, context = context)
+    actualTraversedTemplate.structure shouldBe Templates.Empty.structure
   }
 
   test("traverse when has stats only") {
@@ -159,7 +161,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       DefnVar,
       DefnDef,
     )
-    val expectedStatResults = List(
+    val expectedStats = List(
       TheDefnVarTraversalResult,
       TheDefnDefTraversalResult
     )
@@ -170,13 +172,18 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       self = Selfs.Empty,
       stats = stats
     )
-    val expectedTraversalResult = TemplateTraversalResult(statResults = expectedStatResults)
+    val expectedTraversedTemplate = Template(
+      early = Nil,
+      inits = Nil,
+      self = Selfs.Empty,
+      stats = expectedStats.map(_.tree)
+    )
 
     expectTraverseSelf()
-    expectTraverseBody(stats = stats, expectedStatResults = expectedStatResults)
+    expectTraverseBody(stats = stats, expectedStats = expectedStats)
 
-    val actualTraversalResult = templateTraverser.traverse(template = template, context = TemplateContext(javaScope = JavaScope.Class))
-    actualTraversalResult should equalTemplateTraversalResult(expectedTraversalResult)
+    val actualTraversedTemplate = templateTraverser.traverse(template = template, context = TemplateContext(javaScope = JavaScope.Class))
+    actualTraversedTemplate.structure shouldBe expectedTraversedTemplate.structure
   }
 
   test("traverse when has everything") {
@@ -184,7 +191,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       DefnDef,
       DefnVar,
     )
-    val expectedStatResults = List(
+    val expectedStats = List(
       TheDefnVarTraversalResult,
       TheDefnDefTraversalResult
     )
@@ -195,11 +202,11 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       self = NonEmptySelf,
       stats = stats
     )
-    val expectedTraversalResult = TemplateTraversalResult(
-      maybeInheritanceKeyword = Some(Implements),
+    val expectedTraversedTemplate = Template(
+      early = Nil,
       inits = TraversedIncludedInits,
       self = TraversedNonEmptySelf,
-      statResults = expectedStatResults
+      stats = expectedStats.map(_.tree)
     )
 
     val context = TemplateContext(
@@ -219,17 +226,17 @@ class TemplateTraverserImplTest extends UnitTestSuite {
     expectTraverseBody(
       stats = stats,
       context = expectedBodyContext,
-      expectedStatResults = expectedStatResults
+      expectedStats = expectedStats
     )
 
-    val actualTraversalResult = templateTraverser.traverse(template = template, context = context)
-    actualTraversalResult should equalTemplateTraversalResult(expectedTraversalResult)
+    val actualTraversedTemplate = templateTraverser.traverse(template = template, context = context)
+    actualTraversedTemplate.structure shouldBe expectedTraversedTemplate.structure
   }
 
   private def expectFilterInits(): Unit = {
-      when(templateInitExcludedPredicate.apply(any[Init])).thenAnswer(
-        (actualInit: Init) => ExcludedInits.exists(_.structure == actualInit.structure)
-      )
+    when(templateInitExcludedPredicate.apply(any[Init])).thenAnswer(
+      (actualInit: Init) => ExcludedInits.exists(_.structure == actualInit.structure)
+    )
   }
 
   private def expectResolveInheritanceKeywordAndTraverseInits(javaScope: JavaScope): Unit = {
@@ -251,10 +258,10 @@ class TemplateTraverserImplTest extends UnitTestSuite {
 
   private def expectTraverseBody(stats: List[Stat] = Nil,
                                  context: TemplateBodyContext = TemplateBodyContext(javaScope = JavaScope.Class),
-                                 expectedStatResults: List[PopulatedStatTraversalResult] = Nil): Unit = {
-    doReturn(MultiStatTraversalResult(expectedStatResults))
+                                 expectedStats: List[PopulatedStatTraversalResult] = Nil): Unit = {
+    doReturn(MultiStatTraversalResult(expectedStats))
       .when(templateBodyTraverser).traverse(
-      eqTreeList(stats),
-      eqTemplateBodyContext(context))
+        eqTreeList(stats),
+        eqTemplateBodyContext(context))
   }
 }

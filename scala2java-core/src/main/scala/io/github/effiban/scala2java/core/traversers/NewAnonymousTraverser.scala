@@ -9,10 +9,10 @@ trait NewAnonymousTraverser extends ScalaTreeTraverser1[NewAnonymous]
 
 private[traversers] class NewAnonymousTraverserImpl(templateTraverser: => TemplateTraverser) extends NewAnonymousTraverser {
 
+  // TODO - fully support the body by adding an enricher in the enrichment phase
   override def traverse(newAnonymous: NewAnonymous): NewAnonymous = {
-    val templateTraversalResult = templateTraverser.traverse(newAnonymous.templ, TemplateContext(JavaScope.Class))
-    // TODO - fully support the body by returning the template stat results upwards
-    newAnonymous.copy(templ = templateTraversalResult.template)
+    val traversedTemplate = templateTraverser.traverse(newAnonymous.templ, TemplateContext(JavaScope.Class))
+    newAnonymous.copy(templ = traversedTemplate)
   }
 }
 

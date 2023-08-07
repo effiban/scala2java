@@ -1,10 +1,8 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts._
-import io.github.effiban.scala2java.core.entities.{JavaKeyword, JavaModifier}
 import io.github.effiban.scala2java.core.matchers.TemplateContextMatcher.eqTemplateContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results._
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -56,14 +54,12 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
 
   private val TheDefnVar = q"var y = 4"
   private val TheTraversedDefnVar = q"var yy = 44"
-  private val TheDefnVarTraversalResult = DefnVarTraversalResult(TheTraversedDefnVar)
 
   private val TheDefnDef = q"def myMethod(param: Int): Int = doSomething(param)"
   private val TheTraversedDefnDef = q"def myTraversedMethod(param2: Int): Int = doSomething(param2)"
-  private val TheDefnDefTraversalResult = DefnDefTraversalResult(TheTraversedDefnDef)
 
   private val TheStats = List(TheDefnVar, TheDefnDef)
-  private val TheTraversedStatResults = List(TheDefnVarTraversalResult, TheDefnDefTraversalResult)
+  private val TheTraversedStats = List(TheTraversedDefnVar, TheTraversedDefnDef)
 
   private val statModListTraverser = mock[StatModListTraverser]
   private val typeParamTraverser = mock[TypeParamTraverser]
@@ -104,22 +100,23 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       javaScope = JavaScope.Class,
       maybeClassName = Some(TheClassName)
     )
-    val expectedJavaModifiers = List(JavaModifier.Public)
     val expectedTraversedCtorPrimary = Ctor.Primary(
       mods = Nil,
       name = Name.Anonymous(),
       paramss = List(TraversedCtorArgList1)
     )
-    val expectedTemplateTraversalResult = TemplateTraversalResult(
+    val expectedTraversedTemplate = Template(
+      early = Nil,
+      inits = Nil,
       self = TheTraversedSelf,
-      statResults = TheTraversedStatResults
+      stats = TheTraversedStats
     )
     val expectedTraversedCaseClass = Defn.Class(
       mods = TheTraversedScalaMods,
       name = TheClassName,
       tparams = Nil,
       ctor = expectedTraversedCtorPrimary,
-      templ = expectedTemplateTraversalResult.template
+      templ = expectedTraversedTemplate
     )
 
     doReturn(TheTraversedScalaMods).when(statModListTraverser).traverse(eqTreeList(TheScalaMods))
@@ -128,7 +125,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       case aParam if aParam.structure == CtorArg2.structure => TraversedCtorArg2
       case aParam => aParam
     }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.Class)))
-    doReturn(expectedTemplateTraversalResult)
+    doReturn(expectedTraversedTemplate)
       .when(templateTraverser).traverse(
       eqTree(template),
       eqTemplateContext(expectedTemplateContext))
@@ -167,16 +164,18 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       name = Name.Anonymous(),
       paramss = List(TraversedCtorArgList1)
     )
-    val expectedTemplateTraversalResult = TemplateTraversalResult(
+    val expectedTraversedTemplate = Template(
+      early = Nil,
+      inits = Nil,
       self = TheTraversedSelf,
-      statResults = TheTraversedStatResults
+      stats = TheTraversedStats
     )
     val expectedTraversedCaseClass = Defn.Class(
       mods = TheTraversedScalaMods,
       name = TheClassName,
       tparams = TheTraversedTypeParams,
       ctor = expectedTraversedCtorPrimary,
-      templ = expectedTemplateTraversalResult.template
+      templ = expectedTraversedTemplate
     )
 
     doReturn(TheTraversedScalaMods).when(statModListTraverser).traverse(eqTreeList(TheScalaMods))
@@ -190,7 +189,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       case aParam if aParam.structure == CtorArg2.structure => TraversedCtorArg2
       case aParam => aParam
     }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.Class)))
-    doReturn(expectedTemplateTraversalResult)
+    doReturn(expectedTraversedTemplate)
       .when(templateTraverser).traverse(
       eqTree(template),
       eqTemplateContext(expectedTemplateContext))
@@ -231,16 +230,18 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       name = Name.Anonymous(),
       paramss = List(TraversedCtorArgList1)
     )
-    val expectedTemplateTraversalResult = TemplateTraversalResult(
+    val expectedTraversedTemplate = Template(
+      early = Nil,
+      inits = Nil,
       self = TheTraversedSelf,
-      statResults = TheTraversedStatResults
+      stats = TheTraversedStats
     )
     val expectedTraversedCaseClass = Defn.Class(
       mods = TheTraversedScalaMods,
       name = TheClassName,
       tparams = Nil,
       ctor = expectedTraversedCtorPrimary,
-      templ = expectedTemplateTraversalResult.template
+      templ = expectedTraversedTemplate
     )
 
     doReturn(TheTraversedScalaMods).when(statModListTraverser).traverse(eqTreeList(TheScalaMods))
@@ -249,7 +250,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       case aParam if aParam.structure == CtorArg2.structure => TraversedCtorArg2
       case aParam => aParam
     }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.Class)))
-    doReturn(expectedTemplateTraversalResult)
+    doReturn(expectedTraversedTemplate)
       .when(templateTraverser).traverse(
       eqTree(template),
       eqTemplateContext(expectedTemplateContext))
@@ -288,18 +289,18 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       name = Name.Anonymous(),
       paramss = List(TraversedCtorArgList1)
     )
-    val expectedTemplateTraversalResult = TemplateTraversalResult(
-      maybeInheritanceKeyword = Some(JavaKeyword.Implements),
+    val expectedTraversedTemplate = Template(
+      early = Nil,
       inits = TheTraversedInits,
       self = TheTraversedSelf,
-      statResults = TheTraversedStatResults
+      stats = TheTraversedStats
     )
     val expectedTraversedCaseClass = Defn.Class(
       mods = TheTraversedScalaMods,
       name = TheClassName,
       tparams = Nil,
       ctor = expectedTraversedCtorPrimary,
-      templ = expectedTemplateTraversalResult.template
+      templ = expectedTraversedTemplate
     )
 
     doReturn(TheTraversedScalaMods).when(statModListTraverser).traverse(eqTreeList(TheScalaMods))
@@ -308,7 +309,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       case aParam if aParam.structure == CtorArg2.structure => TraversedCtorArg2
       case aParam => aParam
     }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.Class)))
-    doReturn(expectedTemplateTraversalResult)
+    doReturn(expectedTraversedTemplate)
       .when(templateTraverser).traverse(
       eqTree(template),
       eqTemplateContext(expectedTemplateContext))
@@ -347,16 +348,18 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       name = Name.Anonymous(),
       paramss = List(TraversedCtorArgList1, TraversedCtorArgList2)
     )
-    val expectedTemplateTraversalResult = TemplateTraversalResult(
+    val expectedTraversedTemplate = Template(
+      early = Nil,
+      inits = Nil,
       self = TheTraversedSelf,
-      statResults = TheTraversedStatResults
+      stats = TheTraversedStats
     )
     val expectedTraversedCaseClass = Defn.Class(
       mods = TheTraversedScalaMods,
       name = TheClassName,
       tparams = Nil,
       ctor = expectedTraversedCtorPrimary,
-      templ = expectedTemplateTraversalResult.template
+      templ = expectedTraversedTemplate
     )
 
     doReturn(TheTraversedScalaMods).when(statModListTraverser).traverse(eqTreeList(TheScalaMods))
@@ -366,7 +369,7 @@ class CaseClassTraverserImplTest extends UnitTestSuite {
       case aParam if aParam.structure == CtorArg3.structure => TraversedCtorArg3
       case aParam if aParam.structure == CtorArg4.structure => TraversedCtorArg4
     }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.Class)))
-    doReturn(expectedTemplateTraversalResult)
+    doReturn(expectedTraversedTemplate)
       .when(templateTraverser).traverse(
       eqTree(template),
       eqTemplateContext(expectedTemplateContext))

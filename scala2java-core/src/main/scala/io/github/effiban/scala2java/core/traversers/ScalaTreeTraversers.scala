@@ -336,7 +336,6 @@ class ScalaTreeTraversers(implicit factories: Factories,
     initTraverser,
     selfTraverser,
     templateBodyTraverser,
-    JavaInheritanceKeywordResolver,
     new CompositeTemplateInitExcludedPredicate(CoreTemplateInitExcludedPredicate)
   )
 

@@ -4,7 +4,6 @@ import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.matchers.TemplateContextMatcher.eqTemplateContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.PrimaryCtors
-import io.github.effiban.scala2java.core.traversers.results.{SimpleStatTraversalResult, TemplateTraversalResult}
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.any
@@ -76,17 +75,18 @@ class TraitTraverserImplTest extends UnitTestSuite {
       templ = TheTemplate
     )
 
-    val expectedTemplateTraversalResult = TemplateTraversalResult(
+    val expectedTraversedTemplate = Template(
+      early = Nil,
       inits = TraversedInits,
       self = TheTraversedSelf,
-      statResults = TheTraversedStats.map(SimpleStatTraversalResult(_))
+      stats = TheTraversedStats
     )
     val expectedTraversedTrait = Trait(
       mods = TraversedScalaMods,
       name = TraitName,
       ctor = PrimaryCtors.Empty,
       tparams = TraversedTypeParams,
-      templ = expectedTemplateTraversalResult.template
+      templ = expectedTraversedTemplate
     )
 
     doReturn(TraversedScalaMods).when(statModListTraverser).traverse(`trait`.mods)
@@ -95,7 +95,7 @@ class TraitTraverserImplTest extends UnitTestSuite {
       case aTypeParam if aTypeParam.structure == TypeParam2.structure => TraversedTypeParam2
       case aTypeParam => aTypeParam
     }).when(typeParamTraverser).traverse(any[Type.Param])
-    doReturn(expectedTemplateTraversalResult)
+    doReturn(expectedTraversedTemplate)
       .when(templateTraverser).traverse(
         eqTree(TheTemplate),
         eqTemplateContext(TemplateContext(javaScope = JavaScope.Interface)))

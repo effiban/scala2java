@@ -1,14 +1,13 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts._
+import io.github.effiban.scala2java.core.entities.JavaTreeType
 import io.github.effiban.scala2java.core.entities.JavaTreeType.JavaTreeType
-import io.github.effiban.scala2java.core.entities.{JavaKeyword, JavaTreeType}
 import io.github.effiban.scala2java.core.matchers.JavaChildScopeContextMatcher.eqJavaChildScopeContext
 import io.github.effiban.scala2java.core.matchers.JavaTreeTypeContextMatcher.eqJavaTreeTypeContext
 import io.github.effiban.scala2java.core.matchers.TemplateContextMatcher.eqTemplateContext
 import io.github.effiban.scala2java.core.resolvers.{JavaChildScopeResolver, JavaTreeTypeResolver}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results._
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -37,14 +36,12 @@ class ObjectTraverserImplTest extends UnitTestSuite {
 
   private val TheDefnVar = q"var y = 4"
   private val TheTraversedDefnVar = q"var yy = 44"
-  private val TheDefnVarTraversalResult = DefnVarTraversalResult(TheTraversedDefnVar)
 
   private val TheDefnDef = q"def myMethod(param: Int): Int = doSomething(param)"
   private val TheTraversedDefnDef = q"def myTraversedMethod(param2: Int): Int = doSomething(param2)"
-  private val TheDefnDefTraversalResult = DefnDefTraversalResult(TheTraversedDefnDef)
 
   private val TheStats = List(TheDefnVar, TheDefnDef)
-  private val TheTraversedStatResults = List(TheDefnVarTraversalResult, TheDefnDefTraversalResult)
+  private val TheTraversedStats = List(TheTraversedDefnVar, TheTraversedDefnDef)
 
   private val statModListTraverser = mock[StatModListTraverser]
   private val templateTraverser = mock[TemplateTraverser]
@@ -76,21 +73,23 @@ class ObjectTraverserImplTest extends UnitTestSuite {
     val expectedJavaTreeType = JavaTreeType.Class
     val expectedChildJavaScope = JavaScope.UtilityClass
     val expectedTemplateContext = TemplateContext(javaScope = expectedChildJavaScope)
-    val expectedTemplateTraversalResult = TemplateTraversalResult(
+    val expectedTraversedTemplate = Template(
+      early = Nil,
+      inits = Nil,
       self = TheTraversedSelf,
-      statResults = TheTraversedStatResults
+      stats = TheTraversedStats
     )
     val expectedTraversedObject = Defn.Object(
       mods = TheTraversedScalaMods,
       name = TheObjectName,
-      templ = expectedTemplateTraversalResult.template
+      templ = expectedTraversedTemplate
     )
 
     expectResolveJavaTreeType(objectDef, TheScalaMods, expectedJavaTreeType)
     doReturn(TheTraversedScalaMods).when(statModListTraverser).traverse(eqTreeList(TheScalaMods))
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(objectDef, expectedJavaTreeType))))
       .thenReturn(expectedChildJavaScope)
-    doReturn(expectedTemplateTraversalResult)
+    doReturn(expectedTraversedTemplate)
       .when(templateTraverser).traverse(eqTree(template), eqTemplateContext(expectedTemplateContext))
 
     objectTraverser.traverse(objectDef, StatContext(TheParentJavaScope)).structure shouldBe expectedTraversedObject.structure
@@ -112,25 +111,24 @@ class ObjectTraverserImplTest extends UnitTestSuite {
 
     val expectedJavaTreeType = JavaTreeType.Class
     val expectedChildJavaScope = JavaScope.Class
-    val expectedInheritanceKeyword = JavaKeyword.Implements
     val expectedTemplateContext = TemplateContext(javaScope = expectedChildJavaScope)
-    val expectedTemplateTraversalResult = TemplateTraversalResult(
-      maybeInheritanceKeyword = Some(expectedInheritanceKeyword),
+    val expectedTraversedTemplate = Template(
+      early = Nil,
       inits = TheTraversedInits,
       self = TheTraversedSelf,
-      statResults = TheTraversedStatResults
+      stats = TheTraversedStats
     )
     val expectedTraversedObject = Defn.Object(
       mods = TheTraversedScalaMods,
       name = TheObjectName,
-      templ = expectedTemplateTraversalResult.template
+      templ = expectedTraversedTemplate
     )
 
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(objectDef, expectedJavaTreeType))))
       .thenReturn(expectedChildJavaScope)
     expectResolveJavaTreeType(objectDef, TheScalaMods, expectedJavaTreeType)
     doReturn(TheTraversedScalaMods).when(statModListTraverser).traverse(eqTreeList(TheScalaMods))
-    doReturn(expectedTemplateTraversalResult)
+    doReturn(expectedTraversedTemplate)
       .when(templateTraverser).traverse(eqTree(template), eqTemplateContext(expectedTemplateContext))
 
     objectTraverser.traverse(objectDef, StatContext(TheParentJavaScope)).structure shouldBe expectedTraversedObject.structure
@@ -153,21 +151,23 @@ class ObjectTraverserImplTest extends UnitTestSuite {
     val expectedJavaTreeType = JavaTreeType.Enum
     val expectedChildJavaScope = JavaScope.Enum
     val expectedTemplateContext = TemplateContext(javaScope = expectedChildJavaScope)
-    val expectedTemplateTraversalResult = TemplateTraversalResult(
+    val expectedTraversedTemplate = Template(
+      early = Nil,
+      inits = Nil,
       self = TheTraversedSelf,
-      statResults = TheTraversedStatResults
+      stats = TheTraversedStats
     )
     val expectedTraversedObject = Defn.Object(
       mods = TheTraversedScalaMods,
       name = TheObjectName,
-      templ = expectedTemplateTraversalResult.template
+      templ = expectedTraversedTemplate
     )
 
     expectResolveJavaTreeType(objectDef, TheScalaMods, expectedJavaTreeType)
     doReturn(TheTraversedScalaMods).when(statModListTraverser).traverse(eqTreeList(TheScalaMods))
     when(javaChildScopeResolver.resolve(eqJavaChildScopeContext(JavaChildScopeContext(objectDef, expectedJavaTreeType))))
       .thenReturn(expectedChildJavaScope)
-    doReturn(expectedTemplateTraversalResult)
+    doReturn(expectedTraversedTemplate)
       .when(templateTraverser).traverse(eqTree(template), eqTemplateContext(expectedTemplateContext))
 
     objectTraverser.traverse(objectDef, StatContext(TheParentJavaScope)).structure shouldBe expectedTraversedObject.structure

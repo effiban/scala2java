@@ -21,14 +21,14 @@ private[traversers] class CaseClassTraverserImpl(statModListTraverser: => StatMo
     val traversedCtorParamss = classDef.ctor.paramss.map(_.map(
       param => termParamTraverser.traverse(param, StatContext(JavaScope.Class)))
     )
-    val templateTraversalResult = traverseTemplate(classDef, JavaScope.Class)
+    val traversedTemplate = traverseTemplate(classDef, JavaScope.Class)
 
     Defn.Class(
       mods = traversedMods,
       name = classDef.name,
       tparams = traversedTypeParams,
       ctor = classDef.ctor.copy(paramss = traversedCtorParamss),
-      templ = templateTraversalResult.template
+      templ = traversedTemplate
     )
   }
 

@@ -19,12 +19,12 @@ private[traversers] class ObjectTraverserImpl(statModListTraverser: => StatModLi
     val traversedMods = statModListTraverser.traverse(objectDef.mods)
     val javaChildScope = javaChildScopeResolver.resolve(JavaChildScopeContext(objectDef, javaTreeType))
     // TODO if child scope is utility class, add private ctor.
-    val templateTraversalResult = templateTraverser.traverse(objectDef.templ, TemplateContext(javaScope = javaChildScope))
+    val traversedTemplate = templateTraverser.traverse(objectDef.templ, TemplateContext(javaScope = javaChildScope))
 
     Defn.Object(
       mods = traversedMods,
       name = objectDef.name,
-      templ = templateTraversalResult.template
+      templ = traversedTemplate
     )
   }
 }
