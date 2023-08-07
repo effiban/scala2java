@@ -2,7 +2,6 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{ClassOrTraitContext, StatContext}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results._
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
@@ -28,8 +27,6 @@ class PkgStatTraverserImplTest extends UnitTestSuite {
   private val objectTraverser = mock[ObjectTraverser]
   private val defaultStatTraverser = mock[DefaultStatTraverser]
 
-  private val objectTraversalResult = mock[ObjectTraversalResult]
-
   private val pkgStatTraverser = new PkgStatTraverserImpl(
     classTraverser,
     traitTraverser,
@@ -53,11 +50,10 @@ class PkgStatTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for object") {
-    doReturn(objectTraversalResult).when(objectTraverser).traverse(
+    doReturn(TheTraversedObject).when(objectTraverser).traverse(
       eqTree(TheObject),
       eqTo(StatContext(javaScope = JavaScope.Package))
     )
-    when(objectTraversalResult.tree).thenReturn(TheTraversedObject)
 
     pkgStatTraverser.traverse(TheObject).value.structure shouldBe TheTraversedObject.structure
   }

@@ -21,7 +21,7 @@ private[traversers] class DefnTraverserImpl(defnVarTraverser: => DefnVarTraverse
     case defnDef: Defn.Def => defnDefTraverser.traverse(defnDef, DefnDefContext(context.javaScope)).tree
     case defnTrait: Trait => traitTraverser.traverse(defnTrait)
     case defnClass: Defn.Class => classTraverser.traverse(defnClass, ClassOrTraitContext(context.javaScope))
-    case defnObject: Defn.Object => objectTraverser.traverse(defnObject, context).tree
+    case defnObject: Defn.Object => objectTraverser.traverse(defnObject, context)
     case unsupported => UnsupportedDefnTraversalResult(unsupported).tree
   }
 }

@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts._
-import io.github.effiban.scala2java.core.entities.{JavaKeyword, JavaModifier}
+import io.github.effiban.scala2java.core.entities.JavaModifier
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.traversers.results._
 import io.github.effiban.scala2java.spi.entities.JavaScope
@@ -83,21 +83,11 @@ class DefnTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for Defn.Object") {
-    val defnObject =
-      q"""
-      object MyObject {
-        final var x: Int = 3
-      }
-      """
-    val traversalResult = ObjectTraversalResult(
-      javaModifiers = List(JavaModifier.Public, JavaModifier.Final),
-      javaTypeKeyword = JavaKeyword.Class,
-      name = q"MyObject",
-      statResults = List(DefnVarTraversalResult(q"final var xx: Int = 33"))
-    )
+    val defnObject = q"object MyObject { final var x: Int = 3 }"
+    val traversedObject = q"object MyTraversedObject { final var xx: Int = 3 }"
 
-    doReturn(traversalResult).when(objectTraverser).traverse(eqTree(defnObject), eqTo(TheStatContext))
+    doReturn(traversedObject).when(objectTraverser).traverse(eqTree(defnObject), eqTo(TheStatContext))
 
-    defnTraverser.traverse(defnObject, TheStatContext).structure shouldBe traversalResult.tree.structure
+    defnTraverser.traverse(defnObject, TheStatContext).structure shouldBe traversedObject.structure
   }
 }

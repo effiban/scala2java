@@ -18,7 +18,7 @@ private[traversers] class PkgStatTraverserImpl(classTraverser: => ClassTraverser
     stat match {
       case `class`: Defn.Class => Some(classTraverser.traverse(`class`, ClassOrTraitContext(JavaScope.Package)))
       case `trait`: Defn.Trait => Some(traitTraverser.traverse(`trait`))
-      case `object`: Defn.Object => Some(objectTraverser.traverse(`object`, StatContext(JavaScope.Package)).tree)
+      case `object`: Defn.Object => Some(objectTraverser.traverse(`object`, StatContext(JavaScope.Package)))
       case stat => defaultStatTraverser.traverse(stat, StatContext(JavaScope.Package))
     }
   }
