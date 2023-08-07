@@ -5,7 +5,6 @@ import io.github.effiban.scala2java.core.factories.TemplateChildContextFactory
 import io.github.effiban.scala2java.core.resolvers.TemplateChildrenResolver
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.transformers.TemplateStatTransformer
-import io.github.effiban.scala2java.core.traversers.results.{MultiStatTraversalResult, SimpleStatTraversalResult}
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchersSugar.eqTo
@@ -55,7 +54,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
   test("traverse when empty") {
     when(templateChildrenResolver.resolve(terms = eqTo(Nil), nonTerms = eqTo(Nil), eqTo(bodyContext))).thenReturn(Nil)
     when(templateChildContextFactory.create(bodyContext, Nil)).thenReturn(childContext)
-    doReturn(MultiStatTraversalResult()).when(templateChildrenTraverser).traverse(Nil, childContext)
+    doReturn(Nil).when(templateChildrenTraverser).traverse(Nil, childContext)
 
     templateBodyTraverser.traverse(Nil, bodyContext) shouldBe Nil
   }
@@ -70,8 +69,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
     when(templateChildrenResolver.resolve(terms = eqTreeList(transformedTerms), nonTerms = eqTo(Nil), eqTo(bodyContext)))
       .thenReturn(children)
     when(templateChildContextFactory.create(eqTo(bodyContext), eqTreeList(transformedTerms))).thenReturn(childContext)
-    doReturn(MultiStatTraversalResult(expectedTraversedChildren.map(SimpleStatTraversalResult)))
-      .when(templateChildrenTraverser).traverse(eqTreeList(children), eqTo(childContext))
+    doReturn(expectedTraversedChildren).when(templateChildrenTraverser).traverse(eqTreeList(children), eqTo(childContext))
 
     templateBodyTraverser.traverse(terms, bodyContext).structure shouldBe expectedTraversedChildren.structure
   }
@@ -86,8 +84,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
     when(templateChildrenResolver.resolve(terms = eqTo(Nil), nonTerms = eqTreeList(transformedDefns), eqTo(bodyContext)))
       .thenReturn(children)
     when(templateChildContextFactory.create(bodyContext, Nil)).thenReturn(childContext)
-    doReturn(MultiStatTraversalResult(expectedTraversedChildren.map(SimpleStatTraversalResult)))
-      .when(templateChildrenTraverser).traverse(eqTreeList(children), eqTo(childContext))
+    doReturn(expectedTraversedChildren).when(templateChildrenTraverser).traverse(eqTreeList(children), eqTo(childContext))
 
     templateBodyTraverser.traverse(defns, bodyContext).structure shouldBe expectedTraversedChildren.structure
   }
@@ -113,8 +110,7 @@ class TemplateBodyTraverserImplTest extends UnitTestSuite {
     expectTransformStats(stats, transformedStats)
     when(templateChildrenResolver.resolve(eqTreeList(transformedTerms), eqTreeList(transformedDefns), eqTo(bodyContext))).thenReturn(children)
     when(templateChildContextFactory.create(eqTo(bodyContext), eqTreeList(transformedTerms))).thenReturn(childContext)
-    doReturn(MultiStatTraversalResult(expectedTraversedChildren.map(SimpleStatTraversalResult)))
-      .when(templateChildrenTraverser).traverse(eqTreeList(children), eqTo(childContext))
+    doReturn(expectedTraversedChildren).when(templateChildrenTraverser).traverse(eqTreeList(children), eqTo(childContext))
 
     templateBodyTraverser.traverse(stats, bodyContext).structure shouldBe expectedTraversedChildren.structure
   }

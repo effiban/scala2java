@@ -4,7 +4,6 @@ import io.github.effiban.scala2java.core.contexts.TemplateChildContext
 import io.github.effiban.scala2java.core.orderings.JavaTemplateChildOrdering
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.traversers.results._
-import io.github.effiban.scala2java.core.traversers.results.matchers.MultiStatTraversalResultScalatestMatcher.equalMultiStatTraversalResult
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchersSugar.eqTo
@@ -101,14 +100,13 @@ class TemplateChildrenTraverserImplTest extends UnitTestSuite {
       PrimaryCtor
     )
 
-    val expectedChildTraversalResults = List[PopulatedStatTraversalResult](
-      TheDeclVarTraversalResult,
-      TheDefnVarTraversalResult,
-      PrimaryCtorTraversalResult,
-      SecondaryCtorTraversalResult,
-      TheDefnDefTraversalResult
+    val expectedTraversedChildren = List(
+      TheTraversedDeclVar,
+      TheTraversedDefnVar,
+      PrimaryCtorDefnDef,
+      TraversedSecondaryCtor,
+      TheTraversedDefnDef
     )
-    val expectedTraversalResult = MultiStatTraversalResult(expectedChildTraversalResults)
 
     expectTraverseDeclVar()
     expectTraverseRegularDefnVar()
@@ -118,7 +116,7 @@ class TemplateChildrenTraverserImplTest extends UnitTestSuite {
 
     expectChildOrdering()
 
-    childrenTraverser.traverse(children, childContext) should equalMultiStatTraversalResult(expectedTraversalResult)
+    childrenTraverser.traverse(children, childContext).structure shouldBe expectedTraversedChildren.structure
   }
 
   test("traverse() should skip empty results") {
@@ -128,15 +126,14 @@ class TemplateChildrenTraverserImplTest extends UnitTestSuite {
       TheEnumTypeDef
     )
 
-    val expectedChildTraversalResults = List[PopulatedStatTraversalResult](TheDefnDefTraversalResult)
-    val expectedTraversalResult = MultiStatTraversalResult(expectedChildTraversalResults)
+    val expectedTraversedChildren = List(TheTraversedDefnDef)
 
     expectTraverseEnumTypeDef()
     expectTraverseDefnDef()
 
     expectChildOrdering()
 
-    childrenTraverser.traverse(children, childContext) should equalMultiStatTraversalResult(expectedTraversalResult)
+    childrenTraverser.traverse(children, childContext).structure shouldBe expectedTraversedChildren.structure
   }
 
 
