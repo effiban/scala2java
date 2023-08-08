@@ -92,7 +92,6 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val ctorSecondaryTraverser: CtorSecondaryTraverser = new CtorSecondaryTraverserImpl(
     statModListTraverser,
-    typeNameTraverser,
     termParamTraverser,
     initTraverser,
     blockStatTraverser

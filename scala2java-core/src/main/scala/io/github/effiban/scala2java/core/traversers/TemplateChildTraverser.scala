@@ -16,7 +16,7 @@ private[traversers] class TemplateChildTraverserImpl(ctorPrimaryTraverser: => Ct
 
   override def traverse(child: Tree, context: TemplateChildContext): Option[Stat] = child match {
     case primaryCtor: Ctor.Primary => traversePrimaryCtor(primaryCtor, context)
-    case secondaryCtor: Ctor.Secondary => traverseSecondaryCtor(secondaryCtor, context)
+    case secondaryCtor: Ctor.Secondary => traverseSecondaryCtor(secondaryCtor)
     // The type definition in a Scala Enumeration is redundant in Java - skip it
     case defnTrait: Defn.Trait if traitClassifier.isEnumTypeDef(defnTrait, context.javaScope) => None
     case stat: Stat => defaultStatTraverser.traverse(stat, StatContext(context.javaScope))
@@ -30,11 +30,8 @@ private[traversers] class TemplateChildTraverserImpl(ctorPrimaryTraverser: => Ct
     }
   }
 
-  private def traverseSecondaryCtor(secondaryCtor: Ctor.Secondary, context: TemplateChildContext) = {
-    context.maybeClassName match {
-      case Some(className) => Some(ctorSecondaryTraverser.traverse(secondaryCtor, toCtorContext(context, className)).tree)
-      case None => throw new IllegalStateException("Secondary Ctor. exists but no context could be constructed for it")
-    }
+  private def traverseSecondaryCtor(secondaryCtor: Ctor.Secondary) = {
+    Some(ctorSecondaryTraverser.traverse(secondaryCtor))
   }
 
   private def toCtorContext(childContext: TemplateChildContext, className: Type.Name) = {
