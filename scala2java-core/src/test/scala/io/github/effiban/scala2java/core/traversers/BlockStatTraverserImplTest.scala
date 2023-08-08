@@ -55,8 +55,7 @@ class BlockStatTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for a Decl.Var") {
-    doReturn(TheTraversedDeclVar)
-      .when(declVarTraverser).traverse(eqTree(TheDeclVar), eqTo(StatContext(JavaScope.Block)))
+    doReturn(TheTraversedDeclVar).when(declVarTraverser).traverse(eqTree(TheDeclVar))
 
     blockStatTraverser.traverse(TheDeclVar).structure shouldBe TheTraversedDeclVar.structure
   }

@@ -1,8 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.StatContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
@@ -43,22 +41,18 @@ class DeclVarTraverserImplTest extends UnitTestSuite {
 
 
   test("traverse() when it is a class member") {
-    val javaScope = JavaScope.Class
-
     doReturn(TheTraversedScalaMods).when(statModListTraverser).traverse(eqTreeList(TheScalaMods))
     doReturn(TheTraversedType).when(typeTraverser).traverse(eqTree(TheType))
     doReturn(MyTraversedVarPat).when(patTraverser).traverse(eqTree(MyVarPat))
 
-    declVarTraverser.traverse(TheDeclVar, StatContext(javaScope)).structure shouldBe TheTraversedDeclVar.structure
+    declVarTraverser.traverse(TheDeclVar).structure shouldBe TheTraversedDeclVar.structure
   }
 
   test("traverse() when it is an interface member") {
-    val javaScope = JavaScope.Interface
-
     doReturn(TheTraversedScalaMods).when(statModListTraverser).traverse(eqTreeList(TheScalaMods))
     doReturn(TheTraversedType).when(typeTraverser).traverse(eqTree(TheType))
     doReturn(MyTraversedVarPat).when(patTraverser).traverse(eqTree(MyVarPat))
 
-    declVarTraverser.traverse(TheDeclVar, StatContext(javaScope)).structure shouldBe TheTraversedDeclVar.structure
+    declVarTraverser.traverse(TheDeclVar).structure shouldBe TheTraversedDeclVar.structure
   }
 }

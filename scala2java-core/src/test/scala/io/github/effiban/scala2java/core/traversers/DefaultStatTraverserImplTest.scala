@@ -64,7 +64,7 @@ class DefaultStatTraverserImplTest extends UnitTestSuite {
     val declVar = q"private var myVar: Int"
     val traversedDeclVar = q"private var myTraversedVar: Int"
 
-    doReturn(traversedDeclVar).when(declTraverser).traverse(eqTree(declVar), eqTo(StatContext(JavaScope.Block)))
+    doReturn(traversedDeclVar).when(declTraverser).traverse(eqTree(declVar))
 
     defaultStatTraverser.traverse(declVar, StatContext(JavaScope.Block)).value.structure shouldBe traversedDeclVar.structure
   }
@@ -73,7 +73,7 @@ class DefaultStatTraverserImplTest extends UnitTestSuite {
     val declDef = q"private def foo(x: Int): Int"
     val traversedDeclDef = q"private def traversedFoo(xx: Int): Int"
 
-    doReturn(traversedDeclDef).when(declTraverser).traverse(eqTree(declDef), eqTo(StatContext(JavaScope.Block)))
+    doReturn(traversedDeclDef).when(declTraverser).traverse(eqTree(declDef))
 
     defaultStatTraverser.traverse(declDef, StatContext(JavaScope.Block)).value.structure shouldBe traversedDeclDef.structure
   }
