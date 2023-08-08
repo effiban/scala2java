@@ -1,9 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts._
-import io.github.effiban.scala2java.core.entities.JavaModifier
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results._
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
@@ -53,9 +51,8 @@ class DefnTraverserImplTest extends UnitTestSuite {
   test("traverse() for Defn.Def") {
     val defnDef = q"def myMethod(x: Int) = doSomething(x)"
     val traversedDefnDef = q"def myMethod2(xx: Int) = doSomething2(xx)"
-    val traversalResult = DefnDefTraversalResult(traversedDefnDef, List(JavaModifier.Public))
 
-    doReturn(traversalResult).when(defnDefTraverser).traverse(eqTree(defnDef), eqTo(DefnDefContext(TheStatContext.javaScope)))
+    doReturn(traversedDefnDef).when(defnDefTraverser).traverse(eqTree(defnDef))
 
     defnTraverser.traverse(defnDef, TheStatContext).structure shouldBe traversedDefnDef.structure
   }
