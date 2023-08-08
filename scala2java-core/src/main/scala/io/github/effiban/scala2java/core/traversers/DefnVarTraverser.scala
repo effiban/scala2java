@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{ModifiersContext, StatContext}
 import io.github.effiban.scala2java.core.entities.JavaTreeType
-import io.github.effiban.scala2java.core.traversers.results.{DefnVarTraversalResult, StatWithJavaModifiersTraversalResult}
+import io.github.effiban.scala2java.core.traversers.results.{DeclVarTraversalResult, DefnVarTraversalResult, StatWithJavaModifiersTraversalResult}
 import io.github.effiban.scala2java.spi.transformers.{DefnVarToDeclVarTransformer, DefnVarTransformer}
 
 import scala.meta.Defn
@@ -22,7 +22,7 @@ private[traversers] class DefnVarTraverserImpl(statModListTraverser: => StatModL
   //TODO replace interface data member (invalid in Java) with accessor method (+ mutator if not 'final')
   override def traverse(defnVar: Defn.Var, context: StatContext = StatContext()): StatWithJavaModifiersTraversalResult = {
     defnVarToDeclVarTransformer.transform(defnVar, context.javaScope) match {
-      case Some(varDecl) => declVarTraverser.traverse(varDecl, context)
+      case Some(varDecl) => DeclVarTraversalResult(declVarTraverser.traverse(varDecl, context))
       case None => traverseInner(defnVar, context)
     }
   }

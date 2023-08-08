@@ -14,7 +14,7 @@ private[traversers] class DeclTraverserImpl(declVarTraverser: => DeclVarTraverse
                                             declDefTraverser: => DeclDefTraverser) extends DeclTraverser {
 
   override def traverse(decl: Decl, context: StatContext = StatContext()): Decl = decl match {
-    case varDecl: Decl.Var => declVarTraverser.traverse(varDecl, context).tree
+    case varDecl: Decl.Var => declVarTraverser.traverse(varDecl, context)
     case defDecl: Decl.Def => declDefTraverser.traverse(defDecl, context).tree
     case decl => UnsupportedDeclTraversalResult(decl).tree
   }

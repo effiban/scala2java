@@ -3,7 +3,7 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.StatContext
 import io.github.effiban.scala2java.core.entities.JavaModifier
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.{DeclDefTraversalResult, DeclVarTraversalResult}
+import io.github.effiban.scala2java.core.traversers.results.DeclDefTraversalResult
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
@@ -22,10 +22,8 @@ class DeclTraverserImplTest extends UnitTestSuite {
   test("traverse() a Decl.Var") {
     val declVar = q"private var myVar: Int"
     val traversedDeclVar = q"var myTraversedVar: Int"
-    val javaModifiers = List(JavaModifier.Private)
-    val traversalResult = DeclVarTraversalResult(traversedDeclVar, javaModifiers)
 
-    doReturn(traversalResult).when(declVarTraverser).traverse(eqTree(declVar), eqTo(TheStatContext))
+    doReturn(traversedDeclVar).when(declVarTraverser).traverse(eqTree(declVar), eqTo(TheStatContext))
     
     declTraverser.traverse(declVar, TheStatContext).structure shouldBe traversedDeclVar.structure
   }
