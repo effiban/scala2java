@@ -7,7 +7,6 @@ import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.core.transformers.CtorPrimaryTransformer
 import io.github.effiban.scala2java.core.traversers.results.DefnDefTraversalResult
-import io.github.effiban.scala2java.core.traversers.results.matchers.DefnDefTraversalResultScalatestMatcher.equalDefnDefTraversalResult
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
@@ -77,7 +76,7 @@ class CtorPrimaryTraverserImplTest extends UnitTestSuite {
     doReturn(ExpectedTraversalResult)
       .when(defnDefTraverser).traverse(eqTree(ExpectedTransformedDefnDef), eqTo(DefnDefContext(JavaScope.Class)))
 
-    ctorPrimaryTraverser.traverse(PrimaryCtor, TheCtorContext) should equalDefnDefTraversalResult(ExpectedTraversalResult)
+    ctorPrimaryTraverser.traverse(PrimaryCtor, TheCtorContext).structure shouldBe ExpectedTraversedDefnDef.structure
   }
 
   private def termParam(name: String, typeName: String) = {
