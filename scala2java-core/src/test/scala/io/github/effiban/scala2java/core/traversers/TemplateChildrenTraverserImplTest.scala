@@ -3,24 +3,21 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.contexts.TemplateChildContext
 import io.github.effiban.scala2java.core.orderings.JavaTemplateChildOrdering
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results._
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchersSugar.eqTo
 
-import scala.meta.{Ctor, Defn, Lit, Name, Tree, XtensionQuasiquoteInit, XtensionQuasiquoteTerm, XtensionQuasiquoteTermParam, XtensionQuasiquoteType}
+import scala.meta.{Ctor, Defn, Lit, Name, Tree, XtensionQuasiquoteInit, XtensionQuasiquoteTerm, XtensionQuasiquoteTermParam}
 
 class TemplateChildrenTraverserImplTest extends UnitTestSuite {
 
   private val TheDeclVar = q"var x: Int"
   private val TheTraversedDeclVar = q"var xx: Int"
-  private val TheDeclVarTraversalResult = DeclVarTraversalResult(TheTraversedDeclVar)
 
   private val TheEnumTypeDef = q"var One, Two = Value"
 
   private val TheDefnVar = q"var x = 4"
   private val TheTraversedDefnVar = q"var xx = 44"
-  private val TheDefnVarTraversalResult = DefnVarTraversalResult(TheTraversedDefnVar)
 
   private val PrimaryCtorArgs = List(
     param"arg1: Int",
@@ -53,7 +50,6 @@ class TemplateChildrenTraverserImplTest extends UnitTestSuite {
     decltpe = None,
     body = Lit.Unit()
   )
-  private val PrimaryCtorTraversalResult = DefnDefTraversalResult(PrimaryCtorDefnDef)
 
   private val SecondaryCtor = Ctor.Secondary(
     mods = Nil,
@@ -69,11 +65,9 @@ class TemplateChildrenTraverserImplTest extends UnitTestSuite {
     init = init"this()",
     stats = Nil
   )
-  private val SecondaryCtorTraversalResult = CtorSecondaryTraversalResult(tree = TraversedSecondaryCtor, className = t"MyClass")
 
   private val TheDefnDef = q"def myMethod(param: Int) = doSomething(param)"
   private val TheTraversedDefnDef = q"def myTraversedMethod(param: Int) = doSomething(param)"
-  private val TheDefnDefTraversalResult = DefnDefTraversalResult(TheTraversedDefnDef)
 
   private val ChildOrder = List[Tree](
     TheDeclVar,
@@ -143,32 +137,32 @@ class TemplateChildrenTraverserImplTest extends UnitTestSuite {
   }
 
   private def expectTraverseDeclVar(): Unit = {
-    doReturn(TheDeclVarTraversalResult)
+    doReturn(Some(TheTraversedDeclVar))
       .when(childTraverser).traverse(eqTree(TheDeclVar), eqTo(childContext))
   }
 
   private def expectTraverseRegularDefnVar(): Unit = {
-    doReturn(TheDefnVarTraversalResult)
+    doReturn(Some(TheTraversedDefnVar))
       .when(childTraverser).traverse(eqTree(TheDefnVar), eqTo(childContext))
   }
 
   private def expectTraverseEnumTypeDef(): Unit = {
-    doReturn(EmptyStatTraversalResult)
+    doReturn(None)
       .when(childTraverser).traverse(eqTree(TheEnumTypeDef), eqTo(childContext))
   }
 
   private def expectTraversePrimaryCtor(): Unit = {
-    doReturn(PrimaryCtorTraversalResult)
+    doReturn(Some(PrimaryCtorDefnDef))
       .when(childTraverser).traverse(eqTree(PrimaryCtor), eqTo(childContext))
   }
 
   private def expectTraverseSecondaryCtor(): Unit = {
-    doReturn(SecondaryCtorTraversalResult)
+    doReturn(Some(TraversedSecondaryCtor))
       .when(childTraverser).traverse(eqTree(SecondaryCtor), eqTo(childContext))
   }
 
   private def expectTraverseDefnDef(): Unit = {
-    doReturn(TheDefnDefTraversalResult)
+    doReturn(Some(TheTraversedDefnDef))
       .when(childTraverser).traverse(eqTree(TheDefnDef), eqTo(childContext))
   }
 

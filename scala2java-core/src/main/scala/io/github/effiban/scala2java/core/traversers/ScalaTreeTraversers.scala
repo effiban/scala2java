@@ -328,7 +328,6 @@ class ScalaTreeTraversers(implicit factories: Factories,
     ctorPrimaryTraverser,
     ctorSecondaryTraverser,
     defaultStatTraverser,
-    DefnVarClassifier,
     TraitClassifier
   )
 
