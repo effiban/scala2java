@@ -80,25 +80,25 @@ class BlockLastStatTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for a 'Term.Try' when shouldReturnValue=No") {
-    val expectedTraversalResult = TheTraversedTry
+    val expectedTraversedTry = TheTraversedTry
 
-    doReturn(expectedTraversalResult).when(tryTraverser).traverse(eqTree(TheTry), eqTo(TryContext()))
+    doReturn(expectedTraversedTry).when(tryTraverser).traverse(eqTree(TheTry), eqTo(TryContext()))
 
     blockLastStatTraverser.traverse(TheTry).structure shouldBe TheTraversedTry.structure
   }
 
   test("traverse() for a 'Term.Try' when shouldReturnValue=Yes") {
-    val expectedTraversalResult = TheTraversedTry
+    val expectedTraversedTry = TheTraversedTry
 
-    doReturn(expectedTraversalResult).when(tryTraverser).traverse(eqTree(TheTry), eqTo(TryContext(shouldReturnValue = Yes)))
+    doReturn(expectedTraversedTry).when(tryTraverser).traverse(eqTree(TheTry), eqTo(TryContext(shouldReturnValue = Yes)))
 
     blockLastStatTraverser.traverse(TheTry, shouldReturnValue = Yes).structure shouldBe TheTraversedTry.structure
   }
 
   test("traverse() for a 'Term.Try' when shouldReturnValue=Uncertain and catch result has uncertainReturn=true") {
-    val expectedTraversalResult = TheTraversedTry
+    val expectedTraversedTry = TheTraversedTry
 
-    doReturn(expectedTraversalResult).when(tryTraverser).traverse(eqTree(TheTry), eqTo(TryContext(shouldReturnValue = Uncertain)))
+    doReturn(expectedTraversedTry).when(tryTraverser).traverse(eqTree(TheTry), eqTo(TryContext(shouldReturnValue = Uncertain)))
 
     blockLastStatTraverser.traverse(TheTry, shouldReturnValue = Uncertain).structure shouldBe TheTraversedTry.structure
   }

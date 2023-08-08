@@ -38,10 +38,10 @@ class TraitEnricherImplTest extends UnitTestSuite {
   private val TheEnrichedDefnVar = EnrichedDefnVar(TheDefnVar)
 
   private val TheDefnDef = q"def myMethod(param: Int): Int = doSomething(param)"
-  private val TheDefnDefTraversalResult = EnrichedDefnDef(TheDefnDef)
+  private val TheEnrichedDefnDef = EnrichedDefnDef(TheDefnDef)
 
   private val TheStats = List(TheDefnVar, TheDefnDef)
-  private val TheEnrichedStats = List(TheEnrichedDefnVar, TheDefnDefTraversalResult)
+  private val TheEnrichedStats = List(TheEnrichedDefnVar, TheEnrichedDefnDef)
 
   private val TheTemplate =
     Template(

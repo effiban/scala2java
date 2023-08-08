@@ -58,7 +58,7 @@ class RegularClassEnricherImplTest extends UnitTestSuite {
   private val TheEnrichedDefnVar = EnrichedDefnVar(TheDefnVar)
 
   private val TheDefnDef = q"def myMethod(param: Int): Int = doSomething(param)"
-  private val TheDefnDefTraversalResult = EnrichedDefnDef(TheDefnDef)
+  private val TheEnrichedDefnDef = EnrichedDefnDef(TheDefnDef)
 
 
   private val templateEnricher = mock[TemplateEnricher]
@@ -77,7 +77,7 @@ class RegularClassEnricherImplTest extends UnitTestSuite {
 
   test("enrich() when resolves to Java class, and has inits and inheritance keyword") {
     val stats = List(TheDefnVar, TheDefnDef)
-    val enrichedStats = List(TheEnrichedDefnVar, TheDefnDefTraversalResult)
+    val enrichedStats = List(TheEnrichedDefnVar, TheEnrichedDefnDef)
 
     val template =
       Template(
@@ -133,7 +133,7 @@ class RegularClassEnricherImplTest extends UnitTestSuite {
 
   test("enrich() when resolves to Java class, and has no inits and no inheritance keyword") {
     val stats = List(TheDefnVar, TheDefnDef)
-    val enrichedStats = List(TheEnrichedDefnVar, TheDefnDefTraversalResult)
+    val enrichedStats = List(TheEnrichedDefnVar, TheEnrichedDefnDef)
 
     val template =
       Template(

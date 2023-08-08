@@ -302,7 +302,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   lazy val sourceTraverser: SourceTraverser = new SourceTraverserImpl(defaultStatTraverser)
 
-  private lazy val statModListTraverser: StatModListTraverser = new StatModListTraverserImpl(annotTraverser, JavaModifiersResolver)
+  private lazy val statModListTraverser: StatModListTraverser = new StatModListTraverserImpl(annotTraverser)
 
   private lazy val statTermTraverser: StatTermTraverser = new StatTermTraverserImpl(
     expressionTermRefTraverser,
