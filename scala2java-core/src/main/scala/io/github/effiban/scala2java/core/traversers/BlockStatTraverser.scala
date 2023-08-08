@@ -15,12 +15,12 @@ private[traversers] class BlockStatTraverserImpl(statTermTraverser: => StatTermT
     case term: Term => statTermTraverser.traverse(term)
     case defnVar: Defn.Var => traverseDefnVar(defnVar)
     case declVar: Decl.Var => traverseDeclVar(declVar)
-    // TODO support other stats once renderers are ready
+    // TODO support Class/Trait/Object
     case aStat: Stat => throw new UnsupportedOperationException(s"Traversal of $aStat in a block is not supported yet")
   }
 
   private def traverseDefnVar(defnVar: Defn.Var) = {
-    defnVarTraverser.traverse(defnVar, StatContext(JavaScope.Block)).tree
+    defnVarTraverser.traverse(defnVar, StatContext(JavaScope.Block))
   }
 
   private def traverseDeclVar(declVar: Decl.Var) = {
