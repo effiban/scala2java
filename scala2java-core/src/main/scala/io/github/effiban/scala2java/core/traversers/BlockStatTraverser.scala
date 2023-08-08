@@ -24,6 +24,6 @@ private[traversers] class BlockStatTraverserImpl(statTermTraverser: => StatTermT
   }
 
   private def traverseDeclVar(declVar: Decl.Var) = {
-    declVarTraverser.traverse(declVar, StatContext(JavaScope.Block)).tree
+    declVarTraverser.traverse(declVar, StatContext(JavaScope.Block))
   }
 }
