@@ -1,8 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.entities.JavaModifier
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results._
 import io.github.effiban.scala2java.spi.providers.AdditionalImportersProvider
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -18,17 +16,8 @@ class PkgTraverserImplTest extends UnitTestSuite {
     importer"java.util._"
   )
 
-  private val TheClass =
-    q"""
-    class MyClass {
-      def foo(x: Int) = x + 1
-    }
-    """
-  private val TheClassTraversalResult = TestableRegularClassTraversalResult(
-    defnClass = TheClass,
-    javaModifiers = List(JavaModifier.Public),
-    statResults = List(DefnDefTraversalResult(q"def traversedFoo(xx: Int) = xx + 1"))
-  )
+  private val TheClass = q"class MyClass { def foo(x: Int) = x + 1 }"
+  private val TheTraversedClass = q"class MyTraversedClass { def foo(xx: Int) = xx + 1 }"
 
   private val defaultTermRefTraverser = mock[DefaultTermRefTraverser]
   private val pkgStatListTraverser = mock[PkgStatListTraverser]
@@ -51,7 +40,7 @@ class PkgTraverserImplTest extends UnitTestSuite {
     val expectedTraversedStats = List(
       ArbitraryImport,
       Import(CoreImporters),
-      TheClassTraversalResult.tree
+      TheTraversedClass
     )
 
     val expectedPkg = Pkg(ref = traversedPkgRef, stats = expectedTraversedStats)
