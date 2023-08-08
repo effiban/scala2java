@@ -2,7 +2,6 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.StatContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.DefnVarTraversalResult
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
@@ -48,7 +47,7 @@ class BlockStatTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() for a Defn.Var") {
-    doReturn(DefnVarTraversalResult(TheTraversedDefnVar))
+    doReturn(TheTraversedDefnVar)
       .when(defnVarTraverser).traverse(eqTree(TheDefnVar), eqTo(StatContext(JavaScope.Block)))
 
     blockStatTraverser.traverse(TheDefnVar).structure shouldBe TheTraversedDefnVar.structure

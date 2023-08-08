@@ -17,7 +17,7 @@ private[traversers] class DefnTraverserImpl(defnVarTraverser: => DefnVarTraverse
                                             objectTraverser: => ObjectTraverser) extends DefnTraverser {
 
   override def traverse(defn: Defn, context: StatContext = StatContext()): Stat = defn match {
-    case defnVar: Defn.Var => defnVarTraverser.traverse(defnVar, context).tree
+    case defnVar: Defn.Var => defnVarTraverser.traverse(defnVar, context)
     case defnDef: Defn.Def => defnDefTraverser.traverse(defnDef, DefnDefContext(context.javaScope)).tree
     case defnTrait: Trait => traitTraverser.traverse(defnTrait)
     case defnClass: Defn.Class => classTraverser.traverse(defnClass, ClassOrTraitContext(context.javaScope))

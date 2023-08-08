@@ -34,10 +34,8 @@ class DefnTraverserImplTest extends UnitTestSuite {
 
     val defnVar = q"private var myVar: Int = 3"
     val traversedDefnVar = q"private var myTraversedVar: Int = 33"
-    val javaModifiers = List(JavaModifier.Private)
-    val traversalResult = DefnVarTraversalResult(traversedDefnVar, javaModifiers)
 
-    doReturn(traversalResult).when(defnVarTraverser).traverse(eqTree(defnVar), eqTo(TheStatContext))
+    doReturn(traversedDefnVar).when(defnVarTraverser).traverse(eqTree(defnVar), eqTo(TheStatContext))
 
     defnTraverser.traverse(defnVar, TheStatContext).structure shouldBe traversedDefnVar.structure
   }
@@ -46,10 +44,8 @@ class DefnTraverserImplTest extends UnitTestSuite {
 
     val defnVar = q"private var myVar: Int = 3"
     val declVar = q"private var myVar: Int"
-    val javaModifiers = List(JavaModifier.Private)
-    val traversalResult = DeclVarTraversalResult(declVar, javaModifiers)
 
-    doReturn(traversalResult).when(defnVarTraverser).traverse(eqTree(defnVar), eqTo(TheStatContext))
+    doReturn(declVar).when(defnVarTraverser).traverse(eqTree(defnVar), eqTo(TheStatContext))
 
     defnTraverser.traverse(defnVar, TheStatContext).structure shouldBe declVar.structure
   }
