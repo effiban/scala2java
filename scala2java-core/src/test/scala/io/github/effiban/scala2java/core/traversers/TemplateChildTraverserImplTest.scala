@@ -92,10 +92,7 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
   )
 
   test("traverse() for primary ctor. when class name provided") {
-    val ctorJavaModifiers: List[JavaModifier] = List(JavaModifier.Public)
-    val traversalResult = DefnDefTraversalResult(PrimaryCtorDefnDef, ctorJavaModifiers)
-
-    doReturn(traversalResult)
+    doReturn(PrimaryCtorDefnDef)
       .when(ctorPrimaryTraverser).traverse(primaryCtor = eqTree(PrimaryCtor), ctorContext = eqCtorContext(CtorContextWithClassName))
 
     val maybeTraversedTemplateChild = templateChildTraverser.traverse(child = PrimaryCtor, context = ChildContextWithClassName)

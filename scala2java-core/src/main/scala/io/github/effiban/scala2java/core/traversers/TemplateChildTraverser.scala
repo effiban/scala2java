@@ -25,7 +25,7 @@ private[traversers] class TemplateChildTraverserImpl(ctorPrimaryTraverser: => Ct
 
   private def traversePrimaryCtor(primaryCtor: Ctor.Primary, context: TemplateChildContext) = {
     context.maybeClassName match {
-      case Some(className) => Some(ctorPrimaryTraverser.traverse(primaryCtor, toCtorContext(context, className)).tree)
+      case Some(className) => Some(ctorPrimaryTraverser.traverse(primaryCtor, toCtorContext(context, className)))
       case None => throw new IllegalStateException("Primary Ctor. exists but no context could be constructed for it")
     }
   }
