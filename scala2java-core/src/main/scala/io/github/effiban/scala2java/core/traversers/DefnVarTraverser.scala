@@ -22,7 +22,7 @@ private[traversers] class DefnVarTraverserImpl(statModListTraverser: => StatModL
   //TODO replace interface data member (invalid in Java) with accessor method (+ mutator if not 'final')
   override def traverse(defnVar: Defn.Var, context: StatContext = StatContext()): StatWithJavaModifiersTraversalResult = {
     defnVarToDeclVarTransformer.transform(defnVar, context.javaScope) match {
-      case Some(varDecl) => DeclVarTraversalResult(declVarTraverser.traverse(varDecl, context))
+      case Some(varDecl) => DeclVarTraversalResult(declVarTraverser.traverse(varDecl))
       case None => traverseInner(defnVar, context)
     }
   }

@@ -19,7 +19,7 @@ private[traversers] class DefaultStatTraverserImpl(statTermTraverser: => StatTer
     case `import`: Import => importTraverser.traverse(`import`)
     case pkg: Pkg => Some(pkgTraverser.traverse(pkg))
     case defn: Defn => Some(defnTraverser.traverse(defn, statContext))
-    case decl: Decl => Some(declTraverser.traverse(decl, statContext))
+    case decl: Decl => Some(declTraverser.traverse(decl))
     case other => Some(other)
   }
 }

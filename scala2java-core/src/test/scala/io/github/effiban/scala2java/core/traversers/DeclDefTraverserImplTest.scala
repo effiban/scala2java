@@ -1,13 +1,9 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.{ModifiersContext, StatContext}
-import io.github.effiban.scala2java.core.entities.{JavaModifier, JavaTreeType}
-import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
+import io.github.effiban.scala2java.core.contexts.StatContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.matchers.DeclDefTraversalResultScalatestMatcher.equalDeclDefTraversalResult
-import io.github.effiban.scala2java.core.traversers.results.{DeclDefTraversalResult, ModListTraversalResult}
 import io.github.effiban.scala2java.spi.entities.JavaScope
-import io.github.effiban.scala2java.spi.entities.JavaScope.JavaScope
+import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.{any, eqTo}
 
@@ -60,8 +56,6 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
 
 
   test("traverse() for class method when has one list of params") {
-    val javaScope = JavaScope.Class
-
     val declDef = Decl.Def(
       mods = ScalaMods,
       name = MethodName,
@@ -78,11 +72,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
       decltpe = TraversedMethodType
     )
 
-    val javaModifiers = List(JavaModifier.Public)
-    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TraversedScalaMods, javaModifiers = javaModifiers)
-    val expectedDeclDefTraversalResult = DeclDefTraversalResult(tree = expectedTraversedDeclDef, javaModifiers = javaModifiers)
-
-    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(declDef, javaScope))
+    doReturn(TraversedScalaMods).when(statModListTraverser).traverse(eqTreeList(ScalaMods))
     doReturn(TraversedMethodType).when(typeTraverser).traverse(eqTree(MethodType))
     doAnswer((param: Term.Param) => param match {
       case aParam if aParam.structure == MethodParam1.structure => TraversedMethodParam1
@@ -90,13 +80,10 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
       case aParam => aParam
     }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.MethodSignature)))
 
-    val actualTraversalResult = declDefTraverser.traverse(declDef, StatContext(javaScope))
-    actualTraversalResult should equalDeclDefTraversalResult(expectedDeclDefTraversalResult)
+    declDefTraverser.traverse(declDef).structure shouldBe expectedTraversedDeclDef.structure
   }
 
   test("traverse() for class method when has type params") {
-    val javaScope = JavaScope.Class
-
     val declDef = Decl.Def(
       mods = ScalaMods,
       name = MethodName,
@@ -113,11 +100,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
       decltpe = TraversedMethodType
     )
 
-    val javaModifiers = List(JavaModifier.Public)
-    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TraversedScalaMods, javaModifiers = javaModifiers)
-    val expectedDeclDefTraversalResult = DeclDefTraversalResult(tree = expectedTraversedDeclDef, javaModifiers = javaModifiers)
-
-    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(declDef, javaScope))
+    doReturn(TraversedScalaMods).when(statModListTraverser).traverse(eqTreeList(ScalaMods))
     doAnswer((tparam: Type.Param) => tparam match {
       case aTypeParam if aTypeParam.structure == TypeParam1.structure => TraversedTypeParam1
       case aTypeParam if aTypeParam.structure == TypeParam2.structure => TraversedTypeParam2
@@ -130,13 +113,10 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
       case aParam => aParam
     }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.MethodSignature)))
 
-    val actualTraversalResult = declDefTraverser.traverse(declDef, StatContext(javaScope))
-    actualTraversalResult should equalDeclDefTraversalResult(expectedDeclDefTraversalResult)
+    declDefTraverser.traverse(declDef).structure shouldBe expectedTraversedDeclDef.structure
   }
 
   test("traverse() for interface method when has one list of params") {
-    val javaScope = JavaScope.Interface
-
     val declDef = Decl.Def(
       mods = ScalaMods,
       name = MethodName,
@@ -153,10 +133,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
       decltpe = TraversedMethodType
     )
 
-    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TraversedScalaMods)
-    val expectedDeclDefTraversalResult = DeclDefTraversalResult(tree = expectedTraversedDeclDef)
-
-    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(declDef, javaScope))
+    doReturn(TraversedScalaMods).when(statModListTraverser).traverse(eqTreeList(ScalaMods))
     doReturn(TraversedMethodType).when(typeTraverser).traverse(eqTree(MethodType))
     doAnswer((param: Term.Param) => param match {
       case aParam if aParam.structure == MethodParam1.structure => TraversedMethodParam1
@@ -164,13 +141,10 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
       case aParam => aParam
     }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.MethodSignature)))
 
-    val actualTraversalResult = declDefTraverser.traverse(declDef, StatContext(javaScope))
-    actualTraversalResult should equalDeclDefTraversalResult(expectedDeclDefTraversalResult)
+    declDefTraverser.traverse(declDef).structure shouldBe expectedTraversedDeclDef.structure
   }
 
   test("traverse() for interface method when has two lists of params") {
-    val javaScope = JavaScope.Interface
-
     val declDef = Decl.Def(
       mods = ScalaMods,
       name = MethodName,
@@ -187,10 +161,7 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
       decltpe = TraversedMethodType
     )
 
-    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TraversedScalaMods)
-    val expectedDeclDefTraversalResult = DeclDefTraversalResult(tree = expectedTraversedDeclDef)
-
-    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(declDef, javaScope))
+    doReturn(TraversedScalaMods).when(statModListTraverser).traverse(eqTreeList(ScalaMods))
     doReturn(TraversedMethodType).when(typeTraverser).traverse(eqTree(MethodType))
     doAnswer((param: Term.Param) => param match {
       case aParam if aParam.structure == MethodParam1.structure => TraversedMethodParam1
@@ -200,12 +171,6 @@ class DeclDefTraverserImplTest extends UnitTestSuite {
       case aParam => aParam
     }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.MethodSignature)))
 
-    val actualTraversalResult = declDefTraverser.traverse(declDef, StatContext(javaScope))
-    actualTraversalResult should equalDeclDefTraversalResult(expectedDeclDefTraversalResult)
-  }
-
-  private def eqExpectedScalaMods(declDef: Decl.Def, javaScope: JavaScope) = {
-    val expectedModifiersContext = ModifiersContext(declDef, JavaTreeType.Method, javaScope)
-    eqModifiersContext(expectedModifiersContext)
+    declDefTraverser.traverse(declDef).structure shouldBe expectedTraversedDeclDef.structure
   }
 }

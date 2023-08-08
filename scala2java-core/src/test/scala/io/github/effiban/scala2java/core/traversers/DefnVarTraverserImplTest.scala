@@ -82,7 +82,7 @@ class DefnVarTraverserImplTest extends UnitTestSuite {
     val expectedResult = DeclVarTraversalResult(traversedDeclVar)
 
     when(defnVarToDeclVarTransformer.transform(eqTree(defnVar), eqTo(javaScope))).thenReturn(Some(declVar))
-    doReturn(traversedDeclVar).when(declVarTraverser).traverse(eqTree(declVar), eqTo(context))
+    doReturn(traversedDeclVar).when(declVarTraverser).traverse(eqTree(declVar))
 
     defnVarTraverser.traverse(defnVar, context) should equalStatWithJavaModifiersTraversalResult(expectedResult)
   }
