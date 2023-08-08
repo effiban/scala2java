@@ -2,10 +2,8 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.classifiers.TraitClassifier
 import io.github.effiban.scala2java.core.contexts._
-import io.github.effiban.scala2java.core.entities.JavaModifier
 import io.github.effiban.scala2java.core.matchers.CtorContextMatcher.eqCtorContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results._
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
@@ -15,7 +13,6 @@ import scala.meta.{Ctor, Defn, Init, Name, Term, Type, XtensionQuasiquoteInit, X
 class TemplateChildTraverserImplTest extends UnitTestSuite {
 
   private val ClassName = t"MyClass"
-  private val TraversedClassName = t"MyTraversedClass"
   private val TermClassName = q"MyClass"
 
   private val TheInits = List(init"Parent1()", init"Parent2()")
@@ -105,24 +102,13 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
     }
   }
 
-  test("traverse() for secondary ctor. when class name provided") {
-    val ctorJavaModifiers = List(JavaModifier.Public)
-    val traversalResult = CtorSecondaryTraversalResult(
-      tree = TraversedSecondaryCtor,
-      className = TraversedClassName,
-      javaModifiers = ctorJavaModifiers
-    )
-    doReturn(traversalResult)
-      .when(ctorSecondaryTraverser).traverse(eqTree(SecondaryCtor), eqCtorContext(CtorContextWithClassName))
+  test("traverse() for secondary ctor.") {
+    val childContext = TemplateChildContext(javaScope = JavaScope.Class)
 
-    val maybeTraversedTemplateChild = templateChildTraverser.traverse(child = SecondaryCtor, context = ChildContextWithClassName)
+    doReturn(TraversedSecondaryCtor).when(ctorSecondaryTraverser).traverse(eqTree(SecondaryCtor))
+
+    val maybeTraversedTemplateChild = templateChildTraverser.traverse(child = SecondaryCtor, context = childContext)
     maybeTraversedTemplateChild.value.structure shouldBe TraversedSecondaryCtor.structure 
-  }
-
-  test("traverse() for secondary ctor. without ctor. context should throw exception") {
-    intercept[IllegalStateException] {
-      templateChildTraverser.traverse(child = SecondaryCtor, context = TemplateChildContext(javaScope = JavaScope.Class))
-    }
   }
 
   test("traverse() for a Trait which is not an enum type def") {

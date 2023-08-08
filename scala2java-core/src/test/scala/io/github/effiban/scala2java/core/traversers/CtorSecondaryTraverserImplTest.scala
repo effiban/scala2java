@@ -1,30 +1,15 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts._
-import io.github.effiban.scala2java.core.entities.{JavaModifier, JavaTreeType}
-import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.matchers.CtorSecondaryTraversalResultScalatestMatcher.equalCtorSecondaryTraversalResult
-import io.github.effiban.scala2java.core.traversers.results.{CtorSecondaryTraversalResult, ModListTraversalResult}
 import io.github.effiban.scala2java.spi.entities.JavaScope
-import io.github.effiban.scala2java.spi.entities.JavaScope.JavaScope
+import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.{any, eqTo}
 
-import scala.meta.{Ctor, Init, Mod, Name, Stat, Term, Type, XtensionQuasiquoteInit, XtensionQuasiquoteTerm, XtensionQuasiquoteTermParam, XtensionQuasiquoteType}
+import scala.meta.{Ctor, Init, Mod, Name, Stat, Term, Type, XtensionQuasiquoteInit, XtensionQuasiquoteTerm, XtensionQuasiquoteTermParam}
 
 class CtorSecondaryTraverserImplTest extends UnitTestSuite {
-
-  private val ClassName = t"MyClass"
-  private val TraversedClassName = t"MyTraversedClass"
-
-  private val TheParentInits = List(init"Parent1", init"Parent2")
-
-  private val TheCtorContext = CtorContext(
-    javaScope = JavaScope.Class,
-    className = ClassName,
-    inits = TheParentInits
-  )
 
   private val TheAnnot = Mod.Annot(
     Init(tpe = Type.Name("MyAnnotation"), name = Name.Anonymous(), argss = List())
@@ -34,8 +19,6 @@ class CtorSecondaryTraverserImplTest extends UnitTestSuite {
   )
   private val TheScalaMods = List(TheAnnot)
   private val TheTraversedScalaMods = List(TheTraversedAnnot)
-
-  private val TheJavaModifiers = List(JavaModifier.Public)
 
   private val CtorArg1 = param"param1: Int"
   private val CtorArg2 = param"param2: Int"
@@ -63,22 +46,18 @@ class CtorSecondaryTraverserImplTest extends UnitTestSuite {
   private val TraversedStatement2 = q"doSomething22(param22)"
 
   private val statModListTraverser = mock[StatModListTraverser]
-  private val typeNameTraverser = mock[TypeNameTraverser]
   private val termParamTraverser = mock[TermParamTraverser]
   private val initTraverser = mock[InitTraverser]
   private val blockStatTraverser = mock[BlockStatTraverser]
 
   private val ctorSecondaryTraverser = new CtorSecondaryTraverserImpl(
     statModListTraverser,
-    typeNameTraverser,
     termParamTraverser,
     initTraverser,
     blockStatTraverser
   )
 
   test("traverse() with no statements") {
-    val javaScope = JavaScope.Class
-
     val ctorSecondary = Ctor.Secondary(
       mods = TheScalaMods,
       name = Name.Anonymous(),
@@ -95,15 +74,7 @@ class CtorSecondaryTraverserImplTest extends UnitTestSuite {
       stats = Nil
     )
 
-    val expectedModListTraversalResult = ModListTraversalResult(TheTraversedScalaMods, TheJavaModifiers)
-    val expectedCtorSecondaryTraversalResult = CtorSecondaryTraversalResult(
-      tree = expectedTraversedCtorSecondary,
-      className = TraversedClassName,
-      javaModifiers = TheJavaModifiers
-    )
-
-    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(ctorSecondary, javaScope))
-    doReturn(TraversedClassName).when(typeNameTraverser).traverse(eqTree(ClassName))
+    doReturn(TheTraversedScalaMods).when(statModListTraverser).traverse(eqTreeList(TheScalaMods))
     doAnswer((param: Term.Param) => param match {
       case aParam if aParam.structure == CtorArg1.structure => TraversedCtorArg1
       case aParam if aParam.structure == CtorArg2.structure => TraversedCtorArg2
@@ -111,13 +82,10 @@ class CtorSecondaryTraverserImplTest extends UnitTestSuite {
     }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.MethodSignature)))
     doReturn(TheTraversedSelfInit).when(initTraverser).traverse(eqTree(TheSelfInit))
 
-    val actualResult = ctorSecondaryTraverser.traverse(ctorSecondary, TheCtorContext)
-    actualResult should equalCtorSecondaryTraversalResult(expectedCtorSecondaryTraversalResult)
+    ctorSecondaryTraverser.traverse(ctorSecondary).structure shouldBe expectedTraversedCtorSecondary.structure
   }
 
   test("traverse() with statements") {
-    val javaScope = JavaScope.Class
-
     val ctorSecondary = Ctor.Secondary(
       mods = TheScalaMods,
       name = Name.Anonymous(),
@@ -134,15 +102,7 @@ class CtorSecondaryTraverserImplTest extends UnitTestSuite {
       stats = List(TraversedStatement1, TraversedStatement2)
     )
 
-    val expectedModListTraversalResult = ModListTraversalResult(TheTraversedScalaMods, TheJavaModifiers)
-    val expectedCtorSecondaryTraversalResult = CtorSecondaryTraversalResult(
-      tree = expectedTraversedCtorSecondary,
-      className = TraversedClassName,
-      javaModifiers = TheJavaModifiers
-    )
-
-    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(ctorSecondary, javaScope))
-    doReturn(TraversedClassName).when(typeNameTraverser).traverse(eqTree(ClassName))
+    doReturn(TheTraversedScalaMods).when(statModListTraverser).traverse(eqTreeList(TheScalaMods))
     doAnswer((param: Term.Param) => param match {
       case aParam if aParam.structure == CtorArg1.structure => TraversedCtorArg1
       case aParam if aParam.structure == CtorArg2.structure => TraversedCtorArg2
@@ -156,13 +116,10 @@ class CtorSecondaryTraverserImplTest extends UnitTestSuite {
       case aStat => aStat
     }).when(blockStatTraverser).traverse(any[Stat])
 
-    val actualResult = ctorSecondaryTraverser.traverse(ctorSecondary, TheCtorContext)
-    actualResult should equalCtorSecondaryTraversalResult(expectedCtorSecondaryTraversalResult)
+    ctorSecondaryTraverser.traverse(ctorSecondary).structure shouldBe expectedTraversedCtorSecondary.structure
   }
 
   test("traverse() with two argument lists") {
-    val javaScope = JavaScope.Class
-
     val ctorSecondary = Ctor.Secondary(
       mods = TheScalaMods,
       name = Name.Anonymous(),
@@ -179,15 +136,7 @@ class CtorSecondaryTraverserImplTest extends UnitTestSuite {
       stats = Nil
     )
 
-    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TheTraversedScalaMods, javaModifiers = TheJavaModifiers)
-    val expectedCtorSecondaryTraversalResult = CtorSecondaryTraversalResult(
-      tree = expectedTraversedCtorSecondary,
-      className = TraversedClassName,
-      javaModifiers = TheJavaModifiers
-    )
-
-    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(ctorSecondary, javaScope))
-    doReturn(TraversedClassName).when(typeNameTraverser).traverse(eqTree(ClassName))
+    doReturn(TheTraversedScalaMods).when(statModListTraverser).traverse(eqTreeList(TheScalaMods))
     doAnswer((param: Term.Param) => param match {
       case aParam if aParam.structure == CtorArg1.structure => TraversedCtorArg1
       case aParam if aParam.structure == CtorArg2.structure => TraversedCtorArg2
@@ -197,12 +146,6 @@ class CtorSecondaryTraverserImplTest extends UnitTestSuite {
     }).when(termParamTraverser).traverse(any[Term.Param], eqTo(StatContext(JavaScope.MethodSignature)))
     doReturn(TheTraversedSelfInit).when(initTraverser).traverse(eqTree(TheSelfInit))
 
-    val actualResult = ctorSecondaryTraverser.traverse(ctorSecondary, TheCtorContext)
-    actualResult should equalCtorSecondaryTraversalResult(expectedCtorSecondaryTraversalResult)
-  }
-
-  private def eqExpectedScalaMods(ctorSecondary: Ctor.Secondary, javaScope: JavaScope) = {
-    val expectedModifiersContext = ModifiersContext(ctorSecondary, JavaTreeType.Method, javaScope)
-    eqModifiersContext(expectedModifiersContext)
+    ctorSecondaryTraverser.traverse(ctorSecondary).structure shouldBe expectedTraversedCtorSecondary.structure
   }
 }
