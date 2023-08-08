@@ -2,8 +2,6 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.entities.Decision.{No, Uncertain, Yes}
-import io.github.effiban.scala2java.core.entities.JavaTreeType
-import io.github.effiban.scala2java.core.traversers.results.DefnDefTraversalResult
 import io.github.effiban.scala2java.core.typeinference.TermTypeInferrer
 import io.github.effiban.scala2java.spi.entities.JavaScope.MethodSignature
 import io.github.effiban.scala2java.spi.transformers.DefnDefTransformer
@@ -11,7 +9,7 @@ import io.github.effiban.scala2java.spi.transformers.DefnDefTransformer
 import scala.meta.{Defn, Type}
 
 trait DefnDefTraverser {
-  def traverse(defnDef: Defn.Def, context: DefnDefContext = DefnDefContext()): DefnDefTraversalResult
+  def traverse(defnDef: Defn.Def): Defn.Def
 }
 
 private[traversers] class DefnDefTraverserImpl(statModListTraverser: => StatModListTraverser,
@@ -22,28 +20,26 @@ private[traversers] class DefnDefTraverserImpl(statModListTraverser: => StatModL
                                                termTypeInferrer: => TermTypeInferrer,
                                                defnDefTransformer: DefnDefTransformer) extends DefnDefTraverser {
 
-  override def traverse(defnDef: Defn.Def, context: DefnDefContext = DefnDefContext()): DefnDefTraversalResult = {
+  override def traverse(defnDef: Defn.Def): Defn.Def = {
     val transformedDefnDef = defnDefTransformer.transform(defnDef)
-    val modListTraversalResult = traverseMods(context, transformedDefnDef)
+    val traversedMods = traverseMods(transformedDefnDef)
     val traversedTypeParams = transformedDefnDef.tparams.map(typeParamTraverser.traverse)
     val maybeMethodType = resolveMethodType(transformedDefnDef)
     val maybeTraversedMethodType = traverseMethodType(maybeMethodType)
     val traversedMethodParamss = traverseMethodParams(transformedDefnDef)
     val traversedBody = traverseBody(transformedDefnDef, maybeMethodType)
 
-    val traversedDefnDef = Defn.Def(
-      mods = modListTraversalResult.scalaMods,
+    Defn.Def(
+      mods = traversedMods,
       name = transformedDefnDef.name,
       tparams = traversedTypeParams,
       paramss = traversedMethodParamss,
       decltpe = maybeTraversedMethodType,
       body = traversedBody)
-
-    DefnDefTraversalResult(tree = traversedDefnDef, javaModifiers = modListTraversalResult.javaModifiers)
   }
 
-  private def traverseMods(context: DefnDefContext, transformedDefnDef: Defn.Def) = {
-    statModListTraverser.traverse(ModifiersContext(transformedDefnDef, JavaTreeType.Method, context.javaScope))
+  private def traverseMods(transformedDefnDef: Defn.Def) = {
+    statModListTraverser.traverse(transformedDefnDef.mods)
   }
 
   private def traverseMethodParams(defDef: Defn.Def) = {

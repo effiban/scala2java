@@ -2,16 +2,12 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.entities.Decision.{Uncertain, Yes}
-import io.github.effiban.scala2java.core.entities.{JavaModifier, JavaTreeType}
 import io.github.effiban.scala2java.core.matchers.BlockContextMatcher.eqBlockContext
-import io.github.effiban.scala2java.core.matchers.ModifiersContextMatcher.eqModifiersContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.traversers.results.matchers.DefnDefTraversalResultScalatestMatcher.equalDefnDefTraversalResult
-import io.github.effiban.scala2java.core.traversers.results.{DefnDefTraversalResult, ModListTraversalResult}
 import io.github.effiban.scala2java.core.typeinference.TermTypeInferrer
 import io.github.effiban.scala2java.spi.entities.JavaScope
-import io.github.effiban.scala2java.spi.entities.JavaScope.JavaScope
 import io.github.effiban.scala2java.spi.transformers.DefnDefTransformer
+import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.{any, eqTo}
 
@@ -96,9 +92,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
   )
 
 
-  test("traverse() for class method with one statement returning non-Unit") {
-    val javaScope = JavaScope.Class
-
+  test("traverse() for method with one statement returning non-Unit") {
     val methodType = t"MyType"
     val transformedMethodType = t"MyTransformedType"
     val traversedMethodType = t"MyTraversedType"
@@ -122,26 +116,19 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       body = expectedTraversedBody
     )
 
-    val expectedJavaModifiers = List(JavaModifier.Public)
-    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TraversedScalaMods, javaModifiers = expectedJavaModifiers)
-    val expectedDefnDefTraversalResult = DefnDefTraversalResult(expectedTraversedDefnDef, expectedJavaModifiers)
-
     when(defnDefTransformer.transform(eqTree(initialDefnDef))).thenReturn(transformedDefnDef)
-    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(transformedDefnDef, javaScope))
+    doReturn(TraversedScalaMods).when(statModListTraverser).traverse(eqTreeList(TransformedScalaMods))
     doReturn(traversedMethodType).when(typeTraverser).traverse(eqTree(transformedMethodType))
     expectTraverseOneParamList()
     doReturn(expectedTraversedBody)
       .when(blockWrappingTermTraverser).traverse(eqTree(TransformedStatement1),
-      context = eqBlockContext(BlockContext(shouldReturnValue = Yes))
-    )
+        context = eqBlockContext(BlockContext(shouldReturnValue = Yes))
+      )
 
-    val actualResult = defnDefTraverser.traverse(initialDefnDef, DefnDefContext(javaScope = javaScope))
-    actualResult should equalDefnDefTraversalResult(expectedDefnDefTraversalResult)
+    defnDefTraverser.traverse(initialDefnDef).structure shouldBe expectedTraversedDefnDef.structure
   }
 
-  test("traverse() for class method with one statement returning Unit") {
-    val javaScope = JavaScope.Class
-
+  test("traverse() for method with one statement returning Unit") {
     val initialDefnDef = initialDefnDefWith(
       paramss = List(MethodParamList1),
       maybeDeclType = Some(t"Unit"),
@@ -161,26 +148,19 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       body = expectedTraversedBody
     )
 
-    val expectedJavaModifiers = List(JavaModifier.Public)
-    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TraversedScalaMods, javaModifiers = expectedJavaModifiers)
-    val expectedDefnDefTraversalResult = DefnDefTraversalResult(expectedTraversedDefnDef, javaModifiers = expectedJavaModifiers)
-
     when(defnDefTransformer.transform(eqTree(initialDefnDef))).thenReturn(transformedDefnDef)
-    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(transformedDefnDef, javaScope))
+    doReturn(TraversedScalaMods).when(statModListTraverser).traverse(eqTreeList(TransformedScalaMods))
     doReturn(t"void").when(typeTraverser).traverse(eqTree(t"Unit"))
     expectTraverseOneParamList()
     doReturn(expectedTraversedBody)
       .when(blockWrappingTermTraverser).traverse(eqTree(TransformedStatement1),
-      context = eqBlockContext(BlockContext())
-    )
+        context = eqBlockContext(BlockContext())
+      )
 
-    val actualResult = defnDefTraverser.traverse(initialDefnDef, DefnDefContext(javaScope = javaScope))
-    actualResult should equalDefnDefTraversalResult(expectedDefnDefTraversalResult)
+    defnDefTraverser.traverse(initialDefnDef).structure shouldBe expectedTraversedDefnDef.structure
   }
 
-  test("traverse() for class method with type params") {
-    val javaScope = JavaScope.Class
-
+  test("traverse() for method with type params") {
     val initialDefnDef = initialDefnDefWith(
       tparams = TypeParams,
       paramss = List(MethodParamList1),
@@ -203,12 +183,8 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       body = expectedTraversedBody
     )
 
-    val expectedJavaModifiers = List(JavaModifier.Public)
-    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TraversedScalaMods, javaModifiers = expectedJavaModifiers)
-    val expectedDefnDefTraversalResult = DefnDefTraversalResult(expectedTraversedDefnDef, javaModifiers = expectedJavaModifiers)
-
     when(defnDefTransformer.transform(eqTree(initialDefnDef))).thenReturn(transformedDefnDef)
-    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(transformedDefnDef, javaScope))
+    doReturn(TraversedScalaMods).when(statModListTraverser).traverse(eqTreeList(TransformedScalaMods))
     doAnswer((tparam: Type.Param) => tparam match {
       case aTypeParam if aTypeParam.structure == TransformedTypeParam1.structure => TraversedTypeParam1
       case aTypeParam if aTypeParam.structure == TransformedTypeParam2.structure => TraversedTypeParam2
@@ -218,17 +194,14 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     expectTraverseOneParamList()
     doReturn(expectedTraversedBody)
       .when(blockWrappingTermTraverser).traverse(eqTree(TransformedStatement1),
-      context = eqBlockContext(BlockContext())
-    )
+        context = eqBlockContext(BlockContext())
+      )
 
-    val actualResult = defnDefTraverser.traverse(initialDefnDef, DefnDefContext(javaScope = javaScope))
-    actualResult should equalDefnDefTraversalResult(expectedDefnDefTraversalResult)
+    defnDefTraverser.traverse(initialDefnDef).structure shouldBe expectedTraversedDefnDef.structure
   }
 
 
-  test("traverse() for class method with one statement missing return type when not inferrable") {
-    val javaScope = JavaScope.Class
-
+  test("traverse() for method with one statement missing return type when not inferrable") {
     val initialDefnDef = initialDefnDefWith(
       paramss = List(MethodParamList1),
       body = Statement1
@@ -245,26 +218,19 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       body = expectedTraversedBody
     )
 
-    val expectedJavaModifiers = List(JavaModifier.Public)
-    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TraversedScalaMods, javaModifiers = expectedJavaModifiers)
-    val expectedDefnDefTraversalResult = DefnDefTraversalResult(expectedTraversedDefnDef, javaModifiers = expectedJavaModifiers)
-
     when(defnDefTransformer.transform(eqTree(initialDefnDef))).thenReturn(transformedDefnDef)
-    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(transformedDefnDef, javaScope))
+    doReturn(TraversedScalaMods).when(statModListTraverser).traverse(eqTreeList(TransformedScalaMods))
     when(termTypeInferrer.infer(eqTree(TransformedStatement1))).thenReturn(None)
     expectTraverseOneParamList()
     doReturn(expectedTraversedBody)
       .when(blockWrappingTermTraverser).traverse(eqTree(TransformedStatement1),
-      context = eqBlockContext(BlockContext(shouldReturnValue = Uncertain))
-    )
+        context = eqBlockContext(BlockContext(shouldReturnValue = Uncertain))
+      )
 
-    val actualResult = defnDefTraverser.traverse(initialDefnDef, DefnDefContext(javaScope = javaScope))
-    actualResult should equalDefnDefTraversalResult(expectedDefnDefTraversalResult)
+    defnDefTraverser.traverse(initialDefnDef).structure shouldBe expectedTraversedDefnDef.structure
   }
 
-  test("traverse() for class method with one statement missing return type when inferrable") {
-    val javaScope = JavaScope.Class
-
+  test("traverse() for method with one statement missing return type when inferrable") {
     val inferredMethodType = t"MyInferredType"
     val traversedMethodType = t"MyTraversedType"
 
@@ -285,27 +251,20 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       body = expectedTraversedBody
     )
 
-    val expectedJavaModifiers = List(JavaModifier.Public)
-    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TraversedScalaMods, javaModifiers = expectedJavaModifiers)
-    val expectedDefnDefTraversalResult = DefnDefTraversalResult(expectedTraversedDefnDef, javaModifiers = expectedJavaModifiers)
-
     when(defnDefTransformer.transform(eqTree(initialDefnDef))).thenReturn(transformedDefnDef)
-    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(transformedDefnDef, javaScope))
+    doReturn(TraversedScalaMods).when(statModListTraverser).traverse(eqTreeList(TransformedScalaMods))
     when(termTypeInferrer.infer(eqTree(TransformedStatement1))).thenReturn(Some(inferredMethodType))
     doReturn(traversedMethodType).when(typeTraverser).traverse(eqTree(inferredMethodType))
     expectTraverseOneParamList()
     doReturn(expectedTraversedBody)
       .when(blockWrappingTermTraverser).traverse(eqTree(TransformedStatement1),
-      context = eqBlockContext(BlockContext(shouldReturnValue = Yes))
-    )
+        context = eqBlockContext(BlockContext(shouldReturnValue = Yes))
+      )
 
-    val actualResult = defnDefTraverser.traverse(initialDefnDef, DefnDefContext(javaScope = javaScope))
-    actualResult should equalDefnDefTraversalResult(expectedDefnDefTraversalResult)
+    defnDefTraverser.traverse(initialDefnDef).structure shouldBe expectedTraversedDefnDef.structure
   }
 
-  test("traverse() for class method with block") {
-    val javaScope = JavaScope.Class
-
+  test("traverse() for method with block") {
     val methodType = t"MyType"
     val transformedMethodType = t"MyTransformedType"
     val traversedMethodType = t"MyTraversedType"
@@ -330,112 +289,52 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       body = expectedTraversedBody
     )
 
-    val expectedJavaModifiers = List(JavaModifier.Public)
-    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TraversedScalaMods, javaModifiers = expectedJavaModifiers)
-    val expectedDefnDefTraversalResult = DefnDefTraversalResult(expectedTraversedDefnDef, expectedJavaModifiers)
-
     when(defnDefTransformer.transform(eqTree(initialDefnDef))).thenReturn(transformedDefnDef)
-    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(transformedDefnDef, javaScope))
+    doReturn(TraversedScalaMods).when(statModListTraverser).traverse(eqTreeList(TransformedScalaMods))
     doReturn(traversedMethodType).when(typeTraverser).traverse(eqTree(transformedMethodType))
     expectTraverseOneParamList()
     doReturn(expectedTraversedBody)
       .when(blockWrappingTermTraverser).traverse(eqTree(expectedTransformedBody),
-      context = eqBlockContext(BlockContext(shouldReturnValue = Yes))
-    )
+        context = eqBlockContext(BlockContext(shouldReturnValue = Yes))
+      )
 
-    val actualResult = defnDefTraverser.traverse(initialDefnDef, DefnDefContext(javaScope = javaScope))
-    actualResult should equalDefnDefTraversalResult(expectedDefnDefTraversalResult)
+    defnDefTraverser.traverse(initialDefnDef).structure shouldBe expectedTraversedDefnDef.structure
   }
 
-  test("traverse() for interface method with one list of params") {
-    val javaScope = JavaScope.Interface
-
+  test("traverse() for method with two lists of params") {
     val methodType = t"MyType"
     val transformedMethodType = t"MyTransformedType"
     val traversedMethodType = t"MyTraversedType"
 
     val initialDefnDef = initialDefnDefWith(
-      paramss = List(MethodParamList1),
+      paramss = List(MethodParamList1, MethodParamList2),
       maybeDeclType = Some(methodType),
       body = Statement1
     )
 
     val transformedDefnDef = transformedDefnDefWith(
-      paramss = List(TransformedMethodParamList1),
+      paramss = List(TransformedMethodParamList1, TransformedMethodParamList2),
       maybeDeclType = Some(transformedMethodType),
       body = TransformedStatement1
     )
 
     val expectedTraversedBody = Block(List(TraversedStatement1))
     val expectedTraversedDefnDef = traversedDefnDefWith(
-      paramss = List(TraversedMethodParamList1),
+      paramss = List(TraversedMethodParamList1, TraversedMethodParamList2),
       maybeDeclType = Some(traversedMethodType),
       body = expectedTraversedBody
     )
 
-    val expectedJavaModifiers = List(JavaModifier.Default)
-    val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TraversedScalaMods, javaModifiers = expectedJavaModifiers)
-    val expectedDefnDefTraversalResult = DefnDefTraversalResult(expectedTraversedDefnDef, javaModifiers = expectedJavaModifiers)
-
     when(defnDefTransformer.transform(eqTree(initialDefnDef))).thenReturn(transformedDefnDef)
-    doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(transformedDefnDef, javaScope))
+    doReturn(TraversedScalaMods).when(statModListTraverser).traverse(eqTreeList(TransformedScalaMods))
     doReturn(traversedMethodType).when(typeTraverser).traverse(eqTree(transformedMethodType))
-    expectTraverseOneParamList()
+    expectTraverseTwoParamLists()
     doReturn(expectedTraversedBody)
       .when(blockWrappingTermTraverser).traverse(eqTree(TransformedStatement1),
-      context = eqBlockContext(BlockContext(shouldReturnValue = Yes))
-    )
-
-    val actualResult = defnDefTraverser.traverse(initialDefnDef, DefnDefContext(javaScope = javaScope))
-    actualResult should equalDefnDefTraversalResult(expectedDefnDefTraversalResult)
-  }
-
-    test("traverse() for interface method with two lists of params") {
-      val javaScope = JavaScope.Interface
-
-      val methodType = t"MyType"
-      val transformedMethodType = t"MyTransformedType"
-      val traversedMethodType = t"MyTraversedType"
-
-      val initialDefnDef = initialDefnDefWith(
-        paramss = List(MethodParamList1, MethodParamList2),
-        maybeDeclType = Some(methodType),
-        body = Statement1
-      )
-
-      val transformedDefnDef = transformedDefnDefWith(
-        paramss = List(TransformedMethodParamList1, TransformedMethodParamList2),
-        maybeDeclType = Some(transformedMethodType),
-        body = TransformedStatement1
-      )
-
-      val expectedTraversedBody = Block(List(TraversedStatement1))
-      val expectedTraversedDefnDef = traversedDefnDefWith(
-        paramss = List(TraversedMethodParamList1, TraversedMethodParamList2),
-        maybeDeclType = Some(traversedMethodType),
-        body = expectedTraversedBody
-      )
-
-      val expectedJavaModifiers = List(JavaModifier.Default)
-      val expectedModListTraversalResult = ModListTraversalResult(scalaMods = TraversedScalaMods, javaModifiers = expectedJavaModifiers)
-      val expectedDefnDefTraversalResult = DefnDefTraversalResult(expectedTraversedDefnDef, javaModifiers = expectedJavaModifiers)
-
-      when(defnDefTransformer.transform(eqTree(initialDefnDef))).thenReturn(transformedDefnDef)
-      doReturn(expectedModListTraversalResult).when(statModListTraverser).traverse(eqExpectedScalaMods(transformedDefnDef, javaScope))
-      doReturn(traversedMethodType).when(typeTraverser).traverse(eqTree(transformedMethodType))
-      expectTraverseTwoParamLists()
-      doReturn(expectedTraversedBody)
-        .when(blockWrappingTermTraverser).traverse(eqTree(TransformedStatement1),
         context = eqBlockContext(BlockContext(shouldReturnValue = Yes))
       )
 
-      val actualResult = defnDefTraverser.traverse(initialDefnDef, DefnDefContext(javaScope = javaScope))
-      actualResult should equalDefnDefTraversalResult(expectedDefnDefTraversalResult)
-    }
-
-  private def eqExpectedScalaMods(defnDef: Defn.Def, javaScope: JavaScope) = {
-    val expectedModifiersContext = ModifiersContext(defnDef, JavaTreeType.Method, javaScope)
-    eqModifiersContext(expectedModifiersContext)
+    defnDefTraverser.traverse(initialDefnDef).structure shouldBe expectedTraversedDefnDef.structure
   }
 
   private def initialDefnDefWith(tparams: List[Type.Param] = Nil,

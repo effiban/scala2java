@@ -1,15 +1,12 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.contexts.{CtorContext, DefnDefContext}
-import io.github.effiban.scala2java.core.entities.JavaModifier
+import io.github.effiban.scala2java.core.contexts.CtorContext
 import io.github.effiban.scala2java.core.matchers.CtorContextMatcher.eqCtorContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.core.transformers.CtorPrimaryTransformer
-import io.github.effiban.scala2java.core.traversers.results.DefnDefTraversalResult
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
-import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.meta.{Ctor, Defn, Init, Name, Term, Type}
 
@@ -59,8 +56,6 @@ class CtorPrimaryTraverserImplTest extends UnitTestSuite {
     decltpe = Some(TypeNames.Int),
     body = TraversedStatement
   )
-  private val ExpectedJavaModifiers = List(JavaModifier.Public)
-  private val ExpectedTraversalResult = DefnDefTraversalResult(ExpectedTraversedDefnDef, ExpectedJavaModifiers)
 
   private val ctorPrimaryTransformer = mock[CtorPrimaryTransformer]
   private val defnDefTraverser = mock[DefnDefTraverser]
@@ -73,8 +68,7 @@ class CtorPrimaryTraverserImplTest extends UnitTestSuite {
   test("traverse") {
     when(ctorPrimaryTransformer.transform(eqTree(PrimaryCtor), eqCtorContext(TheCtorContext))).thenReturn(ExpectedTransformedDefnDef)
 
-    doReturn(ExpectedTraversalResult)
-      .when(defnDefTraverser).traverse(eqTree(ExpectedTransformedDefnDef), eqTo(DefnDefContext(JavaScope.Class)))
+    doReturn(ExpectedTraversedDefnDef).when(defnDefTraverser).traverse(eqTree(ExpectedTransformedDefnDef))
 
     ctorPrimaryTraverser.traverse(PrimaryCtor, TheCtorContext).structure shouldBe ExpectedTraversedDefnDef.structure
   }
