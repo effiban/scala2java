@@ -1,17 +1,16 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.classifiers.{DefnVarClassifier, TraitClassifier}
+import io.github.effiban.scala2java.core.classifiers.TraitClassifier
 import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.entities.JavaModifier
 import io.github.effiban.scala2java.core.matchers.CtorContextMatcher.eqCtorContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.traversers.results._
-import io.github.effiban.scala2java.core.traversers.results.matchers.StatTraversalResultScalatestMatcher.equalStatTraversalResult
 import io.github.effiban.scala2java.spi.entities.JavaScope
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
 
-import scala.meta.{Ctor, Defn, Init, Name, Term, Type, XtensionQuasiquoteInit, XtensionQuasiquoteMod, XtensionQuasiquoteTerm, XtensionQuasiquoteTermParam, XtensionQuasiquoteType}
+import scala.meta.{Ctor, Defn, Init, Name, Term, Type, XtensionQuasiquoteInit, XtensionQuasiquoteMod, XtensionQuasiquoteTerm, XtensionQuasiquoteTermParam, XtensionQuasiquoteType, XtensionStructure}
 
 class TemplateChildTraverserImplTest extends UnitTestSuite {
 
@@ -83,14 +82,12 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
   private val ctorPrimaryTraverser = mock[CtorPrimaryTraverser]
   private val ctorSecondaryTraverser = mock[CtorSecondaryTraverser]
   private val defaultStatTraverser = mock[DefaultStatTraverser]
-  private val defnValClassifier = mock[DefnVarClassifier]
   private val traitClassifier = mock[TraitClassifier]
 
   private val templateChildTraverser = new TemplateChildTraverserImpl(
     ctorPrimaryTraverser,
     ctorSecondaryTraverser,
     defaultStatTraverser,
-    defnValClassifier,
     traitClassifier
   )
 
@@ -101,8 +98,8 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
     doReturn(traversalResult)
       .when(ctorPrimaryTraverser).traverse(primaryCtor = eqTree(PrimaryCtor), ctorContext = eqCtorContext(CtorContextWithClassName))
 
-    val actualTraversalResult = templateChildTraverser.traverse(child = PrimaryCtor, context = ChildContextWithClassName)
-    actualTraversalResult should equalStatTraversalResult(traversalResult)
+    val maybeTraversedTemplateChild = templateChildTraverser.traverse(child = PrimaryCtor, context = ChildContextWithClassName)
+    maybeTraversedTemplateChild.value.structure shouldBe PrimaryCtorDefnDef.structure
   }
 
   test("traverse() for primary ctor. when class name not provided should throw exception") {
@@ -121,8 +118,8 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
     doReturn(traversalResult)
       .when(ctorSecondaryTraverser).traverse(eqTree(SecondaryCtor), eqCtorContext(CtorContextWithClassName))
 
-    val actualTraversalResult = templateChildTraverser.traverse(child = SecondaryCtor, context = ChildContextWithClassName)
-    actualTraversalResult should equalStatTraversalResult(traversalResult)
+    val maybeTraversedTemplateChild = templateChildTraverser.traverse(child = SecondaryCtor, context = ChildContextWithClassName)
+    maybeTraversedTemplateChild.value.structure shouldBe TraversedSecondaryCtor.structure 
   }
 
   test("traverse() for secondary ctor. without ctor. context should throw exception") {
@@ -131,58 +128,42 @@ class TemplateChildTraverserImplTest extends UnitTestSuite {
     }
   }
 
-  test("traverse() for Defn.Var which is not an enum constant list") {
-    val traversalResult = SimpleStatTraversalResult(TheTraversedDefnVar)
-
-    when(defnValClassifier.isEnumConstantList(eqTree(TheDefnVar), eqTo(JavaScope.Class))).thenReturn(false)
-    doReturn(Some(TheTraversedDefnVar))
-      .when(defaultStatTraverser).traverse(eqTree(TheDefnVar), eqTo(StatContext(JavaScope.Class)))
-
-    val actualTraversalResult = templateChildTraverser.traverse(
-      child = TheDefnVar,
-      context = TemplateChildContext(javaScope = JavaScope.Class)
-    )
-    actualTraversalResult should equalStatTraversalResult(traversalResult)
-  }
-
-  test("traverse() for Defn.Var which is an enum constant list") {
-    val traversalResult = EnumConstantListTraversalResult(TheDefnVar)
-
-    when(defnValClassifier.isEnumConstantList(eqTree(TheDefnVar), eqTo(JavaScope.Class))).thenReturn(true)
-
-    val actualResult = templateChildTraverser.traverse(child = TheDefnVar, context = TemplateChildContext(javaScope = JavaScope.Class))
-    actualResult should equalStatTraversalResult(traversalResult)
-  }
-
   test("traverse() for a Trait which is not an enum type def") {
-    val traversalResult = SimpleStatTraversalResult(TheTraversedTrait)
-
     when(traitClassifier.isEnumTypeDef(eqTree(TheTrait), eqTo(JavaScope.Enum))).thenReturn(false)
     doReturn(Some(TheTraversedTrait))
       .when(defaultStatTraverser).traverse(eqTree(TheTrait), eqTo(StatContext(JavaScope.Class)))
 
-    val actualTraversalResult = templateChildTraverser.traverse(
+    val maybeTraversedTemplateChild = templateChildTraverser.traverse(
       child = TheTrait,
       context = TemplateChildContext(javaScope = JavaScope.Class)
     )
-    actualTraversalResult should equalStatTraversalResult(traversalResult)
+    maybeTraversedTemplateChild.value.structure shouldBe TheTraversedTrait.structure
   }
 
   test("traverse() for a Trait which is an enum type def, should skip it") {
     when(traitClassifier.isEnumTypeDef(eqTree(TheTrait), eqTo(JavaScope.Enum))).thenReturn(true)
 
-    val actualResult = templateChildTraverser.traverse(child = TheTrait, context = TemplateChildContext(javaScope = JavaScope.Enum))
-    actualResult shouldBe EmptyStatTraversalResult
+    val maybeTraversedTemplateChild = templateChildTraverser.traverse(child = TheTrait, context = TemplateChildContext(javaScope = JavaScope.Enum))
+    maybeTraversedTemplateChild shouldBe None
   }
 
   test("traverse() for a Defn.Def") {
-    val traversalResult = SimpleStatTraversalResult(TheTraversedDefnDef)
-
     doReturn(Some(TheTraversedDefnDef))
       .when(defaultStatTraverser).traverse(eqTree(TheDefnDef), eqTo(StatContext(JavaScope.Class)))
 
-    val actualResult = templateChildTraverser.traverse(child = TheDefnDef, context = TemplateChildContext(javaScope = JavaScope.Class))
-    actualResult should equalStatTraversalResult(traversalResult)
+    val maybeTraversedTemplateChild = templateChildTraverser.traverse(child = TheDefnDef, context = TemplateChildContext(javaScope = JavaScope.Class))
+    maybeTraversedTemplateChild.value.structure shouldBe TheTraversedDefnDef.structure
+  }
+
+  test("traverse() for Defn.Var") {
+    doReturn(Some(TheTraversedDefnVar))
+      .when(defaultStatTraverser).traverse(eqTree(TheDefnVar), eqTo(StatContext(JavaScope.Class)))
+
+    val maybeTraversedTemplateChild = templateChildTraverser.traverse(
+      child = TheDefnVar,
+      context = TemplateChildContext(javaScope = JavaScope.Class)
+    )
+    maybeTraversedTemplateChild.value.structure shouldBe TheTraversedDefnVar.structure
   }
 
   test("traverse() for non-stat should throw exception") {
