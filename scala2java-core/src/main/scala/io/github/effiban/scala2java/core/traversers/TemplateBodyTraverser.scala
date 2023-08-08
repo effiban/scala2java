@@ -23,7 +23,7 @@ private[traversers] class TemplateBodyTraverserImpl(templateChildrenTraverser: =
     val (terms, nonTerms) = splitStats(transformedStats)
     val children = templateChildrenResolver.resolve(terms, nonTerms, context)
     val childContext = templateChildContextFactory.create(context, terms)
-    templateChildrenTraverser.traverse(children, childContext).statResults.map(_.tree)
+    templateChildrenTraverser.traverse(children, childContext)
   }
 
   private def splitStats(stats: List[Stat]) = {
