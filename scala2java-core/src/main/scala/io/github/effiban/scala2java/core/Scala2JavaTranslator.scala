@@ -14,6 +14,7 @@ import io.github.effiban.scala2java.core.resolvers.JavaFileResolverImpl
 import io.github.effiban.scala2java.core.transformers.CompositeFileNameTransformer
 import io.github.effiban.scala2java.core.traversers.ScalaTreeTraversers
 import io.github.effiban.scala2java.core.typeinference.TypeInferrers
+import io.github.effiban.scala2java.core.unqualifiers.SourceUnqualifier
 import io.github.effiban.scala2java.core.writers.{ConsoleJavaWriter, JavaWriterImpl}
 import io.github.effiban.scala2java.spi.transformers.FileNameTransformer
 
@@ -42,7 +43,8 @@ object Scala2JavaTranslator {
     val semanticDesugaredSource = new SemanticDesugarers().sourceDesugarer.desugar(syntacticDesugaredSource)
     val traversedSource = new ScalaTreeTraversers().sourceTraverser.traverse(semanticDesugaredSource)
     val sourceWithImports = SourceImportAdder.addTo(traversedSource)
-    val enrichedSource = Enrichers.sourceEnricher.enrich(sourceWithImports)
+    val unqualifiedSource = SourceUnqualifier.unqualify(sourceWithImports)
+    val enrichedSource = Enrichers.sourceEnricher.enrich(unqualifiedSource)
     val sourceRenderContext = sourceRenderContextFactory(enrichedSource)
     Using(createJavaWriter(scalaPath, maybeOutputJavaBasePath, sourceTree)) { implicit writer =>
       new Renderers().sourceRenderer.render(enrichedSource.source, sourceRenderContext)

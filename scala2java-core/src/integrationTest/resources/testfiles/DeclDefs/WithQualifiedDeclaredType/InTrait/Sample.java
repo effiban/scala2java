@@ -10,5 +10,5 @@ import a.B;
 
 public interface Sample {
 
-    a.B foo();
+    B foo();
 }
