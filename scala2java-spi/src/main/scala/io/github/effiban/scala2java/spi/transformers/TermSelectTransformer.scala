@@ -13,7 +13,7 @@ trait TermSelectTransformer extends DifferentTypeTransformer1[Term.Select, TermS
 
 
 object TermSelectTransformer {
-  /** The default transformer which returns the None, indicating that no transformation is needed. */
+  /** The default transformer which returns None, indicating that no transformation is needed. */
   val Empty: TermSelectTransformer = (_, _) => None
 }
 

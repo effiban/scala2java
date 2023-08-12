@@ -432,7 +432,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val typeSelectTraverser: TypeSelectTraverser = new TypeSelectTraverserImpl(
     defaultTermRefTraverser,
-    typeNameTraverser
+    typeNameTraverser,
+    new CompositeTypeSelectTransformer(CoreTypeSelectTransformer)
   )
 
   private lazy val typeSingletonTraverser: TypeSingletonTraverser = new TypeSingletonTraverserImpl(thisTraverser)

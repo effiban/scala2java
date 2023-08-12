@@ -126,4 +126,11 @@ trait ExtendedTransformers {
    *         otherwise - the default which leaves the type name unchanged<br>
    */
   def typeNameTransformer(): TypeNameTransformer = TypeNameTransformer.Identity
+
+  /** Override this method if you need to transform a Scala qualified type into an equivalent Java type
+   *
+   * @return if overriden - a transformer which changes the qualified type<br>
+   *         otherwise - the empty transformer which leaves the qualified type unchanged<br>
+   */
+  def typeSelectTransformer(): TypeSelectTransformer = TypeSelectTransformer.Empty
 }

@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.renderers
 
 
-import io.github.effiban.scala2java.core.entities.TreeKeyedMaps
+import io.github.effiban.scala2java.core.entities.TreeKeyedMap
 import io.github.effiban.scala2java.core.renderers.contexts.PkgRenderContext
 import io.github.effiban.scala2java.core.writers.JavaWriter
 
@@ -24,7 +24,7 @@ private[renderers] class PkgRendererImpl(defaultTermRefRenderer: => DefaultTermR
     writeLine()
 
     pkg.stats.foreach(stat =>
-      defaultStatRenderer.render(stat, TreeKeyedMaps.get(context.statContextMap, stat))
+      defaultStatRenderer.render(stat, TreeKeyedMap(context.statContextMap, stat))
     )
   }
 }
