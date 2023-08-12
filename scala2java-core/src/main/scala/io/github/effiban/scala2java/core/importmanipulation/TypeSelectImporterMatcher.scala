@@ -13,11 +13,12 @@ object TypeSelectImporterMatcher extends TypeSelectImporterMatcher {
   }
 
   private def qualMatchesRef(typeSelect: Type.Select, importer: Importer) = {
-    // TODO support partial match (when importer is a prefix)
+    // TODO support partial match (when full importer is a prefix of qual)
     typeSelect.qual.structure == importer.ref.structure
   }
 
   private def findByMatchingImportee(typeSelect: Type.Select, importer: Importer) = {
+    // TODO use semantic information to match against wildcards
     importer.importees.collectFirst {
       case importee if matchesAnyImportee(typeSelect, importer) => importer.copy(importees = List(importee))
     }
