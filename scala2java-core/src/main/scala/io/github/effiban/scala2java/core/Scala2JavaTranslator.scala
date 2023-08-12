@@ -6,6 +6,7 @@ import io.github.effiban.scala2java.core.desugarers.syntactic.SourceDesugarer
 import io.github.effiban.scala2java.core.enrichers.Enrichers
 import io.github.effiban.scala2java.core.extensions.{ExtensionRegistry, ExtensionRegistryBuilder}
 import io.github.effiban.scala2java.core.factories.Factories
+import io.github.effiban.scala2java.core.importmanipulation.SourceImportAdder
 import io.github.effiban.scala2java.core.predicates.Predicates
 import io.github.effiban.scala2java.core.renderers.Renderers
 import io.github.effiban.scala2java.core.renderers.contextfactories.RenderContextFactories.sourceRenderContextFactory
@@ -40,7 +41,8 @@ object Scala2JavaTranslator {
     val syntacticDesugaredSource = SourceDesugarer.desugar(sourceTree)
     val semanticDesugaredSource = new SemanticDesugarers().sourceDesugarer.desugar(syntacticDesugaredSource)
     val traversedSource = new ScalaTreeTraversers().sourceTraverser.traverse(semanticDesugaredSource)
-    val enrichedSource = Enrichers.sourceEnricher.enrich(traversedSource)
+    val sourceWithImports = SourceImportAdder.addTo(traversedSource)
+    val enrichedSource = Enrichers.sourceEnricher.enrich(sourceWithImports)
     val sourceRenderContext = sourceRenderContextFactory(enrichedSource)
     Using(createJavaWriter(scalaPath, maybeOutputJavaBasePath, sourceTree)) { implicit writer =>
       new Renderers().sourceRenderer.render(enrichedSource.source, sourceRenderContext)
