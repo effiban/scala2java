@@ -1,6 +1,6 @@
-package io.github.effiban.scala2java.core.importeradders
+package io.github.effiban.scala2java.core.importadders
 
-import io.github.effiban.scala2java.core.importeradders.ImporterDeduplicater.dedup
+import io.github.effiban.scala2java.core.importadders.ImporterDeduplicater.dedup
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 
 import scala.meta.XtensionQuasiquoteImporter

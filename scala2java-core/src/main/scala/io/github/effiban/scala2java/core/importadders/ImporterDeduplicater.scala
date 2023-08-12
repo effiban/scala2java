@@ -1,4 +1,4 @@
-package io.github.effiban.scala2java.core.importeradders
+package io.github.effiban.scala2java.core.importadders
 
 import scala.meta.{Importee, Importer}
 

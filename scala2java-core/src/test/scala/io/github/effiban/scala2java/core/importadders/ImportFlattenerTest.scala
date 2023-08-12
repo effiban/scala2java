@@ -1,6 +1,6 @@
-package io.github.effiban.scala2java.core.importeradders
+package io.github.effiban.scala2java.core.importadders
 
-import io.github.effiban.scala2java.core.importeradders.ImportFlattener.flatten
+import io.github.effiban.scala2java.core.importadders.ImportFlattener.flatten
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 
 import scala.meta.{XtensionQuasiquoteImporter, XtensionQuasiquoteTerm}
