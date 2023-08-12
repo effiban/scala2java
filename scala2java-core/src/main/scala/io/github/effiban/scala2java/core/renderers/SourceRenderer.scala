@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.renderers
 
-import io.github.effiban.scala2java.core.entities.TreeKeyedMaps
+import io.github.effiban.scala2java.core.entities.TreeKeyedMap
 import io.github.effiban.scala2java.core.renderers.contexts.SourceRenderContext
 
 import scala.meta.Source
@@ -13,7 +13,7 @@ private[renderers] class SourceRendererImpl(defaultStatRenderer: => DefaultStatR
 
   def render(source: Source, context: SourceRenderContext): Unit = {
     source.stats.foreach(stat =>
-      defaultStatRenderer.render(stat, TreeKeyedMaps.get(context.statContextMap, stat))
+      defaultStatRenderer.render(stat, TreeKeyedMap(context.statContextMap, stat))
     )
   }
 }
