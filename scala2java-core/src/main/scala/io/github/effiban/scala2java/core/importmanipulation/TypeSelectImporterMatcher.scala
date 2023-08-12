@@ -10,6 +10,7 @@ object TypeSelectImporterMatcher extends TypeSelectImporterMatcher {
 
   // NOTE: assuming the importer has only one importee
   override def matches(typeSelect: Type.Select, importer: Importer): Boolean = {
+    // TODO support partial match (when importer is a prefix)
     qualMatchesRef(typeSelect, importer) && nameMatchesImportee(typeSelect, importer)
   }
 
