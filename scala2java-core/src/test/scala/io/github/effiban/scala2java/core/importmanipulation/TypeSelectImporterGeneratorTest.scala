@@ -1,6 +1,6 @@
-package io.github.effiban.scala2java.core.importadders
+package io.github.effiban.scala2java.core.importmanipulation
 
-import io.github.effiban.scala2java.core.importadders.TypeSelectImporterGenerator.generate
+import io.github.effiban.scala2java.core.importmanipulation.TypeSelectImporterGenerator.generate
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 
 import scala.meta.{XtensionQuasiquoteImporter, XtensionQuasiquoteType}
