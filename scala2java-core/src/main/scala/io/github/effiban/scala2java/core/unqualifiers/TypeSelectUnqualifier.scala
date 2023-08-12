@@ -1,15 +1,20 @@
 package io.github.effiban.scala2java.core.unqualifiers
 
-import scala.meta.Type
+import io.github.effiban.scala2java.core.importmanipulation.TypeSelectImporterMatcher
+
+import scala.meta.{Importer, Type}
 
 trait TypeSelectUnqualifier {
 
-  def unqualify(typeSelect: Type.Select): Type
+  def unqualify(typeSelect: Type.Select, importers: List[Importer] = Nil): Type
 }
 
-object TypeSelectUnqualifier extends TypeSelectUnqualifier {
-  override def unqualify(typeSelect: Type.Select): Type = {
-    // TODO support partial unqualification according to input Importer(s)
-    typeSelect.name
+private[unqualifiers] class TypeSelectUnqualifierImpl(typeSelectImporterMatcher: TypeSelectImporterMatcher) extends TypeSelectUnqualifier {
+
+  override def unqualify(typeSelect: Type.Select, importers: List[Importer] = Nil): Type = {
+    // TODO support partial unqualification once support is added to the matcher
+    if (importers.exists(importer => typeSelectImporterMatcher.matches(typeSelect, importer))) typeSelect.name else typeSelect
   }
 }
+
+object TypeSelectUnqualifier extends TypeSelectUnqualifierImpl(TypeSelectImporterMatcher)
