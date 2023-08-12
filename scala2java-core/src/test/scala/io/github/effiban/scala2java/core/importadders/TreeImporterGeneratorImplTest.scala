@@ -5,13 +5,13 @@ import org.mockito.ArgumentMatchersSugar.any
 
 import scala.meta.{Type, XtensionQuasiquoteImporter, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
-class TreeImporterResolverImplTest extends UnitTestSuite {
+class TreeImporterGeneratorImplTest extends UnitTestSuite {
 
-  private val typeSelectImporterResolver = mock[TypeSelectImporterResolver]
+  private val typeSelectImporterGenerator = mock[TypeSelectImporterGenerator]
 
-  private val treeImporterResolver = new TreeImporterResolverImpl(typeSelectImporterResolver)
+  private val treeImporterGenerator = new TreeImporterGeneratorImpl(typeSelectImporterGenerator)
 
-  test("resolve for class with two members defined using Type.Selects should return Importers") {
+  test("generate for class with two members defined using Type.Selects should return Importers") {
     val typeSelect1 = t"a.b.C"
     val typeSelect2 = t"d.e.F"
 
@@ -30,12 +30,12 @@ class TreeImporterResolverImplTest extends UnitTestSuite {
       case aTypeSelect if aTypeSelect.structure == typeSelect1.structure => importer1
       case aTypeSelect if aTypeSelect.structure == typeSelect2.structure => importer2
       case aTypeSelect => throw new IllegalStateException(s"No stubbed importer answer defined for Type.Select $aTypeSelect")
-    }).when(typeSelectImporterResolver).resolve(any[Type.Select])
+    }).when(typeSelectImporterGenerator).generate(any[Type.Select])
 
-    treeImporterResolver.resolve(theClass).structure shouldBe List(importer1, importer2).structure
+    treeImporterGenerator.generate(theClass).structure shouldBe List(importer1, importer2).structure
   }
 
-  test("resolve for class with two members defined using Type.Names should return empty") {
+  test("generate for class with two members defined using Type.Names should return empty") {
     val theClass =
       q"""
       class MyClass {
@@ -44,6 +44,6 @@ class TreeImporterResolverImplTest extends UnitTestSuite {
       }
       """
 
-    treeImporterResolver.resolve(theClass) shouldBe Nil
+    treeImporterGenerator.generate(theClass) shouldBe Nil
   }
 }
