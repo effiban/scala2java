@@ -9,5 +9,5 @@ import java.util.stream.*;
 import a.b.C;
 
 public class Sample {
-    private final a.b.C x = new a.b.C();
+    private final C x = new C();
 }
