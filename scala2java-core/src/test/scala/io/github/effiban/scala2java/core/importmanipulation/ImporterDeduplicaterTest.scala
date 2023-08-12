@@ -62,6 +62,26 @@ class ImporterDeduplicaterTest extends UnitTestSuite {
     dedup(inputImporters).structure shouldBe expectedImporters.structure
   }
 
+  test("resolve when have names and wildcards with the same prefix") {
+    val importer1 = importer"a.b._"
+    val importer2 = importer"a.b.C"
+    val importer3 = importer"a.b.D"
+    val importer4 = importer"e.f.G"
+    val importer5 = importer"e.f._"
+    val importer6 = importer"e.f.H"
+    val inputImporters = List(
+      importer1,
+      importer2,
+      importer3,
+      importer4,
+      importer5,
+      importer6
+    )
+    val expectedImporters = List(importer1, importer5)
+
+    dedup(inputImporters).structure shouldBe expectedImporters.structure
+  }
+
   test("resolve when empty should return empty") {
     dedup(Nil) shouldBe Nil
   }
