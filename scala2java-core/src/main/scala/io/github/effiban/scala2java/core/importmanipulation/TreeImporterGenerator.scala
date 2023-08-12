@@ -11,6 +11,7 @@ private[importmanipulation] class TreeImporterGeneratorImpl(typeSelectImporterGe
   override def generate(tree: Tree): List[Importer] = {
     tree.collect {
       case typeSelect: Type.Select => typeSelectImporterGenerator.generate(typeSelect)
+      // TODO generate for Type.Project
       // TODO generate for Term.Select-s when relevant, using semantic information
     }
   }
