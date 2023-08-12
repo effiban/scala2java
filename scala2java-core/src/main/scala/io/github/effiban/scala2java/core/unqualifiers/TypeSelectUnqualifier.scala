@@ -6,14 +6,16 @@ import scala.meta.{Importer, Type}
 
 trait TypeSelectUnqualifier {
 
-  def unqualify(typeSelect: Type.Select, importers: List[Importer] = Nil): Type
+  def unqualify(typeSelect: Type.Select, importers: List[Importer] = Nil): Type.Ref
 }
 
 private[unqualifiers] class TypeSelectUnqualifierImpl(typeSelectImporterMatcher: TypeSelectImporterMatcher) extends TypeSelectUnqualifier {
 
-  override def unqualify(typeSelect: Type.Select, importers: List[Importer] = Nil): Type = {
+  override def unqualify(typeSelect: Type.Select, importers: List[Importer] = Nil): Type.Ref = {
     // TODO support partial unqualification once support is added to the matcher
-    if (importers.exists(importer => typeSelectImporterMatcher.matches(typeSelect, importer))) typeSelect.name else typeSelect
+    importers.map(importer => typeSelectImporterMatcher.findMatch(typeSelect, importer))
+      .collectFirst { case Some(_) => typeSelect.name }
+      .getOrElse(typeSelect)
   }
 }
 
