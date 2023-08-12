@@ -22,16 +22,17 @@ class TypeSelectUnqualifierImplTest extends UnitTestSuite {
     val typeSelect = t"a.b.C"
     val importer = importer"c.d.E"
 
-    doReturn(false).when(typeSelectImporterMatcher).matches(eqTree(typeSelect), eqTree(importer))
+    doReturn(None).when(typeSelectImporterMatcher).findMatch(eqTree(typeSelect), eqTree(importer))
 
     typeSelectUnqualifier.unqualify(typeSelect, List(importer)).structure shouldBe typeSelect.structure
   }
 
   test("unqualify() when one importer provided and matches, should return name only") {
     val typeSelect = t"a.b.C"
-    val importer = importer"a.b.C"
+    val importer = importer"a.b.{C, D}"
+    val expectedMatchingImporter = importer"a.b.C"
 
-    doReturn(true).when(typeSelectImporterMatcher).matches(eqTree(typeSelect), eqTree(importer))
+    doReturn(Some(expectedMatchingImporter)).when(typeSelectImporterMatcher).findMatch(eqTree(typeSelect), eqTree(importer))
 
     typeSelectUnqualifier.unqualify(typeSelect, List(importer)).structure shouldBe t"C".structure
   }
@@ -41,7 +42,7 @@ class TypeSelectUnqualifierImplTest extends UnitTestSuite {
     val importer1 = importer"d.e.F"
     val importer2 = importer"g.h.I"
 
-    doReturn(false).when(typeSelectImporterMatcher).matches(eqTree(typeSelect), any[Importer])
+    doReturn(None).when(typeSelectImporterMatcher).findMatch(eqTree(typeSelect), any[Importer])
 
     typeSelectUnqualifier.unqualify(typeSelect, List(importer1, importer2)).structure shouldBe typeSelect.structure
   }
@@ -49,12 +50,13 @@ class TypeSelectUnqualifierImplTest extends UnitTestSuite {
   test("unqualify() when two importers provided and second one matches, should return name only") {
     val typeSelect = t"a.b.C"
     val importer1 = importer"d.e.F"
-    val importer2 = importer"a.b.C"
+    val importer2 = importer"a.b.{C, D}"
+    val expectedMatchingImporter = importer"a.b.C"
 
     doAnswer((_: Type.Select, importer: Importer) => importer match {
-      case anImporter if anImporter.structure == importer2.structure => true
-      case _ => false
-    }).when(typeSelectImporterMatcher).matches(eqTree(typeSelect), any[Importer])
+      case anImporter if anImporter.structure == importer2.structure => Some(expectedMatchingImporter)
+      case _ => None
+    }).when(typeSelectImporterMatcher).findMatch(eqTree(typeSelect), any[Importer])
 
     typeSelectUnqualifier.unqualify(typeSelect, List(importer1, importer2)).structure shouldBe t"C".structure
   }
