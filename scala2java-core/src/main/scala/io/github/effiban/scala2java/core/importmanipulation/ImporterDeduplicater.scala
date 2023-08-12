@@ -10,17 +10,13 @@ object ImporterDeduplicater extends ImporterDeduplicater {
 
   // NOTE: Assuming this is called only after the importers have been flattened to one importee each
   def dedup(importers: List[Importer]): List[Importer] = {
-    val exactDeduped = dedupExact(importers)
-    val wildcardDeduped = dedupWildcardWithNames(exactDeduped)
-    dedupNameClashes(wildcardDeduped)
+    Function.chain(List(exactDeduper, wildcardWithNamesDeduper, nameDeduper))(importers)
   }
 
-  private def dedupExact(importers: List[Importer]) = {
-    importers.distinctBy(_.structure)
-  }
+  private def exactDeduper: List[Importer] => List[Importer] = _.distinctBy(_.structure)
 
   // If both a wildcard and individual imports exist for same prefix, retain the wildcard only
-  private def dedupWildcardWithNames(importers: List[Importer]) = {
+  private def wildcardWithNamesDeduper: List[Importer] => List[Importer] = importers =>
     importers.groupBy(_.ref.structure).view
       .mapValues(curImporters => {
         curImporters.collectFirst {
@@ -35,14 +31,12 @@ object ImporterDeduplicater extends ImporterDeduplicater {
       // The final sorting of imports in the Java file ("organize imports") may be implemented later on,
       // but in any case this method should not affect the input order
       .sortBy(importer => importers.indexWhere(_.structure == importer.structure))
-  }
 
-  private def dedupNameClashes(importers: List[Importer]) = {
+  private def nameDeduper: List[Importer] => List[Importer] = importers =>
     importers.distinctBy { importer =>
       importer.importees.head match {
         case importeeName: Importee.Name => importeeName.name.value
         case importer => importer
       }
     }
-  }
 }
