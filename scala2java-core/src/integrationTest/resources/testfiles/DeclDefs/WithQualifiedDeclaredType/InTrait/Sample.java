@@ -6,8 +6,9 @@ import java.math.*;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
-import a.b.C;
+import a.B;
 
-public class Sample {
-    private final a.b.C x = new a.b.C();
+public interface Sample {
+
+    a.B foo();
 }
