@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.qualifiers
 
-import io.github.effiban.scala2java.core.entities.TypeSelects.{ScalaAny, ScalaUnit}
+import io.github.effiban.scala2java.core.entities.TypeSelects._
 import io.github.effiban.scala2java.core.qualifiers.CoreTypeNameQualifier.qualify
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 
@@ -12,21 +12,21 @@ class CoreTypeNameQualifierTest extends UnitTestSuite {
     ("Type", "QualifiedType"),
     (t"Any", ScalaAny),
     (t"AnyRef", t"scala.AnyRef"),
-    (t"Boolean", t"scala.Boolean"),
-    (t"Byte", t"scala.Byte"),
-    (t"Char", t"scala.Char"),
-    (t"Short", t"scala.Short"),
-    (t"Int", t"scala.Int"),
-    (t"Long", t"scala.Long"),
-    (t"Float", t"scala.Float"),
-    (t"Double", t"scala.Double"),
+    (t"Boolean", ScalaBoolean),
+    (t"Byte", ScalaByte),
+    (t"Char", ScalaChar),
+    (t"Short", ScalaShort),
+    (t"Int", ScalaInt),
+    (t"Long", ScalaLong),
+    (t"Float", ScalaFloat),
+    (t"Double", ScalaDouble),
     (ScalaUnit.name, ScalaUnit),
     (t"Seq", t"scala.collection.immutable.Seq"),
     (t"Vector", t"scala.collection.immutable.Vector"),
-    (t"List", t"scala.collection.immutable.List"),
+    (t"List", ScalaList),
     (t"Set", t"scala.collection.immutable.Set"),
     (t"Map", t"scala.collection.immutable.Map"),
-    (t"Option", t"scala.Option"),
+    (t"Option", ScalaOption),
     (t"Future", t"scala.concurrent.Future")
   )
 
