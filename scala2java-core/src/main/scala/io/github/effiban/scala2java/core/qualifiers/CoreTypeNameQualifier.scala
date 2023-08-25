@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.qualifiers
 
 import io.github.effiban.scala2java.core.entities.TreeKeyedMap
-import io.github.effiban.scala2java.core.entities.TypeSelects.{ScalaAny, ScalaDouble, ScalaInt, ScalaUnit}
+import io.github.effiban.scala2java.core.entities.TypeSelects._
 
 import scala.meta.{Type, XtensionQuasiquoteType}
 
@@ -26,10 +26,10 @@ object CoreTypeNameQualifier extends CoreTypeNameQualifier {
     t"Unit" -> ScalaUnit,
     t"Seq" -> t"scala.collection.immutable.Seq",
     t"Vector" -> t"scala.collection.immutable.Vector",
-    t"List" -> t"scala.collection.immutable.List",
+    t"List" -> ScalaList,
     t"Set" -> t"scala.collection.immutable.Set",
     t"Map" -> t"scala.collection.immutable.Map",
-    t"Option" -> t"scala.Option",
+    t"Option" -> ScalaOption,
     t"Future" -> t"scala.concurrent.Future"
   )
 
