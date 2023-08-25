@@ -4,6 +4,7 @@ import io.github.effiban.scala2java.core.collectors.MainClassInitCollector
 import io.github.effiban.scala2java.core.desugarers.semantic.SemanticDesugarers
 import io.github.effiban.scala2java.core.desugarers.syntactic.SourceDesugarer
 import io.github.effiban.scala2java.core.enrichers.Enrichers
+import io.github.effiban.scala2java.core.enrichers.entities.EnrichedSource
 import io.github.effiban.scala2java.core.extensions.{ExtensionRegistry, ExtensionRegistryBuilder}
 import io.github.effiban.scala2java.core.factories.Factories
 import io.github.effiban.scala2java.core.importmanipulation.SourceImportAdder
@@ -31,24 +32,36 @@ object Scala2JavaTranslator {
     val scalaText = Files.readString(scalaPath)
     val scalaFileName = scalaPath.getFileName.toString
     val input = Input.VirtualFile(scalaFileName, scalaText)
-    val sourceTree = input.parse[Source].get
+    val source = input.parse[Source].get
 
-    implicit val extensionRegistry: ExtensionRegistry = ExtensionRegistryBuilder.buildFor(sourceTree)
+    implicit val extensionRegistry: ExtensionRegistry = ExtensionRegistryBuilder.buildFor(source)
     implicit val fileNameTransformer: FileNameTransformer = new CompositeFileNameTransformer()
     implicit val predicates: Predicates = new Predicates()
     implicit lazy val factories: Factories = new Factories(typeInferrers)
     implicit lazy val typeInferrers: TypeInferrers = new TypeInferrers(factories, predicates)
 
-    // Run the translation flow
-    val syntacticDesugaredSource = SourceDesugarer.desugar(sourceTree)
-    val qualifiedSource = SourceQualifier.qualify(syntacticDesugaredSource)
-    val semanticDesugaredSource = new SemanticDesugarers().sourceDesugarer.desugar(qualifiedSource)
-    val traversedSource = new ScalaTreeTraversers().sourceTraverser.traverse(semanticDesugaredSource)
-    val sourceWithImports = SourceImportAdder.addTo(traversedSource)
-    val unqualifiedSource = SourceUnqualifier.unqualify(sourceWithImports)
-    val enrichedSource = Enrichers.sourceEnricher.enrich(unqualifiedSource)
+    val flowRunner: Source => Unit =
+      Function.chain[Source](
+          Seq(
+            SourceDesugarer.desugar,
+            SourceQualifier.qualify,
+            new SemanticDesugarers().sourceDesugarer.desugar,
+            new ScalaTreeTraversers().sourceTraverser.traverse,
+            SourceImportAdder.addTo,
+            SourceUnqualifier.unqualify
+          )
+        ).andThen(Enrichers.sourceEnricher.enrich)
+        .andThen(enrichedSource => renderJava(enrichedSource, scalaPath, maybeOutputJavaBasePath))
+
+    flowRunner(source)
+  }
+
+  private def renderJava(enrichedSource: EnrichedSource,
+                         scalaPath: Path,
+                         maybeOutputJavaBasePath: Option[Path])
+                        (implicit fileNameTransformer: FileNameTransformer) = {
     val sourceRenderContext = sourceRenderContextFactory(enrichedSource)
-    Using(createJavaWriter(scalaPath, maybeOutputJavaBasePath, sourceTree)) { implicit writer =>
+    Using(createJavaWriter(scalaPath, maybeOutputJavaBasePath, enrichedSource.source)) { implicit writer =>
       new Renderers().sourceRenderer.render(enrichedSource.source, sourceRenderContext)
     }
   }
