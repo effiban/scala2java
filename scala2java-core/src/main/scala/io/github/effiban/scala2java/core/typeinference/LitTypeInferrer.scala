@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.typeinference
 
-import io.github.effiban.scala2java.core.entities.TypeSelects.ScalaUnit
+import io.github.effiban.scala2java.core.entities.TypeNameValues
+import io.github.effiban.scala2java.core.entities.TypeSelects._
 import io.github.effiban.scala2java.spi.typeinferrers.TypeInferrer0
 
 import scala.meta.{Lit, Type}
@@ -11,16 +12,16 @@ object LitTypeInferrer extends LitTypeInferrer {
 
   override def infer(lit: Lit): Option[Type] = {
     lit match {
-      case _: Lit.Boolean => Some(Type.Name("Boolean"))
-      case _: Lit.Byte => Some(Type.Name("Byte"))
-      case _: Lit.Short => Some(Type.Name("Short"))
-      case _: Lit.Int => Some(Type.Name("Int"))
-      case _: Lit.Long => Some(Type.Name("Long"))
-      case _: Lit.Float => Some(Type.Name("Float"))
-      case _: Lit.Double => Some(Type.Name("Double"))
-      case _: Lit.Char => Some(Type.Name("Char"))
-      case _: Lit.String => Some(Type.Name("String"))
-      case _: Lit.Symbol => Some(Type.Name("String"))
+      case _: Lit.Boolean => Some(ScalaBoolean)
+      case _: Lit.Byte => Some(ScalaByte)
+      case _: Lit.Short => Some(ScalaShort)
+      case _: Lit.Int => Some(ScalaInt)
+      case _: Lit.Long => Some(ScalaLong)
+      case _: Lit.Float => Some(ScalaFloat)
+      case _: Lit.Double => Some(ScalaDouble)
+      case _: Lit.Char => Some(ScalaChar)
+      case _: Lit.String => Some(Type.Name(TypeNameValues.String))
+      case _: Lit.Symbol => Some(Type.Name(TypeNameValues.String))
       case _: Lit.Unit => Some(ScalaUnit)
       case _: Lit.Null => Some(Type.AnonymousName())
       case _ => None

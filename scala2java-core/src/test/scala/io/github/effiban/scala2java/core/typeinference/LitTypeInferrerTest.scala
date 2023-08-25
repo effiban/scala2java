@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.typeinference
 
-import io.github.effiban.scala2java.core.entities.TypeSelects.ScalaUnit
+import io.github.effiban.scala2java.core.entities.TypeSelects._
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
 
@@ -10,14 +10,14 @@ class LitTypeInferrerTest extends UnitTestSuite {
 
   private val LiteralTypeMappings = Table(
     ("Literal", "ExpectedType"),
-    (Lit.Boolean(true), Type.Name("Boolean")),
-    (Lit.Byte(1), Type.Name("Byte")),
-    (Lit.Short(1), Type.Name("Short")),
-    (Lit.Int(1), Type.Name("Int")),
-    (Lit.Long(1), Type.Name("Long")),
-    (Lit.Float(1.1f), Type.Name("Float")),
-    (Lit.Double(1.1), Type.Name("Double")),
-    (Lit.Char('a'), Type.Name("Char")),
+    (Lit.Boolean(true), ScalaBoolean),
+    (Lit.Byte(1), ScalaByte),
+    (Lit.Short(1), ScalaShort),
+    (Lit.Int(1), ScalaInt),
+    (Lit.Long(1), ScalaLong),
+    (Lit.Float(1.1f), ScalaFloat),
+    (Lit.Double(1.1), ScalaDouble),
+    (Lit.Char('a'), ScalaChar),
     (Lit.String("abc"), TypeNames.String),
     (Lit.Symbol(scala.Symbol("sym")), TypeNames.String),
     (Lit.Unit(), ScalaUnit),
