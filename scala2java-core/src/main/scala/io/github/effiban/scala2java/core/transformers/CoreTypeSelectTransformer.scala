@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.transformers
 
 import io.github.effiban.scala2java.core.entities.TreeKeyedMap
+import io.github.effiban.scala2java.core.entities.TypeSelects.{ScalaAny, ScalaUnit}
 import io.github.effiban.scala2java.spi.transformers.TypeSelectTransformer
 
 import scala.meta.{Type, XtensionQuasiquoteType}
@@ -8,7 +9,7 @@ import scala.meta.{Type, XtensionQuasiquoteType}
 object CoreTypeSelectTransformer extends TypeSelectTransformer {
 
   private final val ScalaTypeToJavaType = Map[Type.Select, Type.Ref](
-    t"scala.Any" -> t"Object",
+    ScalaAny -> t"Object",
     t"scala.AnyRef" -> t"Object",
     t"scala.Boolean" -> t"boolean",
     t"scala.Byte" -> t"byte",
@@ -18,7 +19,7 @@ object CoreTypeSelectTransformer extends TypeSelectTransformer {
     t"scala.Long" -> t"long",
     t"scala.Float" -> t"float",
     t"scala.Double" -> t"double",
-    t"scala.Unit" -> t"void",
+    ScalaUnit -> t"void",
     t"scala.collection.immutable.Seq" -> t"java.util.List",
     t"scala.collection.immutable.Vector" -> t"java.util.List",
     t"scala.collection.immutable.List" -> t"java.util.List",

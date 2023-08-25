@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.typeinference
 
+import io.github.effiban.scala2java.core.entities.TypeSelects.ScalaUnit
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -15,9 +16,9 @@ class FunctionTypeInferrerImplTest extends UnitTestSuite {
   test("infer() for function of () => Unit") {
     val termFunction = q"""() => print("bla")"""
 
-    when(termTypeInferrer.infer(eqTree(q"""print("bla")"""))).thenReturn(Some(TypeNames.Unit))
+    when(termTypeInferrer.infer(eqTree(q"""print("bla")"""))).thenReturn(Some(ScalaUnit))
 
-    functionTypeInferrer.infer(termFunction).structure shouldBe t"() => Unit".structure
+    functionTypeInferrer.infer(termFunction).structure shouldBe t"() => scala.Unit".structure
   }
 
   test("infer() for function of () => Any") {
@@ -39,9 +40,9 @@ class FunctionTypeInferrerImplTest extends UnitTestSuite {
   test("infer() for function of Int => Unit") {
     val termFunction = q"(x: Int) => print(x)"
 
-    when(termTypeInferrer.infer(eqTree(q"print(x)"))).thenReturn(Some(TypeNames.Unit))
+    when(termTypeInferrer.infer(eqTree(q"print(x)"))).thenReturn(Some(ScalaUnit))
 
-    functionTypeInferrer.infer(termFunction).structure shouldBe t"Int => Unit".structure
+    functionTypeInferrer.infer(termFunction).structure shouldBe t"Int => scala.Unit".structure
   }
 
   test("infer() for function of Int => Any") {

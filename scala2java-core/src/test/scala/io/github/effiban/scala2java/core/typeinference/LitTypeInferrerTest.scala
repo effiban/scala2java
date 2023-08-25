@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.typeinference
 
+import io.github.effiban.scala2java.core.entities.TypeSelects.ScalaUnit
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
 
@@ -19,7 +20,7 @@ class LitTypeInferrerTest extends UnitTestSuite {
     (Lit.Char('a'), Type.Name("Char")),
     (Lit.String("abc"), TypeNames.String),
     (Lit.Symbol(scala.Symbol("sym")), TypeNames.String),
-    (Lit.Unit(), Type.Name("Unit")),
+    (Lit.Unit(), ScalaUnit),
     (Lit.Null(), Type.AnonymousName())
   )
 

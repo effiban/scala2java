@@ -8,6 +8,7 @@ import io.github.effiban.scala2java.core.extensions.{ExtensionRegistry, Extensio
 import io.github.effiban.scala2java.core.factories.Factories
 import io.github.effiban.scala2java.core.importmanipulation.SourceImportAdder
 import io.github.effiban.scala2java.core.predicates.Predicates
+import io.github.effiban.scala2java.core.qualifiers.SourceQualifier
 import io.github.effiban.scala2java.core.renderers.Renderers
 import io.github.effiban.scala2java.core.renderers.contextfactories.RenderContextFactories.sourceRenderContextFactory
 import io.github.effiban.scala2java.core.resolvers.JavaFileResolverImpl
@@ -40,7 +41,8 @@ object Scala2JavaTranslator {
 
     // Run the translation flow
     val syntacticDesugaredSource = SourceDesugarer.desugar(sourceTree)
-    val semanticDesugaredSource = new SemanticDesugarers().sourceDesugarer.desugar(syntacticDesugaredSource)
+    val qualifiedSource = SourceQualifier.qualify(syntacticDesugaredSource)
+    val semanticDesugaredSource = new SemanticDesugarers().sourceDesugarer.desugar(qualifiedSource)
     val traversedSource = new ScalaTreeTraversers().sourceTraverser.traverse(semanticDesugaredSource)
     val sourceWithImports = SourceImportAdder.addTo(traversedSource)
     val unqualifiedSource = SourceUnqualifier.unqualify(sourceWithImports)

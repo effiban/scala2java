@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.classifiers
 
 import io.github.effiban.scala2java.core.entities.Decision.{No, Uncertain, Yes}
+import io.github.effiban.scala2java.core.entities.TypeSelects.ScalaUnit
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.core.typeinference.TermTypeInferrer
@@ -15,7 +16,7 @@ class TermTypeClassifierImplTest extends UnitTestSuite {
   private val termTypeClassifier = new TermTypeClassifierImpl(termTypeInferrer)
 
   test("isReturnable() when inferred type is Unit should return No") {
-    when(termTypeInferrer.infer(eqTree(Lit.Unit()))).thenReturn(Some(TypeNames.Unit))
+    when(termTypeInferrer.infer(eqTree(Lit.Unit()))).thenReturn(Some(ScalaUnit))
     termTypeClassifier.isReturnable(Lit.Unit()) shouldBe No
   }
 

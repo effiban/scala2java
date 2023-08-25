@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.typeinference
 
 import io.github.effiban.scala2java.core.classifiers.TypeClassifier
 import io.github.effiban.scala2java.core.entities.TermNameValues.{Empty, Print, Println, ScalaFailed, ScalaInclusive, ScalaRange, ScalaSuccessful}
-import io.github.effiban.scala2java.core.entities.TypeNameValues.{ScalaAny, ScalaUnit}
+import io.github.effiban.scala2java.core.entities.TypeSelects.{ScalaAny, ScalaUnit}
 import io.github.effiban.scala2java.core.entities.{TermNameValues, TypeNameValues}
 import io.github.effiban.scala2java.spi.contexts.TermApplyInferenceContext
 import io.github.effiban.scala2java.spi.entities.PartialDeclDef
@@ -53,7 +53,7 @@ private[typeinference] class CoreApplyDeclDefInferrer(initializerDeclDefInferrer
         Some(Type.Apply(Type.Name(TypeNameValues.Future), List(tpe)))
 
       case (Term.Select(Term.Name(TermNameValues.Future), Term.Name(ScalaFailed)), _) =>
-        Some(Type.Apply(Type.Name(TypeNameValues.Future), List(Type.Name(ScalaAny))))
+        Some(Type.Apply(Type.Name(TypeNameValues.Future), List(ScalaAny)))
 
       case (Term.Select(_, q"length"), TermApplyInferenceContext(Some(parentType), _)) if typeClassifier.isJavaListLike(parentType) =>
         Some(Type.Name(TypeNameValues.Int))
@@ -62,7 +62,7 @@ private[typeinference] class CoreApplyDeclDefInferrer(initializerDeclDefInferrer
 
       case (Term.Select(_, q"toString"), _) => Some(Type.Name(TypeNameValues.String))
 
-      case (Term.Name(Print) | Term.Name(Println), _) => Some(Type.Name(ScalaUnit))
+      case (Term.Name(Print) | Term.Name(Println), _) => Some(ScalaUnit)
 
       // TODO add more
       case _ => None

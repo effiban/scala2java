@@ -6,7 +6,7 @@ import io.github.effiban.scala2java.core.typeinference.TermTypeInferrer
 import io.github.effiban.scala2java.spi.entities.JavaScope.MethodSignature
 import io.github.effiban.scala2java.spi.transformers.DefnDefTransformer
 
-import scala.meta.{Defn, Type}
+import scala.meta.{Defn, Type, XtensionQuasiquoteType}
 
 trait DefnDefTraverser {
   def traverse(defnDef: Defn.Def): Defn.Def
@@ -48,7 +48,7 @@ private[traversers] class DefnDefTraverserImpl(statModListTraverser: => StatModL
 
   private def traverseBody(defDef: Defn.Def, maybeMethodType: Option[Type]) = {
     val shouldReturnValue = maybeMethodType match {
-      case Some(Type.Name("Unit") | Type.AnonymousName()) => No
+      case Some(t"scala.Unit" | Type.AnonymousName()) => No
       case Some(_) => Yes
       case None => Uncertain
     }

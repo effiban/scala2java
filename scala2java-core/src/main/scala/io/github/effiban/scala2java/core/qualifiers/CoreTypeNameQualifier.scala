@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.qualifiers
 
 import io.github.effiban.scala2java.core.entities.TreeKeyedMap
+import io.github.effiban.scala2java.core.entities.TypeSelects.{ScalaAny, ScalaDouble, ScalaInt, ScalaUnit}
 
 import scala.meta.{Type, XtensionQuasiquoteType}
 
@@ -10,18 +11,19 @@ trait CoreTypeNameQualifier {
 
 object CoreTypeNameQualifier extends CoreTypeNameQualifier {
 
+  // TODO consider using reflection or semantic information instead of this hard-coded and incomplete mapping
   private final val QualifiedTypeMapping = Map[Type.Name, Type.Select](
-    t"Any" -> t"scala.Any",
+    t"Any" -> ScalaAny,
     t"AnyRef" -> t"scala.AnyRef",
     t"Boolean" -> t"scala.Boolean",
     t"Byte" -> t"scala.Byte",
     t"Char" -> t"scala.Char",
     t"Short" -> t"scala.Short",
-    t"Int" -> t"scala.Int",
+    t"Int" -> ScalaInt,
     t"Long" -> t"scala.Long",
     t"Float" -> t"scala.Float",
-    t"Double" -> t"scala.Double",
-    t"Unit" -> t"scala.Unit",
+    t"Double" -> ScalaDouble,
+    t"Unit" -> ScalaUnit,
     t"Seq" -> t"scala.collection.immutable.Seq",
     t"Vector" -> t"scala.collection.immutable.Vector",
     t"List" -> t"scala.collection.immutable.List",

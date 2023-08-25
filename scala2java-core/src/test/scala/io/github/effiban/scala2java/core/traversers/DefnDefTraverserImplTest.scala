@@ -2,6 +2,7 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts._
 import io.github.effiban.scala2java.core.entities.Decision.{Uncertain, Yes}
+import io.github.effiban.scala2java.core.entities.TypeSelects.ScalaUnit
 import io.github.effiban.scala2java.core.matchers.BlockContextMatcher.eqBlockContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.typeinference.TermTypeInferrer
@@ -131,13 +132,13 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
   test("traverse() for method with one statement returning Unit") {
     val initialDefnDef = initialDefnDefWith(
       paramss = List(MethodParamList1),
-      maybeDeclType = Some(t"Unit"),
+      maybeDeclType = Some(ScalaUnit),
       body = Statement1
     )
 
     val transformedDefnDef = transformedDefnDefWith(
       paramss = List(TransformedMethodParamList1),
-      maybeDeclType = Some(t"Unit"),
+      maybeDeclType = Some(ScalaUnit),
       body = TransformedStatement1
     )
 
@@ -150,7 +151,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
 
     when(defnDefTransformer.transform(eqTree(initialDefnDef))).thenReturn(transformedDefnDef)
     doReturn(TraversedScalaMods).when(statModListTraverser).traverse(eqTreeList(TransformedScalaMods))
-    doReturn(t"void").when(typeTraverser).traverse(eqTree(t"Unit"))
+    doReturn(t"void").when(typeTraverser).traverse(eqTree(ScalaUnit))
     expectTraverseOneParamList()
     doReturn(expectedTraversedBody)
       .when(blockWrappingTermTraverser).traverse(eqTree(TransformedStatement1),
@@ -164,14 +165,14 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
     val initialDefnDef = initialDefnDefWith(
       tparams = TypeParams,
       paramss = List(MethodParamList1),
-      maybeDeclType = Some(t"Unit"),
+      maybeDeclType = Some(ScalaUnit),
       body = Statement1
     )
 
     val transformedDefnDef = transformedDefnDefWith(
       tparams = TransformedTypeParams,
       paramss = List(TransformedMethodParamList1),
-      maybeDeclType = Some(t"Unit"),
+      maybeDeclType = Some(ScalaUnit),
       body = TransformedStatement1
     )
 
@@ -190,7 +191,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
       case aTypeParam if aTypeParam.structure == TransformedTypeParam2.structure => TraversedTypeParam2
       case aTypeParam => aTypeParam
     }).when(typeParamTraverser).traverse(any[Type.Param])
-    doReturn(t"void").when(typeTraverser).traverse(eqTree(t"Unit"))
+    doReturn(t"void").when(typeTraverser).traverse(eqTree(ScalaUnit))
     expectTraverseOneParamList()
     doReturn(expectedTraversedBody)
       .when(blockWrappingTermTraverser).traverse(eqTree(TransformedStatement1),
@@ -339,7 +340,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
 
   private def initialDefnDefWith(tparams: List[Type.Param] = Nil,
                                  paramss: List[List[Term.Param]] = Nil,
-                                 maybeDeclType: Option[Type.Name] = None,
+                                 maybeDeclType: Option[Type] = None,
                                  body: Term) = {
     Defn.Def(
       mods = ScalaMods,
@@ -353,7 +354,7 @@ class DefnDefTraverserImplTest extends UnitTestSuite {
 
   private def transformedDefnDefWith(tparams: List[Type.Param] = Nil,
                                      paramss: List[List[Term.Param]] = Nil,
-                                     maybeDeclType: Option[Type.Name] = None,
+                                     maybeDeclType: Option[Type] = None,
                                      body: Term) = {
     Defn.Def(
       mods = TransformedScalaMods,
