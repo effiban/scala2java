@@ -13,7 +13,6 @@ object TypeNames {
   val Double: Type.Name = Type.Name("Double")
   val Char: Type.Name = Type.Name("Char")
   val String: Type.Name = Type.Name("String")
-  val Unit: Type.Name = Type.Name("Unit")
 
   val Either: Type.Name = Type.Name("Either")
   val Try: Type.Name = Type.Name("Try")

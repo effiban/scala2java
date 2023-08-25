@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.typeinference
 
 import io.github.effiban.scala2java.core.classifiers.TypeClassifier
+import io.github.effiban.scala2java.core.entities.TypeSelects.{ScalaAny, ScalaUnit}
 import io.github.effiban.scala2java.core.matchers.PartialDeclDefScalatestMatcher.equalPartialDeclDef
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{TermNames, TypeNames}
@@ -242,7 +243,7 @@ class CoreApplyDeclDefInferrerTest extends UnitTestSuite {
     val maybeArgTypes = argTypes.map(Some(_))
     val context = TermApplyInferenceContext(maybeArgTypes = maybeArgTypes)
 
-    val expectedReturnType = Type.Apply(TypeNames.Future, List(TypeNames.ScalaAny))
+    val expectedReturnType = Type.Apply(TypeNames.Future, List(ScalaAny))
 
     coreApplyDeclDefInferrer.infer(termApply, context) should equalPartialDeclDef(
       PartialDeclDef(maybeParamTypes = maybeArgTypes, maybeReturnType = Some(expectedReturnType))
@@ -303,13 +304,13 @@ class CoreApplyDeclDefInferrerTest extends UnitTestSuite {
 
   test("""infer print("abc"")""") {
     coreApplyDeclDefInferrer.infer(q"""print("abc")""", TermApplyInferenceContext()) should equalPartialDeclDef(
-      PartialDeclDef(maybeReturnType = Some(TypeNames.Unit))
+      PartialDeclDef(maybeReturnType = Some(ScalaUnit))
     )
   }
 
   test("""infer println("abc"")""") {
     coreApplyDeclDefInferrer.infer(q"""println("abc")""", TermApplyInferenceContext()) should equalPartialDeclDef(
-      PartialDeclDef(maybeReturnType = Some(TypeNames.Unit))
+      PartialDeclDef(maybeReturnType = Some(ScalaUnit))
     )
   }
 

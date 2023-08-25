@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.typeinference
 
+import io.github.effiban.scala2java.core.entities.TypeSelects.ScalaUnit
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -31,7 +32,7 @@ class IfTypeInferrerImplTest extends UnitTestSuite {
     when(termTypeInferrer.infer(any[Term])).thenAnswer((term: Term) =>
       term match {
         case aTerm if aTerm.structure == thenp.structure => Some(TypeNames.String)
-        case aTerm if aTerm.structure == Lit.Unit().structure => Some(TypeNames.Unit)
+        case aTerm if aTerm.structure == Lit.Unit().structure => Some(ScalaUnit)
       }
     )
 

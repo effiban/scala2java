@@ -4,6 +4,7 @@ import io.github.effiban.scala2java.core.classifiers.ModsClassifier
 import io.github.effiban.scala2java.core.contexts.ModifiersContext
 import io.github.effiban.scala2java.core.entities.JavaModifier.Public
 import io.github.effiban.scala2java.core.entities.JavaTreeType.JavaTreeType
+import io.github.effiban.scala2java.core.entities.TypeSelects.ScalaUnit
 import io.github.effiban.scala2java.core.entities.{JavaModifier, JavaTreeType}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.{PrimaryCtors, Templates, TypeNames}
@@ -38,7 +39,7 @@ class JavaPublicModifierResolverTest extends UnitTestSuite {
     name = Term.Name("myMethod"),
     tparams = Nil,
     paramss = List(Nil),
-    decltpe = Type.Name("Unit")
+    decltpe = ScalaUnit
   )
 
   private val TheDefnDef = Defn.Def(
@@ -46,7 +47,7 @@ class JavaPublicModifierResolverTest extends UnitTestSuite {
     name = Term.Name("myMethod"),
     tparams = Nil,
     paramss = List(Nil),
-    decltpe = Some(TypeNames.Unit),
+    decltpe = Some(ScalaUnit),
     body = Lit.Int(3)
   )
 

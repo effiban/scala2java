@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.qualifiers
 
+import io.github.effiban.scala2java.core.entities.TypeSelects.{ScalaAny, ScalaUnit}
 import io.github.effiban.scala2java.core.qualifiers.CoreTypeNameQualifier.qualify
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 
@@ -9,7 +10,7 @@ class CoreTypeNameQualifierTest extends UnitTestSuite {
 
   private final val PositiveScenarios = Table(
     ("Type", "QualifiedType"),
-    (t"Any", t"scala.Any"),
+    (t"Any", ScalaAny),
     (t"AnyRef", t"scala.AnyRef"),
     (t"Boolean", t"scala.Boolean"),
     (t"Byte", t"scala.Byte"),
@@ -19,7 +20,7 @@ class CoreTypeNameQualifierTest extends UnitTestSuite {
     (t"Long", t"scala.Long"),
     (t"Float", t"scala.Float"),
     (t"Double", t"scala.Double"),
-    (t"Unit", t"scala.Unit"),
+    (ScalaUnit.name, ScalaUnit),
     (t"Seq", t"scala.collection.immutable.Seq"),
     (t"Vector", t"scala.collection.immutable.Vector"),
     (t"List", t"scala.collection.immutable.List"),

@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.transformers
 
+import io.github.effiban.scala2java.core.entities.TypeSelects.ScalaUnit
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 
 import scala.meta.Type
@@ -17,7 +18,7 @@ class CoreTypeNameTransformerTest extends UnitTestSuite {
     ("Long", "long"),
     ("Float", "float"),
     ("Double", "double"),
-    ("Unit", "void"),
+    (ScalaUnit.name.value, "void"),
     ("Array", "Object[]"),
     ("Seq", "List"),
     ("Vector", "List"),

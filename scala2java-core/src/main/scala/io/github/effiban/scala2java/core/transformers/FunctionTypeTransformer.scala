@@ -14,11 +14,11 @@ object FunctionTypeTransformer extends FunctionTypeTransformer {
   // Transform a Scala function type (e.g.: Int => String) into a Java function type (e.g. Function<Int, String>)
   override def transform(functionType: Type.Function): Type = {
     (functionType.params, functionType.res) match {
-      case (Nil | List(t"Unit") , t"Unit") => Type.Name(JavaRunnable)
-      case (Nil | List(t"Unit"), res) => Type.Apply(Type.Name(JavaSupplier), List(res))
-      case (List(param), t"Unit") => Type.Apply(Type.Name(JavaConsumer), List(param))
+      case (Nil | List(t"scala.Unit") , t"scala.Unit") => Type.Name(JavaRunnable)
+      case (Nil | List(t"scala.Unit"), res) => Type.Apply(Type.Name(JavaSupplier), List(res))
+      case (List(param), t"scala.Unit") => Type.Apply(Type.Name(JavaConsumer), List(param))
       case (List(param), res) => Type.Apply(Type.Name(TypeNameValues.Function), List(param, res))
-      case (List(param1, param2), t"Unit") => Type.Apply(Type.Name(JavaBiConsumer), List(param1, param2))
+      case (List(param1, param2), t"scala.Unit") => Type.Apply(Type.Name(JavaBiConsumer), List(param1, param2))
       case (List(param1, param2), res) => Type.Apply(Type.Name(JavaBiFunction), List(param1, param2, res))
       // Since Java doesn't have built-in support for a function type of more than 2 params, using JOOL instead
       case (params, res) => Type.Apply(Type.Name(joolFunctionTypeOf(params)), params :+ res)

@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.transformers
 
+import io.github.effiban.scala2java.core.entities.TypeSelects.ScalaUnit
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.core.testtrees.TypeNames.{JavaBiConsumer, JavaBiFunction, JavaConsumer, JavaRunnable, JavaSupplier}
@@ -10,7 +11,7 @@ import scala.meta.Type
 class FunctionTypeTransformerTest extends UnitTestSuite {
 
   test("transform for zero input types and a Unit result should return a Runnable") {
-    val scalaFunctionType = Type.Function(params = Nil, res = TypeNames.Unit)
+    val scalaFunctionType = Type.Function(params = Nil, res = ScalaUnit)
 
     val expectedJavaFunctionType = JavaRunnable
 
@@ -20,7 +21,7 @@ class FunctionTypeTransformerTest extends UnitTestSuite {
   }
 
   test("transform for a Unit input type and Unit result should return a Runnable") {
-    val scalaFunctionType = Type.Function(params = List(TypeNames.Unit), res = TypeNames.Unit)
+    val scalaFunctionType = Type.Function(params = List(ScalaUnit), res = ScalaUnit)
 
     val expectedJavaFunctionType = JavaRunnable
 
@@ -44,7 +45,7 @@ class FunctionTypeTransformerTest extends UnitTestSuite {
   test("transform for one input type and a Unit result should return a Consumer") {
     val typeT = Type.Name("T")
 
-    val scalaFunctionType = Type.Function(params = List(typeT), res = TypeNames.Unit)
+    val scalaFunctionType = Type.Function(params = List(typeT), res = ScalaUnit)
 
     val expectedJavaFunctionType = Type.Apply(tpe = JavaConsumer, args = List(typeT))
 
@@ -70,7 +71,7 @@ class FunctionTypeTransformerTest extends UnitTestSuite {
     val typeT1 = Type.Name("T1")
     val typeT2 = Type.Name("T2")
 
-    val scalaFunctionType = Type.Function(params = List(typeT1, typeT2), res = TypeNames.Unit)
+    val scalaFunctionType = Type.Function(params = List(typeT1, typeT2), res = ScalaUnit)
 
     val expectedJavaFunctionType = Type.Apply(tpe = JavaBiConsumer, args = List(typeT1, typeT2))
 
