@@ -16,7 +16,14 @@ class JavaInheritanceKeywordResolverTest extends UnitTestSuite {
     JavaInheritanceKeywordResolver.resolve(JavaScope.Class, inits) shouldBe Extends
   }
 
-  test("resolve for class without parent args should return 'implements'") {
+  test("resolve for class with empty parent args should return 'extends'") {
+    val inits = List(
+      Init(tpe = Type.Name("Parent"), name = Name.Anonymous(), argss = List(Nil, Nil))
+    )
+    JavaInheritanceKeywordResolver.resolve(JavaScope.Class, inits) shouldBe Extends
+  }
+
+  test("resolve for class without parent args at all should return 'implements'") {
     val inits = List(
       Init(tpe = Type.Name("Parent"), name = Name.Anonymous(), argss = Nil)
     )

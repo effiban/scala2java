@@ -27,7 +27,10 @@ object JavaInheritanceKeywordResolver extends JavaInheritanceKeywordResolver {
   }
 
   private def doInitsHaveArgs(inits: List[Init]) = {
-    inits.flatMap(_.argss).flatten.nonEmpty
+    // NOTE that emptiness is only checked at the upper level.
+    // If there are empty lists inside (displayed as empty parens), they are still considered to be "existing args" -
+    // and indicate that the parent is a class.
+    inits.exists(_.argss.nonEmpty)
   }
 
 }

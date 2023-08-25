@@ -10,14 +10,14 @@ trait TemplateTraverser {
   def traverse(template: Template, context: TemplateContext): Template
 }
 
-private[traversers] class TemplateTraverserImpl(initTraverser: => InitTraverser,
+private[traversers] class TemplateTraverserImpl(templateInitTraverser: => TemplateInitTraverser,
                                                 selfTraverser: => SelfTraverser,
                                                 templateBodyTraverser: => TemplateBodyTraverser,
                                                 templateInitExcludedPredicate: TemplateInitExcludedPredicate) extends TemplateTraverser {
 
   def traverse(template: Template, context: TemplateContext): Template = {
     val includedInits = template.inits.filterNot(templateInitExcludedPredicate)
-    val traversedInits = includedInits.map(initTraverser.traverse)
+    val traversedInits = includedInits.map(templateInitTraverser.traverse)
     val traversedSelf = selfTraverser.traverse(template.self)
     val bodyContext = TemplateBodyContext(
       javaScope = context.javaScope,

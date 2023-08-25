@@ -330,8 +330,10 @@ class ScalaTreeTraversers(implicit factories: Factories,
     TraitClassifier
   )
 
+  private lazy val templateInitTraverser: TemplateInitTraverser = new TemplateInitTraverserImpl(typeTraverser)
+
   private lazy val templateTraverser: TemplateTraverser = new TemplateTraverserImpl(
-    initTraverser,
+    templateInitTraverser,
     selfTraverser,
     templateBodyTraverser,
     new CompositeTemplateInitExcludedPredicate(CoreTemplateInitExcludedPredicate)
