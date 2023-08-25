@@ -5,7 +5,7 @@ import io.github.effiban.scala2java.core.entities.JavaTreeType.JavaTreeType
 import io.github.effiban.scala2java.core.resolvers.{JavaChildScopeResolver, JavaTreeTypeResolver}
 import io.github.effiban.scala2java.core.transformers.ParamToDeclVarTransformer
 
-import scala.meta.Defn
+import scala.meta.{Ctor, Defn}
 
 trait RegularClassTraverser {
   def traverse(classDef: Defn.Class, context: ClassOrTraitContext = ClassOrTraitContext()): Defn.Class
@@ -28,7 +28,7 @@ private[traversers] class RegularClassTraverserImpl(statModListTraverser: => Sta
       mods = traversedMods,
       name = classDef.name,
       tparams = traversedTypeParams,
-      ctor = classDef.ctor,
+      ctor = clearCtorArgs(classDef.ctor),
       templ = traversedTemplate
     )
   }
@@ -45,5 +45,11 @@ private[traversers] class RegularClassTraverserImpl(statModListTraverser: => Sta
       maybePrimaryCtor = Some(classDef.ctor)
     )
     templateTraverser.traverse(template = enrichedTemplate, context = templateContext)
+  }
+
+  private def clearCtorArgs(ctorPrimary: Ctor.Primary) = {
+    // Clearing the arguments because they have just been copied into explicit arguments and members to match the Java style,
+    // and we don't want to manipulate them any further.
+    ctorPrimary.copy(paramss = ctorPrimary.paramss.map(_ => Nil))
   }
 }

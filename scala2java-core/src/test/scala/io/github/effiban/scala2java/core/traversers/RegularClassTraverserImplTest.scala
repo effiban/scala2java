@@ -115,11 +115,12 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       self = TheTraversedSelf,
       stats = List(SyntheticDeclVar1, SyntheticDeclVar2)
     )
+    val expectedCtorPrimary = ctorPrimaryOf(List(Nil))
     val expectedTraversedRegularClass = Defn.Class(
       mods = TheTraversedScalaMods,
       name = TheClassName,
       tparams = Nil,
-      ctor = ctorPrimary,
+      ctor = expectedCtorPrimary,
       templ = expectedTraversedTemplate
     )
 
@@ -323,11 +324,12 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       self = TheTraversedSelf,
       stats = expectedSyntheticDeclVarResults ++ TheTraversedStats
     )
+    val expectedCtorPrimary = ctorPrimaryOf(List(Nil))
     val expectedTraversedRegularClass = Defn.Class(
       mods = TheTraversedScalaMods,
       name = TheClassName,
       tparams = Nil,
-      ctor = ctorPrimary,
+      ctor = expectedCtorPrimary,
       templ = expectedTraversedTemplate
     )
 
@@ -383,11 +385,12 @@ class RegularClassTraverserImplTest extends UnitTestSuite {
       self = TheTraversedSelf,
       stats = expectedSyntheticDeclVars
     )
+    val expectedCtorPrimary = ctorPrimaryOf(List(Nil, Nil))
     val expectedTraversedRegularClass = Defn.Class(
       mods = TheTraversedScalaMods,
       name = TheClassName,
       tparams = Nil,
-      ctor = ctorPrimary,
+      ctor = expectedCtorPrimary,
       templ = expectedTraversedTemplate
     )
 

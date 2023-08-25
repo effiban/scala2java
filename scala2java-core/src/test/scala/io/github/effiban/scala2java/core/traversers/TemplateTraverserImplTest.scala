@@ -47,14 +47,14 @@ class TemplateTraverserImplTest extends UnitTestSuite {
   private val DefnDef = q"def myMethod(param: Int): Int = doSomething(param)"
   private val TraversedDefnDef = q"def myTraversedMethod(param2: Int): Int = doSomething(param2)"
 
-  private val initTraverser = mock[InitTraverser]
+  private val templateInitTraverser = mock[TemplateInitTraverser]
   private val selfTraverser = mock[SelfTraverser]
   private val javaInheritanceKeywordResolver = mock[JavaInheritanceKeywordResolver]
   private val templateBodyTraverser = mock[TemplateBodyTraverser]
   private val templateInitExcludedPredicate = mock[TemplateInitExcludedPredicate]
 
   private val templateTraverser = new TemplateTraverserImpl(
-    initTraverser,
+    templateInitTraverser,
     selfTraverser,
     templateBodyTraverser,
     templateInitExcludedPredicate
@@ -242,7 +242,7 @@ class TemplateTraverserImplTest extends UnitTestSuite {
       case anInit if anInit.structure == IncludedInit1.structure => TraversedIncludedInit1
       case anInit if anInit.structure == IncludedInit2.structure => TraversedIncludedInit2
       case anInit => anInit
-    }).when(initTraverser).traverse(any[Init])
+    }).when(templateInitTraverser).traverse(any[Init])
   }
 
   private def expectResolveInheritanceKeyword(javaScope: JavaScope) = {
