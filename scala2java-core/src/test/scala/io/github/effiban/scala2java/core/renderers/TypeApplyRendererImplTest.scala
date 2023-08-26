@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.renderers
 
+import io.github.effiban.scala2java.core.entities.TypeSelects
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
@@ -12,8 +13,13 @@ class TypeApplyRendererImplTest extends UnitTestSuite {
 
   private val typeRenderer = mock[TypeRenderer]
   private val typeListRenderer = mock[TypeListRenderer]
+  private val arrayTypeRenderer = mock[ArrayTypeRenderer]
 
-  private val typeApplyRenderer = new TypeApplyRendererImpl(typeRenderer, typeListRenderer)
+  private val typeApplyRenderer = new TypeApplyRendererImpl(
+    typeRenderer,
+    typeListRenderer,
+    arrayTypeRenderer
+  )
 
   test("render() a 'Map'") {
     val tpe = TypeNames.Map
@@ -30,12 +36,12 @@ class TypeApplyRendererImplTest extends UnitTestSuite {
   }
 
   test("render() a valid 'Array'") {
-    val tpe = TypeNames.ScalaArray
+    val tpe = TypeSelects.ScalaArray
     val args = List(TypeNames.String)
 
     val typeApply = Type.Apply(tpe = tpe, args = args)
 
-    doWrite("String").when(typeRenderer).render(eqTree(TypeNames.String))
+    doWrite("String[]").when(arrayTypeRenderer).render(eqTree(TypeNames.String))
 
     typeApplyRenderer.render(typeApply)
 
@@ -43,7 +49,7 @@ class TypeApplyRendererImplTest extends UnitTestSuite {
   }
 
   test("render() an 'Array' with 2 type args should throw an exception") {
-    val tpe = TypeNames.ScalaArray
+    val tpe = TypeSelects.ScalaArray
     val args = List(TypeNames.String, TypeNames.Int)
 
     val typeApply = Type.Apply(tpe = tpe, args = args)

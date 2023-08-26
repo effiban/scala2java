@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.resolvers
 
+import io.github.effiban.scala2java.core.entities.TypeSelects
 import io.github.effiban.scala2java.core.matchers.ArrayInitializerSizeRenderContextScalatestMatcher.equalArrayInitializerSizeRenderContext
 import io.github.effiban.scala2java.core.renderers.contexts.{ArrayInitializerSizeRenderContext, ArrayInitializerValuesRenderContext}
 import io.github.effiban.scala2java.core.renderers.matchers.ArrayInitializerValuesRenderContextScalatestMatcher.equalArrayInitializerValuesRenderContext
@@ -33,10 +34,10 @@ class ArrayInitializerRenderContextResolverTest extends UnitTestSuite {
     tryResolve(termApply) shouldBe None
   }
 
-  test("""tryResolve() for an 'Init' of 'Array[String](3)' should return a context with type 'String' and size 3""") {
+  test("""tryResolve() for an 'Init' of 'scala.Array[String](3)' should return a context with type 'String' and size 3""") {
     val arg = Lit.Int(3)
     val init = Init(
-      tpe = Type.Apply(TypeNames.ScalaArray, List(TypeNames.String)),
+      tpe = Type.Apply(TypeSelects.ScalaArray, List(TypeNames.String)),
       name = Name.Anonymous(),
       argss = List(List(arg))
     )
@@ -46,14 +47,39 @@ class ArrayInitializerRenderContextResolverTest extends UnitTestSuite {
     tryResolve(init).value should equalArrayInitializerSizeRenderContext(expectedContext)
   }
 
-  test("""tryResolve() for an 'Init' of 'Array[String]()' should return a context with type 'String' and size 0""") {
+  test("""tryResolve() for an 'Init' of 'scala.Array[String]()' should return a context with type 'String' and size 0""") {
     val init = Init(
-      tpe = Type.Apply(TypeNames.ScalaArray, List(TypeNames.String)),
+      tpe = Type.Apply(TypeSelects.ScalaArray, List(TypeNames.String)),
       name = Name.Anonymous(),
       argss = List(Nil)
     )
 
     val expectedContext = ArrayInitializerSizeRenderContext(tpe = TypeNames.String)
+
+    tryResolve(init).value should equalArrayInitializerSizeRenderContext(expectedContext)
+  }
+
+  test("""tryResolve() for an 'Init' of 'scala.Array(3)' should return a context with type 'Object' and size 3""") {
+    val arg = Lit.Int(3)
+    val init = Init(
+      tpe = TypeSelects.ScalaArray,
+      name = Name.Anonymous(),
+      argss = List(List(arg))
+    )
+
+    val expectedContext = ArrayInitializerSizeRenderContext(tpe = TypeNames.JavaObject, size = arg)
+
+    tryResolve(init).value should equalArrayInitializerSizeRenderContext(expectedContext)
+  }
+
+  test("""tryResolve() for an 'Init' of 'scala.Array()' should return a context with type 'Object' and size 0""") {
+    val init = Init(
+      tpe = TypeSelects.ScalaArray,
+      name = Name.Anonymous(),
+      argss = List(Nil)
+    )
+
+    val expectedContext = ArrayInitializerSizeRenderContext(tpe = TypeNames.JavaObject)
 
     tryResolve(init).value should equalArrayInitializerSizeRenderContext(expectedContext)
   }

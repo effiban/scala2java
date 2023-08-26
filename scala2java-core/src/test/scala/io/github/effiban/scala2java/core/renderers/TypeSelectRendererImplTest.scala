@@ -10,13 +10,15 @@ class TypeSelectRendererImplTest extends UnitTestSuite {
 
   private val defaultTermRefRenderer = mock[DefaultTermRefRenderer]
   private val typeNameRenderer = mock[TypeNameRenderer]
+  private val arrayTypeRenderer = mock[ArrayTypeRenderer]
 
   private val typeSelectRenderer = new TypeSelectRendererImpl(
     defaultTermRefRenderer,
-    typeNameRenderer
+    typeNameRenderer,
+    arrayTypeRenderer
   )
 
-  test("render()") {
+  test("render() for a non-Array") {
     val qual = q"myObj"
     val tpe = t"MyType"
 
@@ -28,5 +30,13 @@ class TypeSelectRendererImplTest extends UnitTestSuite {
     typeSelectRenderer.render(typeSelect)
 
     outputWriter.toString shouldBe "myObj.MyType"
+  }
+
+  test("render() for an untyped Array") {
+    val typeSelect = t"scala.Array"
+
+    typeSelectRenderer.render(typeSelect)
+
+    verify(arrayTypeRenderer).render(eqTree(t"Object"))
   }
 }

@@ -12,6 +12,7 @@ class CoreTypeNameQualifierTest extends UnitTestSuite {
     ("Type", "QualifiedType"),
     (t"Any", ScalaAny),
     (t"AnyRef", t"scala.AnyRef"),
+    (t"Array", ScalaArray),
     (t"Boolean", ScalaBoolean),
     (t"Byte", ScalaByte),
     (t"Char", ScalaChar),

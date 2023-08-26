@@ -6,15 +6,16 @@ import io.github.effiban.scala2java.core.entities.TypeSelects._
 import scala.meta.{Type, XtensionQuasiquoteType}
 
 trait CoreTypeNameQualifier {
-  def qualify(typeName: Type.Name): Option[Type.Select]
+  def qualify(typeName: Type.Name): Option[Type]
 }
 
 object CoreTypeNameQualifier extends CoreTypeNameQualifier {
 
   // TODO consider using reflection or semantic information instead of this hard-coded and incomplete mapping
-  private final val QualifiedTypeMapping = Map[Type.Name, Type.Select](
+  private final val QualifiedTypeMapping = Map[Type.Name, Type](
     t"Any" -> ScalaAny,
     t"AnyRef" -> t"scala.AnyRef",
+    t"Array" -> ScalaArray,
     t"Boolean" -> ScalaBoolean,
     t"Byte" -> ScalaByte,
     t"Char" -> ScalaChar,
@@ -33,5 +34,5 @@ object CoreTypeNameQualifier extends CoreTypeNameQualifier {
     t"Future" -> t"scala.concurrent.Future"
   )
 
-  override def qualify(typeName: Type.Name): Option[Type.Select] = TreeKeyedMap.get(QualifiedTypeMapping, typeName)
+  override def qualify(typeName: Type.Name): Option[Type] = TreeKeyedMap.get(QualifiedTypeMapping, typeName)
 }
