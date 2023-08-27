@@ -1,8 +1,8 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.entities.TypeSelects
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
-import io.github.effiban.scala2java.core.testtrees.TypeNames.ScalaArray
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.{Type, XtensionQuasiquoteType}
@@ -36,7 +36,7 @@ class TypeApplyTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() a valid 'Array'") {
-    val tpe = ScalaArray
+    val tpe = TypeSelects.ScalaArray
     val typeArg = t"T"
     val traversedTypeArg = t"U"
 
@@ -49,7 +49,7 @@ class TypeApplyTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse() an 'Array' with 2 type args should throw an exception") {
-    val tpe = ScalaArray
+    val tpe = TypeSelects.ScalaArray
     val args = List(TypeNames.String, TypeNames.Int)
 
     val typeApply = Type.Apply(tpe = tpe, args = args)

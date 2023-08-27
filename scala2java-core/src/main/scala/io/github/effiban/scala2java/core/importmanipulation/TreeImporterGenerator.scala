@@ -13,7 +13,7 @@ private[importmanipulation] class TreeImporterGeneratorImpl(typeSelectImporterGe
       case typeSelect: Type.Select => typeSelectImporterGenerator.generate(typeSelect)
       // TODO generate for Type.Project
       // TODO generate for Term.Select-s when relevant, using semantic information
-    }
+    }.flatten
   }
 }
 

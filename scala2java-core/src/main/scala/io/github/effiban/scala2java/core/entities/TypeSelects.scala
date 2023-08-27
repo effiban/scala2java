@@ -7,6 +7,7 @@ object TypeSelects {
   // Please maintain alphabetical order in each section
 
   final val ScalaAny = t"scala.Any"
+  final val ScalaArray = t"scala.Array"
   final val ScalaBoolean = t"scala.Boolean"
   final val ScalaByte = t"scala.Byte"
   final val ScalaChar = t"scala.Char"

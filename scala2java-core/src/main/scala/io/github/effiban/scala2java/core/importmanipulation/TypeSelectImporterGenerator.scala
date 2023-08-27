@@ -1,17 +1,20 @@
 package io.github.effiban.scala2java.core.importmanipulation
 
-import scala.meta.{Importee, Importer, Name, Type}
+import scala.meta.{Importee, Importer, Name, Type, XtensionQuasiquoteType}
 
 trait TypeSelectImporterGenerator {
-  def generate(typeSelect: Type.Select): Importer
+  def generate(typeSelect: Type.Select): Option[Importer]
 }
 
 object TypeSelectImporterGenerator extends TypeSelectImporterGenerator {
 
-  override def generate(typeSelect: Type.Select): Importer = {
-    Importer(
-      ref = typeSelect.qual,
-      importees = List(Importee.Name(Name.Indeterminate(typeSelect.name.value)))
+  override def generate(typeSelect: Type.Select): Option[Importer] = typeSelect match {
+    case t"scala.Array" => None
+    case aTypeSelect => Some(
+      Importer(
+        ref = aTypeSelect.qual,
+        importees = List(Importee.Name(Name.Indeterminate(aTypeSelect.name.value)))
+      )
     )
   }
 }

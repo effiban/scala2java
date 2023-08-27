@@ -17,7 +17,6 @@ object CoreTypeNameTransformer extends TypeNameTransformer {
     "Float" -> "float",
     "Double" -> "double",
     "Unit" -> "void",
-    "Array" -> "Object[]",
     "Seq" -> "List",
     "Vector" -> "List",
     "Option" -> "Optional",

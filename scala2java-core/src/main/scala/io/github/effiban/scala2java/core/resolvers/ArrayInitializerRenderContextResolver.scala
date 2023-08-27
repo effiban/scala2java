@@ -1,9 +1,9 @@
 package io.github.effiban.scala2java.core.resolvers
 
-import io.github.effiban.scala2java.core.entities.{TermNameValues, TypeNameValues}
+import io.github.effiban.scala2java.core.entities.TermNameValues
 import io.github.effiban.scala2java.core.renderers.contexts.{ArrayInitializerSizeRenderContext, ArrayInitializerValuesRenderContext}
 
-import scala.meta.{Init, Lit, Term, Type}
+import scala.meta.{Init, Lit, Term, Type, XtensionQuasiquoteType}
 
 trait ArrayInitializerRenderContextResolver {
 
@@ -30,10 +30,9 @@ object ArrayInitializerRenderContextResolver extends ArrayInitializerRenderConte
 
   override def tryResolve(init: Init): Option[ArrayInitializerSizeRenderContext] = {
     init.tpe match {
-      case arrayInitializer@Type.Name(TypeNameValues.ScalaArray) =>
-        throw new IllegalStateException(
-          s"An array size initializer must be typed by the time this resolver is called, but it is: $arrayInitializer")
-      case Type.Apply(Type.Name(TypeNameValues.ScalaArray), tpe :: Nil) =>
+      case t"scala.Array" =>
+        Some(ArrayInitializerSizeRenderContext(tpe = t"Object", size = resolveSize(init.argss)))
+      case Type.Apply(t"scala.Array", tpe :: Nil) =>
         Some(ArrayInitializerSizeRenderContext(tpe = tpe, size = resolveSize(init.argss)))
       case _ => None
     }

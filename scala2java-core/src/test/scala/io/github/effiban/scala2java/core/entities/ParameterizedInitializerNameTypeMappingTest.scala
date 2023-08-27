@@ -20,7 +20,7 @@ class ParameterizedInitializerNameTypeMappingTest extends UnitTestSuite {
     (TermNames.ScalaFailure, TypeNames.Try),
     (TermNames.Future, TypeNames.Future),
     (TermNames.Stream, TypeNames.Stream),
-    (TermNames.ScalaArray, TypeNames.ScalaArray),
+    (TermNames.ScalaArray, TypeSelects.ScalaArray),
     (TermNames.List, TypeNames.List),
     (TermNames.ScalaVector, TypeNames.ScalaVector),
     (TermNames.Seq, TypeNames.Seq),
@@ -34,7 +34,7 @@ class ParameterizedInitializerNameTypeMappingTest extends UnitTestSuite {
     q"bar"
   )
 
-  forAll(ValidScenarios) { (name: Term.Name, expectedType: Type.Name) =>
+  forAll(ValidScenarios) { (name: Term.Name, expectedType: Type.Ref) =>
     test(s"Type initialized by $name should be $expectedType") {
       typeInitializedBy(name).value.structure shouldBe expectedType.structure
     }

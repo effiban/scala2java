@@ -19,7 +19,6 @@ class CoreTypeNameTransformerTest extends UnitTestSuite {
     ("Float", "float"),
     ("Double", "double"),
     (ScalaUnit.name.value, "void"),
-    ("Array", "Object[]"),
     ("Seq", "List"),
     ("Vector", "List"),
     ("Option", "Optional"),

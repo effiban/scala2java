@@ -20,6 +20,8 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   private[renderers] val argumentListRenderer: ArgumentListRenderer = new ArgumentListRendererImpl()
 
+  private[renderers] lazy val arrayTypeRenderer: ArrayTypeRenderer = new ArrayTypeRendererImpl(typeRenderer)
+
   private[renderers] lazy val arrayInitializerRenderer: ArrayInitializerRenderer = new ArrayInitializerRendererImpl(
     typeRenderer,
     expressionTermRenderer,
@@ -380,7 +382,11 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   private[renderers] val typeApplyInfixRenderer: TypeApplyInfixRenderer = new TypeApplyInfixRendererImpl()
 
-  private[renderers] lazy val typeApplyRenderer: TypeApplyRenderer = new TypeApplyRendererImpl(typeRenderer, typeListRenderer)
+  private[renderers] lazy val typeApplyRenderer: TypeApplyRenderer = new TypeApplyRendererImpl(
+    typeRenderer,
+    typeListRenderer,
+    arrayTypeRenderer
+  )
 
   private[renderers] lazy val typeBoundsRenderer: TypeBoundsRenderer = new TypeBoundsRendererImpl(typeRenderer)
 
@@ -434,7 +440,11 @@ class Renderers(implicit javaWriter: JavaWriter) {
 
   private[renderers] lazy val typeRepeatedRenderer: TypeRepeatedRenderer = new TypeRepeatedRendererImpl(typeRenderer)
 
-  private[renderers] lazy val typeSelectRenderer: TypeSelectRenderer = new TypeSelectRendererImpl(defaultTermRefRenderer, typeNameRenderer)
+  private[renderers] lazy val typeSelectRenderer: TypeSelectRenderer = new TypeSelectRendererImpl(
+    defaultTermRefRenderer,
+    typeNameRenderer,
+    arrayTypeRenderer
+  )
 
   private[renderers] val typeSingletonRenderer: TypeSingletonRenderer = new TypeSingletonRendererImpl(thisRenderer)
 
