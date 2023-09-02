@@ -18,7 +18,6 @@ class TermParamTraverserImplTest extends UnitTestSuite {
   private val TheTraversedScalaMods = List(TheTraversedAnnot, Mod.Private(Name.Anonymous()), Mod.Final())
 
   private val TheParamName = q"myParam"
-  private val TheTraversedParamName = q"traversedMyParam"
 
   private val TheType = t"Type1"
   private val TheTraversedType = t"Type2"
@@ -27,13 +26,11 @@ class TermParamTraverserImplTest extends UnitTestSuite {
   private val TheTraversedDefault = q"33"
 
   private val termParamModListTraverser = mock[TermParamModListTraverser]
-  private val nameTraverser = mock[NameTraverser]
   private val typeTraverser = mock[TypeTraverser]
   private val expressionTermTraverser = mock[ExpressionTermTraverser]
 
   private val termParamTraverser = new TermParamTraverserImpl(
     termParamModListTraverser,
-    nameTraverser,
     typeTraverser,
     expressionTermTraverser
   )
@@ -47,13 +44,12 @@ class TermParamTraverserImplTest extends UnitTestSuite {
     )
     val traversedTermParam = Term.Param(
       mods = TheTraversedScalaMods,
-      name = TheTraversedParamName,
+      name = TheParamName,
       decltpe = Some(TheTraversedType),
       default = Some(TheTraversedDefault)
     )
 
     doReturn(TheTraversedScalaMods).when(termParamModListTraverser).traverse(eqTree(termParam), eqTo(MethodSignature))
-    doReturn(TheTraversedParamName).when(nameTraverser).traverse(eqTree(TheParamName))
     doReturn(TheTraversedType).when(typeTraverser).traverse(eqTree(TheType))
     doReturn(TheTraversedDefault).when(expressionTermTraverser).traverse(eqTree(TheDefault))
 
@@ -69,13 +65,12 @@ class TermParamTraverserImplTest extends UnitTestSuite {
     )
     val traversedTermParam = Term.Param(
       mods = TheTraversedScalaMods,
-      name = TheTraversedParamName,
+      name = TheParamName,
       decltpe = None,
       default = None
     )
 
     doReturn(TheTraversedScalaMods).when(termParamModListTraverser).traverse(eqTree(termParam), eqTo(MethodSignature))
-    doReturn(TheTraversedParamName).when(nameTraverser).traverse(eqTree(TheParamName))
 
     termParamTraverser.traverse(termParam, TheStatContext).structure shouldBe traversedTermParam.structure
   }

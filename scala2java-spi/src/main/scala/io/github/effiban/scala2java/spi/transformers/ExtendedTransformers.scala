@@ -120,13 +120,6 @@ trait ExtendedTransformers {
    */
   def termNameTransformer(): TermNameTransformer = TermNameTransformer.Empty
 
-  /** Override this method if you need to transform a Scala type name into an equivalent Java one
-   *
-   * @return if overriden - a transformer which changes the type name<br>
-   *         otherwise - the default which leaves the type name unchanged<br>
-   */
-  def typeNameTransformer(): TypeNameTransformer = TypeNameTransformer.Identity
-
   /** Override this method if you need to transform a Scala qualified type into an equivalent Java type
    *
    * @return if overriden - a transformer which changes the qualified type<br>

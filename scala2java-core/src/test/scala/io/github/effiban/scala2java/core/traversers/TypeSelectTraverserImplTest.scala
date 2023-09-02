@@ -9,12 +9,10 @@ import scala.meta.{XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 class TypeSelectTraverserImplTest extends UnitTestSuite {
 
   private val defaultTermRefTraverser = mock[DefaultTermRefTraverser]
-  private val typeNameTraverser = mock[TypeNameTraverser]
   private val typeSelectTransformer = mock[TypeSelectTransformer]
 
   private val typeSelectTraverser = new TypeSelectTraverserImpl(
     defaultTermRefTraverser,
-    typeNameTraverser,
     typeSelectTransformer
   )
 
@@ -31,15 +29,12 @@ class TypeSelectTraverserImplTest extends UnitTestSuite {
   test("traverse() when not transformed") {
     val qual = q"myObj"
     val traversedQual = q"myTraversedObj"
-    val tpe = t"MyType"
-    val traversedType = t"MyTraversedType"
 
     val typeSelect = t"myObj.MyType"
-    val traversedTypeSelect = t"myTraversedObj.MyTraversedType"
+    val traversedTypeSelect = t"myTraversedObj.MyType"
 
     doReturn(None).when(typeSelectTransformer).transform(eqTree(typeSelect))
     doReturn(traversedQual).when(defaultTermRefTraverser).traverse(eqTree(qual))
-    doReturn(traversedType).when(typeNameTraverser).traverse(eqTree(tpe))
 
     typeSelectTraverser.traverse(typeSelect).structure shouldBe traversedTypeSelect.structure
   }
