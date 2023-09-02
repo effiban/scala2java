@@ -7,25 +7,18 @@ import scala.meta.{Term, Type, XtensionQuasiquoteType}
 
 class TypeRefTraverserImplTest extends UnitTestSuite {
 
-  private val typeNameTraverser = mock[TypeNameTraverser]
   private val typeSelectTraverser = mock[TypeSelectTraverser]
-  private val typeSingletonTraverser = mock[TypeSingletonTraverser]
   private val typeProjectTraverser = mock[TypeProjectTraverser]
 
   private val typeRefTraverser = new TypeRefTraverserImpl(
-    typeNameTraverser,
     typeSelectTraverser,
-    typeSingletonTraverser,
     typeProjectTraverser
   )
 
   test("traverse Type.Name") {
     val typeName = t"MyType"
-    val traversedTypeName = t"MyTraversedType"
 
-    doReturn(traversedTypeName).when(typeNameTraverser).traverse(eqTree(typeName))
-
-    typeRefTraverser.traverse(typeName).structure shouldBe traversedTypeName.structure
+    typeRefTraverser.traverse(typeName).structure shouldBe typeName.structure
   }
 
   test("traverse Type.Select") {
@@ -39,11 +32,8 @@ class TypeRefTraverserImplTest extends UnitTestSuite {
 
   test("traverse Type.Singleton") {
     val typeSingleton = Type.Singleton(Term.Name("myObj"))
-    val traversedTypeSingleton = Type.Singleton(Term.Name("myTraversedObj"))
 
-    doAnswer(traversedTypeSingleton).when(typeSingletonTraverser).traverse(eqTree(typeSingleton))
-
-    typeRefTraverser.traverse(typeSingleton).structure shouldBe traversedTypeSingleton.structure
+    typeRefTraverser.traverse(typeSingleton).structure shouldBe typeSingleton.structure
   }
 
   test("traverse Type.Project") {

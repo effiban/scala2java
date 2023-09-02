@@ -8,32 +8,20 @@ import scala.meta.{Name, XtensionQuasiquoteTerm}
 
 class DefaultTermRefTraverserImplTest extends UnitTestSuite {
 
-  private val thisTraverser = mock[ThisTraverser]
-  private val superTraverser = mock[SuperTraverser]
   private val defaultTermSelectTraverser = mock[DefaultTermSelectTraverser]
 
-  private val defaultTermRefTraverser = new DefaultTermRefTraverserImpl(
-    thisTraverser,
-    superTraverser,
-    defaultTermSelectTraverser
-  )
+  private val defaultTermRefTraverser = new DefaultTermRefTraverserImpl(defaultTermSelectTraverser)
 
   test("traverse 'this'") {
     val `this` = This(Name.Indeterminate("MyName"))
-    val traversedThis = This(Name.Indeterminate("MyTraversedName"))
 
-    doReturn(traversedThis).when(thisTraverser).traverse(eqTree(`this`))
-
-    defaultTermRefTraverser.traverse(`this`).structure shouldBe traversedThis.structure
+    defaultTermRefTraverser.traverse(`this`).structure shouldBe `this`.structure
   }
 
   test("traverse 'super'") {
     val `super` = Super(thisp = Name.Indeterminate("superName"), superp = Name.Anonymous())
-    val traversedSuper = Super(thisp = Name.Indeterminate("traversedSuperName"), superp = Name.Anonymous())
 
-    doReturn(traversedSuper).when(superTraverser).traverse(eqTree(`super`))
-
-    defaultTermRefTraverser.traverse(`super`).structure shouldBe traversedSuper.structure
+    defaultTermRefTraverser.traverse(`super`).structure shouldBe `super`.structure
   }
 
   test("traverse termName") {

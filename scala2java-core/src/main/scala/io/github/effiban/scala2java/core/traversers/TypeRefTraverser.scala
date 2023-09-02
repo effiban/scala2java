@@ -4,15 +4,12 @@ import scala.meta.Type
 
 trait TypeRefTraverser extends ScalaTreeTraverser2[Type.Ref, Type]
 
-private[traversers] class TypeRefTraverserImpl(typeNameTraverser: TypeNameTraverser,
-                                               typeSelectTraverser: TypeSelectTraverser,
-                                               typeSingletonTraverser: TypeSingletonTraverser,
+private[traversers] class TypeRefTraverserImpl(typeSelectTraverser: TypeSelectTraverser,
                                                typeProjectTraverser: => TypeProjectTraverser) extends TypeRefTraverser {
 
   override def traverse(typeRef: Type.Ref): Type = typeRef match {
-      case typeName: Type.Name => typeNameTraverser.traverse(typeName)
+      case typeName: Type.Name => typeName
       case typeSelect: Type.Select => typeSelectTraverser.traverse(typeSelect)
-      case typeSingleton: Type.Singleton => typeSingletonTraverser.traverse(typeSingleton)
       case typeProject: Type.Project => typeProjectTraverser.traverse(typeProject)
       case aTypeRef => aTypeRef
     }

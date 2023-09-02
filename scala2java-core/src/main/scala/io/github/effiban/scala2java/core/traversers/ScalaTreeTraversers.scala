@@ -129,11 +129,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
     declTraverser
   )
 
-  private lazy val defaultTermRefTraverser: DefaultTermRefTraverser = new DefaultTermRefTraverserImpl(
-    thisTraverser,
-    superTraverser,
-    defaultTermSelectTraverser
-  )
+  private lazy val defaultTermRefTraverser: DefaultTermRefTraverser = new DefaultTermRefTraverserImpl(defaultTermSelectTraverser)
 
   private lazy val defaultTermSelectTraverser: DefaultTermSelectTraverser = new DefaultTermSelectTraverserImpl(defaultTermRefTraverser)
 
@@ -242,8 +238,6 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val initTraverser: InitTraverser = new InitTraverserImpl(typeTraverser, expressionTermTraverser)
 
-  private lazy val nameTraverser: NameTraverser = new NameTraverserImpl(typeNameTraverser)
-
   private lazy val newAnonymousTraverser: NewAnonymousTraverser = new NewAnonymousTraverserImpl(templateTraverser)
 
   private lazy val newTraverser: NewTraverser = new NewTraverserImpl(
@@ -311,8 +305,6 @@ class ScalaTreeTraversers(implicit factories: Factories,
     defaultTermTraverser
   )
 
-  private lazy val superTraverser: SuperTraverser = new SuperTraverserImpl(nameTraverser)
-
   private lazy val templateBodyTraverser: TemplateBodyTraverser = new TemplateBodyTraverserImpl(
     templateChildrenTraverser,
     new TemplateStatTransformerImpl(new CompositeTemplateTermApplyInfixToDefnTransformer, new CompositeTemplateTermApplyToDefnTransformer),
@@ -370,7 +362,6 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val termParamTraverser: TermParamTraverser = new TermParamTraverserImpl(
     termParamModListTraverser,
-    nameTraverser,
     typeTraverser,
     expressionTermTraverser
   )
@@ -378,8 +369,6 @@ class ScalaTreeTraversers(implicit factories: Factories,
   private lazy val termRepeatedTraverser: TermRepeatedTraverser = new TermRepeatedTraverserImpl(expressionTermTraverser)
 
   private lazy val termTupleTraverser: TermTupleTraverser = new TermTupleTraverserImpl(termApplyTraverser, TermTupleToTermApplyTransformer)
-
-  private lazy val thisTraverser: ThisTraverser = new ThisTraverserImpl(nameTraverser)
 
   private lazy val throwTraverser: ThrowTraverser = new ThrowTraverserImpl(expressionTermTraverser)
 
@@ -411,24 +400,14 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val typeFunctionTraverser: TypeFunctionTraverser = new TypeFunctionTraverserImpl(typeTraverser, FunctionTypeTransformer)
 
-  private lazy val typeNameTraverser: TypeNameTraverser = new TypeNameTraverserImpl(new CompositeTypeNameTransformer(CoreTypeNameTransformer))
+  private lazy val typeParamTraverser: TypeParamTraverser = new TypeParamTraverserImpl(typeBoundsTraverser)
 
-  private lazy val typeParamTraverser: TypeParamTraverser = new TypeParamTraverserImpl(
-    nameTraverser,
-    typeBoundsTraverser
-  )
-
-  private lazy val typeProjectTraverser: TypeProjectTraverser = new TypeProjectTraverserImpl(
-    typeTraverser,
-    typeNameTraverser
-  )
+  private lazy val typeProjectTraverser: TypeProjectTraverser = new TypeProjectTraverserImpl(typeTraverser)
 
   private lazy val typeRefineTraverser: TypeRefineTraverser = new TypeRefineTraverserImpl(typeTraverser)
 
   private lazy val typeRefTraverser: TypeRefTraverser = new TypeRefTraverserImpl(
-    typeNameTraverser,
     typeSelectTraverser,
-    typeSingletonTraverser,
     typeProjectTraverser
   )
 
@@ -436,11 +415,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val typeSelectTraverser: TypeSelectTraverser = new TypeSelectTraverserImpl(
     defaultTermRefTraverser,
-    typeNameTraverser,
     new CompositeTypeSelectTransformer(CoreTypeSelectTransformer)
   )
-
-  private lazy val typeSingletonTraverser: TypeSingletonTraverser = new TypeSingletonTraverserImpl(thisTraverser)
 
   private lazy val typeTraverser: TypeTraverser = new TypeTraverserImpl(
     typeRefTraverser,
