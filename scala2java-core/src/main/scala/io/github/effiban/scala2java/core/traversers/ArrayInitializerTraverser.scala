@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{ArrayInitializerSizeContext, ArrayInitializerTypedValuesContext, ArrayInitializerValuesContext}
-import io.github.effiban.scala2java.core.entities.TypeNameValues.ScalaAny
+import io.github.effiban.scala2java.core.entities.TypeSelects.ScalaAny
 import io.github.effiban.scala2java.core.typeinference.{CompositeCollectiveTypeInferrer, TermTypeInferrer}
 
 import scala.meta.{Term, Type}
@@ -38,7 +38,7 @@ private[traversers] class ArrayInitializerTraverserImpl(typeTraverser: => TypeTr
   private def resolveTypeWithValues(maybeType: Option[Type] = None, values: List[Term] = Nil) = {
     (maybeType, values) match {
       case (Some(tpe), _) => tpe
-      case (None, Nil) => Type.Name(ScalaAny)
+      case (None, Nil) => ScalaAny
       case (None, values) => compositeCollectiveTypeInferrer.infer(values.map(termTypeInferrer.infer))
     }
   }

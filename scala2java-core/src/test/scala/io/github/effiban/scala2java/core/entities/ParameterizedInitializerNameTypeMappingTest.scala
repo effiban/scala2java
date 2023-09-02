@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.entities
 
 import io.github.effiban.scala2java.core.entities.ParameterizedInitializerNameTypeMapping.typeInitializedBy
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.testtrees.{TermNames, TypeNames}
+import io.github.effiban.scala2java.core.testtrees.TermNames
 
 import scala.meta.{Term, Type, XtensionQuasiquoteTerm}
 
@@ -10,22 +10,22 @@ class ParameterizedInitializerNameTypeMappingTest extends UnitTestSuite {
 
   private val ValidScenarios = Table(
     ("Name", "ExpectedType"),
-    (TermNames.ScalaRange, TypeNames.ScalaRange),
-    (TermNames.ScalaOption, TypeNames.ScalaOption),
-    (TermNames.ScalaSome, TypeNames.ScalaOption),
-    (TermNames.ScalaRight, TypeNames.Either),
-    (TermNames.ScalaLeft, TypeNames.Either),
-    (TermNames.Try, TypeNames.Try),
-    (TermNames.ScalaSuccess, TypeNames.Try),
-    (TermNames.ScalaFailure, TypeNames.Try),
-    (TermNames.Future, TypeNames.Future),
-    (TermNames.Stream, TypeNames.Stream),
+    (TermNames.ScalaRange, TypeSelects.ScalaRange),
+    (TermNames.ScalaOption, TypeSelects.ScalaOption),
+    (TermNames.ScalaSome, TypeSelects.ScalaSome),
+    (TermNames.ScalaRight, TypeSelects.ScalaRight),
+    (TermNames.ScalaLeft, TypeSelects.ScalaLeft),
+    (TermNames.Try, TypeSelects.ScalaTry),
+    (TermNames.ScalaSuccess, TypeSelects.ScalaSuccess),
+    (TermNames.ScalaFailure, TypeSelects.ScalaFailure),
+    (TermNames.Future, TypeSelects.ScalaFuture),
+    (TermNames.Stream, TypeSelects.ScalaStream),
     (TermNames.ScalaArray, TypeSelects.ScalaArray),
-    (TermNames.List, TypeNames.List),
-    (TermNames.ScalaVector, TypeNames.ScalaVector),
-    (TermNames.Seq, TypeNames.Seq),
-    (TermNames.Set, TypeNames.Set),
-    (TermNames.Map, TypeNames.Map)
+    (TermNames.List, TypeSelects.ScalaList),
+    (TermNames.ScalaVector, TypeSelects.ScalaVector),
+    (TermNames.Seq, TypeSelects.ScalaSeq),
+    (TermNames.Set, TypeSelects.ScalaSet),
+    (TermNames.Map, TypeSelects.ScalaMap)
   )
 
   private val InvalidScenarios = Table(

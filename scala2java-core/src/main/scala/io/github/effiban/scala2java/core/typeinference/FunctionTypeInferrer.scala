@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.typeinference
 
-import io.github.effiban.scala2java.core.entities.TypeNameValues.ScalaAny
+import io.github.effiban.scala2java.core.entities.TypeSelects.ScalaAny
 
 import scala.meta.{Term, Type}
 
@@ -13,8 +13,8 @@ trait FunctionTypeInferrer {
 private[typeinference] class FunctionTypeInferrerImpl(termTypeInferrer: => TermTypeInferrer) extends FunctionTypeInferrer {
 
   override def infer(termFunction: Term.Function): Type.Function = {
-    val paramTypes = termFunction.params.map(_.decltpe.getOrElse(Type.Name(ScalaAny)))
-    val bodyType = termTypeInferrer.infer(termFunction.body).getOrElse(Type.Name(ScalaAny))
+    val paramTypes = termFunction.params.map(_.decltpe.getOrElse(ScalaAny))
+    val bodyType = termTypeInferrer.infer(termFunction.body).getOrElse(ScalaAny)
     Type.Function(paramTypes, bodyType)
   }
 }

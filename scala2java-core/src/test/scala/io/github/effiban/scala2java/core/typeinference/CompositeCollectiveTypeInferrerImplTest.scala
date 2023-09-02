@@ -1,11 +1,10 @@
 package io.github.effiban.scala2java.core.typeinference
 
+import io.github.effiban.scala2java.core.entities.TypeSelects._
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.testtrees.TypeNames
-import io.github.effiban.scala2java.core.testtrees.TypeNames.ScalaAny
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.{eqOptionTreeList, eqTreeList}
 
-import scala.meta.XtensionQuasiquoteType
+import scala.meta.Type
 
 class CompositeCollectiveTypeInferrerImplTest extends UnitTestSuite {
 
@@ -14,15 +13,15 @@ class CompositeCollectiveTypeInferrerImplTest extends UnitTestSuite {
   private val compositeCollectiveTypeInferrer = new CompositeCollectiveTypeInferrerImpl(collectiveTypeInferrer)
 
   test("infer when all types are scalars and have a collective type, should return it") {
-    val maybeTypes = List(TypeNames.Int, TypeNames.Int).map(Some(_))
+    val maybeTypes = List(ScalaInt, ScalaInt).map(Some(_))
 
-    when(collectiveTypeInferrer.inferScalar(eqOptionTreeList(maybeTypes))).thenReturn(Some(TypeNames.Int))
+    when(collectiveTypeInferrer.inferScalar(eqOptionTreeList(maybeTypes))).thenReturn(Some(ScalaInt))
 
-    compositeCollectiveTypeInferrer.infer(maybeTypes).structure shouldBe TypeNames.Int.structure
+    compositeCollectiveTypeInferrer.infer(maybeTypes).structure shouldBe ScalaInt.structure
   }
 
   test("infer when all types are scalars and don't have a collective type, should return Any") {
-    val maybeTypes = List(TypeNames.Int, TypeNames.String).map(Some(_))
+    val maybeTypes = List(ScalaInt, ScalaString).map(Some(_))
 
     when(collectiveTypeInferrer.inferScalar(eqOptionTreeList(maybeTypes))).thenReturn(None)
 
@@ -30,7 +29,7 @@ class CompositeCollectiveTypeInferrerImplTest extends UnitTestSuite {
   }
 
   test("infer when all types are tuples and have a collective type, should return it") {
-    val tupleType = t"(String, Int)"
+    val tupleType = Type.Tuple(List(ScalaString, ScalaInt))
     val tupleTypes = List(tupleType, tupleType)
 
     when(collectiveTypeInferrer.inferTuple(eqTreeList(tupleTypes))).thenReturn(tupleType)
@@ -39,9 +38,9 @@ class CompositeCollectiveTypeInferrerImplTest extends UnitTestSuite {
   }
 
   test("infer when all types are tuples and do not have a collective type, should return a tuple of Any-s") {
-    val tupleType1 = t"(String, Int)"
-    val tupleType2 = t"(Short, Long)"
-    val tupleTypeAny = t"(Any, Any)"
+    val tupleType1 = Type.Tuple(List(ScalaString, ScalaInt))
+    val tupleType2 = Type.Tuple(List(ScalaShort, ScalaLong))
+    val tupleTypeAny = Type.Tuple(List(ScalaAny, ScalaAny))
 
     val inputTupleTypes = List(tupleType1, tupleType2)
 
@@ -51,10 +50,10 @@ class CompositeCollectiveTypeInferrerImplTest extends UnitTestSuite {
   }
 
   test("infer when some types are tuples and some scalars, should return result of inferring as scalars") {
-    val tupleType1 = t"(String, Int)"
-    val tupleType2 = t"(Short, Long)"
-    val scalarType1 = t"String"
-    val scalarType2 = t"Int"
+    val tupleType1 = Type.Tuple(List(ScalaString, ScalaInt))
+    val tupleType2 = Type.Tuple(List(ScalaShort, ScalaLong))
+    val scalarType1 = ScalaString
+    val scalarType2 = ScalaInt
 
     val maybeInputTypes = List(tupleType1, tupleType2, scalarType1, scalarType2).map(Some(_))
 

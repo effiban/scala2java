@@ -63,6 +63,7 @@ class CoreTypeNameQualifierTest extends UnitTestSuite {
     (t"Serializable", ScalaSerializable),
     (t"Set", ScalaSet),
     (t"Short", ScalaShort),
+    (t"Some", ScalaSome),
     (t"Stream", ScalaStream),
     (t"String", ScalaString),
     (t"StringBuilder", ScalaStringBuilder),

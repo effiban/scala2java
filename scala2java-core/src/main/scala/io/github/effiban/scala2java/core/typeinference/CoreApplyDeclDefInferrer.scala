@@ -2,8 +2,7 @@ package io.github.effiban.scala2java.core.typeinference
 
 import io.github.effiban.scala2java.core.classifiers.TypeClassifier
 import io.github.effiban.scala2java.core.entities.TermNameValues.{Empty, Print, Println, ScalaFailed, ScalaInclusive, ScalaRange, ScalaSuccessful}
-import io.github.effiban.scala2java.core.entities.TypeSelects.{ScalaAny, ScalaUnit}
-import io.github.effiban.scala2java.core.entities.{TermNameValues, TypeNameValues}
+import io.github.effiban.scala2java.core.entities.{TermNameValues, TypeSelects}
 import io.github.effiban.scala2java.spi.contexts.TermApplyInferenceContext
 import io.github.effiban.scala2java.spi.entities.PartialDeclDef
 import io.github.effiban.scala2java.spi.typeinferrers.ApplyDeclDefInferrer
@@ -28,8 +27,6 @@ private[typeinference] class CoreApplyDeclDefInferrer(initializerDeclDefInferrer
     (termApply.fun, termApply.args) match {
       case (Term.ApplyType(Term.Select(name: Term.Name, Term.Name(TermNameValues.Apply) | Term.Name(Empty)), appliedTypes), args) =>
         inferByAppliedTypes(name, appliedTypes, args.size)
-      case (Term.ApplyType(Term.Select(name@Term.Name(ScalaRange), Term.Name(ScalaInclusive)), appliedTypes), args) =>
-        inferByAppliedTypes(name, appliedTypes, args.size)
       case (Term.ApplyType(Term.Select(name@Term.Name(TermNameValues.Future), Term.Name(ScalaSuccessful)), appliedTypes), args) =>
         inferByAppliedTypes(name, appliedTypes, args.size)
 
@@ -50,19 +47,19 @@ private[typeinference] class CoreApplyDeclDefInferrer(initializerDeclDefInferrer
   private def inferOther(termApply: Term.Apply, context: TermApplyInferenceContext) = {
     val maybeReturnType = (termApply.fun, context) match {
       case (Term.ApplyType(Term.Select(Term.Name(TermNameValues.Future), Term.Name(ScalaFailed)), List(tpe)), _) =>
-        Some(Type.Apply(Type.Name(TypeNameValues.Future), List(tpe)))
+        Some(Type.Apply(TypeSelects.ScalaFuture, List(tpe)))
 
       case (Term.Select(Term.Name(TermNameValues.Future), Term.Name(ScalaFailed)), _) =>
-        Some(Type.Apply(Type.Name(TypeNameValues.Future), List(ScalaAny)))
+        Some(Type.Apply(TypeSelects.ScalaFuture, List(TypeSelects.ScalaAny)))
 
       case (Term.Select(_, q"length"), TermApplyInferenceContext(Some(parentType), _)) if typeClassifier.isJavaListLike(parentType) =>
-        Some(Type.Name(TypeNameValues.Int))
+        Some(TypeSelects.ScalaInt)
       case (Term.Select(_, q"take"), TermApplyInferenceContext(Some(parentType), _)) if typeClassifier.isJavaListLike(parentType) =>
         Some(parentType)
 
-      case (Term.Select(_, q"toString"), _) => Some(Type.Name(TypeNameValues.String))
+      case (Term.Select(_, q"toString"), _) => Some(TypeSelects.ScalaString)
 
-      case (Term.Name(Print) | Term.Name(Println), _) => Some(ScalaUnit)
+      case (Term.Name(Print) | Term.Name(Println), _) => Some(TypeSelects.ScalaUnit)
 
       // TODO add more
       case _ => None
