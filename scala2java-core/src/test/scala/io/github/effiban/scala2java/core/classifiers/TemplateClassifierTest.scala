@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.classifiers
 
+import io.github.effiban.scala2java.core.entities.TypeSelects.ScalaEnumeration
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.Selfs
 
@@ -21,7 +22,7 @@ class TemplateClassifierTest extends UnitTestSuite {
   test("isEnum when has one init that is 'Enumeration' should return true") {
     val template = Template(
       early = Nil,
-      inits = List(Init(tpe = Type.Name("Enumeration"), name = Name.Anonymous(), argss = List(Nil))),
+      inits = List(Init(tpe = ScalaEnumeration, name = Name.Anonymous(), argss = List(Nil))),
       self = Selfs.Empty,
       stats = Nil
     )
@@ -44,7 +45,7 @@ class TemplateClassifierTest extends UnitTestSuite {
     val template = Template(
       early = Nil,
       inits = List(
-        Init(tpe = Type.Name("Enumeration"), name = Name.Anonymous(), argss = List(Nil)),
+        Init(tpe = ScalaEnumeration, name = Name.Anonymous(), argss = List(Nil)),
         Init(tpe = Type.Name("blabla"), name = Name.Anonymous(), argss = List(Nil))
       ),
       self = Selfs.Empty,

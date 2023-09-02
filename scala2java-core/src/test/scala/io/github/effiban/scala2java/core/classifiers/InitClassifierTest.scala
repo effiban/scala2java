@@ -10,7 +10,7 @@ class InitClassifierTest extends UnitTestSuite {
     InitClassifier.isEnum(init"BlaBla()") shouldBe false
   }
 
-  test("isEnum when 'Enumeration' should return true") {
-    InitClassifier.isEnum(init"Enumeration()") shouldBe true
+  test("isEnum when 'scala.Enumeration' should return true") {
+    InitClassifier.isEnum(init"scala.Enumeration()") shouldBe true
   }
 }

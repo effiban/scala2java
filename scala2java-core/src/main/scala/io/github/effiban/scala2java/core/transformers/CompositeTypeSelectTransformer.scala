@@ -7,7 +7,7 @@ import scala.meta.Type
 
 class CompositeTypeSelectTransformer(override val coreTransformer: TypeSelectTransformer)
                                     (implicit extensionRegistry: ExtensionRegistry)
-  extends CompositeDifferentTypeTransformer0[Type.Select, Type.Ref]
+  extends CompositeDifferentTypeTransformer0[Type.Select, Type]
     with ExtensionAndCoreTransformers[TypeSelectTransformer]
     with TypeSelectTransformer {
 

@@ -9,7 +9,7 @@ trait TypeSelectImporterGenerator {
 object TypeSelectImporterGenerator extends TypeSelectImporterGenerator {
 
   override def generate(typeSelect: Type.Select): Option[Importer] = typeSelect match {
-    case t"scala.Array" => None
+    case t"scala.Array" | t"scala.Enumeration" => None
     case aTypeSelect => Some(
       Importer(
         ref = aTypeSelect.qual,

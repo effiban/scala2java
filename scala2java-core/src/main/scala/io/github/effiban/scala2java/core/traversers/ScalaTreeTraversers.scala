@@ -73,8 +73,10 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val caseTraverser: CaseTraverser = new CaseTraverserImpl(patTraverser, expressionTermTraverser)
 
+  private lazy val catchArgumentTraverser: CatchArgumentTraverser = new CatchArgumentTraverserImpl(patTraverser)
+
   private lazy val catchHandlerTraverser: CatchHandlerTraverser = new CatchHandlerTraverserImpl(
-    CatchArgumentTraverser,
+    catchArgumentTraverser,
     blockWrappingTermTraverser
   )
 
