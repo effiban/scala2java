@@ -8,12 +8,12 @@ import scala.meta.{XtensionQuasiquoteImporter, XtensionQuasiquoteTerm}
 
 class PkgImportAdderImplTest extends UnitTestSuite {
 
-  private val importFlattener = mock[ImportFlattener]
+  private val importerCollector = mock[ImporterCollector]
   private val importerDeduplicater = mock[ImporterDeduplicater]
   private val treeImporterGenerator = mock[TreeImporterGenerator]
 
   private val pkgImportAdder = new PkgImportAdderImpl(
-    importFlattener,
+    importerCollector,
     importerDeduplicater,
     treeImporterGenerator
   )
@@ -21,7 +21,7 @@ class PkgImportAdderImplTest extends UnitTestSuite {
   test("addTo() when has no initial imports and no imports to add") {
     val pkg = q"package a.b"
 
-    doReturn(Nil).when(importFlattener).flatten(Nil)
+    doReturn(Nil).when(importerCollector).collectFlat(Nil)
     doReturn(Nil).when(treeImporterGenerator).generate(eqTree(pkg))
     doReturn(Nil).when(importerDeduplicater).dedup(Nil)
 
@@ -58,7 +58,7 @@ class PkgImportAdderImplTest extends UnitTestSuite {
       }
       """
 
-    doReturn(Nil).when(importFlattener).flatten(Nil)
+    doReturn(Nil).when(importerCollector).collectFlat(Nil)
     doReturn(expectedAdditionalImporters).when(treeImporterGenerator).generate(eqTree(initialPkg))
     doReturn(expectedFinalImporters).when(importerDeduplicater).dedup(eqTreeList(expectedAdditionalImporters))
 
@@ -68,18 +68,17 @@ class PkgImportAdderImplTest extends UnitTestSuite {
   test("addTo() when has initial imports but has no imports to add") {
     val initialPkg =
       q"""
-    package a.b {
-      import c.{D, E}
-      import c.D
+      package a.b {
+        import c.{D, E}
+        import c.D
 
-      trait MyTrait {
-        val x: D
-        val y: E
+        trait MyTrait {
+          val x: D
+          val y: E
+        }
       }
-    }
-    """
+      """
 
-    val expectedInitialImports = List(q"import c.{D, E}", q"import c.D")
     val expectedInitialImporters = List(importer"c.D", importer"c.E", importer"c.D")
     val expectedFinalImporters = List(importer"c.D", importer"c.E")
 
@@ -96,7 +95,7 @@ class PkgImportAdderImplTest extends UnitTestSuite {
       }
       """
 
-    doReturn(expectedInitialImporters).when(importFlattener).flatten(expectedInitialImports)
+    doReturn(expectedInitialImporters).when(importerCollector).collectFlat(eqTreeList(initialPkg.stats))
     doReturn(Nil).when(treeImporterGenerator).generate(eqTree(initialPkg))
     doReturn(expectedFinalImporters).when(importerDeduplicater).dedup(eqTreeList(expectedInitialImporters))
 
@@ -120,7 +119,6 @@ class PkgImportAdderImplTest extends UnitTestSuite {
       }
       """
 
-    val expectedInitialImports = List(q"import c.{D, E}", q"import c.D")
     val expectedInitialImporters = List(importer"c.D", importer"c.E", importer"c.D")
     val expectedAdditionalImporters = List(importer"c.D", importer"c.E", importer"f.G", importer"h.I", importer"h.I")
     val expectedFinalImporters = List(importer"c.D", importer"c.E", importer"f.G", importer"h.I")
@@ -143,7 +141,7 @@ class PkgImportAdderImplTest extends UnitTestSuite {
       }
       """
 
-    doReturn(expectedInitialImporters).when(importFlattener).flatten(expectedInitialImports)
+    doReturn(expectedInitialImporters).when(importerCollector).collectFlat(eqTreeList(initialPkg.stats))
     doReturn(expectedAdditionalImporters).when(treeImporterGenerator).generate(eqTree(initialPkg))
     doReturn(expectedFinalImporters).when(importerDeduplicater).dedup(eqTreeList(expectedInitialImporters ++ expectedAdditionalImporters))
 

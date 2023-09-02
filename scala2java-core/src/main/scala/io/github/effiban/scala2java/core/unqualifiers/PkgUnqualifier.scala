@@ -1,19 +1,18 @@
 package io.github.effiban.scala2java.core.unqualifiers
 
-import io.github.effiban.scala2java.core.importmanipulation.ImportFlattener
+import io.github.effiban.scala2java.core.importmanipulation.ImporterCollector
 
-import scala.meta.{Import, Pkg, Type}
+import scala.meta.{Pkg, Type}
 
 trait PkgUnqualifier {
   def unqualify(pkg: Pkg): Pkg
 }
 
-private[unqualifiers] class PkgUnqualifierImpl(importFlattener: ImportFlattener,
+private[unqualifiers] class PkgUnqualifierImpl(importerCollector: ImporterCollector,
                                                typeSelectUnqualifier: TypeSelectUnqualifier) extends PkgUnqualifier {
 
   override def unqualify(pkg: Pkg): Pkg = {
-    val imports = pkg.stats.collect { case `import`: Import => `import` }
-    val importers = importFlattener.flatten(imports)
+    val importers = importerCollector.collectFlat(pkg.stats)
 
     pkg.transform {
       case typeSelect: Type.Select => typeSelectUnqualifier.unqualify(typeSelect, importers)
@@ -25,4 +24,4 @@ private[unqualifiers] class PkgUnqualifierImpl(importFlattener: ImportFlattener,
   }
 }
 
-object PkgUnqualifier extends PkgUnqualifierImpl(ImportFlattener, TypeSelectUnqualifier)
+object PkgUnqualifier extends PkgUnqualifierImpl(ImporterCollector, TypeSelectUnqualifier)

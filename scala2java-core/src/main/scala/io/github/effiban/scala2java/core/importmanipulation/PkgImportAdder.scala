@@ -6,15 +6,14 @@ trait PkgImportAdder {
   def addTo(pkg: Pkg): Pkg
 }
 
-private[importmanipulation] class PkgImportAdderImpl(importFlattener: ImportFlattener,
+private[importmanipulation] class PkgImportAdderImpl(importerCollector: ImporterCollector,
                                                      importerDeduplicater: ImporterDeduplicater,
                                                      treeImporterGenerator: TreeImporterGenerator) extends PkgImportAdder {
 
   override def addTo(pkg: Pkg): Pkg = {
-    val initialImports = collectImports(pkg)
     val nonImports = collectNonImports(pkg)
 
-    val initialImporters = importFlattener.flatten(initialImports)
+    val initialImporters = importerCollector.collectFlat(pkg.stats)
     val additionalImporters = treeImporterGenerator.generate(pkg)
 
     val finalImporters = importerDeduplicater.dedup(initialImporters ++ additionalImporters)
@@ -36,7 +35,7 @@ private[importmanipulation] class PkgImportAdderImpl(importFlattener: ImportFlat
 }
 
 object PkgImportAdder extends PkgImportAdderImpl(
-  ImportFlattener,
+  ImporterCollector,
   ImporterDeduplicater,
   TreeImporterGenerator
 )
