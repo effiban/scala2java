@@ -1,10 +1,10 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{ArrayInitializerSizeContext, ArrayInitializerTypedValuesContext, ArrayInitializerValuesContext}
+import io.github.effiban.scala2java.core.entities.TypeSelects.ScalaAny
 import io.github.effiban.scala2java.core.matchers.ArrayInitializerSizeContextScalatestMatcher.equalArrayInitializerSizeContext
 import io.github.effiban.scala2java.core.matchers.ArrayInitializerTypedValuesContextScalatestMatcher.equalArrayInitializerTypedValuesContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.testtrees.TypeNames.ScalaAny
 import io.github.effiban.scala2java.core.typeinference.{CompositeCollectiveTypeInferrer, TermTypeInferrer}
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqOptionTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -85,7 +85,7 @@ class ArrayInitializerTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverseWithValues() when has an empty context should use the type 'Any'") {
-    val expectedOutputContext = ArrayInitializerTypedValuesContext(tpe = ScalaAny)
+    val expectedOutputContext = ArrayInitializerTypedValuesContext(ScalaAny)
 
     doReturn(ScalaAny).when(typeTraverser).traverse(eqTree(ScalaAny))
 

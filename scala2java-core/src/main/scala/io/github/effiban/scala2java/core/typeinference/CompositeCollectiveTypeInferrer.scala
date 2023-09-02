@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.typeinference
 
-import io.github.effiban.scala2java.core.entities.TypeNameValues.ScalaAny
+import io.github.effiban.scala2java.core.entities.TypeSelects.ScalaAny
 
 import scala.meta.Type
 
@@ -16,7 +16,7 @@ private[typeinference] class CompositeCollectiveTypeInferrerImpl(collectiveTypeI
     if (tupleTypes.nonEmpty && tupleTypes.size == maybeTypes.size) {
       collectiveTypeInferrer.inferTuple(tupleTypes)
     } else {
-      collectiveTypeInferrer.inferScalar(maybeTypes).getOrElse(Type.Name(ScalaAny))
+      collectiveTypeInferrer.inferScalar(maybeTypes).getOrElse(ScalaAny)
     }
   }
 }
