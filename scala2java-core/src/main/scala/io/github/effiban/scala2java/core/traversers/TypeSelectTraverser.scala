@@ -4,14 +4,14 @@ import io.github.effiban.scala2java.spi.transformers.TypeSelectTransformer
 
 import scala.meta.Type
 
-trait TypeSelectTraverser extends ScalaTreeTraverser2[Type.Select, Type.Ref]
+trait TypeSelectTraverser extends ScalaTreeTraverser2[Type.Select, Type]
 
 private[traversers] class TypeSelectTraverserImpl(defaultTermRefTraverser: => DefaultTermRefTraverser,
                                                   typeNameTraverser: TypeNameTraverser,
                                                   typeSelectTransformer: TypeSelectTransformer) extends TypeSelectTraverser {
 
   // A qualified type (e.g.: a.b.C where 'a.b' is a package and C is a class inside it)
-  override def traverse(typeSelect: Type.Select): Type.Ref = {
+  override def traverse(typeSelect: Type.Select): Type = {
     typeSelectTransformer.transform(typeSelect) match {
       case Some(transformedType) => transformedType
       case None =>

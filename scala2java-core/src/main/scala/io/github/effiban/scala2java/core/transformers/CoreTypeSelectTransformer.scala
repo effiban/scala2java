@@ -8,26 +8,59 @@ import scala.meta.{Type, XtensionQuasiquoteType}
 
 object CoreTypeSelectTransformer extends TypeSelectTransformer {
 
-  private final val ScalaTypeToJavaType = Map[Type.Select, Type.Ref](
+  // Please keep in alphabetical order
+  private final val ScalaTypeToJavaType = Map[Type.Select, Type](
+    ScalaAbstractMethodError -> t"AbstractMethodError",
     ScalaAny -> t"Object",
-    t"scala.AnyRef" -> t"Object",
+    ScalaAnyRef -> t"Object",
+    ScalaAnyVal -> t"Object",
+    ScalaArrayIndexOutOfBoundsException -> t"ArrayIndexOutOfBoundsException",
+    ScalaBigDecimal -> JavaBigDecimal,
+    ScalaBigInt -> JavaBigInt,
     ScalaBoolean -> t"boolean",
     ScalaByte -> t"byte",
     ScalaChar -> t"char",
-    ScalaShort -> t"short",
-    ScalaInt -> t"int",
-    ScalaLong -> t"long",
-    ScalaFloat -> t"float",
+    ScalaClass -> t"Class",
+    ScalaClassCastException -> t"ClassCastException",
+    ScalaCloneable -> t"Cloneable",
     ScalaDouble -> t"double",
+    ScalaEither -> JavaEither,
+    ScalaError -> t"Error",
+    ScalaException -> t"Exception",
+    ScalaFloat -> t"float",
+    ScalaFunction -> JavaFunction,
+    ScalaIllegalArgumentException -> t"IllegalArgumentException",
+    ScalaIndexedSeq -> JavaList,
+    ScalaIndexOutOfBoundsException -> t"IndexOutOfBoundsException",
+    ScalaInt -> t"int",
+    ScalaInterruptedException -> t"InterruptedException",
+    ScalaIterable -> t"Iterable",
+    ScalaIterator -> t"Iterator",
+    ScalaLazyList -> JavaStream,
+    ScalaLeft -> JavaEither,
+    ScalaList -> JavaList,
+    ScalaLong -> t"long",
+    ScalaMap -> JavaMap,
+    ScalaNoSuchElementException -> JavaNoSuchElementException,
+    ScalaNullPointerException -> t"NullPointerException",
+    ScalaNumberFormatException -> t"NumberFormatException",
+    ScalaOption -> JavaOptional,
+    ScalaRange -> t"java.util.List[Integer]",
+    ScalaRight -> JavaEither,
+    ScalaRuntimeException -> t"RuntimeException",
+    ScalaSeq -> JavaList,
+    ScalaSet -> JavaSet,
+    ScalaSerializable -> JavaSerializable,
+    ScalaShort -> t"short",
+    ScalaStream -> JavaStream,
+    ScalaString -> t"String",
+    ScalaStringBuilder -> t"StringBuilder",
+    ScalaStringIndexOutOfBoundsException -> t"StringIndexOutOfBoundsException",
+    ScalaThrowable -> t"Throwable",
     ScalaUnit -> t"void",
-    t"scala.collection.immutable.Seq" -> t"java.util.List",
-    t"scala.collection.immutable.Vector" -> t"java.util.List",
-    ScalaList -> t"java.util.List",
-    t"scala.collection.immutable.Set" -> t"java.util.Set",
-    t"scala.collection.immutable.Map" -> t"java.util.Map",
-    ScalaOption -> t"java.util.Optional",
-    t"scala.concurrent.Future" -> t"java.util.concurrent.CompletableFuture"
+    ScalaUnsupportedOperationException -> t"UnsupportedOperationException",
+    ScalaVector -> JavaList
   )
 
-  override def transform(scalaType: Type.Select): Option[Type.Ref] = TreeKeyedMap.get(ScalaTypeToJavaType, scalaType)
+  override def transform(scalaType: Type.Select): Option[Type] = TreeKeyedMap.get(ScalaTypeToJavaType, scalaType)
 }
