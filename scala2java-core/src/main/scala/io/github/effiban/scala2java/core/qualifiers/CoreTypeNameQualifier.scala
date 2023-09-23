@@ -1,6 +1,9 @@
 package io.github.effiban.scala2java.core.qualifiers
 
-import scala.meta.{Term, Type}
+import io.github.effiban.scala2java.core.entities.ReflectedEntities.{PredefModule, ScalaPackage}
+import io.github.effiban.scala2java.core.entities.{TermNames, TermSelects}
+
+import scala.meta.Type
 import scala.reflect.runtime.universe._
 
 trait CoreTypeNameQualifier {
@@ -9,24 +12,22 @@ trait CoreTypeNameQualifier {
 
 object CoreTypeNameQualifier extends CoreTypeNameQualifier {
 
-  private val mirror = runtimeMirror(getClass.getClassLoader)
-
   override def qualify(typeName: Type.Name): Option[Type] = {
       qualifyAsPredefMember(typeName)
         .orElse(qualifyAsScalaPackageMember(typeName))
   }
 
   private def qualifyAsPredefMember(scalaMetaTypeName: Type.Name) = {
-    mirror.staticModule("scala.Predef").typeSignature.decl(TypeName(scalaMetaTypeName.value)) match {
+    PredefModule.typeSignature.decl(TypeName(scalaMetaTypeName.value)) match {
       case NoSymbol => None
-      case _ => Some(Type.Select(Term.Select(Term.Name("scala"), Term.Name("Predef")), scalaMetaTypeName))
+      case _ => Some(Type.Select(TermSelects.ScalaPredef, scalaMetaTypeName))
     }
   }
 
   private def qualifyAsScalaPackageMember(scalaMetaTypeName: Type.Name) = {
-    mirror.staticPackage("scala").typeSignature.decl(TypeName(scalaMetaTypeName.value)) match {
+    ScalaPackage.typeSignature.decl(TypeName(scalaMetaTypeName.value)) match {
       case NoSymbol => None
-      case _ => Some(Type.Select(Term.Name("scala"), scalaMetaTypeName))
+      case _ => Some(Type.Select(TermNames.Scala, scalaMetaTypeName))
     }
   }
 }
