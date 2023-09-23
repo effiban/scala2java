@@ -58,11 +58,11 @@ class PkgImportAdderImplTest extends UnitTestSuite {
       }
       """
 
-    doReturn(Nil).when(importerCollector).collectFlat(Nil)
+    doReturn(Nil).when(importerCollector).collectFlat(eqTreeList(initialPkg.stats))
     doReturn(expectedAdditionalImporters).when(treeImporterGenerator).generate(eqTree(initialPkg))
     doReturn(expectedFinalImporters).when(importerDeduplicater).dedup(eqTreeList(expectedAdditionalImporters))
 
-    PkgImportAdder.addTo(initialPkg).structure shouldBe expectedFinalPkg.structure
+    pkgImportAdder.addTo(initialPkg).structure shouldBe expectedFinalPkg.structure
   }
 
   test("addTo() when has initial imports but has no imports to add") {
@@ -145,6 +145,6 @@ class PkgImportAdderImplTest extends UnitTestSuite {
     doReturn(expectedAdditionalImporters).when(treeImporterGenerator).generate(eqTree(initialPkg))
     doReturn(expectedFinalImporters).when(importerDeduplicater).dedup(eqTreeList(expectedInitialImporters ++ expectedAdditionalImporters))
 
-    PkgImportAdder.addTo(initialPkg).structure shouldBe expectedFinalPkg.structure
+    pkgImportAdder.addTo(initialPkg).structure shouldBe expectedFinalPkg.structure
   }
 }
