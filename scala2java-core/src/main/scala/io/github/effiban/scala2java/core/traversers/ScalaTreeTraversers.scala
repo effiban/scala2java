@@ -5,7 +5,6 @@ import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
 import io.github.effiban.scala2java.core.factories.{Factories, TemplateChildContextFactory}
 import io.github.effiban.scala2java.core.orderings.JavaTemplateChildOrdering
 import io.github.effiban.scala2java.core.predicates._
-import io.github.effiban.scala2java.core.providers.{CompositeAdditionalImportersProvider, CoreAdditionalImportersProvider}
 import io.github.effiban.scala2java.core.resolvers._
 import io.github.effiban.scala2java.core.transformers._
 import io.github.effiban.scala2java.core.typeinference.TypeInferrers
@@ -275,8 +274,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val pkgTraverser: PkgTraverser = new PkgTraverserImpl(
     defaultTermRefTraverser,
-    pkgStatListTraverser,
-    new CompositeAdditionalImportersProvider(CoreAdditionalImportersProvider)
+    pkgStatListTraverser
   )
 
   private lazy val regularClassTraverser: RegularClassTraverser = new RegularClassTraverserImpl(
