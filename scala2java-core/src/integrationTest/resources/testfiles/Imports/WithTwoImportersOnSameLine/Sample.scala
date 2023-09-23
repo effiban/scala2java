@@ -1,5 +1,8 @@
 package dummy
 
-import aaa.bbb, ccc.ddd
+import aaa.B, ccc.D
 
-class Sample
+class Sample {
+  var b: B
+  var d: D
+}

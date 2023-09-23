@@ -7,7 +7,7 @@ import io.github.effiban.scala2java.core.enrichers.Enrichers
 import io.github.effiban.scala2java.core.enrichers.entities.EnrichedSource
 import io.github.effiban.scala2java.core.extensions.{ExtensionRegistry, ExtensionRegistryBuilder}
 import io.github.effiban.scala2java.core.factories.Factories
-import io.github.effiban.scala2java.core.importmanipulation.SourceImportAdder
+import io.github.effiban.scala2java.core.importmanipulation.{SourceImportAdder, SourceImportRemover}
 import io.github.effiban.scala2java.core.predicates.Predicates
 import io.github.effiban.scala2java.core.qualifiers.SourceQualifier
 import io.github.effiban.scala2java.core.renderers.Renderers
@@ -45,6 +45,7 @@ object Scala2JavaTranslator {
           Seq(
             SourceDesugarer.desugar,
             SourceQualifier.qualify,
+            SourceImportRemover.removeUnusedFrom,
             new SemanticDesugarers().sourceDesugarer.desugar,
             new ScalaTreeTraversers().sourceTraverser.traverse,
             SourceImportAdder.addTo,
