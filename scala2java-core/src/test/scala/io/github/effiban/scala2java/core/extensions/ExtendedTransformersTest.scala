@@ -23,19 +23,6 @@ class ExtendedTransformersTest extends UnitTestSuite {
     extensionRegistry.fileNameTransformers shouldBe fileNameTransformers
   }
 
-  test("importerTransformers") {
-    val importerTransformer1 = mock[ImporterTransformer]
-    val importerTransformer2 = mock[ImporterTransformer]
-    val importerTransformers = List(importerTransformer1, importerTransformer2)
-
-    when(extension1.importerTransformer()).thenReturn(importerTransformer1)
-    when(extension2.importerTransformer()).thenReturn(importerTransformer2)
-
-    val extensionRegistry = ExtensionRegistry(extensions)
-
-    extensionRegistry.importerTransformers shouldBe importerTransformers
-  }
-
   test("classTransformers") {
     val classTransformer1 = mock[ClassTransformer]
     val classTransformer2 = mock[ClassTransformer]

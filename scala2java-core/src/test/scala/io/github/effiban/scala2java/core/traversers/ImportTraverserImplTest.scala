@@ -1,7 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.spi.transformers.ImporterTransformer
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchers.any
 
@@ -10,12 +9,8 @@ import scala.meta.{Import, Importer, XtensionQuasiquoteImporter}
 class ImportTraverserImplTest extends UnitTestSuite {
 
   private val importerTraverser = mock[ImporterTraverser]
-  private val importerTransformer = mock[ImporterTransformer]
 
-  private val importTraverser = new ImportTraverserImpl(
-    importerTraverser,
-    importerTransformer
-  )
+  private val importTraverser = new ImportTraverserImpl(importerTraverser)
 
   test("traverse() when importers have single importees") {
     val importer1 = importer"mypackage1.myclass1"
@@ -25,8 +20,6 @@ class ImportTraverserImplTest extends UnitTestSuite {
     val traversedImporter1 = importer"mypackage11.myclass11"
     val traversedImporter2 = importer"mypackage22.myclass22"
     val traversedImport = Import(List(traversedImporter1, traversedImporter2))
-
-    when(importerTransformer.transform(any[Importer])).thenAnswer((importer: Importer) => importer)
 
     doReturn(traversedImporter1).when(importerTraverser).traverse(eqTree(importer1))
     doReturn(traversedImporter2).when(importerTraverser).traverse(eqTree(importer2))
@@ -50,40 +43,12 @@ class ImportTraverserImplTest extends UnitTestSuite {
     val traversedImporter4 = importer"mypackage22.myclass44"
     val traversedImport = Import(List(traversedImporter1, traversedImporter2, traversedImporter3, traversedImporter4))
 
-    when(importerTransformer.transform(any[Importer])).thenAnswer((importer: Importer) => importer)
-
     doReturn(traversedImporter1).when(importerTraverser).traverse(eqTree(flattenedImporter1))
     doReturn(traversedImporter2).when(importerTraverser).traverse(eqTree(flattenedImporter2))
     doReturn(traversedImporter3).when(importerTraverser).traverse(eqTree(flattenedImporter3))
     doReturn(traversedImporter4).when(importerTraverser).traverse(eqTree(flattenedImporter4))
 
     importTraverser.traverse(Import(allImporters)).value.structure shouldBe traversedImport.structure
-  }
-
-  test("traverse() when importers should be transformed") {
-    val importer1A = importer"package1A.myclass1A"
-    val importer1B = importer"package1B.myclass1B"
-    val importer2A = importer"package2A.myclass2A"
-    val importer2B = importer"package2B.myclass2B"
-    val inputImporters = List(
-      importer1A,
-      importer2A
-    )
-    val traversedImporter1B = importer"package11B.myclass11B"
-    val traversedImporter2B = importer"package22B.myclass22B"
-    val traversedImport = Import(List(traversedImporter1B, traversedImporter2B))
-
-    when(importerTransformer.transform(any[Importer])).thenAnswer((importer: Importer) =>
-      importer match {
-        case anImporter if anImporter.structure == importer1A.structure => importer1B
-        case anImporter if anImporter.structure == importer2A.structure => importer2B
-      }
-    )
-
-    doReturn(traversedImporter1B).when(importerTraverser).traverse(eqTree(importer1B))
-    doReturn(traversedImporter2B).when(importerTraverser).traverse(eqTree(importer2B))
-
-    importTraverser.traverse(Import(inputImporters)).value.structure shouldBe traversedImport.structure
   }
 
   test("traverse() when some importers are duplicated should remove the duplicates") {
@@ -103,8 +68,6 @@ class ImportTraverserImplTest extends UnitTestSuite {
     val traversedImporter2 = importer"package22.myclass22"
     val traversedImporter3 = importer"package33.myclass33"
     val traversedImport = Import(List(traversedImporter1, traversedImporter2, traversedImporter3))
-
-    when(importerTransformer.transform(any[Importer])).thenAnswer((importer: Importer) => importer)
 
     doReturn(traversedImporter1).when(importerTraverser).traverse(eqTree(importer1A))
     doReturn(traversedImporter2).when(importerTraverser).traverse(eqTree(importer2))
