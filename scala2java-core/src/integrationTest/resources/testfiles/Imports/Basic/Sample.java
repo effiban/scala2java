@@ -6,8 +6,10 @@ import java.math.*;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.*;
-import aaa.bbb;
-import ccc.ddd;
+import aaa.B;
+import ccc.D;
 
 public class Sample {
+    public B b;
+    public D d;
 }
