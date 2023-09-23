@@ -1,21 +1,17 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.spi.transformers.ImporterTransformer
-
 import scala.meta.{Import, Importer}
 
 trait ImportTraverser {
   def traverse(`import`: Import): Option[Import]
 }
 
-private[traversers] class ImportTraverserImpl(importerTraverser: => ImporterTraverser,
-                                              importerTransformer: ImporterTransformer) extends ImportTraverser {
+private[traversers] class ImportTraverserImpl(importerTraverser: => ImporterTraverser) extends ImportTraverser {
 
   override def traverse(`import`: Import): Option[Import] = {
     val traversedImporters = `import`.importers match {
       case Nil => throw new IllegalStateException("Invalid import with no inner importers")
       case importers => importers.flatMap(flattenImportees)
-        .map(importerTransformer.transform)
         .distinctBy(_.structure)
         .map(importerTraverser.traverse)
     }

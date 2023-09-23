@@ -6,8 +6,6 @@ private[extensions] trait ExtendedTransformers { this: ExtensionContainer =>
 
   val fileNameTransformers: List[FileNameTransformer] = extensions.map(_.fileNameTransformer())
 
-  val importerTransformers: List[ImporterTransformer] = extensions.map(_.importerTransformer())
-
   val classTransformers: List[ClassTransformer] = extensions.map(_.classTransformer())
 
   val templateTermApplyInfixToDefnTransformers: List[TemplateTermApplyInfixToDefnTransformer] =

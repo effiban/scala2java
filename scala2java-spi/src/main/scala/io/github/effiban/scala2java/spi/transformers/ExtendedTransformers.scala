@@ -15,17 +15,6 @@ trait ExtendedTransformers {
    */
   def fileNameTransformer(): FileNameTransformer = FileNameTransformer.Identity
 
-  /** Override this method if you need to modify an [[scala.meta.Importer]] (import statement).<br>
-   * '''NOTE regarding precedence''': This transformer will be invoked after [[importerTransformer]]. This means that if
-   * this extension, or any other one, excludes an importer that is modified by this transformer -
-   * the modification will be ignored.
-   *
-   * @see [[ImporterTransformer]] for more information on how the framework will invoke this predicate.
-   * @return if overriden - a transformer which modifies importers<br>
-   *         otherwise - the default transformer which doesn't change anything<br>
-   */
-  def importerTransformer(): ImporterTransformer = ImporterTransformer.Identity
-
   /** Override this method if you need to transform a [[scala.meta.Defn.Class]].<br>
    * NOTE that this transformer intended for manipulating the class declaration (e.g. name, visibility, annotations).<br>
    * For manipulating the template part (parents, body) - override one of the other transformers instead.

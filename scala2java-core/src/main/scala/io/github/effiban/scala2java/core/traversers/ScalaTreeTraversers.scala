@@ -230,10 +230,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val importerTraverser: ImporterTraverser = new ImporterTraverserImpl(defaultTermRefTraverser)
 
-  private lazy val importTraverser: ImportTraverser = new ImportTraverserImpl(
-    importerTraverser,
-    new CompositeImporterTransformer
-  )
+  private lazy val importTraverser: ImportTraverser = new ImportTraverserImpl(importerTraverser)
 
   private lazy val initTraverser: InitTraverser = new InitTraverserImpl(typeTraverser, expressionTermTraverser)
 
