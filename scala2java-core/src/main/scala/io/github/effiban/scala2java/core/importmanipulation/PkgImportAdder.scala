@@ -22,10 +22,6 @@ private[importmanipulation] class PkgImportAdderImpl(importerCollector: Importer
     pkg.copy(stats = finalImports ++ nonImports)
   }
 
-  private def collectImports(pkg: Pkg) = {
-    pkg.stats.collect { case `import`: Import => `import` }
-  }
-
   private def collectNonImports(pkg: Pkg) = {
     pkg.stats.collect {
       case _: Import => None

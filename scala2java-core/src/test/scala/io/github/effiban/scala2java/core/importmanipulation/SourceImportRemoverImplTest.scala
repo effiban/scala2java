@@ -10,13 +10,13 @@ class SourceImportRemoverImplTest extends UnitTestSuite {
 
   private val sourceImportRemover = new SourceImportRemoverImpl(pkgImportRemover)
 
-  test("removeFrom() when has no packages should return unchanged") {
+  test("removeUnusedFrom() when has no packages should return unchanged") {
     val source = Source(List(q"val x: Int = 3"))
 
-    sourceImportRemover.removeFrom(source).structure shouldBe source.structure
+    sourceImportRemover.removeUnusedFrom(source).structure shouldBe source.structure
   }
 
-  test("removeFrom() when has packages should return a Source containing the packages with removed imports") {
+  test("removeUnusedFrom() when has packages should return a Source containing the packages with removed imports") {
     val initialPkg1 =
       q"""
       package pkg1 {
@@ -81,9 +81,9 @@ class SourceImportRemoverImplTest extends UnitTestSuite {
       case aPkg if aPkg.structure == initialPkg1.structure => expectedFinalPkg1
       case aPkg if aPkg.structure == initialPkg2.structure => expectedFinalPkg2
       case aPkg => throw new IllegalStateException(s"No final Pkg has been stubbed for initial Pkg $aPkg")
-    }).when(pkgImportRemover).removeFrom(any[Pkg])
+    }).when(pkgImportRemover).removeUnusedFrom(any[Pkg])
 
-    sourceImportRemover.removeFrom(initialSource).structure shouldBe expectedFinalSource.structure
+    sourceImportRemover.removeUnusedFrom(initialSource).structure shouldBe expectedFinalSource.structure
   }
 
 }
