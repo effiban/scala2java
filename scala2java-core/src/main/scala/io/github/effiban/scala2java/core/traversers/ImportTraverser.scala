@@ -1,6 +1,5 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.spi.predicates.ImporterExcludedPredicate
 import io.github.effiban.scala2java.spi.transformers.ImporterTransformer
 
 import scala.meta.{Import, Importer}
@@ -10,14 +9,12 @@ trait ImportTraverser {
 }
 
 private[traversers] class ImportTraverserImpl(importerTraverser: => ImporterTraverser,
-                                              importerExcludedPredicate: ImporterExcludedPredicate,
                                               importerTransformer: ImporterTransformer) extends ImportTraverser {
 
   override def traverse(`import`: Import): Option[Import] = {
     val traversedImporters = `import`.importers match {
       case Nil => throw new IllegalStateException("Invalid import with no inner importers")
       case importers => importers.flatMap(flattenImportees)
-        .filterNot(importerExcludedPredicate)
         .map(importerTransformer.transform)
         .distinctBy(_.structure)
         .map(importerTraverser.traverse)
