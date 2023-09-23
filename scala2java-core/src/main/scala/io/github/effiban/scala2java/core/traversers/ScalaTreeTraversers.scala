@@ -232,7 +232,6 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val importTraverser: ImportTraverser = new ImportTraverserImpl(
     importerTraverser,
-    new CompositeImporterExcludedPredicate(CoreImporterExcludedPredicate),
     new CompositeImporterTransformer
   )
 
