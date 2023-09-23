@@ -1,11 +1,6 @@
 package dummy;
 
-import java.io.*;
-import java.lang.*;
-import java.math.*;
-import java.util.*;
-import java.util.function.*;
-import java.util.stream.*;
+import java.util.Map;
 
 public class Sample {
     public final Map<String, int> x = Map.<String, int>of();

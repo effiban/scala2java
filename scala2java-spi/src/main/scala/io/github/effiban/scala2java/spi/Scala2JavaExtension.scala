@@ -1,7 +1,6 @@
 package io.github.effiban.scala2java.spi
 
 import io.github.effiban.scala2java.spi.predicates.ExtendedPredicates
-import io.github.effiban.scala2java.spi.providers.ExtendedProviders
 import io.github.effiban.scala2java.spi.transformers.ExtendedTransformers
 import io.github.effiban.scala2java.spi.typeinferrers.ExtendedTypeInferrers
 
@@ -23,7 +22,6 @@ import scala.meta.Term
  */
 trait Scala2JavaExtension
   extends ExtendedPredicates
-    with ExtendedProviders
     with ExtendedTransformers
     with ExtendedTypeInferrers {
 

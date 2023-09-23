@@ -1,21 +1,17 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.spi.providers.AdditionalImportersProvider
-
-import scala.meta.{Import, Pkg}
+import scala.meta.Pkg
 
 trait PkgTraverser {
   def traverse(pkg: Pkg): Pkg
 }
 
 private[traversers] class PkgTraverserImpl(defaultTermRefTraverser: => DefaultTermRefTraverser,
-                                           pkgStatListTraverser: => PkgStatListTraverser,
-                                           additionalImportersProvider: AdditionalImportersProvider) extends PkgTraverser {
+                                           pkgStatListTraverser: => PkgStatListTraverser) extends PkgTraverser {
 
   override def traverse(pkg: Pkg): Pkg = {
     val traversedPkgRef = defaultTermRefTraverser.traverse(pkg.ref)
-    val enrichedPkgStats = Import(additionalImportersProvider.provide()) +: pkg.stats
-    val traversedPkgStats = pkgStatListTraverser.traverse(enrichedPkgStats)
+    val traversedPkgStats = pkgStatListTraverser.traverse(pkg.stats)
 
     Pkg(ref = traversedPkgRef, stats = traversedPkgStats)
   }
