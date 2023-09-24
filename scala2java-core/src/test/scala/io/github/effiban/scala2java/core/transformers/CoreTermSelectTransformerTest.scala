@@ -12,8 +12,8 @@ class CoreTermSelectTransformerTest extends UnitTestSuite {
     transform(ScalaNil).value.structure shouldBe q"java.util.List.of()".structure
   }
 
-  test("transform 'scala.None' should return 'Optional.empty()'") {
-    transform(ScalaNone).value.structure shouldBe q"Optional.empty()".structure
+  test("transform 'scala.None' should return 'java.util.Optional.empty()'") {
+    transform(ScalaNone).value.structure shouldBe q"java.util.Optional.empty()".structure
   }
 
   test("transform 'myTuple._1' should return 'myTuple.v1'") {
