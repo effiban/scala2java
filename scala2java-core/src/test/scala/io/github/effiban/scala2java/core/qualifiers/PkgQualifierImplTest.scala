@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.qualifiers
 
 import io.github.effiban.scala2java.core.entities.TypeSelects.{ScalaDouble, ScalaInt}
-import io.github.effiban.scala2java.core.importmanipulation.ImporterCollector
+import io.github.effiban.scala2java.core.importmanipulation.StatsByImportSplitter
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import org.mockito.ArgumentMatchersSugar.any
@@ -10,12 +10,33 @@ import scala.meta.{Type, XtensionQuasiquoteImporter, XtensionQuasiquoteTerm, Xte
 
 class PkgQualifierImplTest extends UnitTestSuite {
 
-  private val importerCollector = mock[ImporterCollector]
+  private val statsByImportSplitter = mock[StatsByImportSplitter]
   private val typeNameQualifier = mock[CompositeTypeNameQualifier]
 
-  private val pkgQualifier = new PkgQualifierImpl(importerCollector, typeNameQualifier)
+  private val pkgQualifier = new PkgQualifierImpl(
+    statsByImportSplitter,
+    typeNameQualifier
+  )
 
-  test("qualify when inner qualifier returns unchanged for all, should return unchanged") {
+  test("qualify when has no nested trees that could be qualified, should return unchanged") {
+    val pkg =
+      q"""
+      package a.b {
+        import c.d
+        import e.f
+      }
+      """
+
+    val expectedImporters = List(importer"c.d", importer"e.f")
+
+    doReturn((expectedImporters, Nil)).when(statsByImportSplitter).split(eqTreeList(pkg.stats))
+
+    pkgQualifier.qualify(pkg).structure shouldBe pkg.structure
+  }
+
+
+
+  test("qualify when has nested Type.Names but TypeNameQualifier returns nothing, should return unchanged") {
     val pkg =
       q"""
       package a.b {
@@ -30,14 +51,24 @@ class PkgQualifierImplTest extends UnitTestSuite {
       """
 
     val expectedImporters = List(importer"c.d", importer"e.f")
+    val expectedNonImports = List(
+      q"""
+      trait G {
+      }
+      """,
+      q"""
+      trait H {
+      }
+      """
+    )
 
-    doReturn(expectedImporters).when(importerCollector).collectFlat(eqTreeList(pkg.stats))
+    doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(pkg.stats))
     doAnswer((typeName: Type.Name) => typeName).when(typeNameQualifier).qualify(any[Type.Name], eqTreeList(expectedImporters))
 
     pkgQualifier.qualify(pkg).structure shouldBe pkg.structure
   }
 
-  test("qualify when inner qualifier qualifies some of the types, should return those types qualified") {
+  test("qualify when TypeNameQualifier qualifies some of the types, should return those types qualified") {
     val initialPkg =
       q"""
       package a.b {
@@ -65,8 +96,16 @@ class PkgQualifierImplTest extends UnitTestSuite {
       """
 
     val expectedImporters = List(importer"c.d", importer"e.f")
+    val expectedNonImports = List(
+      q"""
+      trait C {
+        val x: Int = 2
+        val y: Double = 3.3
+      }
+      """
+    )
 
-    doReturn(expectedImporters).when(importerCollector).collectFlat(eqTreeList(initialPkg.stats))
+    doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
     doAnswer((typeName: Type.Name) => typeName match {
       case aTypeName if aTypeName.structure == t"Int".structure => ScalaInt
       case aTypeName if aTypeName.structure == t"Double".structure => ScalaDouble

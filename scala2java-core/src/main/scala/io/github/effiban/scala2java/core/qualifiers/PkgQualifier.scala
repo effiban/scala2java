@@ -1,20 +1,27 @@
 package io.github.effiban.scala2java.core.qualifiers
 
-import io.github.effiban.scala2java.core.importmanipulation.ImporterCollector
+import io.github.effiban.scala2java.core.importmanipulation.StatsByImportSplitter
 
-import scala.meta.{Importer, Pkg, Transformer, Tree, Type}
+import scala.meta.{Import, Importer, Pkg, Stat, Transformer, Tree, Type}
 
 trait PkgQualifier {
   def qualify(pkg: Pkg): Pkg
 }
 
-private[qualifiers] class PkgQualifierImpl(importerCollector: ImporterCollector,
+private[qualifiers] class PkgQualifierImpl(statsByImportSplitter: StatsByImportSplitter,
                                            typeNameQualifier: CompositeTypeNameQualifier) extends PkgQualifier {
   override def qualify(pkg: Pkg): Pkg = {
-    val importers = importerCollector.collectFlat(pkg.stats)
-    new QualifyingTransformer(importers)(pkg) match {
-      case transformedPkg: Pkg => transformedPkg
-      case other => throw new IllegalStateException(s"The transformed Pkg should also be a Pkg but it is: $other")
+    val (importers, nonImports) = statsByImportSplitter.split(pkg.stats)
+    val imports = importers.map(importer => Import(List(importer)))
+    val qualifiedStats = nonImports.map(stat => qualify(stat, importers))
+
+    pkg.copy(stats = imports ++ qualifiedStats)
+  }
+
+  private def qualify(stat: Stat, importers: List[Importer]): Stat = {
+    new QualifyingTransformer(importers)(stat) match {
+      case qualifiedStat: Stat => qualifiedStat
+      case other => throw new IllegalStateException(s"A qualified Stat should also be a Stat but it is: $other")
     }
   }
 
@@ -29,4 +36,7 @@ private[qualifiers] class PkgQualifierImpl(importerCollector: ImporterCollector,
   }
 }
 
-object PkgQualifier extends PkgQualifierImpl(ImporterCollector, CompositeTypeNameQualifier)
+object PkgQualifier extends PkgQualifierImpl(
+  StatsByImportSplitter,
+  CompositeTypeNameQualifier
+)
