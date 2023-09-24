@@ -12,7 +12,7 @@ object CoreTermSelectTransformer extends TermSelectTransformer {
 
   private final val ScalaTermSelectToJavaTerm = Map[Term.Select, Term](
     ScalaNil -> q"java.util.List.of()",
-    ScalaNone -> q"Optional.empty()"
+    ScalaNone -> q"java.util.Optional.empty()"
   )
 
   override def transform(termSelect: Term.Select, context: TermSelectTransformationContext = TermSelectTransformationContext()): Option[Term] = {
