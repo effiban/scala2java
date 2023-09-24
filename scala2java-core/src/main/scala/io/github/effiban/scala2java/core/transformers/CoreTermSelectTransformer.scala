@@ -1,16 +1,26 @@
 package io.github.effiban.scala2java.core.transformers
 
 import io.github.effiban.scala2java.core.entities.TermNameValues.ScalaTupleElementRegex
+import io.github.effiban.scala2java.core.entities.TermSelects.{ScalaNil, ScalaNone}
+import io.github.effiban.scala2java.core.entities.TreeKeyedMap
 import io.github.effiban.scala2java.spi.contexts.TermSelectTransformationContext
 import io.github.effiban.scala2java.spi.transformers.TermSelectTransformer
 
-import scala.meta.Term
+import scala.meta.{Term, XtensionQuasiquoteTerm}
 
 object CoreTermSelectTransformer extends TermSelectTransformer {
 
-  // Transform a Scala-specific qualified name into an equivalent in Java
-  // Either and Try use the syntax of the VAVR framework (Maven: io.vavr:vavr)
+  private final val ScalaTermSelectToJavaTerm = Map[Term.Select, Term](
+    ScalaNil -> q"java.util.List.of()",
+    ScalaNone -> q"Optional.empty()"
+  )
+
   override def transform(termSelect: Term.Select, context: TermSelectTransformationContext = TermSelectTransformationContext()): Option[Term] = {
+    TreeKeyedMap.get(ScalaTermSelectToJavaTerm, termSelect)
+      .orElse(transformSpecialCase(termSelect, context))
+  }
+
+  private def transformSpecialCase(termSelect: Term.Select, context: TermSelectTransformationContext = TermSelectTransformationContext()): Option[Term] = {
     (termSelect.qual, termSelect.name) match {
       // TODO handle a tuple of 2 args, which are transformed into a Map.Entry before we get here, correctly
       case (qual, Term.Name(ScalaTupleElementRegex(index))) => Some(Term.Select(qual, Term.Name(s"v$index")))
