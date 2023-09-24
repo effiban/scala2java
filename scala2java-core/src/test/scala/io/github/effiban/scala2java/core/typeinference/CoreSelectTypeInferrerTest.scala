@@ -1,5 +1,7 @@
 package io.github.effiban.scala2java.core.typeinference
 
+import io.github.effiban.scala2java.core.entities.TermSelects.{ScalaNil, ScalaNone}
+import io.github.effiban.scala2java.core.entities.TypeSelects.{ScalaList, ScalaOption}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.core.typeinference.CoreSelectTypeInferrer.infer
@@ -8,6 +10,14 @@ import io.github.effiban.scala2java.spi.contexts.TermSelectInferenceContext
 import scala.meta.{XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 class CoreSelectTypeInferrerTest extends UnitTestSuite {
+
+  test("infer() for 'scala.Nil' should return 'scala.List'") {
+    infer(ScalaNil, TermSelectInferenceContext()).value.structure shouldBe ScalaList.structure
+  }
+
+  test("infer() for 'scala.None' should return 'scala.Option'") {
+    infer(ScalaNone, TermSelectInferenceContext()).value.structure shouldBe ScalaOption.structure
+  }
 
   test("infer() for first elem of a Tuple2 should return correct type") {
     val termSelect = q"""("a", 1)._1"""
