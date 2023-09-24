@@ -1,30 +1,25 @@
 package io.github.effiban.scala2java.core.importmanipulation
 
-import scala.meta.{Import, Pkg, Stat}
+import scala.meta.{Import, Importer, Pkg, Stat}
 
 trait PkgImportRemover {
   def removeUnusedFrom(pkg: Pkg): Pkg
 }
 
-private[importmanipulation] class PkgImportRemoverImpl(importerCollector: ImporterCollector, treeImporterUsed: TreeImporterUsed)
+private[importmanipulation] class PkgImportRemoverImpl(statsByImportSplitter: StatsByImportSplitter, treeImporterUsed: TreeImporterUsed)
   extends PkgImportRemover {
 
   override def removeUnusedFrom(pkg: Pkg): Pkg = {
-    val nonImports = collectNonImports(pkg)
-
-    val initialImporters = importerCollector.collectFlat(pkg.stats)
-    val finalImports = initialImporters.filterNot(importer => treeImporterUsed(pkg, importer))
+    val (initialImporters, nonImports) = statsByImportSplitter.split(pkg.stats)
+    val finalImports = initialImporters.filter(importer => importerUsed(importer, nonImports))
       .map(importer => Import(List(importer)))
 
     pkg.copy(stats = finalImports ++ nonImports)
   }
 
-  private def collectNonImports(pkg: Pkg) = {
-    pkg.stats.collect {
-      case _: Import => None
-      case stat: Stat => Some(stat)
-    }.flatten
+  def importerUsed(importer: Importer, nonImports: List[Stat]): Boolean = {
+    nonImports.exists(nonImport => treeImporterUsed(nonImport, importer))
   }
 }
 
-object PkgImportRemover extends PkgImportRemoverImpl(ImporterCollector, TreeImporterUsed)
+object PkgImportRemover extends PkgImportRemoverImpl(StatsByImportSplitter, TreeImporterUsed)
