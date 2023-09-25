@@ -4,8 +4,9 @@ import io.github.effiban.scala2java.core.importmanipulation.TermNameImporterMatc
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.any
+import org.mockito.Mockito.verifyNoInteractions
 
-import scala.meta.{Importer, Term, XtensionQuasiquoteImporter, XtensionQuasiquoteTerm}
+import scala.meta.{Importer, Term, XtensionQuasiquoteImporter, XtensionQuasiquoteTerm, XtensionQuasiquoteTermParam}
 
 class CompositeTermNameQualifierImplTest extends UnitTestSuite {
   private val termNameImporterMatcher = mock[TermNameImporterMatcher]
@@ -72,5 +73,61 @@ class CompositeTermNameQualifierImplTest extends UnitTestSuite {
     doReturn(None).when(coreTermNameQualifier).qualify(eqTree(termName))
 
     compositeTermNameQualifier.qualify(termName, Nil).structure shouldBe termName.structure
+  }
+
+  test("qualify when Term.Name has a parent Object should ignore matching importers") {
+    val anObject =
+      q"""
+      object A {
+      }
+      """
+
+    val importers = List(importer"a.A")
+
+    compositeTermNameQualifier.qualify(anObject.name, importers).structure shouldBe anObject.name.structure
+  }
+
+  test("qualify when Term.Name has a parent Object should not invoke core qualifier") {
+    val anObject =
+      q"""
+      object A {
+      }
+      """
+
+    compositeTermNameQualifier.qualify(anObject.name, Nil)
+
+    verifyNoInteractions(coreTermNameQualifier)
+  }
+
+  test("qualify when Term.Name has a parent Decl.Def should ignore matching importers") {
+    val declDef = q"def foo()"
+
+    val importers = List(importer"a.foo")
+
+    compositeTermNameQualifier.qualify(declDef.name, importers).structure shouldBe declDef.name.structure
+  }
+
+  test("qualify when Term.Name has a parent Decl.Def should not invoke core qualifier") {
+    val declDef = q"def foo()"
+
+    compositeTermNameQualifier.qualify(declDef.name, Nil)
+
+    verifyNoInteractions(coreTermNameQualifier)
+  }
+
+  test("qualify when Term.Name has a parent Term.Param should ignore matching importers") {
+    val termParam = param"x: Int"
+
+    val importers = List(importer"x.X")
+
+    compositeTermNameQualifier.qualify(termParam.name.asInstanceOf[Term.Name], importers).structure shouldBe termParam.name.structure
+  }
+
+  test("qualify when Term.Name has a parent Term.Param should not invoke core qualifier") {
+    val termParam = param"x: Int"
+
+    compositeTermNameQualifier.qualify(termParam.name.asInstanceOf[Term.Name], Nil)
+
+    verifyNoInteractions(coreTermNameQualifier)
   }
 }
