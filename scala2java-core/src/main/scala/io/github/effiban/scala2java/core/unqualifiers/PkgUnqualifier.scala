@@ -2,13 +2,14 @@ package io.github.effiban.scala2java.core.unqualifiers
 
 import io.github.effiban.scala2java.core.importmanipulation.StatsByImportSplitter
 
-import scala.meta.{Import, Importer, Pkg, Stat, Transformer, Tree, Type}
+import scala.meta.{Import, Importer, Pkg, Stat, Term, Transformer, Tree, Type}
 
 trait PkgUnqualifier {
   def unqualify(pkg: Pkg): Pkg
 }
 
 private[unqualifiers] class PkgUnqualifierImpl(statsByImportSplitter: StatsByImportSplitter,
+                                               termApplyUnqualifier: TermApplyUnqualifier,
                                                typeSelectUnqualifier: TypeSelectUnqualifier) extends PkgUnqualifier {
 
   override def unqualify(pkg: Pkg): Pkg = {
@@ -30,6 +31,8 @@ private[unqualifiers] class PkgUnqualifierImpl(statsByImportSplitter: StatsByImp
 
     override def apply(tree: Tree): Tree =
       tree match {
+        case termApply: Term.Apply => termApplyUnqualifier.unqualify(termApply, importers)
+        case termSelect: Term.Select => termSelect // TODO support standalone qualified terms when relevant using reflection
         case typeSelect: Type.Select => typeSelectUnqualifier.unqualify(typeSelect, importers)
         // TODO support Type.Project
         case aTree => super.apply(aTree)
@@ -39,5 +42,6 @@ private[unqualifiers] class PkgUnqualifierImpl(statsByImportSplitter: StatsByImp
 
 object PkgUnqualifier extends PkgUnqualifierImpl(
   StatsByImportSplitter,
+  TermApplyUnqualifier,
   TypeSelectUnqualifier
 )
