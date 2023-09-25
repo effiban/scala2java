@@ -2,13 +2,14 @@ package io.github.effiban.scala2java.core.qualifiers
 
 import io.github.effiban.scala2java.core.importmanipulation.StatsByImportSplitter
 
-import scala.meta.{Import, Importer, Pkg, Stat, Transformer, Tree, Type}
+import scala.meta.{Import, Importer, Pkg, Stat, Term, Transformer, Tree, Type}
 
 trait PkgQualifier {
   def qualify(pkg: Pkg): Pkg
 }
 
 private[qualifiers] class PkgQualifierImpl(statsByImportSplitter: StatsByImportSplitter,
+                                           termNameQualifier: CompositeTermNameQualifier,
                                            typeNameQualifier: CompositeTypeNameQualifier) extends PkgQualifier {
   override def qualify(pkg: Pkg): Pkg = {
     val (importers, nonImports) = statsByImportSplitter.split(pkg.stats)
@@ -29,6 +30,8 @@ private[qualifiers] class PkgQualifierImpl(statsByImportSplitter: StatsByImportS
 
     override def apply(tree: Tree): Tree =
       tree match {
+        case termSelect: Term.Select => termSelect // TODO
+        case termName: Term.Name => termNameQualifier.qualify(termName, importers)
         case typeSelect: Type.Select => typeSelect // TODO
         case typeName: Type.Name => typeNameQualifier.qualify(typeName, importers)
         case aTree => super.apply(aTree)
@@ -38,5 +41,6 @@ private[qualifiers] class PkgQualifierImpl(statsByImportSplitter: StatsByImportS
 
 object PkgQualifier extends PkgQualifierImpl(
   StatsByImportSplitter,
+  CompositeTermNameQualifier,
   CompositeTypeNameQualifier
 )

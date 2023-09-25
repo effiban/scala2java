@@ -27,4 +27,4 @@ private[qualifiers] class CompositeTermNameQualifierImpl(termNameImporterMatcher
   }
 }
 
-object CompositeTermNameQualifier extends CompositeTermNameQualifierImpl(TermNameImporterMatcher, CoreTermNameQualifier)
+object CompositeTermNameQualifier extends CompositeTermNameQualifierImpl(TermNameImporterMatcher, StandaloneCoreTermNameQualifier)
