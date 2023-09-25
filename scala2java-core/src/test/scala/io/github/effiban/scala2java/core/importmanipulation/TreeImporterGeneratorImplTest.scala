@@ -3,13 +3,66 @@ package io.github.effiban.scala2java.core.importmanipulation
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import org.mockito.ArgumentMatchersSugar.any
 
-import scala.meta.{Type, XtensionQuasiquoteImporter, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
+import scala.meta.{Term, Type, XtensionQuasiquoteImporter, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 class TreeImporterGeneratorImplTest extends UnitTestSuite {
 
+  private val termApplyImporterGenerator = mock[TermApplyImporterGenerator]
   private val typeSelectImporterGenerator = mock[TypeSelectImporterGenerator]
 
-  private val treeImporterGenerator = new TreeImporterGeneratorImpl(typeSelectImporterGenerator)
+  private val treeImporterGenerator = new TreeImporterGeneratorImpl(
+    termApplyImporterGenerator,
+    typeSelectImporterGenerator
+  )
+
+  test("generate for a class with two Term.Apply-s, and Importers generated for both") {
+    val termApply1 = q"a.B.doC()"
+    val termApply2 = q"d.E.doF()"
+
+    val importer1 = importer"a.B.doC"
+    val importer2 = importer"d.E.doF"
+
+    val theClass =
+      q"""
+      class MyClass {
+        def foo {
+          a.B.doC()
+          d.E.doF()
+        }
+      }
+      """
+
+    doAnswer((termApply: Term.Apply) => termApply match {
+      case aTermApply if aTermApply.structure == termApply1.structure => Some(importer1)
+      case aTermApply if aTermApply.structure == termApply2.structure => Some(importer2)
+      case _ => None
+    }).when(termApplyImporterGenerator).generate(any[Term.Apply])
+
+    treeImporterGenerator.generate(theClass).structure shouldBe List(importer1, importer2).structure
+  }
+
+  test("generate for a class with two Term.Apply-s, and an Importer generated for one only") {
+    val termApply1 = q"a.B.doC()"
+
+    val importer1 = importer"a.B.doC"
+
+    val theClass =
+    q"""
+    class MyClass {
+      def foo {
+        a.B.doC()
+        d.E.doF()
+      }
+    }
+    """
+
+    doAnswer((termApply: Term.Apply) => termApply match {
+      case aTermApply if aTermApply.structure == termApply1.structure => Some(importer1)
+      case _ => None
+    }).when(termApplyImporterGenerator).generate(any[Term.Apply])
+
+    treeImporterGenerator.generate(theClass).structure shouldBe List(importer1).structure
+  }
 
   test("generate for class with two members defined using Type.Selects, and Importers generated for both") {
     val typeSelect1 = t"a.b.C"
