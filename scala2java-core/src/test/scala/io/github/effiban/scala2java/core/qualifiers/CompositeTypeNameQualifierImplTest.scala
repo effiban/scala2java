@@ -4,8 +4,9 @@ import io.github.effiban.scala2java.core.importmanipulation.TypeNameImporterMatc
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.any
+import org.mockito.Mockito.verifyNoInteractions
 
-import scala.meta.{Importer, Type, XtensionQuasiquoteImporter, XtensionQuasiquoteType}
+import scala.meta.{Importer, Type, XtensionQuasiquoteImporter, XtensionQuasiquoteTerm, XtensionQuasiquoteType, XtensionQuasiquoteTypeParam}
 
 class CompositeTypeNameQualifierImplTest extends UnitTestSuite {
 
@@ -73,5 +74,69 @@ class CompositeTypeNameQualifierImplTest extends UnitTestSuite {
     doReturn(None).when(coreTypeNameQualifier).qualify(eqTree(typeName))
 
     compositeTypeNameQualifier.qualify(typeName, Nil).structure shouldBe typeName.structure
+  }
+
+  test("qualify when Type.Name has a parent Class should ignore matching importers") {
+    val aClass =
+      q"""
+      class A {
+      }
+      """
+
+    val importers = List(importer"a.A")
+
+    compositeTypeNameQualifier.qualify(aClass.name, importers).structure shouldBe aClass.name.structure
+  }
+
+  test("qualify when Type.Name has a parent Class should not invoke core qualifier") {
+    val aClass =
+      q"""
+      class A {
+      }
+      """
+
+    compositeTypeNameQualifier.qualify(aClass.name, Nil)
+
+    verifyNoInteractions(coreTypeNameQualifier)
+  }
+
+  test("qualify when Type.Name has a parent Trait should ignore matching importers") {
+    val aTrait =
+      q"""
+      trait A {
+      }
+      """
+
+    val importers = List(importer"a.A")
+
+    compositeTypeNameQualifier.qualify(aTrait.name, importers).structure shouldBe aTrait.name.structure
+  }
+
+  test("qualify when Type.Name has a parent Trait should not invoke core qualifier") {
+    val aTrait =
+      q"""
+      trait A {
+      }
+      """
+
+    compositeTypeNameQualifier.qualify(aTrait.name, Nil)
+
+    verifyNoInteractions(coreTypeNameQualifier)
+  }
+
+  test("qualify when Type.Name has a parent Type.Param should ignore matching importers") {
+    val typeParam = tparam"T"
+
+    val importers = List(importer"t.T")
+
+    compositeTypeNameQualifier.qualify(typeParam.name.asInstanceOf[Type.Name], importers).structure shouldBe typeParam.name.structure
+  }
+
+  test("qualify when Type.Name has a parent Type.Param should not invoke core qualifier") {
+    val typeParam = tparam"T"
+
+    compositeTypeNameQualifier.qualify(typeParam.name.asInstanceOf[Type.Name], Nil)
+
+    verifyNoInteractions(coreTypeNameQualifier)
   }
 }
