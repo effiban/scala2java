@@ -4,14 +4,88 @@ import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.Mockito.verifyNoInteractions
 
-import scala.meta.{Type, XtensionQuasiquoteImporter, XtensionQuasiquoteTerm, XtensionQuasiquoteType, XtensionQuasiquoteTypeParam}
+import scala.meta.{Type, XtensionQuasiquoteImporter, XtensionQuasiquoteTerm, XtensionQuasiquoteTermParam, XtensionQuasiquoteType, XtensionQuasiquoteTypeParam}
 
 class TreeImporterUsedImplTest extends UnitTestSuite {
 
+  private val termNameImporterMatcher = mock[TermNameImporterMatcher]
   private val typeNameImporterMatcher = mock[TypeNameImporterMatcher]
 
-  private val treeImporterUsed = new TreeImporterUsedImpl(typeNameImporterMatcher)
+  private val treeImporterUsed = new TreeImporterUsedImpl(termNameImporterMatcher, typeNameImporterMatcher)
 
+  test("apply() for a 'Defn.Var' when has a matching Term.Name in the RHS should return true") {
+    val importer = importer"a.foo"
+
+    doReturn(Some(importer)).when(termNameImporterMatcher).findMatch(eqTree(q"foo"), eqTree(importer))
+
+    treeImporterUsed(q"var x = foo", importer) shouldBe true
+  }
+
+  test("apply() for a 'Defn.Var' when has a non-matching Term.Name in the RHS should return false") {
+    val importer = importer"a.foo"
+
+    doReturn(None).when(termNameImporterMatcher).findMatch(eqTree(q"foo"), eqTree(importer))
+
+    treeImporterUsed(q"var x = foo", importer) shouldBe false
+  }
+
+  test("apply() for a Object when has a matching nested Term.Name should return true") {
+    val theObject =
+      q"""
+      object A {
+        final var c = foo
+      }
+      """
+
+    val importer = importer"a.foo"
+
+    doReturn(Some(importer)).when(termNameImporterMatcher).findMatch(eqTree(q"foo"), eqTree(importer))
+
+    treeImporterUsed(theObject, importer) shouldBe true
+  }
+
+  test("apply() for an Object when has no matching nested trees should return false") {
+    val theObject =
+      q"""
+      object A {
+        final var c = foo
+      }
+      """
+
+    val importer = importer"a.bla"
+
+    doReturn(None).when(termNameImporterMatcher).findMatch(eqTree(q"foo"), eqTree(importer))
+
+    treeImporterUsed(theObject, importer) shouldBe false
+  }
+
+  test("apply() for a Defn.Def when has a matching nested Term.Name should return true") {
+    val defnDef = q"def myFunc() = { var x = foo }"
+
+    val importer = importer"a.foo"
+
+    doReturn(Some(importer)).when(termNameImporterMatcher).findMatch(eqTree(q"foo"), eqTree(importer))
+
+    treeImporterUsed(defnDef, importer) shouldBe true
+  }
+
+  test("apply() for a Defn.Def when has no matching nested trees should return false") {
+    val defnDef = q"def myFunc() = { var x = foo }"
+
+    val importer = importer"a.bar"
+
+    doReturn(None).when(termNameImporterMatcher).findMatch(eqTree(q"foo"), eqTree(importer))
+
+    treeImporterUsed(defnDef, importer) shouldBe false
+  }
+
+  test("apply() for the name of a Term.Param should not try to match it and return false") {
+    val importer = importer"a.foo"
+
+    treeImporterUsed(param"foo: x.X", importer) shouldBe false
+
+    verifyNoInteractions(termNameImporterMatcher)
+  }
 
   test("apply() for a 'Decl.Var' when has a matching Type.Name should return true") {
     val importer = importer"x.X"
