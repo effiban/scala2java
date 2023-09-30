@@ -11,12 +11,12 @@ import scala.meta.{Importer, Term, Type, XtensionQuasiquoteImporter, XtensionQua
 class PkgUnqualifierImplTest extends UnitTestSuite {
 
   private val statsByImportSplitter = mock[StatsByImportSplitter]
-  private val termApplyUnqualifier = mock[TermApplyUnqualifier]
+  private val termSelectUnqualifier = mock[TermSelectUnqualifier]
   private val typeSelectUnqualifier = mock[TypeSelectUnqualifier]
 
   private val pkgUnqualifier = new PkgUnqualifierImpl(
     statsByImportSplitter,
-    termApplyUnqualifier,
+    termSelectUnqualifier,
     typeSelectUnqualifier
   )
 
@@ -35,10 +35,10 @@ class PkgUnqualifierImplTest extends UnitTestSuite {
 
     pkgUnqualifier.unqualify(pkg).structure shouldBe pkg.structure
 
-    verifyNoInteractions(termApplyUnqualifier, typeSelectUnqualifier)
+    verifyNoInteractions(termSelectUnqualifier, typeSelectUnqualifier)
   }
 
-  test("unqualify when has nested Term.Apply-s but TermApplyUnqualifier returns unchanged, should return unchanged") {
+  test("unqualify when has nested Term.Select-s but TermSelectUnqualifier returns unchanged, should return unchanged") {
     val pkg =
       q"""
       package a.b {
@@ -65,7 +65,7 @@ class PkgUnqualifierImplTest extends UnitTestSuite {
     )
 
     doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(pkg.stats))
-    doAnswer((termApply: Term.Apply) => termApply).when(termApplyUnqualifier).unqualify(any[Term.Apply], eqTreeList(expectedImporters))
+    doAnswer((termSelect: Term.Select) => termSelect).when(termSelectUnqualifier).unqualify(any[Term.Select], eqTreeList(expectedImporters))
 
     pkgUnqualifier.unqualify(pkg).structure shouldBe pkg.structure
   }
@@ -105,7 +105,7 @@ class PkgUnqualifierImplTest extends UnitTestSuite {
     pkgUnqualifier.unqualify(pkg).structure shouldBe pkg.structure
   }
 
-  test("unqualify when TermApplyUnqualifier unqualifies some of the Term.Apply-s, should return them unqualified") {
+  test("unqualify when TermSelectUnqualifier unqualifies some of the Term.Select-s by full match, should return them unqualified") {
     val initialPkg =
       q"""
       package a.b {
@@ -149,11 +149,64 @@ class PkgUnqualifierImplTest extends UnitTestSuite {
     )
 
     doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
-    doAnswer((termApply: Term.Apply, _: List[Importer]) => termApply match {
-      case aTermApply if aTermApply.structure == q"c.c1()".structure => q"c1()"
-      case aTermApply if aTermApply.structure == q"d.d1()".structure => q"d1()"
-      case aTermApply => aTermApply
-    }).when(termApplyUnqualifier).unqualify(any[Term.Apply], eqTreeList(expectedImporters))
+    doAnswer((termSelect: Term.Select, _: List[Importer]) => termSelect match {
+      case aTermSelect if aTermSelect.structure == q"c.c1".structure => q"c1"
+      case aTermSelect if aTermSelect.structure == q"d.d1".structure => q"d1"
+      case aTermSelect => aTermSelect
+    }).when(termSelectUnqualifier).unqualify(any[Term.Select], eqTreeList(expectedImporters))
+
+    pkgUnqualifier.unqualify(initialPkg).structure shouldBe expectedFinalPkg.structure
+  }
+
+  test("unqualify when TermSelectUnqualifier unqualifies some Term.Select-s by prefix match, should return them unqualified") {
+    val initialPkg =
+      q"""
+    package a.b {
+      import c.c1.c2
+      import d.d1.d2
+
+      trait MyTrait {
+        def foo(): Unit = {
+          c1.c2.c3()
+          d1.d2.d3()
+        }
+      }
+    }
+    """
+
+    val expectedFinalPkg =
+      q"""
+    package a.b {
+      import c.c1.c2
+      import d.d1.d2
+
+      trait MyTrait {
+        def foo(): Unit = {
+          c2.c3()
+          d2.d3()
+        }
+      }
+    }
+    """
+
+    val expectedImporters = List(importer"c.c1.c2", importer"d.d1.d2")
+    val expectedNonImports = List(
+      q"""
+    trait MyTrait {
+              def foo(): Unit = {
+                c1.c2.c3()
+                d1.d2.d3()
+              }
+            }
+    """
+    )
+
+    doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
+    doAnswer((termSelect: Term.Select, _: List[Importer]) => termSelect match {
+      case aTermSelect if aTermSelect.structure == q"c1.c2".structure => q"c2"
+      case aTermSelect if aTermSelect.structure == q"d1.d2".structure => q"d2"
+      case aTermSelect => aTermSelect
+    }).when(termSelectUnqualifier).unqualify(any[Term.Select], eqTreeList(expectedImporters))
 
     pkgUnqualifier.unqualify(initialPkg).structure shouldBe expectedFinalPkg.structure
   }
@@ -196,7 +249,7 @@ class PkgUnqualifierImplTest extends UnitTestSuite {
     )
 
     doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
-    doAnswer((termApply: Term.Apply) => termApply).when(termApplyUnqualifier).unqualify(any[Term.Apply], eqTreeList(expectedImporters))
+    doAnswer((termSelect: Term.Select) => termSelect).when(termSelectUnqualifier).unqualify(any[Term.Select], eqTreeList(expectedImporters))
     doAnswer((typeSelect: Type.Select, _: List[Importer]) => typeSelect match {
       case aTypeSelect if aTypeSelect.structure == t"c.C".structure => t"C"
       case aTypeSelect if aTypeSelect.structure == t"d.D".structure => t"D"

@@ -9,7 +9,7 @@ trait PkgUnqualifier {
 }
 
 private[unqualifiers] class PkgUnqualifierImpl(statsByImportSplitter: StatsByImportSplitter,
-                                               termApplyUnqualifier: TermApplyUnqualifier,
+                                               termSelectUnqualifier: TermSelectUnqualifier,
                                                typeSelectUnqualifier: TypeSelectUnqualifier) extends PkgUnqualifier {
 
   override def unqualify(pkg: Pkg): Pkg = {
@@ -31,8 +31,12 @@ private[unqualifiers] class PkgUnqualifierImpl(statsByImportSplitter: StatsByImp
 
     override def apply(tree: Tree): Tree =
       tree match {
-        case termApply: Term.Apply => termApplyUnqualifier.unqualify(termApply, importers)
-        case termSelect: Term.Select => termSelect // TODO support standalone qualified terms when relevant using reflection
+        case aTree@(_: Importer | _: Pkg) => aTree
+
+        case termSelect: Term.Select => termSelectUnqualifier.unqualify(termSelect, importers) match {
+          case aTermSelect: Term.Select => super.apply(aTermSelect)
+          case aTermRef => aTermRef
+        }
         case typeSelect: Type.Select => typeSelectUnqualifier.unqualify(typeSelect, importers)
         // TODO support Type.Project
         case aTree => super.apply(aTree)
@@ -42,6 +46,6 @@ private[unqualifiers] class PkgUnqualifierImpl(statsByImportSplitter: StatsByImp
 
 object PkgUnqualifier extends PkgUnqualifierImpl(
   StatsByImportSplitter,
-  TermApplyUnqualifier,
+  TermSelectUnqualifier,
   TypeSelectUnqualifier
 )
