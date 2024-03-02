@@ -1,17 +1,24 @@
 package io.github.effiban.scala2java.core.importmanipulation
 
-import scala.meta.{Importer, Term, XtensionQuasiquoteImporter, XtensionQuasiquoteTerm}
+import scala.meta.{Importer, Term, XtensionQuasiquoteTerm}
 
 trait TermApplyImporterGenerator {
   def generate(termApply: Term.Apply): Option[Importer]
 }
 
-object TermApplyImporterGenerator extends TermApplyImporterGenerator {
+private[importmanipulation] class TermApplyImporterGeneratorImpl(qualifiedNameImporterGenerator: QualifiedNameImporterGenerator)
+  extends TermApplyImporterGenerator {
 
-  override def generate(termApply: Term.Apply): Option[Importer] = termApply match {
-    // TODO generate for all relevant cases using reflection, once qualified terms are fully supported in the flow
-    case q"java.util.List.of()" => Some(importer"java.util.List.of")
-    case q"java.util.Optional.empty()" => Some(importer"java.util.Optional.empty")
+  override def generate(termApply: Term.Apply): Option[Importer] = (termApply.fun, termApply.args) match {
+    case (Term.Select(q"scala.Array", _), _) => None
+    case (Term.Select(qual: Term.Ref, name), args) if qual.isPath => generateForStaticMethod(qual, name, args)
+
     case _ => None
   }
+
+  private def generateForStaticMethod(qual: Term.Ref, name: Term.Name, args: List[Term]) =
+    qualifiedNameImporterGenerator.generateForStaticMethod(qual, name.value, args)
 }
+
+object TermApplyImporterGenerator extends TermApplyImporterGeneratorImpl(QualifiedNameImporterGenerator)
+
