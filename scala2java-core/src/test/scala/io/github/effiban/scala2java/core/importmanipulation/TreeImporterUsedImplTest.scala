@@ -44,6 +44,36 @@ class TreeImporterUsedImplTest extends UnitTestSuite {
     treeImporterUsed(theObject, importer) shouldBe true
   }
 
+  test("apply() for a Object when has a partially-matching matching nested Term.Select should return true") {
+    val theObject =
+      q"""
+      object A {
+        final var x = C.foo
+      }
+      """
+
+    val importer = importer"B.C"
+
+    doReturn(Some(importer)).when(termNameImporterMatcher).findMatch(eqTree(q"C"), eqTree(importer))
+
+    treeImporterUsed(theObject, importer) shouldBe true
+  }
+
+  test("apply() for a Object when has a non-matching matching nested Term.Select should return false") {
+    val theObject =
+      q"""
+      object A {
+        final var x = C.foo
+      }
+      """
+
+    val importer = importer"B.D"
+
+    doReturn(None).when(termNameImporterMatcher).findMatch(eqTree(q"C"), eqTree(importer))
+
+    treeImporterUsed(theObject, importer) shouldBe false
+  }
+
   test("apply() for an Object when has no matching nested trees should return false") {
     val theObject =
       q"""

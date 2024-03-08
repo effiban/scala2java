@@ -18,7 +18,7 @@ private[importmanipulation] class TreeImporterUsedImpl(termNameImporterMatcher: 
     var inUse = false
 
     override def apply(tree: Tree): Unit = tree match {
-      case _: Term.Select => //TODO support match by qualifier prefix
+      case termSelect: Term.Select => apply(termSelect.qual)
       case termName: Term.Name => checkTermName(termName)
       case _: Type.Select => //TODO support match by qualifier prefix
       case _: Type.Project => //TODO support match by qualifier prefix

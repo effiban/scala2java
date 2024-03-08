@@ -13,7 +13,6 @@ object TermSelectImporterMatcher extends TermSelectImporterMatcher {
   }
 
   private def qualMatchesRef(termSelect: Term.Select, importer: Importer) = {
-    // TODO support partial match (when full importer is a prefix of qual)
     termSelect.qual.structure == importer.ref.structure
   }
 
