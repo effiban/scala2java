@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.predicates
 
-import io.github.effiban.scala2java.core.classifiers.{TermNameClassifier, TypeClassifier}
+import io.github.effiban.scala2java.core.classifiers.{TermNameClassifier, TermSelectClassifier, TypeClassifier}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.spi.contexts.TermSelectInferenceContext
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -12,11 +12,51 @@ class CoreTermSelectSupportsNoArgInvocationTest extends UnitTestSuite {
   private val EmptyContext = TermSelectInferenceContext()
 
   private val termNameClassifier = mock[TermNameClassifier]
+  private val termSelectClassifier = mock[TermSelectClassifier]
   private val typeClassifier = mock[TypeClassifier[Type]]
 
-  private val coreTermSelectSupportsNoArgInvocation = new CoreTermSelectSupportsNoArgInvocation(termNameClassifier, typeClassifier)
+  private val coreTermSelectSupportsNoArgInvocation = new CoreTermSelectSupportsNoArgInvocation(
+    termNameClassifier,
+    termSelectClassifier,
+    typeClassifier)
 
-  test("apply() when name is 'apply' and qualifier has apply() method should return true") {
+  test("apply() for 'x.y.apply' when 'x.y' has apply() method should return true") {
+    val termSelect = q"x.y.apply"
+    val qual = q"x.y"
+
+    when(termSelectClassifier.hasApplyMethod(eqTree(qual))).thenReturn(true)
+
+    coreTermSelectSupportsNoArgInvocation(termSelect, EmptyContext) shouldBe true
+  }
+
+  test("apply() for 'x.y.apply' when 'x.y' does not have apply() method should return false") {
+    val termSelect = q"x.y.apply"
+    val qual = q"x.y"
+
+    when(termSelectClassifier.hasApplyMethod(eqTree(qual))).thenReturn(false)
+
+    coreTermSelectSupportsNoArgInvocation(termSelect, EmptyContext) shouldBe false
+  }
+
+  test("apply() for 'x.y.empty' when 'x.y' has empty() method should return true") {
+    val termSelect = q"x.y.empty"
+    val qual = q"x.y"
+
+    when(termSelectClassifier.hasEmptyMethod(eqTree(qual))).thenReturn(true)
+
+    coreTermSelectSupportsNoArgInvocation(termSelect, EmptyContext) shouldBe true
+  }
+
+  test("apply() 'for x.y.empty' when 'x.y' does not have empty() method should return false") {
+    val termSelect = q"x.y.empty"
+    val qual = q"x.y"
+
+    when(termSelectClassifier.hasEmptyMethod(eqTree(qual))).thenReturn(false)
+
+    coreTermSelectSupportsNoArgInvocation(termSelect, EmptyContext) shouldBe false
+  }
+
+  test("apply() for 'x.apply' when 'x' has apply() method should return true") {
     val termSelect = q"x.apply"
     val qual = q"x"
 
@@ -25,7 +65,7 @@ class CoreTermSelectSupportsNoArgInvocationTest extends UnitTestSuite {
     coreTermSelectSupportsNoArgInvocation(termSelect, EmptyContext) shouldBe true
   }
 
-  test("apply() when name is 'apply' and qualifier does not have apply() method should return false") {
+  test("apply() for 'x.apply' when 'x' does not have apply() method should return false") {
     val termSelect = q"x.apply"
     val qual = q"x"
 
@@ -34,7 +74,7 @@ class CoreTermSelectSupportsNoArgInvocationTest extends UnitTestSuite {
     coreTermSelectSupportsNoArgInvocation(termSelect, EmptyContext) shouldBe false
   }
 
-  test("apply() when name is 'empty' and qualifier has empty() method should return true") {
+  test("apply() for 'x.empty' when 'x' has empty() method should return true") {
     val termSelect = q"x.empty"
     val qual = q"x"
 
@@ -43,7 +83,7 @@ class CoreTermSelectSupportsNoArgInvocationTest extends UnitTestSuite {
     coreTermSelectSupportsNoArgInvocation(termSelect, EmptyContext) shouldBe true
   }
 
-  test("apply() when name is 'empty' and qualifier does not have empty() method should return false") {
+  test("apply() 'for x.empty' when 'x' does not have empty() method should return false") {
     val termSelect = q"x.empty"
     val qual = q"x"
 
