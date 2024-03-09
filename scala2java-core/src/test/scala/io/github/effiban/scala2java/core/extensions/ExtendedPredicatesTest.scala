@@ -49,6 +49,19 @@ class ExtendedPredicatesTest extends UnitTestSuite {
     extensionRegistry.termNameSupportsNoArgInvocations shouldBe termNameSupportsNoArgInvocations
   }
 
+  test("termSelectHasApplyMethods") {
+    val termSelectHasApplyMethod1 = mock[TermSelectHasApplyMethod]
+    val termSelectHasApplyMethod2 = mock[TermSelectHasApplyMethod]
+    val termSelectHasApplyMethods = List(termSelectHasApplyMethod1, termSelectHasApplyMethod2)
+
+    when(extension1.termSelectHasApplyMethod()).thenReturn(termSelectHasApplyMethod1)
+    when(extension2.termSelectHasApplyMethod()).thenReturn(termSelectHasApplyMethod2)
+
+    val extensionRegistry = ExtensionRegistry(extensions)
+
+    extensionRegistry.termSelectHasApplyMethods shouldBe termSelectHasApplyMethods
+  }
+
   test("termSelectSupportsNoArgInvocations") {
     val termSelectSupportsNoArgInvocation1 = mock[TermSelectSupportsNoArgInvocation]
     val termSelectSupportsNoArgInvocation2 = mock[TermSelectSupportsNoArgInvocation]
