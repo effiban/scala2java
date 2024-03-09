@@ -1,19 +1,50 @@
 package io.github.effiban.scala2java.core.transformers
 
-import io.github.effiban.scala2java.core.classifiers.{TermNameClassifier, TypeClassifier}
-import io.github.effiban.scala2java.core.entities.TermNameValues
-import io.github.effiban.scala2java.core.entities.TermNameValues.{List => _, _}
+import io.github.effiban.scala2java.core.classifiers.{TermSelectClassifier, TypeClassifier}
+import io.github.effiban.scala2java.core.entities.TermNames.{Apply, Empty, JavaCompletedFuture, JavaFailedFuture, JavaFailure, JavaOf, JavaOfEntries, JavaOfNullable, JavaOfSupplier, JavaRange, JavaRangeClosed, JavaSuccess, JavaSupplyAsync, LowercaseLeft, LowercaseRight, ScalaFailed, ScalaInclusive, ScalaSuccessful}
+import io.github.effiban.scala2java.core.entities.TermSelects._
+import io.github.effiban.scala2java.core.entities.{TermNameValues, TreeElemSet, TreeKeyedMap}
 import io.github.effiban.scala2java.spi.contexts.TermApplyTransformationContext
 import io.github.effiban.scala2java.spi.transformers.TermApplyTransformer
 
 import scala.meta.{Term, Type, XtensionQuasiquoteTerm}
 
-private[transformers] class CoreTermApplyTransformer(termNameClassifier: TermNameClassifier,
+private[transformers] class CoreTermApplyTransformer(termSelectClassifier: TermSelectClassifier,
                                                      typeClassifier: TypeClassifier[Type],
-                                                     termSelectTermFunctionTransformer: => TermSelectTermFunctionTransformer) extends TermApplyTransformer {
+                                                     termSelectTermFunctionTransformer: => TermSelectTermFunctionTransformer,
+                                                     deprecatedCoreTermApplyTransformer: => DeprecatedCoreTermApplyTransformer) extends TermApplyTransformer {
+
+  private val ScalaToJavaQualifiedName = Map[Term.Select, Term.Select](
+    Term.Select(ScalaRange, Apply) -> Term.Select(JavaIntStream, JavaRange),
+    Term.Select(ScalaRange, ScalaInclusive) -> Term.Select(JavaIntStream, JavaRangeClosed),
+    Term.Select(ScalaOption, Apply) -> Term.Select(JavaOptional, JavaOfNullable),
+    Term.Select(ScalaOption, Empty) -> Term.Select(JavaOptional, Empty),
+    Term.Select(ScalaSome, Apply) -> Term.Select(JavaOptional, JavaOf),
+
+    Term.Select(ScalaRight, Apply) -> Term.Select(JavaEither, LowercaseRight),
+    Term.Select(ScalaLeft, Apply) -> Term.Select(JavaEither, LowercaseLeft),
+
+    Term.Select(ScalaTry, Apply) -> Term.Select(JavaTry, JavaOfSupplier),
+    Term.Select(ScalaSuccess, Apply) -> Term.Select(JavaTry, JavaSuccess),
+    Term.Select(ScalaFailure, Apply) -> Term.Select(JavaTry, JavaFailure),
+
+    Term.Select(ScalaFuture, Apply) -> Term.Select(JavaCompletableFuture, JavaSupplyAsync),
+    Term.Select(ScalaFuture, ScalaSuccessful) -> Term.Select(JavaCompletableFuture, JavaCompletedFuture),
+    Term.Select(ScalaFuture, ScalaFailed) -> Term.Select(JavaCompletableFuture, JavaFailedFuture),
+
+    ScalaPrint -> JavaPrint,
+    ScalaPrintln -> JavaPrintln
+  )
+
+  private val JavaSupplierQualifiedNames = Set(
+    Term.Select(JavaTry, JavaOfSupplier),
+    Term.Select(JavaCompletableFuture, JavaSupplyAsync)
+  )
 
   override final def transform(termApply: Term.Apply, context: TermApplyTransformationContext = TermApplyTransformationContext()): Term.Apply =
-    transformOptional(termApply, context).getOrElse(termApply)
+    transformOptional(termApply, context)
+      .orElse(deprecatedCoreTermApplyTransformer.transformOptional(termApply, context))
+      .getOrElse(termApply)
 
   private def transformOptional(termApply: Term.Apply, context: TermApplyTransformationContext) = {
     termApply match {
@@ -39,45 +70,31 @@ private[transformers] class CoreTermApplyTransformer(termNameClassifier: TermNam
 
   private def transformTypedByQualifiedName(termSelect: Term.Select, targs: List[Type], args: List[Term]) = {
     transformByQualifiedName(termSelect)
-      .map(transformedSelect => {
-        val transformedArgs = transformArgs(transformedSelect, args)
-        Term.Apply(Term.ApplyType(transformedSelect, targs), transformedArgs)
+      .map(transformedQual => {
+        val transformedArgs = transformArgs(transformedQual, args)
+        Term.Apply(Term.ApplyType(transformedQual, targs), transformedArgs)
       })
   }
 
   // Transform a method name which is a Scala-specific qualified name, into an equivalent in Java
   // Either and Try use the syntax of the VAVR framework (Maven: io.vavr:vavr)
   private def transformByQualifiedName(termSelect: Term.Select): Option[Term] = {
+    TreeKeyedMap.get(ScalaToJavaQualifiedName, termSelect)
+      .orElse(transformByQualifiedNameSpecialCases(termSelect))
+  }
+
+  private def transformByQualifiedNameSpecialCases(termSelect: Term.Select) = {
     (termSelect.qual, termSelect.name) match {
-      case (Term.Name(ScalaRange), Term.Name(Apply)) => Some(Term.Select(Term.Name(JavaIntStream), Term.Name(JavaRange)))
-      case (Term.Name(ScalaRange), Term.Name(ScalaInclusive)) => Some(Term.Select(Term.Name(JavaIntStream), Term.Name(JavaRangeClosed)))
-
-      case (Term.Name(ScalaOption), Term.Name(Apply)) => Some(Term.Select(Term.Name(JavaOptional), Term.Name(JavaOfNullable)))
-      case (Term.Name(ScalaOption), Term.Name(Empty)) => Some(Term.Select(Term.Name(JavaOptional), Term.Name(JavaAbsent)))
-      case (Term.Name(ScalaSome), Term.Name(Apply)) => Some(Term.Select(Term.Name(JavaOptional), Term.Name(JavaOf)))
-
-      case (Term.Name(ScalaRight), Term.Name(Apply)) => Some(Term.Select(Term.Name(Either), Term.Name(LowercaseRight)))
-      case (Term.Name(ScalaLeft), Term.Name(Apply)) => Some(Term.Select(Term.Name(Either), Term.Name(LowercaseLeft)))
-
-      case (Term.Name(Try), Term.Name(Apply)) => Some(Term.Select(Term.Name(Try), Term.Name(JavaOfSupplier)))
-      case (Term.Name(ScalaSuccess), Term.Name(Apply)) => Some(Term.Select(Term.Name(Try), Term.Name(JavaSuccess)))
-      case (Term.Name(ScalaFailure), Term.Name(Apply)) => Some(Term.Select(Term.Name(Try), Term.Name(JavaFailure)))
-
-      case (Term.Name(Future), Term.Name(Apply)) => Some(Term.Select(Term.Name(JavaCompletableFuture), Term.Name(JavaSupplyAsync)))
-      case (Term.Name(Future), Term.Name(ScalaSuccessful)) =>
-        Some(Term.Select(Term.Name(JavaCompletableFuture), Term.Name(JavaCompletedFuture)))
-      case (Term.Name(Future), Term.Name(ScalaFailed)) => Some(Term.Select(Term.Name(JavaCompletableFuture), Term.Name(JavaFailedFuture)))
-
-      case (nm: Term.Name, Term.Name(Apply) | Term.Name(Empty)) if termNameClassifier.isJavaStreamLike(nm) =>
-        Some(Term.Select(Term.Name(Stream), Term.Name(JavaOf)))
-      case (nm: Term.Name, Term.Name(Apply) | Term.Name(Empty)) if termNameClassifier.isJavaListLike(nm) =>
-        Some(Term.Select(Term.Name(TermNameValues.List), Term.Name(JavaOf)))
-      case (nm: Term.Name, Term.Name(Apply) | Term.Name(Empty)) if termNameClassifier.isJavaSetLike(nm) =>
-        Some(Term.Select(Term.Name(Set), Term.Name(JavaOf)))
-      case (nm: Term.Name, Term.Name(Apply)) if termNameClassifier.isJavaMapLike(nm) =>
-        Some(Term.Select(Term.Name(Map), Term.Name(JavaOfEntries)))
-      case (nm: Term.Name, Term.Name(Empty)) if termNameClassifier.isJavaMapLike(nm) =>
-        Some(Term.Select(Term.Name(Map), Term.Name(JavaOf)))
+      case (qual: Term.Select, Term.Name(TermNameValues.Apply) | Term.Name(TermNameValues.Empty)) if termSelectClassifier.isJavaStreamLike(qual) =>
+        Some(Term.Select(JavaStream, JavaOf))
+      case (qual: Term.Select, Term.Name(TermNameValues.Apply) | Term.Name(TermNameValues.Empty)) if termSelectClassifier.isJavaListLike(qual) =>
+        Some(Term.Select(JavaList, JavaOf))
+      case (qual: Term.Select, Term.Name(TermNameValues.Apply) | Term.Name(TermNameValues.Empty)) if termSelectClassifier.isJavaSetLike(qual) =>
+        Some(Term.Select(JavaSet, JavaOf))
+      case (qual: Term.Select, Term.Name(TermNameValues.Apply)) if termSelectClassifier.isJavaMapLike(qual) =>
+        Some(Term.Select(JavaMap, JavaOfEntries))
+      case (qual: Term.Select, Term.Name(TermNameValues.Empty)) if termSelectClassifier.isJavaMapLike(qual) =>
+        Some(Term.Select(JavaMap, JavaOf))
       case (qual, q"foreach") => Some(Term.Select(qual, q"forEach"))
 
       case (termFunction: Term.Function, methodName: Term.Name) =>
@@ -113,12 +130,12 @@ private[transformers] class CoreTermApplyTransformer(termNameClassifier: TermNam
     }
   }
 
-  private def transformArgs(transformedTermSelect: Term, args: List[Term]): List[Term] = {
-    (transformedTermSelect, args) match {
-      case (Term.Select(Term.Name(Try), Term.Name(JavaOfSupplier)) |
-           Term.Select(Term.Name(JavaCompletableFuture), Term.Name(JavaSupplyAsync)), arg :: Nil) =>
-        List(Term.Function(Nil, arg))
+  private def transformArgs(transformedQual: Term, args: List[Term]): List[Term] = {
+    (transformedQual, args) match {
+      case (theTransformedQual: Term.Select, arg :: Nil) if isJavaSupplierMethod(theTransformedQual) => List(Term.Function(Nil, arg))
       case (_, theArgs) => theArgs
     }
   }
+
+  private def isJavaSupplierMethod(termSelect: Term.Select) = TreeElemSet.contains(JavaSupplierQualifiedNames, termSelect)
 }
