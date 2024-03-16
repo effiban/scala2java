@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TermNames
 import io.github.effiban.scala2java.core.transformers.TermApplyInfixToMapEntryTransformer.transform
 
-import scala.meta.{Lit, Term}
+import scala.meta.{Lit, Term, XtensionQuasiquoteTerm}
 
 class TermApplyInfixToMapEntryTransformerTest extends UnitTestSuite {
 
@@ -17,7 +17,7 @@ class TermApplyInfixToMapEntryTransformerTest extends UnitTestSuite {
     )
 
     val expectedMapEntry = Term.Apply(
-      fun = Term.Select(Term.Name("Map"), Term.Name("entry")),
+      fun = q"java.util.Map.entry",
       args = List(Lit.String("a"), Lit.Int(1))
     )
 
