@@ -40,7 +40,8 @@ class TypeInferrers(factories: => Factories,
 
   lazy val internalApplyDeclDefInferrer: InternalApplyDeclDefInferrer = new InternalApplyDeclDefInferrerImpl(
     new CompositeApplyDeclDefInferrer(coreApplyDeclDefInferrer),
-    predicates.compositeTermNameHasApplyMethod
+    predicates.compositeTermNameHasApplyMethod,
+    predicates.compositeTermSelectHasApplyMethod
   )
 
   private[typeinference] lazy val internalNameTypeInferrer = new InternalNameTypeInferrerImpl(
