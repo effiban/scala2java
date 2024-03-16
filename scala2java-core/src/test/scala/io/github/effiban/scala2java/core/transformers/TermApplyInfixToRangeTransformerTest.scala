@@ -1,13 +1,16 @@
 package io.github.effiban.scala2java.core.transformers
 
+import io.github.effiban.scala2java.core.entities.TermNames
+import io.github.effiban.scala2java.core.entities.TermNames.{Plus, ScalaInclusive, ScalaUntil}
+import io.github.effiban.scala2java.core.entities.TermSelects.ScalaRange
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.testtrees.TermNames.{Apply, Plus, ScalaInclusive, ScalaRange, ScalaTo, ScalaUntil}
+import io.github.effiban.scala2java.core.testtrees.TermNames.ScalaTo
 
 import scala.meta.{Lit, Term}
 
 class TermApplyInfixToRangeTransformerTest extends UnitTestSuite {
 
-  test("transform 'to' with one arg should return a Range method call") {
+  test("transform 'to' with one arg should return a scala.Range method call") {
     val termApplyInfix = Term.ApplyInfix(
       lhs = Lit.Int(1),
       op = ScalaTo,
@@ -45,7 +48,7 @@ class TermApplyInfixToRangeTransformerTest extends UnitTestSuite {
     )
 
     val expectedTermApply = Term.Apply(
-      fun = Term.Select(ScalaRange, Apply),
+      fun = Term.Select(ScalaRange, TermNames.Apply),
       args = List(Lit.Int(0), Lit.Int(10))
     )
 

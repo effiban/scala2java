@@ -1,10 +1,11 @@
 package dummy;
 
+import java.util.stream.IntStream.rangeClosed;
 
 public class Sample {
 
     public void foo() {
-        IntStream.rangeClosed(1, 4)
-                .forEach(i -> doSomething(i));
+        rangeClosed(1, 4)
+        .forEach(i -> doSomething(i));
     }
 }
