@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.resolvers
 
-import io.github.effiban.scala2java.core.entities.TypeSelects
+import io.github.effiban.scala2java.core.entities.{TermSelects, TypeSelects}
 import io.github.effiban.scala2java.core.matchers.ArrayInitializerSizeRenderContextScalatestMatcher.equalArrayInitializerSizeRenderContext
 import io.github.effiban.scala2java.core.renderers.contexts.{ArrayInitializerSizeRenderContext, ArrayInitializerValuesRenderContext}
 import io.github.effiban.scala2java.core.renderers.matchers.ArrayInitializerValuesRenderContextScalatestMatcher.equalArrayInitializerValuesRenderContext
@@ -11,6 +11,31 @@ import io.github.effiban.scala2java.core.testtrees.{TermNames, TypeNames}
 import scala.meta.{Init, Lit, Name, Term, Type}
 
 class ArrayInitializerRenderContextResolverTest extends UnitTestSuite {
+
+  test("""tryResolve() for a 'Term.Apply' of 'scala.Array[String]("a", "b")' should return a context with type 'String' and the values""") {
+    val args = List(Lit.String("a"), Lit.String("b"))
+    val termApply = Term.Apply(Term.ApplyType(TermSelects.ScalaArray, List(TypeNames.String)), args)
+
+    val expectedContext = ArrayInitializerValuesRenderContext(tpe = TypeNames.String, values = args)
+
+    tryResolve(termApply).value should equalArrayInitializerValuesRenderContext(expectedContext)
+  }
+
+  test("tryResolve() for 'Term.Apply' of 'scala.Array[String]()' should return a context with type 'String' and no values") {
+    val termApply = Term.Apply(Term.ApplyType(TermSelects.ScalaArray, List(TypeNames.String)), Nil)
+
+    val expectedContext = ArrayInitializerValuesRenderContext(tpe = TypeNames.String)
+
+    tryResolve(termApply).value should equalArrayInitializerValuesRenderContext(expectedContext)
+  }
+
+  test("tryResolve() for a 'Term.Apply' of 'scala.List(1)' should return None") {
+    val termApply = Term.Apply(TermSelects.ScalaList, List(Lit.Int(1)))
+
+    tryResolve(termApply) shouldBe None
+  }
+
+  // TODO remove the following block opf Term.Apply tests once core term names are fully qualified at start
   test("""tryResolve() for a 'Term.Apply' of 'Array[String]("a", "b")' should return a context with type 'String' and the values""") {
     val args = List(Lit.String("a"), Lit.String("b"))
     val termApply = Term.Apply(Term.ApplyType(TermNames.ScalaArray, List(TypeNames.String)), args)
@@ -33,6 +58,8 @@ class ArrayInitializerRenderContextResolverTest extends UnitTestSuite {
 
     tryResolve(termApply) shouldBe None
   }
+
+  // TODO  - end of block to remove
 
   test("""tryResolve() for an 'Init' of 'scala.Array[String](3)' should return a context with type 'String' and size 3""") {
     val arg = Lit.Int(3)
