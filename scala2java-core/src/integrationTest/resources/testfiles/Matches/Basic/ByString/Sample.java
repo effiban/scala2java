@@ -1,12 +1,13 @@
 package dummy;
 
+import java.lang.System.out;
 
 public class Sample {
 
     public void foo() {
         switch (str) {
-            case "one" -> println(1);
-            case "two" -> println(2);
+            case "one" -> out.println(1);
+            case "two" -> out.println(2);
         }
     }
 }

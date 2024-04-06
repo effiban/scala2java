@@ -23,6 +23,8 @@ class CoreTermNameQualifierTest extends UnitTestSuite {
     (q"Float", ScalaFloat),
     (q"Function", ScalaFunction),
     (q"Fractional", ScalaFractional),
+    (q"IllegalArgumentException", JavaIllegalArgumentException),
+    (q"IllegalStateException", JavaIllegalStateException),
     (q"Int", ScalaInt),
     (q"IndexedSeq", ScalaIndexedSeq),
     (q"Integral", ScalaIntegral),
