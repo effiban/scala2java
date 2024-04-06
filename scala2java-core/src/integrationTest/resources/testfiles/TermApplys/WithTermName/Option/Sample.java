@@ -1,9 +1,10 @@
 package dummy;
 
+import java.util.Optional.ofNullable;
 
 public class Sample {
 
     public void foo() {
-        Optional.ofNullable(1);
+        ofNullable(1);
     }
 }

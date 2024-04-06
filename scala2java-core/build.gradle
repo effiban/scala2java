@@ -5,6 +5,8 @@ plugins {
 
 dependencies {
     implementation project(':scala2java-spi')
+
+    runtimeOnly 'io.vavr:vavr:0.10.4'
 }
 
 jar {

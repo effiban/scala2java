@@ -1,9 +1,10 @@
 package dummy;
 
+import java.lang.System.out;
 
 public class Sample {
 
     public void foo() {
-        x -> println(x);
+        x -> out.println(x);
     }
 }

@@ -1,7 +1,8 @@
 package dummy;
 
 import java.util.List;
+import java.util.List.of;
 
 public class Sample {
-    public final List<String> x = List.of("abc", "def");
+    public final List<String> x = of("abc", "def");
 }

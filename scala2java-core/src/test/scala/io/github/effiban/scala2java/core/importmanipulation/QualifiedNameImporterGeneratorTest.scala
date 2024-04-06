@@ -36,7 +36,7 @@ class QualifiedNameImporterGeneratorTest extends UnitTestSuite {
   }
 
   test("generateForStaticField() when valid should return a corresponding importer") {
-    generateForStaticField(q"System", "out").value.structure shouldBe importer"System.out".structure
+    generateForStaticField(q"java.lang.System", "out").value.structure shouldBe importer"java.lang.System.out".structure
   }
 
   test("generateForStaticField() when field is not public should return None") {

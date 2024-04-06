@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.qualifiers
 
-import io.github.effiban.scala2java.core.entities.ReflectedEntities.{PredefModule, ScalaPackage}
+import io.github.effiban.scala2java.core.entities.ReflectedEntities.{JavaLangPackage, PredefModule, ScalaPackage}
 import io.github.effiban.scala2java.core.entities.{TermNames, TermSelects}
 
 import scala.meta.Term
@@ -13,21 +13,32 @@ trait CoreTermNameQualifier {
 object CoreTermNameQualifier extends CoreTermNameQualifier {
 
   override def qualify(termName: Term.Name): Option[Term] = {
-      qualifyAsPredefMember(termName)
-        .orElse(qualifyAsScalaPackageMember(termName))
+    LazyList(
+      qualifyAsPredefMember _,
+      qualifyAsScalaPackageMember _,
+      qualifyAsJavaLangMember _
+    ).map(_.apply(termName))
+      .collectFirst { case Some(term) => term }
   }
 
   private def qualifyAsPredefMember(scalaMetaTermName: Term.Name) = {
-    PredefModule.info.member(TermName(scalaMetaTermName.value)) match {
-      case NoSymbol => None
-      case _ => Some(Term.Select(TermSelects.ScalaPredef, scalaMetaTermName))
-    }
+    qualifyAsMemberOf(PredefModule, TermSelects.ScalaPredef, scalaMetaTermName)
   }
 
   private def qualifyAsScalaPackageMember(scalaMetaTermName: Term.Name) = {
-    ScalaPackage.info.member(TermName(scalaMetaTermName.value)) match {
+    qualifyAsMemberOf(ScalaPackage, TermNames.Scala, scalaMetaTermName)
+  }
+
+  private def qualifyAsJavaLangMember(scalaMetaTermName: Term.Name): Option[Term] = {
+    qualifyAsMemberOf(JavaLangPackage, TermSelects.JavaLang, scalaMetaTermName)
+  }
+
+  private def qualifyAsMemberOf(module: ModuleSymbol,
+                                moduleRef: Term.Ref,
+                                scalaMetaTermName: Term.Name): Option[Term] = {
+    module.info.member(TermName(scalaMetaTermName.value)) match {
       case NoSymbol => None
-      case _ => Some(Term.Select(TermNames.Scala, scalaMetaTermName))
+      case _ => Some(Term.Select(moduleRef, scalaMetaTermName))
     }
   }
 }

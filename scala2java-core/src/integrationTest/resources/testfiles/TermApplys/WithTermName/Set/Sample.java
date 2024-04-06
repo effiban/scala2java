@@ -1,9 +1,10 @@
 package dummy;
 
+import java.util.Set.of;
 
 public class Sample {
 
     public void foo() {
-        Set.of(1, 2);
+        of(1, 2);
     }
 }

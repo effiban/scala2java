@@ -6,13 +6,17 @@ object TermSelects {
 
   // Please maintain alphabetical order in each section
 
+  final val JavaLang = q"java.lang"
+
   final val JavaCompletableFuture = q"java.util.concurrent.CompletableFuture"
   final val JavaEither = q"io.vavr.control.Either"
+  final val JavaIllegalArgumentException = q"java.lang.IllegalArgumentException"
+  final val JavaIllegalStateException = q"java.lang.IllegalStateException"
   final val JavaIntStream = q"java.util.stream.IntStream"
   final val JavaList = q"java.util.List"
   final val JavaMap = q"java.util.Map"
-  final val JavaPrint = q"System.out.print"
-  final val JavaPrintln = q"System.out.println"
+  final val JavaPrint = q"java.lang.System.out.print"
+  final val JavaPrintln = q"java.lang.System.out.println"
   final val JavaOptional = q"java.util.Optional"
   final val JavaSet = q"java.util.Set"
   final val JavaStream = q"java.util.stream.Stream"

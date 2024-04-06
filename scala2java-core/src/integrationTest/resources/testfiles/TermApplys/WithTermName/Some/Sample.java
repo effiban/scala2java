@@ -1,9 +1,10 @@
 package dummy;
 
+import java.util.Optional.of;
 
 public class Sample {
 
     public void foo() {
-        Optional.of(1);
+        of(1);
     }
 }

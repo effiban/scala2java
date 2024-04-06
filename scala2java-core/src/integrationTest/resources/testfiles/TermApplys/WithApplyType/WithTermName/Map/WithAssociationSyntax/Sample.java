@@ -1,5 +1,6 @@
 package dummy;
 
+import java.util.Map;
 import java.util.Map.entry;
 
 public class Sample {

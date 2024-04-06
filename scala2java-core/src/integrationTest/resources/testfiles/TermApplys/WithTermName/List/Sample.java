@@ -1,9 +1,10 @@
 package dummy;
 
+import java.util.List.of;
 
 public class Sample {
 
     public void foo() {
-        List.of(1, 2);
+        of(1, 2);
     }
 }
