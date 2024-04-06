@@ -81,6 +81,7 @@ class SemanticDesugarers(implicit predicates: Predicates,
 
   private lazy val termApplyFunDesugarer: TermApplyFunDesugarer = new TermApplyFunDesugarerImpl(
     compositeTermNameHasApplyMethod,
+    compositeTermSelectHasApplyMethod,
     evaluatedTermSelectQualDesugarer,
     termApplyTypeFunDesugarer,
     evaluatedTermDesugarer
