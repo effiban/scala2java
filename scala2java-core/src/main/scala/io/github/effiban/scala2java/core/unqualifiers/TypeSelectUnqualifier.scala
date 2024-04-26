@@ -14,7 +14,7 @@ private[unqualifiers] class TypeSelectUnqualifierImpl(typeSelectImporterMatcher:
   override def unqualify(typeSelect: Type.Select, importers: List[Importer] = Nil): Type.Ref = {
 
     typeSelect match {
-      case t"scala.Array" => t"scala.Array"
+      case aTypeSelect@(t"scala.Array" | t"scala.Enumeration") => aTypeSelect
       case aTypeSelect =>
         // TODO support partial unqualification once support is added to the matcher
         importers.map(importer => typeSelectImporterMatcher.findMatch(aTypeSelect, importer))

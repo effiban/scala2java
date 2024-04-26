@@ -2,6 +2,7 @@ package io.github.effiban.scala2java.core.importmanipulation
 
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.verifyNoInteractions
 
 import scala.meta.{Type, XtensionQuasiquoteImporter, XtensionQuasiquoteTerm, XtensionQuasiquoteTermParam, XtensionQuasiquoteType, XtensionQuasiquoteTypeParam}
@@ -44,22 +45,54 @@ class TreeImporterUsedImplTest extends UnitTestSuite {
     treeImporterUsed(theObject, importer) shouldBe true
   }
 
-  test("apply() for a Object when has a partially-matching matching nested Term.Select should return true") {
+  test("apply() for a Object when has a matching nested Term.Select 'c.d' should return true") {
     val theObject =
       q"""
       object A {
-        final var x = C.foo
+        final val x = c.d
       }
       """
 
-    val importer = importer"B.C"
+    val importer = importer"b.c"
 
-    doReturn(Some(importer)).when(termNameImporterMatcher).findMatch(eqTree(q"C"), eqTree(importer))
+    doReturn(Some(importer)).when(termNameImporterMatcher).findMatch(eqTree(q"c"), eqTree(importer))
 
     treeImporterUsed(theObject, importer) shouldBe true
   }
 
-  test("apply() for a Object when has a non-matching matching nested Term.Select should return false") {
+  test("apply() for a Object when has a matching nested Term.Select 'c.d.e' should return true") {
+    val theObject =
+      q"""
+      object A {
+        final val x = c.d.e
+      }
+      """
+
+    val importer = importer"b.c"
+
+    doReturn(Some(importer)).when(termNameImporterMatcher).findMatch(eqTree(q"c"), eqTree(importer))
+
+    treeImporterUsed(theObject, importer) shouldBe true
+  }
+
+  test("apply() for a Object when has a nested Term.Select 'c.d' should NOT check 'd'") {
+    val theObject =
+      q"""
+      object A {
+        final val x = c.d
+      }
+      """
+
+    val importer = importer"b.c"
+
+    doReturn(Some(importer)).when(termNameImporterMatcher).findMatch(eqTree(q"c"), eqTree(importer))
+
+    treeImporterUsed(theObject, importer)
+
+    verify(termNameImporterMatcher, never).findMatch(eqTree(q"d"), eqTree(importer))
+  }
+
+  test("apply() for a Object when has a non-matching nested Term.Select should return false") {
     val theObject =
       q"""
       object A {
@@ -112,7 +145,9 @@ class TreeImporterUsedImplTest extends UnitTestSuite {
   test("apply() for the name of a Term.Param should not try to match it and return false") {
     val importer = importer"a.foo"
 
-    treeImporterUsed(param"foo: x.X", importer) shouldBe false
+    when(typeNameImporterMatcher.findMatch(any(), any())).thenReturn(None)
+
+    treeImporterUsed(param"foo: X", importer) shouldBe false
 
     verifyNoInteractions(termNameImporterMatcher)
   }
@@ -146,6 +181,68 @@ class TreeImporterUsedImplTest extends UnitTestSuite {
     doReturn(Some(importer)).when(typeNameImporterMatcher).findMatch(eqTree(t"B"), eqTree(importer))
 
     treeImporterUsed(theClass, importer) shouldBe true
+  }
+
+  test("apply() for a Class when has a matching nested Type.Select 'c.D' should return true") {
+    val theClass =
+      q"""
+      class A {
+        final var x: c.D
+      }
+      """
+
+    val importer = importer"b.c"
+
+    doReturn(Some(importer)).when(termNameImporterMatcher).findMatch(eqTree(q"c"), eqTree(importer))
+
+    treeImporterUsed(theClass, importer) shouldBe true
+  }
+
+  test("apply() for a Class when has a matching nested Type.Select 'c.d.E' should return true") {
+    val theClass =
+      q"""
+      class A {
+        final var x: c.d.E
+      }
+      """
+
+    val importer = importer"b.c"
+
+    doReturn(Some(importer)).when(termNameImporterMatcher).findMatch(eqTree(q"c"), eqTree(importer))
+
+    treeImporterUsed(theClass, importer) shouldBe true
+  }
+
+  test("apply() for a Class when has a nested Type.Select 'c.D' should NOT check 'D'") {
+    val theClass =
+      q"""
+      class A {
+        final var x: c.D
+      }
+      """
+
+    val importer = importer"b.c"
+
+    doReturn(Some(importer)).when(termNameImporterMatcher).findMatch(eqTree(q"c"), eqTree(importer))
+
+    treeImporterUsed(theClass, importer)
+
+    verify(termNameImporterMatcher, never).findMatch(eqTree(q"D"), eqTree(importer))
+  }
+
+  test("apply() for a Class when has a non-matching nested Type.Select should return false") {
+    val theClass =
+      q"""
+      object A {
+        final var x: C.foo
+      }
+      """
+
+    val importer = importer"B.D"
+
+    doReturn(None).when(termNameImporterMatcher).findMatch(eqTree(q"C"), eqTree(importer))
+
+    treeImporterUsed(theClass, importer) shouldBe false
   }
 
   test("apply() for a Class when has no matching nested trees should return false") {

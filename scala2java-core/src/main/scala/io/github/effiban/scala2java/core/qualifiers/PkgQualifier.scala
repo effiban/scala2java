@@ -32,7 +32,7 @@ private[qualifiers] class PkgQualifierImpl(statsByImportSplitter: StatsByImportS
       tree match {
         case termSelect: Term.Select => termSelect.copy(qual = apply(termSelect.qual).asInstanceOf[Term])
         case termName: Term.Name => termNameQualifier.qualify(termName, importers)
-        case typeSelect: Type.Select => typeSelect // TODO
+        case typeSelect: Type.Select => typeSelect.copy(qual = apply(typeSelect.qual).asInstanceOf[Term.Ref])
         case typeName: Type.Name => typeNameQualifier.qualify(typeName, importers)
         case aTree => super.apply(aTree)
       }
