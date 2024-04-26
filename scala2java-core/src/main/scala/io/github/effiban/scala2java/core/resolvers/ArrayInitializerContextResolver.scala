@@ -22,15 +22,6 @@ object ArrayInitializerContextResolver extends ArrayInitializerContextResolver {
         Some(ArrayInitializerValuesContext(maybeType = Some(tpe), values = termApply.args))
       case Term.ApplyType(Term.Select(q"scala.Array", Term.Name(TermNameValues.Apply)), tpe :: Nil) =>
         Some(ArrayInitializerValuesContext(maybeType = Some(tpe), values = termApply.args))
-
-      // TODO remove the following block of cases once term names are fully qualified at start
-      case Term.Name(TermNameValues.ScalaArray) |
-           Term.Select(Term.Name(TermNameValues.ScalaArray), Term.Name(TermNameValues.Apply)) =>
-        Some(ArrayInitializerValuesContext(values = termApply.args))
-      case Term.ApplyType(Term.Name(TermNameValues.ScalaArray), tpe :: Nil) =>
-        Some(ArrayInitializerValuesContext(maybeType = Some(tpe), values = termApply.args))
-      case Term.ApplyType(Term.Select(Term.Name(TermNameValues.ScalaArray), Term.Name(TermNameValues.Apply)), tpe :: Nil) =>
-        Some(ArrayInitializerValuesContext(maybeType = Some(tpe), values = termApply.args))
       case _ => None
     }
   }

@@ -1,5 +1,6 @@
 package dummy;
 
+import java.util.concurrent.CompletableFuture;
 
 public class Sample {
 

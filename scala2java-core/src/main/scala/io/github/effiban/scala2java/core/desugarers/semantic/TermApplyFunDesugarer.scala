@@ -2,14 +2,13 @@ package io.github.effiban.scala2java.core.desugarers.semantic
 
 import io.github.effiban.scala2java.core.desugarers.SameTypeDesugarer
 import io.github.effiban.scala2java.core.entities.TermNameValues.Apply
-import io.github.effiban.scala2java.spi.predicates.{TermNameHasApplyMethod, TermSelectHasApplyMethod}
+import io.github.effiban.scala2java.spi.predicates.TermSelectHasApplyMethod
 
 import scala.meta.Term
 
 trait TermApplyFunDesugarer extends SameTypeDesugarer[Term.Apply]
 
-private[semantic] class TermApplyFunDesugarerImpl(termNameHasApplyMethod: TermNameHasApplyMethod,
-                                                  termSelectHasApplyMethod: TermSelectHasApplyMethod,
+private[semantic] class TermApplyFunDesugarerImpl(termSelectHasApplyMethod: TermSelectHasApplyMethod,
                                                   evaluatedTermSelectQualDesugarer: => EvaluatedTermSelectQualDesugarer,
                                                   termApplyTypeFunDesugarer: => TermApplyTypeFunDesugarer,
                                                   evaluatedTermDesugarer: => EvaluatedTermDesugarer)
@@ -20,15 +19,11 @@ private[semantic] class TermApplyFunDesugarerImpl(termNameHasApplyMethod: TermNa
 
     val desugaredFun = fun match {
 
-      // TODO - next one is deprecated
-      case name: Term.Name if termNameHasApplyMethod(name) => toQualifiedApply(name)
       case name: Term.Name => name
 
       case select: Term.Select if termSelectHasApplyMethod(select) => toQualifiedApply(select)
       case select: Term.Select => desugarSelectQual(select)
 
-      // TODO - next one is deprecated
-      case Term.ApplyType(name: Term.Name, types) if termNameHasApplyMethod(name) => Term.ApplyType(toQualifiedApply(name), types)
       case applyType@Term.ApplyType(_: Term.Name, _) => applyType
 
       case Term.ApplyType(select: Term.Select, types) if termSelectHasApplyMethod(select) => Term.ApplyType(toQualifiedApply(select), types)

@@ -1,9 +1,10 @@
 package dummy;
 
+import java.util.concurrent.CompletableFuture.supplyAsync;
 
 public class Sample {
 
     public void foo() {
-        CompletableFuture.supplyAsync(() -> 1);
+        supplyAsync(() -> 1);
     }
 }

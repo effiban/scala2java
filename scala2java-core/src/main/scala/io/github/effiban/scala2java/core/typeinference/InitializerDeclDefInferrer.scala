@@ -8,13 +8,7 @@ import scala.meta.{Term, Type}
 trait InitializerDeclDefInferrer {
   def inferByAppliedTypes(qual: Term.Select, appliedTypes: List[Type], numArgs: Int): PartialDeclDef
 
-  @deprecated
-  def inferByAppliedTypes(name: Term.Name, appliedTypes: List[Type], numArgs: Int): PartialDeclDef
-
   def inferByArgTypes(qual: Term.Select, maybeArgTypes: List[Option[Type]]): PartialDeclDef
-
-  @deprecated
-  def inferByArgTypes(name: Term.Name, maybeArgTypes: List[Option[Type]]): PartialDeclDef
 }
 
 private[typeinference] class InitializerDeclDefInferrerImpl(compositeCollectiveTypeInferrer: => CompositeCollectiveTypeInferrer,
@@ -34,36 +28,9 @@ private[typeinference] class InitializerDeclDefInferrerImpl(compositeCollectiveT
     }
   }
 
-  @deprecated
-  override def inferByAppliedTypes(name: Term.Name, appliedTypes: List[Type], numArgs: Int): PartialDeclDef = {
-
-    typeInitializedBy(name) match {
-      case Some(parameterizedType) => PartialDeclDef(
-        maybeParamTypes = List.fill(numArgs)(Some(inferParamTypeFromAppliedTypes(appliedTypes))),
-        maybeReturnType = Some(Type.Apply(parameterizedType, appliedTypes))
-      )
-      case None => PartialDeclDef()
-    }
-  }
-
   override def inferByArgTypes(qual: Term.Select, maybeArgTypes: List[Option[Type]]): PartialDeclDef = {
 
     typeInitializedBy(qual) match {
-      case Some(parameterizedType) =>
-        val paramType = inferParamTypeFromArgTypes(maybeArgTypes)
-        val appliedTypes = inferAppliedTypesFromParamType(paramType)
-        PartialDeclDef(
-          maybeParamTypes = List.fill(maybeArgTypes.size)(Some(paramType)),
-          maybeReturnType = Some(Type.Apply(parameterizedType, appliedTypes))
-        )
-      case None => PartialDeclDef()
-    }
-  }
-
-  @deprecated
-  override def inferByArgTypes(name: Term.Name, maybeArgTypes: List[Option[Type]]): PartialDeclDef = {
-
-    typeInitializedBy(name) match {
       case Some(parameterizedType) =>
         val paramType = inferParamTypeFromArgTypes(maybeArgTypes)
         val appliedTypes = inferAppliedTypesFromParamType(paramType)

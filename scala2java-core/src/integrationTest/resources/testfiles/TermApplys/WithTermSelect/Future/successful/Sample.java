@@ -1,9 +1,10 @@
 package dummy;
 
+import java.util.concurrent.CompletableFuture.completedFuture;
 
 public class Sample {
 
     public void foo() {
-        CompletableFuture.completedFuture("a");
+        completedFuture("a");
     }
 }

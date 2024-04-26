@@ -23,32 +23,6 @@ class ExtendedPredicatesTest extends UnitTestSuite {
     extensionRegistry.templateInitExcludedPredicates shouldBe templateInitExcludedPredicates
   }
 
-  test("termNameHasApplyMethods") {
-    val termNameHasApplyMethod1 = mock[TermNameHasApplyMethod]
-    val termNameHasApplyMethod2 = mock[TermNameHasApplyMethod]
-    val termNameHasApplyMethods = List(termNameHasApplyMethod1, termNameHasApplyMethod2)
-
-    when(extension1.termNameHasApplyMethod()).thenReturn(termNameHasApplyMethod1)
-    when(extension2.termNameHasApplyMethod()).thenReturn(termNameHasApplyMethod2)
-
-    val extensionRegistry = ExtensionRegistry(extensions)
-
-    extensionRegistry.termNameHasApplyMethods shouldBe termNameHasApplyMethods
-  }
-
-  test("termNameSupportsNoArgInvocations") {
-    val termNameSupportsNoArgInvocation1 = mock[TermNameSupportsNoArgInvocation]
-    val termNameSupportsNoArgInvocation2 = mock[TermNameSupportsNoArgInvocation]
-    val termNameSupportsNoArgInvocations = List(termNameSupportsNoArgInvocation1, termNameSupportsNoArgInvocation2)
-
-    when(extension1.termNameSupportsNoArgInvocation()).thenReturn(termNameSupportsNoArgInvocation1)
-    when(extension2.termNameSupportsNoArgInvocation()).thenReturn(termNameSupportsNoArgInvocation2)
-
-    val extensionRegistry = ExtensionRegistry(extensions)
-
-    extensionRegistry.termNameSupportsNoArgInvocations shouldBe termNameSupportsNoArgInvocations
-  }
-
   test("termSelectHasApplyMethods") {
     val termSelectHasApplyMethod1 = mock[TermSelectHasApplyMethod]
     val termSelectHasApplyMethod2 = mock[TermSelectHasApplyMethod]

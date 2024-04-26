@@ -15,7 +15,6 @@ private[typeinference] class TermTypeInferrerImpl(applyInfixTypeInferrer: => App
                                                   functionTypeInferrer: => FunctionTypeInferrer,
                                                   ifTypeInferrer: => IfTypeInferrer,
                                                   litTypeInferrer: LitTypeInferrer,
-                                                  nameTypeInferrer: => InternalNameTypeInferrer,
                                                   selectTypeInferrer: => InternalSelectTypeInferrer,
                                                   tryTypeInferrer: => TryTypeInferrer,
                                                   tryWithHandlerTypeInferrer: => TryWithHandlerTypeInferrer,
@@ -37,7 +36,7 @@ private[typeinference] class TermTypeInferrerImpl(applyInfixTypeInferrer: => App
       case `if`: If => ifTypeInferrer.infer(`if`)
       case _: Term.Interpolate => Some(Type.Name("String"))
       case lit: Lit => litTypeInferrer.infer(lit)
-      case name: Term.Name => nameTypeInferrer.infer(name)
+      case _: Term.Name => None // TODO handle local/file/package-scope Term.Name-s
       case `new`: New => Some(`new`.init.tpe)
       case repeated: Term.Repeated => inferRepeated(repeated)
       case `return`: Return => infer(`return`.expr)

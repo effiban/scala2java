@@ -200,13 +200,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val expressionIfTraverser: ExpressionIfTraverser = new ExpressionIfTraverserImpl(expressionTermTraverser)
 
-  private lazy val expressionTermNameTraverser: ExpressionTermNameTraverser = new ExpressionTermNameTraverserImpl(
-    expressionTermTraverser,
-    new CompositeTermNameTransformer(CoreTermNameTransformer)
-  )
-
   private lazy val expressionTermRefTraverser: ExpressionTermRefTraverser = new ExpressionTermRefTraverserImpl(
-    expressionTermNameTraverser,
     expressionTermSelectTraverser,
     applyUnaryTraverser,
     defaultTermRefTraverser

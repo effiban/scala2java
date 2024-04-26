@@ -40,14 +40,7 @@ class TypeInferrers(factories: => Factories,
 
   lazy val internalApplyDeclDefInferrer: InternalApplyDeclDefInferrer = new InternalApplyDeclDefInferrerImpl(
     new CompositeApplyDeclDefInferrer(coreApplyDeclDefInferrer),
-    predicates.compositeTermNameHasApplyMethod,
     predicates.compositeTermSelectHasApplyMethod
-  )
-
-  private[typeinference] lazy val internalNameTypeInferrer = new InternalNameTypeInferrerImpl(
-    applyReturnTypeInferrer,
-    new CompositeNameTypeInferrer(CoreNameTypeInferrer),
-    predicates.compositeTermNameSupportsNoArgInvocation
   )
 
   private[typeinference] lazy val internalSelectTypeInferrer = new InternalSelectTypeInferrerImpl(
@@ -73,7 +66,6 @@ class TypeInferrers(factories: => Factories,
     functionTypeInferrer,
     ifTypeInferrer,
     LitTypeInferrer,
-    internalNameTypeInferrer,
     internalSelectTypeInferrer,
     tryTypeInferrer,
     tryWithHandlerTypeInferrer,

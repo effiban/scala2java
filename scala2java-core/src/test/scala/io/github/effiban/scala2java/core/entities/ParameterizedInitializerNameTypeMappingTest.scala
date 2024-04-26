@@ -2,7 +2,6 @@ package io.github.effiban.scala2java.core.entities
 
 import io.github.effiban.scala2java.core.entities.ParameterizedInitializerNameTypeMapping.typeInitializedBy
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.testtrees.TermNames
 
 import scala.meta.{Term, Type, XtensionQuasiquoteTerm}
 
@@ -34,34 +33,6 @@ class ParameterizedInitializerNameTypeMappingTest extends UnitTestSuite {
     q"bar.bar"
   )
 
-  @deprecated
-  private val DeprecatedValidScenarios = Table(
-    ("Name", "ExpectedType"),
-    (TermNames.ScalaRange, TypeSelects.ScalaRange),
-    (TermNames.ScalaOption, TypeSelects.ScalaOption),
-    (TermNames.ScalaSome, TypeSelects.ScalaSome),
-    (TermNames.ScalaRight, TypeSelects.ScalaRight),
-    (TermNames.ScalaLeft, TypeSelects.ScalaLeft),
-    (TermNames.Try, TypeSelects.ScalaTry),
-    (TermNames.ScalaSuccess, TypeSelects.ScalaSuccess),
-    (TermNames.ScalaFailure, TypeSelects.ScalaFailure),
-    (TermNames.Future, TypeSelects.ScalaFuture),
-    (TermNames.Stream, TypeSelects.ScalaStream),
-    (TermNames.ScalaArray, TypeSelects.ScalaArray),
-    (TermNames.List, TypeSelects.ScalaList),
-    (TermNames.ScalaVector, TypeSelects.ScalaVector),
-    (TermNames.Seq, TypeSelects.ScalaSeq),
-    (TermNames.Set, TypeSelects.ScalaSet),
-    (TermNames.Map, TypeSelects.ScalaMap)
-  )
-
-  @deprecated
-  private val DeprecatedInvalidScenarios = Table(
-    "Name",
-    q"foo",
-    q"bar"
-  )
-
   forAll(ValidScenarios) { (termSelect: Term.Select, expectedType: Type.Ref) =>
     test(s"Type initialized by $termSelect should be $expectedType") {
       typeInitializedBy(termSelect).value.structure shouldBe expectedType.structure
@@ -71,18 +42,6 @@ class ParameterizedInitializerNameTypeMappingTest extends UnitTestSuite {
   forAll(InvalidScenarios) { (termSelect: Term.Select) =>
     test(s"Type initialized by $termSelect should be None") {
       typeInitializedBy(termSelect) shouldBe None
-    }
-  }
-
-  forAll(DeprecatedValidScenarios) { (name: Term.Name, expectedType: Type.Ref) =>
-    test(s"Type initialized by $name should be $expectedType") {
-      typeInitializedBy(name).value.structure shouldBe expectedType.structure
-    }
-  }
-
-  forAll(DeprecatedInvalidScenarios) { (name: Term.Name) =>
-    test(s"Type initialized by $name should be None") {
-      typeInitializedBy(name) shouldBe None
     }
   }
 }
