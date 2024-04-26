@@ -1,9 +1,10 @@
 package dummy;
 
+import io.vavr.control.Try.failure;
 
 public class Sample {
 
     public void foo() {
-        Try.failure(new RuntimeException());
+        failure(new RuntimeException());
     }
 }

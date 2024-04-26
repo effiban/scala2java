@@ -24,16 +24,6 @@ object ArrayInitializerRenderContextResolver extends ArrayInitializerRenderConte
       case Term.ApplyType(Term.Select(q"scala.Array", Term.Name(TermNameValues.Apply)), tpe :: Nil) =>
         Some(ArrayInitializerValuesRenderContext(tpe = tpe, values = termApply.args))
 
-        // TODO remove once term names are fully qualified at start
-      case arrayInitializer@(Term.Name(TermNameValues.ScalaArray) |
-                             Term.Select(Term.Name(TermNameValues.ScalaArray), Term.Name(TermNameValues.Apply))) =>
-        throw new IllegalStateException(
-          s"An array values initializer must be typed by the time this resolver is called, but it is: $arrayInitializer")
-      case Term.ApplyType(Term.Name(TermNameValues.ScalaArray), tpe :: Nil) =>
-        Some(ArrayInitializerValuesRenderContext(tpe = tpe, values = termApply.args))
-      case Term.ApplyType(Term.Select(Term.Name(TermNameValues.ScalaArray), Term.Name(TermNameValues.Apply)), tpe :: Nil) =>
-        Some(ArrayInitializerValuesRenderContext(tpe = tpe, values = termApply.args))
-
       case _ => None
     }
   }

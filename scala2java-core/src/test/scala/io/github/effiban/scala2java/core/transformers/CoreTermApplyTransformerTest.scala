@@ -20,13 +20,11 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
   private val termSelectClassifier = mock[TermSelectClassifier]
   private val typeClassifier = mock[TypeClassifier[Type]]
   private val termSelectTermFunctionTransformer = mock[TermSelectTermFunctionTransformer]
-  private val deprecatedCoreTermApplyTransformer = mock[DeprecatedCoreTermApplyTransformer]
 
   private val termApplyTransformer = new CoreTermApplyTransformer(
     termSelectClassifier,
     typeClassifier,
-    termSelectTermFunctionTransformer,
-    deprecatedCoreTermApplyTransformer
+    termSelectTermFunctionTransformer
   )
 
   test("transform 'scala.Range.apply(1, 10)' should return 'java.util.stream.IntStream.range(1, 10)'") {
@@ -442,8 +440,6 @@ class CoreTermApplyTransformerTest extends UnitTestSuite {
 
   test("transform 'Dummy.dummy(1)' should return same") {
     val termApply = q"Dummy.dummy(1)"
-
-    doReturn(None).when(deprecatedCoreTermApplyTransformer).transformOptional(eqTree(termApply), any())
 
     termApplyTransformer.transform(termApply).structure shouldBe termApply.structure
   }

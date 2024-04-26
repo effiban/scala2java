@@ -1,66 +1,24 @@
 package io.github.effiban.scala2java.core.desugarers.semantic
 
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.spi.predicates.{TermNameHasApplyMethod, TermSelectHasApplyMethod}
+import io.github.effiban.scala2java.spi.predicates.TermSelectHasApplyMethod
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.XtensionQuasiquoteTerm
 
 class TermApplyFunDesugarerImplTest extends UnitTestSuite {
 
-  private val termNameHasApplyMethod = mock[TermNameHasApplyMethod]
   private val termSelectHasApplyMethod = mock[TermSelectHasApplyMethod]
   private val evaluatedTermSelectQualDesugarer = mock[EvaluatedTermSelectQualDesugarer]
   private val termApplyTypeFunDesugarer = mock[TermApplyTypeFunDesugarer]
   private val evaluatedTermDesugarer = mock[EvaluatedTermDesugarer]
 
   private val termApplyFunDesugarer = new TermApplyFunDesugarerImpl(
-    termNameHasApplyMethod,
     termSelectHasApplyMethod,
     evaluatedTermSelectQualDesugarer,
     termApplyTypeFunDesugarer,
     evaluatedTermDesugarer
   )
-
-  // TODO - start of deprecated block
-  test("desugar() when fun is a Term.Name with implicit 'apply()', should add the 'apply()'") {
-    val termName = q"MyObject"
-    val termApply = q"MyObject(1)"
-    val desugaredTermApply = q"MyObject.apply(1)"
-
-    when(termNameHasApplyMethod(eqTree(termName))).thenReturn(true)
-
-    termApplyFunDesugarer.desugar(termApply).structure shouldBe desugaredTermApply.structure
-  }
-
-  test("desugar() when fun is a Term.ApplyType of Term.Name, with implicit 'apply()', should add the 'apply()'") {
-    val termName = q"MyObject"
-    val termApply = q"MyObject[Int](1)"
-    val desugaredTermApply = q"MyObject.apply[Int](1)"
-
-    when(termNameHasApplyMethod(eqTree(termName))).thenReturn(true)
-
-    termApplyFunDesugarer.desugar(termApply).structure shouldBe desugaredTermApply.structure
-  }
-
-  test("desugar() when fun is a Term.Name with no implicit 'apply()', should return unchanged") {
-    val termName = q"myMethod"
-    val termApply = q"myMethod(1)"
-
-    when(termNameHasApplyMethod(eqTree(termName))).thenReturn(false)
-
-    termApplyFunDesugarer.desugar(termApply).structure shouldBe termApply.structure
-  }
-
-  test("desugar() when fun is a Term.ApplyType of a Term.Name, with no implicit 'apply()', should return unchanged") {
-    val termName = q"myMethod"
-    val termApply = q"myMethod[Int](1)"
-
-    when(termNameHasApplyMethod(eqTree(termName))).thenReturn(false)
-
-    termApplyFunDesugarer.desugar(termApply).structure shouldBe termApply.structure
-  }
-  // TODO - end of deprecated block
 
   test("desugar() when fun is a Term.Select, and has an 'apply' method - should add the 'apply()'") {
     val termSelect = q"MyObj1.MyObj2"

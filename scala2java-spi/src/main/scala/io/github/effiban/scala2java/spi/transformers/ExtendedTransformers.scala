@@ -97,18 +97,6 @@ trait ExtendedTransformers {
    */
   def termSelectTransformer(): TermSelectTransformer = TermSelectTransformer.Empty
 
-  /** Override this method if you need to modify a [[scala.meta.Term.Name]] (identifier) appearing in the context
-   * of an evaluated expression (see [[TermApplyTransformer]] for examples).<br>
-   * '''NOTE''': This transformer will only be called for identifiers that are __not__ method invocations.<br>
-   * If some method invocation is an identifier with no args and no parentheses,
-   * it will be automatically 'desugared' into a method invocation and eventually passed to [[termApplyTransformer]].<br>
-   * The framework will identify such cases by calling [[io.github.effiban.scala2java.spi.predicates.ExtendedPredicates.termNameSupportsNoArgInvocation]]
-   *
-   * @return if overriden - a transformer which modifies a given [[scala.meta.Term.Name]]<br>
-   *         otherwise - the default transformer which doesn't modify anything<br>
-   */
-  def termNameTransformer(): TermNameTransformer = TermNameTransformer.Empty
-
   /** Override this method if you need to transform a Scala qualified type into an equivalent Java type
    *
    * @return if overriden - a transformer which changes the qualified type<br>

@@ -1,5 +1,6 @@
 package dummy;
 
+import io.vavr.control.Try;
 
 public class Sample {
 

@@ -53,7 +53,6 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
   private val functionTypeInferrer = mock[FunctionTypeInferrer]
   private val ifTypeInferrer = mock[IfTypeInferrer]
   private val litTypeInferrer = mock[LitTypeInferrer]
-  private val nameTypeInferrer = mock[InternalNameTypeInferrer]
   private val selectTypeInferrer = mock[InternalSelectTypeInferrer]
   private val tryTypeInferrer = mock[TryTypeInferrer]
   private val tryWithHandlerTypeInferrer = mock[TryWithHandlerTypeInferrer]
@@ -68,7 +67,6 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
     functionTypeInferrer,
     ifTypeInferrer,
     litTypeInferrer,
-    nameTypeInferrer,
     selectTypeInferrer,
     tryTypeInferrer,
     tryWithHandlerTypeInferrer,
@@ -182,13 +180,7 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
     termTypeInferrer.infer(`match`).value.structure shouldBe TypeNames.Int.structure
   }
 
-  test("infer 'Name' when 'NameTypeInferrer' returns a result, should return it") {
-    when(nameTypeInferrer.infer(eqTree(Term.Name("List")))).thenReturn(Some(TypeNames.List))
-    termTypeInferrer.infer(Term.Name("List")).value.structure shouldBe TypeNames.List.structure
-  }
-
-  test("infer 'Name' when 'NameTypeInferrer' returns None should return None") {
-    when(nameTypeInferrer.infer(eqTree(Term.Name("foo")))).thenReturn(None)
+  test("infer 'Name' should return None") {
     termTypeInferrer.infer(Term.Name("foo")) shouldBe None
   }
 

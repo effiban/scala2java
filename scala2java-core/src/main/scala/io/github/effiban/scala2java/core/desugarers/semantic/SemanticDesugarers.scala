@@ -44,12 +44,7 @@ class SemanticDesugarers(implicit predicates: Predicates,
     etaDesugarer,
     treeDesugarer)
 
-  private lazy val evaluatedTermNameDesugarer: EvaluatedTermNameDesugarer = new EvaluatedTermNameDesugarerImpl(
-    compositeTermNameSupportsNoArgInvocation
-  )
-
   private lazy val evaluatedTermRefDesugarer: EvaluatedTermRefDesugarer = new EvaluatedTermRefDesugarerImpl(
-    evaluatedTermNameDesugarer,
     evaluatedTermSelectDesugarer,
     applyUnaryDesugarer,
     treeDesugarer
@@ -80,7 +75,6 @@ class SemanticDesugarers(implicit predicates: Predicates,
   private lazy val termApplyDesugarer: TermApplyDesugarer = new TermApplyDesugarerImpl(termApplyFunDesugarer, evaluatedTermDesugarer)
 
   private lazy val termApplyFunDesugarer: TermApplyFunDesugarer = new TermApplyFunDesugarerImpl(
-    compositeTermNameHasApplyMethod,
     compositeTermSelectHasApplyMethod,
     evaluatedTermSelectQualDesugarer,
     termApplyTypeFunDesugarer,

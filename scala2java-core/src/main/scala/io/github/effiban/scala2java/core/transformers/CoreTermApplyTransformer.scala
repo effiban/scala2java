@@ -11,8 +11,7 @@ import scala.meta.{Term, Type, XtensionQuasiquoteTerm}
 
 private[transformers] class CoreTermApplyTransformer(termSelectClassifier: TermSelectClassifier,
                                                      typeClassifier: TypeClassifier[Type],
-                                                     termSelectTermFunctionTransformer: => TermSelectTermFunctionTransformer,
-                                                     deprecatedCoreTermApplyTransformer: => DeprecatedCoreTermApplyTransformer) extends TermApplyTransformer {
+                                                     termSelectTermFunctionTransformer: => TermSelectTermFunctionTransformer) extends TermApplyTransformer {
 
   private val ScalaToJavaQualifiedName = Map[Term.Select, Term.Select](
     Term.Select(ScalaRange, Apply) -> Term.Select(JavaIntStream, JavaRange),
@@ -43,7 +42,6 @@ private[transformers] class CoreTermApplyTransformer(termSelectClassifier: TermS
 
   override final def transform(termApply: Term.Apply, context: TermApplyTransformationContext = TermApplyTransformationContext()): Term.Apply =
     transformOptional(termApply, context)
-      .orElse(deprecatedCoreTermApplyTransformer.transformOptional(termApply, context))
       .getOrElse(termApply)
 
   private def transformOptional(termApply: Term.Apply, context: TermApplyTransformationContext) = {

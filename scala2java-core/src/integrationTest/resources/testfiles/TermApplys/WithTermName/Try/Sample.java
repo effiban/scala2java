@@ -1,9 +1,10 @@
 package dummy;
 
+import io.vavr.control.Try.ofSupplier;
 
 public class Sample {
 
     public void foo() {
-        Try.ofSupplier(() -> 1);
+        ofSupplier(() -> 1);
     }
 }

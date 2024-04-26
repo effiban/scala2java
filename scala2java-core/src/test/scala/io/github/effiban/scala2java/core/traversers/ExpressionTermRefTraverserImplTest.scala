@@ -7,26 +7,15 @@ import scala.meta.XtensionQuasiquoteTerm
 
 class ExpressionTermRefTraverserImplTest extends UnitTestSuite {
 
-  private val expressionTermNameTraverser = mock[ExpressionTermNameTraverser]
   private val expressionTermSelectTraverser = mock[ExpressionTermSelectTraverser]
   private val applyUnaryTraverser = mock[ApplyUnaryTraverser]
   private val defaultTermRefTraverser = mock[DefaultTermRefTraverser]
 
   private val expressionTermRefTraverser = new ExpressionTermRefTraverserImpl(
-    expressionTermNameTraverser,
     expressionTermSelectTraverser,
     applyUnaryTraverser,
     defaultTermRefTraverser
   )
-
-  test("traverse() for Term.Name") {
-    val termName = q"x"
-    val traversedTerm = q"x(a)"
-
-    doReturn(traversedTerm).when(expressionTermNameTraverser).traverse(eqTree(termName))
-
-    expressionTermRefTraverser.traverse(termName).structure shouldBe traversedTerm.structure
-  }
 
   test("traverse() for Term.Select") {
     val termSelect = q"x.y"
@@ -53,5 +42,14 @@ class ExpressionTermRefTraverserImplTest extends UnitTestSuite {
     doReturn(traversedTermThis).when(defaultTermRefTraverser).traverse(eqTree(termThis))
 
     expressionTermRefTraverser.traverse(termThis).structure shouldBe traversedTermThis.structure
+  }
+
+  test("traverse() for Term.Name") {
+    val termName = q"x"
+    val traversedTermName = q"xx"
+
+    doReturn(traversedTermName).when(defaultTermRefTraverser).traverse(eqTree(termName))
+
+    expressionTermRefTraverser.traverse(termName).structure shouldBe traversedTermName.structure
   }
 }

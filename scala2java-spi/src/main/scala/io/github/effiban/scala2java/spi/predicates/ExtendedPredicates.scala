@@ -18,14 +18,6 @@ trait ExtendedPredicates {
   def templateInitExcludedPredicate(): TemplateInitExcludedPredicate = TemplateInitExcludedPredicate.None
 
 
-  /** Override this method if you need to specify that a given [[Term.Name]] appearing in the Scala source file,
-   * has an `apply()` method (whether defined implicitly or explicitly).<br>
-   * This is true of all case classes and functions, and also some companion objects.<br>
-   * The framework will use this in order to properly identify invocations where the `apply()`
-   * does not appear explicitly and be able to infer their types and also transform them properly into Java.
-   */
-  def termNameHasApplyMethod(): TermNameHasApplyMethod = TermNameHasApplyMethod.None
-
   /** Override this method if you need to specify that a given [[Term.Select]] appearing in the Scala source file,
    * has an `apply()` method (whether defined implicitly or explicitly).<br>
    * This is true of all case classes and functions, and also some companion objects.<br>
@@ -33,16 +25,6 @@ trait ExtendedPredicates {
    * does not appear explicitly and be able to infer their types and also transform them properly into Java.
    */
   def termSelectHasApplyMethod(): TermSelectHasApplyMethod = TermSelectHasApplyMethod.None
-
-  /** Override this method if you need to specify that a given [[Term.Name]] appearing in the Scala source file,
-   * is actually a no-argument invocation to a method.<br>
-   * In Scala some methods are defined without parentheses and must be called that way, while others have repeated (variable) argument lists
-   * and may also be optionally invoked without parentheses.<br>
-   * For example: The expression `println` (with no parentheses) is a call to the `println()` method.<br>
-   * The framework will use this in order to properly identify such invocations, so as to be able to infer their types
-   * and also transform them properly into Java.
-   */
-  def termNameSupportsNoArgInvocation(): TermNameSupportsNoArgInvocation = TermNameSupportsNoArgInvocation.None
 
   /** Override this method if you need to specify that a given [[Term.Select]] (qualified name) appearing in the Scala source file,
    * is actually a no-argument invocation to a method.<br>
