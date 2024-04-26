@@ -31,6 +31,7 @@ object TermSelects {
   final val ScalaBoolean = q"scala.Boolean"
   final val ScalaByte = q"scala.Byte"
   final val ScalaChar = q"scala.Char"
+  final val ScalaConcurrent = q"scala.concurrent"
   final val ScalaDouble = q"scala.Double"
   final val ScalaEither = q"scala.Either"
   final val ScalaEquiv = q"scala.Equiv"

@@ -14,16 +14,20 @@ class TypeSelectUnqualifierImplTest extends UnitTestSuite {
 
   private val typeSelectUnqualifier = new TypeSelectUnqualifierImpl(typeSelectImporterMatcher)
 
-  test("unqualify() for Array should return unchanged") {
+  test("unqualify() for scala.Array should return unchanged") {
     typeSelectUnqualifier.unqualify(TypeSelects.ScalaArray, Nil).structure shouldBe TypeSelects.ScalaArray.structure
   }
 
-  test("unqualify() for non-Array when no importers provided should return unchanged") {
+  test("unqualify() for scala.Enumeration should return unchanged") {
+    typeSelectUnqualifier.unqualify(TypeSelects.ScalaEnumeration, Nil).structure shouldBe TypeSelects.ScalaEnumeration.structure
+  }
+
+  test("unqualify() for non-Array/Enumeration when no importers provided should return unchanged") {
     val typeSelect = t"a.b.C"
     typeSelectUnqualifier.unqualify(typeSelect, Nil).structure shouldBe typeSelect.structure
   }
 
-  test("unqualify() for non-Array when one importer provided and doesn't match, should return unchanged") {
+  test("unqualify() for non-Array/Enumeration when one importer provided and doesn't match, should return unchanged") {
     val typeSelect = t"a.b.C"
     val importer = importer"c.d.E"
 
@@ -32,7 +36,7 @@ class TypeSelectUnqualifierImplTest extends UnitTestSuite {
     typeSelectUnqualifier.unqualify(typeSelect, List(importer)).structure shouldBe typeSelect.structure
   }
 
-  test("unqualify() for non-Array when one importer provided and matches, should return name only") {
+  test("unqualify() for non-Array/Enumeration when one importer provided and matches, should return name only") {
     val typeSelect = t"a.b.C"
     val importer = importer"a.b.{C, D}"
     val expectedMatchingImporter = importer"a.b.C"
@@ -42,7 +46,7 @@ class TypeSelectUnqualifierImplTest extends UnitTestSuite {
     typeSelectUnqualifier.unqualify(typeSelect, List(importer)).structure shouldBe t"C".structure
   }
 
-  test("unqualify() for non-Array when two importers provided and none match, should return unchanged") {
+  test("unqualify() for non-Array/Enumeration when two importers provided and none match, should return unchanged") {
     val typeSelect = t"a.b.C"
     val importer1 = importer"d.e.F"
     val importer2 = importer"g.h.I"
@@ -52,7 +56,7 @@ class TypeSelectUnqualifierImplTest extends UnitTestSuite {
     typeSelectUnqualifier.unqualify(typeSelect, List(importer1, importer2)).structure shouldBe typeSelect.structure
   }
 
-  test("unqualify() for non-Array when two importers provided and second one matches, should return name only") {
+  test("unqualify() for non-Array/Enumeration when two importers provided and second one matches, should return name only") {
     val typeSelect = t"a.b.C"
     val importer1 = importer"d.e.F"
     val importer2 = importer"a.b.{C, D}"

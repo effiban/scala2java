@@ -20,7 +20,7 @@ private[importmanipulation] class TreeImporterUsedImpl(termNameImporterMatcher: 
     override def apply(tree: Tree): Unit = tree match {
       case termSelect: Term.Select => apply(termSelect.qual)
       case termName: Term.Name => checkTermName(termName)
-      case _: Type.Select => //TODO support match by qualifier prefix
+      case typeSelect: Type.Select => apply(typeSelect.qual)
       case _: Type.Project => //TODO support match by qualifier prefix
       case typeName: Type.Name => checkTypeName(typeName)
       case aTree => super.apply(aTree)
