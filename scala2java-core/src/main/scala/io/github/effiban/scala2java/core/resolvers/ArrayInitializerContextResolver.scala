@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.resolvers
 
 import io.github.effiban.scala2java.core.contexts.{ArrayInitializerSizeContext, ArrayInitializerValuesContext}
-import io.github.effiban.scala2java.core.entities.{TermNameValues, TypeNameValues}
+import io.github.effiban.scala2java.core.entities.TypeNameValues
 
 import scala.meta.{Init, Lit, Term, Type, XtensionQuasiquoteTerm}
 
@@ -16,11 +16,11 @@ object ArrayInitializerContextResolver extends ArrayInitializerContextResolver {
 
   override def tryResolve(termApply: Term.Apply): Option[ArrayInitializerValuesContext] = {
     termApply.fun match {
-      case q"scala.Array" | Term.Select(q"scala.Array", Term.Name(TermNameValues.Apply)) =>
+      case q"scala.Array" | Term.Select(q"scala.Array", q"apply") =>
         Some(ArrayInitializerValuesContext(values = termApply.args))
       case Term.ApplyType(q"scala.Array", tpe :: Nil) =>
         Some(ArrayInitializerValuesContext(maybeType = Some(tpe), values = termApply.args))
-      case Term.ApplyType(Term.Select(q"scala.Array", Term.Name(TermNameValues.Apply)), tpe :: Nil) =>
+      case Term.ApplyType(Term.Select(q"scala.Array", q"apply"), tpe :: Nil) =>
         Some(ArrayInitializerValuesContext(maybeType = Some(tpe), values = termApply.args))
       case _ => None
     }

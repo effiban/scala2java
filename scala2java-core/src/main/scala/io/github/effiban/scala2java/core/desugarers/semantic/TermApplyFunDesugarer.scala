@@ -1,10 +1,9 @@
 package io.github.effiban.scala2java.core.desugarers.semantic
 
 import io.github.effiban.scala2java.core.desugarers.SameTypeDesugarer
-import io.github.effiban.scala2java.core.entities.TermNameValues.Apply
 import io.github.effiban.scala2java.spi.predicates.TermSelectHasApplyMethod
 
-import scala.meta.Term
+import scala.meta.{Term, XtensionQuasiquoteTerm}
 
 trait TermApplyFunDesugarer extends SameTypeDesugarer[Term.Apply]
 
@@ -42,6 +41,6 @@ private[semantic] class TermApplyFunDesugarerImpl(termSelectHasApplyMethod: Term
 
   private def desugarApplyTypeFun(termApplyType: Term.ApplyType) = termApplyTypeFunDesugarer.desugar(termApplyType)
 
-  private def toQualifiedApply(term: Term) = Term.Select(term, Term.Name(Apply))
+  private def toQualifiedApply(term: Term) = Term.Select(term, q"apply")
 
 }

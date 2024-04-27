@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.typeinference
 
-import io.github.effiban.scala2java.core.entities.TermNameValues.ScalaTupleElementRegex
+import io.github.effiban.scala2java.core.entities.Regexes.ScalaTupleElementRegex
 import io.github.effiban.scala2java.core.entities.TermSelects.{ScalaNil, ScalaNone}
 import io.github.effiban.scala2java.core.entities.TreeKeyedMap
 import io.github.effiban.scala2java.core.entities.TypeSelects.{ScalaList, ScalaOption}

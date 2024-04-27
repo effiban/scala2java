@@ -3,7 +3,7 @@ package io.github.effiban.scala2java.core.transformers
 import io.github.effiban.scala2java.core.classifiers.{TermSelectClassifier, TypeClassifier}
 import io.github.effiban.scala2java.core.entities.TermNames.{Apply, Empty, JavaCompletedFuture, JavaFailedFuture, JavaFailure, JavaOf, JavaOfEntries, JavaOfNullable, JavaOfSupplier, JavaRange, JavaRangeClosed, JavaSuccess, JavaSupplyAsync, LowercaseLeft, LowercaseRight, ScalaFailed, ScalaInclusive, ScalaSuccessful}
 import io.github.effiban.scala2java.core.entities.TermSelects._
-import io.github.effiban.scala2java.core.entities.{TermNameValues, TreeElemSet, TreeKeyedMap}
+import io.github.effiban.scala2java.core.entities.{TreeElemSet, TreeKeyedMap}
 import io.github.effiban.scala2java.spi.contexts.TermApplyTransformationContext
 import io.github.effiban.scala2java.spi.transformers.TermApplyTransformer
 
@@ -83,15 +83,15 @@ private[transformers] class CoreTermApplyTransformer(termSelectClassifier: TermS
 
   private def transformByQualifiedNameSpecialCases(termSelect: Term.Select) = {
     (termSelect.qual, termSelect.name) match {
-      case (qual: Term.Select, Term.Name(TermNameValues.Apply) | Term.Name(TermNameValues.Empty)) if termSelectClassifier.isJavaStreamLike(qual) =>
+      case (qual: Term.Select, q"apply" | q"empty") if termSelectClassifier.isJavaStreamLike(qual) =>
         Some(Term.Select(JavaStream, JavaOf))
-      case (qual: Term.Select, Term.Name(TermNameValues.Apply) | Term.Name(TermNameValues.Empty)) if termSelectClassifier.isJavaListLike(qual) =>
+      case (qual: Term.Select, q"apply" | q"empty") if termSelectClassifier.isJavaListLike(qual) =>
         Some(Term.Select(JavaList, JavaOf))
-      case (qual: Term.Select, Term.Name(TermNameValues.Apply) | Term.Name(TermNameValues.Empty)) if termSelectClassifier.isJavaSetLike(qual) =>
+      case (qual: Term.Select, q"apply" | q"empty") if termSelectClassifier.isJavaSetLike(qual) =>
         Some(Term.Select(JavaSet, JavaOf))
-      case (qual: Term.Select, Term.Name(TermNameValues.Apply)) if termSelectClassifier.isJavaMapLike(qual) =>
+      case (qual: Term.Select, q"apply") if termSelectClassifier.isJavaMapLike(qual) =>
         Some(Term.Select(JavaMap, JavaOfEntries))
-      case (qual: Term.Select, Term.Name(TermNameValues.Empty)) if termSelectClassifier.isJavaMapLike(qual) =>
+      case (qual: Term.Select, q"empty") if termSelectClassifier.isJavaMapLike(qual) =>
         Some(Term.Select(JavaMap, JavaOf))
       case (qual, q"foreach") => Some(Term.Select(qual, q"forEach"))
 

@@ -1,10 +1,9 @@
 package io.github.effiban.scala2java.core.transformers
 
-import io.github.effiban.scala2java.core.entities.TermNameValues.{Apply, Get, JavaAccept, JavaRun}
 import io.github.effiban.scala2java.core.entities.TypeNameValues.{JavaBiConsumer, JavaConsumer, JavaRunnable, JavaSupplier}
 import io.github.effiban.scala2java.core.typeinference.FunctionTypeInferrer
 
-import scala.meta.{Term, Type}
+import scala.meta.{Term, Type, XtensionQuasiquoteTerm}
 
 /** Transforms a qualified expression of a Scala lambda plus a method name, e.g. :
  * {{{
@@ -28,9 +27,9 @@ class TermSelectTermFunctionTransformerImpl(functionTypeInferrer: => FunctionTyp
   override def transform(termFunction: Term.Function, methodName: Term.Name): Term.Select = {
     val transformedFunctionType = functionTypeTransformer.transform(functionTypeInferrer.infer(termFunction))
     val transformedMethodName = (transformedFunctionType, methodName) match {
-      case (Type.Name(JavaRunnable), Term.Name(Apply)) => Term.Name(JavaRun)
-      case (Type.Apply(Type.Name(JavaSupplier), _), Term.Name(Apply)) => Term.Name(Get)
-      case (Type.Apply(Type.Name(JavaConsumer) | Type.Name(JavaBiConsumer), _), Term.Name(Apply)) => Term.Name(JavaAccept)
+      case (Type.Name(JavaRunnable), q"apply") => q"run"
+      case (Type.Apply(Type.Name(JavaSupplier), _), q"apply") => q"get"
+      case (Type.Apply(Type.Name(JavaConsumer) | Type.Name(JavaBiConsumer), _), q"apply") => q"accept"
       case (_, methodName) => methodName
     }
     Term.Select(Term.Ascribe(termFunction, transformedFunctionType), transformedMethodName)

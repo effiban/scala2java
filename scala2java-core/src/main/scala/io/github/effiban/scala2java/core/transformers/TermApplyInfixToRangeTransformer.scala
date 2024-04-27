@@ -1,6 +1,5 @@
 package io.github.effiban.scala2java.core.transformers
 
-import io.github.effiban.scala2java.core.entities.TermNameValues.{ScalaTo, ScalaUntil}
 import io.github.effiban.scala2java.spi.transformers.TermApplyInfixToTermApplyTransformer
 
 import scala.meta.{Term, XtensionQuasiquoteTerm}
@@ -9,10 +8,10 @@ object TermApplyInfixToRangeTransformer extends TermApplyInfixToTermApplyTransfo
 
   override def transform(termApplyInfix: Term.ApplyInfix): Option[Term.Apply] = {
     val termApply = (termApplyInfix.op, termApplyInfix.args) match {
-      case (Term.Name(ScalaTo), end :: Nil) => inclusiveRangeOf(termApplyInfix.lhs, end)
-      case (Term.Name(ScalaTo), _) => handleInvalidRHS(termApplyInfix)
-      case (Term.Name(ScalaUntil), end :: Nil) => exclusiveRangeOf(termApplyInfix.lhs, end)
-      case (Term.Name(ScalaUntil), _) => handleInvalidRHS(termApplyInfix)
+      case (q"to", end :: Nil) => inclusiveRangeOf(termApplyInfix.lhs, end)
+      case (q"to", _) => handleInvalidRHS(termApplyInfix)
+      case (q"until", end :: Nil) => exclusiveRangeOf(termApplyInfix.lhs, end)
+      case (q"until", _) => handleInvalidRHS(termApplyInfix)
       case _ => handleNonRange(termApplyInfix)
     }
     Some(termApply)
