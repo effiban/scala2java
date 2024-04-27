@@ -1,9 +1,10 @@
 package dummy;
 
+import java.util.Map.entry;
 
 public class Sample {
 
     public void foo() {
-        doSomething(Map.entry(1, 2));
+        doSomething(entry(1, 2));
     }
 }
