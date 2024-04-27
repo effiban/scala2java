@@ -1,9 +1,8 @@
 package io.github.effiban.scala2java.core.resolvers
 
 import io.github.effiban.scala2java.core.contexts.{ArrayInitializerSizeContext, ArrayInitializerValuesContext}
-import io.github.effiban.scala2java.core.entities.TypeNameValues
 
-import scala.meta.{Init, Lit, Term, Type, XtensionQuasiquoteTerm}
+import scala.meta.{Init, Lit, Term, Type, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 trait ArrayInitializerContextResolver {
 
@@ -28,8 +27,8 @@ object ArrayInitializerContextResolver extends ArrayInitializerContextResolver {
 
   override def tryResolve(init: Init): Option[ArrayInitializerSizeContext] = {
     init.tpe match {
-      case Type.Name(TypeNameValues.ScalaArray) => Some(ArrayInitializerSizeContext(size = resolveSize(init.argss)))
-      case Type.Apply(Type.Name(TypeNameValues.ScalaArray), tpe :: Nil) =>
+      case t"scala.Array" => Some(ArrayInitializerSizeContext(size = resolveSize(init.argss)))
+      case Type.Apply(t"scala.Array", tpe :: Nil) =>
         Some(ArrayInitializerSizeContext(tpe = tpe, size = resolveSize(init.argss)))
       case _ => None
     }

@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.renderers
 
+import io.github.effiban.scala2java.core.entities.TypeSelects
 import io.github.effiban.scala2java.core.matchers.ArrayInitializerSizeRenderContextMockitoMatcher.eqArrayInitializerSizeRenderContext
 import io.github.effiban.scala2java.core.renderers.contexts.{ArrayInitializerSizeRenderContext, InitRenderContext}
 import io.github.effiban.scala2java.core.resolvers.ArrayInitializerRenderContextResolver
@@ -43,15 +44,15 @@ class NewRendererImplTest extends UnitTestSuite {
     outputWriter.toString shouldBe "new MyClass(val1, val2)"
   }
 
-  test("render instantiation of 'Array'") {
+  test("render instantiation of 'scala.Array'") {
     val init = Init(
-      tpe = Type.Apply(TypeNames.ScalaArray, List(TypeNames.String)),
+      tpe = Type.Apply(TypeSelects.ScalaArray, List(TypeSelects.ScalaString)),
       name = Name.Anonymous(),
       argss = List(List(Lit.Int(3)))
     )
     val `new` = New(init)
 
-    val expectedContext = ArrayInitializerSizeRenderContext(tpe = TypeNames.String, size = Lit.Int(3))
+    val expectedContext = ArrayInitializerSizeRenderContext(tpe = TypeSelects.ScalaString, size = Lit.Int(3))
 
     when(arrayInitializerRenderContextResolver.tryResolve(`new`.init)).thenReturn(Some(expectedContext))
 

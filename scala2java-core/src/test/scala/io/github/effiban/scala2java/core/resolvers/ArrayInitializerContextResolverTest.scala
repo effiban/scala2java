@@ -1,22 +1,21 @@
 package io.github.effiban.scala2java.core.resolvers
 
 import io.github.effiban.scala2java.core.contexts.{ArrayInitializerSizeContext, ArrayInitializerValuesContext}
-import io.github.effiban.scala2java.core.entities.TermSelects
+import io.github.effiban.scala2java.core.entities.{TermSelects, TypeSelects}
 import io.github.effiban.scala2java.core.matchers.ArrayInitializerSizeContextScalatestMatcher.equalArrayInitializerSizeContext
 import io.github.effiban.scala2java.core.matchers.ArrayInitializerValuesContextScalatestMatcher.equalArrayInitializerValuesContext
 import io.github.effiban.scala2java.core.resolvers.ArrayInitializerContextResolver.tryResolve
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.testtrees.{TermNames, TypeNames}
 
 import scala.meta.{Init, Lit, Name, Term, Type}
 
 class ArrayInitializerContextResolverTest extends UnitTestSuite {
 
-  test("""tryResolve() for a 'Term.Apply' of 'scala.Array[String]("a", "b")' should return a context with type 'String' and the values""") {
+  test("""tryResolve() for a 'Term.Apply' of 'scala.Array[scala.Predef.String]("a", "b")' should return a context with type 'scala.Predef.String' and the values""") {
     val args = List(Lit.String("a"), Lit.String("b"))
-    val termApply = Term.Apply(Term.ApplyType(TermSelects.ScalaArray, List(TypeNames.String)), args)
+    val termApply = Term.Apply(Term.ApplyType(TermSelects.ScalaArray, List(TypeSelects.ScalaString)), args)
 
-    val expectedContext = ArrayInitializerValuesContext(maybeType = Some(TypeNames.String), values = args)
+    val expectedContext = ArrayInitializerValuesContext(maybeType = Some(TypeSelects.ScalaString), values = args)
 
     tryResolve(termApply).value should equalArrayInitializerValuesContext(expectedContext)
   }
@@ -42,23 +41,23 @@ class ArrayInitializerContextResolverTest extends UnitTestSuite {
     tryResolve(termApply) shouldBe None
   }
 
-  test("""tryResolve() for an 'Init' of 'Array[String](3)' should return a context with type 'String' and size 3""") {
+  test("""tryResolve() for an 'Init' of 'scala.Array[scala.Predef.String](3)' should return a context with type 'scala.Predef.String' and size 3""") {
     val arg = Lit.Int(3)
     val init = Init(
-      tpe = Type.Apply(TypeNames.ScalaArray, List(TypeNames.String)),
+      tpe = Type.Apply(TypeSelects.ScalaArray, List(TypeSelects.ScalaString)),
       name = Name.Anonymous(),
       argss = List(List(arg))
     )
 
-    val expectedContext = ArrayInitializerSizeContext(tpe = TypeNames.String, size = arg)
+    val expectedContext = ArrayInitializerSizeContext(tpe = TypeSelects.ScalaString, size = arg)
 
     tryResolve(init).value should equalArrayInitializerSizeContext(expectedContext)
   }
 
-  test("""tryResolve() for an 'Init' of 'Array(3)' should return a context with type 'Any' and size 3""") {
+  test("""tryResolve() for an 'Init' of 'scala.Array(3)' should return a context with type 'scala.Any' and size 3""") {
     val arg = Lit.Int(3)
     val init = Init(
-      tpe = TypeNames.ScalaArray,
+      tpe = TypeSelects.ScalaArray,
       name = Name.Anonymous(),
       argss = List(List(arg))
     )
@@ -68,9 +67,9 @@ class ArrayInitializerContextResolverTest extends UnitTestSuite {
     tryResolve(init).value should equalArrayInitializerSizeContext(expectedContext)
   }
 
-  test("""tryResolve() for an 'Init' of 'Array()' should return the default context""") {
+  test("""tryResolve() for an 'Init' of 'scala.Array()' should return the default context""") {
     val init = Init(
-      tpe = TypeNames.ScalaArray,
+      tpe = TypeSelects.ScalaArray,
       name = Name.Anonymous(),
       argss = List(Nil)
     )
@@ -78,10 +77,10 @@ class ArrayInitializerContextResolverTest extends UnitTestSuite {
     tryResolve(init).value should equalArrayInitializerSizeContext(ArrayInitializerSizeContext())
   }
 
-  test("""tryResolve() for an 'Init' of 'List(3)' should return None""") {
+  test("""tryResolve() for an 'Init' of 'scala.List(3)' should return None""") {
     val arg = Lit.Int(3)
     val init = Init(
-      tpe = TypeNames.List,
+      tpe = TypeSelects.ScalaList,
       name = Name.Anonymous(),
       argss = List(List(arg))
     )
