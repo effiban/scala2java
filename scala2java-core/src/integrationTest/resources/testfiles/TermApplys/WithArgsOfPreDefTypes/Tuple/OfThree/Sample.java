@@ -1,10 +1,11 @@
 package dummy;
 
+import org.jooq.lambda.tuple.Tuple.tuple;
 
 public class Sample {
 
     public void foo() {
-        doSomething(Tuple.tuple(1,
+        doSomething(tuple(1,
                 2,
                 3));
     }

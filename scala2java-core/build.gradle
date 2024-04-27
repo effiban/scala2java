@@ -7,6 +7,7 @@ dependencies {
     implementation project(':scala2java-spi')
 
     runtimeOnly 'io.vavr:vavr:0.10.4'
+    runtimeOnly 'org.jooq:jool:0.9.15'
 }
 
 jar {
