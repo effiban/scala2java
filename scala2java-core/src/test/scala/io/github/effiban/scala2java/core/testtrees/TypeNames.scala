@@ -2,7 +2,10 @@ package io.github.effiban.scala2java.core.testtrees
 
 import scala.meta.{Type, XtensionQuasiquoteType}
 
-
+/**
+ * @deprecated use [[io.github.effiban.scala2java.core.entities.TypeNames]] instead but copy only what is really used in production
+ */
+@deprecated
 object TypeNames {
 
   val Int: Type.Name = Type.Name("Int")
@@ -34,11 +37,4 @@ object TypeNames {
   val ScalaAny: Type.Name = Type.Name("Any")
   val ScalaVector: Type.Name = Type.Name("Vector")
   val ScalaRange: Type.Name = Type.Name("Range")
-
-  val JavaBiFunction: Type.Name = t"BiFunction"
-  val JavaBiConsumer: Type.Name = t"BiConsumer"
-  val JavaConsumer: Type.Name = t"Consumer"
-  val JavaSupplier: Type.Name = t"Supplier"
-  val JavaRunnable: Type.Name = t"Runnable"
-  val JavaObject: Type.Name = t"Object"
 }

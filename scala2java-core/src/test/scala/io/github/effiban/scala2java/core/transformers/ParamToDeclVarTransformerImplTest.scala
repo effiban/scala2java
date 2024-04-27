@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.transformers
 
 import io.github.effiban.scala2java.core.entities.TraversalConstants.UnknownType
+import io.github.effiban.scala2java.core.entities.TypeSelects
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -67,7 +68,7 @@ class ParamToDeclVarTransformerImplTest extends UnitTestSuite {
       default = None
     )
 
-    val expectedSupplierType = Type.Apply(TypeNames.JavaSupplier, List(TypeNames.Int))
+    val expectedSupplierType = Type.Apply(TypeSelects.JavaSupplier, List(TypeNames.Int))
 
     val expectedDeclVar = Decl.Var(
       mods = List(Private(within = Name.Anonymous()), Final()),

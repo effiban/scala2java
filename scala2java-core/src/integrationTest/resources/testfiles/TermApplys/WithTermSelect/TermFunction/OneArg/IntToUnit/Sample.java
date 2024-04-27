@@ -1,6 +1,7 @@
 package dummy;
 
 import java.lang.System.out;
+import java.util.function.Consumer;
 
 public class Sample {
 

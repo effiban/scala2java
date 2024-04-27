@@ -1,8 +1,8 @@
 package io.github.effiban.scala2java.core.transformers
 
+import io.github.effiban.scala2java.core.entities.TypeNames.JavaRunnable
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TermNames
-import io.github.effiban.scala2java.core.testtrees.TypeNames.JavaRunnable
 import io.github.effiban.scala2java.core.typeinference.FunctionTypeInferrer
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
@@ -26,68 +26,68 @@ class TermSelectTermFunctionTransformerImplTest extends UnitTestSuite {
     termSelectTermFunctionTransformer.transform(termFunction, TermNames.Apply).structure shouldBe expectedResult.structure
   }
 
-  test("transform() for a lambda of type '() => Int' and the method 'apply', should return 'Supplier.get'") {
+  test("transform() for a lambda of type '() => Int' and the method 'apply', should return 'java.util.function.Supplier.get'") {
     val termFunction = q"""() => 3"""
     val expectedTypeFunction = t"() => Int"
-    val expectedResult = q"""((() => 3): Supplier[Int]).get"""
+    val expectedResult = q"""((() => 3): java.util.function.Supplier[Int]).get"""
 
     when(functionTypeInferrer.infer(eqTree(termFunction))).thenReturn(t"() => Int")
-    when(functionTypeTransformer.transform(eqTree(expectedTypeFunction))).thenReturn(t"Supplier[Int]")
+    when(functionTypeTransformer.transform(eqTree(expectedTypeFunction))).thenReturn(t"java.util.function.Supplier[Int]")
 
     termSelectTermFunctionTransformer.transform(termFunction, TermNames.Apply).structure shouldBe expectedResult.structure
   }
 
-  test("transform() for a lambda of type 'Int => Unit' and the method 'apply', should return 'Consumer.accept'") {
+  test("transform() for a lambda of type 'Int => Unit' and the method 'apply', should return 'java.util.function.Consumer.accept'") {
     val termFunction = q"""(x: Int) => print(x)"""
     val expectedTypeFunction = t"Int => Unit"
-    val expectedResult = q"""(((x: Int) => print(x)): Consumer[Int]).accept"""
+    val expectedResult = q"""(((x: Int) => print(x)): java.util.function.Consumer[Int]).accept"""
 
     when(functionTypeInferrer.infer(eqTree(termFunction))).thenReturn(t"Int => Unit")
-    when(functionTypeTransformer.transform(eqTree(expectedTypeFunction))).thenReturn(t"Consumer[Int]")
+    when(functionTypeTransformer.transform(eqTree(expectedTypeFunction))).thenReturn(t"java.util.function.Consumer[Int]")
 
     termSelectTermFunctionTransformer.transform(termFunction, TermNames.Apply).structure shouldBe expectedResult.structure
   }
 
-  test("transform() for a lambda of type 'Int => Unit' and the method 'andThen', should return 'Consumer.andThen'") {
+  test("transform() for a lambda of type 'Int => Unit' and the method 'andThen', should return 'java.util.function.Consumer.andThen'") {
     val termFunction = q"""(x: Int) => print(x)"""
     val expectedTypeFunction = t"Int => Unit"
-    val expectedResult = q"""(((x: Int) => print(x)): Consumer[Int]).andThen"""
+    val expectedResult = q"""(((x: Int) => print(x)): java.util.function.Consumer[Int]).andThen"""
 
     when(functionTypeInferrer.infer(eqTree(termFunction))).thenReturn(t"Int => Unit")
-    when(functionTypeTransformer.transform(eqTree(expectedTypeFunction))).thenReturn(t"Consumer[Int]")
+    when(functionTypeTransformer.transform(eqTree(expectedTypeFunction))).thenReturn(t"java.util.function.Consumer[Int]")
 
     termSelectTermFunctionTransformer.transform(termFunction, TermNames.AndThen).structure shouldBe expectedResult.structure
   }
 
-  test("transform() for a lambda of type '(Int, String) => Unit' and the method 'apply', should return 'BiConsumer.accept'") {
+  test("transform() for a lambda of type '(Int, String) => Unit' and the method 'apply', should return 'java.util.function.BiConsumer.accept'") {
     val termFunction = q"""(x: Int, y: String) => print(x + y)"""
     val expectedTypeFunction = t"(Int, String) => Unit"
-    val expectedResult = q"""(((x: Int, y: String) => print(x + y)): BiConsumer[Int, String]).accept"""
+    val expectedResult = q"""(((x: Int, y: String) => print(x + y)): java.util.function.BiConsumer[Int, String]).accept"""
 
     when(functionTypeInferrer.infer(eqTree(termFunction))).thenReturn(t"(Int, String) => Unit")
-    when(functionTypeTransformer.transform(eqTree(expectedTypeFunction))).thenReturn(t"BiConsumer[Int, String]")
+    when(functionTypeTransformer.transform(eqTree(expectedTypeFunction))).thenReturn(t"java.util.function.BiConsumer[Int, String]")
 
     termSelectTermFunctionTransformer.transform(termFunction, TermNames.Apply).structure shouldBe expectedResult.structure
   }
 
-  test("transform() for a lambda of type 'Int => String' and the method 'apply', should return 'Function.apply'") {
+  test("transform() for a lambda of type 'Int => String' and the method 'apply', should return 'java.util.function.Function.apply'") {
     val termFunction = q"""(x: Int) => x.toString"""
     val expectedTypeFunction = t"Int => String"
-    val expectedResult = q"""(((x: Int) => x.toString): Function[Int, String]).apply"""
+    val expectedResult = q"""(((x: Int) => x.toString): java.util.function.Function[Int, String]).apply"""
 
     when(functionTypeInferrer.infer(eqTree(termFunction))).thenReturn(t"Int => String")
-    when(functionTypeTransformer.transform(eqTree(expectedTypeFunction))).thenReturn(t"Function[Int, String]")
+    when(functionTypeTransformer.transform(eqTree(expectedTypeFunction))).thenReturn(t"java.util.function.Function[Int, String]")
 
     termSelectTermFunctionTransformer.transform(termFunction, TermNames.Apply).structure shouldBe expectedResult.structure
   }
 
-  test("transform() for a lambda of type 'Int => String' and the method 'andThen', should return 'Function.andThen'") {
+  test("transform() for a lambda of type 'Int => String' and the method 'andThen', should return 'java.util.function.Function.andThen'") {
     val termFunction = q"""(x: Int) => x.toString"""
     val expectedTypeFunction = t"Int => String"
-    val expectedResult = q"""(((x: Int) => x.toString): Function[Int, String]).andThen"""
+    val expectedResult = q"""(((x: Int) => x.toString): java.util.function.Function[Int, String]).andThen"""
 
     when(functionTypeInferrer.infer(eqTree(termFunction))).thenReturn(t"Int => String")
-    when(functionTypeTransformer.transform(eqTree(expectedTypeFunction))).thenReturn(t"Function[Int, String]")
+    when(functionTypeTransformer.transform(eqTree(expectedTypeFunction))).thenReturn(t"java.util.function.Function[Int, String]")
 
     termSelectTermFunctionTransformer.transform(termFunction, TermNames.AndThen).structure shouldBe expectedResult.structure
   }

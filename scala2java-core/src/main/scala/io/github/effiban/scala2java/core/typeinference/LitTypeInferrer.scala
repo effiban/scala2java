@@ -1,6 +1,5 @@
 package io.github.effiban.scala2java.core.typeinference
 
-import io.github.effiban.scala2java.core.entities.TypeNameValues
 import io.github.effiban.scala2java.core.entities.TypeSelects._
 import io.github.effiban.scala2java.spi.typeinferrers.TypeInferrer0
 
@@ -20,8 +19,8 @@ object LitTypeInferrer extends LitTypeInferrer {
       case _: Lit.Float => Some(ScalaFloat)
       case _: Lit.Double => Some(ScalaDouble)
       case _: Lit.Char => Some(ScalaChar)
-      case _: Lit.String => Some(Type.Name(TypeNameValues.String))
-      case _: Lit.Symbol => Some(Type.Name(TypeNameValues.String))
+      case _: Lit.String => Some(ScalaString)
+      case _: Lit.Symbol => Some(ScalaString)
       case _: Lit.Unit => Some(ScalaUnit)
       case _: Lit.Null => Some(Type.AnonymousName())
       case _ => None

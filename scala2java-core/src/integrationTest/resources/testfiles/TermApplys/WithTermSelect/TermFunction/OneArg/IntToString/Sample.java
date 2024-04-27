@@ -1,5 +1,6 @@
 package dummy;
 
+import java.util.function.Function;
 
 public class Sample {
 

@@ -1,11 +1,11 @@
 package io.github.effiban.scala2java.core.transformers
 
-import io.github.effiban.scala2java.core.entities.TypeSelects.ScalaUnit
+import io.github.effiban.scala2java.core.entities.TypeNames.JavaRunnable
+import io.github.effiban.scala2java.core.entities.TypeSelects
+import io.github.effiban.scala2java.core.entities.TypeSelects.{JavaBiConsumer, JavaBiFunction, JavaConsumer, JavaSupplier, ScalaUnit}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.testtrees.TypeNames
-import io.github.effiban.scala2java.core.testtrees.TypeNames.{JavaBiConsumer, JavaBiFunction, JavaConsumer, JavaRunnable, JavaSupplier}
 
-import scala.meta.Type
+import scala.meta.{Type, XtensionQuasiquoteType}
 
 
 class FunctionTypeTransformerTest extends UnitTestSuite {
@@ -30,7 +30,7 @@ class FunctionTypeTransformerTest extends UnitTestSuite {
     actualJavaFunctionType.structure shouldBe expectedJavaFunctionType.structure
   }
 
-  test("transform for zero input types and a non-Unit result should return a Supplier") {
+  test("transform for zero input types and a non-Unit result should return a java.util.function.Supplier") {
     val typeT = Type.Name("T")
 
     val scalaFunctionType = Type.Function(params = Nil, res = typeT)
@@ -60,7 +60,7 @@ class FunctionTypeTransformerTest extends UnitTestSuite {
 
     val scalaFunctionType = Type.Function(params = List(typeT), res = typeU)
 
-    val expectedJavaFunctionType = Type.Apply(tpe = TypeNames.Function, args = List(typeT, typeU))
+    val expectedJavaFunctionType = Type.Apply(tpe = TypeSelects.JavaFunction, args = List(typeT, typeU))
 
     val actualJavaFunctionType = FunctionTypeTransformer.transform(scalaFunctionType)
 
@@ -102,7 +102,7 @@ class FunctionTypeTransformerTest extends UnitTestSuite {
 
     val scalaFunctionType = Type.Function(params = List(typeT1, typeT2, typeT3), res = typeU)
 
-    val expectedJavaFunctionType = Type.Apply(tpe = Type.Name("Function3"), args = List(typeT1, typeT2, typeT3, typeU))
+    val expectedJavaFunctionType = Type.Apply(tpe = t"org.jooq.lambda.function.Function3", args = List(typeT1, typeT2, typeT3, typeU))
 
     val actualMaybeJavaFunctionType = FunctionTypeTransformer.transform(scalaFunctionType)
 
