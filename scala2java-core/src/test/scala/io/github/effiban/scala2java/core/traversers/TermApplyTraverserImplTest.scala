@@ -1,13 +1,13 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{ArrayInitializerTypedValuesContext, ArrayInitializerValuesContext}
+import io.github.effiban.scala2java.core.entities.TermSelects.ScalaArray
 import io.github.effiban.scala2java.core.factories.TermApplyTransformationContextFactory
 import io.github.effiban.scala2java.core.matchers.ArrayInitializerValuesContextMockitoMatcher.eqArrayInitializerValuesContext
 import io.github.effiban.scala2java.core.matchers.TermApplyTransformationContextMockitoMatcher.eqTermApplyTransformationContext
 import io.github.effiban.scala2java.core.resolvers.ArrayInitializerContextResolver
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TermNames
-import io.github.effiban.scala2java.core.testtrees.TermNames.ScalaArray
 import io.github.effiban.scala2java.core.transformers.InternalTermApplyTransformer
 import io.github.effiban.scala2java.spi.contexts.TermApplyTransformationContext
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -63,7 +63,7 @@ class TermApplyTraverserImplTest extends UnitTestSuite {
     termApplyTraverser.traverse(termApply).structure shouldBe traversedTermApply.structure
   }
 
-  test("traverse() an Array initializer when 'fun' is 'Array'") {
+  test("traverse() an Array initializer when 'fun' is 'scala.Array'") {
     val expectedOutputType = t"MyOutputType"
 
     val inputValues = List(q"in1", q"in2")

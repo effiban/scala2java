@@ -30,7 +30,6 @@ object TypeNames {
 
   val Class: Type.Name = t"Class"
 
-  val ScalaArray: Type.Name = Type.Name("Array")
   val ScalaOption: Type.Name = Type.Name("Option")
   val ScalaAny: Type.Name = Type.Name("Any")
   val ScalaVector: Type.Name = Type.Name("Vector")

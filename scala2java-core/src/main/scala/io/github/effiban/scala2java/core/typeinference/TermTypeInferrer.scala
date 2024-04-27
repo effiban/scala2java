@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.typeinference
 
+import io.github.effiban.scala2java.core.entities.TypeSelects
 import io.github.effiban.scala2java.spi.typeinferrers.TypeInferrer0
 
 import scala.meta.Term.{Annotate, ApplyType, Ascribe, Assign, Block, Do, For, ForYield, If, New, Return, Throw, Try, TryWithHandler, While}
@@ -54,6 +55,6 @@ private[typeinference] class TermTypeInferrerImpl(applyInfixTypeInferrer: => App
 
   private def inferRepeated(repeated: Term.Repeated): Option[Type] = {
     infer(repeated.expr)
-      .map(tpe => Type.Apply(Type.Name("Array"), args = List(tpe)))
+      .map(tpe => Type.Apply(TypeSelects.ScalaArray, args = List(tpe)))
   }
 }
