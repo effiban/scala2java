@@ -2,14 +2,14 @@ package io.github.effiban.scala2java.core.renderers
 
 import io.github.effiban.scala2java.core.contexts.ArgumentListContext
 import io.github.effiban.scala2java.core.entities.EnclosingDelimiter.Parentheses
-import io.github.effiban.scala2java.core.entities.ListTraversalOptions
+import io.github.effiban.scala2java.core.entities.{ListTraversalOptions, TermSelects, TypeSelects}
 import io.github.effiban.scala2java.core.matchers.ArgumentListContextMatcher.eqArgumentListContext
 import io.github.effiban.scala2java.core.renderers.contexts.ArrayInitializerValuesRenderContext
 import io.github.effiban.scala2java.core.renderers.matchers.ArrayInitializerValuesRenderContextMockitoMatcher.eqArrayInitializerValuesRenderContext
 import io.github.effiban.scala2java.core.resolvers.ArrayInitializerRenderContextResolver
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.testtrees.{TermNames, TypeNames}
+import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
@@ -60,11 +60,11 @@ class TermApplyRendererImplTest extends UnitTestSuite {
   test("render() an Array initializer") {
     val values = List(Lit.String("a"), Lit.String("b"))
     val termApply = Term.Apply(
-      fun = Term.ApplyType(TermNames.ScalaArray, List(TypeNames.String)),
+      fun = Term.ApplyType(TermSelects.ScalaArray, List(TypeSelects.ScalaString)),
       args = values
     )
 
-    val expectedContext = ArrayInitializerValuesRenderContext(tpe = TypeNames.String, values = values)
+    val expectedContext = ArrayInitializerValuesRenderContext(tpe = TypeSelects.ScalaString, values = values)
 
     when(arrayInitializerRenderContextResolver.tryResolve(eqTree(termApply))).thenReturn(Some(expectedContext))
 

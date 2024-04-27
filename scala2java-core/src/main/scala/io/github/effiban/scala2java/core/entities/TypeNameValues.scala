@@ -19,7 +19,6 @@ object TypeNameValues {
   final val Class = "Class"
 
   final val ScalaAny = "Any"
-  final val ScalaArray = "Array"
   final val ScalaOption = "Option"
   final val ScalaRange = "Range"
   final val ScalaVector = "Vector"

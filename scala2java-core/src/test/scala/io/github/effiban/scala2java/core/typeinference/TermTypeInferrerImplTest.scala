@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.typeinference
 
+import io.github.effiban.scala2java.core.entities.TypeSelects
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
@@ -195,12 +196,12 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
     termTypeInferrer.infer(New(myClassInit)).value.structure shouldBe myClassTypeName.structure
   }
 
-  test("infer 'Repeated' should return Array of its inferred type recursively") {
+  test("infer 'Repeated' should return a scala.Array of its inferred type recursively") {
     val expr = Lit.String("abc")
 
-    when(litTypeInferrer.infer(eqTree(expr))).thenReturn(Some(TypeNames.String))
+    when(litTypeInferrer.infer(eqTree(expr))).thenReturn(Some(TypeSelects.ScalaString))
 
-    termTypeInferrer.infer(Term.Repeated(expr)).value.structure shouldBe Type.Apply(Type.Name("Array"), List(TypeNames.String)).structure
+    termTypeInferrer.infer(Term.Repeated(expr)).value.structure shouldBe Type.Apply(TypeSelects.ScalaArray, List(TypeSelects.ScalaString)).structure
   }
 
   test("infer 'Return' should infer by its expression recursively") {

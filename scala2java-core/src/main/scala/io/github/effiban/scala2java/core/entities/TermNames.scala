@@ -57,7 +57,6 @@ object TermNames {
   final val ScalaFailure: Term.Name = q"Failure"
   final val ScalaSuccessful: Term.Name = q"successful"
   final val ScalaFailed: Term.Name = q"failed"
-  final val ScalaArray: Term.Name = q"Array"
   final val ScalaVector: Term.Name = q"Vector"
   final val ScalaNil: Term.Name = q"Nil"
   final val ScalaTo: Term.Name = q"to"
