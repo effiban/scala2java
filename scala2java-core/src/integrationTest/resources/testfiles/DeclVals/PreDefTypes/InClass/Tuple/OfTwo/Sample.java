@@ -1,6 +1,7 @@
 package dummy;
 
+import java.util.Map.Entry;
 
 public abstract class Sample {
-    public final Map.Entry<String, int> x;
+    public final Entry<String, int> x;
 }
