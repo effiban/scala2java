@@ -49,7 +49,8 @@ object Scala2JavaTranslator {
             new SemanticDesugarers().sourceDesugarer.desugar,
             new ScalaTreeTraversers().sourceTraverser.traverse,
             SourceImportAdder.addTo,
-            SourceUnqualifier.unqualify
+            SourceUnqualifier.unqualify,
+            SourceImportRemover.removeJavaLangFrom
           )
         ).andThen(Enrichers.sourceEnricher.enrich)
         .andThen(enrichedSource => renderJava(enrichedSource, scalaPath, maybeOutputJavaBasePath))

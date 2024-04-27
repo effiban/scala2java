@@ -36,6 +36,7 @@ class CoreTypeNameQualifierTest extends UnitTestSuite {
     (t"Function", ScalaFunction),
     (t"Fractional", ScalaFractional),
     (t"IllegalArgumentException", ScalaIllegalArgumentException),
+    (t"IllegalStateException", t"java.lang.IllegalStateException"),
     (t"Int", ScalaInt),
     (t"IndexedSeq", ScalaIndexedSeq),
     (t"IndexOutOfBoundsException", ScalaIndexOutOfBoundsException),
