@@ -1,9 +1,9 @@
 package io.github.effiban.scala2java.core.qualifiers
 
-import io.github.effiban.scala2java.core.entities.ReflectedEntities.{PredefModule, ScalaPackage}
+import io.github.effiban.scala2java.core.entities.ReflectedEntities.{JavaLangPackage, PredefModule, ScalaPackage}
 import io.github.effiban.scala2java.core.entities.{TermNames, TermSelects}
 
-import scala.meta.Type
+import scala.meta.{Term, Type}
 import scala.reflect.runtime.universe._
 
 trait CoreTypeNameQualifier {
@@ -13,21 +13,32 @@ trait CoreTypeNameQualifier {
 object CoreTypeNameQualifier extends CoreTypeNameQualifier {
 
   override def qualify(typeName: Type.Name): Option[Type] = {
-      qualifyAsPredefMember(typeName)
-        .orElse(qualifyAsScalaPackageMember(typeName))
+    LazyList(
+      qualifyAsPredefMember _,
+      qualifyAsScalaPackageMember _,
+      qualifyAsJavaLangMember _
+    ).map(_.apply(typeName))
+      .collectFirst { case Some(tpe) => tpe }
   }
 
   private def qualifyAsPredefMember(scalaMetaTypeName: Type.Name) = {
-    PredefModule.typeSignature.decl(TypeName(scalaMetaTypeName.value)) match {
-      case NoSymbol => None
-      case _ => Some(Type.Select(TermSelects.ScalaPredef, scalaMetaTypeName))
-    }
+    qualifyAsMemberOf(PredefModule, TermSelects.ScalaPredef, scalaMetaTypeName)
   }
 
   private def qualifyAsScalaPackageMember(scalaMetaTypeName: Type.Name) = {
-    ScalaPackage.typeSignature.decl(TypeName(scalaMetaTypeName.value)) match {
+    qualifyAsMemberOf(ScalaPackage, TermNames.Scala, scalaMetaTypeName)
+  }
+
+  private def qualifyAsJavaLangMember(scalaMetaTypeName: Type.Name) = {
+    qualifyAsMemberOf(JavaLangPackage, TermSelects.JavaLang, scalaMetaTypeName)
+  }
+
+  private def qualifyAsMemberOf(module: ModuleSymbol,
+                                moduleRef: Term.Ref,
+                                scalaMetaTypeName: Type.Name) = {
+    module.typeSignature.decl(TypeName(scalaMetaTypeName.value)) match {
       case NoSymbol => None
-      case _ => Some(Type.Select(TermNames.Scala, scalaMetaTypeName))
+      case _ => Some(Type.Select(moduleRef, scalaMetaTypeName))
     }
   }
 }

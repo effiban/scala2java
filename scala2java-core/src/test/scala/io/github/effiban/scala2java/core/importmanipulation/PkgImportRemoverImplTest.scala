@@ -130,4 +130,109 @@ class PkgImportRemoverImplTest extends UnitTestSuite {
 
     pkgImportRemover.removeUnusedFrom(initialPkg).structure shouldBe expectedFinalPkg.structure
   }
+
+  test("removeJavaLangFrom() when has no initial imports") {
+    val pkg = q"package a.b"
+
+    doReturn((Nil, Nil)).when(statsByImportSplitter).split(Nil)
+
+    pkgImportRemover.removeJavaLangFrom(pkg).structure shouldBe pkg.structure
+  }
+
+  test("removeJavaLangFrom() when has initial imports and none are java.lang") {
+    val initialPkg =
+      q"""
+      package a.b {
+        import c.{D, E}
+
+        trait MyTrait {
+          val x: D
+          val y: E
+        }
+      }
+      """
+
+    val expectedInitialImporters = List(importer"c.D", importer"c.E")
+    val expectedNonImport =
+      q"""
+      trait MyTrait {
+        val x: D
+        val y: E
+      }
+      """
+
+    val expectedFinalPkg =
+      q"""
+      package a.b {
+        import c.D
+        import c.E
+
+        trait MyTrait {
+          val x: D
+          val y: E
+        }
+      }
+      """
+
+    doReturn((expectedInitialImporters, List(expectedNonImport))).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
+
+    pkgImportRemover.removeJavaLangFrom(initialPkg).structure shouldBe expectedFinalPkg.structure
+  }
+
+  test("removeJavaLangFrom() when has initial imports and some are java.lang") {
+    val initialPkg =
+      q"""
+      package a.b {
+        import c.{D, E}
+        import java.lang.{F, G}
+
+        trait MyTrait1 {
+          val x: D
+          val y: F
+        }
+        trait MyTrait2 {
+          val xx: E
+          val yy: G
+        }
+      }
+      """
+
+    val expectedInitialImporters = List(importer"c.D", importer"c.E", importer"java.lang.F", importer"java.lang.G")
+    val expectedNonImport1 =
+      q"""
+      trait MyTrait1 {
+        val x: D
+        val y: F
+      }
+      """
+    val expectedNonImport2 =
+      q"""
+      trait MyTrait2 {
+        val xx: E
+        val yy: G
+      }
+      """
+
+    val expectedFinalPkg =
+      q"""
+      package a.b {
+        import c.D
+        import c.E
+
+        trait MyTrait1 {
+          val x: D
+          val y: F
+        }
+        trait MyTrait2 {
+          val xx: E
+          val yy: G
+        }
+      }
+      """
+
+    doReturn((expectedInitialImporters, List(expectedNonImport1, expectedNonImport2)))
+      .when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
+
+    pkgImportRemover.removeJavaLangFrom(initialPkg).structure shouldBe expectedFinalPkg.structure
+  }
 }
