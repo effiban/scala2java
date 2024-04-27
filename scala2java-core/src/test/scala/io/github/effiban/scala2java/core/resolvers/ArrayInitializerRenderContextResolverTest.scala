@@ -1,14 +1,13 @@
 package io.github.effiban.scala2java.core.resolvers
 
-import io.github.effiban.scala2java.core.entities.{TermSelects, TypeSelects}
+import io.github.effiban.scala2java.core.entities.{TermSelects, TypeNames, TypeSelects}
 import io.github.effiban.scala2java.core.matchers.ArrayInitializerSizeRenderContextScalatestMatcher.equalArrayInitializerSizeRenderContext
 import io.github.effiban.scala2java.core.renderers.contexts.{ArrayInitializerSizeRenderContext, ArrayInitializerValuesRenderContext}
 import io.github.effiban.scala2java.core.renderers.matchers.ArrayInitializerValuesRenderContextScalatestMatcher.equalArrayInitializerValuesRenderContext
 import io.github.effiban.scala2java.core.resolvers.ArrayInitializerRenderContextResolver.tryResolve
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.testtrees.{TermNames, TypeNames}
 
-import scala.meta.{Init, Lit, Name, Term, Type}
+import scala.meta.{Init, Lit, Name, Term, Type, XtensionQuasiquoteType}
 
 class ArrayInitializerRenderContextResolverTest extends UnitTestSuite {
 
@@ -88,7 +87,7 @@ class ArrayInitializerRenderContextResolverTest extends UnitTestSuite {
   test("""tryResolve() for an 'Init' of 'List(3)' should return None""") {
     val arg = Lit.Int(3)
     val init = Init(
-      tpe = TypeNames.List,
+      tpe = t"List",
       name = Name.Anonymous(),
       argss = List(List(arg))
     )

@@ -2,6 +2,10 @@ package io.github.effiban.scala2java.core.testtrees
 
 import scala.meta.{Term, XtensionQuasiquoteTerm}
 
+/**
+ * @deprecated use [[io.github.effiban.scala2java.core.entities.TermNames]] instead but copy only what is really used in production
+ */
+@deprecated
 object TermNames {
 
   val String: Term.Name = Term.Name("String")

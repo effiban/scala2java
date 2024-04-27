@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.qualifiers
 
+import io.github.effiban.scala2java.core.entities.TypeNames
 import io.github.effiban.scala2java.core.entities.TypeSelects._
 import io.github.effiban.scala2java.core.qualifiers.CoreTypeNameQualifier.qualify
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
@@ -22,7 +23,7 @@ class CoreTypeNameQualifierTest extends UnitTestSuite {
     (t"Boolean", ScalaBoolean),
     (t"Byte", ScalaByte),
     (t"Char", ScalaChar),
-    (t"Class", ScalaClass),
+    (TypeNames.Class, ScalaClass),
     (t"ClassCastException", ScalaClassCastException),
     (t"Cloneable", ScalaCloneable),
     (t"Double", ScalaDouble),

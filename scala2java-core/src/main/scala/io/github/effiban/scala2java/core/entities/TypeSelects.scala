@@ -6,9 +6,12 @@ object TypeSelects {
 
   // Please maintain alphabetical order in each section
 
+  final val JavaBiConsumer = t"java.util.function.BiConsumer"
+  final val JavaBiFunction = t"java.util.function.BiFunction"
   final val JavaBigDecimal = t"java.math.BigDecimal"
   final val JavaBigInt = t"java.math.BigInt"
   final val JavaCompletableFuture = t"java.util.concurrent.CompletableFuture"
+  final val JavaConsumer = t"java.util.function.Consumer"
   final val JavaEither = t"io.vavr.control.Either"
   final val JavaFunction = t"java.util.function.Function"
   final val JavaList = t"java.util.List"
@@ -18,6 +21,7 @@ object TypeSelects {
   final val JavaSet = t"java.util.Set"
   final var JavaSerializable = t"java.io.Serializable"
   final val JavaStream = t"java.util.stream.Stream"
+  final val JavaSupplier = t"java.util.function.Supplier"
   final val JavaTry = t"io.vavr.control.Try"
 
   final val ScalaAbstractMethodError = t"scala.AbstractMethodError"

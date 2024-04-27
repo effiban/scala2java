@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.transformers
 
-import io.github.effiban.scala2java.core.entities.TreeKeyedMap
+import io.github.effiban.scala2java.core.entities.{TreeKeyedMap, TypeNames}
 import io.github.effiban.scala2java.core.entities.TypeSelects._
 import io.github.effiban.scala2java.spi.transformers.TypeSelectTransformer
 
@@ -20,7 +20,7 @@ object CoreTypeSelectTransformer extends TypeSelectTransformer {
     ScalaBoolean -> t"boolean",
     ScalaByte -> t"byte",
     ScalaChar -> t"char",
-    ScalaClass -> t"Class",
+    ScalaClass -> TypeNames.Class,
     ScalaClassCastException -> t"ClassCastException",
     ScalaCloneable -> t"Cloneable",
     ScalaDouble -> t"double",

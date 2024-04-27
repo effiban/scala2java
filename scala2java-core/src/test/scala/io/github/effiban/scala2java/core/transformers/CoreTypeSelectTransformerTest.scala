@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.transformers
 
+import io.github.effiban.scala2java.core.entities.TypeNames
 import io.github.effiban.scala2java.core.entities.TypeSelects._
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.transformers.CoreTypeSelectTransformer.transform
@@ -21,7 +22,7 @@ class CoreTypeSelectTransformerTest extends UnitTestSuite {
     (ScalaBoolean, t"boolean"),
     (ScalaByte, t"byte"),
     (ScalaChar, t"char"),
-    (ScalaClass, t"Class"),
+    (ScalaClass, TypeNames.Class),
     (ScalaClassCastException, t"ClassCastException"),
     (ScalaCloneable, t"Cloneable"),
     (ScalaDouble, t"double"),
