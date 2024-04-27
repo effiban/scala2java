@@ -9,7 +9,8 @@ trait TreeImporterGenerator {
 
 private[importmanipulation] class TreeImporterGeneratorImpl(termApplyImporterGenerator: TermApplyImporterGenerator,
                                                             termSelectImporterGenerator: TermSelectImporterGenerator,
-                                                            typeSelectImporterGenerator: TypeSelectImporterGenerator) extends TreeImporterGenerator {
+                                                            typeSelectImporterGenerator: TypeSelectImporterGenerator,
+                                                            typeProjectImporterGenerator: TypeProjectImporterGenerator) extends TreeImporterGenerator {
 
   override def generate(tree: Tree): List[Importer] = {
     val generatingTraverser = new GeneratingTraverser()
@@ -26,7 +27,7 @@ private[importmanipulation] class TreeImporterGeneratorImpl(termApplyImporterGen
       case termApply: Term.Apply => generateForTermApply(termApply)
       case termSelect: Term.Select => generateForTermSelect(termSelect)
       case typeSelect: Type.Select => importersBuilder ++= typeSelectImporterGenerator.generate(typeSelect)
-      case _: Type.Project => // TODO
+      case typeProject: Type.Project => generateForTypeProject(typeProject)
       case _ => super.apply(tree)
     }
 
@@ -39,10 +40,17 @@ private[importmanipulation] class TreeImporterGeneratorImpl(termApplyImporterGen
       }
     }
 
-    private def generateForTermSelect(termSelect: Term.Select): Unit = {
+    private def generateForTermSelect(termSelect: Term.Select) = {
       termSelectImporterGenerator.generate(termSelect) match {
         case Some(importer) => importersBuilder += importer
         case None => super.apply(termSelect)
+      }
+    }
+
+    private def generateForTypeProject(typeProject: Type.Project) = {
+      typeProjectImporterGenerator.generate(typeProject) match {
+        case Some(importer) => importersBuilder += importer
+        case None => super.apply(typeProject)
       }
     }
   }
@@ -51,5 +59,6 @@ private[importmanipulation] class TreeImporterGeneratorImpl(termApplyImporterGen
 object TreeImporterGenerator extends TreeImporterGeneratorImpl(
   TermApplyImporterGenerator,
   TermSelectImporterGenerator,
-  TypeSelectImporterGenerator
+  TypeSelectImporterGenerator,
+  TypeProjectImporterGenerator
 )

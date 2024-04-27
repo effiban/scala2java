@@ -170,6 +170,16 @@ class PkgQualifierImplTest extends UnitTestSuite {
       }
       """
 
+    val expectedImporters = List(importer"c.d", importer"e.f")
+    val expectedNonImports = List(
+      q"""
+      object C {
+        val x = g.h
+        val y = ZZ.WW
+      }
+      """
+    )
+
     val expectedFinalPkg =
       q"""
       package a.b {
@@ -182,16 +192,6 @@ class PkgQualifierImplTest extends UnitTestSuite {
         }
       }
       """
-
-    val expectedImporters = List(importer"c.d", importer"e.f")
-    val expectedNonImports = List(
-      q"""
-      object C {
-        val x = qual.g.h
-        val y = ZZ.WW
-      }
-      """
-    )
 
     doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
     doAnswer((termName: Term.Name) => termName match {
@@ -217,6 +217,16 @@ class PkgQualifierImplTest extends UnitTestSuite {
       }
       """
 
+    val expectedImporters = List(importer"c.d", importer"e.f")
+    val expectedNonImports = List(
+      q"""
+      object C {
+        val x = g.h.i
+        val y = ZZ.WW
+      }
+      """
+    )
+
     val expectedFinalPkg =
       q"""
       package a.b {
@@ -229,16 +239,6 @@ class PkgQualifierImplTest extends UnitTestSuite {
         }
       }
       """
-
-    val expectedImporters = List(importer"c.d", importer"e.f")
-    val expectedNonImports = List(
-      q"""
-      object C {
-        val x = qual.g.h.i
-        val y = ZZ.WW
-      }
-      """
-    )
 
     doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
     doAnswer((termName: Term.Name) => termName match {
@@ -327,6 +327,16 @@ class PkgQualifierImplTest extends UnitTestSuite {
       }
       """
 
+    val expectedImporters = List(importer"c.d", importer"e.f")
+    val expectedNonImports = List(
+      q"""
+      trait C {
+        val x: Int = 2
+        val y: Double = 3.3
+      }
+      """
+    )
+
     val expectedFinalPkg =
       q"""
       package a.b {
@@ -339,16 +349,6 @@ class PkgQualifierImplTest extends UnitTestSuite {
         }
       }
       """
-
-    val expectedImporters = List(importer"c.d", importer"e.f")
-    val expectedNonImports = List(
-      q"""
-      trait C {
-        val x: Int = 2
-        val y: Double = 3.3
-      }
-      """
-    )
 
     doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
     doAnswer((termName: Term.Name) => termName).when(termNameQualifier).qualify(any[Term.Name], eqTreeList(expectedImporters))
@@ -412,6 +412,16 @@ class PkgQualifierImplTest extends UnitTestSuite {
       }
       """
 
+    val expectedImporters = List(importer"c.d", importer"e.f")
+    val expectedNonImports = List(
+      q"""
+      object C {
+        var x: g.H
+        var y: ZZ.WW
+      }
+      """
+    )
+
     val expectedFinalPkg =
       q"""
       package a.b {
@@ -424,16 +434,6 @@ class PkgQualifierImplTest extends UnitTestSuite {
         }
       }
       """
-
-    val expectedImporters = List(importer"c.d", importer"e.f")
-    val expectedNonImports = List(
-      q"""
-      object C {
-        var x: qual.g.H
-        var y: ZZ.WW
-      }
-      """
-    )
 
     doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
     doAnswer((termName: Term.Name) => termName match {
@@ -459,6 +459,16 @@ class PkgQualifierImplTest extends UnitTestSuite {
       }
       """
 
+    val expectedImporters = List(importer"c.d", importer"e.f")
+    val expectedNonImports = List(
+      q"""
+      object C {
+        var x: g.H.I
+        var y: ZZ.WW
+      }
+      """
+    )
+
     val expectedFinalPkg =
       q"""
       package a.b {
@@ -471,16 +481,6 @@ class PkgQualifierImplTest extends UnitTestSuite {
         }
       }
       """
-
-    val expectedImporters = List(importer"c.d", importer"e.f")
-    val expectedNonImports = List(
-      q"""
-      object C {
-        var x: qual.g.H.I
-        var y: ZZ.WW
-      }
-      """
-    )
 
     doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
     doAnswer((termName: Term.Name) => termName match {
@@ -510,7 +510,6 @@ class PkgQualifierImplTest extends UnitTestSuite {
       q"""
       object C {
         var x: g.H
-        var y: ZZ.WW
       }
       """
     )
@@ -522,5 +521,215 @@ class PkgQualifierImplTest extends UnitTestSuite {
     pkgQualifier.qualify(initialPkg)
 
     verify(termNameQualifier, never).qualify(eqTree(q"H"), eqTreeList(expectedImporters))
+  }
+
+  test("qualify when has nested Type.Projects but for the first term of all, TypeNameQualifier returns nothing - should return unchanged") {
+    val pkg =
+      q"""
+      package a.b {
+        import c.d
+        import e.f
+
+        object A {
+          var x: CC#DD
+        }
+        object B {
+          var y: EE#FF
+        }
+      }
+      """
+
+
+    val expectedImporters = List(importer"c.d", importer"e.f")
+    val expectedNonImports = List(
+      q"""
+      object A {
+          var x: CC#DD
+      }
+      """,
+      q"""
+      object B {
+          var y: EE#FF
+      }
+      """
+    )
+
+    doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(pkg.stats))
+    doAnswer((termName: Term.Name) => termName).when(termNameQualifier).qualify(any[Term.Name], eqTreeList(expectedImporters))
+    doAnswer((typeName: Type.Name) => typeName).when(typeNameQualifier).qualify(any[Type.Name], eqTreeList(expectedImporters))
+
+    pkgQualifier.qualify(pkg).structure shouldBe pkg.structure
+  }
+
+  test("qualify when has a nested Type.Project 'G#H' and TypeNameQualifier qualifies 'G' should return it qualified") {
+    val initialPkg =
+      q"""
+      package a.b {
+        import c.d
+        import e.f
+
+        object C {
+          var x: G#H
+          val y: ZZ#WW
+        }
+      }
+      """
+
+    val expectedImporters = List(importer"c.d", importer"e.f")
+    val expectedNonImports = List(
+      q"""
+      object C {
+        var x: G#H
+        var y: ZZ#WW
+      }
+      """
+    )
+
+    val expectedFinalPkg =
+      q"""
+      package a.b {
+        import c.d
+        import e.f
+
+        object C {
+          var x: qual.G#H
+          var y: ZZ#WW
+        }
+      }
+      """
+
+    doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
+    doAnswer((termName: Term.Name) => termName).when(termNameQualifier).qualify(any[Term.Name], eqTreeList(expectedImporters))
+    doAnswer((typeName: Type.Name) => typeName match {
+      case aTypeName if aTypeName.structure == t"G".structure => t"qual.G"
+      case aTypeName => aTypeName
+    }).when(typeNameQualifier).qualify(any[Type.Name], eqTreeList(expectedImporters))
+
+    pkgQualifier.qualify(initialPkg).structure shouldBe expectedFinalPkg.structure
+  }
+
+  test("qualify when has a nested Type.Project 'g.H#I' and TypeNameQualifier qualifies 'g' should return it qualified") {
+    val initialPkg =
+      q"""
+      package a.b {
+        import c.d
+        import e.f
+
+        object C {
+          var x: g.H#I
+          val y: ZZ#WW
+        }
+      }
+      """
+
+    val expectedImporters = List(importer"c.d", importer"e.f")
+    val expectedNonImports = List(
+      q"""
+      object C {
+        var x: g.H#I
+        var y: ZZ#WW
+      }
+      """
+    )
+
+    val expectedFinalPkg =
+      q"""
+      package a.b {
+        import c.d
+        import e.f
+
+        object C {
+          var x: qual.g.H#I
+          var y: ZZ#WW
+        }
+      }
+      """
+
+    doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
+    doAnswer((termName: Term.Name) => termName match {
+      case aTermName if aTermName.structure == q"g".structure => q"qual.g"
+      case aTermName => aTermName
+    }).when(termNameQualifier).qualify(any[Term.Name], eqTreeList(expectedImporters))
+    doAnswer((typeName: Type.Name) => typeName).when(typeNameQualifier).qualify(any[Type.Name], eqTreeList(expectedImporters))
+
+    pkgQualifier.qualify(initialPkg).structure shouldBe expectedFinalPkg.structure
+  }
+
+  test("qualify when has a nested Type.Project 'G#H#I' and TypeNameQualifier qualifies 'G' should return it qualified") {
+    val initialPkg =
+      q"""
+      package a.b {
+        import c.d
+        import e.f
+
+        object C {
+          var x: G#H#I
+          val y: ZZ#WW
+        }
+      }
+      """
+
+    val expectedImporters = List(importer"c.d", importer"e.f")
+    val expectedNonImports = List(
+      q"""
+      object C {
+        var x: G#H#I
+        var y: ZZ#WW
+      }
+      """
+    )
+
+    val expectedFinalPkg =
+      q"""
+      package a.b {
+        import c.d
+        import e.f
+
+        object C {
+          var x: qual.G#H#I
+          var y: ZZ#WW
+        }
+      }
+      """
+
+    doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
+    doAnswer((termName: Term.Name) => termName).when(termNameQualifier).qualify(any[Term.Name], eqTreeList(expectedImporters))
+    doAnswer((typeName: Type.Name) => typeName match {
+      case aTypeName if aTypeName.structure == t"G".structure => t"qual.G"
+      case aTypeName => aTypeName
+    }).when(typeNameQualifier).qualify(any[Type.Name], eqTreeList(expectedImporters))
+
+    pkgQualifier.qualify(initialPkg).structure shouldBe expectedFinalPkg.structure
+  }
+
+  test("qualify when has a nested Type.Project 'G#H' should NOT try to qualify 'H'") {
+    val initialPkg =
+      q"""
+      package a.b {
+        import c.d
+        import e.f
+
+        object C {
+          var x: G#H
+        }
+      }
+      """
+
+    val expectedImporters = List(importer"c.d", importer"e.f")
+    val expectedNonImports = List(
+      q"""
+      object C {
+        var x: G#H
+      }
+      """
+    )
+
+    doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
+    doAnswer((termName: Term.Name) => termName).when(termNameQualifier).qualify(any[Term.Name], eqTreeList(expectedImporters))
+    doAnswer((typeName: Type.Name) => typeName).when(typeNameQualifier).qualify(any[Type.Name], eqTreeList(expectedImporters))
+
+    pkgQualifier.qualify(initialPkg)
+
+    verify(typeNameQualifier, never).qualify(eqTree(t"H"), eqTreeList(expectedImporters))
   }
 }

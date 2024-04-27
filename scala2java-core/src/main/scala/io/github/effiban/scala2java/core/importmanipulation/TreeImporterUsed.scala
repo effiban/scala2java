@@ -21,7 +21,7 @@ private[importmanipulation] class TreeImporterUsedImpl(termNameImporterMatcher: 
       case termSelect: Term.Select => apply(termSelect.qual)
       case termName: Term.Name => checkTermName(termName)
       case typeSelect: Type.Select => apply(typeSelect.qual)
-      case _: Type.Project => //TODO support match by qualifier prefix
+      case typeProject: Type.Project => apply(typeProject.qual)
       case typeName: Type.Name => checkTypeName(typeName)
       case aTree => super.apply(aTree)
     }

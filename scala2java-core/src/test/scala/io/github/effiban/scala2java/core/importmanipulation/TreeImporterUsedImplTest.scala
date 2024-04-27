@@ -245,6 +245,83 @@ class TreeImporterUsedImplTest extends UnitTestSuite {
     treeImporterUsed(theClass, importer) shouldBe false
   }
 
+  test("apply() for a Class when has a matching nested Type.Project 'C#D' should return true") {
+    val theClass =
+      q"""
+      class A {
+        var x: C#D
+      }
+      """
+
+    val importer = importer"b.C"
+
+    doReturn(Some(importer)).when(typeNameImporterMatcher).findMatch(eqTree(t"C"), eqTree(importer))
+
+    treeImporterUsed(theClass, importer) shouldBe true
+  }
+
+  test("apply() for a Class when has a matching nested Type.Project 'c.D#E' should return true") {
+    val theClass =
+      q"""
+      class A {
+        var x: c.D#E
+      }
+      """
+
+    val importer = importer"b.c"
+
+    doReturn(Some(importer)).when(termNameImporterMatcher).findMatch(eqTree(q"c"), eqTree(importer))
+
+    treeImporterUsed(theClass, importer) shouldBe true
+  }
+
+  test("apply() for a Class when has a matching nested Type.Project 'C#D#E' should return true") {
+    val theClass =
+      q"""
+      class A {
+        var x: C#D#E
+      }
+      """
+
+    val importer = importer"b.C"
+
+    doReturn(Some(importer)).when(typeNameImporterMatcher).findMatch(eqTree(t"C"), eqTree(importer))
+
+    treeImporterUsed(theClass, importer) shouldBe true
+  }
+
+  test("apply() for a Class when has a nested Type.Project 'C#D' should NOT check 'D'") {
+    val theClass =
+      q"""
+      class A {
+        var x: C#D
+      }
+      """
+
+    val importer = importer"b.C"
+
+    doReturn(Some(importer)).when(typeNameImporterMatcher).findMatch(eqTree(t"C"), eqTree(importer))
+
+    treeImporterUsed(theClass, importer)
+
+    verify(typeNameImporterMatcher, never).findMatch(eqTree(t"D"), eqTree(importer))
+  }
+
+  test("apply() for a Class when has a non-matching nested Type.Project should return false") {
+    val theClass =
+      q"""
+      class A {
+        var x: B#C
+      }
+      """
+
+    val importer = importer"d.e"
+
+    doReturn(None).when(typeNameImporterMatcher).findMatch(eqTree(t"B"), eqTree(importer))
+
+    treeImporterUsed(theClass, importer) shouldBe false
+  }
+
   test("apply() for a Class when has no matching nested trees should return false") {
     val theClass =
       q"""

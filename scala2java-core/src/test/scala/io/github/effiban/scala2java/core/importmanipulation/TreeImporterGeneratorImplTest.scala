@@ -10,11 +10,13 @@ class TreeImporterGeneratorImplTest extends UnitTestSuite {
   private val termApplyImporterGenerator = mock[TermApplyImporterGenerator]
   private val termSelectImporterGenerator = mock[TermSelectImporterGenerator]
   private val typeSelectImporterGenerator = mock[TypeSelectImporterGenerator]
+  private val typeProjectImporterGenerator = mock[TypeProjectImporterGenerator]
 
   private val treeImporterGenerator = new TreeImporterGeneratorImpl(
     termApplyImporterGenerator,
     termSelectImporterGenerator,
-    typeSelectImporterGenerator
+    typeSelectImporterGenerator,
+    typeProjectImporterGenerator
   )
 
   test("generate for a class with two Term.Apply-s of Term.Name-s without args, and Importers generated for both") {
@@ -184,6 +186,51 @@ class TreeImporterGeneratorImplTest extends UnitTestSuite {
       case aTypeSelect if aTypeSelect.structure == typeSelect1.structure => Some(importer1)
       case _ => None
     }).when(typeSelectImporterGenerator).generate(any[Type.Select])
+
+    treeImporterGenerator.generate(theClass).structure shouldBe List(importer1).structure
+  }
+
+  test("generate for class with two members defined using Type.Projects, and Importers generated for both") {
+    val typeProject1 = t"a.B#C"
+    val typeProject2 = t"d.E#F"
+
+    val importer1 = importer"a.B.C"
+    val importer2 = importer"d.E.F"
+
+    val theClass =
+      q"""
+      class MyClass {
+        var x: a.B#C
+        var y: d.E#F
+      }
+      """
+
+    doAnswer((typeProject: Type.Project) => typeProject match {
+      case aTypeProject if aTypeProject.structure == typeProject1.structure => Some(importer1)
+      case aTypeProject if aTypeProject.structure == typeProject2.structure => Some(importer2)
+      case _ => None
+    }).when(typeProjectImporterGenerator).generate(any[Type.Project])
+
+    treeImporterGenerator.generate(theClass).structure shouldBe List(importer1, importer2).structure
+  }
+
+  test("generate for class with two members defined using Type.Projects, and an Importer generated only for one") {
+    val typeProject1 = t"A#B"
+
+    val importer1 = importer"A.B"
+
+    val theClass =
+      q"""
+      class MyClass {
+        val x: A#B
+        val y: C#D
+      }
+      """
+
+    doAnswer((typeProject: Type.Project) => typeProject match {
+      case aTypeProject if aTypeProject.structure == typeProject1.structure => Some(importer1)
+      case _ => None
+    }).when(typeProjectImporterGenerator).generate(any[Type.Project])
 
     treeImporterGenerator.generate(theClass).structure shouldBe List(importer1).structure
   }

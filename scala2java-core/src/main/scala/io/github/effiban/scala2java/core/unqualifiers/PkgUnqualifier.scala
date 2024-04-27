@@ -10,7 +10,8 @@ trait PkgUnqualifier {
 
 private[unqualifiers] class PkgUnqualifierImpl(statsByImportSplitter: StatsByImportSplitter,
                                                termSelectUnqualifier: TermSelectUnqualifier,
-                                               typeSelectUnqualifier: TypeSelectUnqualifier) extends PkgUnqualifier {
+                                               typeSelectUnqualifier: TypeSelectUnqualifier,
+                                               typeProjectUnqualifier: TypeProjectUnqualifier) extends PkgUnqualifier {
 
   override def unqualify(pkg: Pkg): Pkg = {
     val (importers, nonImports) = statsByImportSplitter.split(pkg.stats)
@@ -38,7 +39,12 @@ private[unqualifiers] class PkgUnqualifierImpl(statsByImportSplitter: StatsByImp
           case aTermRef => aTermRef
         }
         case typeSelect: Type.Select => typeSelectUnqualifier.unqualify(typeSelect, importers)
-        // TODO support Type.Project
+
+        case typeProject: Type.Project => typeProjectUnqualifier.unqualify(typeProject, importers) match {
+          case aTypeProject: Type.Project => super.apply(aTypeProject)
+          case aTypeRef => aTypeRef
+        }
+
         case aTree => super.apply(aTree)
       }
   }
@@ -47,5 +53,6 @@ private[unqualifiers] class PkgUnqualifierImpl(statsByImportSplitter: StatsByImp
 object PkgUnqualifier extends PkgUnqualifierImpl(
   StatsByImportSplitter,
   TermSelectUnqualifier,
-  TypeSelectUnqualifier
+  TypeSelectUnqualifier,
+  TypeProjectUnqualifier
 )

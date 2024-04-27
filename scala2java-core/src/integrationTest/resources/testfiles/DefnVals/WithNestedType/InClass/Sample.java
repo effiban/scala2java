@@ -1,6 +1,7 @@
 package dummy;
 
+import A.B;
 
 public class Sample {
-    private final A.B x = new A.B();
+    private final B x = new B();
 }
