@@ -35,9 +35,9 @@ class NewTraverserImplTest extends UnitTestSuite {
     newTraverser.traverse(`new`).structure shouldBe traversedNew.structure
   }
 
-  test("traverse instantiation of 'Array[MyClass]'") {
-    val init = init"Array[MyClass](3)"
-    val traversedInit = init"Array[MyTraversedClass](33)"
+  test("traverse instantiation of 'scala.Array[MyClass]'") {
+    val init = init"scala.Array[MyClass](3)"
+    val traversedInit = init"scala.Array[MyTraversedClass](33)"
 
     val `new` = New(init)
     val traversedNew = New(traversedInit)

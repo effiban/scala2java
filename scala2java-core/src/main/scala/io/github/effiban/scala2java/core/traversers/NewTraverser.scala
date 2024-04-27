@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.ArrayInitializerSizeContext
+import io.github.effiban.scala2java.core.entities.TypeSelects
 import io.github.effiban.scala2java.core.resolvers.ArrayInitializerContextResolver
 
 import scala.meta.Term.New
@@ -22,7 +23,7 @@ private[traversers] class NewTraverserImpl(initTraverser: => InitTraverser,
   private def traverseAsArrayInitializer(context: ArrayInitializerSizeContext) = {
     val traversedContext = arrayInitializerTraverser.traverseWithSize(context)
     val traversedInit = Init(
-      tpe = Type.Apply(t"Array", List(traversedContext.tpe)),
+      tpe = Type.Apply(TypeSelects.ScalaArray, List(traversedContext.tpe)),
       name = Name.Anonymous(),
       argss = List(List(traversedContext.size))
     )
