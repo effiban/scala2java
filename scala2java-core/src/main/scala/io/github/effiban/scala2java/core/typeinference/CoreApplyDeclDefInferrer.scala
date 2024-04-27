@@ -1,8 +1,7 @@
 package io.github.effiban.scala2java.core.typeinference
 
 import io.github.effiban.scala2java.core.classifiers.TypeClassifier
-import io.github.effiban.scala2java.core.entities.TermNameValues.{Empty, ScalaFailed, ScalaInclusive, ScalaSuccessful}
-import io.github.effiban.scala2java.core.entities.{TermNameValues, TypeSelects}
+import io.github.effiban.scala2java.core.entities.TypeSelects
 import io.github.effiban.scala2java.spi.contexts.TermApplyInferenceContext
 import io.github.effiban.scala2java.spi.entities.PartialDeclDef
 import io.github.effiban.scala2java.spi.typeinferrers.ApplyDeclDefInferrer
@@ -25,14 +24,14 @@ private[typeinference] class CoreApplyDeclDefInferrer(initializerDeclDefInferrer
   private def inferAsParameterizedInitializer(termApply: Term.Apply, context: TermApplyInferenceContext) = {
 
     (termApply.fun, termApply.args) match {
-      case (Term.ApplyType(Term.Select(qual: Term.Select, Term.Name(TermNameValues.Apply) | Term.Name(Empty)), appliedTypes), args) =>
+      case (Term.ApplyType(Term.Select(qual: Term.Select, q"apply" | q"empty"), appliedTypes), args) =>
         inferByAppliedTypes(qual, appliedTypes, args.size)
-      case (Term.ApplyType(Term.Select(qual@Term.Select(q"scala.concurrent", q"Future"), Term.Name(ScalaSuccessful)), appliedTypes), args) =>
+      case (Term.ApplyType(Term.Select(qual@Term.Select(q"scala.concurrent", q"Future"), q"successful"), appliedTypes), args) =>
         inferByAppliedTypes(qual, appliedTypes, args.size)
 
-      case (Term.Select(qual: Term.Select, Term.Name(TermNameValues.Apply) | Term.Name(Empty)), _) => inferByArgTypes(qual, context.maybeArgTypes)
-      case (Term.Select(qual@Term.Select(q"scala", q"Range"), Term.Name(ScalaInclusive)), _) => inferByArgTypes(qual, context.maybeArgTypes)
-      case (Term.Select(qual@Term.Select(q"scala.concurrent", q"Future"), Term.Name(ScalaSuccessful)), _) => inferByArgTypes(qual, context.maybeArgTypes)
+      case (Term.Select(qual: Term.Select, q"apply" | q"empty"), _) => inferByArgTypes(qual, context.maybeArgTypes)
+      case (Term.Select(qual@Term.Select(q"scala", q"Range"), q"inclusive"), _) => inferByArgTypes(qual, context.maybeArgTypes)
+      case (Term.Select(qual@Term.Select(q"scala.concurrent", q"Future"), q"successful"), _) => inferByArgTypes(qual, context.maybeArgTypes)
 
       case _ => PartialDeclDef()
     }
@@ -46,10 +45,10 @@ private[typeinference] class CoreApplyDeclDefInferrer(initializerDeclDefInferrer
 
   private def inferOther(termApply: Term.Apply, context: TermApplyInferenceContext) = {
     val maybeReturnType = (termApply.fun, context) match {
-      case (Term.ApplyType(Term.Select(q"scala.concurrent.Future", Term.Name(ScalaFailed)), List(tpe)), _) =>
+      case (Term.ApplyType(Term.Select(q"scala.concurrent.Future", q"failed"), List(tpe)), _) =>
         Some(Type.Apply(TypeSelects.ScalaFuture, List(tpe)))
 
-      case (Term.Select(q"scala.concurrent.Future", Term.Name(ScalaFailed)), _) =>
+      case (Term.Select(q"scala.concurrent.Future", q"failed"), _) =>
         Some(Type.Apply(TypeSelects.ScalaFuture, List(TypeSelects.ScalaAny)))
 
       case (Term.Select(_, q"length"), TermApplyInferenceContext(Some(parentType), _)) if typeClassifier.isJavaListLike(parentType) =>

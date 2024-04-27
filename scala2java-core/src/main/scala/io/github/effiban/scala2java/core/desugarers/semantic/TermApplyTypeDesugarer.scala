@@ -1,9 +1,9 @@
 package io.github.effiban.scala2java.core.desugarers.semantic
 
 import io.github.effiban.scala2java.core.desugarers.DifferentTypeDesugarer
-import io.github.effiban.scala2java.core.entities.TermNameValues.ScalaClassOf
 
-import scala.meta.Term
+import scala.meta.{Term, XtensionQuasiquoteTerm}
+
 
 trait TermApplyTypeDesugarer extends DifferentTypeDesugarer[Term.ApplyType, Term]
 
@@ -11,7 +11,7 @@ private[semantic] class TermApplyTypeDesugarerImpl(termApplyDesugarer: => TermAp
   extends TermApplyTypeDesugarer {
 
   override def desugar(termApplyType: Term.ApplyType): Term = termApplyType.fun match {
-    case Term.Name(ScalaClassOf) => termApplyType
+    case q"classOf" => termApplyType
     case _ => termApplyDesugarer.desugar(Term.Apply(termApplyType, Nil))
   }
 }
