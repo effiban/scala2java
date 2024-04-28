@@ -28,6 +28,7 @@ private[traversers] class TemplateTraverserImpl(templateInitTraverser: => Templa
     val traversedStats = templateBodyTraverser.traverse(statements = template.stats, context = bodyContext)
 
     Template(
+      // TODO handle early definitions
       early = Nil,
       inits = traversedInits,
       self = traversedSelf,

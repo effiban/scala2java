@@ -1,5 +1,7 @@
 package io.github.effiban.scala2java.core.qualifiers
 
+import io.github.effiban.scala2java.core.qualifiers.Qualifiers.pkgQualifier
+
 import scala.meta.{Pkg, Source}
 
 trait SourceQualifier {
@@ -17,4 +19,4 @@ private[qualifiers] class SourceQualifierImpl(pkgQualifier: PkgQualifier) extend
     }
 }
 
-object SourceQualifier extends SourceQualifierImpl(PkgQualifier)
+object SourceQualifier extends SourceQualifierImpl(pkgQualifier)
