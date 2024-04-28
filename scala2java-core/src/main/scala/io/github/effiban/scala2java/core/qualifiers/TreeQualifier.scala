@@ -2,14 +2,14 @@ package io.github.effiban.scala2java.core.qualifiers
 
 import scala.meta.{Import, Pkg, Stat, Term, Transformer, Tree, Type}
 
-trait StatQualifier {
-  def qualify(stat: Stat, context: QualificationContext = QualificationContext()): Stat
+trait TreeQualifier {
+  def qualify(tree: Tree, context: QualificationContext = QualificationContext()): Tree
 }
 
-private[qualifiers] class StatQualifierImpl(termNameQualifier: CompositeTermNameQualifier,
-                                            typeNameQualifier: CompositeTypeNameQualifier) extends StatQualifier {
-  override def qualify(stat: Stat, context: QualificationContext = QualificationContext()): Stat = {
-    new QualifyingTransformer(context)(stat).asInstanceOf[Stat]
+private[qualifiers] class TreeQualifierImpl(termNameQualifier: CompositeTermNameQualifier,
+                                            typeNameQualifier: CompositeTypeNameQualifier) extends TreeQualifier {
+  override def qualify(tree: Tree, context: QualificationContext = QualificationContext()): Tree = {
+    new QualifyingTransformer(context)(tree)
   }
 
   private class QualifyingTransformer(context: QualificationContext) extends Transformer {
@@ -28,7 +28,7 @@ private[qualifiers] class StatQualifierImpl(termNameQualifier: CompositeTermName
   }
 }
 
-object StatQualifier extends StatQualifierImpl(
+object TreeQualifier extends TreeQualifierImpl(
   CompositeTermNameQualifier,
   CompositeTypeNameQualifier
 )

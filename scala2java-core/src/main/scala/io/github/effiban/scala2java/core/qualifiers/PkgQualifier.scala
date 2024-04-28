@@ -9,7 +9,7 @@ trait PkgQualifier {
 }
 
 private[qualifiers] class PkgQualifierImpl(statsByImportSplitter: StatsByImportSplitter,
-                                           statQualifier: StatQualifier) extends PkgQualifier {
+                                           treeQualifier: TreeQualifier) extends PkgQualifier {
   override def qualify(pkg: Pkg): Pkg = {
     val (importers, nonImports) = statsByImportSplitter.split(pkg.stats)
     val imports = importers.map(importer => Import(List(importer)))
@@ -19,11 +19,11 @@ private[qualifiers] class PkgQualifierImpl(statsByImportSplitter: StatsByImportS
   }
 
   private def qualify(stat: Stat, importers: List[Importer]): Stat = {
-    statQualifier.qualify(stat, QualificationContext(importers))
+    treeQualifier.qualify(stat, QualificationContext(importers)).asInstanceOf[Stat]
   }
 }
 
 object PkgQualifier extends PkgQualifierImpl(
   StatsByImportSplitter,
-  StatQualifier
+  TreeQualifier
 )
