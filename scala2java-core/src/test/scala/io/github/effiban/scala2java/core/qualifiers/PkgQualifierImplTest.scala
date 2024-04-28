@@ -3,6 +3,7 @@ package io.github.effiban.scala2java.core.qualifiers
 import io.github.effiban.scala2java.core.entities.TermSelects.{ScalaNil, ScalaNone}
 import io.github.effiban.scala2java.core.entities.TypeSelects.{ScalaDouble, ScalaInt}
 import io.github.effiban.scala2java.core.importmanipulation.StatsByImportSplitter
+import io.github.effiban.scala2java.core.matchers.QualificationContextMockitoMatcher.eqQualificationContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -66,7 +67,8 @@ class PkgQualifierImplTest extends UnitTestSuite {
     )
 
     doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(pkg.stats))
-    doAnswer((termName: Term.Name) => termName).when(termNameQualifier).qualify(any[Term.Name], eqTreeList(expectedImporters))
+    doAnswer((termName: Term.Name) => termName)
+      .when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(QualificationContext(expectedImporters)))
 
     pkgQualifier.qualify(pkg).structure shouldBe pkg.structure
   }
@@ -113,8 +115,9 @@ class PkgQualifierImplTest extends UnitTestSuite {
       case aTermName if aTermName.structure == q"None".structure => ScalaNone
       case aTermName if aTermName.structure == q"Nil".structure => ScalaNil
       case aTermName => aTermName
-    }).when(termNameQualifier).qualify(any[Term.Name], eqTreeList(expectedImporters))
-    doAnswer((typeName: Type.Name) => typeName).when(typeNameQualifier).qualify(any[Type.Name], eqTreeList(expectedImporters))
+    }).when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(QualificationContext(expectedImporters)))
+    doAnswer((typeName: Type.Name) => typeName)
+      .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(QualificationContext(expectedImporters)))
 
     pkgQualifier.qualify(initialPkg).structure shouldBe expectedFinalPkg.structure
   }
@@ -151,7 +154,8 @@ class PkgQualifierImplTest extends UnitTestSuite {
     )
 
     doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(pkg.stats))
-    doAnswer((termName: Term.Name) => termName).when(termNameQualifier).qualify(any[Term.Name], eqTreeList(expectedImporters))
+    doAnswer((termName: Term.Name) => termName)
+      .when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(QualificationContext(expectedImporters)))
 
     pkgQualifier.qualify(pkg).structure shouldBe pkg.structure
   }
@@ -197,8 +201,9 @@ class PkgQualifierImplTest extends UnitTestSuite {
     doAnswer((termName: Term.Name) => termName match {
       case aTermName if aTermName.structure == q"g".structure => q"qual.g"
       case aTermName => aTermName
-    }).when(termNameQualifier).qualify(any[Term.Name], eqTreeList(expectedImporters))
-    doAnswer((typeName: Type.Name) => typeName).when(typeNameQualifier).qualify(any[Type.Name], eqTreeList(expectedImporters))
+    }).when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(QualificationContext(expectedImporters)))
+    doAnswer((typeName: Type.Name) => typeName)
+      .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(QualificationContext(expectedImporters)))
 
     pkgQualifier.qualify(initialPkg).structure shouldBe expectedFinalPkg.structure
   }
@@ -244,8 +249,9 @@ class PkgQualifierImplTest extends UnitTestSuite {
     doAnswer((termName: Term.Name) => termName match {
       case aTermName if aTermName.structure == q"g".structure => q"qual.g"
       case aTermName => aTermName
-    }).when(termNameQualifier).qualify(any[Term.Name], eqTreeList(expectedImporters))
-    doAnswer((typeName: Type.Name) => typeName).when(typeNameQualifier).qualify(any[Type.Name], eqTreeList(expectedImporters))
+    }).when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(QualificationContext(expectedImporters)))
+    doAnswer((typeName: Type.Name) => typeName)
+      .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(QualificationContext(expectedImporters)))
 
     pkgQualifier.qualify(initialPkg).structure shouldBe expectedFinalPkg.structure
   }
@@ -273,12 +279,14 @@ class PkgQualifierImplTest extends UnitTestSuite {
     )
 
     doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
-    doAnswer((termName: Term.Name) => termName).when(termNameQualifier).qualify(any[Term.Name], eqTreeList(expectedImporters))
-    doAnswer((typeName: Type.Name) => typeName).when(typeNameQualifier).qualify(any[Type.Name], eqTreeList(expectedImporters))
+    doAnswer((termName: Term.Name) => termName)
+      .when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(QualificationContext(expectedImporters)))
+    doAnswer((typeName: Type.Name) => typeName)
+      .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(QualificationContext(expectedImporters)))
 
     pkgQualifier.qualify(initialPkg)
 
-    verify(termNameQualifier, never).qualify(eqTree(q"h"), eqTreeList(expectedImporters))
+    verify(termNameQualifier, never).qualify(eqTree(q"h"), eqQualificationContext(QualificationContext(expectedImporters)))
   }
 
   test("qualify when has nested Type.Names but TypeNameQualifier returns nothing, should return unchanged") {
@@ -308,7 +316,8 @@ class PkgQualifierImplTest extends UnitTestSuite {
     )
 
     doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(pkg.stats))
-    doAnswer((typeName: Type.Name) => typeName).when(typeNameQualifier).qualify(any[Type.Name], eqTreeList(expectedImporters))
+    doAnswer((typeName: Type.Name) => typeName)
+      .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(QualificationContext(expectedImporters)))
 
     pkgQualifier.qualify(pkg).structure shouldBe pkg.structure
   }
@@ -351,12 +360,13 @@ class PkgQualifierImplTest extends UnitTestSuite {
       """
 
     doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
-    doAnswer((termName: Term.Name) => termName).when(termNameQualifier).qualify(any[Term.Name], eqTreeList(expectedImporters))
+    doAnswer((termName: Term.Name) => termName).when(termNameQualifier).qualify(any[Term.Name],
+      eqQualificationContext(QualificationContext(expectedImporters)))
     doAnswer((typeName: Type.Name) => typeName match {
       case aTypeName if aTypeName.structure == t"Int".structure => ScalaInt
       case aTypeName if aTypeName.structure == t"Double".structure => ScalaDouble
       case aTypeName => aTypeName
-    }).when(typeNameQualifier).qualify(any[Type.Name], eqTreeList(expectedImporters))
+    }).when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(QualificationContext(expectedImporters)))
 
     pkgQualifier.qualify(initialPkg).structure shouldBe expectedFinalPkg.structure
   }
@@ -393,7 +403,8 @@ class PkgQualifierImplTest extends UnitTestSuite {
     )
 
     doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(pkg.stats))
-    doAnswer((termName: Term.Name) => termName).when(termNameQualifier).qualify(any[Term.Name], eqTreeList(expectedImporters))
+    doAnswer((termName: Term.Name) => termName)
+      .when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(QualificationContext(expectedImporters)))
 
     pkgQualifier.qualify(pkg).structure shouldBe pkg.structure
   }
@@ -439,8 +450,9 @@ class PkgQualifierImplTest extends UnitTestSuite {
     doAnswer((termName: Term.Name) => termName match {
       case aTermName if aTermName.structure == q"g".structure => q"qual.g"
       case aTermName => aTermName
-    }).when(termNameQualifier).qualify(any[Term.Name], eqTreeList(expectedImporters))
-    doAnswer((typeName: Type.Name) => typeName).when(typeNameQualifier).qualify(any[Type.Name], eqTreeList(expectedImporters))
+    }).when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(QualificationContext(expectedImporters)))
+    doAnswer((typeName: Type.Name) => typeName)
+      .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(QualificationContext(expectedImporters)))
 
     pkgQualifier.qualify(initialPkg).structure shouldBe expectedFinalPkg.structure
   }
@@ -486,8 +498,9 @@ class PkgQualifierImplTest extends UnitTestSuite {
     doAnswer((termName: Term.Name) => termName match {
       case aTermName if aTermName.structure == q"g".structure => q"qual.g"
       case aTermName => aTermName
-    }).when(termNameQualifier).qualify(any[Term.Name], eqTreeList(expectedImporters))
-    doAnswer((typeName: Type.Name) => typeName).when(typeNameQualifier).qualify(any[Type.Name], eqTreeList(expectedImporters))
+    }).when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(QualificationContext(expectedImporters)))
+    doAnswer((typeName: Type.Name) => typeName)
+      .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(QualificationContext(expectedImporters)))
 
     pkgQualifier.qualify(initialPkg).structure shouldBe expectedFinalPkg.structure
   }
@@ -515,12 +528,14 @@ class PkgQualifierImplTest extends UnitTestSuite {
     )
 
     doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
-    doAnswer((termName: Term.Name) => termName).when(termNameQualifier).qualify(any[Term.Name], eqTreeList(expectedImporters))
-    doAnswer((typeName: Type.Name) => typeName).when(typeNameQualifier).qualify(any[Type.Name], eqTreeList(expectedImporters))
+    doAnswer((termName: Term.Name) => termName)
+      .when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(QualificationContext(expectedImporters)))
+    doAnswer((typeName: Type.Name) => typeName)
+      .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(QualificationContext(expectedImporters)))
 
     pkgQualifier.qualify(initialPkg)
 
-    verify(termNameQualifier, never).qualify(eqTree(q"H"), eqTreeList(expectedImporters))
+    verify(termNameQualifier, never).qualify(eqTree(q"H"), eqQualificationContext(QualificationContext(expectedImporters)))
   }
 
   test("qualify when has nested Type.Projects but for the first term of all, TypeNameQualifier returns nothing - should return unchanged") {
@@ -555,8 +570,10 @@ class PkgQualifierImplTest extends UnitTestSuite {
     )
 
     doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(pkg.stats))
-    doAnswer((termName: Term.Name) => termName).when(termNameQualifier).qualify(any[Term.Name], eqTreeList(expectedImporters))
-    doAnswer((typeName: Type.Name) => typeName).when(typeNameQualifier).qualify(any[Type.Name], eqTreeList(expectedImporters))
+    doAnswer((termName: Term.Name) => termName)
+      .when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(QualificationContext(expectedImporters)))
+    doAnswer((typeName: Type.Name) => typeName)
+      .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(QualificationContext(expectedImporters)))
 
     pkgQualifier.qualify(pkg).structure shouldBe pkg.structure
   }
@@ -599,11 +616,12 @@ class PkgQualifierImplTest extends UnitTestSuite {
       """
 
     doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
-    doAnswer((termName: Term.Name) => termName).when(termNameQualifier).qualify(any[Term.Name], eqTreeList(expectedImporters))
+    doAnswer((termName: Term.Name) => termName)
+      .when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(QualificationContext(expectedImporters)))
     doAnswer((typeName: Type.Name) => typeName match {
       case aTypeName if aTypeName.structure == t"G".structure => t"qual.G"
       case aTypeName => aTypeName
-    }).when(typeNameQualifier).qualify(any[Type.Name], eqTreeList(expectedImporters))
+    }).when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(QualificationContext(expectedImporters)))
 
     pkgQualifier.qualify(initialPkg).structure shouldBe expectedFinalPkg.structure
   }
@@ -649,8 +667,9 @@ class PkgQualifierImplTest extends UnitTestSuite {
     doAnswer((termName: Term.Name) => termName match {
       case aTermName if aTermName.structure == q"g".structure => q"qual.g"
       case aTermName => aTermName
-    }).when(termNameQualifier).qualify(any[Term.Name], eqTreeList(expectedImporters))
-    doAnswer((typeName: Type.Name) => typeName).when(typeNameQualifier).qualify(any[Type.Name], eqTreeList(expectedImporters))
+    }).when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(QualificationContext(expectedImporters)))
+    doAnswer((typeName: Type.Name) => typeName)
+      .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(QualificationContext(expectedImporters)))
 
     pkgQualifier.qualify(initialPkg).structure shouldBe expectedFinalPkg.structure
   }
@@ -693,11 +712,12 @@ class PkgQualifierImplTest extends UnitTestSuite {
       """
 
     doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
-    doAnswer((termName: Term.Name) => termName).when(termNameQualifier).qualify(any[Term.Name], eqTreeList(expectedImporters))
+    doAnswer((termName: Term.Name) => termName)
+      .when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(QualificationContext(expectedImporters)))
     doAnswer((typeName: Type.Name) => typeName match {
       case aTypeName if aTypeName.structure == t"G".structure => t"qual.G"
       case aTypeName => aTypeName
-    }).when(typeNameQualifier).qualify(any[Type.Name], eqTreeList(expectedImporters))
+    }).when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(QualificationContext(expectedImporters)))
 
     pkgQualifier.qualify(initialPkg).structure shouldBe expectedFinalPkg.structure
   }
@@ -725,11 +745,13 @@ class PkgQualifierImplTest extends UnitTestSuite {
     )
 
     doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
-    doAnswer((termName: Term.Name) => termName).when(termNameQualifier).qualify(any[Term.Name], eqTreeList(expectedImporters))
-    doAnswer((typeName: Type.Name) => typeName).when(typeNameQualifier).qualify(any[Type.Name], eqTreeList(expectedImporters))
+    doAnswer((termName: Term.Name) => termName)
+      .when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(QualificationContext(expectedImporters)))
+    doAnswer((typeName: Type.Name) => typeName)
+      .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(QualificationContext(expectedImporters)))
 
     pkgQualifier.qualify(initialPkg)
 
-    verify(typeNameQualifier, never).qualify(eqTree(t"H"), eqTreeList(expectedImporters))
+    verify(typeNameQualifier, never).qualify(eqTree(t"H"), eqQualificationContext(QualificationContext(expectedImporters)))
   }
 }

@@ -29,7 +29,7 @@ class CompositeTypeNameQualifierImplTest extends UnitTestSuite {
       case _ => None
     }).when(typeNameImporterMatcher).findMatch(eqTree(typeName), any[Importer])
 
-    compositeTypeNameQualifier.qualify(typeName, importers).structure shouldBe expectedQualifiedType.structure
+    compositeTypeNameQualifier.qualify(typeName, QualificationContext(importers)).structure shouldBe expectedQualifiedType.structure
   }
 
   test("qualify when has importers and match found by core qualifier should return qualified type") {
@@ -43,7 +43,7 @@ class CompositeTypeNameQualifierImplTest extends UnitTestSuite {
     doReturn(None).when(typeNameImporterMatcher).findMatch(eqTree(typeName), any[Importer])
     doReturn(Some(expectedQualifiedType)).when(coreTypeNameQualifier).qualify(eqTree(typeName))
 
-    compositeTypeNameQualifier.qualify(typeName, importers).structure shouldBe expectedQualifiedType.structure
+    compositeTypeNameQualifier.qualify(typeName, QualificationContext(importers)).structure shouldBe expectedQualifiedType.structure
   }
 
   test("qualify when has importers and no match found by import or by core qualifier - should return unchanged") {
@@ -56,7 +56,7 @@ class CompositeTypeNameQualifierImplTest extends UnitTestSuite {
     doReturn(None).when(typeNameImporterMatcher).findMatch(eqTree(typeName), any[Importer])
     doReturn(None).when(coreTypeNameQualifier).qualify(eqTree(typeName))
 
-    compositeTypeNameQualifier.qualify(typeName, importers).structure shouldBe typeName.structure
+    compositeTypeNameQualifier.qualify(typeName, QualificationContext(importers)).structure shouldBe typeName.structure
   }
 
   test("qualify when has no importers and match found by core qualifier should return qualified type") {
@@ -65,7 +65,7 @@ class CompositeTypeNameQualifierImplTest extends UnitTestSuite {
 
     doReturn(Some(expectedQualifiedType)).when(coreTypeNameQualifier).qualify(eqTree(typeName))
 
-    compositeTypeNameQualifier.qualify(typeName, Nil).structure shouldBe expectedQualifiedType.structure
+    compositeTypeNameQualifier.qualify(typeName, QualificationContext()).structure shouldBe expectedQualifiedType.structure
   }
 
   test("qualify when has no importers and no match found by core qualifier should return unchanged") {
@@ -73,7 +73,7 @@ class CompositeTypeNameQualifierImplTest extends UnitTestSuite {
 
     doReturn(None).when(coreTypeNameQualifier).qualify(eqTree(typeName))
 
-    compositeTypeNameQualifier.qualify(typeName, Nil).structure shouldBe typeName.structure
+    compositeTypeNameQualifier.qualify(typeName, QualificationContext()).structure shouldBe typeName.structure
   }
 
   test("qualify when Type.Name has a parent Class should ignore matching importers") {
@@ -85,7 +85,7 @@ class CompositeTypeNameQualifierImplTest extends UnitTestSuite {
 
     val importers = List(importer"a.A")
 
-    compositeTypeNameQualifier.qualify(aClass.name, importers).structure shouldBe aClass.name.structure
+    compositeTypeNameQualifier.qualify(aClass.name, QualificationContext(importers)).structure shouldBe aClass.name.structure
   }
 
   test("qualify when Type.Name has a parent Class should not invoke core qualifier") {
@@ -95,7 +95,7 @@ class CompositeTypeNameQualifierImplTest extends UnitTestSuite {
       }
       """
 
-    compositeTypeNameQualifier.qualify(aClass.name, Nil)
+    compositeTypeNameQualifier.qualify(aClass.name, QualificationContext())
 
     verifyNoInteractions(coreTypeNameQualifier)
   }
@@ -109,7 +109,7 @@ class CompositeTypeNameQualifierImplTest extends UnitTestSuite {
 
     val importers = List(importer"a.A")
 
-    compositeTypeNameQualifier.qualify(aTrait.name, importers).structure shouldBe aTrait.name.structure
+    compositeTypeNameQualifier.qualify(aTrait.name, QualificationContext(importers)).structure shouldBe aTrait.name.structure
   }
 
   test("qualify when Type.Name has a parent Trait should not invoke core qualifier") {
@@ -119,7 +119,7 @@ class CompositeTypeNameQualifierImplTest extends UnitTestSuite {
       }
       """
 
-    compositeTypeNameQualifier.qualify(aTrait.name, Nil)
+    compositeTypeNameQualifier.qualify(aTrait.name, QualificationContext())
 
     verifyNoInteractions(coreTypeNameQualifier)
   }
@@ -129,13 +129,14 @@ class CompositeTypeNameQualifierImplTest extends UnitTestSuite {
 
     val importers = List(importer"t.T")
 
-    compositeTypeNameQualifier.qualify(typeParam.name.asInstanceOf[Type.Name], importers).structure shouldBe typeParam.name.structure
+    compositeTypeNameQualifier.qualify(typeParam.name.asInstanceOf[Type.Name], QualificationContext(importers)).structure shouldBe
+      typeParam.name.structure
   }
 
   test("qualify when Type.Name has a parent Type.Param should not invoke core qualifier") {
     val typeParam = tparam"T"
 
-    compositeTypeNameQualifier.qualify(typeParam.name.asInstanceOf[Type.Name], Nil)
+    compositeTypeNameQualifier.qualify(typeParam.name.asInstanceOf[Type.Name], QualificationContext())
 
     verifyNoInteractions(coreTypeNameQualifier)
   }

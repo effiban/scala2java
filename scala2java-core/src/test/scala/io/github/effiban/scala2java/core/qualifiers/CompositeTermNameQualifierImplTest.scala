@@ -28,7 +28,7 @@ class CompositeTermNameQualifierImplTest extends UnitTestSuite {
       case _ => None
     }).when(termNameImporterMatcher).findMatch(eqTree(termName), any[Importer])
 
-    compositeTermNameQualifier.qualify(termName, importers).structure shouldBe expectedQualifiedTerm.structure
+    compositeTermNameQualifier.qualify(termName, QualificationContext(importers)).structure shouldBe expectedQualifiedTerm.structure
   }
 
   test("qualify when has importers and match found by core qualifier should return qualified term") {
@@ -42,7 +42,7 @@ class CompositeTermNameQualifierImplTest extends UnitTestSuite {
     doReturn(None).when(termNameImporterMatcher).findMatch(eqTree(termName), any[Importer])
     doReturn(Some(expectedQualifiedTerm)).when(coreTermNameQualifier).qualify(eqTree(termName))
 
-    compositeTermNameQualifier.qualify(termName, importers).structure shouldBe expectedQualifiedTerm.structure
+    compositeTermNameQualifier.qualify(termName, QualificationContext(importers)).structure shouldBe expectedQualifiedTerm.structure
   }
 
   test("qualify when has importers and no match found by import or by core qualifier - should return unchanged") {
@@ -55,7 +55,7 @@ class CompositeTermNameQualifierImplTest extends UnitTestSuite {
     doReturn(None).when(termNameImporterMatcher).findMatch(eqTree(termName), any[Importer])
     doReturn(None).when(coreTermNameQualifier).qualify(eqTree(termName))
 
-    compositeTermNameQualifier.qualify(termName, importers).structure shouldBe termName.structure
+    compositeTermNameQualifier.qualify(termName, QualificationContext(importers)).structure shouldBe termName.structure
   }
 
   test("qualify when has no importers and match found by core qualifier should return qualified term") {
@@ -64,7 +64,7 @@ class CompositeTermNameQualifierImplTest extends UnitTestSuite {
 
     doReturn(Some(expectedQualifiedTerm)).when(coreTermNameQualifier).qualify(eqTree(termName))
 
-    compositeTermNameQualifier.qualify(termName, Nil).structure shouldBe expectedQualifiedTerm.structure
+    compositeTermNameQualifier.qualify(termName, QualificationContext()).structure shouldBe expectedQualifiedTerm.structure
   }
 
   test("qualify when has no importers and no match found by core qualifier should return unchanged") {
@@ -72,7 +72,7 @@ class CompositeTermNameQualifierImplTest extends UnitTestSuite {
 
     doReturn(None).when(coreTermNameQualifier).qualify(eqTree(termName))
 
-    compositeTermNameQualifier.qualify(termName, Nil).structure shouldBe termName.structure
+    compositeTermNameQualifier.qualify(termName, QualificationContext()).structure shouldBe termName.structure
   }
 
   test("qualify when Term.Name has a parent Object should ignore matching importers") {
@@ -84,7 +84,7 @@ class CompositeTermNameQualifierImplTest extends UnitTestSuite {
 
     val importers = List(importer"a.A")
 
-    compositeTermNameQualifier.qualify(anObject.name, importers).structure shouldBe anObject.name.structure
+    compositeTermNameQualifier.qualify(anObject.name, QualificationContext(importers)).structure shouldBe anObject.name.structure
   }
 
   test("qualify when Term.Name has a parent Object should not invoke core qualifier") {
@@ -94,7 +94,7 @@ class CompositeTermNameQualifierImplTest extends UnitTestSuite {
       }
       """
 
-    compositeTermNameQualifier.qualify(anObject.name, Nil)
+    compositeTermNameQualifier.qualify(anObject.name, QualificationContext())
 
     verifyNoInteractions(coreTermNameQualifier)
   }
@@ -104,13 +104,13 @@ class CompositeTermNameQualifierImplTest extends UnitTestSuite {
 
     val importers = List(importer"a.foo")
 
-    compositeTermNameQualifier.qualify(declDef.name, importers).structure shouldBe declDef.name.structure
+    compositeTermNameQualifier.qualify(declDef.name, QualificationContext(importers)).structure shouldBe declDef.name.structure
   }
 
   test("qualify when Term.Name has a parent Decl.Def should not invoke core qualifier") {
     val declDef = q"def foo()"
 
-    compositeTermNameQualifier.qualify(declDef.name, Nil)
+    compositeTermNameQualifier.qualify(declDef.name, QualificationContext())
 
     verifyNoInteractions(coreTermNameQualifier)
   }
@@ -120,13 +120,14 @@ class CompositeTermNameQualifierImplTest extends UnitTestSuite {
 
     val importers = List(importer"x.X")
 
-    compositeTermNameQualifier.qualify(termParam.name.asInstanceOf[Term.Name], importers).structure shouldBe termParam.name.structure
+    compositeTermNameQualifier.qualify(termParam.name.asInstanceOf[Term.Name], QualificationContext(importers)).structure shouldBe
+      termParam.name.structure
   }
 
   test("qualify when Term.Name has a parent Term.Param should not invoke core qualifier") {
     val termParam = param"x: Int"
 
-    compositeTermNameQualifier.qualify(termParam.name.asInstanceOf[Term.Name], Nil)
+    compositeTermNameQualifier.qualify(termParam.name.asInstanceOf[Term.Name], QualificationContext())
 
     verifyNoInteractions(coreTermNameQualifier)
   }
