@@ -11,7 +11,7 @@ import scala.meta.{Stat, XtensionQuasiquoteImporter, XtensionQuasiquoteTerm}
 class PkgQualifierImplTest extends UnitTestSuite {
 
   private val statsByImportSplitter = mock[StatsByImportSplitter]
-  private val statQualifier = mock[StatQualifier]
+  private val statQualifier = mock[TreeQualifier]
 
   private val pkgQualifier = new PkgQualifierImpl(
     statsByImportSplitter,

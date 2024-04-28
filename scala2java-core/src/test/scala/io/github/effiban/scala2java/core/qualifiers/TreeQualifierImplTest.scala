@@ -9,20 +9,20 @@ import org.mockito.ArgumentMatchersSugar.any
 
 import scala.meta.{Term, Type, XtensionQuasiquoteImporter, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
-class StatQualifierImplTest extends UnitTestSuite {
+class TreeQualifierImplTest extends UnitTestSuite {
 
   private val termNameQualifier = mock[CompositeTermNameQualifier]
   private val typeNameQualifier = mock[CompositeTypeNameQualifier]
 
   private val qualificationContext = QualificationContext(List(importer"dummy.dummy"))
 
-  private val statQualifier = new StatQualifierImpl(
+  private val treeQualifier = new TreeQualifierImpl(
     termNameQualifier,
     typeNameQualifier
   )
 
   test("qualify when has nested Term.Names but TermNameQualifier returns unchanged, should return unchanged") {
-    val stat =
+    val tree =
       q"""
       object A {
       }
@@ -31,11 +31,11 @@ class StatQualifierImplTest extends UnitTestSuite {
     doAnswer((termName: Term.Name) => termName)
       .when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(qualificationContext))
 
-    statQualifier.qualify(stat, qualificationContext).structure shouldBe stat.structure
+    treeQualifier.qualify(tree, qualificationContext).structure shouldBe tree.structure
   }
 
   test("qualify when has nested Term.Names and TermNameQualifier qualifies some of them, should return those terms qualified") {
-    val initialStat =
+    val initialTree =
       q"""
       object C {
         val x = None
@@ -43,7 +43,7 @@ class StatQualifierImplTest extends UnitTestSuite {
       }
       """
 
-    val expectedFinalStat =
+    val expectedFinalTree =
       q"""
       object C {
         val x = scala.None
@@ -59,11 +59,11 @@ class StatQualifierImplTest extends UnitTestSuite {
     doAnswer((typeName: Type.Name) => typeName)
       .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(qualificationContext))
 
-    statQualifier.qualify(initialStat, qualificationContext).structure shouldBe expectedFinalStat.structure
+    treeQualifier.qualify(initialTree, qualificationContext).structure shouldBe expectedFinalTree.structure
   }
 
   test("qualify when has a nested Term.Select 'g.h' and TermNameQualifier qualifies 'g' should return it qualified") {
-    val initialStat =
+    val initialTree =
       q"""
       object C {
         val x = g.h
@@ -71,7 +71,7 @@ class StatQualifierImplTest extends UnitTestSuite {
       }
       """
 
-    val expectedFinalStat =
+    val expectedFinalTree =
       q"""
       object C {
         val x = qual.g.h
@@ -86,11 +86,11 @@ class StatQualifierImplTest extends UnitTestSuite {
     doAnswer((typeName: Type.Name) => typeName)
       .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(qualificationContext))
 
-    statQualifier.qualify(initialStat, qualificationContext).structure shouldBe expectedFinalStat.structure
+    treeQualifier.qualify(initialTree, qualificationContext).structure shouldBe expectedFinalTree.structure
   }
 
   test("qualify when has a nested Term.Select 'g.h.i' and TermNameQualifier qualifies 'g' should return it qualified") {
-    val initialStat =
+    val initialTree =
       q"""
       object C {
         val x = g.h.i
@@ -98,7 +98,7 @@ class StatQualifierImplTest extends UnitTestSuite {
       }
       """
 
-    val expectedFinalStat =
+    val expectedFinalTree =
       q"""
       object C {
         val x = qual.g.h.i
@@ -113,11 +113,11 @@ class StatQualifierImplTest extends UnitTestSuite {
     doAnswer((typeName: Type.Name) => typeName)
       .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(qualificationContext))
 
-    statQualifier.qualify(initialStat, qualificationContext).structure shouldBe expectedFinalStat.structure
+    treeQualifier.qualify(initialTree, qualificationContext).structure shouldBe expectedFinalTree.structure
   }
 
   test("qualify when has a nested Term.Select 'g.h' should NOT try to qualify 'h'") {
-    val initialStat =
+    val initialTree =
       q"""
       object C {
         val x = g.h
@@ -129,13 +129,13 @@ class StatQualifierImplTest extends UnitTestSuite {
     doAnswer((typeName: Type.Name) => typeName)
       .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(qualificationContext))
 
-    statQualifier.qualify(initialStat, qualificationContext)
+    treeQualifier.qualify(initialTree, qualificationContext)
 
     verify(termNameQualifier, never).qualify(eqTree(q"h"), eqQualificationContext(qualificationContext))
   }
 
   test("qualify when has nested Type.Names but TypeNameQualifier returns nothing, should return unchanged") {
-    val stat =
+    val tree =
       q"""
       trait G {
       }
@@ -144,11 +144,11 @@ class StatQualifierImplTest extends UnitTestSuite {
     doAnswer((typeName: Type.Name) => typeName)
       .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(qualificationContext))
 
-    statQualifier.qualify(stat, qualificationContext).structure shouldBe stat.structure
+    treeQualifier.qualify(tree, qualificationContext).structure shouldBe tree.structure
   }
 
   test("qualify when TypeNameQualifier qualifies some of the nested types, should return those types qualified") {
-    val initialStat =
+    val initialTree =
       q"""
       trait C {
         val x: Int = 2
@@ -156,7 +156,7 @@ class StatQualifierImplTest extends UnitTestSuite {
       }
       """
 
-    val expectedFinalStat =
+    val expectedFinalTree =
       q"""
       trait C {
         val x: scala.Int = 2
@@ -172,11 +172,11 @@ class StatQualifierImplTest extends UnitTestSuite {
       case aTypeName => aTypeName
     }).when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(qualificationContext))
 
-    statQualifier.qualify(initialStat, qualificationContext).structure shouldBe expectedFinalStat.structure
+    treeQualifier.qualify(initialTree, qualificationContext).structure shouldBe expectedFinalTree.structure
   }
 
   test("qualify when has nested Type.Selects but for the first term of all, TermNameQualifier returns nothing - should return unchanged") {
-    val stat =
+    val tree =
       q"""
       object A {
         var x: CC.DD
@@ -187,11 +187,11 @@ class StatQualifierImplTest extends UnitTestSuite {
     doAnswer((termName: Term.Name) => termName)
       .when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(qualificationContext))
 
-    statQualifier.qualify(stat, qualificationContext).structure shouldBe stat.structure
+    treeQualifier.qualify(tree, qualificationContext).structure shouldBe tree.structure
   }
 
   test("qualify when has a nested Type.Select 'g.H' and TermNameQualifier qualifies 'g' should return it qualified") {
-    val initialStat =
+    val initialTree =
       q"""
       object C {
         var x: g.H
@@ -199,7 +199,7 @@ class StatQualifierImplTest extends UnitTestSuite {
       }
       """
 
-    val expectedFinalStat =
+    val expectedFinalTree =
       q"""
       object C {
         var x: qual.g.H
@@ -214,11 +214,11 @@ class StatQualifierImplTest extends UnitTestSuite {
     doAnswer((typeName: Type.Name) => typeName)
       .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(qualificationContext))
 
-    statQualifier.qualify(initialStat, qualificationContext).structure shouldBe expectedFinalStat.structure
+    treeQualifier.qualify(initialTree, qualificationContext).structure shouldBe expectedFinalTree.structure
   }
 
   test("qualify when has a nested Type.Select 'g.h.I' and TermNameQualifier qualifies 'g' should return it qualified") {
-    val initialStat =
+    val initialTree =
       q"""
       object C {
         var x: g.h.I
@@ -226,7 +226,7 @@ class StatQualifierImplTest extends UnitTestSuite {
       }
       """
 
-    val expectedFinalStat =
+    val expectedFinalTree =
       q"""
       object C {
         var x: qual.g.h.I
@@ -241,11 +241,11 @@ class StatQualifierImplTest extends UnitTestSuite {
     doAnswer((typeName: Type.Name) => typeName)
       .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(qualificationContext))
 
-    statQualifier.qualify(initialStat, qualificationContext).structure shouldBe expectedFinalStat.structure
+    treeQualifier.qualify(initialTree, qualificationContext).structure shouldBe expectedFinalTree.structure
   }
 
   test("qualify when has a nested Type.Select 'g.H' should NOT try to qualify 'H'") {
-    val initialStat =
+    val initialTree =
       q"""
       object C {
         var x: g.H
@@ -257,13 +257,13 @@ class StatQualifierImplTest extends UnitTestSuite {
     doAnswer((typeName: Type.Name) => typeName)
       .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(qualificationContext))
 
-    statQualifier.qualify(initialStat, qualificationContext)
+    treeQualifier.qualify(initialTree, qualificationContext)
 
     verify(termNameQualifier, never).qualify(eqTree(q"H"), eqQualificationContext(qualificationContext))
   }
 
   test("qualify when has nested Type.Projects but for the first term of all, TypeNameQualifier returns nothing - should return unchanged") {
-    val stat =
+    val tree =
       q"""
       object A {
         var x: CC#DD
@@ -276,11 +276,11 @@ class StatQualifierImplTest extends UnitTestSuite {
     doAnswer((typeName: Type.Name) => typeName)
       .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(qualificationContext))
 
-    statQualifier.qualify(stat, qualificationContext).structure shouldBe stat.structure
+    treeQualifier.qualify(tree, qualificationContext).structure shouldBe tree.structure
   }
 
   test("qualify when has a nested Type.Project 'G#H' and TypeNameQualifier qualifies 'G' should return it qualified") {
-    val initialStat =
+    val initialTree =
       q"""
       object C {
         var x: G#H
@@ -288,7 +288,7 @@ class StatQualifierImplTest extends UnitTestSuite {
       }
       """
 
-    val expectedFinalStat =
+    val expectedFinalTree =
       q"""
       object C {
         var x: qual.G#H
@@ -303,11 +303,11 @@ class StatQualifierImplTest extends UnitTestSuite {
       case aTypeName => aTypeName
     }).when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(qualificationContext))
 
-    statQualifier.qualify(initialStat, qualificationContext).structure shouldBe expectedFinalStat.structure
+    treeQualifier.qualify(initialTree, qualificationContext).structure shouldBe expectedFinalTree.structure
   }
 
   test("qualify when has a nested Type.Project 'g.H#I' and TypeNameQualifier qualifies 'g' should return it qualified") {
-    val initialStat =
+    val initialTree =
       q"""
       object C {
         var x: g.H#I
@@ -315,7 +315,7 @@ class StatQualifierImplTest extends UnitTestSuite {
       }
       """
 
-    val expectedFinalStat =
+    val expectedFinalTree =
       q"""
       object C {
         var x: qual.g.H#I
@@ -330,11 +330,11 @@ class StatQualifierImplTest extends UnitTestSuite {
     doAnswer((typeName: Type.Name) => typeName)
       .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(qualificationContext))
 
-    statQualifier.qualify(initialStat, qualificationContext).structure shouldBe expectedFinalStat.structure
+    treeQualifier.qualify(initialTree, qualificationContext).structure shouldBe expectedFinalTree.structure
   }
 
   test("qualify when has a nested Type.Project 'G#H#I' and TypeNameQualifier qualifies 'G' should return it qualified") {
-    val initialStat =
+    val initialTree =
       q"""
       object C {
         var x: G#H#I
@@ -342,7 +342,7 @@ class StatQualifierImplTest extends UnitTestSuite {
       }
       """
 
-    val expectedFinalStat =
+    val expectedFinalTree =
       q"""
       object C {
         var x: qual.G#H#I
@@ -357,11 +357,11 @@ class StatQualifierImplTest extends UnitTestSuite {
       case aTypeName => aTypeName
     }).when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(qualificationContext))
 
-    statQualifier.qualify(initialStat, qualificationContext).structure shouldBe expectedFinalStat.structure
+    treeQualifier.qualify(initialTree, qualificationContext).structure shouldBe expectedFinalTree.structure
   }
 
   test("qualify when has a nested Type.Project 'G#H' should NOT try to qualify 'H'") {
-    val stat =
+    val tree =
       q"""
       object C {
         var x: G#H
@@ -373,7 +373,7 @@ class StatQualifierImplTest extends UnitTestSuite {
     doAnswer((typeName: Type.Name) => typeName)
       .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(qualificationContext))
 
-    statQualifier.qualify(stat, qualificationContext)
+    treeQualifier.qualify(tree, qualificationContext)
 
     verify(typeNameQualifier, never).qualify(eqTree(t"H"), eqQualificationContext(qualificationContext))
   }
