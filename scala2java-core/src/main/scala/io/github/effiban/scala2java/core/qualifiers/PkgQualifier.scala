@@ -2,15 +2,14 @@ package io.github.effiban.scala2java.core.qualifiers
 
 import io.github.effiban.scala2java.core.importmanipulation.StatsByImportSplitter
 
-import scala.meta.{Import, Importer, Pkg, Stat, Term, Transformer, Tree, Type}
+import scala.meta.{Import, Importer, Pkg, Stat}
 
 trait PkgQualifier {
   def qualify(pkg: Pkg): Pkg
 }
 
 private[qualifiers] class PkgQualifierImpl(statsByImportSplitter: StatsByImportSplitter,
-                                           termNameQualifier: CompositeTermNameQualifier,
-                                           typeNameQualifier: CompositeTypeNameQualifier) extends PkgQualifier {
+                                           statQualifier: StatQualifier) extends PkgQualifier {
   override def qualify(pkg: Pkg): Pkg = {
     val (importers, nonImports) = statsByImportSplitter.split(pkg.stats)
     val imports = importers.map(importer => Import(List(importer)))
@@ -20,28 +19,11 @@ private[qualifiers] class PkgQualifierImpl(statsByImportSplitter: StatsByImportS
   }
 
   private def qualify(stat: Stat, importers: List[Importer]): Stat = {
-    new QualifyingTransformer(QualificationContext(importers))(stat) match {
-      case qualifiedStat: Stat => qualifiedStat
-      case other => throw new IllegalStateException(s"A qualified Stat should also be a Stat but it is: $other")
-    }
-  }
-
-  private class QualifyingTransformer(context: QualificationContext) extends Transformer {
-
-    override def apply(tree: Tree): Tree =
-      tree match {
-        case termSelect: Term.Select => termSelect.copy(qual = apply(termSelect.qual).asInstanceOf[Term])
-        case termName: Term.Name => termNameQualifier.qualify(termName, context)
-        case typeSelect: Type.Select => typeSelect.copy(qual = apply(typeSelect.qual).asInstanceOf[Term.Ref])
-        case typeProject: Type.Project => typeProject.copy(qual = apply(typeProject.qual).asInstanceOf[Type])
-        case typeName: Type.Name => typeNameQualifier.qualify(typeName, context)
-        case aTree => super.apply(aTree)
-      }
+    statQualifier.qualify(stat, QualificationContext(importers))
   }
 }
 
 object PkgQualifier extends PkgQualifierImpl(
   StatsByImportSplitter,
-  CompositeTermNameQualifier,
-  CompositeTypeNameQualifier
+  StatQualifier
 )

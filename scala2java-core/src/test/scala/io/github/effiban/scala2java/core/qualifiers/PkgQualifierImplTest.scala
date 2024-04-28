@@ -1,29 +1,24 @@
 package io.github.effiban.scala2java.core.qualifiers
 
-import io.github.effiban.scala2java.core.entities.TermSelects.{ScalaNil, ScalaNone}
-import io.github.effiban.scala2java.core.entities.TypeSelects.{ScalaDouble, ScalaInt}
 import io.github.effiban.scala2java.core.importmanipulation.StatsByImportSplitter
 import io.github.effiban.scala2java.core.matchers.QualificationContextMockitoMatcher.eqQualificationContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
-import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.any
 
-import scala.meta.{Term, Type, XtensionQuasiquoteImporter, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
+import scala.meta.{Stat, XtensionQuasiquoteImporter, XtensionQuasiquoteTerm}
 
 class PkgQualifierImplTest extends UnitTestSuite {
 
   private val statsByImportSplitter = mock[StatsByImportSplitter]
-  private val termNameQualifier = mock[CompositeTermNameQualifier]
-  private val typeNameQualifier = mock[CompositeTypeNameQualifier]
+  private val statQualifier = mock[StatQualifier]
 
   private val pkgQualifier = new PkgQualifierImpl(
     statsByImportSplitter,
-    termNameQualifier,
-    typeNameQualifier
+    statQualifier
   )
 
-  test("qualify when has no nested trees that could be qualified, should return unchanged") {
+  test("qualify when has no nested stats that could be qualified, should return unchanged") {
     val pkg =
       q"""
       package a.b {
@@ -39,7 +34,7 @@ class PkgQualifierImplTest extends UnitTestSuite {
     pkgQualifier.qualify(pkg).structure shouldBe pkg.structure
   }
 
-  test("qualify when has nested Term.Names but TermNameQualifier returns unchanged, should return unchanged") {
+  test("qualify when has nested stats but StatQualifier returns unchanged, should return unchanged") {
     val pkg =
       q"""
       package a.b {
@@ -60,6 +55,7 @@ class PkgQualifierImplTest extends UnitTestSuite {
       object A {
       }
       """,
+
       q"""
       object B {
       }
@@ -67,13 +63,13 @@ class PkgQualifierImplTest extends UnitTestSuite {
     )
 
     doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(pkg.stats))
-    doAnswer((termName: Term.Name) => termName)
-      .when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(QualificationContext(expectedImporters)))
+    doAnswer((stat: Stat) => stat)
+      .when(statQualifier).qualify(any[Stat], eqQualificationContext(QualificationContext(expectedImporters)))
 
     pkgQualifier.qualify(pkg).structure shouldBe pkg.structure
   }
 
-  test("qualify when has nested Term.Names and TermNameQualifier qualifies some of them, should return those terms qualified") {
+  test("qualify when has two nested stats and StatQualifier qualifies one of them, should return that one qualified") {
     val initialPkg =
       q"""
       package a.b {
@@ -81,22 +77,18 @@ class PkgQualifierImplTest extends UnitTestSuite {
         import e.f
 
         object C {
-          val x = None
-          val y = Nil
+          val x = xx
+        }
+        object D {
+          val y = yy
         }
       }
       """
 
-    val expectedFinalPkg =
+    val initialStat2 =
       q"""
-      package a.b {
-        import c.d
-        import e.f
-
-        object C {
-          val x = scala.None
-          val y = scala.Nil
-        }
+      object D {
+        val y = yy
       }
       """
 
@@ -104,85 +96,24 @@ class PkgQualifierImplTest extends UnitTestSuite {
     val expectedNonImports = List(
       q"""
       object C {
-        val x = None
-        val y = Nil
-      }
-      """
-    )
-
-    doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
-    doAnswer((termName: Term.Name) => termName match {
-      case aTermName if aTermName.structure == q"None".structure => ScalaNone
-      case aTermName if aTermName.structure == q"Nil".structure => ScalaNil
-      case aTermName => aTermName
-    }).when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(QualificationContext(expectedImporters)))
-    doAnswer((typeName: Type.Name) => typeName)
-      .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(QualificationContext(expectedImporters)))
-
-    pkgQualifier.qualify(initialPkg).structure shouldBe expectedFinalPkg.structure
-  }
-
-  test("qualify when has nested Term.Selects but for the first term of all, TermNameQualifier returns unchanged - should return unchanged") {
-    val pkg =
-      q"""
-      package a.b {
-        import c.d
-        import e.f
-
-        object A {
-          val x = CC.DD
-        }
-        object B {
-          val y = EE.FF
-        }
-      }
-      """
-
-
-    val expectedImporters = List(importer"c.d", importer"e.f")
-    val expectedNonImports = List(
-      q"""
-      object A {
-          val x = CC.DD
+        val x = xx
       }
       """,
+
       q"""
-      object B {
-          val y = EE.FF
+      object D {
+        val y = yy
       }
       """
     )
 
-    doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(pkg.stats))
-    doAnswer((termName: Term.Name) => termName)
-      .when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(QualificationContext(expectedImporters)))
-
-    pkgQualifier.qualify(pkg).structure shouldBe pkg.structure
-  }
-
-  test("qualify when has a nested Term.Select 'g.h' and TermNameQualifier qualifies 'g' should return it qualified") {
-    val initialPkg =
+    val expectedFinalStat2 =
       q"""
-      package a.b {
-        import c.d
-        import e.f
-
-        object C {
-          val x = g.h
-          val y = ZZ.WW
-        }
+      object D {
+        val y = qual.yy
       }
       """
 
-    val expectedImporters = List(importer"c.d", importer"e.f")
-    val expectedNonImports = List(
-      q"""
-      object C {
-        val x = g.h
-        val y = ZZ.WW
-      }
-      """
-    )
 
     val expectedFinalPkg =
       q"""
@@ -191,24 +122,24 @@ class PkgQualifierImplTest extends UnitTestSuite {
         import e.f
 
         object C {
-          val x = qual.g.h
-          val y = ZZ.WW
+          val x = xx
+        }
+        object D {
+          val y = qual.yy
         }
       }
       """
 
     doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
-    doAnswer((termName: Term.Name) => termName match {
-      case aTermName if aTermName.structure == q"g".structure => q"qual.g"
-      case aTermName => aTermName
-    }).when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(QualificationContext(expectedImporters)))
-    doAnswer((typeName: Type.Name) => typeName)
-      .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(QualificationContext(expectedImporters)))
+    doAnswer((stat: Stat) => stat match {
+      case aStat if aStat.structure == initialStat2.structure => expectedFinalStat2
+      case aStat => aStat
+    }).when(statQualifier).qualify(any[Stat], eqQualificationContext(QualificationContext(expectedImporters)))
 
     pkgQualifier.qualify(initialPkg).structure shouldBe expectedFinalPkg.structure
   }
 
-  test("qualify when has a nested Term.Select 'g.h.i' and TermNameQualifier qualifies 'g' should return it qualified") {
+  test("qualify when has two nested stats and StatQualifier qualifies both, should return those stats qualified") {
     val initialPkg =
       q"""
       package a.b {
@@ -216,9 +147,25 @@ class PkgQualifierImplTest extends UnitTestSuite {
         import e.f
 
         object C {
-          val x = g.h.i
-          val y = ZZ.WW
+          val x = xx
         }
+        object D {
+          val y = yy
+        }
+      }
+      """
+
+    val initialStat1 =
+      q"""
+      object C {
+        val x = xx
+      }
+      """
+
+    val initialStat2 =
+      q"""
+      object D {
+        val y = yy
       }
       """
 
@@ -226,212 +173,31 @@ class PkgQualifierImplTest extends UnitTestSuite {
     val expectedNonImports = List(
       q"""
       object C {
-        val x = g.h.i
-        val y = ZZ.WW
-      }
-      """
-    )
-
-    val expectedFinalPkg =
-      q"""
-      package a.b {
-        import c.d
-        import e.f
-
-        object C {
-          val x = qual.g.h.i
-          val y = ZZ.WW
-        }
-      }
-      """
-
-    doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
-    doAnswer((termName: Term.Name) => termName match {
-      case aTermName if aTermName.structure == q"g".structure => q"qual.g"
-      case aTermName => aTermName
-    }).when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(QualificationContext(expectedImporters)))
-    doAnswer((typeName: Type.Name) => typeName)
-      .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(QualificationContext(expectedImporters)))
-
-    pkgQualifier.qualify(initialPkg).structure shouldBe expectedFinalPkg.structure
-  }
-
-  test("qualify when has a nested Term.Select 'g.h' should NOT try to qualify 'h'") {
-    val initialPkg =
-      q"""
-      package a.b {
-        import c.d
-        import e.f
-
-        object C {
-          val x = g.h
-        }
-      }
-      """
-
-    val expectedImporters = List(importer"c.d", importer"e.f")
-    val expectedNonImports = List(
-      q"""
-      object C {
-        val x = g.h
-      }
-      """
-    )
-
-    doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
-    doAnswer((termName: Term.Name) => termName)
-      .when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(QualificationContext(expectedImporters)))
-    doAnswer((typeName: Type.Name) => typeName)
-      .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(QualificationContext(expectedImporters)))
-
-    pkgQualifier.qualify(initialPkg)
-
-    verify(termNameQualifier, never).qualify(eqTree(q"h"), eqQualificationContext(QualificationContext(expectedImporters)))
-  }
-
-  test("qualify when has nested Type.Names but TypeNameQualifier returns nothing, should return unchanged") {
-    val pkg =
-      q"""
-      package a.b {
-        import c.d
-        import e.f
-
-        trait G {
-        }
-        trait H {
-        }
-      }
-      """
-
-    val expectedImporters = List(importer"c.d", importer"e.f")
-    val expectedNonImports = List(
-      q"""
-      trait G {
+        val x = xx
       }
       """,
+
       q"""
-      trait H {
+      object D {
+        val y = yy
       }
       """
     )
 
-    doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(pkg.stats))
-    doAnswer((typeName: Type.Name) => typeName)
-      .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(QualificationContext(expectedImporters)))
-
-    pkgQualifier.qualify(pkg).structure shouldBe pkg.structure
-  }
-
-  test("qualify when TypeNameQualifier qualifies some of the nested types, should return those types qualified") {
-    val initialPkg =
-      q"""
-      package a.b {
-        import c.d
-        import e.f
-
-        trait C {
-          val x: Int = 2
-          val y: Double = 3.3
-        }
-      }
-      """
-
-    val expectedImporters = List(importer"c.d", importer"e.f")
-    val expectedNonImports = List(
-      q"""
-      trait C {
-        val x: Int = 2
-        val y: Double = 3.3
-      }
-      """
-    )
-
-    val expectedFinalPkg =
-      q"""
-      package a.b {
-        import c.d
-        import e.f
-
-        trait C {
-          val x: scala.Int = 2
-          val y: scala.Double = 3.3
-        }
-      }
-      """
-
-    doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
-    doAnswer((termName: Term.Name) => termName).when(termNameQualifier).qualify(any[Term.Name],
-      eqQualificationContext(QualificationContext(expectedImporters)))
-    doAnswer((typeName: Type.Name) => typeName match {
-      case aTypeName if aTypeName.structure == t"Int".structure => ScalaInt
-      case aTypeName if aTypeName.structure == t"Double".structure => ScalaDouble
-      case aTypeName => aTypeName
-    }).when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(QualificationContext(expectedImporters)))
-
-    pkgQualifier.qualify(initialPkg).structure shouldBe expectedFinalPkg.structure
-  }
-
-  test("qualify when has nested Type.Selects but for the first term of all, TermNameQualifier returns nothing - should return unchanged") {
-    val pkg =
-      q"""
-      package a.b {
-        import c.d
-        import e.f
-
-        object A {
-          var x: CC.DD
-        }
-        object B {
-          var y: EE.FF
-        }
-      }
-      """
-
-
-    val expectedImporters = List(importer"c.d", importer"e.f")
-    val expectedNonImports = List(
-      q"""
-      object A {
-          var x: CC.DD
-      }
-      """,
-      q"""
-      object B {
-          var y: EE.FF
-      }
-      """
-    )
-
-    doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(pkg.stats))
-    doAnswer((termName: Term.Name) => termName)
-      .when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(QualificationContext(expectedImporters)))
-
-    pkgQualifier.qualify(pkg).structure shouldBe pkg.structure
-  }
-
-  test("qualify when has a nested Type.Select 'g.H' and TermNameQualifier qualifies 'g' should return it qualified") {
-    val initialPkg =
-      q"""
-      package a.b {
-        import c.d
-        import e.f
-
-        object C {
-          var x: g.H
-          val y: ZZ.WW
-        }
-      }
-      """
-
-    val expectedImporters = List(importer"c.d", importer"e.f")
-    val expectedNonImports = List(
+    val expectedFinalStat1 =
       q"""
       object C {
-        var x: g.H
-        var y: ZZ.WW
+        val x = qual.xx
       }
       """
-    )
+
+    val expectedFinalStat2 =
+      q"""
+      object D {
+        val y = qual.yy
+      }
+      """
+
 
     val expectedFinalPkg =
       q"""
@@ -440,318 +206,21 @@ class PkgQualifierImplTest extends UnitTestSuite {
         import e.f
 
         object C {
-          var x: qual.g.H
-          var y: ZZ.WW
+          val x = qual.xx
+        }
+        object D {
+          val y = qual.yy
         }
       }
       """
 
     doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
-    doAnswer((termName: Term.Name) => termName match {
-      case aTermName if aTermName.structure == q"g".structure => q"qual.g"
-      case aTermName => aTermName
-    }).when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(QualificationContext(expectedImporters)))
-    doAnswer((typeName: Type.Name) => typeName)
-      .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(QualificationContext(expectedImporters)))
+    doAnswer((stat: Stat) => stat match {
+      case aStat if aStat.structure == initialStat1.structure => expectedFinalStat1
+      case aStat if aStat.structure == initialStat2.structure => expectedFinalStat2
+      case aStat => aStat
+    }).when(statQualifier).qualify(any[Stat], eqQualificationContext(QualificationContext(expectedImporters)))
 
     pkgQualifier.qualify(initialPkg).structure shouldBe expectedFinalPkg.structure
-  }
-
-  test("qualify when has a nested Type.Select 'g.h.I' and TermNameQualifier qualifies 'g' should return it qualified") {
-    val initialPkg =
-      q"""
-      package a.b {
-        import c.d
-        import e.f
-
-        object C {
-          var x: g.h.I
-          val y: ZZ.WW
-        }
-      }
-      """
-
-    val expectedImporters = List(importer"c.d", importer"e.f")
-    val expectedNonImports = List(
-      q"""
-      object C {
-        var x: g.H.I
-        var y: ZZ.WW
-      }
-      """
-    )
-
-    val expectedFinalPkg =
-      q"""
-      package a.b {
-        import c.d
-        import e.f
-
-        object C {
-          var x: qual.g.H.I
-          var y: ZZ.WW
-        }
-      }
-      """
-
-    doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
-    doAnswer((termName: Term.Name) => termName match {
-      case aTermName if aTermName.structure == q"g".structure => q"qual.g"
-      case aTermName => aTermName
-    }).when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(QualificationContext(expectedImporters)))
-    doAnswer((typeName: Type.Name) => typeName)
-      .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(QualificationContext(expectedImporters)))
-
-    pkgQualifier.qualify(initialPkg).structure shouldBe expectedFinalPkg.structure
-  }
-
-  test("qualify when has a nested Type.Select 'g.H' should NOT try to qualify 'H'") {
-    val initialPkg =
-      q"""
-      package a.b {
-        import c.d
-        import e.f
-
-        object C {
-          var x: g.H
-        }
-      }
-      """
-
-    val expectedImporters = List(importer"c.d", importer"e.f")
-    val expectedNonImports = List(
-      q"""
-      object C {
-        var x: g.H
-      }
-      """
-    )
-
-    doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
-    doAnswer((termName: Term.Name) => termName)
-      .when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(QualificationContext(expectedImporters)))
-    doAnswer((typeName: Type.Name) => typeName)
-      .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(QualificationContext(expectedImporters)))
-
-    pkgQualifier.qualify(initialPkg)
-
-    verify(termNameQualifier, never).qualify(eqTree(q"H"), eqQualificationContext(QualificationContext(expectedImporters)))
-  }
-
-  test("qualify when has nested Type.Projects but for the first term of all, TypeNameQualifier returns nothing - should return unchanged") {
-    val pkg =
-      q"""
-      package a.b {
-        import c.d
-        import e.f
-
-        object A {
-          var x: CC#DD
-        }
-        object B {
-          var y: EE#FF
-        }
-      }
-      """
-
-
-    val expectedImporters = List(importer"c.d", importer"e.f")
-    val expectedNonImports = List(
-      q"""
-      object A {
-          var x: CC#DD
-      }
-      """,
-      q"""
-      object B {
-          var y: EE#FF
-      }
-      """
-    )
-
-    doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(pkg.stats))
-    doAnswer((termName: Term.Name) => termName)
-      .when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(QualificationContext(expectedImporters)))
-    doAnswer((typeName: Type.Name) => typeName)
-      .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(QualificationContext(expectedImporters)))
-
-    pkgQualifier.qualify(pkg).structure shouldBe pkg.structure
-  }
-
-  test("qualify when has a nested Type.Project 'G#H' and TypeNameQualifier qualifies 'G' should return it qualified") {
-    val initialPkg =
-      q"""
-      package a.b {
-        import c.d
-        import e.f
-
-        object C {
-          var x: G#H
-          val y: ZZ#WW
-        }
-      }
-      """
-
-    val expectedImporters = List(importer"c.d", importer"e.f")
-    val expectedNonImports = List(
-      q"""
-      object C {
-        var x: G#H
-        var y: ZZ#WW
-      }
-      """
-    )
-
-    val expectedFinalPkg =
-      q"""
-      package a.b {
-        import c.d
-        import e.f
-
-        object C {
-          var x: qual.G#H
-          var y: ZZ#WW
-        }
-      }
-      """
-
-    doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
-    doAnswer((termName: Term.Name) => termName)
-      .when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(QualificationContext(expectedImporters)))
-    doAnswer((typeName: Type.Name) => typeName match {
-      case aTypeName if aTypeName.structure == t"G".structure => t"qual.G"
-      case aTypeName => aTypeName
-    }).when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(QualificationContext(expectedImporters)))
-
-    pkgQualifier.qualify(initialPkg).structure shouldBe expectedFinalPkg.structure
-  }
-
-  test("qualify when has a nested Type.Project 'g.H#I' and TypeNameQualifier qualifies 'g' should return it qualified") {
-    val initialPkg =
-      q"""
-      package a.b {
-        import c.d
-        import e.f
-
-        object C {
-          var x: g.H#I
-          val y: ZZ#WW
-        }
-      }
-      """
-
-    val expectedImporters = List(importer"c.d", importer"e.f")
-    val expectedNonImports = List(
-      q"""
-      object C {
-        var x: g.H#I
-        var y: ZZ#WW
-      }
-      """
-    )
-
-    val expectedFinalPkg =
-      q"""
-      package a.b {
-        import c.d
-        import e.f
-
-        object C {
-          var x: qual.g.H#I
-          var y: ZZ#WW
-        }
-      }
-      """
-
-    doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
-    doAnswer((termName: Term.Name) => termName match {
-      case aTermName if aTermName.structure == q"g".structure => q"qual.g"
-      case aTermName => aTermName
-    }).when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(QualificationContext(expectedImporters)))
-    doAnswer((typeName: Type.Name) => typeName)
-      .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(QualificationContext(expectedImporters)))
-
-    pkgQualifier.qualify(initialPkg).structure shouldBe expectedFinalPkg.structure
-  }
-
-  test("qualify when has a nested Type.Project 'G#H#I' and TypeNameQualifier qualifies 'G' should return it qualified") {
-    val initialPkg =
-      q"""
-      package a.b {
-        import c.d
-        import e.f
-
-        object C {
-          var x: G#H#I
-          val y: ZZ#WW
-        }
-      }
-      """
-
-    val expectedImporters = List(importer"c.d", importer"e.f")
-    val expectedNonImports = List(
-      q"""
-      object C {
-        var x: G#H#I
-        var y: ZZ#WW
-      }
-      """
-    )
-
-    val expectedFinalPkg =
-      q"""
-      package a.b {
-        import c.d
-        import e.f
-
-        object C {
-          var x: qual.G#H#I
-          var y: ZZ#WW
-        }
-      }
-      """
-
-    doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
-    doAnswer((termName: Term.Name) => termName)
-      .when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(QualificationContext(expectedImporters)))
-    doAnswer((typeName: Type.Name) => typeName match {
-      case aTypeName if aTypeName.structure == t"G".structure => t"qual.G"
-      case aTypeName => aTypeName
-    }).when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(QualificationContext(expectedImporters)))
-
-    pkgQualifier.qualify(initialPkg).structure shouldBe expectedFinalPkg.structure
-  }
-
-  test("qualify when has a nested Type.Project 'G#H' should NOT try to qualify 'H'") {
-    val initialPkg =
-      q"""
-      package a.b {
-        import c.d
-        import e.f
-
-        object C {
-          var x: G#H
-        }
-      }
-      """
-
-    val expectedImporters = List(importer"c.d", importer"e.f")
-    val expectedNonImports = List(
-      q"""
-      object C {
-        var x: G#H
-      }
-      """
-    )
-
-    doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
-    doAnswer((termName: Term.Name) => termName)
-      .when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(QualificationContext(expectedImporters)))
-    doAnswer((typeName: Type.Name) => typeName)
-      .when(typeNameQualifier).qualify(any[Type.Name], eqQualificationContext(QualificationContext(expectedImporters)))
-
-    pkgQualifier.qualify(initialPkg)
-
-    verify(typeNameQualifier, never).qualify(eqTree(t"H"), eqQualificationContext(QualificationContext(expectedImporters)))
   }
 }
