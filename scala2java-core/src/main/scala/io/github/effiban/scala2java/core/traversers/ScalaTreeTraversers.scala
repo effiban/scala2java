@@ -209,7 +209,8 @@ class ScalaTreeTraversers(implicit factories: Factories,
   private lazy val expressionTermSelectTraverser: ExpressionTermSelectTraverser = new ExpressionTermSelectTraverserImpl(
     expressionTermTraverser,
     qualifierTypeInferrer,
-    new CompositeTermSelectTransformer(CoreTermSelectTransformer)
+    new CompositeTermSelectTransformer(CoreTermSelectTransformer),
+    new CompositeTermSelectNameTransformer(CoreTermSelectNameTransformer)
   )
 
   private lazy val expressionTermTraverser: ExpressionTermTraverser = new ExpressionTermTraverserImpl(
