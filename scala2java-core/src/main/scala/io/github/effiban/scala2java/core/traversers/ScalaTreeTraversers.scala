@@ -14,7 +14,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
                           extensionRegistry: ExtensionRegistry) {
 
   private implicit lazy val classifiers: Classifiers = new Classifiers(typeInferrers)
-  private implicit lazy val transformers: Transformers = new Transformers(typeInferrers)
+  private implicit lazy val transformers: Transformers = new Transformers()
   private lazy val resolvers = new Resolvers()
 
   import factories._
@@ -401,10 +401,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val typeRepeatedTraverser: TypeRepeatedTraverser = new TypeRepeatedTraverserImpl(typeTraverser)
 
-  private lazy val typeSelectTraverser: TypeSelectTraverser = new TypeSelectTraverserImpl(
-    defaultTermRefTraverser,
-    new CompositeTypeSelectTransformer(CoreTypeSelectTransformer)
-  )
+  private lazy val typeSelectTraverser: TypeSelectTraverser = new TypeSelectTraverserImpl(defaultTermRefTraverser)
 
   private lazy val typeTraverser: TypeTraverser = new TypeTraverserImpl(
     typeRefTraverser,
