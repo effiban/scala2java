@@ -87,6 +87,9 @@ trait ExtendedTransformers {
   def termApplyTransformer(): TermApplyTransformer = TermApplyTransformer.Identity
 
   /** Override this method if you need to modify a [[scala.meta.Term.Select]] (qualified name).<br>
+   * This transformer should be overriden whenever the qualifier name must be transformed as a whole,
+   * as opposed to scenarios where the qualifier and name parts can be transformed separately, in which case
+   * [[termSelectNameTransformer()]] shoud be used instead.<br>
    * '''NOTE''': This transformer will only be called for qualified names that are __not__ method invocations.<br>
    * If some method invocation is a qualified name with no args and no parentheses,
    * it will be automatically 'desugared' into a method invocation and eventually passed to [[termApplyTransformer]].<br>
@@ -96,6 +99,21 @@ trait ExtendedTransformers {
    *         otherwise - the default transformer which doesn't modify anything<br>
    */
   def termSelectTransformer(): TermSelectTransformer = TermSelectTransformer.Empty
+
+  /** Override this method if you need to modify the '''name''' part of a [[scala.meta.Term.Select]] (qualified name).<br>
+   * This transformer should be overriden whenever the qualifier and name can be transformed separately.<br>
+   * This ios possible whenever the transformation of the name part depends only the type of the qualifier,
+   * while the qualifier itself can be transformed independently.<br>
+   * The transformer receives a context object which includes the type of the qualifier (when available).<br>
+   * '''NOTE''': This transformer will only be called for qualified names that are __not__ method invocations.<br>
+   * If some method invocation is a qualified name with no args and no parentheses,
+   * it will be automatically 'desugared' into a method invocation and eventually passed to [[termApplyTransformer]].<br>
+   * The framework will identify such cases by calling [[io.github.effiban.scala2java.spi.predicates.ExtendedPredicates.termSelectSupportsNoArgInvocation]]
+   *
+   * @return if overriden - a transformer which modifies a given [[scala.meta.Term.Select]]<br>
+   *         otherwise - the default transformer which doesn't modify anything<br>
+   */
+  def termSelectNameTransformer(): TermSelectNameTransformer = TermSelectNameTransformer.Identity
 
   /** Override this method if you need to transform a Scala qualified type into an equivalent Java type
    *
