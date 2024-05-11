@@ -3,10 +3,10 @@ package io.github.effiban.scala2java.core.transformers
 import io.github.effiban.scala2java.core.classifiers.{CompositeTypeClassifier, TermSelectClassifier}
 import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
 import io.github.effiban.scala2java.core.typeinference.TypeInferrers
-import io.github.effiban.scala2java.spi.transformers.TermApplyTransformer
+import io.github.effiban.scala2java.spi.transformers.{TermApplyTransformer, TypeSelectTransformer}
 
-class Transformers(typeInferrers: => TypeInferrers)
-                  (implicit extensionRegistry: ExtensionRegistry) {
+class Transformers(implicit typeInferrers: => TypeInferrers,
+                   extensionRegistry: ExtensionRegistry) {
 
   private lazy val coreTermApplyTransformer: TermApplyTransformer = new CoreTermApplyTransformer(
     TermSelectClassifier,
@@ -18,8 +18,17 @@ class Transformers(typeInferrers: => TypeInferrers)
     new CompositeTermApplyTransformer(coreTermApplyTransformer)
   )
 
+  private lazy val pkgTransformer: PkgTransformer = new PkgTransformerImpl(treeTransformer)
+
+  val sourceTransformer: SourceTransformer = new SourceTransformerImpl(treeTransformer)
+
   private lazy val termSelectTermFunctionTransformer: TermSelectTermFunctionTransformer = new TermSelectTermFunctionTransformerImpl(
     typeInferrers.functionTypeInferrer,
     FunctionTypeTransformer
   )
+
+  private val typeSelectTransformer: TypeSelectTransformer = new CompositeTypeSelectTransformer(CoreTypeSelectTransformer)
+
+  private lazy val treeTransformer: TreeTransformer = new TreeTransformerImpl(pkgTransformer, typeSelectTransformer)
+
 }

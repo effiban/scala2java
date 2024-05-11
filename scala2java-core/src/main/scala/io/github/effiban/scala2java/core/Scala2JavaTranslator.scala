@@ -13,7 +13,7 @@ import io.github.effiban.scala2java.core.qualifiers.SourceQualifier
 import io.github.effiban.scala2java.core.renderers.Renderers
 import io.github.effiban.scala2java.core.renderers.contextfactories.RenderContextFactories.sourceRenderContextFactory
 import io.github.effiban.scala2java.core.resolvers.JavaFileResolverImpl
-import io.github.effiban.scala2java.core.transformers.CompositeFileNameTransformer
+import io.github.effiban.scala2java.core.transformers.{CompositeFileNameTransformer, Transformers}
 import io.github.effiban.scala2java.core.traversers.ScalaTreeTraversers
 import io.github.effiban.scala2java.core.typeinference.TypeInferrers
 import io.github.effiban.scala2java.core.unqualifiers.SourceUnqualifier
@@ -48,6 +48,7 @@ object Scala2JavaTranslator {
             SourceImportRemover.removeUnusedFrom,
             new SemanticDesugarers().sourceDesugarer.desugar,
             new ScalaTreeTraversers().sourceTraverser.traverse,
+            new Transformers().sourceTransformer.transform,
             SourceImportAdder.addTo,
             SourceUnqualifier.unqualify,
             SourceImportRemover.removeJavaLangFrom
