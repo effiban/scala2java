@@ -25,9 +25,14 @@ class TreeTransformerImplTest extends UnitTestSuite {
     """
 
   private val pkgTransformer = mock[PkgTransformer]
+  private val internalTermSelectTransformer = mock[InternalTermSelectTransformer]
   private val typeSelectTransformer = mock[TypeSelectTransformer]
 
-  private val treeTransformer = new TreeTransformerImpl(pkgTransformer, typeSelectTransformer)
+  private val treeTransformer = new TreeTransformerImpl(
+    pkgTransformer,
+    internalTermSelectTransformer,
+    typeSelectTransformer
+  )
 
   test("transform Pkg") {
     doAnswer(TransformedPkg).when(pkgTransformer).transform(eqTree(Pkg))
@@ -40,6 +45,15 @@ class TreeTransformerImplTest extends UnitTestSuite {
     treeTransformer.transform(`import`).structure shouldBe `import`.structure
   }
 
+  test("transform Term.Select should return result of inner transformer") {
+    val termSelect = q"a.b.c"
+    val transformedTermSelect = q"a.b.cc"
+
+    when(internalTermSelectTransformer.transform(eqTree(termSelect))).thenReturn(transformedTermSelect)
+
+    treeTransformer.transform(termSelect).structure shouldBe transformedTermSelect.structure
+  }
+
   test("transform Type.Select when inner transformer returns a result should return it") {
     val typeSelect = t"a.b.C"
     val transformedTypeSelect = t"a.b.CC"
@@ -49,11 +63,16 @@ class TreeTransformerImplTest extends UnitTestSuite {
     treeTransformer.transform(typeSelect).structure shouldBe transformedTypeSelect.structure
   }
 
-  test("transform Type.Select when inner transformer returns None should return the same") {
+  test("transform Type.Select when inner transformer returns None should transform the qualifier") {
     val typeSelect = t"a.b.C"
+    val transformedTypeSelect = t"aa.bb.C"
+
+    val qualifier = q"a.b"
+    val transformedQualifier = q"aa.bb"
 
     when(typeSelectTransformer.transform(eqTree(typeSelect))).thenReturn(None)
+    when(internalTermSelectTransformer.transform(eqTree(qualifier))).thenReturn(transformedQualifier)
 
-    treeTransformer.transform(typeSelect).structure shouldBe typeSelect.structure
+    treeTransformer.transform(typeSelect).structure shouldBe transformedTypeSelect.structure
   }
 }

@@ -18,6 +18,13 @@ class Transformers(implicit typeInferrers: => TypeInferrers,
     new CompositeTermApplyTransformer(coreTermApplyTransformer)
   )
 
+  private lazy val internalTermSelectTransformer: InternalTermSelectTransformer = new InternalTermSelectTransformerImpl(
+    treeTransformer,
+    new CompositeTermSelectTransformer(CoreTermSelectTransformer),
+    new CompositeTermSelectNameTransformer(CoreTermSelectNameTransformer),
+    typeInferrers.qualifierTypeInferrer
+  )
+
   private lazy val pkgTransformer: PkgTransformer = new PkgTransformerImpl(treeTransformer)
 
   val sourceTransformer: SourceTransformer = new SourceTransformerImpl(treeTransformer)
@@ -27,8 +34,11 @@ class Transformers(implicit typeInferrers: => TypeInferrers,
     FunctionTypeTransformer
   )
 
+  private lazy val treeTransformer: TreeTransformer = new TreeTransformerImpl(
+    pkgTransformer,
+    internalTermSelectTransformer,
+    typeSelectTransformer
+  )
+
   private val typeSelectTransformer: TypeSelectTransformer = new CompositeTypeSelectTransformer(CoreTypeSelectTransformer)
-
-  private lazy val treeTransformer: TreeTransformer = new TreeTransformerImpl(pkgTransformer, typeSelectTransformer)
-
 }
