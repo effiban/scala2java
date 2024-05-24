@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.transformers
 
+import io.github.effiban.scala2java.core.factories.UnqualifiedTermApplyTransformationContextFactory
 import io.github.effiban.scala2java.spi.contexts.UnqualifiedTermApplyTransformationContext
 import io.github.effiban.scala2java.spi.entities.QualifiedTermApply
 import io.github.effiban.scala2java.spi.transformers.{QualifiedTermApplyTransformer, UnqualifiedTermApplyTransformer}
@@ -7,17 +8,18 @@ import io.github.effiban.scala2java.spi.transformers.{QualifiedTermApplyTransfor
 import scala.meta.{Term, Type}
 
 trait InternalTermApplyTransformer {
-  def transform(termApply: Term.Apply, context: UnqualifiedTermApplyTransformationContext = UnqualifiedTermApplyTransformationContext()): Term.Apply
+  def transform(termApply: Term.Apply): Term.Apply
 }
 
-private[transformers] class InternalTermApplyTransformerImpl(treeTransformer: => TreeTransformer,
-                                                             qualifiedTermApplyTransformer: QualifiedTermApplyTransformer,
-                                                             unqualifiedTermApplyTransformer: UnqualifiedTermApplyTransformer,
-                                                             termSelectTermFunctionTransformer: TermSelectTermFunctionTransformer)
-  extends InternalTermApplyTransformer {
+private[transformers] class InternalTermApplyTransformerImpl(
+  treeTransformer: => TreeTransformer,
+  qualifiedTermApplyTransformer: QualifiedTermApplyTransformer,
+  unqualifiedTermApplyTransformer: UnqualifiedTermApplyTransformer,
+  termSelectTermFunctionTransformer: TermSelectTermFunctionTransformer,
+  unqualifiedTermApplyTransformationContextFactory: => UnqualifiedTermApplyTransformationContextFactory) extends InternalTermApplyTransformer {
 
-  override final def transform(termApply: Term.Apply,
-                               context: UnqualifiedTermApplyTransformationContext = UnqualifiedTermApplyTransformationContext()): Term.Apply = {
+  override final def transform(termApply: Term.Apply): Term.Apply = {
+    val context = unqualifiedTermApplyTransformationContextFactory.create(termApply)
     val transformedArgs = termApply.args.map(treeTransformer.transform(_).asInstanceOf[Term])
 
     termApply.fun match {

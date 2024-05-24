@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.transformers
 
 import io.github.effiban.scala2java.core.entities.TermNames.Apply
+import io.github.effiban.scala2java.core.factories.UnqualifiedTermApplyTransformationContextFactory
 import io.github.effiban.scala2java.core.matchers.QualifiedTermApplyMockitoMatcher.eqQualifiedTermApply
 import io.github.effiban.scala2java.core.matchers.QualifiedTermApplyTransformationContextMockitoMatcher.eqQualifiedTermApplyTransformationContext
 import io.github.effiban.scala2java.core.matchers.UnqualifiedTermApplyMockitoMatcher.eqUnqualifiedTermApply
@@ -22,12 +23,14 @@ class InternalTermApplyTransformerImplTest extends UnitTestSuite {
   private val qualifiedTransformer = mock[QualifiedTermApplyTransformer]
   private val unqualifiedTransformer = mock[UnqualifiedTermApplyTransformer]
   private val termSelectTermFunctionTransformer = mock[TermSelectTermFunctionTransformer]
+  private val unqualifiedTransformationContextFactory = mock[UnqualifiedTermApplyTransformationContextFactory]
 
   private val internalTermApplyTransformer = new InternalTermApplyTransformerImpl(
     treeTransformer,
     qualifiedTransformer,
     unqualifiedTransformer,
-    termSelectTermFunctionTransformer
+    termSelectTermFunctionTransformer,
+    unqualifiedTransformationContextFactory
   )
 
 
@@ -36,6 +39,8 @@ class InternalTermApplyTransformerImplTest extends UnitTestSuite {
     val qualifiedTermApply = QualifiedTermApply(q"myQual.myMethod", List(q"11", q"22"))
     val javaQualifiedTermApply = QualifiedTermApply(q"myJavaQual.myJavaMethod", List(q"11", q"22"))
     val javaTermApply = q"myJavaQual.myJavaMethod(11, 22)"
+
+    when(unqualifiedTransformationContextFactory.create(eqTree(termApply))).thenReturn(UnqualifiedContext)
 
     doAnswer((tree: Tree) => tree match {
       case q"1" => q"11"
@@ -48,7 +53,7 @@ class InternalTermApplyTransformerImplTest extends UnitTestSuite {
       eqQualifiedTermApplyTransformationContext(UnqualifiedContext.asQualifiedContext()))
     ).thenReturn(Some(javaQualifiedTermApply))
 
-    internalTermApplyTransformer.transform(termApply, UnqualifiedContext).structure shouldBe javaTermApply.structure
+    internalTermApplyTransformer.transform(termApply).structure shouldBe javaTermApply.structure
   }
 
   test("transform() of a qualified method invocation with types, when qualified transformer returns a value") {
@@ -60,6 +65,9 @@ class InternalTermApplyTransformerImplTest extends UnitTestSuite {
       q"myJavaQual.myJavaMethod", List(t"java.lang.String", t"java.lang.Integer"), List(q""""aa"""", q"11")
     )
     val javaTermApply = q"""myJavaQual.myJavaMethod[java.lang.String, java.lang.Integer]("aa", 11)"""
+
+
+    when(unqualifiedTransformationContextFactory.create(eqTree(termApply))).thenReturn(UnqualifiedContext)
 
     doAnswer((tree: Tree) => tree match {
       case q""""a"""" => q""""aa""""
@@ -74,7 +82,7 @@ class InternalTermApplyTransformerImplTest extends UnitTestSuite {
       eqQualifiedTermApplyTransformationContext(UnqualifiedContext.asQualifiedContext()))
     ).thenReturn(Some(javaQualifiedTermApply))
 
-    internalTermApplyTransformer.transform(termApply, UnqualifiedContext).structure shouldBe javaTermApply.structure
+    internalTermApplyTransformer.transform(termApply).structure shouldBe javaTermApply.structure
   }
 
   test("transform() of a qualified method invocation with no type, " +
@@ -85,6 +93,8 @@ class InternalTermApplyTransformerImplTest extends UnitTestSuite {
     val javaUnqualifiedTermApply = UnqualifiedTermApply(q"myJavaMethod", List(q"11"))
     val javaTermApply = q"myJavaQual.myJavaMethod(11)"
 
+    when(unqualifiedTransformationContextFactory.create(eqTree(termApply))).thenReturn(UnqualifiedContext)
+
     doAnswer((tree: Tree) => tree match {
       case q"1" => q"11"
       case q"myQual" => q"myJavaQual"
@@ -101,7 +111,7 @@ class InternalTermApplyTransformerImplTest extends UnitTestSuite {
       eqUnqualifiedTermApplyTransformationContext(UnqualifiedContext))
     ).thenReturn(Some(javaUnqualifiedTermApply))
 
-    internalTermApplyTransformer.transform(termApply, UnqualifiedContext).structure shouldBe javaTermApply.structure
+    internalTermApplyTransformer.transform(termApply).structure shouldBe javaTermApply.structure
   }
 
   test("transform() of a qualified method invocation with a type, " +
@@ -112,6 +122,8 @@ class InternalTermApplyTransformerImplTest extends UnitTestSuite {
     val javaUnqualifiedTermApply = UnqualifiedTermApply(q"myJavaMethod", List(t"java.lang.Integer"), List(q"11"))
     val javaTermApply = q"myJavaQual.myJavaMethod[java.lang.Integer](11)"
 
+    when(unqualifiedTransformationContextFactory.create(eqTree(termApply))).thenReturn(UnqualifiedContext)
+
     doAnswer((tree: Tree) => tree match {
       case q"1" => q"11"
       case t"scala.Int" => t"java.lang.Integer"
@@ -129,13 +141,15 @@ class InternalTermApplyTransformerImplTest extends UnitTestSuite {
       eqUnqualifiedTermApplyTransformationContext(UnqualifiedContext))
     ).thenReturn(Some(javaUnqualifiedTermApply))
 
-    internalTermApplyTransformer.transform(termApply, UnqualifiedContext).structure shouldBe javaTermApply.structure
+    internalTermApplyTransformer.transform(termApply).structure shouldBe javaTermApply.structure
   }
 
   test("transform() of a qualified method invocation with no type when both transformers return None") {
 
     val termApply = q"myQual.myMethod(1)"
     val qualifiedTermApply = QualifiedTermApply(q"myQual.myMethod", List(q"11"))
+
+    when(unqualifiedTransformationContextFactory.create(eqTree(termApply))).thenReturn(UnqualifiedContext)
 
     doAnswer((tree: Tree) => tree match {
       case q"1" => q"11"
@@ -152,13 +166,15 @@ class InternalTermApplyTransformerImplTest extends UnitTestSuite {
       eqUnqualifiedTermApplyTransformationContext(UnqualifiedContext))
     ).thenReturn(None)
 
-    internalTermApplyTransformer.transform(termApply, UnqualifiedContext).structure shouldBe qualifiedTermApply.asTermApply().structure
+    internalTermApplyTransformer.transform(termApply).structure shouldBe qualifiedTermApply.asTermApply().structure
   }
 
   test("transform() of a qualified method invocation with a type, when both transformers return None") {
 
     val termApply = q"myQual.myMethod[scala.Int](1)"
     val qualifiedTermApply = QualifiedTermApply(q"myQual.myMethod", List(t"java.lang.Integer"), List(q"11"))
+
+    when(unqualifiedTransformationContextFactory.create(eqTree(termApply))).thenReturn(UnqualifiedContext)
 
     doAnswer((tree: Tree) => tree match {
       case q"1" => q"11"
@@ -176,7 +192,7 @@ class InternalTermApplyTransformerImplTest extends UnitTestSuite {
       eqUnqualifiedTermApplyTransformationContext(UnqualifiedContext))
     ).thenReturn(None)
 
-    internalTermApplyTransformer.transform(termApply, UnqualifiedContext).structure shouldBe qualifiedTermApply.asTermApply().structure
+    internalTermApplyTransformer.transform(termApply).structure shouldBe qualifiedTermApply.asTermApply().structure
   }
 
   test("transform a 'Term.Function' (lambda) with a method name, should return result of 'TermSelectTermFunctionTransformer'") {
@@ -184,6 +200,8 @@ class InternalTermApplyTransformerImplTest extends UnitTestSuite {
     val termApply = q"((x: Int) => print(x)).apply()"
     val expectedTransformedTermSelect = q"(((x: int) => print(x)): java.util.function.Consumer[java.lang.Integer]).accept"
     val expectedTransformedTermApply = q"(((x: int) => print(x)): java.util.function.Consumer[java.lang.Integer]).accept()"
+
+    when(unqualifiedTransformationContextFactory.create(eqTree(termApply))).thenReturn(UnqualifiedContext)
 
     when(termSelectTermFunctionTransformer.transform(eqTree(lambda), eqTree(Apply))).thenReturn(expectedTransformedTermSelect)
 
@@ -193,6 +211,8 @@ class InternalTermApplyTransformerImplTest extends UnitTestSuite {
   test("transform() of a method invocation which is not a qualified name, should transform the children (components) separately") {
     val termApply = q"(f1(x) + f2(y))(z.w)"
     val expectedTransformedTermApply = q"(f1(xx) + f2(yy))(zz.ww)"
+
+    when(unqualifiedTransformationContextFactory.create(eqTree(termApply))).thenReturn(UnqualifiedContext)
 
     doAnswer((tree: Tree) => tree match {
       case q"(f1(x) + f2(y))" => q"(f1(xx) + f2(yy))"
