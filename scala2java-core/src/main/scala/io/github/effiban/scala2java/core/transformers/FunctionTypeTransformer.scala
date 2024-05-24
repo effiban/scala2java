@@ -1,6 +1,5 @@
 package io.github.effiban.scala2java.core.transformers
 
-import io.github.effiban.scala2java.core.entities.TypeNames._
 import io.github.effiban.scala2java.core.entities.TypeSelects._
 
 import scala.meta.{Type, XtensionQuasiquoteTerm, XtensionQuasiquoteType}

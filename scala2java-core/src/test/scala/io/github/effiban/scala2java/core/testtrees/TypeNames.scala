@@ -3,7 +3,7 @@ package io.github.effiban.scala2java.core.testtrees
 import scala.meta.{Type, XtensionQuasiquoteType}
 
 /**
- * @deprecated use [[io.github.effiban.scala2java.core.entities.TypeNames]] instead but copy only what is really used in production
+ * @deprecated use the corresponding fully-qualified type instead from [[io.github.effiban.scala2java.core.entities.TypeSelects]]
  */
 @deprecated
 object TypeNames {
