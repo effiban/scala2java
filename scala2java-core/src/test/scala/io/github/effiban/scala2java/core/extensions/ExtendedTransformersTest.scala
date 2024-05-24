@@ -114,17 +114,30 @@ class ExtendedTransformersTest extends UnitTestSuite {
     extensionRegistry.termApplyInfixToTermApplyTransformers shouldBe termApplyInfixToTermApplyTransformers
   }
 
-  test("termApplyTransformers") {
-    val termApplyTransformer1 = mock[TermApplyTransformer]
-    val termApplyTransformer2 = mock[TermApplyTransformer]
-    val termApplyTransformers = List(termApplyTransformer1, termApplyTransformer2)
+  test("qualifiedTermApplyTransformers") {
+    val qualifiedTermApplyTransformer1 = mock[QualifiedTermApplyTransformer]
+    val qualifiedTermApplyTransformer2 = mock[QualifiedTermApplyTransformer]
+    val qualifiedTermApplyTransformers = List(qualifiedTermApplyTransformer1, qualifiedTermApplyTransformer2)
 
-    when(extension1.termApplyTransformer()).thenReturn(termApplyTransformer1)
-    when(extension2.termApplyTransformer()).thenReturn(termApplyTransformer2)
+    when(extension1.qualifiedTermApplyTransformer()).thenReturn(qualifiedTermApplyTransformer1)
+    when(extension2.qualifiedTermApplyTransformer()).thenReturn(qualifiedTermApplyTransformer2)
 
     val extensionRegistry = ExtensionRegistry(extensions)
 
-    extensionRegistry.termApplyTransformers shouldBe termApplyTransformers
+    extensionRegistry.qualifiedTermApplyTransformers shouldBe qualifiedTermApplyTransformers
+  }
+
+  test("unqualifiedTermApplyTransformers") {
+    val unqualifiedTermApplyTransformer1 = mock[UnqualifiedTermApplyTransformer]
+    val unqualifiedTermApplyTransformer2 = mock[UnqualifiedTermApplyTransformer]
+    val unqualifiedTermApplyTransformers = List(unqualifiedTermApplyTransformer1, unqualifiedTermApplyTransformer2)
+
+    when(extension1.unqualifiedTermApplyTransformer()).thenReturn(unqualifiedTermApplyTransformer1)
+    when(extension2.unqualifiedTermApplyTransformer()).thenReturn(unqualifiedTermApplyTransformer2)
+
+    val extensionRegistry = ExtensionRegistry(extensions)
+
+    extensionRegistry.unqualifiedTermApplyTransformers shouldBe unqualifiedTermApplyTransformers
   }
 
   test("termSelectTransformers") {

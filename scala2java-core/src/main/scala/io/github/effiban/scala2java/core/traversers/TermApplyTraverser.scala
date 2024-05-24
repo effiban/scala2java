@@ -1,22 +1,31 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.ArrayInitializerValuesContext
-import io.github.effiban.scala2java.core.factories.TermApplyTransformationContextFactory
+import io.github.effiban.scala2java.core.factories.UnqualifiedTermApplyTransformationContextFactory
 import io.github.effiban.scala2java.core.resolvers.ArrayInitializerContextResolver
 import io.github.effiban.scala2java.core.transformers.InternalTermApplyTransformer
 
+import scala.annotation.tailrec
 import scala.meta.Term
 
 trait TermApplyTraverser extends ScalaTreeTraverser1[Term.Apply]
 
 private[traversers] class TermApplyTraverserImpl(expressionTermTraverser: => ExpressionTermTraverser,
                                                  arrayInitializerTraverser: => ArrayInitializerTraverser,
-                                                 termApplyTransformationContextFactory: TermApplyTransformationContextFactory,
+                                                 unqualifiedTermApplyTransformationContextFactory: UnqualifiedTermApplyTransformationContextFactory,
                                                  arrayInitializerContextResolver: ArrayInitializerContextResolver,
                                                  termApplyTransformer: InternalTermApplyTransformer) extends TermApplyTraverser {
 
   // method invocation
-  override def traverse(termApply: Term.Apply): Term.Apply = {
+  @tailrec
+  final override def traverse(termApply: Term.Apply): Term.Apply = {
+    termApply match {
+      case Term.Apply(Term.Apply(fun, args1), args2) => traverse(Term.Apply(fun, args1 ++ args2))
+      case aTermApply => traverseUncurried(aTermApply)
+    }
+  }
+
+  private def traverseUncurried(termApply: Term.Apply): Term.Apply = {
     arrayInitializerContextResolver.tryResolve(termApply) match {
       case Some(context) => traverseArrayInitializer(termApply, context)
       case None => traverseMethodInvocation(termApply)
@@ -33,9 +42,9 @@ private[traversers] class TermApplyTraverserImpl(expressionTermTraverser: => Exp
     Term.Apply(traversedFun, outputContext.values)
   }
 
-  private def traverseMethodInvocation(termApply: Term.Apply): Term.Apply = {
-    val transformationContext = termApplyTransformationContextFactory.create(termApply)
-    val transformedTermApply = termApplyTransformer.transform(termApply, transformationContext)
+  private def traverseMethodInvocation(aTermApply: Term.Apply) = {
+    val transformationContext = unqualifiedTermApplyTransformationContextFactory.create(aTermApply)
+    val transformedTermApply = termApplyTransformer.transform(aTermApply, transformationContext)
     val traversedFun = expressionTermTraverser.traverse(transformedTermApply.fun)
     val traversedArgs = transformedTermApply.args.map(expressionTermTraverser.traverse)
     Term.Apply(traversedFun, traversedArgs)

@@ -21,7 +21,9 @@ private[extensions] trait ExtendedTransformers { this: ExtensionContainer =>
 
   val termApplyInfixToTermApplyTransformers: List[TermApplyInfixToTermApplyTransformer] = extensions.map(_.termApplyInfixToTermApplyTransformer())
 
-  val termApplyTransformers: List[TermApplyTransformer] = extensions.map(_.termApplyTransformer())
+  val qualifiedTermApplyTransformers: List[QualifiedTermApplyTransformer] = extensions.map(_.qualifiedTermApplyTransformer())
+
+  val unqualifiedTermApplyTransformers: List[UnqualifiedTermApplyTransformer] = extensions.map(_.unqualifiedTermApplyTransformer())
 
   val termSelectTransformers: List[TermSelectTransformer] = extensions.map(_.termSelectTransformer())
 

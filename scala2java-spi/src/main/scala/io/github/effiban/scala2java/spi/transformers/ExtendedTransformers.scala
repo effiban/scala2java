@@ -36,7 +36,7 @@ trait ExtendedTransformers {
 
   /** Override this method if you need to transform a [[scala.meta.Term.Apply]] (method invocation) appearing in a Scala template body
    * (class/trait/object body), into a [[scala.meta.Defn]] (variable/method/class etc. definition).<br>
-   * '''NOTE regarding precedence''': This transformer will be applied before [[termApplyTransformer()]] (if needed).
+   * '''NOTE regarding precedence''': This transformer will be applied before [[qualifiedTermApplyTransformer()]] (if needed).
    *
    * @see [[TemplateTermApplyToDefnTransformer]] for as usage example.
    * @return if overriden - a transformer which transforms a [[scala.meta.Term.Apply]] appearing in a template body,
@@ -70,7 +70,7 @@ trait ExtendedTransformers {
 
   /** Override this method if you need to transform a [[scala.meta.Term.ApplyInfix]] (infix method invocation) into a
    * [[scala.meta.Term.Apply]] (regular method invocation).<br>
-   * '''NOTE regarding precedence''': The output of this transformer, if not empty, will be passed to [[termApplyTransformer]] for additional processing
+   * '''NOTE regarding precedence''': The output of this transformer, if not empty, will be passed to [[qualifiedTermApplyTransformer]] for additional processing
    *
    * @see [[TermApplyInfixToTermApplyTransformer]] for a usage example.
    * @return if overriden - a transformer which transforms a [[scala.meta.Term.ApplyInfix]] into a [[scala.meta.Term.Apply]] where applicable.<br>
@@ -78,13 +78,28 @@ trait ExtendedTransformers {
    */
   def termApplyInfixToTermApplyTransformer(): TermApplyInfixToTermApplyTransformer = TermApplyInfixToTermApplyTransformer.Empty
 
-  /** Override this method if you need to modify a [[scala.meta.Term.Apply]] (method invocation).<br>
-   * '''NOTE regarding precedence''': In the scope of a template body, this transformer will be invoked after [[templateTermApplyToDefnTransformer()]]
+  /** Override this method if you need to transform a [[io.github.effiban.scala2java.spi.entities.QualifiedTermApply]]
+   * (qualified method invocation) based on the qualified name as a whole, without regard for the type of the qualifier.<br>
+   * This is usually appropriate when the qualifier has no defined type - as in a Scala 'object'.<br>
+   * '''NOTE regarding precedence''': In the scope of a template body, this transformer will be invoked after [[templateTermApplyToDefnTransformer]]
    *
-   * @return if overriden - a transformer which modifies a given [[scala.meta.Term.Apply]]<br>
+   * @return if overriden - a transformer which modifies a given qualified [[scala.meta.Term.Apply]]<br>
    *         otherwise - the default transformer which doesn't modify anything<br>
    */
-  def termApplyTransformer(): TermApplyTransformer = TermApplyTransformer.Identity
+  def qualifiedTermApplyTransformer(): QualifiedTermApplyTransformer = QualifiedTermApplyTransformer.Empty
+
+  /** Override this method if you need to transform a [[scala.meta.Term.Apply]] (method invocation)
+   * with an unqualified name, given that the qualified part of the name shall be transformed separately
+   * and only the qualifier type is needed for this transformation.<br>
+   * This is appropriate whenever the qualifier is a complex expression or any term that has a defined type (e.g. not a Scala 'object') .<br>
+   * '''NOTES regarding precedence''':
+   *  - In the scope of a template body, this transformer will be invoked after [[templateTermApplyToDefnTransformer]]
+   *  - This transformer will be invoked after [[qualifiedTermApplyTransformer]], in case the former returns empty
+   *
+   * @return if overriden - a transformer which modifies a given unqualified [[scala.meta.Term.Apply]]<br>
+   *         otherwise - the default transformer which doesn't modify anything<br>
+   */
+  def unqualifiedTermApplyTransformer(): UnqualifiedTermApplyTransformer = UnqualifiedTermApplyTransformer.Empty
 
   /** Override this method if you need to modify a [[scala.meta.Term.Select]] (qualified name).<br>
    * This transformer should be overriden whenever the qualifier name must be transformed as a whole,
@@ -92,7 +107,7 @@ trait ExtendedTransformers {
    * [[termSelectNameTransformer()]] shoud be used instead.<br>
    * '''NOTE''': This transformer will only be called for qualified names that are __not__ method invocations.<br>
    * If some method invocation is a qualified name with no args and no parentheses,
-   * it will be automatically 'desugared' into a method invocation and eventually passed to [[termApplyTransformer]].<br>
+   * it will be automatically 'desugared' into a method invocation and eventually passed to [[qualifiedTermApplyTransformer]].<br>
    * The framework will identify such cases by calling [[io.github.effiban.scala2java.spi.predicates.ExtendedPredicates.termSelectSupportsNoArgInvocation]]
    *
    * @return if overriden - a transformer which modifies a given [[scala.meta.Term.Select]]<br>
@@ -107,7 +122,7 @@ trait ExtendedTransformers {
    * The transformer receives a context object which includes the type of the qualifier (when available).<br>
    * '''NOTE''': This transformer will only be called for qualified names that are __not__ method invocations.<br>
    * If some method invocation is a qualified name with no args and no parentheses,
-   * it will be automatically 'desugared' into a method invocation and eventually passed to [[termApplyTransformer]].<br>
+   * it will be automatically 'desugared' into a method invocation and eventually passed to [[qualifiedTermApplyTransformer]].<br>
    * The framework will identify such cases by calling [[io.github.effiban.scala2java.spi.predicates.ExtendedPredicates.termSelectSupportsNoArgInvocation]]
    *
    * @return if overriden - a transformer which modifies a given [[scala.meta.Term.Select]]<br>
