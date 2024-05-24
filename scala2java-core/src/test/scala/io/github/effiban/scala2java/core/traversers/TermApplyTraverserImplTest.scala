@@ -1,56 +1,71 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.{ArrayInitializerTypedValuesContext, ArrayInitializerValuesContext}
+import io.github.effiban.scala2java.core.entities.TermNames
 import io.github.effiban.scala2java.core.entities.TermSelects.ScalaArray
-import io.github.effiban.scala2java.core.factories.TermApplyTransformationContextFactory
+import io.github.effiban.scala2java.core.factories.UnqualifiedTermApplyTransformationContextFactory
 import io.github.effiban.scala2java.core.matchers.ArrayInitializerValuesContextMockitoMatcher.eqArrayInitializerValuesContext
-import io.github.effiban.scala2java.core.matchers.TermApplyTransformationContextMockitoMatcher.eqTermApplyTransformationContext
+import io.github.effiban.scala2java.core.matchers.UnqualifiedTermApplyTransformationContextMockitoMatcher.eqUnqualifiedTermApplyTransformationContext
 import io.github.effiban.scala2java.core.resolvers.ArrayInitializerContextResolver
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.testtrees.TermNames
 import io.github.effiban.scala2java.core.transformers.InternalTermApplyTransformer
-import io.github.effiban.scala2java.spi.contexts.TermApplyTransformationContext
+import io.github.effiban.scala2java.spi.contexts.UnqualifiedTermApplyTransformationContext
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.any
 
 import scala.meta.{Term, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 class TermApplyTraverserImplTest extends UnitTestSuite {
+
+  private val fun = Term.Name("foo")
+  private val transformedFun = Term.Name("transformedFoo")
+  private val traversedFun = Term.Name("traversedFoo")
+
+  private val arg1 = Term.Name("arg1")
+  private val arg2 = Term.Name("arg2")
+  private val arg3 = Term.Name("arg3")
+  private val arg4 = Term.Name("arg4")
+  private val arg5 = Term.Name("arg5")
+  private val arg6 = Term.Name("arg6")
+
+  private val transformedArg1 = Term.Name("transformedArg1")
+  private val transformedArg2 = Term.Name("transformedArg2")
+  private val transformedArg3 = Term.Name("transformedArg3")
+  private val transformedArg4 = Term.Name("transformedArg4")
+  private val transformedArg5 = Term.Name("transformedArg5")
+  private val transformedArg6 = Term.Name("transformedArg6")
+
+  private val traversedArg1 = Term.Name("traversedArg1")
+  private val traversedArg2 = Term.Name("traversedArg2")
+  private val traversedArg3 = Term.Name("traversedArg3")
+  private val traversedArg4 = Term.Name("traversedArg4")
+  private val traversedArg5 = Term.Name("traversedArg5")
+  private val traversedArg6 = Term.Name("traversedArg6")
+
   private val expressionTermTraverser = mock[ExpressionTermTraverser]
   private val arrayInitializerTraverser = mock[ArrayInitializerTraverser]
-  private val termApplyTransformationContextFactory = mock[TermApplyTransformationContextFactory]
+  private val unqualifiedTermApplyTransformationContextFactory = mock[UnqualifiedTermApplyTransformationContextFactory]
   private val arrayInitializerContextResolver = mock[ArrayInitializerContextResolver]
   private val termApplyTransformer = mock[InternalTermApplyTransformer]
 
   private val termApplyTraverser = new TermApplyTraverserImpl(
     expressionTermTraverser,
     arrayInitializerTraverser,
-    termApplyTransformationContextFactory,
+    unqualifiedTermApplyTransformationContextFactory,
     arrayInitializerContextResolver,
     termApplyTransformer
   )
 
-  test("traverse() a regular method invocation") {
-    val fun = q"myMethod"
-    val arg1 = q"arg1"
-    val arg2 = q"arg2"
+  test("traverse() a regular uncurried method invocation") {
     val termApply = Term.Apply(fun, List(arg1, arg2))
-
-    val transformedFun = q"myTransformedMethod"
-    val transformedArg1 = q"transformedArg1"
-    val transformedArg2 = q"transformedArg2"
     val transformedTermApply = Term.Apply(transformedFun, List(transformedArg1, transformedArg2))
-
-    val traversedFun = q"myTraversedMethod"
-    val traversedArg1 = q"traversedArg1"
-    val traversedArg2 = q"traversedArg2"
     val traversedTermApply = Term.Apply(traversedFun, List(traversedArg1, traversedArg2))
 
-    val expectedTransformationContext = TermApplyTransformationContext(maybeParentType = Some(t"MyParent"))
+    val expectedTransformationContext = UnqualifiedTermApplyTransformationContext(maybeQualifierType = Some(t"MyParent"))
 
     when(arrayInitializerContextResolver.tryResolve(eqTree(termApply))).thenReturn(None)
-    when(termApplyTransformationContextFactory.create(eqTree(termApply))).thenReturn(expectedTransformationContext)
-    when(termApplyTransformer.transform(eqTree(termApply), eqTermApplyTransformationContext(expectedTransformationContext)))
+    when(unqualifiedTermApplyTransformationContextFactory.create(eqTree(termApply))).thenReturn(expectedTransformationContext)
+    when(termApplyTransformer.transform(eqTree(termApply), eqUnqualifiedTermApplyTransformationContext(expectedTransformationContext)))
       .thenReturn(transformedTermApply)
 
     doAnswer((arg: Term) => arg match {
@@ -61,6 +76,76 @@ class TermApplyTraverserImplTest extends UnitTestSuite {
     }).when(expressionTermTraverser).traverse(any[Term])
 
     termApplyTraverser.traverse(termApply).structure shouldBe traversedTermApply.structure
+  }
+
+  test("transform() of a 2-level curried invocation, should convert to a single invocation with concatenated args") {
+    val curriedTermApply =
+      Term.Apply(
+        Term.Apply(fun, List(arg1, arg2)),
+        List(arg3, arg4)
+      )
+    val flattenedTermApply = Term.Apply(fun, List(arg1, arg2, arg3, arg4))
+    val transformedTermApply = Term.Apply(transformedFun, List(transformedArg1, transformedArg2, transformedArg3, transformedArg4))
+    val traversedTermApply = Term.Apply(traversedFun, List(traversedArg1, traversedArg2, traversedArg3, traversedArg4))
+
+    val expectedTransformationContext = UnqualifiedTermApplyTransformationContext(maybeQualifierType = Some(t"MyParent"))
+
+    when(arrayInitializerContextResolver.tryResolve(eqTree(flattenedTermApply))).thenReturn(None)
+    when(unqualifiedTermApplyTransformationContextFactory.create(eqTree(flattenedTermApply))).thenReturn(expectedTransformationContext)
+    when(termApplyTransformer.transform(eqTree(flattenedTermApply), eqUnqualifiedTermApplyTransformationContext(expectedTransformationContext)))
+      .thenReturn(transformedTermApply)
+
+    doAnswer((arg: Term) => arg match {
+      case anArg if anArg.structure == transformedFun.structure => traversedFun
+      case anArg if anArg.structure == transformedArg1.structure => traversedArg1
+      case anArg if anArg.structure == transformedArg2.structure => traversedArg2
+      case anArg if anArg.structure == transformedArg3.structure => traversedArg3
+      case anArg if anArg.structure == transformedArg4.structure => traversedArg4
+      case anArg => anArg
+    }).when(expressionTermTraverser).traverse(any[Term])
+
+    termApplyTraverser.traverse(curriedTermApply).structure shouldBe traversedTermApply.structure
+  }
+
+  test("transform() of a 3-level curried invocation, should convert to a single invocation with concatenated args") {
+    val curriedTermApply =
+      Term.Apply(
+        Term.Apply(
+          Term.Apply(fun, List(arg1, arg2)),
+          List(arg3, arg4)
+        ),
+        List(arg5, arg6)
+      )
+
+    val flattenedTermApply = Term.Apply(fun, List(arg1, arg2, arg3, arg4, arg5, arg6))
+    val transformedTermApply = Term.Apply(
+      transformedFun,
+      List(transformedArg1, transformedArg2, transformedArg3, transformedArg4, transformedArg5, transformedArg6)
+    )
+    val traversedTermApply = Term.Apply(
+      traversedFun,
+      List(traversedArg1, traversedArg2, traversedArg3, traversedArg4, traversedArg5, traversedArg6)
+    )
+
+    val expectedTransformationContext = UnqualifiedTermApplyTransformationContext(maybeQualifierType = Some(t"MyParent"))
+
+    when(arrayInitializerContextResolver.tryResolve(eqTree(flattenedTermApply))).thenReturn(None)
+    when(unqualifiedTermApplyTransformationContextFactory.create(eqTree(flattenedTermApply))).thenReturn(expectedTransformationContext)
+    when(termApplyTransformer.transform(eqTree(flattenedTermApply), eqUnqualifiedTermApplyTransformationContext(expectedTransformationContext)))
+      .thenReturn(transformedTermApply)
+
+    doAnswer((arg: Term) => arg match {
+      case anArg if anArg.structure == transformedFun.structure => traversedFun
+      case anArg if anArg.structure == transformedArg1.structure => traversedArg1
+      case anArg if anArg.structure == transformedArg2.structure => traversedArg2
+      case anArg if anArg.structure == transformedArg3.structure => traversedArg3
+      case anArg if anArg.structure == transformedArg4.structure => traversedArg4
+      case anArg if anArg.structure == transformedArg5.structure => traversedArg5
+      case anArg if anArg.structure == transformedArg6.structure => traversedArg6
+      case anArg => anArg
+    }).when(expressionTermTraverser).traverse(any[Term])
+
+    termApplyTraverser.traverse(curriedTermApply).structure shouldBe traversedTermApply.structure
   }
 
   test("traverse() an Array initializer when 'fun' is 'scala.Array'") {
@@ -86,7 +171,7 @@ class TermApplyTraverserImplTest extends UnitTestSuite {
     termApplyTraverser.traverse(inputTermApply).structure shouldBe expectedOutputTermApply.structure
   }
 
-  test("traverse() an Array initializer when 'fun' is 'Array.apply'") {
+  test("traverse() an Array initializer when 'fun' is 'scala.Array.apply'") {
     val expectedOutputType = t"MyOutputType"
 
     val inputValues = List(q"in1", q"in2")
@@ -109,7 +194,7 @@ class TermApplyTraverserImplTest extends UnitTestSuite {
     termApplyTraverser.traverse(inputTermApply).structure shouldBe expectedOutputTermApply.structure
   }
 
-  test("traverse() an Array initializer when 'fun' is 'Array[MyType]'") {
+  test("traverse() an Array initializer when 'fun' is 'scala.Array[MyType]'") {
     val inputType = t"MyType"
     val expectedOutputType = t"MyOutputType"
 

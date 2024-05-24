@@ -1,23 +1,80 @@
 package io.github.effiban.scala2java.core.transformers
 
-import io.github.effiban.scala2java.spi.contexts.TermApplyTransformationContext
-import io.github.effiban.scala2java.spi.transformers.TermApplyTransformer
+import io.github.effiban.scala2java.spi.contexts.UnqualifiedTermApplyTransformationContext
+import io.github.effiban.scala2java.spi.entities.QualifiedTermApply
+import io.github.effiban.scala2java.spi.transformers.{QualifiedTermApplyTransformer, UnqualifiedTermApplyTransformer}
 
-import scala.annotation.tailrec
-import scala.meta.Term
+import scala.meta.{Term, Type}
 
 trait InternalTermApplyTransformer {
-  def transform(termApply: Term.Apply, context: TermApplyTransformationContext = TermApplyTransformationContext()): Term.Apply
+  def transform(termApply: Term.Apply, context: UnqualifiedTermApplyTransformationContext = UnqualifiedTermApplyTransformationContext()): Term.Apply
 }
 
-private[transformers] class InternalTermApplyTransformerImpl(termApplyTransformer: TermApplyTransformer) extends InternalTermApplyTransformer {
+private[transformers] class InternalTermApplyTransformerImpl(treeTransformer: => TreeTransformer,
+                                                             qualifiedTermApplyTransformer: QualifiedTermApplyTransformer,
+                                                             unqualifiedTermApplyTransformer: UnqualifiedTermApplyTransformer,
+                                                             termSelectTermFunctionTransformer: TermSelectTermFunctionTransformer)
+  extends InternalTermApplyTransformer {
 
-  @tailrec
-  override final def transform(termApply: Term.Apply, context: TermApplyTransformationContext = TermApplyTransformationContext()): Term.Apply = {
-    termApply match {
-      // Invocation of method with more than one param list
-      case Term.Apply(Term.Apply(fun, args1), args2) => transform(Term.Apply(fun, args1 ++ args2), context)
-      case other => termApplyTransformer.transform(other, context)
+  override final def transform(termApply: Term.Apply,
+                               context: UnqualifiedTermApplyTransformationContext = UnqualifiedTermApplyTransformationContext()): Term.Apply = {
+    val transformedArgs = termApply.args.map(treeTransformer.transform(_).asInstanceOf[Term])
+
+    termApply.fun match {
+      case Term.ApplyType(qualifiedName: Term.Select, typeArgs) =>
+        transformWhenTypedWithQualifiedName(qualifiedName, typeArgs, transformedArgs, context)
+
+      case Term.Select(termFunction: Term.Function, name) =>
+        transformWhenQualifierIsLambda(termFunction, name, transformedArgs)
+
+      case qualifiedName: Term.Select => transformWhenUntypedWithQualifiedName(qualifiedName, transformedArgs, context)
+
+      case _ => transformFunOnly(termApply, transformedArgs)
     }
+  }
+
+  private def transformWhenTypedWithQualifiedName(qualifiedName: Term.Select,
+                                                  typeArgs: List[Type],
+                                                  transformedArgs: List[Term],
+                                                  context: UnqualifiedTermApplyTransformationContext) = {
+    val transformedTypeArgs = typeArgs.map(treeTransformer.transform(_).asInstanceOf[Type])
+    val qualifiedTermApply = QualifiedTermApply(qualifiedName, transformedTypeArgs, transformedArgs)
+    transformWhenHasQualifiedName(qualifiedTermApply, context)
+  }
+
+  private def transformWhenUntypedWithQualifiedName(qualifiedName: Term.Select,
+                                                    transformedArgs: List[Term],
+                                                    context: UnqualifiedTermApplyTransformationContext) = {
+    val qualifiedTermApply = QualifiedTermApply(qualifiedName, Nil, transformedArgs)
+    transformWhenHasQualifiedName(qualifiedTermApply, context)
+  }
+
+  private def transformWhenHasQualifiedName(qualifiedTermApply: QualifiedTermApply,
+                                            context: UnqualifiedTermApplyTransformationContext) = {
+    val transformedQualifiedTermApply = qualifiedTermApplyTransformer.transform(qualifiedTermApply, context.asQualifiedContext())
+      .orElse(transformWhenHasQualifiedNameInParts(qualifiedTermApply, context))
+      .getOrElse(qualifiedTermApply)
+    transformedQualifiedTermApply.asTermApply()
+  }
+
+  private def transformWhenHasQualifiedNameInParts(qualifiedTermApply: QualifiedTermApply, context: UnqualifiedTermApplyTransformationContext) = {
+    val unqualifiedTermApply = qualifiedTermApply.asUnqualified()
+    unqualifiedTermApplyTransformer.transform(unqualifiedTermApply, context)
+      .map(transformedUnqualifiedTermApply => {
+        val transformedQual = treeTransformer.transform(qualifiedTermApply.qualifiedName.qual).asInstanceOf[Term]
+        transformedUnqualifiedTermApply.qualifiedBy(transformedQual)
+      })
+  }
+
+  private def transformWhenQualifierIsLambda(termFunction: Term.Function,
+                                             name: Term.Name,
+                                             transformedArgs: List[Term]) = {
+    val transformedTermFunction = termSelectTermFunctionTransformer.transform(termFunction, name)
+    Term.Apply(transformedTermFunction, transformedArgs)
+  }
+
+  private def transformFunOnly(termApply: Term.Apply, transformedArgs: List[Term]) = {
+    val transformedFun = treeTransformer.transform(termApply.fun).asInstanceOf[Term]
+    Term.Apply(transformedFun, transformedArgs)
   }
 }

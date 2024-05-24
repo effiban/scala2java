@@ -3,19 +3,24 @@ package io.github.effiban.scala2java.core.transformers
 import io.github.effiban.scala2java.core.classifiers.{CompositeTypeClassifier, TermSelectClassifier}
 import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
 import io.github.effiban.scala2java.core.typeinference.TypeInferrers
-import io.github.effiban.scala2java.spi.transformers.{TermApplyTransformer, TypeSelectTransformer}
+import io.github.effiban.scala2java.spi.transformers.{QualifiedTermApplyTransformer, TypeSelectTransformer, UnqualifiedTermApplyTransformer}
 
 class Transformers(implicit typeInferrers: => TypeInferrers,
                    extensionRegistry: ExtensionRegistry) {
 
-  private lazy val coreTermApplyTransformer: TermApplyTransformer = new CoreTermApplyTransformer(
-    TermSelectClassifier,
-    CompositeTypeClassifier,
-    termSelectTermFunctionTransformer
+  private lazy val coreQualifiedTermApplyTransformer: QualifiedTermApplyTransformer = new CoreQualifiedTermApplyTransformer(
+    TermSelectClassifier
+  )
+
+  private lazy val coreUnqualifiedTermApplyTransformer: UnqualifiedTermApplyTransformer = new CoreUnqualifiedTermApplyTransformer(
+    CompositeTypeClassifier
   )
 
   lazy val internalTermApplyTransformer: InternalTermApplyTransformer = new InternalTermApplyTransformerImpl(
-    new CompositeTermApplyTransformer(coreTermApplyTransformer)
+    treeTransformer,
+    new CompositeQualifiedTermApplyTransformer(coreQualifiedTermApplyTransformer),
+    new CompositeUnqualifiedTermApplyTransformer(coreUnqualifiedTermApplyTransformer),
+    termSelectTermFunctionTransformer
   )
 
   private lazy val internalTermSelectTransformer: InternalTermSelectTransformer = new InternalTermSelectTransformerImpl(

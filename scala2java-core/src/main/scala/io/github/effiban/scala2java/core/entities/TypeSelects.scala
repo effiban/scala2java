@@ -14,6 +14,7 @@ object TypeSelects {
   final val JavaConsumer = t"java.util.function.Consumer"
   final val JavaEither = t"io.vavr.control.Either"
   final val JavaFunction = t"java.util.function.Function"
+  final val JavaInteger = t"java.lang.Integer"
   final val JavaList = t"java.util.List"
   final val JavaMap = t"java.util.Map"
   final val JavaNoSuchElementException = t"java.util.NoSuchElementException"
@@ -21,7 +22,9 @@ object TypeSelects {
   final val JavaSet = t"java.util.Set"
   final var JavaSerializable = t"java.io.Serializable"
   final val JavaStream = t"java.util.stream.Stream"
+  final val JavaString = t"java.lang.String"
   final val JavaSupplier = t"java.util.function.Supplier"
+  final val JavaThrowable = t"java.lang.Throwable"
   final val JavaTry = t"io.vavr.control.Try"
 
   final val ScalaAbstractMethodError = t"scala.AbstractMethodError"
