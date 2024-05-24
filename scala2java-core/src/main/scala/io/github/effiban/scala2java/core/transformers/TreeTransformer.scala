@@ -1,8 +1,6 @@
 package io.github.effiban.scala2java.core.transformers
 
-import io.github.effiban.scala2java.core.typeinference.QualifierTypeInferrer
-import io.github.effiban.scala2java.spi.contexts.TermSelectTransformationContext
-import io.github.effiban.scala2java.spi.transformers.{TermSelectNameTransformer, TermSelectTransformer, TypeSelectTransformer}
+import io.github.effiban.scala2java.spi.transformers.TypeSelectTransformer
 
 import scala.meta.{Import, Pkg, Term, Transformer, Tree, Type}
 
@@ -11,6 +9,7 @@ trait TreeTransformer {
 }
 
 private[transformers] class TreeTransformerImpl(pkgTransformer: => PkgTransformer,
+                                                internalTermApplyTransformer: => InternalTermApplyTransformer,
                                                 internalTermSelectTransformer: => InternalTermSelectTransformer,
                                                 typeSelectTransformer: TypeSelectTransformer) extends TreeTransformer {
 
@@ -24,6 +23,7 @@ private[transformers] class TreeTransformerImpl(pkgTransformer: => PkgTransforme
       tree match {
         case pkg: Pkg => pkgTransformer.transform(pkg)
         case `import`: Import => `import`
+        case termApply: Term.Apply => internalTermApplyTransformer.transform(termApply)
         case termSelect: Term.Select => internalTermSelectTransformer.transform(termSelect)
         case typeSelect: Type.Select => typeSelectTransformer.transform(typeSelect).getOrElse(super.apply(typeSelect))
         case aTree => super.apply(aTree)

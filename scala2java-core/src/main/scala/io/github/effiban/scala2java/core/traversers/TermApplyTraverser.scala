@@ -12,9 +12,7 @@ trait TermApplyTraverser extends ScalaTreeTraverser1[Term.Apply]
 
 private[traversers] class TermApplyTraverserImpl(expressionTermTraverser: => ExpressionTermTraverser,
                                                  arrayInitializerTraverser: => ArrayInitializerTraverser,
-                                                 unqualifiedTermApplyTransformationContextFactory: UnqualifiedTermApplyTransformationContextFactory,
-                                                 arrayInitializerContextResolver: ArrayInitializerContextResolver,
-                                                 termApplyTransformer: InternalTermApplyTransformer) extends TermApplyTraverser {
+                                                 arrayInitializerContextResolver: ArrayInitializerContextResolver) extends TermApplyTraverser {
 
   // method invocation
   @tailrec
@@ -43,10 +41,8 @@ private[traversers] class TermApplyTraverserImpl(expressionTermTraverser: => Exp
   }
 
   private def traverseMethodInvocation(aTermApply: Term.Apply) = {
-    val transformationContext = unqualifiedTermApplyTransformationContextFactory.create(aTermApply)
-    val transformedTermApply = termApplyTransformer.transform(aTermApply, transformationContext)
-    val traversedFun = expressionTermTraverser.traverse(transformedTermApply.fun)
-    val traversedArgs = transformedTermApply.args.map(expressionTermTraverser.traverse)
+    val traversedFun = expressionTermTraverser.traverse(aTermApply.fun)
+    val traversedArgs = aTermApply.args.map(expressionTermTraverser.traverse)
     Term.Apply(traversedFun, traversedArgs)
   }
 }

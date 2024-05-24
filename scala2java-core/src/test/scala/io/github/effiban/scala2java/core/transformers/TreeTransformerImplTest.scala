@@ -25,11 +25,13 @@ class TreeTransformerImplTest extends UnitTestSuite {
     """
 
   private val pkgTransformer = mock[PkgTransformer]
+  private val internalTermApplyTransformer = mock[InternalTermApplyTransformer]
   private val internalTermSelectTransformer = mock[InternalTermSelectTransformer]
   private val typeSelectTransformer = mock[TypeSelectTransformer]
 
   private val treeTransformer = new TreeTransformerImpl(
     pkgTransformer,
+    internalTermApplyTransformer,
     internalTermSelectTransformer,
     typeSelectTransformer
   )
@@ -43,6 +45,15 @@ class TreeTransformerImplTest extends UnitTestSuite {
   test("transform 'import' should return the same") {
     val `import` = q"import a.b.c"
     treeTransformer.transform(`import`).structure shouldBe `import`.structure
+  }
+
+  test("transform Term.Apply should return result of inner transformer") {
+    val termApply = q"foo(2)"
+    val transformedTermApply = q"bar(3)"
+
+    when(internalTermApplyTransformer.transform(eqTree(termApply))).thenReturn(transformedTermApply)
+
+    treeTransformer.transform(termApply).structure shouldBe transformedTermApply.structure
   }
 
   test("transform Term.Select should return result of inner transformer") {

@@ -328,9 +328,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
   private lazy val termApplyTraverser: TermApplyTraverser = new TermApplyTraverserImpl(
     expressionTermTraverser,
     arrayInitializerTraverser,
-    termApplyTransformationContextFactory,
-    ArrayInitializerContextResolver,
-    internalTermApplyTransformer
+    ArrayInitializerContextResolver
   )
 
   private lazy val termFunctionTraverser: TermFunctionTraverser = new TermFunctionTraverserImpl(
