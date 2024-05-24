@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.resolvers
 
-import io.github.effiban.scala2java.core.entities.{TermSelects, TypeNames, TypeSelects}
+import io.github.effiban.scala2java.core.entities.{TermSelects, TypeSelects}
 import io.github.effiban.scala2java.core.matchers.ArrayInitializerSizeRenderContextScalatestMatcher.equalArrayInitializerSizeRenderContext
 import io.github.effiban.scala2java.core.renderers.contexts.{ArrayInitializerSizeRenderContext, ArrayInitializerValuesRenderContext}
 import io.github.effiban.scala2java.core.renderers.matchers.ArrayInitializerValuesRenderContextScalatestMatcher.equalArrayInitializerValuesRenderContext
@@ -13,17 +13,17 @@ class ArrayInitializerRenderContextResolverTest extends UnitTestSuite {
 
   test("""tryResolve() for a 'Term.Apply' of 'scala.Array[String]("a", "b")' should return a context with type 'String' and the values""") {
     val args = List(Lit.String("a"), Lit.String("b"))
-    val termApply = Term.Apply(Term.ApplyType(TermSelects.ScalaArray, List(TypeNames.String)), args)
+    val termApply = Term.Apply(Term.ApplyType(TermSelects.ScalaArray, List(t"String")), args)
 
-    val expectedContext = ArrayInitializerValuesRenderContext(tpe = TypeNames.String, values = args)
+    val expectedContext = ArrayInitializerValuesRenderContext(tpe = t"String", values = args)
 
     tryResolve(termApply).value should equalArrayInitializerValuesRenderContext(expectedContext)
   }
 
   test("tryResolve() for 'Term.Apply' of 'scala.Array[String]()' should return a context with type 'String' and no values") {
-    val termApply = Term.Apply(Term.ApplyType(TermSelects.ScalaArray, List(TypeNames.String)), Nil)
+    val termApply = Term.Apply(Term.ApplyType(TermSelects.ScalaArray, List(t"String")), Nil)
 
-    val expectedContext = ArrayInitializerValuesRenderContext(tpe = TypeNames.String)
+    val expectedContext = ArrayInitializerValuesRenderContext(tpe = t"String")
 
     tryResolve(termApply).value should equalArrayInitializerValuesRenderContext(expectedContext)
   }
@@ -37,24 +37,24 @@ class ArrayInitializerRenderContextResolverTest extends UnitTestSuite {
   test("""tryResolve() for an 'Init' of 'scala.Array[String](3)' should return a context with type 'String' and size 3""") {
     val arg = Lit.Int(3)
     val init = Init(
-      tpe = Type.Apply(TypeSelects.ScalaArray, List(TypeNames.String)),
+      tpe = Type.Apply(TypeSelects.ScalaArray, List(t"String")),
       name = Name.Anonymous(),
       argss = List(List(arg))
     )
 
-    val expectedContext = ArrayInitializerSizeRenderContext(tpe = TypeNames.String, size = arg)
+    val expectedContext = ArrayInitializerSizeRenderContext(tpe = t"String", size = arg)
 
     tryResolve(init).value should equalArrayInitializerSizeRenderContext(expectedContext)
   }
 
   test("""tryResolve() for an 'Init' of 'scala.Array[String]()' should return a context with type 'String' and size 0""") {
     val init = Init(
-      tpe = Type.Apply(TypeSelects.ScalaArray, List(TypeNames.String)),
+      tpe = Type.Apply(TypeSelects.ScalaArray, List(t"String")),
       name = Name.Anonymous(),
       argss = List(Nil)
     )
 
-    val expectedContext = ArrayInitializerSizeRenderContext(tpe = TypeNames.String)
+    val expectedContext = ArrayInitializerSizeRenderContext(tpe = t"String")
 
     tryResolve(init).value should equalArrayInitializerSizeRenderContext(expectedContext)
   }
@@ -67,7 +67,7 @@ class ArrayInitializerRenderContextResolverTest extends UnitTestSuite {
       argss = List(List(arg))
     )
 
-    val expectedContext = ArrayInitializerSizeRenderContext(tpe = TypeNames.JavaObject, size = arg)
+    val expectedContext = ArrayInitializerSizeRenderContext(tpe = t"Object", size = arg)
 
     tryResolve(init).value should equalArrayInitializerSizeRenderContext(expectedContext)
   }
@@ -79,7 +79,7 @@ class ArrayInitializerRenderContextResolverTest extends UnitTestSuite {
       argss = List(Nil)
     )
 
-    val expectedContext = ArrayInitializerSizeRenderContext(tpe = TypeNames.JavaObject)
+    val expectedContext = ArrayInitializerSizeRenderContext(tpe = t"Object")
 
     tryResolve(init).value should equalArrayInitializerSizeRenderContext(expectedContext)
   }

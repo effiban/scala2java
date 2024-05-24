@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.typeinference
 
-import io.github.effiban.scala2java.core.entities.{TermNames, TypeNames}
+import io.github.effiban.scala2java.core.entities.{TermNames, TypeSelects}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
@@ -12,18 +12,18 @@ class ApplyTypeTypeInferrerImplTest extends UnitTestSuite {
 
   private val applyTypeTypeInferrer = new ApplyTypeTypeInferrerImpl(applyReturnTypeInferrer)
 
-  test("infer() when term is 'classOf[Foo]' should return 'Class[Foo]'") {
+  test("infer() when term is 'classOf[Foo]' should return 'scala.Class[Foo]'") {
     val innerType = t"Foo"
     val termApplyType = Term.ApplyType(TermNames.ScalaClassOf, List(innerType))
-    val expectedType = Type.Apply(TypeNames.Class, List(innerType))
+    val expectedType = Type.Apply(TypeSelects.ScalaClass, List(innerType))
 
     applyTypeTypeInferrer.infer(termApplyType).value.structure shouldBe expectedType.structure
   }
 
   test("infer() for arbitrary typed term should return an equivalent Term.Apply with no params") {
-    val termApplyType = q"Foo[Int]"
-    val expectedTermApply = q"Foo[Int]()"
-    val expectedType = t"String"
+    val termApplyType = q"Foo[scala.Int]"
+    val expectedTermApply = q"Foo[scala.Int]()"
+    val expectedType = t"scala.String"
 
     when(applyReturnTypeInferrer.infer(eqTree(expectedTermApply))).thenReturn(Some(expectedType))
 

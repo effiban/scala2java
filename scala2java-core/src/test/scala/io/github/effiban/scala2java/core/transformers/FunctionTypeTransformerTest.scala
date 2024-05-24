@@ -1,8 +1,7 @@
 package io.github.effiban.scala2java.core.transformers
 
-import io.github.effiban.scala2java.core.entities.TypeNames.JavaRunnable
 import io.github.effiban.scala2java.core.entities.TypeSelects
-import io.github.effiban.scala2java.core.entities.TypeSelects.{JavaBiConsumer, JavaBiFunction, JavaConsumer, JavaSupplier, ScalaUnit}
+import io.github.effiban.scala2java.core.entities.TypeSelects.{JavaBiConsumer, JavaBiFunction, JavaConsumer, JavaRunnable, JavaSupplier, ScalaUnit}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 
 import scala.meta.{Type, XtensionQuasiquoteType}

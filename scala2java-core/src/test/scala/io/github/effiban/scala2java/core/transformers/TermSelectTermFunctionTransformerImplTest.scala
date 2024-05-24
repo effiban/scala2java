@@ -1,8 +1,8 @@
 package io.github.effiban.scala2java.core.transformers
 
-import io.github.effiban.scala2java.core.entities.TypeNames.JavaRunnable
+import io.github.effiban.scala2java.core.entities.TermNames
+import io.github.effiban.scala2java.core.entities.TypeSelects.JavaRunnable
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.testtrees.TermNames
 import io.github.effiban.scala2java.core.typeinference.FunctionTypeInferrer
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
@@ -15,24 +15,24 @@ class TermSelectTermFunctionTransformerImplTest extends UnitTestSuite {
 
   private val termSelectTermFunctionTransformer = new TermSelectTermFunctionTransformerImpl(functionTypeInferrer, functionTypeTransformer)
 
-  test("transform() for a lambda of type '() => Unit' and the method 'apply', should return 'Runnable.run'") {
+  test("transform() for a lambda of type '() => scala.Unit' and the method 'apply', should return 'java.lang.Runnable.run'") {
     val termFunction = q"""() => print("bla")"""
-    val expectedTypeFunction = t"() => Unit"
-    val expectedResult = q"""((() => print("bla")): Runnable).run"""
+    val expectedTypeFunction = t"() => scala.Unit"
+    val expectedResult = q"""((() => print("bla")): java.lang.Runnable).run"""
 
-    when(functionTypeInferrer.infer(eqTree(termFunction))).thenReturn(t"() => Unit")
+    when(functionTypeInferrer.infer(eqTree(termFunction))).thenReturn(t"() => scala.Unit")
     when(functionTypeTransformer.transform(eqTree(expectedTypeFunction))).thenReturn(JavaRunnable)
 
     termSelectTermFunctionTransformer.transform(termFunction, TermNames.Apply).structure shouldBe expectedResult.structure
   }
 
-  test("transform() for a lambda of type '() => Int' and the method 'apply', should return 'java.util.function.Supplier.get'") {
+  test("transform() for a lambda of type '() => scala.Int' and the method 'apply', should return 'java.util.function.Supplier.get'") {
     val termFunction = q"""() => 3"""
-    val expectedTypeFunction = t"() => Int"
-    val expectedResult = q"""((() => 3): java.util.function.Supplier[Int]).get"""
+    val expectedTypeFunction = t"() => scala.Int"
+    val expectedResult = q"""((() => 3): java.util.function.Supplier[java.lang.Integer]).get"""
 
-    when(functionTypeInferrer.infer(eqTree(termFunction))).thenReturn(t"() => Int")
-    when(functionTypeTransformer.transform(eqTree(expectedTypeFunction))).thenReturn(t"java.util.function.Supplier[Int]")
+    when(functionTypeInferrer.infer(eqTree(termFunction))).thenReturn(t"() => scala.Int")
+    when(functionTypeTransformer.transform(eqTree(expectedTypeFunction))).thenReturn(t"java.util.function.Supplier[java.lang.Integer]")
 
     termSelectTermFunctionTransformer.transform(termFunction, TermNames.Apply).structure shouldBe expectedResult.structure
   }

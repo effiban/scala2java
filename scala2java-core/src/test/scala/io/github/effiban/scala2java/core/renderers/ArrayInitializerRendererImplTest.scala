@@ -3,7 +3,6 @@ package io.github.effiban.scala2java.core.renderers
 import io.github.effiban.scala2java.core.contexts.ArgumentListContext
 import io.github.effiban.scala2java.core.entities.EnclosingDelimiter.CurlyBrace
 import io.github.effiban.scala2java.core.entities.ListTraversalOptions
-import io.github.effiban.scala2java.core.entities.TypeNames.JavaObject
 import io.github.effiban.scala2java.core.matchers.ArgumentListContextMatcher.eqArgumentListContext
 import io.github.effiban.scala2java.core.renderers.contexts.{ArrayInitializerSizeRenderContext, ArrayInitializerValuesRenderContext}
 import io.github.effiban.scala2java.core.stubbers.OutputWriterStubber.doWrite
@@ -67,7 +66,7 @@ class ArrayInitializerRendererImplTest extends UnitTestSuite {
     val values = List(q"val1", q"val2")
     val context = ArrayInitializerValuesRenderContext(values = values)
 
-    doWrite("Object").when(typeRenderer).render(eqTree(JavaObject))
+    doWrite("Object").when(typeRenderer).render(eqTree(t"Object"))
     doWrite("{ val1, val2 }").when(argumentListRenderer).render(
       eqTreeList(values),
       eqTo(termArgumentRenderer),
@@ -80,7 +79,7 @@ class ArrayInitializerRendererImplTest extends UnitTestSuite {
   }
 
   test("renderWithValues() when has an empty context should use the Java type 'Object'") {
-    doWrite("Object").when(typeRenderer).render(eqTree(JavaObject))
+    doWrite("Object").when(typeRenderer).render(eqTree(t"Object"))
     doWrite("""{}""").when(argumentListRenderer).render(
       eqTreeList(Nil),
       eqTo(termArgumentRenderer),
@@ -108,7 +107,7 @@ class ArrayInitializerRendererImplTest extends UnitTestSuite {
   test("renderWithSize() when has the defaults for both type and size") {
     val size = q"0"
 
-    doWrite("Object").when(typeRenderer).render(eqTree(JavaObject))
+    doWrite("Object").when(typeRenderer).render(eqTree(t"Object"))
     doWrite("0").when(expressionTermRenderer).render(eqTree(size))
 
     arrayInitializerRenderer.renderWithSize(ArrayInitializerSizeRenderContext())

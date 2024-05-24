@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.typeinference
 
-import io.github.effiban.scala2java.core.entities.TypeNames
+import io.github.effiban.scala2java.core.entities.TypeSelects.ScalaClass
 
 import scala.meta.{Term, Type, XtensionQuasiquoteTerm}
 
@@ -13,7 +13,7 @@ private[typeinference] class ApplyTypeTypeInferrerImpl(applyReturnTypeInferrer: 
 
   override def infer(termApplyType: Term.ApplyType): Option[Type] = {
     termApplyType match {
-      case Term.ApplyType(q"classOf", List(tpe)) => Some(Type.Apply(TypeNames.Class, List(tpe)))
+      case Term.ApplyType(q"classOf", List(tpe)) => Some(Type.Apply(ScalaClass, List(tpe)))
       case aTermApplyType => applyReturnTypeInferrer.infer(Term.Apply(aTermApplyType, Nil))
     }
   }
