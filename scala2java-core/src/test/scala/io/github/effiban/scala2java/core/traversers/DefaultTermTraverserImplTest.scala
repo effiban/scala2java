@@ -139,10 +139,10 @@ class DefaultTermTraverserImplTest extends UnitTestSuite {
 
   test("traverse() for Term.Tuple") {
     val tuple = q"(x, 1)"
-    val traversedTermApply = q"Tuple.tuple(x, 1)"
-    doReturn(traversedTermApply).when(termTupleTraverser).traverse(eqTree(tuple))
+    val traversedTuple = q"(xx, 11)"
+    doReturn(traversedTuple).when(termTupleTraverser).traverse(eqTree(tuple))
 
-    defaultTermTraverser.traverse(tuple).structure shouldBe traversedTermApply.structure
+    defaultTermTraverser.traverse(tuple).structure shouldBe traversedTuple.structure
   }
 
   test("traverse() for Block") {

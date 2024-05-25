@@ -1,28 +1,29 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.transformers.TermTupleToTermApplyTransformer
-import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
+import org.mockito.ArgumentMatchersSugar.any
 
 import scala.meta.Term.Tuple
-import scala.meta.XtensionQuasiquoteTerm
+import scala.meta.{Term, XtensionQuasiquoteTerm}
 
 class TermTupleTraverserImplTest extends UnitTestSuite {
 
-  private val termApplyTraverser = mock[TermApplyTraverser]
-  private val termTupleToTermApplyTransformer = mock[TermTupleToTermApplyTransformer]
+  private val expressionTermTraverser = mock[ExpressionTermTraverser]
 
-  private val termTupleTraverser = new TermTupleTraverserImpl(termApplyTraverser, termTupleToTermApplyTransformer)
+  private val termTupleTraverser = new TermTupleTraverserImpl(expressionTermTraverser)
 
   test("traverse") {
-    val terms = List(q"1", q"2")
-    val tuple = Tuple(terms)
-    val expectedIntermediateTermApply = q"Tuple.tuple(1, 2)"
-    val expectedTraversedTermApply = q"Tuple.tuple(11, 22)"
+    val args = List(q"1", q"2")
+    val traversedArgs = List(q"11", q"22")
+    val tuple = Tuple(args)
+    val expectedTraversedTuple = Tuple(traversedArgs)
 
-    when(termTupleToTermApplyTransformer.transform(eqTree(tuple))).thenReturn(expectedIntermediateTermApply)
-    doReturn(expectedTraversedTermApply).when(termApplyTraverser).traverse(eqTree(expectedIntermediateTermApply))
+    doAnswer((arg: Term) => arg match {
+      case q"1" => q"11"
+      case q"2" => q"22"
+      case other => other
+    }).when(expressionTermTraverser).traverse(any[Term])
 
-    termTupleTraverser.traverse(tuple).structure shouldBe expectedTraversedTermApply.structure
+    termTupleTraverser.traverse(tuple).structure shouldBe expectedTraversedTuple.structure
   }
 }

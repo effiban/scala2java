@@ -28,6 +28,7 @@ class TreeTransformerImplTest extends UnitTestSuite {
   private val internalTermApplyInfixTransformer = mock[InternalTermApplyInfixTransformer]
   private val internalTermApplyTransformer = mock[InternalTermApplyTransformer]
   private val internalTermSelectTransformer = mock[InternalTermSelectTransformer]
+  private val termTupleToTermApplyTransformer = mock[TermTupleToTermApplyTransformer]
   private val typeSelectTransformer = mock[TypeSelectTransformer]
 
   private val treeTransformer = new TreeTransformerImpl(
@@ -35,6 +36,7 @@ class TreeTransformerImplTest extends UnitTestSuite {
     internalTermApplyInfixTransformer,
     internalTermApplyTransformer,
     internalTermSelectTransformer,
+    termTupleToTermApplyTransformer,
     typeSelectTransformer
   )
 
@@ -74,6 +76,15 @@ class TreeTransformerImplTest extends UnitTestSuite {
     when(internalTermSelectTransformer.transform(eqTree(termSelect))).thenReturn(transformedTermSelect)
 
     treeTransformer.transform(termSelect).structure shouldBe transformedTermSelect.structure
+  }
+
+  test("transform Term.Tuple should return result of inner transformer") {
+    val termTuple = q"(a, b, c)"
+    val termApply = q"org.jooq.lambda.tuple.Tuple.tuple(a, b, c)"
+
+    when(termTupleToTermApplyTransformer.transform(eqTree(termTuple))).thenReturn(termApply)
+
+    treeTransformer.transform(termTuple).structure shouldBe termApply.structure
   }
 
   test("transform Type.Select when inner transformer returns a result should return it") {
