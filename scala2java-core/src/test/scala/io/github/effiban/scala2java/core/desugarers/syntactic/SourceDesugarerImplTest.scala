@@ -15,6 +15,7 @@ class SourceDesugarerImplTest extends UnitTestSuite {
   private val declValToDeclVarDesugarer = mock[DeclValToDeclVarDesugarer]
   private val defnValToDefnVarDesugarer = mock[DefnValToDefnVarDesugarer]
   private val defnTypeToTraitDesugarer = mock[DefnTypeToTraitDesugarer]
+  private val termApplyInfixDesugarer = mock[TermApplyInfixDesugarer]
 
   private val sourceDesugarer = new SourceDesugarerImpl(
     termInterpolateDesugarer,
@@ -22,7 +23,8 @@ class SourceDesugarerImplTest extends UnitTestSuite {
     forYieldDesugarer,
     declValToDeclVarDesugarer,
     defnValToDefnVarDesugarer,
-    defnTypeToTraitDesugarer
+    defnTypeToTraitDesugarer,
+    termApplyInfixDesugarer
   )
 
   test("desugar when has a Term.Interpolate should return a desugared equivalent") {
@@ -204,6 +206,31 @@ class SourceDesugarerImplTest extends UnitTestSuite {
       """
 
     doReturn(expectedTrait).when(defnTypeToTraitDesugarer).desugar(eqTree(defnType))
+
+    sourceDesugarer.desugar(source).structure shouldBe expectedDesugaredSource.structure
+  }
+
+
+  test("desugar when has a Term.ApplyInfix should return a corresponding Term") {
+    val source =
+      source"""
+      package dummy
+
+      class MyClass {
+        var x = Map(a -> b)
+      }
+      """
+
+    val expectedDesugaredSource =
+      source"""
+      package dummy
+
+      class MyClass {
+        var x = Map((a, b))
+      }
+      """
+
+    doReturn(q"(a, b)").when(termApplyInfixDesugarer).desugar(eqTree(q"a -> b"))
 
     sourceDesugarer.desugar(source).structure shouldBe expectedDesugaredSource.structure
   }

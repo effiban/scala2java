@@ -12,7 +12,8 @@ private[syntactic] class SourceDesugarerImpl(termInterpolateDesugarer: TermInter
                                              forYieldDesugarer: ForYieldDesugarer,
                                              declValToDeclVarDesugarer: DeclValToDeclVarDesugarer,
                                              defnValToDefnVarDesugarer: DefnValToDefnVarDesugarer,
-                                             defnTypeToTraitDesugarer: DefnTypeToTraitDesugarer) extends SourceDesugarer {
+                                             defnTypeToTraitDesugarer: DefnTypeToTraitDesugarer,
+                                             termApplyInfixDesugarer: TermApplyInfixDesugarer) extends SourceDesugarer {
 
   override def desugar(source: Source): Source = desugarInner(source) match {
     case desugaredSource: Source => desugaredSource
@@ -26,6 +27,7 @@ private[syntactic] class SourceDesugarerImpl(termInterpolateDesugarer: TermInter
     case declVal: Decl.Val => declValToDeclVarDesugarer.desugar(declVal)
     case defnVal: Defn.Val => defnValToDefnVarDesugarer.desugar(defnVal)
     case defnType: Defn.Type => defnTypeToTraitDesugarer.desugar(defnType)
+    case termApplyInfix: Term.ApplyInfix => termApplyInfixDesugarer.desugar(termApplyInfix)
     case other => other
   }
 }
@@ -36,5 +38,6 @@ object SourceDesugarer extends SourceDesugarerImpl(
   ForYieldDesugarer,
   DeclValToDeclVarDesugarer,
   DefnValToDefnVarDesugarer,
-  DefnTypeToTraitDesugarer
+  DefnTypeToTraitDesugarer,
+  CompositeTermApplyInfixDesugarer
 )
