@@ -319,11 +319,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val termAnnotateTraverser: TermAnnotateTraverser = new TermAnnotateTraverserImpl(expressionTermTraverser, annotTraverser)
 
-  private lazy val termApplyInfixTraverser: TermApplyInfixTraverser = new TermApplyInfixTraverserImpl(
-    expressionTermTraverser,
-    termApplyTraverser,
-    new CompositeTermApplyInfixToTermApplyTransformer(CoreTermApplyInfixToTermApplyTransformer)
-  )
+  private lazy val termApplyInfixTraverser: TermApplyInfixTraverser = new TermApplyInfixTraverserImpl(expressionTermTraverser)
 
   private lazy val termApplyTraverser: TermApplyTraverser = new TermApplyTraverserImpl(
     expressionTermTraverser,
