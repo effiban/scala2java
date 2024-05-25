@@ -47,12 +47,16 @@ class Transformers(implicit typeInferrers: => TypeInferrers,
     FunctionTypeTransformer
   )
 
+  private lazy val termTupleToTermApplyTransformer: TermTupleToTermApplyTransformer = new TermTupleToTermApplyTransformerImpl(treeTransformer)
+
   private lazy val treeTransformer: TreeTransformer = new TreeTransformerImpl(
     pkgTransformer,
     internalTermApplyInfixTransformer,
     internalTermApplyTransformer,
     internalTermSelectTransformer,
+    termTupleToTermApplyTransformer,
     typeSelectTransformer
   )
+
   private val typeSelectTransformer: TypeSelectTransformer = new CompositeTypeSelectTransformer(CoreTypeSelectTransformer)
 }

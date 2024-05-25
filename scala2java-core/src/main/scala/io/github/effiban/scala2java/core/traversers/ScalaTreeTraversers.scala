@@ -346,7 +346,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
 
   private lazy val termRepeatedTraverser: TermRepeatedTraverser = new TermRepeatedTraverserImpl(expressionTermTraverser)
 
-  private lazy val termTupleTraverser: TermTupleTraverser = new TermTupleTraverserImpl(termApplyTraverser, TermTupleToTermApplyTransformer)
+  private lazy val termTupleTraverser: TermTupleTraverser = new TermTupleTraverserImpl(expressionTermTraverser)
 
   private lazy val throwTraverser: ThrowTraverser = new ThrowTraverserImpl(expressionTermTraverser)
 

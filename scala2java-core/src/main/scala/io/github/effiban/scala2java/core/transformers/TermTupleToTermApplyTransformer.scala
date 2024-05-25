@@ -4,13 +4,16 @@ import scala.meta.{Term, XtensionQuasiquoteTerm}
 
 trait TermTupleToTermApplyTransformer {
 
-  def transform(termTuple: Term.Tuple): Term.Apply
+  def transform(termTuple: Term.Tuple): Term
 }
 
-object TermTupleToTermApplyTransformer extends TermTupleToTermApplyTransformer {
+private[transformers] class TermTupleToTermApplyTransformerImpl(treeTransformer: => TreeTransformer)
+  extends TermTupleToTermApplyTransformer {
 
-  override def transform(termTuple: Term.Tuple): Term.Apply = {
-    termTuple.args match {
+  override def transform(termTuple: Term.Tuple): Term = {
+    val transformedArgs = termTuple.args.map(treeTransformer.transform(_).asInstanceOf[Term])
+
+    transformedArgs match {
       // 0 or 1 arg are both impossible - would fail parsing of the code before we get here
       // For a tuple of 2, using Java's Map.entry()
       case arg1 :: arg2 :: Nil => Term.Apply(fun = q"java.util.Map.entry", args = List(arg1, arg2))

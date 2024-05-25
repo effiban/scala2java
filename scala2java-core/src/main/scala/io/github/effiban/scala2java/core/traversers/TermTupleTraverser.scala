@@ -1,16 +1,13 @@
 package io.github.effiban.scala2java.core.traversers
 
-import io.github.effiban.scala2java.core.transformers.TermTupleToTermApplyTransformer
-
 import scala.meta.Term
 
-trait TermTupleTraverser extends ScalaTreeTraverser2[Term.Tuple, Term.Apply]
+trait TermTupleTraverser extends ScalaTreeTraverser1[Term.Tuple]
 
-private[traversers] class TermTupleTraverserImpl(termApplyTraverser: => TermApplyTraverser,
-                                                 termTupleToTermApplyTransformer: TermTupleToTermApplyTransformer)
+private[traversers] class TermTupleTraverserImpl(expressionTermTraverser: => ExpressionTermTraverser)
   extends TermTupleTraverser {
 
-  override def traverse(termTuple: Term.Tuple): Term.Apply = {
-    termApplyTraverser.traverse(termTupleToTermApplyTransformer.transform(termTuple))
+  override def traverse(termTuple: Term.Tuple): Term.Tuple = {
+    termTuple.copy(args = termTuple.args.map(expressionTermTraverser.traverse))
   }
 }
