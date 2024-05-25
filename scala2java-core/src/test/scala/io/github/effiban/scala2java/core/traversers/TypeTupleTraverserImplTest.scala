@@ -3,25 +3,28 @@ package io.github.effiban.scala2java.core.traversers
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.transformers.TypeTupleToTypeApplyTransformer
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
+import org.mockito.ArgumentMatchersSugar.any
 
-import scala.meta.XtensionQuasiquoteType
+import scala.meta.{Type, XtensionQuasiquoteType}
 
 class TypeTupleTraverserImplTest extends UnitTestSuite {
 
-  private val typeApplyTraverser = mock[TypeApplyTraverser]
-  private val typeTupleToTypeApplyTransformer = mock[TypeTupleToTypeApplyTransformer]
+  private val typeTraverser = mock[TypeTraverser]
 
-  private val typeTupleTraverser = new TypeTupleTraverserImpl(typeApplyTraverser, typeTupleToTypeApplyTransformer)
+  private val typeTupleTraverser = new TypeTupleTraverserImpl(typeTraverser)
 
   test("traverse") {
     val typeTuple = t"(T1, T2, T3)"
-    val expectedTypeApply = t"Tuple3[T1, T2, T3]"
-    val expectedTraversedTypeApply = t"Tuple3[U1, U2, U3]"
+    val traversedTypeTuple = t"(T11, T22, T33)"
 
-    when(typeTupleToTypeApplyTransformer.transform(eqTree(typeTuple))).thenReturn(expectedTypeApply)
-    doReturn(expectedTraversedTypeApply).when(typeApplyTraverser).traverse(eqTree(expectedTypeApply))
+    doAnswer((arg: Type) => arg match {
+      case t"T1" => t"T11"
+      case t"T2" => t"T22"
+      case t"T3" => t"T33"
+      case other => other
+    }).when(typeTraverser).traverse(any[Type])
 
-    typeTupleTraverser.traverse(typeTuple).structure shouldBe expectedTraversedTypeApply.structure
+    typeTupleTraverser.traverse(typeTuple).structure shouldBe traversedTypeTuple.structure
   }
 
 }

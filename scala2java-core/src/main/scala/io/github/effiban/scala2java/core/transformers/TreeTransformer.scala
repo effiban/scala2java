@@ -13,7 +13,8 @@ private[transformers] class TreeTransformerImpl(pkgTransformer: => PkgTransforme
                                                 internalTermApplyTransformer: => InternalTermApplyTransformer,
                                                 internalTermSelectTransformer: => InternalTermSelectTransformer,
                                                 termTupleToTermApplyTransformer: => TermTupleToTermApplyTransformer,
-                                                typeSelectTransformer: TypeSelectTransformer) extends TreeTransformer {
+                                                typeSelectTransformer: TypeSelectTransformer,
+                                                typeTupleToTypeApplyTransformer: => TypeTupleToTypeApplyTransformer) extends TreeTransformer {
 
   override def transform(tree: Tree): Tree = {
     new InnerTransformer()(tree)
@@ -30,6 +31,7 @@ private[transformers] class TreeTransformerImpl(pkgTransformer: => PkgTransforme
         case termSelect: Term.Select => internalTermSelectTransformer.transform(termSelect)
         case termTuple: Term.Tuple => termTupleToTermApplyTransformer.transform(termTuple)
         case typeSelect: Type.Select => typeSelectTransformer.transform(typeSelect).getOrElse(super.apply(typeSelect))
+        case typeTuple: Type.Tuple => typeTupleToTypeApplyTransformer.transform(typeTuple)
         case aTree => super.apply(aTree)
       }
   }

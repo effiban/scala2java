@@ -2,24 +2,20 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.classifiers._
 import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
-import io.github.effiban.scala2java.core.factories.{Factories, TemplateChildContextFactory}
+import io.github.effiban.scala2java.core.factories.TemplateChildContextFactory
 import io.github.effiban.scala2java.core.orderings.JavaTemplateChildOrdering
 import io.github.effiban.scala2java.core.predicates._
 import io.github.effiban.scala2java.core.resolvers._
 import io.github.effiban.scala2java.core.transformers._
 import io.github.effiban.scala2java.core.typeinference.TypeInferrers
 
-class ScalaTreeTraversers(implicit factories: Factories,
-                          typeInferrers: TypeInferrers,
+class ScalaTreeTraversers(implicit typeInferrers: TypeInferrers,
                           extensionRegistry: ExtensionRegistry) {
 
   private implicit lazy val classifiers: Classifiers = new Classifiers(typeInferrers)
-  private implicit lazy val transformers: Transformers = new Transformers()
   private lazy val resolvers = new Resolvers()
 
-  import factories._
   import resolvers._
-  import transformers._
   import typeInferrers._
 
 
@@ -408,10 +404,7 @@ class ScalaTreeTraversers(implicit factories: Factories,
     typeRepeatedTraverser
   )
 
-  private lazy val typeTupleTraverser: TypeTupleTraverser = new TypeTupleTraverserImpl(
-    typeApplyTraverser,
-    TypeTupleToTypeApplyTransformer
-  )
+  private lazy val typeTupleTraverser: TypeTupleTraverser = new TypeTupleTraverserImpl(typeTraverser)
 
   private lazy val typeWildcardTraverser: TypeWildcardTraverser = new TypeWildcardTraverserImpl(typeBoundsTraverser)
 

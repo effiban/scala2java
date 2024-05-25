@@ -1,16 +1,19 @@
 package io.github.effiban.scala2java.core.transformers
 
-import scala.meta.{Type, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
+import scala.meta.{Term, Type, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 trait TypeTupleToTypeApplyTransformer {
 
   def transform(typeTuple: Type.Tuple): Type.Apply
 }
 
-object TypeTupleToTypeApplyTransformer extends TypeTupleToTypeApplyTransformer {
+private[transformers] class TypeTupleToTypeApplyTransformerImpl(treeTransformer: => TreeTransformer)
+  extends TypeTupleToTypeApplyTransformer {
 
   override def transform(typeTuple: Type.Tuple): Type.Apply = {
-    typeTuple.args match {
+    val transformedArgs = typeTuple.args.map(treeTransformer.transform(_).asInstanceOf[Type])
+
+    transformedArgs match {
       // 0 or 1 arg are both impossible - would fail parsing of the code before we get here
       // For a tuple of 2, using Java's Map.Entry type, for example: Map.Entry<String, Int>
       case arg1 :: arg2 :: Nil => Type.Apply(tpe = t"java.util.Map#Entry", args = List(arg1, arg2))
