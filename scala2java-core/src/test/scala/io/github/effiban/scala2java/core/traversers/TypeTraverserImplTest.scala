@@ -1,10 +1,8 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.Type.Bounds
 import scala.meta.{Mod, Type, XtensionQuasiquoteType}
 
 class TypeTraverserImplTest extends UnitTestSuite {
@@ -72,10 +70,10 @@ class TypeTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse Type.Tuple") {
-    val typeTuple = t"(Int, String)"
-    val expectedTypeApply = t"Tuple2[Int, String]"
-    doReturn(expectedTypeApply).when(typeTupleTraverser).traverse(eqTree(typeTuple))
-    typeTraverser.traverse(typeTuple).structure shouldBe expectedTypeApply.structure
+    val typeTuple = t"(T1, T2)"
+    val traversedTypeTuple = t"(T11, T22)"
+    doReturn(traversedTypeTuple).when(typeTupleTraverser).traverse(eqTree(typeTuple))
+    typeTraverser.traverse(typeTuple).structure shouldBe traversedTypeTuple.structure
   }
 
   test("traverse Type.With") {
@@ -121,8 +119,8 @@ class TypeTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse Type.Repeated") {
-    val typeRepeated = Type.Repeated(TypeNames.Double)
-    val traversedTypeRepeated = Type.Repeated(t"double")
+    val typeRepeated = Type.Repeated(t"T")
+    val traversedTypeRepeated = Type.Repeated(t"TT")
     doReturn(traversedTypeRepeated).when(typeRepeatedTraverser).traverse(eqTree(typeRepeated))
     typeTraverser.traverse(typeRepeated).structure shouldBe traversedTypeRepeated.structure
   }
@@ -135,16 +133,5 @@ class TypeTraverserImplTest extends UnitTestSuite {
   test("traverse Type.AnonymousParam") {
     val typeAnonymousParam = Type.AnonymousParam(Some(Mod.Contravariant()))
     typeTraverser.traverse(typeAnonymousParam).structure shouldBe typeAnonymousParam.structure
-  }
-
-  private def typeParamOf(name: String) = {
-    Type.Param(
-      mods = List(),
-      name = Type.Name(name),
-      tparams = List(),
-      tbounds = Bounds(lo = None, hi = None),
-      vbounds = List(),
-      cbounds = List()
-    )
   }
 }
