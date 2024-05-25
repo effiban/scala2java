@@ -1,16 +1,15 @@
-package io.github.effiban.scala2java.core.transformers
+package io.github.effiban.scala2java.core.desugarers.syntactic
 
 import io.github.effiban.scala2java.core.entities.TermNames
-import io.github.effiban.scala2java.core.entities.TermNames.{Plus, ScalaInclusive, ScalaUntil}
+import io.github.effiban.scala2java.core.entities.TermNames.{Plus, ScalaInclusive, ScalaTo, ScalaUntil}
 import io.github.effiban.scala2java.core.entities.TermSelects.ScalaRange
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.testtrees.TermNames.ScalaTo
 
 import scala.meta.{Lit, Term}
 
-class TermApplyInfixToRangeTransformerTest extends UnitTestSuite {
-
-  test("transform 'to' with one arg should return a scala.Range method call") {
+class TermApplyInfixToRangeDesugarerTest extends UnitTestSuite {
+  
+  test("desugar 'to' with one arg should return a scala.Range method call") {
     val termApplyInfix = Term.ApplyInfix(
       lhs = Lit.Int(1),
       op = ScalaTo,
@@ -23,10 +22,10 @@ class TermApplyInfixToRangeTransformerTest extends UnitTestSuite {
       args = List(Lit.Int(1), Lit.Int(10))
     )
 
-    TermApplyInfixToRangeTransformer.transform(termApplyInfix).value.structure shouldBe expectedTermApply.structure
+    TermApplyInfixToRangeDesugarer.desugar(termApplyInfix).structure shouldBe expectedTermApply.structure
   }
 
-  test("transform 'to' with no args should throw an IllegalStateException") {
+  test("desugar 'to' with no args should throw an IllegalStateException") {
     val termApplyInfix = Term.ApplyInfix(
       lhs = Lit.Int(1),
       op = ScalaTo,
@@ -35,11 +34,11 @@ class TermApplyInfixToRangeTransformerTest extends UnitTestSuite {
     )
 
     intercept[IllegalStateException] {
-      TermApplyInfixToRangeTransformer.transform(termApplyInfix)
+      TermApplyInfixToRangeDesugarer.desugar(termApplyInfix)
     }
   }
 
-  test("transform 'until' with one arg") {
+  test("desugar 'until' with one arg") {
     val termApplyInfix = Term.ApplyInfix(
       lhs = Lit.Int(0),
       op = ScalaUntil,
@@ -52,10 +51,10 @@ class TermApplyInfixToRangeTransformerTest extends UnitTestSuite {
       args = List(Lit.Int(0), Lit.Int(10))
     )
 
-    TermApplyInfixToRangeTransformer.transform(termApplyInfix).value.structure shouldBe expectedTermApply.structure
+    TermApplyInfixToRangeDesugarer.desugar(termApplyInfix).structure shouldBe expectedTermApply.structure
   }
 
-  test("transform 'until' with two args should throw an IllegalStateException") {
+  test("desugar 'until' with two args should throw an IllegalStateException") {
     val termApplyInfix = Term.ApplyInfix(
       lhs = Lit.Int(0),
       op = ScalaUntil,
@@ -64,11 +63,11 @@ class TermApplyInfixToRangeTransformerTest extends UnitTestSuite {
     )
 
     intercept[IllegalStateException] {
-      TermApplyInfixToRangeTransformer.transform(termApplyInfix)
+      TermApplyInfixToRangeDesugarer.desugar(termApplyInfix)
     }
   }
 
-  test("transform '+' should throw an IllegalStateException") {
+  test("desugar '+' should throw an IllegalStateException") {
     val termApplyInfix = Term.ApplyInfix(
       lhs = Lit.Int(0),
       op = Plus,
@@ -77,7 +76,8 @@ class TermApplyInfixToRangeTransformerTest extends UnitTestSuite {
     )
 
     intercept[IllegalStateException] {
-      TermApplyInfixToRangeTransformer.transform(termApplyInfix)
+      TermApplyInfixToRangeDesugarer.desugar(termApplyInfix)
     }
   }
+
 }

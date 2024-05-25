@@ -61,7 +61,7 @@ object TermNames {
   final val ScalaNil: Term.Name = q"Nil"
   final val ScalaTo: Term.Name = q"to"
   final val ScalaUntil: Term.Name = q"until"
-  final val ScalaAssociate: Term.Name = q"->"
+  final val ScalaAssociation: Term.Name = Term.Name("->")
   final val ScalaClassOf: Term.Name = q"classOf"
 
   final val Java: Term.Name = q"java"

@@ -12,19 +12,14 @@ private[transformers] class CoreTermApplyInfixToTermApplyTransformer(classifier:
 
   override def transform(termApplyInfix: Term.ApplyInfix): Option[Term.Apply] = {
     val kind = classifier.classify(termApplyInfix)
-    transformerFor(kind).transform(termApplyInfix)
-  }
-
-  private def transformerFor(kind: TermApplyInfixKind) = {
-    transformerMap.getOrElse(kind, throw new IllegalStateException(s"No TermApplyInfixToTermApplyTransformer defined for kind $kind"))
+    transformerMap.get(kind)
+      .flatMap(_.transform(termApplyInfix))
   }
 }
 
 object CoreTermApplyInfixToTermApplyTransformer extends CoreTermApplyInfixToTermApplyTransformer(
   TermApplyInfixClassifier,
   Map(
-    Association -> TermApplyInfixToMapEntryTransformer,
-    Range -> TermApplyInfixToRangeTransformer,
     Operator -> TermApplyInfixToTermApplyTransformer.Empty,
     Unclassified -> BasicTermApplyInfixToTermApplyTransformer
   )
