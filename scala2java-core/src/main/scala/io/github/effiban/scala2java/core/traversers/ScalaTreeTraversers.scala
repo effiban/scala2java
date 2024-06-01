@@ -15,11 +15,9 @@ class ScalaTreeTraversers(implicit typeInferrers: TypeInferrers,
 
   private implicit lazy val classifiers: Classifiers = new Classifiers(typeInferrers)
   private lazy val resolvers = new Resolvers()
-  private lazy val transformers = new Transformers()
 
   import resolvers._
   import typeInferrers._
-  import transformers._
 
 
   private lazy val alternativeTraverser: AlternativeTraverser = new AlternativeTraverserImpl(patTraverser)
@@ -375,7 +373,7 @@ class ScalaTreeTraversers(implicit typeInferrers: TypeInferrers,
 
   private lazy val typeExistentialTraverser: TypeExistentialTraverser = new TypeExistentialTraverserImpl(typeTraverser)
 
-  private lazy val typeFunctionTraverser: TypeFunctionTraverser = new TypeFunctionTraverserImpl(typeTraverser, functionTypeTransformer)
+  private lazy val typeFunctionTraverser: TypeFunctionTraverser = new TypeFunctionTraverserImpl(typeTraverser)
 
   private lazy val typeParamTraverser: TypeParamTraverser = new TypeParamTraverserImpl(typeBoundsTraverser)
 

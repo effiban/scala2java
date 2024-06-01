@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.transformers
 
-import io.github.effiban.scala2java.spi.transformers.{TermApplyInfixToTermApplyTransformer, TypeSelectTransformer}
+import io.github.effiban.scala2java.spi.transformers.TypeSelectTransformer
 
 import scala.meta.{Import, Pkg, Term, Transformer, Tree, Type}
 
@@ -13,6 +13,7 @@ private[transformers] class TreeTransformerImpl(pkgTransformer: => PkgTransforme
                                                 internalTermApplyTransformer: => InternalTermApplyTransformer,
                                                 internalTermSelectTransformer: => InternalTermSelectTransformer,
                                                 termTupleToTermApplyTransformer: => TermTupleToTermApplyTransformer,
+                                                functionTypeTransformer: => FunctionTypeTransformer,
                                                 typeSelectTransformer: TypeSelectTransformer,
                                                 typeTupleToTypeApplyTransformer: => TypeTupleToTypeApplyTransformer) extends TreeTransformer {
 
@@ -30,6 +31,7 @@ private[transformers] class TreeTransformerImpl(pkgTransformer: => PkgTransforme
         case termApply: Term.Apply => internalTermApplyTransformer.transform(termApply)
         case termSelect: Term.Select => internalTermSelectTransformer.transform(termSelect)
         case termTuple: Term.Tuple => termTupleToTermApplyTransformer.transform(termTuple)
+        case typeFunction: Type.Function => functionTypeTransformer.transform(typeFunction)
         case typeSelect: Type.Select => typeSelectTransformer.transform(typeSelect).getOrElse(super.apply(typeSelect))
         case typeTuple: Type.Tuple => typeTupleToTypeApplyTransformer.transform(typeTuple)
         case aTree => super.apply(aTree)

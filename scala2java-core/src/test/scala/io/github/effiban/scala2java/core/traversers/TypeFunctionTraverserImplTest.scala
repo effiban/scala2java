@@ -1,25 +1,26 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.transformers.FunctionTypeTransformer
-import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
+import org.mockito.ArgumentMatchersSugar.any
 
-import scala.meta.XtensionQuasiquoteType
+import scala.meta.{Type, XtensionQuasiquoteType}
 
 class TypeFunctionTraverserImplTest extends UnitTestSuite {
 
   private val typeTraverser = mock[TypeTraverser]
-  private val functionTypeTransformer = mock[FunctionTypeTransformer]
 
-  private val typeFunctionTraverser = new TypeFunctionTraverserImpl(typeTraverser, functionTypeTransformer)
+  private val typeFunctionTraverser = new TypeFunctionTraverserImpl(typeTraverser)
 
   test("traverse()") {
-    val functionType = t"T1 => U1"
-    val expectedTransformedFunctionType = t"Function[T1, U1]"
-    val expectedTraversedFunctionType = t"Function[T2, U2]"
+    val functionType = t"(T1, T2) => T3"
+    val expectedTraversedFunctionType = t"(U1, U2) => U3"
 
-    when(functionTypeTransformer.transform(eqTree(functionType))).thenReturn(expectedTransformedFunctionType)
-    doReturn(expectedTraversedFunctionType).when(typeTraverser).traverse(eqTree(expectedTransformedFunctionType))
+    doAnswer((tpe: Type) => tpe match {
+      case t"T1" => t"U1"
+      case t"T2" => t"U2"
+      case t"T3" => t"U3"
+      case other => other
+    }).when(typeTraverser).traverse(any[Type])
 
     typeFunctionTraverser.traverse(functionType).structure shouldBe expectedTraversedFunctionType.structure
   }

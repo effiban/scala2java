@@ -5,18 +5,17 @@ import io.github.effiban.scala2java.core.entities.TypeSelects.JavaRunnable
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.typeinference.FunctionTypeInferrer
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
+import org.mockito.ArgumentMatchersSugar.any
 
-import scala.meta.{XtensionQuasiquoteTerm, XtensionQuasiquoteType}
+import scala.meta.{Tree, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 class TermSelectTermFunctionTransformerImplTest extends UnitTestSuite {
 
   private val functionTypeInferrer = mock[FunctionTypeInferrer]
-  private val functionTypeTransformer = mock[FunctionTypeTransformer]
   private val treeTransformer = mock[TreeTransformer]
 
   private val termSelectTermFunctionTransformer = new TermSelectTermFunctionTransformerImpl(
     functionTypeInferrer,
-    functionTypeTransformer,
     treeTransformer
   )
 
@@ -26,9 +25,12 @@ class TermSelectTermFunctionTransformerImplTest extends UnitTestSuite {
     val expectedTypeFunction = t"() => scala.Unit"
     val expectedResult = q"""((() => System.out.print("bla")): java.lang.Runnable).run"""
 
-    doReturn(expectedTransformedTermFunction).when(treeTransformer).transform(eqTree(termFunction))
+    doAnswer((tree: Tree) => tree match {
+      case aTree if aTree.structure == termFunction.structure => expectedTransformedTermFunction
+      case aTree if aTree.structure == expectedTypeFunction.structure => JavaRunnable
+      case other => other
+    }).when(treeTransformer).transform(any[Tree])
     when(functionTypeInferrer.infer(eqTree(termFunction))).thenReturn(t"() => scala.Unit")
-    when(functionTypeTransformer.transform(eqTree(expectedTypeFunction))).thenReturn(JavaRunnable)
 
     termSelectTermFunctionTransformer.transform(termFunction, TermNames.Apply).structure shouldBe expectedResult.structure
   }
@@ -39,9 +41,12 @@ class TermSelectTermFunctionTransformerImplTest extends UnitTestSuite {
     val expectedTypeFunction = t"() => scala.Int"
     val expectedResult = q"""((() => 33): java.util.function.Supplier[java.lang.Integer]).get"""
 
-    doReturn(expectedTransformedTermFunction).when(treeTransformer).transform(eqTree(termFunction))
+    doAnswer((tree: Tree) => tree match {
+      case aTree if aTree.structure == termFunction.structure => expectedTransformedTermFunction
+      case aTree if aTree.structure == expectedTypeFunction.structure => t"java.util.function.Supplier[java.lang.Integer]"
+      case other => other
+    }).when(treeTransformer).transform(any[Tree])
     when(functionTypeInferrer.infer(eqTree(termFunction))).thenReturn(t"() => scala.Int")
-    when(functionTypeTransformer.transform(eqTree(expectedTypeFunction))).thenReturn(t"java.util.function.Supplier[java.lang.Integer]")
 
     termSelectTermFunctionTransformer.transform(termFunction, TermNames.Apply).structure shouldBe expectedResult.structure
   }
@@ -52,9 +57,12 @@ class TermSelectTermFunctionTransformerImplTest extends UnitTestSuite {
     val expectedTypeFunction = t"scala.Int => scala.Unit"
     val expectedResult = q"""(((x: int) => System.out.print(x)): java.util.function.Consumer[java.lang.Integer]).accept"""
 
-    doReturn(expectedTransformedTermFunction).when(treeTransformer).transform(eqTree(termFunction))
+    doAnswer((tree: Tree) => tree match {
+      case aTree if aTree.structure == termFunction.structure => expectedTransformedTermFunction
+      case aTree if aTree.structure == expectedTypeFunction.structure => t"java.util.function.Consumer[java.lang.Integer]"
+      case other => other
+    }).when(treeTransformer).transform(any[Tree])
     when(functionTypeInferrer.infer(eqTree(termFunction))).thenReturn(expectedTypeFunction)
-    when(functionTypeTransformer.transform(eqTree(expectedTypeFunction))).thenReturn(t"java.util.function.Consumer[java.lang.Integer]")
 
     termSelectTermFunctionTransformer.transform(termFunction, TermNames.Apply).structure shouldBe expectedResult.structure
   }
@@ -65,9 +73,12 @@ class TermSelectTermFunctionTransformerImplTest extends UnitTestSuite {
     val expectedTypeFunction = t"scala.Int => scala.Unit"
     val expectedResult = q"""(((x: int) => System.out.print(x)): java.util.function.Consumer[java.lang.Integer]).andThen"""
 
-    doReturn(expectedTransformedTermFunction).when(treeTransformer).transform(eqTree(termFunction))
+    doAnswer((tree: Tree) => tree match {
+      case aTree if aTree.structure == termFunction.structure => expectedTransformedTermFunction
+      case aTree if aTree.structure == expectedTypeFunction.structure => t"java.util.function.Consumer[java.lang.Integer]"
+      case other => other
+    }).when(treeTransformer).transform(any[Tree])
     when(functionTypeInferrer.infer(eqTree(termFunction))).thenReturn(expectedTypeFunction)
-    when(functionTypeTransformer.transform(eqTree(expectedTypeFunction))).thenReturn(t"java.util.function.Consumer[java.lang.Integer]")
 
     termSelectTermFunctionTransformer.transform(termFunction, TermNames.AndThen).structure shouldBe expectedResult.structure
   }
@@ -80,9 +91,12 @@ class TermSelectTermFunctionTransformerImplTest extends UnitTestSuite {
       q"""(((x: int, y: java.lang.String) => System.out.print(x + y)): 
          java.util.function.BiConsumer[java.lang.Integer, java.lang.String]).accept"""
 
-    doReturn(expectedTransformedTermFunction).when(treeTransformer).transform(eqTree(termFunction))
+    doAnswer((tree: Tree) => tree match {
+      case aTree if aTree.structure == termFunction.structure => expectedTransformedTermFunction
+      case aTree if aTree.structure == expectedTypeFunction.structure => t"java.util.function.BiConsumer[java.lang.Integer, java.lang.String]"
+      case other => other
+    }).when(treeTransformer).transform(any[Tree])
     when(functionTypeInferrer.infer(eqTree(termFunction))).thenReturn(expectedTypeFunction)
-    when(functionTypeTransformer.transform(eqTree(expectedTypeFunction))).thenReturn(t"java.util.function.BiConsumer[java.lang.Integer, java.lang.String]")
 
     termSelectTermFunctionTransformer.transform(termFunction, TermNames.Apply).structure shouldBe expectedResult.structure
   }
@@ -93,9 +107,12 @@ class TermSelectTermFunctionTransformerImplTest extends UnitTestSuite {
     val expectedTypeFunction = t"scala.Int => scala.String"
     val expectedResult = q"""(((x: int) => x.toString()): java.util.function.Function[java.lang.Integer, java.lang.String]).apply"""
 
-    doReturn(expectedTransformedTermFunction).when(treeTransformer).transform(eqTree(termFunction))
+    doAnswer((tree: Tree) => tree match {
+      case aTree if aTree.structure == termFunction.structure => expectedTransformedTermFunction
+      case aTree if aTree.structure == expectedTypeFunction.structure => t"java.util.function.Function[java.lang.Integer, java.lang.String]"
+      case other => other
+    }).when(treeTransformer).transform(any[Tree])
     when(functionTypeInferrer.infer(eqTree(termFunction))).thenReturn(expectedTypeFunction)
-    when(functionTypeTransformer.transform(eqTree(expectedTypeFunction))).thenReturn(t"java.util.function.Function[java.lang.Integer, java.lang.String]")
 
     termSelectTermFunctionTransformer.transform(termFunction, TermNames.Apply).structure shouldBe expectedResult.structure
   }
@@ -106,9 +123,12 @@ class TermSelectTermFunctionTransformerImplTest extends UnitTestSuite {
     val expectedTypeFunction = t"scala.Int => scala.String"
     val expectedResult = q"""(((x: int) => x.toString()): java.util.function.Function[java.lang.Integer, java.lang.String]).andThen"""
 
-    doReturn(expectedTransformedTermFunction).when(treeTransformer).transform(eqTree(termFunction))
+    doAnswer((tree: Tree) => tree match {
+      case aTree if aTree.structure == termFunction.structure => expectedTransformedTermFunction
+      case aTree if aTree.structure == expectedTypeFunction.structure => t"java.util.function.Function[java.lang.Integer, java.lang.String]"
+      case other => other
+    }).when(treeTransformer).transform(any[Tree])
     when(functionTypeInferrer.infer(eqTree(termFunction))).thenReturn(expectedTypeFunction)
-    when(functionTypeTransformer.transform(eqTree(expectedTypeFunction))).thenReturn(t"java.util.function.Function[java.lang.Integer, java.lang.String]")
 
     termSelectTermFunctionTransformer.transform(termFunction, TermNames.AndThen).structure shouldBe expectedResult.structure
   }
