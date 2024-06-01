@@ -1,0 +1,6 @@
+package testfiles.DefnVals.WithoutDeclaredType.InClass.Inferrable.Lit.Int;
+
+
+public class Sample {
+    public final int x = 3;
+}

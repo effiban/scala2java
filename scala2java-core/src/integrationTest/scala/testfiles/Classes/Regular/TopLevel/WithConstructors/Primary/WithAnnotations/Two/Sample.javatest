@@ -1,0 +1,12 @@
+package testfiles.Classes.Regular.TopLevel.WithConstructors.Primary.WithAnnotations.Two;
+
+import testfilesext.SampleAnnot;
+import testfilesext.SampleAnnot2;
+
+public class Sample {
+
+    @SampleAnnot
+    @SampleAnnot2
+    public Sample() {
+    }
+}

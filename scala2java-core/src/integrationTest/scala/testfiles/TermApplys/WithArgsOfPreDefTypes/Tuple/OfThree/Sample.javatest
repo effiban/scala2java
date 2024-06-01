@@ -1,0 +1,13 @@
+package testfiles.TermApplys.WithArgsOfPreDefTypes.Tuple.OfThree;
+
+import testfilesext.SampleObject.func9;
+import org.jooq.lambda.tuple.Tuple.tuple;
+
+public class Sample {
+
+    public void foo() {
+        func9(tuple(1,
+                2,
+                3));
+    }
+}

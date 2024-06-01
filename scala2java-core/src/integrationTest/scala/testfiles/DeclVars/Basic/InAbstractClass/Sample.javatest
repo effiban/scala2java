@@ -1,0 +1,6 @@
+package testfiles.DeclVars.Basic.InAbstractClass;
+
+
+public abstract class Sample {
+    public int x;
+}

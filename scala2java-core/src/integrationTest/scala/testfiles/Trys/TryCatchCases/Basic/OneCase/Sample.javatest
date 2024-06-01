@@ -1,0 +1,16 @@
+package testfiles.Trys.TryCatchCases.Basic.OneCase;
+
+import testfilesext.SampleObject.func1;
+import testfilesext.SampleObject.func13;
+
+public class Sample {
+
+    public void foo() {
+        try {
+            func1();
+        }
+        catch (Throwable e) {
+            func13(e);
+        }
+    }
+}

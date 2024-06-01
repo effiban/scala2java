@@ -1,0 +1,6 @@
+package testfiles.Objects.WithInits.One;
+
+import testfilesext.SampleParentClass;
+
+public final class Sample implements SampleParentClass {
+}

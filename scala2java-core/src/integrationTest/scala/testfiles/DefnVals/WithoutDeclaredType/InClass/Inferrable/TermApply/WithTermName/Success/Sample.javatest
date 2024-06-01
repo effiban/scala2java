@@ -1,0 +1,8 @@
+package testfiles.DefnVals.WithoutDeclaredType.InClass.Inferrable.TermApply.WithTermName.Success;
+
+import io.vavr.control.Try;
+import io.vavr.control.Try.success;
+
+public class Sample {
+    private final Try<String> x = success("abc");
+}

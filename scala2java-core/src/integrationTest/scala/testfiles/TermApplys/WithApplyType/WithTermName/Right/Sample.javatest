@@ -1,0 +1,10 @@
+package testfiles.TermApplys.WithApplyType.WithTermName.Right;
+
+import io.vavr.control.Either;
+
+public class Sample {
+
+    public void foo() {
+        Either.<Throwable, int>right(1);
+    }
+}

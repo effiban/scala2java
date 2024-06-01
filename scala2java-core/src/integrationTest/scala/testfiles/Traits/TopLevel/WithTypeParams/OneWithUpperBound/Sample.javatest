@@ -1,0 +1,5 @@
+package testfiles.Traits.TopLevel.WithTypeParams.OneWithUpperBound;
+
+
+public interface Sample<T extends String> {
+}

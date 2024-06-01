@@ -1,0 +1,10 @@
+package testfiles.TermApplys.WithTermName.Option;
+
+import java.util.Optional.ofNullable;
+
+public class Sample {
+
+    public void foo() {
+        ofNullable(1);
+    }
+}

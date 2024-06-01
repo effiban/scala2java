@@ -1,0 +1,8 @@
+package testfiles.Classes.Regular.TopLevel.WithConstructors.Primary.WithVisibilityModifiers.Protected;
+
+
+public class Sample {
+
+    protected Sample() {
+    }
+}

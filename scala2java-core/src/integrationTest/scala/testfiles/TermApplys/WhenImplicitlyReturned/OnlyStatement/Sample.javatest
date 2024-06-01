@@ -1,0 +1,10 @@
+package testfiles.TermApplys.WhenImplicitlyReturned.OnlyStatement;
+
+import testfilesext.SampleObject.func5;
+
+public class Sample {
+
+    public int foo() {
+        return func5(3);
+    }
+}

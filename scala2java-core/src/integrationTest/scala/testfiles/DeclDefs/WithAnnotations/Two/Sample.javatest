@@ -1,0 +1,11 @@
+package testfiles.DeclDefs.WithAnnotations.Two;
+
+import testfilesext.SampleAnnot;
+import testfilesext.SampleAnnot2;
+
+public interface Sample {
+
+    @SampleAnnot
+    @SampleAnnot2
+    void foo();
+}

@@ -1,0 +1,13 @@
+package testfiles.TermApplys.WithTwoArgLists;
+
+import testfilesext.SampleObject.func12;
+
+public class Sample {
+
+    public void foo() {
+        func12(1,
+            2,
+            3,
+            4);
+    }
+}

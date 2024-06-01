@@ -15,6 +15,7 @@ private[renderers] class TypeSelectRendererImpl(defaultTermRefRenderer: => Defau
 
   // A scala type selecting a type from a term, e.g.: a.B where 'a' is of some class 'A' that has a 'B' type inside.
   override def render(typeSelect: Type.Select): Unit = typeSelect match {
+    // TODO - remove this, a Scala Array must always have a type
     case t"scala.Array" => arrayTypeRenderer.render(t"Object")
     case aTypeSelect =>
       defaultTermRefRenderer.render(aTypeSelect.qual)

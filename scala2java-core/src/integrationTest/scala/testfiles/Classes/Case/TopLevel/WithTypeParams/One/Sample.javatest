@@ -1,0 +1,5 @@
+package testfiles.Classes.Case.TopLevel.WithTypeParams.One;
+
+
+public record Sample<T>() {
+}

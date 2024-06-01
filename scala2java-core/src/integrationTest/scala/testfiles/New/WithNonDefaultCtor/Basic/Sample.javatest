@@ -1,0 +1,10 @@
+package testfiles.New.WithNonDefaultCtor.Basic;
+
+import testfilesext.SampleClass;
+
+public class Sample {
+
+    public void foo() {
+        new SampleClass("a", 1);
+    }
+}

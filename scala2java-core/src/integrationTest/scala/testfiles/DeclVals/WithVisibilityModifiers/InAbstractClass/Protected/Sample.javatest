@@ -1,0 +1,6 @@
+package testfiles.DeclVals.WithVisibilityModifiers.InAbstractClass.Protected;
+
+
+public abstract class Sample {
+    protected final int x;
+}

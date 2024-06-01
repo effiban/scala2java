@@ -1,0 +1,8 @@
+package testfiles.Pkg.Basic.TraitAndClass;
+
+
+public interface Sample {
+}
+
+public class SampleImpl implements Sample {
+}

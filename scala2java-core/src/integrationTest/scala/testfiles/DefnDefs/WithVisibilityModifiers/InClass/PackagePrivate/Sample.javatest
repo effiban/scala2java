@@ -1,0 +1,8 @@
+package testfiles.DefnDefs.WithVisibilityModifiers.InClass.PackagePrivate;
+
+
+public class Sample {
+
+    void foo() {
+    }
+}

@@ -1,0 +1,7 @@
+package testfiles.Objects.WithInits.Two;
+
+import testfilesext.SampleParentTrait;
+import testfilesext.SampleParentTrait2;
+
+public final class Sample implements SampleParentTrait, SampleParentTrait2 {
+}

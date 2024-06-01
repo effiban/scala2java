@@ -1,0 +1,8 @@
+package testfiles.Objects.Standalone.Inner.WithVisibilityModifiers.Protected;
+
+
+public final class Sample {
+
+    protected static final class InnerSample {
+    }
+}

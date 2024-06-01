@@ -1,0 +1,10 @@
+package testfiles.DefnVals.WithoutDeclaredType.InClass.Inferrable.TermSelect.Tuple3._1;
+
+import org.jooq.lambda.tuple.Tuple.tuple;
+
+public class Sample {
+    private final int x = tuple(1,
+            2,
+            3)
+            .v1;
+}

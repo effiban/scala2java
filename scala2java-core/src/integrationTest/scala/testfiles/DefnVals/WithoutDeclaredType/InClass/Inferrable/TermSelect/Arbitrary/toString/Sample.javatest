@@ -1,0 +1,7 @@
+package testfiles.DefnVals.WithoutDeclaredType.InClass.Inferrable.TermSelect.Arbitrary.toString;
+
+import testfilesext.SampleObject;
+
+public class Sample {
+    private final String x = SampleObject.x.toString();
+}

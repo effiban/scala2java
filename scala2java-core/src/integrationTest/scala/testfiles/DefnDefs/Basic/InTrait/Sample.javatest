@@ -1,0 +1,8 @@
+package testfiles.DefnDefs.Basic.InTrait;
+
+
+public interface Sample {
+
+    default void foo() {
+    }
+}

@@ -1,0 +1,5 @@
+package testfiles.Classes.Case.TopLevel.WithTypeParams.OneWithUpperBound;
+
+
+public record Sample<T extends String>() {
+}

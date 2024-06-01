@@ -1,0 +1,8 @@
+package testfiles.Classes.Case.Inner.Basic;
+
+
+public record Sample() {
+
+    public record InnerSample() {
+    }
+}

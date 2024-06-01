@@ -1,0 +1,8 @@
+package testfiles.Classes.Case.TopLevel.WithConstructors.Primary.WithVisibilityModifiers.Protected;
+
+
+public record Sample() {
+
+    protected Sample() {
+    }
+}

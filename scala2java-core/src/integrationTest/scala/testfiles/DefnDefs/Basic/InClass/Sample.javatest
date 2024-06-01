@@ -1,0 +1,8 @@
+package testfiles.DefnDefs.Basic.InClass;
+
+
+public class Sample {
+
+    public void foo() {
+    }
+}

@@ -1,0 +1,6 @@
+package testfiles.Traits.TopLevel.WithInits.One;
+
+import testfilesext.SampleParentTrait;
+
+public interface Sample extends SampleParentTrait {
+}

@@ -1,0 +1,10 @@
+package testfiles.TermApplys.WithTermName.Right;
+
+import io.vavr.control.Either.right;
+
+public class Sample {
+
+    public void foo() {
+        right(1);
+    }
+}

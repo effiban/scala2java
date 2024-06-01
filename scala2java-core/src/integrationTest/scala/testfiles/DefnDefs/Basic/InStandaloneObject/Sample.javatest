@@ -1,0 +1,8 @@
+package testfiles.DefnDefs.Basic.InStandaloneObject;
+
+
+public final class Sample {
+
+    public static void foo() {
+    }
+}

@@ -1,0 +1,8 @@
+package testfiles.DefnVals.WithoutDeclaredType.InClass.Inferrable.TermSelect.Tuple2._1;
+
+import java.util.Map.entry;
+
+public class Sample {
+    private final int x = entry(1, 2)
+            .v1;
+}

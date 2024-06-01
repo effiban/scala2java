@@ -1,0 +1,8 @@
+package testfiles.DefnVals.WithoutDeclaredType.InClass.Inferrable.TermApply.WithTermSelect.Future.failed;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletableFuture.failedFuture;
+
+public class Sample {
+    private final CompletableFuture<Object> x = failedFuture(new RuntimeException());
+}

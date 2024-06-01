@@ -1,0 +1,9 @@
+package testfiles.Ifs.IfElse.InRHS;
+
+
+public class Sample {
+
+    public void foo() {
+        final String parity = (5 % 2 == 0) ? "even" : "odd";
+    }
+}

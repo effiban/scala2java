@@ -1,0 +1,13 @@
+package testfiles.Classes.Regular.TopLevel.WithInits.OneWithTwoParamLists;
+
+import testfilesext.SampleParentClass2;
+
+public class Sample extends SampleParentClass2 {
+
+    public Sample() {
+        super("name1",
+            1,
+            "name2",
+            2);
+    }
+}

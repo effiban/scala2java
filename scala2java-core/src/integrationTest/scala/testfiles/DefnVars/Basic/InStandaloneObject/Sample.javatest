@@ -1,0 +1,6 @@
+package testfiles.DefnVars.Basic.InStandaloneObject;
+
+
+public final class Sample {
+    private static int x = 3;
+}

@@ -1,0 +1,18 @@
+package testfiles.TermApplys.WithBlockArg.WithMultipleStatements.ReturningInt;
+
+import testfilesext.SampleObject.func11;
+import testfilesext.SampleObject.func1;
+import testfilesext.SampleObject.func2;
+import java.util.function.Supplier;
+
+public class Sample {
+
+    public void foo() {
+        func11(((Supplier<int>)() ->  {
+                    func1();
+                    func2();
+                    3;
+            }
+            ).get());
+    }
+}

@@ -1,0 +1,13 @@
+package testfiles.Matches.Basic.ByString;
+
+import java.lang.System.out;
+
+public class Sample {
+
+    public void foo(final String str) {
+        switch (str) {
+            case "one" -> out.println(1);
+            case "two" -> out.println(2);
+        }
+    }
+}

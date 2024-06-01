@@ -1,0 +1,8 @@
+package testfiles.DefnVals.WithoutDeclaredType.InClass.Inferrable.TermApply.WithTermSelect.Future.successful;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletableFuture.completedFuture;
+
+public class Sample {
+    private final CompletableFuture<String> x = completedFuture("abc");
+}

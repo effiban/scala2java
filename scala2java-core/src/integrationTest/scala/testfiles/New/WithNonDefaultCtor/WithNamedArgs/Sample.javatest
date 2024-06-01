@@ -1,0 +1,10 @@
+package testfiles.New.WithNonDefaultCtor.WithNamedArgs;
+
+import testfilesext.SampleClass;
+
+public class Sample {
+
+    public void foo() {
+        new SampleClass(/* name = */"a", /* size = */1);
+    }
+}

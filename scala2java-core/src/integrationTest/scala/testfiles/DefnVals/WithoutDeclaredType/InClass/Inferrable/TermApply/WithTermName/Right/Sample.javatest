@@ -1,0 +1,8 @@
+package testfiles.DefnVals.WithoutDeclaredType.InClass.Inferrable.TermApply.WithTermName.Right;
+
+import io.vavr.control.Either;
+import io.vavr.control.Either.right;
+
+public class Sample {
+    private final Either<String> x = right("abc");
+}

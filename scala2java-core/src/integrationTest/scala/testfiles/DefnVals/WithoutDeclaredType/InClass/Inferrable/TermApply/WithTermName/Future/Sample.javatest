@@ -1,0 +1,8 @@
+package testfiles.DefnVals.WithoutDeclaredType.InClass.Inferrable.TermApply.WithTermName.Future;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletableFuture.supplyAsync;
+
+public class Sample {
+    private final CompletableFuture<String> x = supplyAsync(() -> "abc");
+}

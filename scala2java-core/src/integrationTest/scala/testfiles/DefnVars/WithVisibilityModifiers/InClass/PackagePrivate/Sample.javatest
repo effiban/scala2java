@@ -1,0 +1,6 @@
+package testfiles.DefnVars.WithVisibilityModifiers.InClass.PackagePrivate;
+
+
+public class Sample {
+    int x = 3;
+}

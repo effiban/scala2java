@@ -1,0 +1,8 @@
+package testfiles.DefnVals.WithoutDeclaredType.InClass.Inferrable.TermName.None;
+
+import java.util.Optional;
+import java.util.Optional.empty;
+
+public class Sample {
+    private final Optional x = empty();
+}

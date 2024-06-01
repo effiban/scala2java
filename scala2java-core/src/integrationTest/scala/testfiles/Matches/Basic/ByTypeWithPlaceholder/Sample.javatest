@@ -1,0 +1,13 @@
+package testfiles.Matches.Basic.ByTypeWithPlaceholder;
+
+import java.lang.System.out;
+
+public class Sample {
+
+    public void foo(final Object obj) {
+        switch (obj) {
+            case int __ -> out.println("integer");
+            case double __ -> out.println("double");
+        }
+    }
+}

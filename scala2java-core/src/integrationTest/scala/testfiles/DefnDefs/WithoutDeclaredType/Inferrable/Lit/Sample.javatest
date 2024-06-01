@@ -1,0 +1,9 @@
+package testfiles.DefnDefs.WithoutDeclaredType.Inferrable.Lit;
+
+
+public class Sample {
+
+    public int foo() {
+        return 3;
+    }
+}

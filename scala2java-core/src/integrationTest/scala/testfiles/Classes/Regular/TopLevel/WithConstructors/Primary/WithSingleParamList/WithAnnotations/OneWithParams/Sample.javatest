@@ -1,0 +1,13 @@
+package testfiles.Classes.Regular.TopLevel.WithConstructors.Primary.WithSingleParamList.WithAnnotations.OneWithParams;
+
+import testfilesext.SampleAnnot;
+
+public class Sample {
+    private final String param1;
+    private final int param2;
+
+    public Sample(@SampleAnnot(name = "myName", size = 10) final String param1, final int param2) {
+        this.param1 = param1;
+        this.param2 = param2;
+    }
+}

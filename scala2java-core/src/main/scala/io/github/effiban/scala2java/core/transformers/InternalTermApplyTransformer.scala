@@ -31,7 +31,7 @@ private[transformers] class InternalTermApplyTransformerImpl(
 
       case qualifiedName: Term.Select => transformWhenUntypedWithQualifiedName(qualifiedName, transformedArgs, context)
 
-      case _ => transformFunOnly(termApply, transformedArgs)
+      case _ => transformFun(termApply, transformedArgs)
     }
   }
 
@@ -54,18 +54,17 @@ private[transformers] class InternalTermApplyTransformerImpl(
   private def transformWhenHasQualifiedName(qualifiedTermApply: QualifiedTermApply,
                                             context: UnqualifiedTermApplyTransformationContext) = {
     val transformedQualifiedTermApply = qualifiedTermApplyTransformer.transform(qualifiedTermApply, context.asQualifiedContext())
-      .orElse(transformWhenHasQualifiedNameInParts(qualifiedTermApply, context))
-      .getOrElse(qualifiedTermApply)
+      .getOrElse(transformWhenHasQualifiedNameInParts(qualifiedTermApply, context))
     transformedQualifiedTermApply.asTermApply()
   }
 
   private def transformWhenHasQualifiedNameInParts(qualifiedTermApply: QualifiedTermApply, context: UnqualifiedTermApplyTransformationContext) = {
     val unqualifiedTermApply = qualifiedTermApply.asUnqualified()
-    unqualifiedTermApplyTransformer.transform(unqualifiedTermApply, context)
-      .map(transformedUnqualifiedTermApply => {
-        val transformedQual = treeTransformer.transform(qualifiedTermApply.qualifiedName.qual).asInstanceOf[Term]
-        transformedUnqualifiedTermApply.qualifiedBy(transformedQual)
-      })
+    val transformedUnqualifiedTermApply = unqualifiedTermApplyTransformer.transform(unqualifiedTermApply, context)
+      .getOrElse(unqualifiedTermApply)
+
+    val transformedQual = treeTransformer.transform(qualifiedTermApply.qualifiedName.qual).asInstanceOf[Term]
+    transformedUnqualifiedTermApply.qualifiedBy(transformedQual)
   }
 
   private def transformWhenQualifierIsLambda(termFunction: Term.Function,
@@ -75,7 +74,7 @@ private[transformers] class InternalTermApplyTransformerImpl(
     Term.Apply(transformedTermFunction, transformedArgs)
   }
 
-  private def transformFunOnly(termApply: Term.Apply, transformedArgs: List[Term]) = {
+  private def transformFun(termApply: Term.Apply, transformedArgs: List[Term]) = {
     val transformedFun = treeTransformer.transform(termApply.fun).asInstanceOf[Term]
     Term.Apply(transformedFun, transformedArgs)
   }

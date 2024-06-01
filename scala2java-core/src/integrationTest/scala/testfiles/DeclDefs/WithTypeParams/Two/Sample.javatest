@@ -1,0 +1,7 @@
+package testfiles.DeclDefs.WithTypeParams.Two;
+
+
+public interface Sample {
+
+    <T1, T2> void foo();
+}

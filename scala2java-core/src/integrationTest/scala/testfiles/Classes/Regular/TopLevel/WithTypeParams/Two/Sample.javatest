@@ -1,0 +1,5 @@
+package testfiles.Classes.Regular.TopLevel.WithTypeParams.Two;
+
+
+public class Sample<T1, T2> {
+}

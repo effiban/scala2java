@@ -1,0 +1,15 @@
+package testfiles.Ifs.IfElse.Basic;
+
+import testfilesext.SampleObject.func3;
+
+public class Sample {
+
+    public void foo() {
+        if (2 < 3) {
+            func3(2);
+        }
+        else {
+            func3(3);
+        }
+    }
+}

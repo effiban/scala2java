@@ -1,0 +1,6 @@
+package testfiles.DeclVals.PreDefTypes.InClass.Array;
+
+
+public abstract class Sample {
+    public final String[] x;
+}

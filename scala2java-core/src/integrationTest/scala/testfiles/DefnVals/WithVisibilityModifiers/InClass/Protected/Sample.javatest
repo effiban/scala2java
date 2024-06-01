@@ -1,0 +1,6 @@
+package testfiles.DefnVals.WithVisibilityModifiers.InClass.Protected;
+
+
+public class Sample {
+    protected final int x = 3;
+}

@@ -1,0 +1,9 @@
+package testfiles.DefnTypes.WithTypeParams.OneWithUpperBound;
+
+import java.util.List;
+
+public class Sample {
+
+    public interface MyType<T extends String> extends List<T> {
+    }
+}

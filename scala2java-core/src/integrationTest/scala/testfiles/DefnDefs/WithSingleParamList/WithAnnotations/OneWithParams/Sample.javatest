@@ -1,0 +1,10 @@
+package testfiles.DefnDefs.WithSingleParamList.WithAnnotations.OneWithParams;
+
+import testfilesext.SampleAnnot;
+
+public class Sample {
+
+    @SampleAnnot(name = "myName", size = 10)
+    public void foo(final String param1, final int param2) {
+    }
+}

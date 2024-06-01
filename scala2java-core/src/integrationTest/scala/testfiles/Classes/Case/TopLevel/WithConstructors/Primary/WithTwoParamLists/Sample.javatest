@@ -1,0 +1,8 @@
+package testfiles.Classes.Case.TopLevel.WithConstructors.Primary.WithTwoParamLists;
+
+
+public record Sample(String param1,
+    int param2,
+    String param3,
+    int param4) {
+}

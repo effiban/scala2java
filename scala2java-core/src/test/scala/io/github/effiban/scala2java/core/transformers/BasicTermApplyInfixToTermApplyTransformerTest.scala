@@ -2,29 +2,21 @@ package io.github.effiban.scala2java.core.transformers
 
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 
-import scala.meta.Term
+import scala.meta.{Term, XtensionQuasiquoteTerm}
 
 class BasicTermApplyInfixToTermApplyTransformerTest extends UnitTestSuite {
 
-  test("transform") {
-    val arg1 = Term.Name("arg1")
-    val arg2 = Term.Name("arg2")
-    val arg3 = Term.Name("arg3")
-    val fun = Term.Name("foo")
-
-    val termApplyInfix = Term.ApplyInfix(
-      lhs = arg1,
-      op = fun,
-      targs = Nil,
-      args = List(arg2, arg3)
-    )
-
-    val expectedTermApply = Term.Apply(
-      fun = fun,
-      args = List(arg1, arg2, arg3)
-    )
+  test("transform with one arg") {
+    val termApplyInfix = q"obj fun arg"
+    val expectedTermApply = q"obj.fun(arg)"
 
     BasicTermApplyInfixToTermApplyTransformer.transform(termApplyInfix).value.structure shouldBe expectedTermApply.structure
   }
 
+  test("transform with two args") {
+    val termApplyInfix = q"obj fun(arg1,arg2)"
+    val expectedTermApply = q"obj.fun(arg1, arg2)"
+
+    BasicTermApplyInfixToTermApplyTransformer.transform(termApplyInfix).value.structure shouldBe expectedTermApply.structure
+  }
 }

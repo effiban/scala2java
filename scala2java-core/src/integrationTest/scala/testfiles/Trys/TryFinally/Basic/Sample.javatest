@@ -1,0 +1,16 @@
+package testfiles.Trys.TryFinally.Basic;
+
+import testfilesext.SampleObject.func1;
+import testfilesext.SampleObject.func2;
+
+public class Sample {
+
+    public void foo() {
+        try {
+            func1();
+        }
+        finally {
+            func2();
+        }
+    }
+}

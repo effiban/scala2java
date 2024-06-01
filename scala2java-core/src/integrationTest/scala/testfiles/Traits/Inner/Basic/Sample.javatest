@@ -1,0 +1,8 @@
+package testfiles.Traits.Inner.Basic;
+
+
+public interface Sample {
+
+    interface InnerSample {
+    }
+}

@@ -1,0 +1,10 @@
+package testfiles.DefnDefs.WithAnnotations.OneWithParams;
+
+import testfilesext.SampleAnnot;
+
+public interface Sample {
+
+    @SampleAnnot(name = "myName", size = 10)
+    default void foo() {
+    }
+}

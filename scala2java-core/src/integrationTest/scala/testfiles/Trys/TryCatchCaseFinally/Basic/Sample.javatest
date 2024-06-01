@@ -1,0 +1,20 @@
+package testfiles.Trys.TryCatchCaseFinally.Basic;
+
+import testfilesext.SampleObject.func3;
+import testfilesext.SampleObject.func1;
+import testfilesext.SampleObject.func2;
+
+public class Sample {
+
+    public void foo() {
+        try {
+            func3(3);
+        }
+        catch (Throwable e) {
+            func1();
+        }
+        finally {
+            func2();
+        }
+    }
+}

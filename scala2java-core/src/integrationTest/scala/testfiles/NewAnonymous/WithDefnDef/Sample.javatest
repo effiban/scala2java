@@ -1,0 +1,13 @@
+package testfiles.NewAnonymous.WithDefnDef;
+
+import testfilesext.SampleClass;
+
+public class Sample {
+    public final SampleClass foo = new SampleClass() {
+
+        int bar(final int x) {
+            return x + 1;
+        }
+    }
+    ;
+}

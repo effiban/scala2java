@@ -1,0 +1,16 @@
+package testfiles.Fors.ForYield.ThreeEnumerators;
+
+import java.util.List.of;
+import testfilesext.SampleObject.func6;
+
+public class Sample {
+
+    public void foo() {
+        of(1, 2)
+        .flatMap(x -> of(3, 4)
+            .flatMap(y -> of(5, 6)
+                .map(z -> func6(x,
+                        y,
+                        z))));
+    }
+}

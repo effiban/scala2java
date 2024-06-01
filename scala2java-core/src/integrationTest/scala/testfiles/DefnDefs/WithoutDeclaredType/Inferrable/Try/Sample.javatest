@@ -1,0 +1,17 @@
+package testfiles.DefnDefs.WithoutDeclaredType.Inferrable.Try;
+
+
+public class Sample {
+
+    private String foo() {
+        try {
+            return "ok";
+        }
+        catch (IllegalStateException e) {
+            return "illegal state";
+        }
+        catch (IllegalArgumentException e) {
+            return "illegal argument";
+        }
+    }
+}

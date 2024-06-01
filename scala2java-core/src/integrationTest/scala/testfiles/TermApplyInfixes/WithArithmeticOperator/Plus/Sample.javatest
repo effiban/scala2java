@@ -1,0 +1,9 @@
+package testfiles.TermApplyInfixes.WithArithmeticOperator.Plus;
+
+
+public class Sample {
+
+    public int foo(final int x, final int y) {
+        return x + y;
+    }
+}

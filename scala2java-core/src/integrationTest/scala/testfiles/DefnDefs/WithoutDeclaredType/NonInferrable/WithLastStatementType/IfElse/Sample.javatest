@@ -1,0 +1,18 @@
+package testfiles.DefnDefs.WithoutDeclaredType.NonInferrable.WithLastStatementType.IfElse;
+
+import testfilesext.SampleObject.func1;
+import testfilesext.SampleObject.func2;
+import testfilesext.SampleObject.func3;
+
+public class Sample {
+
+    private /* UnknownType */ foo() {
+        func1();
+        if (2 < 3) {
+            /* return? */func2();
+        }
+        else {
+            /* return? */func3(3);
+        }
+    }
+}

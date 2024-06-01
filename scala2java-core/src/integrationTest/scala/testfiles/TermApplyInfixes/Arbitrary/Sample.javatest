@@ -1,0 +1,10 @@
+package testfiles.TermApplyInfixes.Arbitrary;
+
+import testfilesext.SampleObject.func3;
+
+public class Sample {
+
+    public void foo() {
+        func3(3);
+    }
+}

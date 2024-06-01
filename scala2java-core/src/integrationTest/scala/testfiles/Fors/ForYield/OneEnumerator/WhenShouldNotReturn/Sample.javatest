@@ -1,0 +1,14 @@
+package testfiles.Fors.ForYield.OneEnumerator.WhenShouldNotReturn;
+
+import java.util.List.of;
+import testfilesext.SampleObject.func3;
+
+public class Sample {
+
+    public void foo() {
+        of(1,
+            2,
+            3)
+        .map(x -> func3(x));
+    }
+}

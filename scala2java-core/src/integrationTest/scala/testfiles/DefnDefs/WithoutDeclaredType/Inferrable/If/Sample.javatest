@@ -1,0 +1,14 @@
+package testfiles.DefnDefs.WithoutDeclaredType.Inferrable.If;
+
+
+public class Sample {
+
+    private String foo() {
+        if (4 > 3) {
+            return "four";
+        }
+        else {
+            return "other";
+        }
+    }
+}
