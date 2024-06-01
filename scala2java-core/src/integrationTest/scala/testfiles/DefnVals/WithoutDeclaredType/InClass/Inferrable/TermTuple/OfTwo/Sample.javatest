@@ -1,0 +1,8 @@
+package testfiles.DefnVals.WithoutDeclaredType.InClass.Inferrable.TermTuple.OfTwo;
+
+import java.util.Map.Entry;
+import java.util.Map.entry;
+
+public class Sample {
+    private final Entry<String, int> x = entry("a", 1);
+}

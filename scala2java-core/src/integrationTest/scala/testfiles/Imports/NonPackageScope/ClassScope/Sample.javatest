@@ -1,0 +1,7 @@
+package testfiles.Imports.NonPackageScope.ClassScope;
+
+
+public class Sample {
+    /* import testfilesext.SampleObject.x */;
+    private final int y = x;
+}

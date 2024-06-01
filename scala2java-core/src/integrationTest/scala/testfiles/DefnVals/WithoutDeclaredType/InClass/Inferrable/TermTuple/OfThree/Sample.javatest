@@ -1,0 +1,10 @@
+package testfiles.DefnVals.WithoutDeclaredType.InClass.Inferrable.TermTuple.OfThree;
+
+import org.jooq.lambda.tuple.Tuple3;
+import org.jooq.lambda.tuple.Tuple.tuple;
+
+public class Sample {
+    private final Tuple3<String, int, double> x = tuple("a",
+            1,
+            2.0);
+}

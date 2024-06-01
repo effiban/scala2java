@@ -1,0 +1,10 @@
+package testfiles.DefnDefs.WithoutDeclaredType.NonInferrable.WithLastStatementType.TermName;
+
+
+public class Sample {
+
+    private /* UnknownType */ foo() {
+        final int y = 3;
+        /* return? */y;
+    }
+}

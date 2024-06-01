@@ -1,0 +1,10 @@
+package testfiles.TermApplyTypes.WithTermSelect.List.empty;
+
+import java.util.List;
+
+public class Sample {
+
+    public void foo() {
+        List.<int>of();
+    }
+}

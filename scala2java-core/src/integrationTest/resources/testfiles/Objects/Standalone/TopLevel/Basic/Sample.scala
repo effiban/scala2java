@@ -1,3 +1,0 @@
-package dummy
-
-object Sample

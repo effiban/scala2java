@@ -1,0 +1,10 @@
+package testfiles.DefnDefs.WithoutDeclaredType.Inferrable.New;
+
+import testfilesext.SampleClass;
+
+public class Sample {
+
+    public SampleClass sampleCls() {
+        return new SampleClass("bla");
+    }
+}

@@ -1,0 +1,8 @@
+package testfiles.DefnVars.WithAnnotations.OneWithParams;
+
+import testfilesext.SampleAnnot;
+
+public interface Sample {
+    @SampleAnnot(name = "myName", size = 10)
+    int x = 3;
+}

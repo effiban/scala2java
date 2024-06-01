@@ -1,0 +1,16 @@
+package testfiles.TermFunctions.SingleParam.WithBlock;
+
+import java.util.function.Function;
+import testfilesext.SampleObject.func3;
+
+public class Sample {
+
+    public void foo() {
+        final Function<int, Object> f = (int x) ->  {
+            func3(x);
+            func3(x + 1);
+        }
+        ;
+        f(2);
+    }
+}

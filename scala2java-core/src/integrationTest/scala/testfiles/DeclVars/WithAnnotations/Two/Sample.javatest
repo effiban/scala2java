@@ -1,0 +1,10 @@
+package testfiles.DeclVars.WithAnnotations.Two;
+
+import testfilesext.SampleAnnot;
+import testfilesext.SampleAnnot2;
+
+public interface Sample {
+    @SampleAnnot
+    @SampleAnnot2
+    int x;
+}

@@ -1,0 +1,8 @@
+package testfiles.DeclDefs.WithQualifiedDeclaredType.InTrait;
+
+import testfilesext.SampleObject.SampleType;
+
+public interface Sample {
+
+    SampleType foo();
+}

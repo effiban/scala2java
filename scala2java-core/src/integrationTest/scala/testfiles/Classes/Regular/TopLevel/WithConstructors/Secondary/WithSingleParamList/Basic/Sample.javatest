@@ -1,0 +1,12 @@
+package testfiles.Classes.Regular.TopLevel.WithConstructors.Secondary.WithSingleParamList.Basic;
+
+
+public class Sample {
+
+    public Sample() {
+    }
+
+    public Sample(final String param1, final int param2) {
+        this;
+    }
+}

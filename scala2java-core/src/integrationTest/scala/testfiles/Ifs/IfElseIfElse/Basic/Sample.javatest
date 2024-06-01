@@ -1,0 +1,21 @@
+package testfiles.Ifs.IfElseIfElse.Basic;
+
+import testfilesext.SampleObject.func3;
+import testfilesext.SampleObject.func1;
+
+public class Sample {
+
+    public void foo() {
+        if (2 < 3) {
+            func3(2);
+        }
+        else {
+            if (9 < 10) {
+                func3(9);
+            }
+            else {
+                func1();
+            }
+        }
+    }
+}

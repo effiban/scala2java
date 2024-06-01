@@ -1,0 +1,11 @@
+package testfiles.TermApplys.WithBlockArg.WithSingleStatement;
+
+import testfilesext.SampleObject.func11;
+import testfilesext.SampleObject;
+
+public class Sample {
+
+    public void foo() {
+        func11(SampleObject.x);
+    }
+}

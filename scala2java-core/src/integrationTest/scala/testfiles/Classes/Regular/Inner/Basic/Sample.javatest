@@ -1,0 +1,8 @@
+package testfiles.Classes.Regular.Inner.Basic;
+
+
+public class Sample {
+
+    public class InnerSample {
+    }
+}

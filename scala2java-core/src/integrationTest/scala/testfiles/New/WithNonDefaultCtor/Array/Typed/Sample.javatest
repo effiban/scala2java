@@ -1,0 +1,6 @@
+package testfiles.New.WithNonDefaultCtor.Array.Typed;
+
+
+public class Sample {
+    public final String[] x = new String[5];
+}

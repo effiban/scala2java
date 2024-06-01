@@ -8,6 +8,6 @@ object BasicTermApplyInfixToTermApplyTransformer extends TermApplyInfixToTermApp
   override def transform(termApplyInfix: Term.ApplyInfix): Option[Term.Apply] = {
     import termApplyInfix._
     //TODO handle type args
-    Some(Term.Apply(fun = op, args = lhs +: args))
+    Some(Term.Apply(fun = Term.Select(lhs, op), args = args))
   }
 }

@@ -1,0 +1,15 @@
+package testfiles.Classes.Regular.TopLevel.WithConstructors.Primary.WithSingleParamList.WithTermsFromTemplate;
+
+import testfilesext.SampleObject.func3;
+
+public class Sample {
+    private final int param1;
+    private final int param2;
+
+    public Sample(final int param1, final int param2) {
+        this.param1 = param1;
+        this.param2 = param2;
+        func3(param1);
+        func3(param2);
+    }
+}

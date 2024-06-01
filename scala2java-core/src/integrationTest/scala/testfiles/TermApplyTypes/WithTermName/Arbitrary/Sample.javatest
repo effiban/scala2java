@@ -1,0 +1,10 @@
+package testfiles.TermApplyTypes.WithTermName.Arbitrary;
+
+import testfilesext.SampleObject;
+
+public class Sample {
+
+    public void foo() {
+        SampleObject.<String>func7B();
+    }
+}

@@ -1,0 +1,15 @@
+package testfiles.Fors.ForYield.OneEnumerator.WhenShouldReturn;
+
+import java.util.List;
+import java.util.List.of;
+import testfilesext.SampleObject.func5;
+
+public class Sample {
+
+    public List<int> foo() {
+        return of(1,
+            2,
+            3)
+        .map(x -> func5(x));
+    }
+}

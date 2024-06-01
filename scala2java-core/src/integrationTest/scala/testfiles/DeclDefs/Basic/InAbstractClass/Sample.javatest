@@ -1,0 +1,7 @@
+package testfiles.DeclDefs.Basic.InAbstractClass;
+
+
+public abstract class Sample {
+
+    public void foo();
+}

@@ -1,0 +1,6 @@
+package testfiles.DefnVars.WithoutDeclaredType.InClass.Inferrable;
+
+
+public class Sample {
+    public int x = 3;
+}

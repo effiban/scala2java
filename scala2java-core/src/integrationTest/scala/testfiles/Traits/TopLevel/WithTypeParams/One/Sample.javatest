@@ -1,0 +1,5 @@
+package testfiles.Traits.TopLevel.WithTypeParams.One;
+
+
+public interface Sample<T> {
+}

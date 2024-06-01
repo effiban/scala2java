@@ -1,0 +1,7 @@
+package testfiles.DeclDefs.WithSingleParamList.Basic;
+
+
+public interface Sample {
+
+    void foo(final String param1, final int param2);
+}

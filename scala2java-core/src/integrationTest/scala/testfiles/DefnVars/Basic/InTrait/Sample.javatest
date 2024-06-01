@@ -1,0 +1,6 @@
+package testfiles.DefnVars.Basic.InTrait;
+
+
+public interface Sample {
+    int x = 3;
+}

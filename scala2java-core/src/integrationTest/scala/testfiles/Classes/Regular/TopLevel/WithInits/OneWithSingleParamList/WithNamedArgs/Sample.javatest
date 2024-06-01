@@ -1,0 +1,10 @@
+package testfiles.Classes.Regular.TopLevel.WithInits.OneWithSingleParamList.WithNamedArgs;
+
+import testfilesext.SampleParentClass;
+
+public class Sample extends SampleParentClass {
+
+    public Sample() {
+        super(/* name = */"name", /* size = */3);
+    }
+}

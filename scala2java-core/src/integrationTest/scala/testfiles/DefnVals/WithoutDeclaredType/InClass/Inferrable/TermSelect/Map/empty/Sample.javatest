@@ -1,0 +1,8 @@
+package testfiles.DefnVals.WithoutDeclaredType.InClass.Inferrable.TermSelect.Map.empty;
+
+import java.util.Map;
+import java.util.Map.of;
+
+public class Sample {
+    private final Map<Object> x = of();
+}

@@ -1,0 +1,12 @@
+package testfiles.Fors.For.OneEnumerator.WithRangeInRHS.Exclusive;
+
+import java.util.stream.IntStream.range;
+import testfilesext.SampleObject.func3;
+
+public class Sample {
+
+    public void foo() {
+        range(0, 4)
+        .forEach(i -> func3(i));
+    }
+}

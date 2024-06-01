@@ -1,0 +1,12 @@
+package testfiles.Matches.WithConditions.TwoConditions;
+
+import java.lang.System.out;
+
+public class Sample {
+
+    public void foo(final Object obj) {
+        switch (obj) {
+            case int x && x > 3 && 5 > 4 -> out.println("matches");
+        }
+    }
+}

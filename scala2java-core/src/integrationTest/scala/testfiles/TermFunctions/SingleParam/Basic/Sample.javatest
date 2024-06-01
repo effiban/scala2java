@@ -1,0 +1,12 @@
+package testfiles.TermFunctions.SingleParam.Basic;
+
+import java.util.function.Consumer;
+import java.lang.System.out;
+
+public class Sample {
+
+    public void foo() {
+        final Consumer<int> f = (int x) -> out.println(x);
+        f(3);
+    }
+}

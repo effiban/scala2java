@@ -1,0 +1,9 @@
+package testfiles.DefnVals.WithNestedType.InClass;
+
+import testfilesext.SampleClass;
+import testfilesext.SampleClass.SampleNestedClass;
+
+public class Sample {
+    private final SampleClass x = new SampleClass();
+    private final SampleNestedClass y = new x.SampleNestedClass();
+}

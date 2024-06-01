@@ -1,0 +1,8 @@
+package testfiles.Classes.Regular.Inner.WithVisibilityModifiers.Protected;
+
+
+public class Sample {
+
+    protected class InnerSample {
+    }
+}

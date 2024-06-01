@@ -1,0 +1,9 @@
+package testfiles.TermApplyInfixes.WithLogicalOperator.And;
+
+
+public class Sample {
+
+    public boolean foo(final boolean x, final boolean y) {
+        return x && y;
+    }
+}

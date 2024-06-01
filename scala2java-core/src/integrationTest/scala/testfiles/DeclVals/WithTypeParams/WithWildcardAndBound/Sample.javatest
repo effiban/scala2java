@@ -1,0 +1,7 @@
+package testfiles.DeclVals.WithTypeParams.WithWildcardAndBound;
+
+import testfilesext.SampleTypedClass;
+
+public abstract class Sample {
+    public final SampleTypedClass<? extends String> x;
+}

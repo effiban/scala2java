@@ -1,0 +1,7 @@
+package testfiles.Classes.Case.TopLevel.WithAnnotations.One;
+
+import testfilesext.SampleAnnot;
+
+@SampleAnnot
+public record Sample() {
+}

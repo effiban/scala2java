@@ -1,0 +1,7 @@
+package testfiles.DefnVals.WithQualifiedType.InClass;
+
+import testfilesext.SampleObject.SampleType;
+
+public class Sample {
+    private final SampleType x = new SampleType();
+}

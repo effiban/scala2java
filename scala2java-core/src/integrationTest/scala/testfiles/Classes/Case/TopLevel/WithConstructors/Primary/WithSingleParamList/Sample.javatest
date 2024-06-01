@@ -1,0 +1,5 @@
+package testfiles.Classes.Case.TopLevel.WithConstructors.Primary.WithSingleParamList;
+
+
+public record Sample(String param1, int param2) {
+}

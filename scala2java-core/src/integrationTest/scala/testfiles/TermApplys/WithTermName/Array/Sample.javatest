@@ -1,0 +1,9 @@
+package testfiles.TermApplys.WithTermName.Array;
+
+
+public class Sample {
+
+    public void foo() {
+        new String[] {"a", "b"};
+    }
+}

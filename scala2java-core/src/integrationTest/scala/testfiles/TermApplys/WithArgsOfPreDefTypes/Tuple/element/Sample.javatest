@@ -1,0 +1,13 @@
+package testfiles.TermApplys.WithArgsOfPreDefTypes.Tuple.element;
+
+import java.util.Map.Entry;
+import java.util.Map.entry;
+import testfilesext.SampleObject.func3;
+
+public class Sample {
+
+    public void foo() {
+        final Entry<int, int> x = entry(1, 2);
+        func3(x.v1);
+    }
+}

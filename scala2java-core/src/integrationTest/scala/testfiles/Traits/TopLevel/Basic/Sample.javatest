@@ -1,0 +1,5 @@
+package testfiles.Traits.TopLevel.Basic;
+
+
+public interface Sample {
+}

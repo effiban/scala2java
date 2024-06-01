@@ -1,0 +1,5 @@
+package testfiles.Classes.Case.TopLevel.Basic;
+
+
+public record Sample() {
+}

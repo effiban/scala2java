@@ -1,0 +1,9 @@
+package testfiles.DeclDefs.WithSingleParamList.WithAnnotations.Two;
+
+import testfilesext.SampleAnnot;
+import testfilesext.SampleAnnot2;
+
+public interface Sample {
+
+    void foo(@SampleAnnot @SampleAnnot2 final String param1, final int param2);
+}

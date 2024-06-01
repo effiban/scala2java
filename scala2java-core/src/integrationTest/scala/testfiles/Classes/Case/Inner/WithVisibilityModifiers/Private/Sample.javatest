@@ -1,0 +1,8 @@
+package testfiles.Classes.Case.Inner.WithVisibilityModifiers.Private;
+
+
+public record Sample() {
+
+    private record InnerSample() {
+    }
+}

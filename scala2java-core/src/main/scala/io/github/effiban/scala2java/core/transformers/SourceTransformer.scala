@@ -9,8 +9,6 @@ trait SourceTransformer {
 private[transformers] class SourceTransformerImpl(treeTransformer: => TreeTransformer) extends SourceTransformer {
 
   override def transform(source: Source): Source = {
-    source.transform {
-      case tree: Tree => treeTransformer.transform(tree)
-    }.asInstanceOf[Source]
+      treeTransformer.transform(source).asInstanceOf[Source]
   }
 }

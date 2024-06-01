@@ -148,11 +148,13 @@ class InternalTermApplyTransformerImplTest extends UnitTestSuite {
 
     val termApply = q"myQual.myMethod(1)"
     val qualifiedTermApply = QualifiedTermApply(q"myQual.myMethod", List(q"11"))
+    val javaTermApply = q"myJavaQual.myMethod(11)"
 
     when(unqualifiedTransformationContextFactory.create(eqTree(termApply))).thenReturn(UnqualifiedContext)
 
     doAnswer((tree: Tree) => tree match {
       case q"1" => q"11"
+      case q"myQual" => q"myJavaQual"
       case other => other
     }).when(treeTransformer).transform(any[Tree])
 
@@ -166,19 +168,21 @@ class InternalTermApplyTransformerImplTest extends UnitTestSuite {
       eqUnqualifiedTermApplyTransformationContext(UnqualifiedContext))
     ).thenReturn(None)
 
-    internalTermApplyTransformer.transform(termApply).structure shouldBe qualifiedTermApply.asTermApply().structure
+    internalTermApplyTransformer.transform(termApply).structure shouldBe javaTermApply.structure
   }
 
   test("transform() of a qualified method invocation with a type, when both transformers return None") {
 
     val termApply = q"myQual.myMethod[scala.Int](1)"
     val qualifiedTermApply = QualifiedTermApply(q"myQual.myMethod", List(t"java.lang.Integer"), List(q"11"))
+    val javaTermApply = q"myJavaQual.myMethod[java.lang.Integer](11)"
 
     when(unqualifiedTransformationContextFactory.create(eqTree(termApply))).thenReturn(UnqualifiedContext)
 
     doAnswer((tree: Tree) => tree match {
       case q"1" => q"11"
       case t"scala.Int" => t"java.lang.Integer"
+      case q"myQual" => q"myJavaQual"
       case other => other
     }).when(treeTransformer).transform(any[Tree])
 
@@ -192,7 +196,7 @@ class InternalTermApplyTransformerImplTest extends UnitTestSuite {
       eqUnqualifiedTermApplyTransformationContext(UnqualifiedContext))
     ).thenReturn(None)
 
-    internalTermApplyTransformer.transform(termApply).structure shouldBe qualifiedTermApply.asTermApply().structure
+    internalTermApplyTransformer.transform(termApply).structure shouldBe javaTermApply.structure
   }
 
   test("transform a 'Term.Function' (lambda) with a method name, should return result of 'TermSelectTermFunctionTransformer'") {

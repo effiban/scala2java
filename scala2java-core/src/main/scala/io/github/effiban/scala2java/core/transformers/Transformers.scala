@@ -18,6 +18,8 @@ class Transformers(implicit typeInferrers: => TypeInferrers,
     CompositeTypeClassifier
   )
 
+  lazy val functionTypeTransformer: FunctionTypeTransformer = new FunctionTypeTransformerImpl(treeTransformer)
+
   lazy val internalTermApplyTransformer: InternalTermApplyTransformer = new InternalTermApplyTransformerImpl(
     treeTransformer,
     new CompositeQualifiedTermApplyTransformer(coreQualifiedTermApplyTransformer),
@@ -44,7 +46,8 @@ class Transformers(implicit typeInferrers: => TypeInferrers,
 
   private lazy val termSelectTermFunctionTransformer: TermSelectTermFunctionTransformer = new TermSelectTermFunctionTransformerImpl(
     typeInferrers.functionTypeInferrer,
-    FunctionTypeTransformer
+    functionTypeTransformer,
+    treeTransformer
   )
 
   private lazy val termTupleToTermApplyTransformer: TermTupleToTermApplyTransformer = new TermTupleToTermApplyTransformerImpl(treeTransformer)

@@ -1,0 +1,12 @@
+package testfiles.TermApplys.WhenImplicitlyReturned.SecondStatement;
+
+import testfilesext.SampleObject.func1;
+import testfilesext.SampleObject.func5;
+
+public class Sample {
+
+    public int foo() {
+        func1();
+        return func5(3);
+    }
+}

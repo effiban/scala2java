@@ -1,0 +1,15 @@
+package testfiles.Ifs.IfElse.WithImplicitReturn;
+
+import testfilesext.SampleObject.func5;
+
+public class Sample {
+
+    public int foo() {
+        if (2 < 3) {
+            return func5(2);
+        }
+        else {
+            return func5(3);
+        }
+    }
+}

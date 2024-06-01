@@ -1,0 +1,10 @@
+package testfiles.TermApplys.WithNamedArguments;
+
+import testfilesext.SampleObject.func4;
+
+public class Sample {
+
+    public void foo() {
+        func4(/* x = */1, /* y = */2);
+    }
+}

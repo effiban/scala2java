@@ -1,0 +1,10 @@
+package testfiles.TermApplys.WithTermName.println;
+
+import java.lang.System.out;
+
+public class Sample {
+
+    public void foo() {
+        out.println(2);
+    }
+}

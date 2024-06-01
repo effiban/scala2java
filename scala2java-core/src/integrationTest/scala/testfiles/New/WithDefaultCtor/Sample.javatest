@@ -1,0 +1,7 @@
+package testfiles.New.WithDefaultCtor;
+
+import testfilesext.SampleClass;
+
+public class Sample {
+    public final SampleClass x = new SampleClass();
+}

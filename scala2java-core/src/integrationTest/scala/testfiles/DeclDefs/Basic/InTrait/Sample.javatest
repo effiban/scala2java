@@ -1,0 +1,7 @@
+package testfiles.DeclDefs.Basic.InTrait;
+
+
+public interface Sample {
+
+    void foo();
+}

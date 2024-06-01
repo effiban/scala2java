@@ -1,0 +1,14 @@
+package testfiles.DefnDefs.WithoutDeclaredType.Inferrable.Match;
+
+
+public class Sample {
+
+    private int foo(final String str) {
+        return switch (str) {
+            case "one" -> 1;
+            case "two" -> 2;
+            default -> 0;
+        }
+        ;
+    }
+}

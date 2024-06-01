@@ -1,0 +1,5 @@
+package testfiles.Objects.Standalone.TopLevel.Basic;
+
+
+public final class Sample {
+}

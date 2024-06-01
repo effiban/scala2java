@@ -1,0 +1,10 @@
+package testfiles.Classes.Case.TopLevel.WithConstructors.Primary.WithAnnotations.One;
+
+import testfilesext.SampleAnnot;
+
+public record Sample() {
+
+    @SampleAnnot
+    public Sample() {
+    }
+}

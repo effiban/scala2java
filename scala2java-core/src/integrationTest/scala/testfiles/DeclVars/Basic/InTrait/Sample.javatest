@@ -1,0 +1,6 @@
+package testfiles.DeclVars.Basic.InTrait;
+
+
+public interface Sample {
+    int x;
+}

@@ -1,0 +1,12 @@
+package testfiles.DefnDefs.WithoutDeclaredType.NonInferrable.WithLastStatementType.TermApply;
+
+import testfilesext.SampleObject.func1;
+import testfilesext.SampleObject.func2;
+
+public class Sample {
+
+    private /* UnknownType */ foo() {
+        func1();
+        /* return? */func2();
+    }
+}

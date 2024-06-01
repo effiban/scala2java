@@ -1,0 +1,6 @@
+package testfiles.DefnVals.Basic.InClass;
+
+
+public class Sample {
+    private final int x = 3;
+}

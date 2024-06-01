@@ -1,0 +1,9 @@
+package testfiles.Imports.WithTwoImporteesOnSameLine;
+
+import testfilesext.SampleClass;
+import testfilesext.SampleClass2;
+
+public interface Sample {
+    SampleClass b;
+    SampleClass2 c;
+}

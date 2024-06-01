@@ -1,0 +1,6 @@
+package testfiles.Classes.Enum.TopLevel.Basic;
+
+
+public enum Sample {
+    First, Second;
+}

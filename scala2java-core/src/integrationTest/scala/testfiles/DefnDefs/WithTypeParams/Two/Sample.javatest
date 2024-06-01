@@ -1,0 +1,8 @@
+package testfiles.DefnDefs.WithTypeParams.Two;
+
+
+public interface Sample {
+
+    default <T1, T2> void foo() {
+    }
+}

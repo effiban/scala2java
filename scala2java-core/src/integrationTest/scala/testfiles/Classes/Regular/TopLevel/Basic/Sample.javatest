@@ -1,0 +1,5 @@
+package testfiles.Classes.Regular.TopLevel.Basic;
+
+
+public class Sample {
+}

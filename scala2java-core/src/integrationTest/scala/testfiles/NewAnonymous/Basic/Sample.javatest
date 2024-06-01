@@ -1,0 +1,9 @@
+package testfiles.NewAnonymous.Basic;
+
+import testfilesext.SampleClass;
+
+public class Sample {
+    public final SampleClass foo = new SampleClass() {
+    }
+    ;
+}

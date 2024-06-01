@@ -1,0 +1,9 @@
+package testfiles.DefnVals.WithoutDeclaredType.InClass.Inferrable.TermApply.WithTermSelect.ListInitializer.take;
+
+import java.util.List;
+import java.util.List.of;
+
+public class Sample {
+    private final List<int> x = of(1, 2)
+    .subList(0, 1);
+}

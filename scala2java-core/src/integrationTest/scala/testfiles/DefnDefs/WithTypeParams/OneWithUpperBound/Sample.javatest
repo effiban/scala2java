@@ -1,0 +1,8 @@
+package testfiles.DefnDefs.WithTypeParams.OneWithUpperBound;
+
+
+public interface Sample {
+
+    default <T extends String> void foo() {
+    }
+}

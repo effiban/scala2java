@@ -1,0 +1,12 @@
+package testfiles.TermFunctions.TwoParams.Basic;
+
+import java.util.function.BiFunction;
+import testfilesext.SampleObject.func4;
+
+public class Sample {
+
+    public void foo() {
+        final BiFunction<int, int, Object> f = (int x, int y) -> func4(x, y);
+        f(2, 3);
+    }
+}

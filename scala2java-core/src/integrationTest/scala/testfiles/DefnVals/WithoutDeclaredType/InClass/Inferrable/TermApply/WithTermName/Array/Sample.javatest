@@ -1,0 +1,6 @@
+package testfiles.DefnVals.WithoutDeclaredType.InClass.Inferrable.TermApply.WithTermName.Array;
+
+
+public class Sample {
+    private final String[] x = new String[] {"abc", "def"};
+}
