@@ -63,10 +63,10 @@ class TypeTraverserImplTest extends UnitTestSuite {
   }
 
   test("traverse Type.Function") {
-    val typeFunction = t"(Int, String) => Int"
-    val expectedType = t"BiFunction[Int, String, Int]"
-    doReturn(expectedType).when(typeFunctionTraverser).traverse(eqTree(typeFunction))
-    typeTraverser.traverse(typeFunction).structure shouldBe expectedType.structure
+    val typeFunction = t"(T1, T2) => T3"
+    val traversedTypeFunction = t"(U1, U2) => U3"
+    doReturn(traversedTypeFunction).when(typeFunctionTraverser).traverse(eqTree(typeFunction))
+    typeTraverser.traverse(typeFunction).structure shouldBe traversedTypeFunction.structure
   }
 
   test("traverse Type.Tuple") {

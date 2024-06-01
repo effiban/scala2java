@@ -21,12 +21,11 @@ trait TermSelectTermFunctionTransformer {
 }
 
 class TermSelectTermFunctionTransformerImpl(functionTypeInferrer: => FunctionTypeInferrer,
-                                            functionTypeTransformer: FunctionTypeTransformer,
                                             treeTransformer: => TreeTransformer) extends TermSelectTermFunctionTransformer {
 
   override def transform(termFunction: Term.Function, methodName: Term.Name): Term.Select = {
     val transformedFunction = treeTransformer.transform(termFunction).asInstanceOf[Term]
-    val transformedFunctionType = functionTypeTransformer.transform(functionTypeInferrer.infer(termFunction))
+    val transformedFunctionType = treeTransformer.transform(functionTypeInferrer.infer(termFunction)).asInstanceOf[Type]
     val transformedMethodName = (transformedFunctionType, methodName) match {
       case (t"java.lang.Runnable", q"apply") => q"run"
       case (Type.Apply(t"java.util.function.Supplier", _), q"apply") => q"get"

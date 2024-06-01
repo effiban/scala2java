@@ -46,7 +46,6 @@ class Transformers(implicit typeInferrers: => TypeInferrers,
 
   private lazy val termSelectTermFunctionTransformer: TermSelectTermFunctionTransformer = new TermSelectTermFunctionTransformerImpl(
     typeInferrers.functionTypeInferrer,
-    functionTypeTransformer,
     treeTransformer
   )
 
@@ -58,6 +57,7 @@ class Transformers(implicit typeInferrers: => TypeInferrers,
     internalTermApplyTransformer,
     internalTermSelectTransformer,
     termTupleToTermApplyTransformer,
+    functionTypeTransformer,
     typeSelectTransformer,
     typeTupleToTermApplyTransformer
   )
