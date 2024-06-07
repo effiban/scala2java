@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.transformers
 
 import io.github.effiban.scala2java.core.classifiers.TypeClassifier
-import io.github.effiban.scala2java.spi.contexts.UnqualifiedTermApplyTransformationContext
+import io.github.effiban.scala2java.spi.contexts.TermApplyTransformationContext
 import io.github.effiban.scala2java.spi.entities.UnqualifiedTermApply
 import io.github.effiban.scala2java.spi.transformers.UnqualifiedTermApplyTransformer
 
@@ -11,7 +11,7 @@ private[transformers] class CoreUnqualifiedTermApplyTransformer(typeClassifier: 
   extends UnqualifiedTermApplyTransformer {
 
   override final def transform(unqualifiedTermApply: UnqualifiedTermApply,
-                               context: UnqualifiedTermApplyTransformationContext = UnqualifiedTermApplyTransformationContext())
+                               context: TermApplyTransformationContext = TermApplyTransformationContext())
     : Option[UnqualifiedTermApply] =
 
     (context.maybeQualifierType, unqualifiedTermApply.name, unqualifiedTermApply.args) match {

@@ -1,9 +1,7 @@
 package io.github.effiban.scala2java.spi.transformers
 
-import io.github.effiban.scala2java.spi.contexts.UnqualifiedTermApplyTransformationContext
+import io.github.effiban.scala2java.spi.contexts.TermApplyTransformationContext
 import io.github.effiban.scala2java.spi.entities.UnqualifiedTermApply
-
-import scala.meta.Term
 
 /** A transformer which can transform an [[UnqualifiedTermApply]] into a Java equivalent.<br>
  * An [[UnqualifiedTermApply]] represents a method invocation that has a qualified name, but without the qualifier part.<br>
@@ -14,7 +12,7 @@ import scala.meta.Term
  * all of the members in the input [[UnqualifiedTermApply]] have been transformed to Java, except for the method name itself.
  */
 trait UnqualifiedTermApplyTransformer extends DifferentTypeTransformer1[
-  UnqualifiedTermApply, UnqualifiedTermApplyTransformationContext, UnqualifiedTermApply
+  UnqualifiedTermApply, TermApplyTransformationContext, UnqualifiedTermApply
 ]
 
 object UnqualifiedTermApplyTransformer {

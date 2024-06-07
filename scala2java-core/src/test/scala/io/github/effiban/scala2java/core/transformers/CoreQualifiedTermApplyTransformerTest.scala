@@ -6,7 +6,7 @@ import io.github.effiban.scala2java.core.entities.TermSelects._
 import io.github.effiban.scala2java.core.entities.{TermNames, TypeSelects}
 import io.github.effiban.scala2java.core.matchers.QualifiedTermApplyScalatestMatcher.equalQualifiedTermApply
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.spi.contexts.QualifiedTermApplyTransformationContext
+import io.github.effiban.scala2java.spi.contexts.TermApplyTransformationContext
 import io.github.effiban.scala2java.spi.entities.{PartialDeclDef, QualifiedTermApply}
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
@@ -15,7 +15,7 @@ import scala.meta.{Term, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 class CoreQualifiedTermApplyTransformerTest extends UnitTestSuite {
 
-  private val DummyContext = QualifiedTermApplyTransformationContext(PartialDeclDef(maybeParamTypes = List(Some(t"scala.Int"))))
+  private val DummyContext = TermApplyTransformationContext(partialDeclDef = PartialDeclDef(maybeParamTypes = List(Some(t"scala.Int"))))
 
   private val termSelectClassifier = mock[TermSelectClassifier]
 

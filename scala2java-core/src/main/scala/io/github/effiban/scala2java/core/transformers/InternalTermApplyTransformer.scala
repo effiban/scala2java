@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.transformers
 
-import io.github.effiban.scala2java.core.factories.UnqualifiedTermApplyTransformationContextFactory
-import io.github.effiban.scala2java.spi.contexts.UnqualifiedTermApplyTransformationContext
+import io.github.effiban.scala2java.core.factories.TermApplyTransformationContextFactory
+import io.github.effiban.scala2java.spi.contexts.TermApplyTransformationContext
 import io.github.effiban.scala2java.spi.entities.QualifiedTermApply
 import io.github.effiban.scala2java.spi.transformers.{QualifiedTermApplyTransformer, UnqualifiedTermApplyTransformer}
 
@@ -16,10 +16,10 @@ private[transformers] class InternalTermApplyTransformerImpl(
   qualifiedTermApplyTransformer: QualifiedTermApplyTransformer,
   unqualifiedTermApplyTransformer: UnqualifiedTermApplyTransformer,
   termSelectTermFunctionTransformer: TermSelectTermFunctionTransformer,
-  unqualifiedTermApplyTransformationContextFactory: => UnqualifiedTermApplyTransformationContextFactory) extends InternalTermApplyTransformer {
+  termApplyTransformationContextFactory: => TermApplyTransformationContextFactory) extends InternalTermApplyTransformer {
 
   override final def transform(termApply: Term.Apply): Term.Apply = {
-    val context = unqualifiedTermApplyTransformationContextFactory.create(termApply)
+    val context = termApplyTransformationContextFactory.create(termApply)
     val transformedArgs = termApply.args.map(treeTransformer.transform(_).asInstanceOf[Term])
 
     termApply.fun match {
@@ -38,7 +38,7 @@ private[transformers] class InternalTermApplyTransformerImpl(
   private def transformWhenTypedWithQualifiedName(qualifiedName: Term.Select,
                                                   typeArgs: List[Type],
                                                   transformedArgs: List[Term],
-                                                  context: UnqualifiedTermApplyTransformationContext) = {
+                                                  context: TermApplyTransformationContext) = {
     val transformedTypeArgs = typeArgs.map(treeTransformer.transform(_).asInstanceOf[Type])
     val qualifiedTermApply = QualifiedTermApply(qualifiedName, transformedTypeArgs, transformedArgs)
     transformWhenHasQualifiedName(qualifiedTermApply, context)
@@ -46,19 +46,19 @@ private[transformers] class InternalTermApplyTransformerImpl(
 
   private def transformWhenUntypedWithQualifiedName(qualifiedName: Term.Select,
                                                     transformedArgs: List[Term],
-                                                    context: UnqualifiedTermApplyTransformationContext) = {
+                                                    context: TermApplyTransformationContext) = {
     val qualifiedTermApply = QualifiedTermApply(qualifiedName, Nil, transformedArgs)
     transformWhenHasQualifiedName(qualifiedTermApply, context)
   }
 
   private def transformWhenHasQualifiedName(qualifiedTermApply: QualifiedTermApply,
-                                            context: UnqualifiedTermApplyTransformationContext) = {
-    val transformedQualifiedTermApply = qualifiedTermApplyTransformer.transform(qualifiedTermApply, context.asQualifiedContext())
+                                            context: TermApplyTransformationContext) = {
+    val transformedQualifiedTermApply = qualifiedTermApplyTransformer.transform(qualifiedTermApply, context)
       .getOrElse(transformWhenHasQualifiedNameInParts(qualifiedTermApply, context))
     transformedQualifiedTermApply.asTermApply()
   }
 
-  private def transformWhenHasQualifiedNameInParts(qualifiedTermApply: QualifiedTermApply, context: UnqualifiedTermApplyTransformationContext) = {
+  private def transformWhenHasQualifiedNameInParts(qualifiedTermApply: QualifiedTermApply, context: TermApplyTransformationContext) = {
     val unqualifiedTermApply = qualifiedTermApply.asUnqualified()
     val transformedUnqualifiedTermApply = unqualifiedTermApplyTransformer.transform(unqualifiedTermApply, context)
       .getOrElse(unqualifiedTermApply)

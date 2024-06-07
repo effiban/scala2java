@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.classifiers.TypeClassifier
 import io.github.effiban.scala2java.core.entities.TypeSelects
 import io.github.effiban.scala2java.core.matchers.UnqualifiedTermApplyScalatestMatcher.equalUnqualifiedTermApply
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.spi.contexts.UnqualifiedTermApplyTransformationContext
+import io.github.effiban.scala2java.spi.contexts.TermApplyTransformationContext
 import io.github.effiban.scala2java.spi.entities.UnqualifiedTermApply
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
@@ -20,7 +20,7 @@ class CoreUnqualifiedTermApplyTransformerTest extends UnitTestSuite {
     val arg = q"2"
     val unqualifiedTermApply = UnqualifiedTermApply(q"take", List(arg))
     val qualifierType = TypeSelects.ScalaList
-    val context = UnqualifiedTermApplyTransformationContext(maybeQualifierType = Some(qualifierType))
+    val context = TermApplyTransformationContext(maybeQualifierType = Some(qualifierType))
     val expectedJavaUnqualifiedTermApply = UnqualifiedTermApply(q"subList", List(q"0", arg))
 
     when(typeClassifier.isJavaListLike(eqTree(qualifierType))).thenReturn(true)
@@ -32,7 +32,7 @@ class CoreUnqualifiedTermApplyTransformerTest extends UnitTestSuite {
   test("transform 'length()' with a JavaList-like qualifier, should return 'size()'") {
     val unqualifiedTermApply = UnqualifiedTermApply(q"length")
     val qualifierType = TypeSelects.ScalaList
-    val context = UnqualifiedTermApplyTransformationContext(maybeQualifierType = Some(qualifierType))
+    val context = TermApplyTransformationContext(maybeQualifierType = Some(qualifierType))
     val expectedJavaUnqualifiedTermApply = UnqualifiedTermApply(q"size")
 
     when(typeClassifier.isJavaListLike(eqTree(qualifierType))).thenReturn(true)
@@ -45,7 +45,7 @@ class CoreUnqualifiedTermApplyTransformerTest extends UnitTestSuite {
     val unqualifiedTermApply = UnqualifiedTermApply(q"foreach", List(q"print(_)"))
     val expectedJavaUnqualifiedTermApply = UnqualifiedTermApply(q"forEach", List(q"(print(_))"))
 
-    unqualifiedTermApplyTransformer.transform(unqualifiedTermApply, UnqualifiedTermApplyTransformationContext()).value should
+    unqualifiedTermApplyTransformer.transform(unqualifiedTermApply, TermApplyTransformationContext()).value should
       equalUnqualifiedTermApply(expectedJavaUnqualifiedTermApply)
   }
 }
