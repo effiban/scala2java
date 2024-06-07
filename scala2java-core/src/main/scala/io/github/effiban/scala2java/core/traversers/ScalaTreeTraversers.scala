@@ -2,15 +2,13 @@ package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.classifiers._
 import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
-import io.github.effiban.scala2java.core.factories.{Factories, TemplateChildContextFactory}
+import io.github.effiban.scala2java.core.factories.TemplateChildContextFactory
 import io.github.effiban.scala2java.core.orderings.JavaTemplateChildOrdering
-import io.github.effiban.scala2java.core.predicates._
 import io.github.effiban.scala2java.core.resolvers._
 import io.github.effiban.scala2java.core.transformers._
 import io.github.effiban.scala2java.core.typeinference.TypeInferrers
 
 class ScalaTreeTraversers(implicit typeInferrers: TypeInferrers,
-                          factories: Factories,
                           extensionRegistry: ExtensionRegistry) {
 
   private implicit lazy val classifiers: Classifiers = new Classifiers(typeInferrers)
@@ -310,8 +308,7 @@ class ScalaTreeTraversers(implicit typeInferrers: TypeInferrers,
   private lazy val templateTraverser: TemplateTraverser = new TemplateTraverserImpl(
     templateInitTraverser,
     selfTraverser,
-    templateBodyTraverser,
-    new CompositeTemplateInitExcludedPredicate(CoreTemplateInitExcludedPredicate)
+    templateBodyTraverser
   )
 
   private lazy val termAnnotateTraverser: TermAnnotateTraverser = new TermAnnotateTraverserImpl(expressionTermTraverser, annotTraverser)

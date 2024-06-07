@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core
 
+import io.github.effiban.scala2java.core.cleanup.Cleanups
 import io.github.effiban.scala2java.core.collectors.MainClassInitCollector
 import io.github.effiban.scala2java.core.desugarers.semantic.SemanticDesugarers
 import io.github.effiban.scala2java.core.desugarers.syntactic.SourceDesugarer
@@ -51,7 +52,8 @@ object Scala2JavaTranslator {
             new Transformers().sourceTransformer.transform,
             SourceImportAdder.addTo,
             SourceUnqualifier.unqualify,
-            SourceImportRemover.removeJavaLangFrom
+            SourceImportRemover.removeJavaLangFrom,
+            new Cleanups().sourceCleanup.cleanup
           )
         ).andThen(Enrichers.sourceEnricher.enrich)
         .andThen(enrichedSource => renderJava(enrichedSource, scalaPath, maybeOutputJavaBasePath))
