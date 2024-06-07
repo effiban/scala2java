@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.spi.transformers.TypeSelectTransformer
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.{XtensionQuasiquoteTerm, XtensionQuasiquoteType}
+import scala.meta.{XtensionQuasiquoteTemplate, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 class TreeTransformerImplTest extends UnitTestSuite {
 
@@ -24,7 +24,22 @@ class TreeTransformerImplTest extends UnitTestSuite {
     }
     """
 
+  private val Template =
+    template"""
+    A with B with C {
+       val x: scala.Int
+    }
+    """
+
+  private val TransformedTemplate =
+    template"""
+    A with B {
+       val x: scala.Int
+    }
+    """
+
   private val pkgTransformer = mock[PkgTransformer]
+  private val templateTransformer = mock[TemplateTransformer]
   private val internalTermApplyInfixTransformer = mock[InternalTermApplyInfixTransformer]
   private val internalTermApplyTransformer = mock[InternalTermApplyTransformer]
   private val internalTermSelectTransformer = mock[InternalTermSelectTransformer]
@@ -35,6 +50,7 @@ class TreeTransformerImplTest extends UnitTestSuite {
 
   private val treeTransformer = new TreeTransformerImpl(
     pkgTransformer,
+    templateTransformer,
     internalTermApplyInfixTransformer,
     internalTermApplyTransformer,
     internalTermSelectTransformer,
@@ -48,6 +64,12 @@ class TreeTransformerImplTest extends UnitTestSuite {
     doAnswer(TransformedPkg).when(pkgTransformer).transform(eqTree(Pkg))
 
     treeTransformer.transform(Pkg).structure shouldBe TransformedPkg.structure
+  }
+
+  test("transform Template") {
+    doAnswer(TransformedTemplate).when(templateTransformer).transform(eqTree(Template))
+
+    treeTransformer.transform(Template).structure shouldBe TransformedTemplate.structure
   }
 
   test("transform 'import' should return the same") {

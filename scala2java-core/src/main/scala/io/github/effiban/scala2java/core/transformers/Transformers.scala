@@ -44,6 +44,8 @@ class Transformers(implicit typeInferrers: => TypeInferrers,
 
   val sourceTransformer: SourceTransformer = new SourceTransformerImpl(treeTransformer)
 
+  private lazy val templateTransformer: TemplateTransformer = new TemplateTransformerImpl(treeTransformer)
+
   private lazy val termSelectTermFunctionTransformer: TermSelectTermFunctionTransformer = new TermSelectTermFunctionTransformerImpl(
     typeInferrers.functionTypeInferrer,
     treeTransformer
@@ -53,6 +55,7 @@ class Transformers(implicit typeInferrers: => TypeInferrers,
 
   private lazy val treeTransformer: TreeTransformer = new TreeTransformerImpl(
     pkgTransformer,
+    templateTransformer,
     internalTermApplyInfixTransformer,
     internalTermApplyTransformer,
     internalTermSelectTransformer,
