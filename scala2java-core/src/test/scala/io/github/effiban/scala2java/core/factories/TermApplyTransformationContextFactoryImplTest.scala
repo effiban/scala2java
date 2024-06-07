@@ -2,21 +2,21 @@ package io.github.effiban.scala2java.core.factories
 
 import io.github.effiban.scala2java.core.entities.TypeSelects
 import io.github.effiban.scala2java.core.matchers.TermApplyInferenceContextMockitoMatcher.eqTermApplyInferenceContext
-import io.github.effiban.scala2java.core.matchers.UnqualifiedTermApplyTransformationContextScalatestMatcher.equalUnqualifiedTermApplyTransformationContext
+import io.github.effiban.scala2java.core.matchers.TermApplyTransformationContextScalatestMatcher.equalTermApplyTransformationContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.typeinference.InternalApplyDeclDefInferrer
-import io.github.effiban.scala2java.spi.contexts.{TermApplyInferenceContext, UnqualifiedTermApplyTransformationContext}
+import io.github.effiban.scala2java.spi.contexts.{TermApplyInferenceContext, TermApplyTransformationContext}
 import io.github.effiban.scala2java.spi.entities.PartialDeclDef
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.{Term, XtensionQuasiquoteTerm}
 
-class UnqualifiedTermApplyTransformationContextFactoryImplTest extends UnitTestSuite {
+class TermApplyTransformationContextFactoryImplTest extends UnitTestSuite {
 
   private val termApplyInferenceContextFactory = mock[TermApplyInferenceContextFactory]
   private val applyDeclDefInferrer = mock[InternalApplyDeclDefInferrer]
 
-  private val unqualifiedTermApplyTransformationContextFactory = new UnqualifiedTermApplyTransformationContextFactoryImpl(
+  private val termApplyTransformationContextFactory = new TermApplyTransformationContextFactoryImpl(
     termApplyInferenceContextFactory,
     applyDeclDefInferrer
   )
@@ -38,7 +38,7 @@ class UnqualifiedTermApplyTransformationContextFactoryImplTest extends UnitTestS
       maybeArgTypes = expectedMaybeArgTypes
     )
 
-    val expectedTransformationContext = UnqualifiedTermApplyTransformationContext(
+    val expectedTransformationContext = TermApplyTransformationContext(
       maybeQualifierType = Some(expectedFunType),
       partialDeclDef = expectedPartialDeclDef
     )
@@ -47,6 +47,6 @@ class UnqualifiedTermApplyTransformationContextFactoryImplTest extends UnitTestS
     when(applyDeclDefInferrer.infer(eqTree(termApply), eqTermApplyInferenceContext(expectedPartialDeclDefContext)))
       .thenReturn(expectedPartialDeclDef)
 
-    unqualifiedTermApplyTransformationContextFactory.create(termApply) should equalUnqualifiedTermApplyTransformationContext(expectedTransformationContext)
+    termApplyTransformationContextFactory.create(termApply) should equalTermApplyTransformationContext(expectedTransformationContext)
   }
 }

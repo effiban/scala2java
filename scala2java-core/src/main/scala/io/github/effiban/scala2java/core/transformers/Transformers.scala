@@ -25,7 +25,7 @@ class Transformers(implicit typeInferrers: => TypeInferrers,
     new CompositeQualifiedTermApplyTransformer(coreQualifiedTermApplyTransformer),
     new CompositeUnqualifiedTermApplyTransformer(coreUnqualifiedTermApplyTransformer),
     termSelectTermFunctionTransformer,
-    factories.unqualifiedTermApplyTransformationContextFactory
+    factories.termApplyTransformationContextFactory
   )
 
   private lazy val internalTermApplyInfixTransformer: InternalTermApplyInfixTransformer = new InternalTermApplyInfixTransformerImpl(

@@ -1,9 +1,7 @@
 package io.github.effiban.scala2java.core.traversers
 
 import io.github.effiban.scala2java.core.contexts.ArrayInitializerValuesContext
-import io.github.effiban.scala2java.core.factories.UnqualifiedTermApplyTransformationContextFactory
 import io.github.effiban.scala2java.core.resolvers.ArrayInitializerContextResolver
-import io.github.effiban.scala2java.core.transformers.InternalTermApplyTransformer
 
 import scala.annotation.tailrec
 import scala.meta.Term

@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.classifiers.TermSelectClassifier
 import io.github.effiban.scala2java.core.entities.TermNames.{Apply, Empty, JavaCompletedFuture, JavaFailedFuture, JavaFailure, JavaOf, JavaOfEntries, JavaOfNullable, JavaOfSupplier, JavaRange, JavaRangeClosed, JavaSuccess, JavaSupplyAsync, LowercaseLeft, LowercaseRight, ScalaFailed, ScalaInclusive, ScalaSuccessful}
 import io.github.effiban.scala2java.core.entities.TermSelects._
 import io.github.effiban.scala2java.core.entities.{TreeElemSet, TreeKeyedMap}
-import io.github.effiban.scala2java.spi.contexts.QualifiedTermApplyTransformationContext
+import io.github.effiban.scala2java.spi.contexts.TermApplyTransformationContext
 import io.github.effiban.scala2java.spi.entities.QualifiedTermApply
 import io.github.effiban.scala2java.spi.transformers.QualifiedTermApplyTransformer
 
@@ -40,7 +40,7 @@ private[transformers] class CoreQualifiedTermApplyTransformer(termSelectClassifi
     Term.Select(JavaCompletableFuture, JavaSupplyAsync)
   )
 
-  override final def transform(qualifiedTermApply: QualifiedTermApply, context: QualifiedTermApplyTransformationContext)
+  override final def transform(qualifiedTermApply: QualifiedTermApply, context: TermApplyTransformationContext)
     : Option[QualifiedTermApply] =
 
     transformByQualifiedName(qualifiedTermApply.qualifiedName)
