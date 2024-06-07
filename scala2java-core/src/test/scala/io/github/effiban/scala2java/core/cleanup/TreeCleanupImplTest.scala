@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.cleanup
 
+import io.github.effiban.scala2java.core.importmanipulation.PkgImportRemover
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
@@ -7,9 +8,34 @@ import scala.meta.{XtensionQuasiquoteTemplate, XtensionQuasiquoteTerm}
 
 class TreeCleanupImplTest extends UnitTestSuite {
 
+  private val pkgImportRemover = mock[PkgImportRemover]
   private val templateCleanup = mock[TemplateCleanup]
 
-  private val treeCleanup = new TreeCleanupImpl(templateCleanup)
+  private val treeCleanup = new TreeCleanupImpl(pkgImportRemover, templateCleanup)
+
+  test("cleanup of package when pkg import remover removes some imports should return without them") {
+    val initialPkg =
+      q"""
+      package a {
+        import java.lang.String
+        import java.lang.IllegalArgumentException
+        import b.B
+        import c.C
+      }
+      """
+
+    val finalPkg =
+      q"""
+      package a {
+        import b.B
+        import c.C
+      }
+      """
+
+    when(pkgImportRemover.removeJavaLangFrom(eqTree(initialPkg))).thenReturn(finalPkg)
+
+    treeCleanup.cleanup(initialPkg).structure shouldBe finalPkg.structure
+  }
 
   test("cleanup of template should call inner cleanup") {
 
