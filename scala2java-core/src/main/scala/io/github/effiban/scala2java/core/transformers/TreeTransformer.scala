@@ -2,13 +2,14 @@ package io.github.effiban.scala2java.core.transformers
 
 import io.github.effiban.scala2java.spi.transformers.TypeSelectTransformer
 
-import scala.meta.{Import, Pkg, Term, Transformer, Tree, Type}
+import scala.meta.{Import, Pkg, Template, Term, Transformer, Tree, Type}
 
 trait TreeTransformer {
   def transform(tree: Tree): Tree
 }
 
 private[transformers] class TreeTransformerImpl(pkgTransformer: => PkgTransformer,
+                                                templateTransformer: => TemplateTransformer,
                                                 internalTermApplyInfixTransformer: => InternalTermApplyInfixTransformer,
                                                 internalTermApplyTransformer: => InternalTermApplyTransformer,
                                                 internalTermSelectTransformer: => InternalTermSelectTransformer,
@@ -27,6 +28,7 @@ private[transformers] class TreeTransformerImpl(pkgTransformer: => PkgTransforme
       tree match {
         case pkg: Pkg => pkgTransformer.transform(pkg)
         case `import`: Import => `import`
+        case template: Template => templateTransformer.transform(template)
         case termApplyInfix: Term.ApplyInfix => internalTermApplyInfixTransformer.transform(termApplyInfix)
         case termApply: Term.Apply => internalTermApplyTransformer.transform(termApply)
         case termSelect: Term.Select => internalTermSelectTransformer.transform(termSelect)
