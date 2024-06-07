@@ -52,7 +52,6 @@ object Scala2JavaTranslator {
             new Transformers().sourceTransformer.transform,
             SourceImportAdder.addTo,
             SourceUnqualifier.unqualify,
-            SourceImportRemover.removeJavaLangFrom,
             new Cleanups().sourceCleanup.cleanup
           )
         ).andThen(Enrichers.sourceEnricher.enrich)
