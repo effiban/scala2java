@@ -40,6 +40,7 @@ object CoreTypeSelectTransformer extends TypeSelectTransformer {
     ScalaIterator -> JavaIterator,
     ScalaLazyList -> JavaStream,
     ScalaLeft -> JavaEither,
+    ScalaLinearSeq -> JavaList,
     ScalaList -> JavaList,
     ScalaLong -> t"long",
     ScalaMap -> JavaMap,
