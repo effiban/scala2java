@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.typeinference
 
 import io.github.effiban.scala2java.core.entities.TypeSelects
+import io.github.effiban.scala2java.core.entities.TypeSelects.ScalaString
 import io.github.effiban.scala2java.spi.typeinferrers.TypeInferrer0
 
 import scala.meta.Term.{Annotate, ApplyType, Ascribe, Assign, Block, Do, For, ForYield, If, New, Return, Throw, Try, TryWithHandler, While}
@@ -17,6 +18,7 @@ private[typeinference] class TermTypeInferrerImpl(applyInfixTypeInferrer: => App
                                                   ifTypeInferrer: => IfTypeInferrer,
                                                   litTypeInferrer: LitTypeInferrer,
                                                   selectTypeInferrer: => InternalSelectTypeInferrer,
+                                                  superTypeInferrer: => SuperTypeInferrer,
                                                   tryTypeInferrer: => TryTypeInferrer,
                                                   tryWithHandlerTypeInferrer: => TryWithHandlerTypeInferrer,
                                                   tupleTypeInferrer: => TupleTypeInferrer) extends TermTypeInferrer {
@@ -35,20 +37,21 @@ private[typeinference] class TermTypeInferrerImpl(applyInfixTypeInferrer: => App
       case forYield: ForYield => infer(forYield.body)
       case function: Term.Function => Some(functionTypeInferrer.infer(function))
       case `if`: If => ifTypeInferrer.infer(`if`)
-      case _: Term.Interpolate => Some(Type.Name("String"))
+      case _: Term.Interpolate => Some(ScalaString)
       case lit: Lit => litTypeInferrer.infer(lit)
       case _: Term.Name => None // TODO handle local/file/package-scope Term.Name-s
       case `new`: New => Some(`new`.init.tpe)
       case repeated: Term.Repeated => inferRepeated(repeated)
       case `return`: Return => infer(`return`.expr)
       case select: Term.Select => selectTypeInferrer.infer(select)
+      case `super`: Term.Super => superTypeInferrer.infer(`super`)
       case termMatch: Term.Match => caseListTypeInferrer.infer(termMatch.cases)
       case _: Throw => Some(Type.AnonymousName())
       case `try`: Try => tryTypeInferrer.infer(`try`)
       case tryWithHandler: TryWithHandler => tryWithHandlerTypeInferrer.infer(tryWithHandler)
       case tuple: Term.Tuple => Some(tupleTypeInferrer.infer(tuple))
       case _: While => Some(Type.AnonymousName())
-      // TODO - support NewAnonymous, PartialFunction
+      // TODO - support NewAnonymous, PartialFunction, This
       case _ => None
     }
   }

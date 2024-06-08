@@ -1,8 +1,8 @@
 package io.github.effiban.scala2java.core.typeinference
 
 import io.github.effiban.scala2java.core.entities.TypeSelects
+import io.github.effiban.scala2java.core.entities.TypeSelects.{ScalaInt, ScalaString}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
@@ -15,7 +15,7 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
   private val ApplyArgNames = List(q"arg1", q"arg2")
   private val TheApply = Term.Apply(q"myMethod", ApplyArgNames)
 
-  private val TheApplyType = Term.ApplyType(Term.Name("foo"), List(TypeNames.Int))
+  private val TheApplyType = Term.ApplyType(Term.Name("foo"), List(ScalaInt))
 
   private val Condition = Term.ApplyInfix(
     lhs = Term.Name("x"),
@@ -55,10 +55,11 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
   private val ifTypeInferrer = mock[IfTypeInferrer]
   private val litTypeInferrer = mock[LitTypeInferrer]
   private val selectTypeInferrer = mock[InternalSelectTypeInferrer]
+  private val superTypeInferrer = mock[SuperTypeInferrer]
   private val tryTypeInferrer = mock[TryTypeInferrer]
   private val tryWithHandlerTypeInferrer = mock[TryWithHandlerTypeInferrer]
-  private val tupleTypeInferrer = mock[TupleTypeInferrer]
 
+  private val tupleTypeInferrer = mock[TupleTypeInferrer]
   private val termTypeInferrer = new TermTypeInferrerImpl(
     applyInfixTypeInferrer,
     applyReturnTypeInferrer,
@@ -69,14 +70,15 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
     ifTypeInferrer,
     litTypeInferrer,
     selectTypeInferrer,
+    superTypeInferrer,
     tryTypeInferrer,
     tryWithHandlerTypeInferrer,
     tupleTypeInferrer
   )
 
   test("infer 'Apply' return type when 'ApplyTypeInferrer' returns a result, should return it") {
-    when(applyReturnTypeInferrer.infer(eqTree(TheApply))).thenReturn(Some(TypeNames.Int))
-    termTypeInferrer.infer(TheApply).value.structure shouldBe TypeNames.Int.structure
+    when(applyReturnTypeInferrer.infer(eqTree(TheApply))).thenReturn(Some(ScalaInt))
+    termTypeInferrer.infer(TheApply).value.structure shouldBe ScalaInt.structure
   }
 
   test("infer 'Apply' return type when 'ApplyTypeInferrer' returns None should return None") {
@@ -85,8 +87,8 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
   }
 
   test("infer 'ApplyType' when 'ApplyTypeTypeInferrer' returns a result, should return it") {
-    when(applyTypeTypeInferrer.infer(eqTree(TheApplyType))).thenReturn(Some(TypeNames.Int))
-    termTypeInferrer.infer(TheApplyType).value.structure shouldBe TypeNames.Int.structure
+    when(applyTypeTypeInferrer.infer(eqTree(TheApplyType))).thenReturn(Some(ScalaInt))
+    termTypeInferrer.infer(TheApplyType).value.structure shouldBe ScalaInt.structure
   }
 
   test("infer 'ApplyType' when 'ApplyTypeTypeInferrer' returns None should return None") {
@@ -95,22 +97,22 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
   }
 
   test("infer 'Ascribe' should return its type") {
-    termTypeInferrer.infer(Ascribe(Term.Name("bla"), TypeNames.Int)).value.structure shouldBe TypeNames.Int.structure
+    termTypeInferrer.infer(Ascribe(Term.Name("bla"), ScalaInt)).value.structure shouldBe ScalaInt.structure
   }
 
   test("infer 'Assign' should infer by type of RHS") {
     val rhs = Lit.Int(3)
     val assign = Assign(lhs = Term.Name("x"), rhs = rhs)
 
-    when(litTypeInferrer.infer(eqTree(rhs))).thenReturn(Some(TypeNames.Int))
+    when(litTypeInferrer.infer(eqTree(rhs))).thenReturn(Some(ScalaInt))
 
-    termTypeInferrer.infer(assign).value.structure shouldBe TypeNames.Int.structure
+    termTypeInferrer.infer(assign).value.structure shouldBe ScalaInt.structure
   }
 
   test("infer 'Block' when 'BlockTypeInferrer' returns a result should return it") {
-    when(blockTypeInferrer.infer(eqTree(TheBlock))).thenReturn(Some(TypeNames.Int))
+    when(blockTypeInferrer.infer(eqTree(TheBlock))).thenReturn(Some(ScalaInt))
 
-    termTypeInferrer.infer(TheBlock).value.structure shouldBe TypeNames.Int.structure
+    termTypeInferrer.infer(TheBlock).value.structure shouldBe ScalaInt.structure
   }
 
   test("infer 'Block' when 'BlockTypeInferrer' returns None should return None") {
@@ -126,9 +128,9 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
       body = body
     )
 
-    when(litTypeInferrer.infer(eqTree(body))).thenReturn(Some(TypeNames.String))
+    when(litTypeInferrer.infer(eqTree(body))).thenReturn(Some(ScalaString))
 
-    termTypeInferrer.infer(forYield).value.structure shouldBe TypeNames.String.structure
+    termTypeInferrer.infer(forYield).value.structure shouldBe ScalaString.structure
   }
 
   test("infer Term.Function should return result of 'FunctionTypeInferrer'") {
@@ -138,9 +140,9 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
   }
 
   test("infer 'If' when 'IfTypeInferrer' returns a result should return it") {
-    when(ifTypeInferrer.infer(eqTree(TheIf))).thenReturn(Some(TypeNames.Int))
+    when(ifTypeInferrer.infer(eqTree(TheIf))).thenReturn(Some(ScalaInt))
 
-    termTypeInferrer.infer(TheIf).value.structure shouldBe TypeNames.Int.structure
+    termTypeInferrer.infer(TheIf).value.structure shouldBe ScalaInt.structure
   }
 
   test("infer 'If' when 'IfTypeInferrer' returns None should return None") {
@@ -156,15 +158,15 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
       args = List(Term.Name("myArg"))
     )
 
-    termTypeInferrer.infer(termInterpolate).value.structure shouldBe TypeNames.String.structure
+    termTypeInferrer.infer(termInterpolate).value.structure shouldBe ScalaString.structure
   }
 
   test("infer 'Lit' when 'LitTypeInferrer' returns a result should return it") {
     val literalInt = Lit.Int(3)
 
-    when(litTypeInferrer.infer(eqTree(literalInt))).thenReturn(Some(TypeNames.Int))
+    when(litTypeInferrer.infer(eqTree(literalInt))).thenReturn(Some(ScalaInt))
 
-    termTypeInferrer.infer(literalInt).value.structure shouldBe TypeNames.Int.structure
+    termTypeInferrer.infer(literalInt).value.structure shouldBe ScalaInt.structure
   }
 
   test("infer 'Lit' when 'LitTypeInferrer' returns None should return None") {
@@ -176,9 +178,9 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
   test("infer 'Match' should infer by its case list") {
     val `match` = Match(expr = Term.Name("x"), cases = MatchCases, mods = Nil)
 
-    when(caseListTypeInferrer.infer(eqTreeList(MatchCases))).thenReturn(Some(TypeNames.Int))
+    when(caseListTypeInferrer.infer(eqTreeList(MatchCases))).thenReturn(Some(ScalaInt))
 
-    termTypeInferrer.infer(`match`).value.structure shouldBe TypeNames.Int.structure
+    termTypeInferrer.infer(`match`).value.structure shouldBe ScalaInt.structure
   }
 
   test("infer 'Name' should return None") {
@@ -207,15 +209,23 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
   test("infer 'Return' should infer by its expression recursively") {
     val expr = Lit.String("abc")
 
-    when(litTypeInferrer.infer(eqTree(expr))).thenReturn(Some(TypeNames.String))
+    when(litTypeInferrer.infer(eqTree(expr))).thenReturn(Some(ScalaString))
 
-    termTypeInferrer.infer(Term.Return(expr)).value.structure shouldBe TypeNames.String.structure
+    termTypeInferrer.infer(Term.Return(expr)).value.structure shouldBe ScalaString.structure
+  }
+
+  test("infer 'Super' should return result of SuperTypeInferrer") {
+    val theSuper = q"super[X]"
+
+    when(superTypeInferrer.infer(eqTree(theSuper))).thenReturn(Some(ScalaString))
+
+    termTypeInferrer.infer(theSuper).value.structure shouldBe ScalaString.structure
   }
 
   test("infer 'Tuple' should return result of 'TupleTypeInferrer'") {
     val termTuple = Term.Tuple(List(Lit.String("a"), Lit.Int(1)))
 
-    val expectedTypeTuple = Type.Tuple(List(TypeNames.String, TypeNames.Int))
+    val expectedTypeTuple = Type.Tuple(List(ScalaString, ScalaInt))
 
     when(tupleTypeInferrer.infer(eqTree(termTuple))).thenReturn(expectedTypeTuple)
 
