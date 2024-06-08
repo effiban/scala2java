@@ -27,9 +27,9 @@ class EvaluatedTermSelectDesugarerImplTest extends UnitTestSuite {
     val context = TermSelectInferenceContext(Some(qualType))
     val termApply = q"(func(func2())).func3()"
 
+    when(qualifierTypeInferrer.infer(eqTree(termSelect))).thenReturn(Some(qualType))
     doReturn(desugaredTermSelect).when(evaluatedTermSelectQualDesugarer).desugar(eqTree(termSelect))
-    when(qualifierTypeInferrer.infer(eqTree(desugaredTermSelect))).thenReturn(Some(qualType))
-    when(termSelectSupportsNoArgInvocation(eqTree(desugaredTermSelect), eqTermSelectInferenceContext(context))).thenReturn(true)
+    when(termSelectSupportsNoArgInvocation(eqTree(termSelect), eqTermSelectInferenceContext(context))).thenReturn(true)
 
     evaluatedTermSelectDesugarer.desugar(termSelect).structure shouldBe termApply.structure
 
@@ -41,9 +41,9 @@ class EvaluatedTermSelectDesugarerImplTest extends UnitTestSuite {
     val qualType = t"A"
     val context = TermSelectInferenceContext(Some(qualType))
 
+    when(qualifierTypeInferrer.infer(eqTree(termSelect))).thenReturn(Some(qualType))
     doReturn(desugaredTermSelect).when(evaluatedTermSelectQualDesugarer).desugar(eqTree(termSelect))
-    when(qualifierTypeInferrer.infer(eqTree(desugaredTermSelect))).thenReturn(Some(qualType))
-    when(termSelectSupportsNoArgInvocation(eqTree(desugaredTermSelect), eqTermSelectInferenceContext(context))).thenReturn(false)
+    when(termSelectSupportsNoArgInvocation(eqTree(termSelect), eqTermSelectInferenceContext(context))).thenReturn(false)
 
     evaluatedTermSelectDesugarer.desugar(termSelect).structure shouldBe desugaredTermSelect.structure
 

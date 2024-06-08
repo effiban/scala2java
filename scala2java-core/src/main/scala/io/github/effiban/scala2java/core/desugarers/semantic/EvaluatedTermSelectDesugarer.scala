@@ -15,10 +15,10 @@ private[semantic] class EvaluatedTermSelectDesugarerImpl(qualifierTypeInferrer: 
   extends EvaluatedTermSelectDesugarer {
 
   override def desugar(termSelect: Term.Select): Term = {
-    val desugaredTermSelect = evaluatedTermSelectQualDesugarer.desugar(termSelect)
-    val maybeQualType = qualifierTypeInferrer.infer(desugaredTermSelect)
+    val maybeQualType = qualifierTypeInferrer.infer(termSelect)
     val context = TermSelectInferenceContext(maybeQualType)
-    if (termSelectSupportsNoArgInvocation(desugaredTermSelect, context)) {
+    val desugaredTermSelect = evaluatedTermSelectQualDesugarer.desugar(termSelect)
+    if (termSelectSupportsNoArgInvocation(termSelect, context)) {
       Term.Apply(desugaredTermSelect, Nil)
     } else {
       desugaredTermSelect
