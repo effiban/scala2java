@@ -2,6 +2,7 @@ package io.github.effiban.scala2java.core.qualifiers
 
 import io.github.effiban.scala2java.core.entities.ReflectedEntities.{JavaLangPackage, PredefModule, ScalaPackage}
 import io.github.effiban.scala2java.core.entities.{TermNames, TermSelects}
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionUtils.isTermMemberOf
 
 import scala.meta.Term
 import scala.reflect.runtime.universe._
@@ -35,10 +36,7 @@ object CoreTermNameQualifier extends CoreTermNameQualifier {
 
   private def qualifyAsMemberOf(module: ModuleSymbol,
                                 moduleRef: Term.Ref,
-                                scalaMetaTermName: Term.Name): Option[Term] = {
-    module.info.member(TermName(scalaMetaTermName.value)) match {
-      case NoSymbol => None
-      case _ => Some(Term.Select(moduleRef, scalaMetaTermName))
-    }
+                                termName: Term.Name): Option[Term] = {
+    if (isTermMemberOf(module, termName)) Some(Term.Select(moduleRef, termName)) else None
   }
 }
