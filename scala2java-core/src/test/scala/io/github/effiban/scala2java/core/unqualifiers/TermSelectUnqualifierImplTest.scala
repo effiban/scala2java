@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.unqualifiers
 
 import io.github.effiban.scala2java.core.importmanipulation.TermSelectImporterMatcher
+import io.github.effiban.scala2java.core.qualifiers.QualificationContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.any
@@ -15,7 +16,7 @@ class TermSelectUnqualifierImplTest extends UnitTestSuite {
 
   test("unqualify() when no importers provided should return unchanged") {
     val typeSelect = q"a.b.C"
-    termSelectUnqualifier.unqualify(typeSelect, Nil).structure shouldBe typeSelect.structure
+    termSelectUnqualifier.unqualify(typeSelect).structure shouldBe typeSelect.structure
   }
 
   test("unqualify() when one importer provided and doesn't match, should return unchanged") {
@@ -24,7 +25,7 @@ class TermSelectUnqualifierImplTest extends UnitTestSuite {
 
     doReturn(None).when(termSelectImporterMatcher).findMatch(eqTree(typeSelect), eqTree(importer))
 
-    termSelectUnqualifier.unqualify(typeSelect, List(importer)).structure shouldBe typeSelect.structure
+    termSelectUnqualifier.unqualify(typeSelect, QualificationContext(List(importer))).structure shouldBe typeSelect.structure
   }
 
   test("unqualify() when one importer provided and matches, should return name only") {
@@ -34,7 +35,7 @@ class TermSelectUnqualifierImplTest extends UnitTestSuite {
 
     doReturn(Some(expectedMatchingImporter)).when(termSelectImporterMatcher).findMatch(eqTree(typeSelect), eqTree(importer))
 
-    termSelectUnqualifier.unqualify(typeSelect, List(importer)).structure shouldBe q"C".structure
+    termSelectUnqualifier.unqualify(typeSelect, QualificationContext(List(importer))).structure shouldBe q"C".structure
   }
 
   test("unqualify() when two importers provided and none match, should return unchanged") {
@@ -44,7 +45,7 @@ class TermSelectUnqualifierImplTest extends UnitTestSuite {
 
     doReturn(None).when(termSelectImporterMatcher).findMatch(eqTree(typeSelect), any[Importer])
 
-    termSelectUnqualifier.unqualify(typeSelect, List(importer1, importer2)).structure shouldBe typeSelect.structure
+    termSelectUnqualifier.unqualify(typeSelect, QualificationContext(List(importer1, importer2))).structure shouldBe typeSelect.structure
   }
 
   test("unqualify() when two importers provided and second one matches, should return name only") {
@@ -58,7 +59,7 @@ class TermSelectUnqualifierImplTest extends UnitTestSuite {
       case _ => None
     }).when(termSelectImporterMatcher).findMatch(eqTree(typeSelect), any[Importer])
 
-    termSelectUnqualifier.unqualify(typeSelect, List(importer1, importer2)).structure shouldBe q"C".structure
+    termSelectUnqualifier.unqualify(typeSelect, QualificationContext(List(importer1, importer2))).structure shouldBe q"C".structure
   }
 
 }

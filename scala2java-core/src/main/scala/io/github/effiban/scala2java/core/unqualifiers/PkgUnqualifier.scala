@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.unqualifiers
 
 import io.github.effiban.scala2java.core.importmanipulation.StatsByImportSplitter
+import io.github.effiban.scala2java.core.qualifiers.QualificationContext
 
 import scala.meta.{Import, Importer, Pkg, Stat}
 
@@ -20,6 +21,6 @@ private[unqualifiers] class PkgUnqualifierImpl(statsByImportSplitter: StatsByImp
   }
 
   private def unqualify(stat: Stat, importers: List[Importer]): Stat = {
-    treeUnqualifier.unqualify(stat, importers).asInstanceOf[Stat]
+    treeUnqualifier.unqualify(stat, QualificationContext(importers)).asInstanceOf[Stat]
   }
 }

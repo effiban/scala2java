@@ -2,6 +2,7 @@ package io.github.effiban.scala2java.core.unqualifiers
 
 import io.github.effiban.scala2java.core.entities.TypeSelects
 import io.github.effiban.scala2java.core.importmanipulation.TypeSelectImporterMatcher
+import io.github.effiban.scala2java.core.qualifiers.QualificationContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.any
@@ -15,16 +16,16 @@ class TypeSelectUnqualifierImplTest extends UnitTestSuite {
   private val typeSelectUnqualifier = new TypeSelectUnqualifierImpl(typeSelectImporterMatcher)
 
   test("unqualify() for scala.Array should return unchanged") {
-    typeSelectUnqualifier.unqualify(TypeSelects.ScalaArray, Nil).structure shouldBe TypeSelects.ScalaArray.structure
+    typeSelectUnqualifier.unqualify(TypeSelects.ScalaArray).structure shouldBe TypeSelects.ScalaArray.structure
   }
 
   test("unqualify() for scala.Enumeration should return unchanged") {
-    typeSelectUnqualifier.unqualify(TypeSelects.ScalaEnumeration, Nil).structure shouldBe TypeSelects.ScalaEnumeration.structure
+    typeSelectUnqualifier.unqualify(TypeSelects.ScalaEnumeration).structure shouldBe TypeSelects.ScalaEnumeration.structure
   }
 
   test("unqualify() for non-Array/Enumeration when no importers provided should return unchanged") {
     val typeSelect = t"a.b.C"
-    typeSelectUnqualifier.unqualify(typeSelect, Nil).structure shouldBe typeSelect.structure
+    typeSelectUnqualifier.unqualify(typeSelect).structure shouldBe typeSelect.structure
   }
 
   test("unqualify() for non-Array/Enumeration when one importer provided and doesn't match, should return unchanged") {
@@ -33,7 +34,7 @@ class TypeSelectUnqualifierImplTest extends UnitTestSuite {
 
     doReturn(None).when(typeSelectImporterMatcher).findMatch(eqTree(typeSelect), eqTree(importer))
 
-    typeSelectUnqualifier.unqualify(typeSelect, List(importer)).structure shouldBe typeSelect.structure
+    typeSelectUnqualifier.unqualify(typeSelect, QualificationContext(List(importer))).structure shouldBe typeSelect.structure
   }
 
   test("unqualify() for non-Array/Enumeration when one importer provided and matches, should return name only") {
@@ -43,7 +44,7 @@ class TypeSelectUnqualifierImplTest extends UnitTestSuite {
 
     doReturn(Some(expectedMatchingImporter)).when(typeSelectImporterMatcher).findMatch(eqTree(typeSelect), eqTree(importer))
 
-    typeSelectUnqualifier.unqualify(typeSelect, List(importer)).structure shouldBe t"C".structure
+    typeSelectUnqualifier.unqualify(typeSelect, QualificationContext(List(importer))).structure shouldBe t"C".structure
   }
 
   test("unqualify() for non-Array/Enumeration when two importers provided and none match, should return unchanged") {
@@ -53,7 +54,7 @@ class TypeSelectUnqualifierImplTest extends UnitTestSuite {
 
     doReturn(None).when(typeSelectImporterMatcher).findMatch(eqTree(typeSelect), any[Importer])
 
-    typeSelectUnqualifier.unqualify(typeSelect, List(importer1, importer2)).structure shouldBe typeSelect.structure
+    typeSelectUnqualifier.unqualify(typeSelect, QualificationContext(List(importer1, importer2))).structure shouldBe typeSelect.structure
   }
 
   test("unqualify() for non-Array/Enumeration when two importers provided and second one matches, should return name only") {
@@ -67,6 +68,6 @@ class TypeSelectUnqualifierImplTest extends UnitTestSuite {
       case _ => None
     }).when(typeSelectImporterMatcher).findMatch(eqTree(typeSelect), any[Importer])
 
-    typeSelectUnqualifier.unqualify(typeSelect, List(importer1, importer2)).structure shouldBe t"C".structure
+    typeSelectUnqualifier.unqualify(typeSelect, QualificationContext(List(importer1, importer2))).structure shouldBe t"C".structure
   }
 }

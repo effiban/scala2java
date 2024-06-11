@@ -1,13 +1,14 @@
 package io.github.effiban.scala2java.core.unqualifiers
 
 import io.github.effiban.scala2java.core.importmanipulation.StatsByImportSplitter
+import io.github.effiban.scala2java.core.matchers.QualificationContextMockitoMatcher.eqQualificationContext
 import io.github.effiban.scala2java.core.qualifiers.QualificationContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import org.mockito.ArgumentMatchersSugar.any
 import org.mockito.Mockito.verifyNoInteractions
 
-import scala.meta.{Importer, Stat, Term, XtensionQuasiquoteImporter, XtensionQuasiquoteTerm}
+import scala.meta.{Stat, Term, XtensionQuasiquoteImporter, XtensionQuasiquoteTerm}
 
 class PkgUnqualifierImplTest extends UnitTestSuite {
 
@@ -66,7 +67,7 @@ class PkgUnqualifierImplTest extends UnitTestSuite {
 
     doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(pkg.stats))
     doAnswer((stat: Stat) => stat)
-      .when(treeUnqualifier).unqualify(any[Stat], eqTreeList(expectedImporters))
+      .when(treeUnqualifier).unqualify(any[Stat], eqQualificationContext(QualificationContext(expectedImporters)))
 
     pkgUnqualifier.unqualify(pkg).structure shouldBe pkg.structure
   }
@@ -129,10 +130,10 @@ class PkgUnqualifierImplTest extends UnitTestSuite {
       """
 
     doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
-    doAnswer((stat: Stat, _: List[Importer]) => stat match {
+    doAnswer((stat: Stat, _: QualificationContext) => stat match {
       case aTermSelect if aTermSelect.structure == initialStat1.structure => expectedFinalStat1
       case aTermSelect => aTermSelect
-    }).when(treeUnqualifier).unqualify(any[Term.Select], eqTreeList(expectedImporters))
+    }).when(treeUnqualifier).unqualify(any[Term.Select], eqQualificationContext(QualificationContext(expectedImporters)))
 
     pkgUnqualifier.unqualify(initialPkg).structure shouldBe expectedFinalPkg.structure
   }
@@ -201,11 +202,11 @@ class PkgUnqualifierImplTest extends UnitTestSuite {
       """
 
     doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(initialPkg.stats))
-    doAnswer((stat: Stat, _: List[Importer]) => stat match {
+    doAnswer((stat: Stat, _: QualificationContext) => stat match {
       case aStat if aStat.structure == initialStat1.structure => expectedFinalStat1
       case aStat if aStat.structure == initialStat2.structure => expectedFinalStat2
       case aStat => aStat
-    }).when(treeUnqualifier).unqualify(any[Stat], eqTreeList(expectedImporters))
+    }).when(treeUnqualifier).unqualify(any[Stat], eqQualificationContext(QualificationContext(expectedImporters)))
 
     pkgUnqualifier.unqualify(initialPkg).structure shouldBe expectedFinalPkg.structure
   }

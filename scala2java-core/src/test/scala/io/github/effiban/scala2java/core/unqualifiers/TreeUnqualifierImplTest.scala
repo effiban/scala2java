@@ -1,12 +1,12 @@
 package io.github.effiban.scala2java.core.unqualifiers
 
+import io.github.effiban.scala2java.core.matchers.QualificationContextMockitoMatcher.eqQualificationContext
 import io.github.effiban.scala2java.core.qualifiers.QualificationContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import org.mockito.ArgumentMatchersSugar.any
 import org.mockito.Mockito.verifyNoInteractions
 
-import scala.meta.{Importer, Term, Type, XtensionQuasiquoteImporter, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
+import scala.meta.{Term, Type, XtensionQuasiquoteImporter, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 class TreeUnqualifierImplTest extends UnitTestSuite {
 
@@ -14,7 +14,7 @@ class TreeUnqualifierImplTest extends UnitTestSuite {
   private val typeSelectUnqualifier = mock[TypeSelectUnqualifier]
   private val typeProjectUnqualifier = mock[TypeProjectUnqualifier]
 
-  private val importers = List(importer"dummy.dummy", importer"dummy.dummy2")
+  private val qualificationContext = QualificationContext(List(importer"dummy.dummy"))
 
   private val treeUnqualifier = new TreeUnqualifierImpl(
     termSelectUnqualifier,
@@ -30,7 +30,7 @@ class TreeUnqualifierImplTest extends UnitTestSuite {
       }
       """
 
-    treeUnqualifier.unqualify(tree, importers).structure shouldBe tree.structure
+    treeUnqualifier.unqualify(tree, qualificationContext).structure shouldBe tree.structure
 
     verifyNoInteractions(termSelectUnqualifier, typeSelectUnqualifier, typeProjectUnqualifier)
   }
@@ -44,9 +44,9 @@ class TreeUnqualifierImplTest extends UnitTestSuite {
       """
 
     doAnswer((termSelect: Term.Select) => termSelect)
-      .when(termSelectUnqualifier).unqualify(any[Term.Select], eqTreeList(importers))
+      .when(termSelectUnqualifier).unqualify(any[Term.Select], eqQualificationContext(qualificationContext))
 
-    treeUnqualifier.unqualify(tree, importers).structure shouldBe tree.structure
+    treeUnqualifier.unqualify(tree, qualificationContext).structure shouldBe tree.structure
   }
 
   test("unqualify when has nested Type.Select-s but TypeSelectUnqualifier returns unchanged, should return unchanged") {
@@ -59,9 +59,9 @@ class TreeUnqualifierImplTest extends UnitTestSuite {
       """
 
     doAnswer((typeSelect: Type.Select) => typeSelect)
-      .when(typeSelectUnqualifier).unqualify(any[Type.Select], eqTreeList(importers))
+      .when(typeSelectUnqualifier).unqualify(any[Type.Select], eqQualificationContext(qualificationContext))
 
-    treeUnqualifier.unqualify(tree, importers).structure shouldBe tree.structure
+    treeUnqualifier.unqualify(tree, qualificationContext).structure shouldBe tree.structure
   }
 
   test("unqualify when has nested Type.Project-s but TypeProjectUnqualifier returns unchanged, should return unchanged") {
@@ -74,9 +74,9 @@ class TreeUnqualifierImplTest extends UnitTestSuite {
       """
 
     doAnswer((typeProject: Type.Project) => typeProject)
-      .when(typeProjectUnqualifier).unqualify(any[Type.Project], eqTreeList(importers))
+      .when(typeProjectUnqualifier).unqualify(any[Type.Project], eqQualificationContext(qualificationContext))
 
-    treeUnqualifier.unqualify(tree, importers).structure shouldBe tree.structure
+    treeUnqualifier.unqualify(tree, qualificationContext).structure shouldBe tree.structure
   }
 
   test("unqualify when TermSelectUnqualifier unqualifies some of the Term.Select-s by full match, should return them unqualified") {
@@ -96,13 +96,13 @@ class TreeUnqualifierImplTest extends UnitTestSuite {
       }
       """
 
-    doAnswer((termSelect: Term.Select, _: List[Importer]) => termSelect match {
+    doAnswer((termSelect: Term.Select, _: QualificationContext) => termSelect match {
       case aTermSelect if aTermSelect.structure == q"c.c1".structure => q"c1"
       case aTermSelect if aTermSelect.structure == q"d.d1".structure => q"d1"
       case aTermSelect => aTermSelect
-    }).when(termSelectUnqualifier).unqualify(any[Term.Select], eqTreeList(importers))
+    }).when(termSelectUnqualifier).unqualify(any[Term.Select], eqQualificationContext(qualificationContext))
 
-    treeUnqualifier.unqualify(initialTree, importers).structure shouldBe expectedFinalTree.structure
+    treeUnqualifier.unqualify(initialTree, qualificationContext).structure shouldBe expectedFinalTree.structure
   }
 
   test("unqualify when TermSelectUnqualifier unqualifies some Term.Select-s by prefix match, should return them unqualified") {
@@ -122,13 +122,13 @@ class TreeUnqualifierImplTest extends UnitTestSuite {
       }
       """
 
-    doAnswer((termSelect: Term.Select, _: List[Importer]) => termSelect match {
+    doAnswer((termSelect: Term.Select, _: QualificationContext) => termSelect match {
       case aTermSelect if aTermSelect.structure == q"c1.c2".structure => q"c2"
       case aTermSelect if aTermSelect.structure == q"d1.d2".structure => q"d2"
       case aTermSelect => aTermSelect
-    }).when(termSelectUnqualifier).unqualify(any[Term.Select], eqTreeList(importers))
+    }).when(termSelectUnqualifier).unqualify(any[Term.Select], eqQualificationContext(qualificationContext))
 
-    treeUnqualifier.unqualify(initialTree, importers).structure shouldBe expectedFinalTree.structure
+    treeUnqualifier.unqualify(initialTree, qualificationContext).structure shouldBe expectedFinalTree.structure
   }
 
   test("unqualify when TypeSelectUnqualifier unqualifies some of the Type.Selects, should return them unqualified") {
@@ -149,14 +149,14 @@ class TreeUnqualifierImplTest extends UnitTestSuite {
       """
 
     doAnswer((termSelect: Term.Select) => termSelect)
-      .when(termSelectUnqualifier).unqualify(any[Term.Select], eqTreeList(importers))
-    doAnswer((typeSelect: Type.Select, _: List[Importer]) => typeSelect match {
+      .when(termSelectUnqualifier).unqualify(any[Term.Select], eqQualificationContext(qualificationContext))
+    doAnswer((typeSelect: Type.Select, _: QualificationContext) => typeSelect match {
       case aTypeSelect if aTypeSelect.structure == t"c.C".structure => t"C"
       case aTypeSelect if aTypeSelect.structure == t"d.D".structure => t"D"
       case aTypeSelect => aTypeSelect
-    }).when(typeSelectUnqualifier).unqualify(any[Type.Select], eqTreeList(importers))
+    }).when(typeSelectUnqualifier).unqualify(any[Type.Select], eqQualificationContext(qualificationContext))
 
-    treeUnqualifier.unqualify(initialTree, importers).structure shouldBe expectedFinalTree.structure
+    treeUnqualifier.unqualify(initialTree, qualificationContext).structure shouldBe expectedFinalTree.structure
   }
 
   test("unqualify when TypeProjectUnqualifier unqualifies some of the Type.Projects by full match, should return them unqualified") {
@@ -177,14 +177,14 @@ class TreeUnqualifierImplTest extends UnitTestSuite {
       """
 
     doAnswer((termSelect: Term.Select) => termSelect)
-      .when(termSelectUnqualifier).unqualify(any[Term.Select], eqTreeList(importers))
-    doAnswer((typeProject: Type.Project, _: List[Importer]) => typeProject match {
+      .when(termSelectUnqualifier).unqualify(any[Term.Select], eqQualificationContext(qualificationContext))
+    doAnswer((typeProject: Type.Project, _: QualificationContext) => typeProject match {
       case aTypeProject if aTypeProject.structure == t"C#D".structure => t"D"
       case aTypeProject if aTypeProject.structure == t"E#F".structure => t"F"
       case aTypeProject => aTypeProject
-    }).when(typeProjectUnqualifier).unqualify(any[Type.Project], eqTreeList(importers))
+    }).when(typeProjectUnqualifier).unqualify(any[Type.Project], eqQualificationContext(qualificationContext))
 
-    treeUnqualifier.unqualify(initialTree, importers).structure shouldBe expectedFinalTree.structure
+    treeUnqualifier.unqualify(initialTree, qualificationContext).structure shouldBe expectedFinalTree.structure
   }
 
   test("unqualify when TypeProjectUnqualifier unqualifies some of the Type.Projects by partial match, should return them unqualified") {
@@ -205,13 +205,13 @@ class TreeUnqualifierImplTest extends UnitTestSuite {
       """
 
     doAnswer((termSelect: Term.Select) => termSelect)
-      .when(termSelectUnqualifier).unqualify(any[Term.Select], eqTreeList(importers))
-    doAnswer((typeProject: Type.Project, _: List[Importer]) => typeProject match {
+      .when(termSelectUnqualifier).unqualify(any[Term.Select], eqQualificationContext(qualificationContext))
+    doAnswer((typeProject: Type.Project, _: QualificationContext) => typeProject match {
       case aTypeProject if aTypeProject.structure == t"C1#C2".structure => t"C2"
       case aTypeProject if aTypeProject.structure == t"D1#D2".structure => t"D2"
       case aTypeProject => aTypeProject
-    }).when(typeProjectUnqualifier).unqualify(any[Type.Project], eqTreeList(importers))
+    }).when(typeProjectUnqualifier).unqualify(any[Type.Project], eqQualificationContext(qualificationContext))
 
-    treeUnqualifier.unqualify(initialTree, importers).structure shouldBe expectedFinalTree.structure
+    treeUnqualifier.unqualify(initialTree, qualificationContext).structure shouldBe expectedFinalTree.structure
   }
 }
