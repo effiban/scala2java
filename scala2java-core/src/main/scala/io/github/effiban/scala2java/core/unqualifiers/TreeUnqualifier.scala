@@ -1,29 +1,31 @@
 package io.github.effiban.scala2java.core.unqualifiers
 
-import scala.meta.{Import, Importer, Pkg, Term, Transformer, Tree, Type}
+import io.github.effiban.scala2java.core.qualifiers.QualificationContext
+
+import scala.meta.{Import, Pkg, Term, Transformer, Tree, Type}
 
 trait TreeUnqualifier {
-  def unqualify(tree: Tree, importers: List[Importer] = Nil): Tree
+  def unqualify(tree: Tree, context: QualificationContext = QualificationContext()): Tree
 }
 
 private[unqualifiers] class TreeUnqualifierImpl(termSelectUnqualifier: TermSelectUnqualifier,
                                                 typeSelectUnqualifier: TypeSelectUnqualifier,
                                                 typeProjectUnqualifier: TypeProjectUnqualifier) extends TreeUnqualifier {
 
-  override def unqualify(tree: Tree, importers: List[Importer] = Nil): Tree = {
-    new UnqualifyingTransformer(importers)(tree)
+  override def unqualify(tree: Tree, context: QualificationContext = QualificationContext()): Tree = {
+    new UnqualifyingTransformer(context)(tree)
   }
 
-  private class UnqualifyingTransformer(importers: List[Importer]) extends Transformer {
+  private class UnqualifyingTransformer(context: QualificationContext) extends Transformer {
 
     override def apply(tree: Tree): Tree =
       tree match {
-        case termSelect: Term.Select => termSelectUnqualifier.unqualify(termSelect, importers) match {
+        case termSelect: Term.Select => termSelectUnqualifier.unqualify(termSelect, context) match {
           case aTermSelect: Term.Select => super.apply(aTermSelect)
           case aTermRef => aTermRef
         }
-        case typeSelect: Type.Select => typeSelectUnqualifier.unqualify(typeSelect, importers)
-        case typeProject: Type.Project => typeProjectUnqualifier.unqualify(typeProject, importers) match {
+        case typeSelect: Type.Select => typeSelectUnqualifier.unqualify(typeSelect, context)
+        case typeProject: Type.Project => typeProjectUnqualifier.unqualify(typeProject, context) match {
           case aTypeProject: Type.Project => super.apply(aTypeProject)
           case aTypeRef => aTypeRef
         }

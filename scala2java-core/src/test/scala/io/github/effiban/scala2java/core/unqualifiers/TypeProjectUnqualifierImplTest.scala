@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.unqualifiers
 
 import io.github.effiban.scala2java.core.importmanipulation.TypeProjectImporterMatcher
+import io.github.effiban.scala2java.core.qualifiers.QualificationContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.any
@@ -15,7 +16,7 @@ class TypeProjectUnqualifierImplTest extends UnitTestSuite {
 
   test("unqualify() when no importers provided should return unchanged") {
     val typeProject = t"A#B"
-    typeProjectUnqualifier.unqualify(typeProject, Nil).structure shouldBe typeProject.structure
+    typeProjectUnqualifier.unqualify(typeProject).structure shouldBe typeProject.structure
   }
 
   test("unqualify() when one importer provided and doesn't match, should return unchanged") {
@@ -24,7 +25,7 @@ class TypeProjectUnqualifierImplTest extends UnitTestSuite {
 
     doReturn(None).when(typeProjectImporterMatcher).findMatch(eqTree(typeProject), eqTree(importer))
 
-    typeProjectUnqualifier.unqualify(typeProject, List(importer)).structure shouldBe typeProject.structure
+    typeProjectUnqualifier.unqualify(typeProject, QualificationContext(List(importer))).structure shouldBe typeProject.structure
   }
 
   test("unqualify() when one importer provided and matches, should return name only") {
@@ -34,7 +35,7 @@ class TypeProjectUnqualifierImplTest extends UnitTestSuite {
 
     doReturn(Some(expectedMatchingImporter)).when(typeProjectImporterMatcher).findMatch(eqTree(typeProject), eqTree(importer))
 
-    typeProjectUnqualifier.unqualify(typeProject, List(importer)).structure shouldBe t"C".structure
+    typeProjectUnqualifier.unqualify(typeProject, QualificationContext(List(importer))).structure shouldBe t"C".structure
   }
 
   test("unqualify() when two importers provided and none match, should return unchanged") {
@@ -44,7 +45,8 @@ class TypeProjectUnqualifierImplTest extends UnitTestSuite {
 
     doReturn(None).when(typeProjectImporterMatcher).findMatch(eqTree(typeProject), any[Importer])
 
-    typeProjectUnqualifier.unqualify(typeProject, List(importer1, importer2)).structure shouldBe typeProject.structure
+    typeProjectUnqualifier.unqualify(typeProject, QualificationContext(List(importer1, importer2))).structure shouldBe
+      typeProject.structure
   }
 
   test("unqualify() when two importers provided and second one matches, should return name only") {
@@ -58,7 +60,7 @@ class TypeProjectUnqualifierImplTest extends UnitTestSuite {
       case _ => None
     }).when(typeProjectImporterMatcher).findMatch(eqTree(typeProject), any[Importer])
 
-    typeProjectUnqualifier.unqualify(typeProject, List(importer1, importer2)).structure shouldBe t"C".structure
+    typeProjectUnqualifier.unqualify(typeProject, QualificationContext(List(importer1, importer2))).structure shouldBe t"C".structure
   }
 
 
