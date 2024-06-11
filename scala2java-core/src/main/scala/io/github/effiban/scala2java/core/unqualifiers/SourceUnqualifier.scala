@@ -18,4 +18,4 @@ private[unqualifiers] class SourceUnqualifierImpl(pkgUnqualifier: PkgUnqualifier
   }
 }
 
-object SourceUnqualifier extends SourceUnqualifierImpl(PkgUnqualifier)
+object SourceUnqualifier extends SourceUnqualifierImpl(Unqualifiers.pkgUnqualifier)

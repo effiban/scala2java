@@ -2,16 +2,14 @@ package io.github.effiban.scala2java.core.unqualifiers
 
 import io.github.effiban.scala2java.core.importmanipulation.StatsByImportSplitter
 
-import scala.meta.{Import, Importer, Pkg, Stat, Term, Transformer, Tree, Type}
+import scala.meta.{Import, Importer, Pkg, Stat}
 
 trait PkgUnqualifier {
   def unqualify(pkg: Pkg): Pkg
 }
 
 private[unqualifiers] class PkgUnqualifierImpl(statsByImportSplitter: StatsByImportSplitter,
-                                               termSelectUnqualifier: TermSelectUnqualifier,
-                                               typeSelectUnqualifier: TypeSelectUnqualifier,
-                                               typeProjectUnqualifier: TypeProjectUnqualifier) extends PkgUnqualifier {
+                                               treeUnqualifier: => TreeUnqualifier) extends PkgUnqualifier {
 
   override def unqualify(pkg: Pkg): Pkg = {
     val (importers, nonImports) = statsByImportSplitter.split(pkg.stats)
@@ -22,37 +20,6 @@ private[unqualifiers] class PkgUnqualifierImpl(statsByImportSplitter: StatsByImp
   }
 
   private def unqualify(stat: Stat, importers: List[Importer]): Stat = {
-    new UnqualifyingTransformer(importers)(stat) match {
-      case unqualifiedStat: Stat => unqualifiedStat
-      case other => throw new IllegalStateException(s"An unqualified Stat should also be a Stat but it is: $other")
-    }
-  }
-
-  private class UnqualifyingTransformer(importers: List[Importer]) extends Transformer {
-
-    override def apply(tree: Tree): Tree =
-      tree match {
-        case aTree@(_: Importer | _: Pkg) => aTree
-
-        case termSelect: Term.Select => termSelectUnqualifier.unqualify(termSelect, importers) match {
-          case aTermSelect: Term.Select => super.apply(aTermSelect)
-          case aTermRef => aTermRef
-        }
-        case typeSelect: Type.Select => typeSelectUnqualifier.unqualify(typeSelect, importers)
-
-        case typeProject: Type.Project => typeProjectUnqualifier.unqualify(typeProject, importers) match {
-          case aTypeProject: Type.Project => super.apply(aTypeProject)
-          case aTypeRef => aTypeRef
-        }
-
-        case aTree => super.apply(aTree)
-      }
+    treeUnqualifier.unqualify(stat, importers).asInstanceOf[Stat]
   }
 }
-
-object PkgUnqualifier extends PkgUnqualifierImpl(
-  StatsByImportSplitter,
-  TermSelectUnqualifier,
-  TypeSelectUnqualifier,
-  TypeProjectUnqualifier
-)
