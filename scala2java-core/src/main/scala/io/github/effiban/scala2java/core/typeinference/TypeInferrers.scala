@@ -67,6 +67,7 @@ class TypeInferrers(factories: => Factories,
     ifTypeInferrer,
     LitTypeInferrer,
     internalSelectTypeInferrer,
+    SuperTypeInferrer,
     tryTypeInferrer,
     tryWithHandlerTypeInferrer,
     tupleTypeInferrer
