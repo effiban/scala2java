@@ -9,10 +9,12 @@ class TreeTermNameDeclarationFinderImplTest extends UnitTestSuite {
 
   private val termParamTermNameDeclarationFinder = mock[TermParamTermNameDeclarationFinder]
   private val declVarTermNameDeclarationFinder = mock[DeclVarTermNameDeclarationFinder]
+  private val defnVarTermNameDeclarationFinder = mock[DefnVarTermNameDeclarationFinder]
 
   private val treeTermNameDeclarationFinder = new TreeTermNameDeclarationFinderImpl(
     termParamTermNameDeclarationFinder,
-    declVarTermNameDeclarationFinder
+    declVarTermNameDeclarationFinder,
+    defnVarTermNameDeclarationFinder
   )
 
   test("find() for Term.Param when found") {
@@ -50,5 +52,24 @@ class TreeTermNameDeclarationFinderImplTest extends UnitTestSuite {
     when(declVarTermNameDeclarationFinder.find(eqTree(declVar), eqTree(termName))).thenReturn(None)
 
     treeTermNameDeclarationFinder.find(declVar, termName) shouldBe None
+  }
+
+  test("find() for Defn.Var when found") {
+    val defnVar = q"var x: scala.Int = 3"
+    val termName = q"x"
+    val patVar = p"x"
+
+    when(defnVarTermNameDeclarationFinder.find(eqTree(defnVar), eqTree(termName))).thenReturn(Some(patVar))
+
+    treeTermNameDeclarationFinder.find(defnVar, termName).value.structure shouldBe patVar.structure
+  }
+
+  test("find() for Defn.Var when not found") {
+    val defnVar = q"var x: scala.Int = 3"
+    val termName = q"y"
+
+    when(defnVarTermNameDeclarationFinder.find(eqTree(defnVar), eqTree(termName))).thenReturn(None)
+
+    treeTermNameDeclarationFinder.find(defnVar, termName) shouldBe None
   }
 }
