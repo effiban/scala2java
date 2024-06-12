@@ -9,8 +9,7 @@ trait DeclVarTermNameDeclarationFinder {
 object DeclVarTermNameDeclarationFinder extends DeclVarTermNameDeclarationFinder {
 
   override def find(declVar: Decl.Var, termName: Term.Name): Option[Pat] =
-    declVar.pats.find {
-      case patVar: Pat.Var if patVar.name.value == termName.value => true
-      case _ => false
+    declVar.pats.collectFirst {
+      case patVar: Pat.Var if patVar.name.value == termName.value => patVar
     }
 }
