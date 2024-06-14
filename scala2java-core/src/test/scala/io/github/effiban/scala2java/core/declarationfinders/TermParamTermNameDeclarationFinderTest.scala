@@ -3,7 +3,7 @@ package io.github.effiban.scala2java.core.declarationfinders
 import io.github.effiban.scala2java.core.declarationfinders.TermParamTermNameDeclarationFinder.find
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 
-import scala.meta.{XtensionQuasiquoteTerm, XtensionQuasiquoteTermParam}
+import scala.meta.{Decl, Defn, Template, Term, XtensionQuasiquoteTerm, XtensionQuasiquoteTermParam}
 
 class TermParamTermNameDeclarationFinderTest extends UnitTestSuite {
 
