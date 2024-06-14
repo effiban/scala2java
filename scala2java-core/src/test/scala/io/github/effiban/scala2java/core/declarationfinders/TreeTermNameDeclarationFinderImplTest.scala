@@ -4,18 +4,20 @@ import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchers.any
 
-import scala.meta.{Term, XtensionQuasiquoteCaseOrPattern, XtensionQuasiquoteTerm, XtensionQuasiquoteTermParam}
+import scala.meta.{Stat, Term, XtensionQuasiquoteCaseOrPattern, XtensionQuasiquoteTemplate, XtensionQuasiquoteTerm, XtensionQuasiquoteTermParam}
 
 class TreeTermNameDeclarationFinderImplTest extends UnitTestSuite {
 
   private val termParamTermNameDeclarationFinder = mock[TermParamTermNameDeclarationFinder]
   private val declVarTermNameDeclarationFinder = mock[DeclVarTermNameDeclarationFinder]
   private val defnVarTermNameDeclarationFinder = mock[DefnVarTermNameDeclarationFinder]
+  private val bodyStatTermNameDeclarationFinder = mock[BodyStatTermNameDeclarationFinder]
 
   private val treeTermNameDeclarationFinder = new TreeTermNameDeclarationFinderImpl(
     termParamTermNameDeclarationFinder,
     declVarTermNameDeclarationFinder,
-    defnVarTermNameDeclarationFinder
+    defnVarTermNameDeclarationFinder,
+    bodyStatTermNameDeclarationFinder
   )
 
   test("find() for Term.Param when found") {
@@ -201,4 +203,105 @@ class TreeTermNameDeclarationFinderImplTest extends UnitTestSuite {
     treeTermNameDeclarationFinder.find(defnClass, termName) shouldBe None
   }
 
+  test("find() for a Block with two stats when one matches") {
+    val block =
+      q"""
+      {
+        val x: scala.Int = 3
+        val y: scala.Int = 4
+      }
+      """
+    val termName = q"y"
+    val patVar = p"y"
+
+    doAnswer((stat: Stat) => stat match {
+      case q"val y: scala.Int = 4" => Some(patVar)
+      case _ => None
+    }).when(bodyStatTermNameDeclarationFinder).find(any(), eqTree(termName))
+
+    treeTermNameDeclarationFinder.find(block, termName).value.structure shouldBe patVar.structure
+  }
+
+  test("find() for a Block with two stats when none match") {
+    val block =
+      q"""
+      {
+        val x: scala.Int = 3
+        val y: scala.Int = 4
+      }
+      """
+    val termName = q"z"
+
+    when(bodyStatTermNameDeclarationFinder.find(any(), eqTree(termName))).thenReturn(None)
+
+    treeTermNameDeclarationFinder.find(block, termName) shouldBe None
+  }
+
+  test("find() for a Template with two stats when one matches") {
+    val template =
+      template"""
+      {
+        val x: scala.Int = 3
+        val y: scala.Int = 4
+      }
+      """
+    val termName = q"y"
+    val patVar = p"y"
+
+    doAnswer((stat: Stat) => stat match {
+      case q"val y: scala.Int = 4" => Some(patVar)
+      case _ => None
+    }).when(bodyStatTermNameDeclarationFinder).find(any(), eqTree(termName))
+
+    treeTermNameDeclarationFinder.find(template, termName).value.structure shouldBe patVar.structure
+  }
+
+  test("find() for a Template with two stats when none match") {
+    val template =
+      template"""
+      {
+        val x: scala.Int = 3
+        val y: scala.Int = 4
+      }
+      """
+    val termName = q"z"
+
+    when(bodyStatTermNameDeclarationFinder.find(any(), eqTree(termName))).thenReturn(None)
+
+    treeTermNameDeclarationFinder.find(template, termName) shouldBe None
+  }
+
+  test("find() for a Pkg with two stats when one matches") {
+    val objectB = q"object B"
+    val pkg =
+      q"""
+      package a.b {
+        object A
+        $objectB
+      }
+      """
+    val termName = q"B"
+
+    doAnswer((stat: Stat) => stat match {
+      case aStat if aStat.structure == objectB.structure => Some(objectB)
+      case _ => None
+    }).when(bodyStatTermNameDeclarationFinder).find(any(), eqTree(termName))
+
+    treeTermNameDeclarationFinder.find(pkg, termName).value.structure shouldBe objectB.structure
+  }
+
+  test("find() for a Pkg with two stats when none match") {
+    val pkg =
+      q"""
+      package a.b {
+        object A
+        object B
+      }
+      """
+    val termName = q"C"
+
+    when(bodyStatTermNameDeclarationFinder.find(any(), eqTree(termName))).thenReturn(None)
+
+    treeTermNameDeclarationFinder.find(pkg, termName) shouldBe None
+  }
 }
