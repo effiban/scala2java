@@ -10,14 +10,22 @@ trait TermSelectUnqualifier {
   def unqualify(termSelect: Term.Select, context: QualificationContext = QualificationContext()): Term.Ref
 }
 
-private[unqualifiers] class TermSelectUnqualifierImpl(termSelectImporterMatcher: TermSelectImporterMatcher) extends TermSelectUnqualifier {
+private[unqualifiers] class TermSelectUnqualifierImpl(termSelectImporterMatcher: TermSelectImporterMatcher,
+                                                      superSelectUnqualifier: SuperSelectUnqualifier) extends TermSelectUnqualifier {
 
   override def unqualify(termSelect: Term.Select, context: QualificationContext = QualificationContext()): Term.Ref = {
-    context.importers.map(importer => termSelectImporterMatcher.findMatch(termSelect, importer))
-      .collectFirst {
-        case Some(_) => termSelect.name
-      }.getOrElse(termSelect)
+    termSelect match {
+      case Term.Select(termSuper: Term.Super, termName: Term.Name) => superSelectUnqualifier.unqualify(termSuper, termName)
+      case aTermSelect =>
+        context.importers.map(importer => termSelectImporterMatcher.findMatch(termSelect, importer))
+          .collectFirst {
+            case Some(_) => aTermSelect.name
+          }.getOrElse(aTermSelect)
+    }
   }
 }
 
-object TermSelectUnqualifier extends TermSelectUnqualifierImpl(TermSelectImporterMatcher)
+object TermSelectUnqualifier extends TermSelectUnqualifierImpl(
+  TermSelectImporterMatcher,
+  SuperSelectUnqualifier
+)

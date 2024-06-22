@@ -3,7 +3,7 @@ package io.github.effiban.scala2java.core.reflection
 import io.github.effiban.scala2java.core.entities.ReflectedEntities.RuntimeMirror
 
 import scala.annotation.tailrec
-import scala.meta.{Defn, Member, Pkg, Term, Type}
+import scala.meta.{Defn, Member, Pkg, Term, Type, XtensionParseInputLike}
 import scala.reflect.runtime.universe._
 
 object ScalaReflectionUtils {
@@ -23,8 +23,21 @@ object ScalaReflectionUtils {
     }
   }
 
+  def asScalaMetaTypeRef(classSymbol: ClassSymbol): Option[Type.Ref] = {
+    classSymbol.owner match {
+      case owner if owner.isPackage =>
+        val qualifier = owner.fullName.parse[Term].get.asInstanceOf[Term.Ref]
+        Some(Type.Select(qualifier, Type.Name(classSymbol.name.toString)))
+      case owner if owner.isClass =>
+        val qualifier = owner.fullName.parse[Type].get
+        Some(Type.Project(qualifier, Type.Name(classSymbol.name.toString)))
+      case _ => None
+    }
+  }
+
   def baseClassesOf(cls: ClassSymbol): List[ClassSymbol] = {
     cls.baseClasses.flatMap(asClassSymbol)
+      .filterNot(_ == cls)
   }
 
   def isTermMemberOf(symbol: Symbol, termName: Term.Name): Boolean = {
