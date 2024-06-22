@@ -1,11 +1,11 @@
 package io.github.effiban.scala2java.core.reflection
 
 import io.github.effiban.scala2java.core.entities.ReflectedEntities.RuntimeMirror
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionUtils.{baseClassesOf, classSymbolOf, isTermMemberOf, isTypeMemberOf, symbolOf}
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionUtils._
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 
-import scala.reflect.runtime.universe.{ClassSymbol, TermName, TypeName}
-import scala.meta.{Term, Type, XtensionQuasiquoteTerm}
+import scala.meta.{Term, Type, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
+import scala.reflect.runtime.universe.TypeName
 
 class ScalaReflectionUtilsTest extends UnitTestSuite {
 
@@ -72,11 +72,25 @@ class ScalaReflectionUtilsTest extends UnitTestSuite {
     symbolOf(List(pkg, cls)) shouldBe None
   }
 
-  test("baseClasses() should return the correct list of base classes") {
-    val clsSymbol = RuntimeMirror.staticPackage("scala.collection.immutable").typeSignature.decl(TypeName("Seq")).asInstanceOf[ClassSymbol]
+  test("asScalaMetaTypeRef() for an outer class should return a corresponding Type.Select") {
+    val clsSymbol = RuntimeMirror.staticClass("scala.collection.immutable.List")
+
+    asScalaMetaTypeRef(clsSymbol).value.structure shouldBe t"scala.collection.immutable.List".structure
+  }
+
+  test("asScalaMetaTypeRef() for an inner class should return a corresponding Type.Project") {
+    val clsSymbol = RuntimeMirror.staticModule("scala.collection.immutable.ArraySeq")
+      .typeSignature
+      .decl(TypeName("ofRef"))
+      .asClass
+
+    asScalaMetaTypeRef(clsSymbol).value.structure shouldBe t"scala.collection.immutable.ArraySeq#ofRef".structure
+  }
+
+  test("baseClassesOf() should return the correct list of base classes") {
+    val clsSymbol = RuntimeMirror.staticClass("scala.collection.immutable.Seq")
     baseClassesOf(clsSymbol).map(_.fullName) shouldBe
       List(
-        "scala.collection.immutable.Seq",
         "scala.collection.immutable.SeqOps",
         "scala.collection.Seq",
         "scala.Equals",

@@ -6,13 +6,17 @@ import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.any
 
-import scala.meta.{Importer, Term, XtensionQuasiquoteImporter, XtensionQuasiquoteTerm}
+import scala.meta.{Importer, Name, Term, XtensionQuasiquoteImporter, XtensionQuasiquoteTerm}
 
 class TermSelectUnqualifierImplTest extends UnitTestSuite {
 
   private val termSelectImporterMatcher = mock[TermSelectImporterMatcher]
+  private val superSelectUnqualifier = mock[SuperSelectUnqualifier]
 
-  private val termSelectUnqualifier = new TermSelectUnqualifierImpl(termSelectImporterMatcher)
+  private val termSelectUnqualifier = new TermSelectUnqualifierImpl(
+    termSelectImporterMatcher,
+    superSelectUnqualifier
+  )
 
   test("unqualify() when no importers provided should return unchanged") {
     val typeSelect = q"a.b.C"
@@ -62,4 +66,16 @@ class TermSelectUnqualifierImplTest extends UnitTestSuite {
     termSelectUnqualifier.unqualify(typeSelect, QualificationContext(List(importer1, importer2))).structure shouldBe q"C".structure
   }
 
+  test("unqualify() when qualifier is a Term.Super should return result of SuperSelectUnqualifier") {
+    val termSuper = Term.Super(thisp = Name.Indeterminate("A"), superp = Name.Indeterminate("B"))
+    val termName = q"c"
+    val termSelect = Term.Select(termSuper, termName)
+
+    val unqualifiedTermSuper = Term.Super(thisp = Name.Anonymous(), superp = Name.Anonymous())
+    val unqualifiedTermSelect = Term.Select(unqualifiedTermSuper, termName)
+
+    when(superSelectUnqualifier.unqualify(eqTree(termSuper), eqTree(termName))).thenReturn(unqualifiedTermSelect)
+
+    termSelectUnqualifier.unqualify(termSelect).structure shouldBe unqualifiedTermSelect.structure
+  }
 }
