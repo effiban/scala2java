@@ -7,9 +7,11 @@ private[unqualifiers] object Unqualifiers {
   private lazy val treeUnqualifier: TreeUnqualifier = new TreeUnqualifierImpl(
     TermSelectUnqualifier,
     TypeSelectUnqualifier,
-    TypeProjectUnqualifier
+    TypeProjectUnqualifier,
+    templateUnqualifier
   )
 
+  private lazy val templateUnqualifier: TemplateUnqualifier = new TemplateUnqualifierImpl(treeUnqualifier)
 
   private[unqualifiers] lazy val pkgUnqualifier: PkgUnqualifier = new PkgUnqualifierImpl(
     StatsByImportSplitter,

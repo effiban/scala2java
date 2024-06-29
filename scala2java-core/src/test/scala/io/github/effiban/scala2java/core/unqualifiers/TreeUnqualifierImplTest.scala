@@ -6,20 +6,22 @@ import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import org.mockito.ArgumentMatchersSugar.any
 import org.mockito.Mockito.verifyNoInteractions
 
-import scala.meta.{Term, Type, XtensionQuasiquoteImporter, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
+import scala.meta.{Importer, Term, Type, XtensionQuasiquoteImporter, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 class TreeUnqualifierImplTest extends UnitTestSuite {
 
   private val termSelectUnqualifier = mock[TermSelectUnqualifier]
   private val typeSelectUnqualifier = mock[TypeSelectUnqualifier]
   private val typeProjectUnqualifier = mock[TypeProjectUnqualifier]
+  private val templateUnqualifier = mock[TemplateUnqualifier]
 
   private val qualificationContext = QualificationContext(List(importer"dummy.dummy"))
 
   private val treeUnqualifier = new TreeUnqualifierImpl(
     termSelectUnqualifier,
     typeSelectUnqualifier,
-    typeProjectUnqualifier
+    typeProjectUnqualifier,
+    templateUnqualifier
   )
 
   test("unqualify when has no nested trees that could be unqualified, should return unchanged") {
