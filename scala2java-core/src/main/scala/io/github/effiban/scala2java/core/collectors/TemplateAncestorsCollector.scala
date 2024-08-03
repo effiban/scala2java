@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.collectors
 
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionUtils.{asScalaMetaTypeRef, baseClassesOf, classSymbolOf}
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionUtils.{asScalaMetaTypeRef, selfAndBaseClassesOf, classSymbolOf}
 
 import scala.meta.{Template, Type}
 
@@ -13,7 +13,7 @@ object TemplateAncestorsCollector extends TemplateAncestorsCollector {
   override def collect(template: Template): List[Type.Ref] = {
     (template.inits.map(_.tpe) ++ template.self.decltpe)
       .flatMap(classSymbolOf)
-      .flatMap(baseClassesOf)
+      .flatMap(selfAndBaseClassesOf)
       .flatMap(asScalaMetaTypeRef)
       .distinctBy(_.structure)
   }

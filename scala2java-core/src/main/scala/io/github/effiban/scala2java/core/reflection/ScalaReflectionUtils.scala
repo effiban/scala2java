@@ -42,9 +42,8 @@ object ScalaReflectionUtils {
     }
   }
 
-  def baseClassesOf(cls: ClassSymbol): List[ClassSymbol] = {
+  def selfAndBaseClassesOf(cls: ClassSymbol): List[ClassSymbol] = {
     cls.baseClasses.flatMap(asClassSymbol)
-      .filterNot(_ == cls)
   }
 
   def isTermMemberOf(symbol: Symbol, termName: Term.Name): Boolean = {
