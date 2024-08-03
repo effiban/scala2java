@@ -1,32 +1,25 @@
 package io.github.effiban.scala2java.core.typeinference
 
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionUtils.{baseClassesOf, classSymbolOf}
+import io.github.effiban.scala2java.core.extractors.TypeRefNameExtractor
 import io.github.effiban.scala2java.spi.typeinferrers.TypeInferrer0
 
-import scala.meta.{Name, Term, Type, XtensionParseInputLike}
+import scala.meta.{Name, Term, Type}
 
 trait SuperTypeInferrer extends TypeInferrer0[Term.Super]
 
-private[typeinference] class SuperTypeInferrerImpl(innermostEnclosingMemberPathInferrer: InnermostEnclosingMemberPathInferrer)
+private[typeinference] class SuperTypeInferrerImpl(innermostEnclosingTemplateAncestorsInferrer: InnermostEnclosingTemplateAncestorsInferrer)
   extends SuperTypeInferrer {
 
-  override def infer(termSuper: Term.Super): Option[Type] = {
-    val innermostEnclosingMemberPath = termSuper.thisp match {
-      case Name.Anonymous() => innermostEnclosingMemberPathInferrer.infer(termSuper)
-      case _ => innermostEnclosingMemberPathInferrer.infer(termSuper, Some(termSuper.thisp.value))
+  override def infer(termSuper: Term.Super): Option[Type.Ref] = {
+    val parentTypes = termSuper.thisp match {
+      case Name.Anonymous() => innermostEnclosingTemplateAncestorsInferrer.infer(termSuper)
+      case _ => innermostEnclosingTemplateAncestorsInferrer.infer(termSuper, Some(termSuper.thisp.value))
     }
-    classSymbolOf(innermostEnclosingMemberPath)
-      // NOTE: baseClassesOf will return all the base classes recursively, while for our purposes here only the direct ones are relevant -
-      // but I don't know how to select them only
-      .map(baseClassesOf)
-      .getOrElse(Nil)
-      .find(cls => termSuper.superp match {
-        case Name.Anonymous() => true
-        case superp => cls.name.toString == superp.value
-      })
-      .map(cls => cls.fullName.parse[Type])
-      .flatMap(_.toOption)
+    parentTypes.find(tpe => termSuper.superp match {
+      case Name.Anonymous() => true
+      case superp => TypeRefNameExtractor.extract(tpe).value == superp.value
+    })
   }
 }
 
-object SuperTypeInferrer extends SuperTypeInferrerImpl(InnermostEnclosingMemberPathInferrer)
+object SuperTypeInferrer extends SuperTypeInferrerImpl(InnermostEnclosingTemplateAncestorsInferrer)

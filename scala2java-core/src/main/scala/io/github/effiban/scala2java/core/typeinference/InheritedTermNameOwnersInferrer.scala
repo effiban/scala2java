@@ -1,27 +1,23 @@
 package io.github.effiban.scala2java.core.typeinference
 
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionUtils.{asScalaMetaTypeRef, baseClassesOf, classSymbolOf, isTermMemberOf}
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionUtils.isTermMemberOf
 
-import scala.meta.{Member, Term, Type}
+import scala.collection.MapView
+import scala.meta.{Template, Term, Type}
 
 trait InheritedTermNameOwnersInferrer {
-  def infer(termName: Term.Name): Map[Member, List[Type.Ref]]
+  def infer(termName: Term.Name): MapView[Template, List[Type.Ref]]
 }
 
-private[typeinference] class InheritedTermNameOwnersInferrerImpl(enclosingMemberPathsInferrer: EnclosingMemberPathsInferrer)
+private[typeinference] class InheritedTermNameOwnersInferrerImpl(enclosingTemplateParentsInferrer: EnclosingTemplateAncestorsInferrer)
   extends InheritedTermNameOwnersInferrer {
 
-  override def infer(termName: Term.Name): Map[Member, List[Type.Ref]] = {
-    enclosingMemberPathsInferrer.infer(termName)
-      .map(memberPath => (memberPath.last, classSymbolOf(memberPath)))
-      .collect { case (member, Some(cls)) => (member, cls) }
-      .map { case (member, cls) => (member, baseClassesOf(cls)) }
-      .map { case (member, classes) => (member, classes.filter(cls => isTermMemberOf(cls, termName))) }
-      .map { case (member, classes) => (member, classes.map(asScalaMetaTypeRef)) }
-      .map { case (member, classes) => (member, classes.collect {case Some(typeRef) => typeRef }) }
-      .filter { case (_, classes) => classes.nonEmpty }
-      .toMap
+  override def infer(termName: Term.Name): MapView[Template, List[Type.Ref]] = {
+    enclosingTemplateParentsInferrer.infer(termName)
+      .view
+      .mapValues { types => types.filter(tpe => isTermMemberOf(tpe, termName)) }
+      .filter { case (_, types) => types.nonEmpty }
   }
 }
 
-object InheritedTermNameOwnersInferrer extends InheritedTermNameOwnersInferrerImpl(EnclosingMemberPathsInferrer)
+object InheritedTermNameOwnersInferrer extends InheritedTermNameOwnersInferrerImpl(EnclosingTemplateAncestorsInferrer)
