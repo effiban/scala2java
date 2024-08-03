@@ -8,9 +8,9 @@ import scala.meta.{Defn, Pat, Term, XtensionQuasiquoteTerm, XtensionQuasiquoteTy
 
 class InheritedTermNameOwnersInferrerImplTest extends UnitTestSuite {
 
-  private val enclosingMemberPathsInferrer = mock[EnclosingMemberPathsInferrer]
+  private val enclosingTemplateAncestorsInferrer = mock[EnclosingTemplateAncestorsInferrer]
 
-  private val inheritedTermNameOwnersInferrer = new InheritedTermNameOwnersInferrerImpl(enclosingMemberPathsInferrer)
+  private val inheritedTermNameOwnersInferrer = new InheritedTermNameOwnersInferrerImpl(enclosingTemplateAncestorsInferrer)
 
   test("infer() when Term.Name has one enclosing member without parents, should return empty") {
     val pkg =
@@ -27,7 +27,7 @@ class InheritedTermNameOwnersInferrerImplTest extends UnitTestSuite {
       .pats.head.asInstanceOf[Pat.Var]
       .name
 
-    when(enclosingMemberPathsInferrer.infer(eqTree(termName))).thenReturn(List(List(pkg, cls)))
+    when(enclosingTemplateAncestorsInferrer.infer(eqTree(termName))).thenReturn(Map.empty)
 
     inheritedTermNameOwnersInferrer.infer(termName) shouldBe empty
   }
@@ -36,7 +36,7 @@ class InheritedTermNameOwnersInferrerImplTest extends UnitTestSuite {
     val pkg =
       q"""
       package io.github.effiban.scala2java.core.typeinference {
-        private class Child4 extends Parent1 {
+        private class Child4 extends io.github.effiban.scala2java.core.typeinference.Parent1 {
           val z: Int = 3
         }
       }
@@ -47,7 +47,14 @@ class InheritedTermNameOwnersInferrerImplTest extends UnitTestSuite {
       .pats.head.asInstanceOf[Pat.Var]
       .name
 
-    when(enclosingMemberPathsInferrer.infer(eqTree(termName))).thenReturn(List(List(pkg, cls)))
+    when(enclosingTemplateAncestorsInferrer.infer(eqTree(termName))).thenReturn(
+      Map(cls.templ ->
+        List(
+          t"io.github.effiban.scala2java.core.typeinference.Parent1",
+          t"io.github.effiban.scala2java.core.typeinference.Grandparent1"
+        )
+      )
+    )
 
     inheritedTermNameOwnersInferrer.infer(termName) shouldBe empty
   }
@@ -56,7 +63,7 @@ class InheritedTermNameOwnersInferrerImplTest extends UnitTestSuite {
     val pkg =
       q"""
       package io.github.effiban.scala2java.core.typeinference {
-        private class Child1 extends Parent1 {
+        private class Child1 extends io.github.effiban.scala2java.core.typeinference.Parent1 {
           x
         }
       }
@@ -65,12 +72,19 @@ class InheritedTermNameOwnersInferrerImplTest extends UnitTestSuite {
     val cls = pkg.stats.head.asInstanceOf[Defn.Class]
     val termName = cls.templ.stats.head.asInstanceOf[Term.Name]
 
-    when(enclosingMemberPathsInferrer.infer(eqTree(termName))).thenReturn(List(List(pkg, cls)))
+    when(enclosingTemplateAncestorsInferrer.infer(eqTree(termName))).thenReturn(
+      Map(cls.templ ->
+        List(
+          t"io.github.effiban.scala2java.core.typeinference.Parent1",
+          t"io.github.effiban.scala2java.core.typeinference.Grandparent1"
+       )
+      )
+    )
 
     val resultMap = inheritedTermNameOwnersInferrer.infer(termName)
     resultMap.size shouldBe 1
-    val (resultMember, resultParents) = resultMap.head
-    resultMember.structure shouldBe cls.structure
+    val (resultTemplate, resultParents) = resultMap.head
+    resultTemplate.structure shouldBe cls.templ.structure
     resultParents.structure shouldBe List(
       t"io.github.effiban.scala2java.core.typeinference.Parent1",
       t"io.github.effiban.scala2java.core.typeinference.Grandparent1"
@@ -82,10 +96,10 @@ class InheritedTermNameOwnersInferrerImplTest extends UnitTestSuite {
       q"""
       package io.github.effiban.scala2java.core.typeinference {
 
-        private class Child1 extends Parent1 {
+        private class Child1 extends io.github.effiban.scala2java.core.typeinference.Parent1 {
           x
 
-          private class Child3 extends Parent2 {
+          private class Child3 extends io.github.effiban.scala2java.core.typeinference.Parent2 {
             y
           }
         }
@@ -96,16 +110,23 @@ class InheritedTermNameOwnersInferrerImplTest extends UnitTestSuite {
     val child3 = child1.templ.stats.collectFirst { case cls: Defn.Class => cls }.get
     val y = child3.templ.stats.head.asInstanceOf[Term.Name]
 
-    when(enclosingMemberPathsInferrer.infer(eqTree(y)))
-      .thenReturn(List(
-        List(pkg, child1),
-        List(pkg, child1, child3))
+    when(enclosingTemplateAncestorsInferrer.infer(eqTree(y))).thenReturn(
+      Map(
+        child1.templ -> List(
+          t"io.github.effiban.scala2java.core.typeinference.Parent1",
+          t"io.github.effiban.scala2java.core.typeinference.Grandparent1"
+        ),
+        child3.templ -> List(
+          t"io.github.effiban.scala2java.core.typeinference.Parent2",
+          t"io.github.effiban.scala2java.core.typeinference.Grandparent2",
+        ),
       )
+    )
 
     val resultMap = inheritedTermNameOwnersInferrer.infer(y)
     resultMap.size shouldBe 1
     val (resultMember, resultParents) = resultMap.head
-    resultMember.structure shouldBe child1.structure
+    resultMember.structure shouldBe child1.templ.structure
     resultParents.structure shouldBe List(
       t"io.github.effiban.scala2java.core.typeinference.Parent1",
       t"io.github.effiban.scala2java.core.typeinference.Grandparent1"
@@ -117,10 +138,10 @@ class InheritedTermNameOwnersInferrerImplTest extends UnitTestSuite {
       q"""
       package io.github.effiban.scala2java.core.typeinference {
 
-        private class Child1 extends Parent1 {
+        private class Child1 extends io.github.effiban.scala2java.core.typeinference.Parent1 {
           x
 
-          private class Child2 extends Parent2 {
+          private class Child2 extends io.github.effiban.scala2java.core.typeinference.Parent2 {
             x
           }
         }
@@ -131,22 +152,30 @@ class InheritedTermNameOwnersInferrerImplTest extends UnitTestSuite {
     val child2 = child1.templ.stats.collectFirst { case cls: Defn.Class => cls }.get
     val innerX = child2.templ.stats.head.asInstanceOf[Term.Name]
 
-    when(enclosingMemberPathsInferrer.infer(eqTree(innerX)))
-      .thenReturn(List(
-        List(pkg, child1),
-        List(pkg, child1, child2))
+    when(enclosingTemplateAncestorsInferrer.infer(eqTree(innerX)))
+      .thenReturn(
+        Map(
+          child1.templ -> List(
+            t"io.github.effiban.scala2java.core.typeinference.Parent1",
+            t"io.github.effiban.scala2java.core.typeinference.Grandparent1"
+          ),
+          child2.templ -> List(
+            t"io.github.effiban.scala2java.core.typeinference.Parent2",
+            t"io.github.effiban.scala2java.core.typeinference.Grandparent2",
+          )
+        )
       )
 
     val resultMap = inheritedTermNameOwnersInferrer.infer(innerX)
     resultMap.size shouldBe 2
 
-    val inferredChild1Parents = TreeKeyedMap(resultMap, child1)
+    val inferredChild1Parents = TreeKeyedMap(resultMap, child1.templ)
     inferredChild1Parents.structure shouldBe List(
       t"io.github.effiban.scala2java.core.typeinference.Parent1",
       t"io.github.effiban.scala2java.core.typeinference.Grandparent1"
     ).structure
 
-    val inferredChild2Parents = TreeKeyedMap(resultMap, child2)
+    val inferredChild2Parents = TreeKeyedMap(resultMap, child2.templ)
     inferredChild2Parents.structure shouldBe List(
       t"io.github.effiban.scala2java.core.typeinference.Parent2",
       t"io.github.effiban.scala2java.core.typeinference.Grandparent2"

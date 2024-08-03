@@ -8,6 +8,13 @@ import scala.reflect.runtime.universe._
 
 object ScalaReflectionUtils {
 
+  def classSymbolOf(tpe: Type): Option[ClassSymbol] = tpe match {
+    case Type.Apply(typeSelect: Type.Select, _) => classSymbolOf(typeSelect)
+    case typeSelect: Type.Select => classSymbolOf(typeSelect)
+    case Type.Project(tpe, name) => innerClassSymbolOf(tpe, name)
+    case _ => None
+  }
+
   def classSymbolOf(memberPath: List[Member]): Option[ClassSymbol] = {
     symbolOf(memberPath) match {
       case Some(symbol) => asClassSymbol(symbol)
@@ -47,6 +54,10 @@ object ScalaReflectionUtils {
     }
   }
 
+  def isTermMemberOf(typeRef: Type.Ref, termName: Term.Name): Boolean = {
+    classSymbolOf(typeRef).exists(cls => isTermMemberOf(cls, termName))
+  }
+
   def isTypeMemberOf(symbol: Symbol, typeName: Type.Name): Boolean = {
     symbol.typeSignature.decl(TypeName(typeName.value)) match {
       case NoSymbol => false
@@ -70,6 +81,23 @@ object ScalaReflectionUtils {
       case (symbol: Symbol, Nil) => Some(symbol)
       case _ => None
     }
+  }
+
+  private def classSymbolOf(typeSelect: Type.Select): Option[ClassSymbol] = {
+    classSymbolOf(typeSelect.qual.toString(), typeSelect.name.value)
+  }
+
+  private def classSymbolOf(qualifierName: String, typeName: String): Option[ClassSymbol] = {
+    scala.util.Try(RuntimeMirror.staticPackage(qualifierName))
+      .orElse(scala.util.Try(RuntimeMirror.staticModule(qualifierName)))
+      .toOption
+      .map(module => module.typeSignature.decl(TypeName(typeName)))
+      .flatMap(asClassSymbol)
+  }
+
+  private def innerClassSymbolOf(outerType: Type, innerName: Type.Name) = {
+    classSymbolOf(outerType)
+      .flatMap(outerClassSymbol => asClassSymbol(outerClassSymbol.companion.info.decl(TypeName(innerName.value))))
   }
 
   private def asClassSymbol(symbol: Symbol): Option[ClassSymbol] = {

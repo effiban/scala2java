@@ -5,6 +5,7 @@ import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.typeinference.InheritedTermNameOwnersInferrer
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
+import scala.collection.MapView
 import scala.meta.{XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 class SuperSelectUnqualifierImplTest extends UnitTestSuite {
@@ -30,10 +31,11 @@ class SuperSelectUnqualifierImplTest extends UnitTestSuite {
     val typeB1 = t"B1"
     val typeB2 = t"B2"
 
-    when(inheritedTermNameOwnersInferrer.infer(eqTree(termName))).thenReturn(Map(
-      classA -> List(typeA1, typeA2),
-      classB -> List(typeB1, typeB2)
-    ))
+    doReturn(
+      MapView(
+        classA.templ -> List(typeA1, typeA2),
+        classB.templ -> List(typeB1, typeB2)
+      )).when(inheritedTermNameOwnersInferrer).infer(eqTree(termName))
 
     when(fileScopeNonInheritedTermNameBinder.bind(eqTree(termName))).thenReturn(Some(q"val c: Int"))
 
@@ -56,10 +58,11 @@ class SuperSelectUnqualifierImplTest extends UnitTestSuite {
     val typeB1 = t"B1"
     val typeB2 = t"B2"
 
-    when(inheritedTermNameOwnersInferrer.infer(eqTree(termName))).thenReturn(Map(
-      classA -> List(typeA1, typeA2),
-      classB -> List(typeB1, typeB2)
-    ))
+    doReturn(
+      MapView(
+        classA.templ -> List(typeA1, typeA2),
+        classB.templ -> List(typeB1, typeB2)
+      )).when(inheritedTermNameOwnersInferrer).infer(eqTree(termName))
 
     when(fileScopeNonInheritedTermNameBinder.bind(eqTree(termName))).thenReturn(None)
 
@@ -79,9 +82,10 @@ class SuperSelectUnqualifierImplTest extends UnitTestSuite {
     val typeA1 = t"A1"
     val typeA2 = t"A2"
 
-    when(inheritedTermNameOwnersInferrer.infer(eqTree(termName))).thenReturn(Map(
-      classA -> List(typeA1, typeA2)
-    ))
+    doReturn(
+      MapView(
+        classA.templ -> List(typeA1, typeA2)
+      )).when(inheritedTermNameOwnersInferrer).infer(eqTree(termName))
 
     when(fileScopeNonInheritedTermNameBinder.bind(eqTree(termName))).thenReturn(Some(q"val c: Int"))
 
@@ -100,9 +104,9 @@ class SuperSelectUnqualifierImplTest extends UnitTestSuite {
     val typeA1 = t"A1"
     val typeA2 = t"A2"
 
-    when(inheritedTermNameOwnersInferrer.infer(eqTree(termName))).thenReturn(Map(
-      classA -> List(typeA1, typeA2)
-    ))
+    doReturn(MapView(
+      classA.templ -> List(typeA1, typeA2)
+    )).when(inheritedTermNameOwnersInferrer).infer(eqTree(termName))
 
     when(fileScopeNonInheritedTermNameBinder.bind(eqTree(termName))).thenReturn(None)
 
