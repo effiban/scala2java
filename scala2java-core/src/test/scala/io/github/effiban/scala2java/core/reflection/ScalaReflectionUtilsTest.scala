@@ -105,10 +105,11 @@ class ScalaReflectionUtilsTest extends UnitTestSuite {
     asScalaMetaTypeRef(clsSymbol).value.structure shouldBe t"scala.collection.immutable.ArraySeq#ofRef".structure
   }
 
-  test("baseClassesOf() should return the correct list of base classes") {
+  test("selfAndBaseClassesOf() should return the correct list of base classes") {
     val clsSymbol = RuntimeMirror.staticClass("scala.collection.immutable.Seq")
-    baseClassesOf(clsSymbol).map(_.fullName) shouldBe
+    selfAndBaseClassesOf(clsSymbol).map(_.fullName) shouldBe
       List(
+        "scala.collection.immutable.Seq",
         "scala.collection.immutable.SeqOps",
         "scala.collection.Seq",
         "scala.Equals",
