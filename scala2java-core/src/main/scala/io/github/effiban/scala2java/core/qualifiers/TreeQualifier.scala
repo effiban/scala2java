@@ -6,7 +6,8 @@ trait TreeQualifier {
   def qualify(tree: Tree, context: QualificationContext = QualificationContext()): Tree
 }
 
-private[qualifiers] class TreeQualifierImpl(termNameQualifier: CompositeTermNameQualifier,
+private[qualifiers] class TreeQualifierImpl(superSelectQualifier: SuperSelectQualifier,
+                                            termNameQualifier: CompositeTermNameQualifier,
                                             typeNameQualifier: CompositeTypeNameQualifier,
                                             templateQualifier: => TemplateQualifier) extends TreeQualifier {
   override def qualify(tree: Tree, context: QualificationContext = QualificationContext()): Tree = {
@@ -17,6 +18,8 @@ private[qualifiers] class TreeQualifierImpl(termNameQualifier: CompositeTermName
 
     override def apply(tree: Tree): Tree =
       tree match {
+        case Term.Select(termSuper: Term.Super, termName: Term.Name) =>
+          superSelectQualifier.qualify(termSuper, termName, context)
         case termSelect: Term.Select => termSelect.copy(qual = apply(termSelect.qual).asInstanceOf[Term])
         case termName: Term.Name => termNameQualifier.qualify(termName, context)
         case typeSelect: Type.Select => typeSelect.copy(qual = apply(typeSelect.qual).asInstanceOf[Term.Ref])

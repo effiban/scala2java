@@ -1,0 +1,7 @@
+package testfiles.TermSupers.InTermSelect.Mixin.WithThisp.Basic;
+
+import java.util.List;
+
+public class Sample implements List<int> {
+    public final int x = size();
+}

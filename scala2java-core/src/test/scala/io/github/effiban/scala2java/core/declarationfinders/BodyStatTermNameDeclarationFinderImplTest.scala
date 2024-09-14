@@ -53,6 +53,34 @@ class BodyStatTermNameDeclarationFinderImplTest extends UnitTestSuite {
     bodyStatTermNameDeclarationFinder.find(defnVar, termName) shouldBe None
   }
 
+  test("find() when stat is a matching Decl.Def") {
+    val declDef = q"def x(): Int"
+    val termName = q"x"
+
+    bodyStatTermNameDeclarationFinder.find(declDef, termName).value.structure shouldBe declDef.structure
+  }
+
+  test("find() when stat is a non-matching Decl.Def") {
+    val declDef = q"def x(): Int"
+    val termName = q"y"
+
+    bodyStatTermNameDeclarationFinder.find(declDef, termName) shouldBe None
+  }
+
+  test("find() when stat is a matching Defn.Def") {
+    val defnDef = q"def x(): Int = 3"
+    val termName = q"x"
+
+    bodyStatTermNameDeclarationFinder.find(defnDef, termName).value.structure shouldBe defnDef.structure
+  }
+
+  test("find() when stat is a non-matching Defn.Def") {
+    val defnDef = q"def x(): Int = 3"
+    val termName = q"y"
+
+    bodyStatTermNameDeclarationFinder.find(defnDef, termName) shouldBe None
+  }
+
   test("find() when stat is a matching Defn.Object") {
     val defnObject = q"object A"
     val termName = q"A"

@@ -5,6 +5,7 @@ import io.github.effiban.scala2java.core.importmanipulation.StatsByImportSplitte
 private[qualifiers] object Qualifiers {
 
   private lazy val treeQualifier: TreeQualifier = new TreeQualifierImpl(
+    SuperSelectQualifier,
     CompositeTermNameQualifier,
     CompositeTypeNameQualifier,
     templateQualifier

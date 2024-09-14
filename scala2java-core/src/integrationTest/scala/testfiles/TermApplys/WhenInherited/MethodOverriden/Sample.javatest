@@ -1,0 +1,14 @@
+package testfiles.TermApplys.WhenInherited.MethodOverriden;
+
+import testfilesext.SampleParentTrait3;
+
+public class Sample implements SampleParentTrait3 {
+
+    public void foo() {
+        final var x = doSomething();
+    }
+
+    public int doSomething() {
+        return 4;
+    }
+}

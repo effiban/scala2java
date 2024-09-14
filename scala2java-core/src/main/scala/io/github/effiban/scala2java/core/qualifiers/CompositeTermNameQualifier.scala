@@ -1,15 +1,14 @@
 package io.github.effiban.scala2java.core.qualifiers
 
-import io.github.effiban.scala2java.core.importmanipulation.TermNameImporterMatcher
-
-import scala.meta.{Importer, Member, Term}
+import scala.meta.{Member, Term}
 
 trait CompositeTermNameQualifier {
 
   def qualify(termName: Term.Name, context: QualificationContext = QualificationContext()): Term
 }
 
-private[qualifiers] class CompositeTermNameQualifierImpl(termNameImporterMatcher: TermNameImporterMatcher,
+private[qualifiers] class CompositeTermNameQualifierImpl(inheritedTermNameQualifier: InheritedTermNameQualifier,
+                                                         importedTermNameQualifier: ImportedTermNameQualifier,
                                                          coreTermNameQualifier: CoreTermNameQualifier)
   extends CompositeTermNameQualifier {
 
@@ -19,12 +18,17 @@ private[qualifiers] class CompositeTermNameQualifierImpl(termNameImporterMatcher
   }
 
   private def qualifyInner(termName: Term.Name, context: QualificationContext): Term = {
-    context.importers.map(importer => termNameImporterMatcher.findMatch(termName, importer))
-      .collectFirst { case Some(importer) => importer }
-      .map(importer => Term.Select(importer.ref, termName))
-      .orElse(coreTermNameQualifier.qualify(termName))
+    LazyList(
+      inheritedTermNameQualifier.qualify _,
+      aTermName => importedTermNameQualifier.qualify(aTermName, context.importers),
+      coreTermNameQualifier.qualify _
+    ).map(_.apply(termName))
+      .collectFirst { case Some(term) => term }
       .getOrElse(termName)
   }
 }
 
-object CompositeTermNameQualifier extends CompositeTermNameQualifierImpl(TermNameImporterMatcher, CoreTermNameQualifier)
+object CompositeTermNameQualifier extends CompositeTermNameQualifierImpl(
+  InheritedTermNameQualifier,
+  ImportedTermNameQualifier,
+  CoreTermNameQualifier)

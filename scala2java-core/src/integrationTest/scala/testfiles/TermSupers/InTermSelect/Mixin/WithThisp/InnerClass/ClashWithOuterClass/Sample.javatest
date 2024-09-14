@@ -1,0 +1,14 @@
+package testfiles.TermSupers.InTermSelect.Mixin.WithThisp.InnerClass.ClashWithOuterClass;
+
+import java.util.List;
+
+public class Sample {
+
+    public int size() {
+        return 3;
+    }
+
+    public class SampleInner implements List<int> {
+        public final int x = super.size();
+    }
+}
