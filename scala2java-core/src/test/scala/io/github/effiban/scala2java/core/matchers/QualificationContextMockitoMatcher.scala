@@ -6,9 +6,7 @@ import org.mockito.ArgumentMatchers.argThat
 
 class QualificationContextMockitoMatcher(expectedContext: QualificationContext) extends ArgumentMatcher[QualificationContext] {
 
-  override def matches(actualContext: QualificationContext): Boolean = {
-    importersMatch(actualContext)
-  }
+  override def matches(actualContext: QualificationContext): Boolean = importersMatch(actualContext)
 
   private def importersMatch(actualContext: QualificationContext) = {
     actualContext.importers.structure == expectedContext.importers.structure

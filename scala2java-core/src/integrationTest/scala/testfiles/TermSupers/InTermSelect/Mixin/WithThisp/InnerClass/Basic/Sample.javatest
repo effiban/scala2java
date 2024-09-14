@@ -1,0 +1,10 @@
+package testfiles.TermSupers.InTermSelect.Mixin.WithThisp.InnerClass.Basic;
+
+import java.util.List;
+
+public class Sample implements List<int> {
+
+    public class SampleInner {
+        public final int x = size();
+    }
+}

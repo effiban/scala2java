@@ -1,0 +1,10 @@
+package testfiles.TermApplys.WhenInherited.Basic;
+
+import testfilesext.SampleParentTrait3;
+
+public class Sample implements SampleParentTrait3 {
+
+    public void foo() {
+        final var x = doSomething();
+    }
+}

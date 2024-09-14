@@ -9,11 +9,11 @@ trait InheritedTermNameOwnersInferrer {
   def infer(termName: Term.Name): MapView[Template, List[Type.Ref]]
 }
 
-private[typeinference] class InheritedTermNameOwnersInferrerImpl(enclosingTemplateParentsInferrer: EnclosingTemplateAncestorsInferrer)
+private[typeinference] class InheritedTermNameOwnersInferrerImpl(enclosingTemplateAncestorsInferrer: EnclosingTemplateAncestorsInferrer)
   extends InheritedTermNameOwnersInferrer {
 
   override def infer(termName: Term.Name): MapView[Template, List[Type.Ref]] = {
-    enclosingTemplateParentsInferrer.infer(termName)
+    enclosingTemplateAncestorsInferrer.infer(termName)
       .view
       .mapValues { types => types.filter(tpe => isTermMemberOf(tpe, termName)) }
       .filter { case (_, types) => types.nonEmpty }

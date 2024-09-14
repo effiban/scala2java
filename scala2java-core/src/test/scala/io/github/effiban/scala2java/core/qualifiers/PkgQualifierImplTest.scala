@@ -11,11 +11,11 @@ import scala.meta.{Stat, XtensionQuasiquoteImporter, XtensionQuasiquoteTerm}
 class PkgQualifierImplTest extends UnitTestSuite {
 
   private val statsByImportSplitter = mock[StatsByImportSplitter]
-  private val statQualifier = mock[TreeQualifier]
+  private val treeQualifier = mock[TreeQualifier]
 
   private val pkgQualifier = new PkgQualifierImpl(
     statsByImportSplitter,
-    statQualifier
+    treeQualifier
   )
 
   test("qualify when has no nested stats that could be qualified, should return unchanged") {
@@ -64,7 +64,7 @@ class PkgQualifierImplTest extends UnitTestSuite {
 
     doReturn((expectedImporters, expectedNonImports)).when(statsByImportSplitter).split(eqTreeList(pkg.stats))
     doAnswer((stat: Stat) => stat)
-      .when(statQualifier).qualify(any[Stat], eqQualificationContext(QualificationContext(expectedImporters)))
+      .when(treeQualifier).qualify(any[Stat], eqQualificationContext(QualificationContext(expectedImporters)))
 
     pkgQualifier.qualify(pkg).structure shouldBe pkg.structure
   }
@@ -134,7 +134,7 @@ class PkgQualifierImplTest extends UnitTestSuite {
     doAnswer((stat: Stat) => stat match {
       case aStat if aStat.structure == initialStat2.structure => expectedFinalStat2
       case aStat => aStat
-    }).when(statQualifier).qualify(any[Stat], eqQualificationContext(QualificationContext(expectedImporters)))
+    }).when(treeQualifier).qualify(any[Stat], eqQualificationContext(QualificationContext(expectedImporters)))
 
     pkgQualifier.qualify(initialPkg).structure shouldBe expectedFinalPkg.structure
   }
@@ -219,7 +219,7 @@ class PkgQualifierImplTest extends UnitTestSuite {
       case aStat if aStat.structure == initialStat1.structure => expectedFinalStat1
       case aStat if aStat.structure == initialStat2.structure => expectedFinalStat2
       case aStat => aStat
-    }).when(statQualifier).qualify(any[Stat], eqQualificationContext(QualificationContext(expectedImporters)))
+    }).when(treeQualifier).qualify(any[Stat], eqQualificationContext(QualificationContext(expectedImporters)))
 
     pkgQualifier.qualify(initialPkg).structure shouldBe expectedFinalPkg.structure
   }

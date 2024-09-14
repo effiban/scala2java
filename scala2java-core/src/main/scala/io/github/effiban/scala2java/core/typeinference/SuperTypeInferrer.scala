@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.typeinference
 
-import io.github.effiban.scala2java.core.extractors.TypeRefNameExtractor
+import io.github.effiban.scala2java.core.extractors.TreeNameExtractor
 import io.github.effiban.scala2java.spi.typeinferrers.TypeInferrer0
 
 import scala.meta.{Name, Term, Type}
@@ -17,7 +17,7 @@ private[typeinference] class SuperTypeInferrerImpl(innermostEnclosingTemplateAnc
     }
     parentTypes.find(tpe => termSuper.superp match {
       case Name.Anonymous() => true
-      case superp => TypeRefNameExtractor.extract(tpe).value == superp.value
+      case superp => TreeNameExtractor.extract(tpe).value == superp.value
     })
   }
 }

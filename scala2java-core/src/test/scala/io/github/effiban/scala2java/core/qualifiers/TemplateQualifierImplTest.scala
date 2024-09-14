@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.qualifiers
 
-import io.github.effiban.scala2java.core.matchers.QualificationContextMockitoMatcher.eqQualificationContext
+import io.github.effiban.scala2java.core.matchers.QualificationContextMockitoMatcher
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import org.mockito.ArgumentMatchersSugar.any
 
@@ -10,11 +10,10 @@ class TemplateQualifierImplTest extends UnitTestSuite {
 
   private val treeQualifier = mock[TreeQualifier]
 
-  private val qualificationContext = QualificationContext(List(importer"dummy.dummy"))
-
   private val templateQualifier = new TemplateQualifierImpl(treeQualifier)
 
   test("qualify") {
+
     val initialTemplate =
       template"""
       A with B { c: C =>
@@ -31,15 +30,25 @@ class TemplateQualifierImplTest extends UnitTestSuite {
       }
       """
 
-    doAnswer((tree: Tree, _: QualificationContext) => tree match {
-      case anInit: Init if anInit.structure == init"A".structure => init"qualA.A"
-      case anInit: Init if anInit.structure == init"B".structure => init"qualB.B"
-      case aSelf: Self if aSelf.structure == self"c: C".structure => self"c: qualC.C"
-      case aStat: Stat if aStat.structure == q"val d = dd".structure => q"val d = qualdd.dd"
-      case aStat: Stat if aStat.structure == q"val e = ee".structure => q"val e = qualee.ee"
-      case aTree => aTree
-    }).when(treeQualifier).qualify(any[Tree], eqQualificationContext(qualificationContext))
+    val importers = List(importer"dummy1.dummy1", importer"dummy2.dummy2")
+    val parentContext = QualificationContext(importers = importers)
 
-    templateQualifier.qualify(initialTemplate, qualificationContext).structure shouldBe expectedFinalTemplate.structure
+    val expectedChildContext = QualificationContext(importers = importers)
+
+    doAnswer((tree: Tree, context: QualificationContext) => {
+      val parentContextMatches = new QualificationContextMockitoMatcher(parentContext).matches(context)
+      val childContextMatches = new QualificationContextMockitoMatcher(expectedChildContext).matches(context)
+
+      tree match {
+        case init: Init if init.structure == init"A".structure && parentContextMatches => init"qualA.A"
+        case init: Init if init.structure == init"B".structure && parentContextMatches => init"qualB.B"
+        case self: Self if self.structure == self"c: C".structure && parentContextMatches => self"c: qualC.C"
+        case stat: Stat if stat.structure == q"val d = dd".structure && childContextMatches => q"val d = qualdd.dd"
+        case stat: Stat if stat.structure == q"val e = ee".structure && childContextMatches => q"val e = qualee.ee"
+        case aTree => aTree
+      }
+    }).when(treeQualifier).qualify(any[Tree], any[QualificationContext])
+
+    templateQualifier.qualify(initialTemplate, parentContext).structure shouldBe expectedFinalTemplate.structure
   }
 }

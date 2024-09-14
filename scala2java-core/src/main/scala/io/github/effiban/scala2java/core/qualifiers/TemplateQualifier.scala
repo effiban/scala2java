@@ -8,20 +8,17 @@ trait TemplateQualifier {
 
 private[qualifiers] class TemplateQualifierImpl(treeQualifier: => TreeQualifier) extends TemplateQualifier {
 
-  override def qualify(template: Template, context: QualificationContext): Template = {
+  override def qualify(template: Template, context: QualificationContext = QualificationContext()): Template = {
+    // TODO - handle "early" definitions
     val qualifiedInits = template.inits.map(init => treeQualifier.qualify(init, context).asInstanceOf[Init])
     val qualifiedSelf = treeQualifier.qualify(template.self, context).asInstanceOf[Self]
 
-    // TODO - collect parents and add to context for qualifying template stats
+    val templateWithQualifiedParents = template.copy(inits = qualifiedInits, self = qualifiedSelf)
 
-    val qualifiedStats = template.stats.map(stat => treeQualifier.qualify(stat, context).asInstanceOf[Stat])
+    // TODO  - pass template imports to children
+    val childContext = QualificationContext(importers = context.importers)
 
-    Template(
-      // TODO qualify early definitions
-      early = Nil,
-      inits = qualifiedInits,
-      self = qualifiedSelf,
-      stats = qualifiedStats
-    )
+    val qualifiedStats = templateWithQualifiedParents.stats.map(stat => treeQualifier.qualify(stat, childContext).asInstanceOf[Stat])
+    templateWithQualifiedParents.copy(stats = qualifiedStats)
   }
 }

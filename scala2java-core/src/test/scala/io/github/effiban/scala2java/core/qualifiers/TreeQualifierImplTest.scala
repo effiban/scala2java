@@ -11,6 +11,7 @@ import scala.meta.{Template, Term, Type, XtensionQuasiquoteImporter, XtensionQua
 
 class TreeQualifierImplTest extends UnitTestSuite {
 
+  private val superSelectQualifier = mock[SuperSelectQualifier]
   private val termNameQualifier = mock[CompositeTermNameQualifier]
   private val typeNameQualifier = mock[CompositeTypeNameQualifier]
   private val templateQualifier = mock[TemplateQualifier]
@@ -18,6 +19,7 @@ class TreeQualifierImplTest extends UnitTestSuite {
   private val qualificationContext = QualificationContext(List(importer"dummy.dummy"))
 
   private val treeQualifier = new TreeQualifierImpl(
+    superSelectQualifier,
     termNameQualifier,
     typeNameQualifier,
     templateQualifier
@@ -136,6 +138,29 @@ class TreeQualifierImplTest extends UnitTestSuite {
     treeQualifier.qualify(tree, qualificationContext)
 
     verify(termNameQualifier, never).qualify(eqTree(q"h"), eqQualificationContext(qualificationContext))
+  }
+
+  test("qualify when has a nested Term.Select 'super.a' should return result of superSelectQualifier") {
+    val initialTree =
+      q"""
+      def foo() = {
+        val x = super.a
+      }
+      """
+
+    val expectedFinalTree =
+      q"""
+      def foo() = {
+        val x = B.super[C].a
+      }
+      """
+
+    doAnswer((termName: Term.Name) => termName)
+      .when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(qualificationContext))
+    doReturn(q"B.super[C].a")
+      .when(superSelectQualifier).qualify(eqTree(q"super"), eqTree(q"a"), eqQualificationContext(qualificationContext))
+
+    treeQualifier.qualify(initialTree, qualificationContext).structure shouldBe expectedFinalTree.structure
   }
 
   test("qualify when has nested Type.Names but TypeNameQualifier returns nothing, should return unchanged") {
