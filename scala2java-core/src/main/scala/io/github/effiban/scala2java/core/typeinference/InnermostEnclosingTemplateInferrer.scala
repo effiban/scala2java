@@ -18,7 +18,7 @@ object InnermostEnclosingTemplateInferrer extends InnermostEnclosingTemplateInfe
     (tree, tree.parent, maybeEnclosingMemberName) match {
       case (template: Template, Some(parent: Member), Some(enclosingMemberName))
         if enclosingMemberName == parent.name.value => Some(template)
-      case (template: Template, Some(_), None) => Some(template)
+      case (template: Template, _, None) => Some(template)
       case (_, Some(parent), maybeEncMemName) => inferInner(parent, maybeEncMemName)
       case _ => None
     }
