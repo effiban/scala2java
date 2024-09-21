@@ -2,9 +2,9 @@ package io.github.effiban.scala2java.core.transformers
 
 import io.github.effiban.scala2java.core.entities.TermNames.Apply
 import io.github.effiban.scala2java.core.factories.TermApplyTransformationContextFactory
-import io.github.effiban.scala2java.core.matchers.QualifiedTermApplyMockitoMatcher.eqQualifiedTermApply
+import io.github.effiban.scala2java.test.utils.matchers.QualifiedTermApplyMockitoMatcher.eqQualifiedTermApply
 import io.github.effiban.scala2java.core.matchers.TermApplyTransformationContextMockitoMatcher.eqTermApplyTransformationContext
-import io.github.effiban.scala2java.core.matchers.UnqualifiedTermApplyMockitoMatcher.eqUnqualifiedTermApply
+import io.github.effiban.scala2java.test.utils.matchers.UnqualifiedTermApplyMockitoMatcher.eqUnqualifiedTermApply
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.spi.contexts.TermApplyTransformationContext
 import io.github.effiban.scala2java.spi.entities.{QualifiedTermApply, UnqualifiedTermApply}
