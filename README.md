@@ -30,6 +30,9 @@ Artifact: **scala2java-core_2.13**
 ### Usage Guide and Documentation
 Refer to the [Wiki](https://github.com/effiban/scala2java/wiki/Home)
 
+### Collaboration
+All are welcome to collaborate! Just open a PR and mention me, or email me at: effi.ban@skai.io
+
 ### Licensing
 
 Scala2Java is licensed under the Apache License, Version 2.0.
