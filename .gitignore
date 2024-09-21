@@ -14,3 +14,4 @@ venv/
 *.sc
 .scala_dependencies
 .env
+gradle.properties
