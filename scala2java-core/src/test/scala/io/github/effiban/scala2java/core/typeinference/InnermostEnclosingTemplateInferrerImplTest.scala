@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.typeinference.InnermostEnclosingTemplateInferrer.infer
 
 import scala.meta.Term.Block
-import scala.meta.{Defn, XtensionQuasiquoteTerm}
+import scala.meta.{Defn, XtensionQuasiquoteTemplate, XtensionQuasiquoteTerm}
 
 class InnermostEnclosingTemplateInferrerImplTest extends UnitTestSuite {
 
@@ -82,6 +82,19 @@ class InnermostEnclosingTemplateInferrerImplTest extends UnitTestSuite {
     val e = classD.templ.stats.head
 
     infer(e).value.structure shouldBe classD.templ.structure
+  }
+
+  test("infer for Defn.Val of template without a parent class, should return the template") {
+    val template =
+      template"""
+      A {
+        val e: scala.Int = 3
+      }
+      """
+
+    val e = template.stats.head
+
+    infer(e).value.structure shouldBe template.structure
   }
 
   test("infer for Defn.Val inside a Defn.Def with enclosing member name, should return the corresponding class template") {
