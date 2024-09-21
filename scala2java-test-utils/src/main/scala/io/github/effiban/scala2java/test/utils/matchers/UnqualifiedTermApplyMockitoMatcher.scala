@@ -1,4 +1,4 @@
-package io.github.effiban.scala2java.core.matchers
+package io.github.effiban.scala2java.test.utils.matchers
 
 import io.github.effiban.scala2java.spi.entities.UnqualifiedTermApply
 import io.github.effiban.scala2java.test.utils.matchers.{ListMatcher, TreeMatcher}

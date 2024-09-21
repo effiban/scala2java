@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.transformers
 
 import io.github.effiban.scala2java.core.classifiers.TypeClassifier
 import io.github.effiban.scala2java.core.entities.TypeSelects
-import io.github.effiban.scala2java.core.matchers.UnqualifiedTermApplyScalatestMatcher.equalUnqualifiedTermApply
+import io.github.effiban.scala2java.test.utils.matchers.UnqualifiedTermApplyScalatestMatcher.equalUnqualifiedTermApply
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.spi.contexts.TermApplyTransformationContext
 import io.github.effiban.scala2java.spi.entities.UnqualifiedTermApply

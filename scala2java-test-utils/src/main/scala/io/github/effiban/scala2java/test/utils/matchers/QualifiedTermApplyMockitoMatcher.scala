@@ -1,11 +1,8 @@
-package io.github.effiban.scala2java.core.matchers
+package io.github.effiban.scala2java.test.utils.matchers
 
 import io.github.effiban.scala2java.spi.entities.QualifiedTermApply
-import io.github.effiban.scala2java.test.utils.matchers.{ListMatcher, TreeMatcher}
 import org.mockito.ArgumentMatcher
 import org.mockito.ArgumentMatchers.argThat
-
-import scala.meta.{Term, Type}
 
 class QualifiedTermApplyMockitoMatcher(expectedQualifiedTermApply: QualifiedTermApply)
   extends ArgumentMatcher[QualifiedTermApply] {
