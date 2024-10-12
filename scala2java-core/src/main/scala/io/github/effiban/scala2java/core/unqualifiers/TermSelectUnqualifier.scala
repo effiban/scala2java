@@ -15,7 +15,8 @@ private[unqualifiers] class TermSelectUnqualifierImpl(termSelectImporterMatcher:
 
   override def unqualify(termSelect: Term.Select, context: QualificationContext = QualificationContext()): Term.Ref = {
     termSelect match {
-      case Term.Select(termSuper: Term.Super, termName: Term.Name) => superSelectUnqualifier.unqualify(termSuper, termName)
+      case Term.Select(termSuper: Term.Super, termName: Term.Name) =>
+        superSelectUnqualifier.unqualify(termSuper, termName, termSelect.parent)
       case aTermSelect =>
         context.importers.map(importer => termSelectImporterMatcher.findMatch(termSelect, importer))
           .collectFirst {

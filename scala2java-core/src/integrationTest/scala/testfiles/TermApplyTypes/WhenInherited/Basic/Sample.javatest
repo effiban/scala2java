@@ -1,0 +1,10 @@
+package testfiles.TermApplyTypes.WhenInherited.Basic;
+
+import testfilesext.SampleParentTrait4;
+
+public class Sample implements SampleParentTrait4 {
+
+    public void foo() {
+        final var x = super.<int>fooTyped();
+    }
+}

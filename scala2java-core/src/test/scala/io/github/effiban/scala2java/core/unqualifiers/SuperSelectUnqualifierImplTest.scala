@@ -39,7 +39,7 @@ class SuperSelectUnqualifierImplTest extends UnitTestSuite {
 
     when(fileScopeNonInheritedTermNameBinder.bind(eqTree(termName))).thenReturn(Some(q"val c: Int"))
 
-    superSelectUnqualifier.unqualify(termSuper, termName).structure shouldBe expectedTermSelect.structure
+    superSelectUnqualifier.unqualify(termSuper, termName, None).structure shouldBe expectedTermSelect.structure
   }
 
   test("unqualify() when has more than one enclosing class which inherits the term, " +
@@ -66,7 +66,7 @@ class SuperSelectUnqualifierImplTest extends UnitTestSuite {
 
     when(fileScopeNonInheritedTermNameBinder.bind(eqTree(termName))).thenReturn(None)
 
-    superSelectUnqualifier.unqualify(termSuper, termName).structure shouldBe expectedTermSelect.structure
+    superSelectUnqualifier.unqualify(termSuper, termName, None).structure shouldBe expectedTermSelect.structure
   }
 
   test("unqualify() when has exactly one enclosing class which inherits the term, " +
@@ -89,15 +89,18 @@ class SuperSelectUnqualifierImplTest extends UnitTestSuite {
 
     when(fileScopeNonInheritedTermNameBinder.bind(eqTree(termName))).thenReturn(Some(q"val c: Int"))
 
-    superSelectUnqualifier.unqualify(termSuper, termName).structure shouldBe expectedTermSelect.structure
+    superSelectUnqualifier.unqualify(termSuper, termName, None).structure shouldBe expectedTermSelect.structure
   }
 
   test("unqualify() when has exactly one enclosing class which inherits the term, " +
     "and does not clash with a declaration in the same file, " +
-    "should return the term name only") {
+    "and IS typed, " +
+    "should return a Term.Select with a default 'super' and same term name") {
 
     val termSuper = q"A.super[A1]"
     val termName = q"c"
+    val termSelectParent = q"A.super[A1].c[T]"
+    val expectedTermSelect = q"super.c"
 
     val classA = q"class A"
 
@@ -110,6 +113,29 @@ class SuperSelectUnqualifierImplTest extends UnitTestSuite {
 
     when(fileScopeNonInheritedTermNameBinder.bind(eqTree(termName))).thenReturn(None)
 
-    superSelectUnqualifier.unqualify(termSuper, termName).structure shouldBe termName.structure
+    superSelectUnqualifier.unqualify(termSuper, termName, Some(termSelectParent)).structure shouldBe expectedTermSelect.structure
+  }
+
+  test("unqualify() when has exactly one enclosing class which inherits the term, " +
+    "and does not clash with a declaration in the same file, " +
+    "and is NOT typed, " +
+    "should return the term name only") {
+
+    val termSuper = q"A.super[A1]"
+    val termName = q"c"
+    val termSelectParent = q"A.super[A1].c"
+
+    val classA = q"class A"
+
+    val typeA1 = t"A1"
+    val typeA2 = t"A2"
+
+    doReturn(MapView(
+      classA.templ -> List(typeA1, typeA2)
+    )).when(inheritedTermNameOwnersInferrer).infer(eqTree(termName))
+
+    when(fileScopeNonInheritedTermNameBinder.bind(eqTree(termName))).thenReturn(None)
+
+    superSelectUnqualifier.unqualify(termSuper, termName, Some(termSelectParent)).structure shouldBe termName.structure
   }
 }
