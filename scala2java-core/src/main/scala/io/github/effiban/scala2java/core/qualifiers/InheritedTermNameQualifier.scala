@@ -1,11 +1,11 @@
 package io.github.effiban.scala2java.core.qualifiers
 
+import io.github.effiban.scala2java.core.binders.FileScopeNonInheritedTermNameBinder
 import io.github.effiban.scala2java.core.entities.TreeKeyedMap
 import io.github.effiban.scala2java.core.extractors.TreeNameExtractor
-import io.github.effiban.scala2java.core.importmanipulation.TermNameImporterMatcher
 import io.github.effiban.scala2java.core.typeinference.{InheritedTermNameOwnersInferrer, InnermostEnclosingTemplateInferrer}
 
-import scala.meta.{Importer, Member, Name, Term, XtensionQuasiquoteTerm}
+import scala.meta.{Name, Term, XtensionQuasiquoteTerm}
 
 trait InheritedTermNameQualifier {
 
@@ -13,7 +13,8 @@ trait InheritedTermNameQualifier {
 }
 
 private[qualifiers] class InheritedTermNameQualifierImpl(innermostEnclosingTemplateInferrer: InnermostEnclosingTemplateInferrer,
-                                                         inheritedTermNameOwnersInferrer: InheritedTermNameOwnersInferrer)
+                                                         inheritedTermNameOwnersInferrer: InheritedTermNameOwnersInferrer,
+                                                         fileScopeNonInheritedTermNameBinder: FileScopeNonInheritedTermNameBinder)
   extends InheritedTermNameQualifier {
 
   override def qualify(termName: Term.Name): Option[Term] = {
@@ -29,22 +30,20 @@ private[qualifiers] class InheritedTermNameQualifierImpl(innermostEnclosingTempl
         .headOption
         .map(TreeNameExtractor.extract)
     })
+    // TODO remove once we handle qualification of file-scope terms properly
+    val maybeFileScopeTermNameDecl = fileScopeNonInheritedTermNameBinder.bind(termName)
 
-    (maybeThisp, maybeSuperp) match {
-      case (Some(thisp), Some(superp)) if !isEnumValue(superp, termName) =>
+
+    (maybeThisp, maybeSuperp, maybeFileScopeTermNameDecl) match {
+      case (Some(thisp), Some(superp), None) =>
         Some(Term.Select(Term.Super(thisp, superp), termName))
       case _ => None
     }
 
   }
-
-  // Skip qualification of Enumeration Value member since it has special logic
-  // TODO - remove this once the same-file scopes are handled at an earlier stage
-  private def isEnumValue(enclosingTypeName: Name, termName: Term.Name) = {
-    enclosingTypeName.value == "Enumeration" && termName.structure == q"Value".structure
-  }
 }
 
 object InheritedTermNameQualifier extends InheritedTermNameQualifierImpl(
   InnermostEnclosingTemplateInferrer,
-  InheritedTermNameOwnersInferrer)
+  InheritedTermNameOwnersInferrer,
+  FileScopeNonInheritedTermNameBinder)
