@@ -10,7 +10,7 @@ trait SuperSelectQualifier {
 
   def qualify(termSuper: Term.Super,
               termName: Term.Name,
-              context: QualificationContext = QualificationContext()): Term.Select
+              context: QualificationContext): Term.Select
 }
 
 private[qualifiers] class SuperSelectQualifierImpl(innermostEnclosingTemplateInferrer: InnermostEnclosingTemplateInferrer,
@@ -18,7 +18,7 @@ private[qualifiers] class SuperSelectQualifierImpl(innermostEnclosingTemplateInf
 
   override def qualify(termSuper: Term.Super,
                        termName: Term.Name,
-                       context: QualificationContext = QualificationContext()): Term.Select = {
+                       context: QualificationContext): Term.Select = {
     val maybeEnclosingMemberName = termSuper.thisp match {
       case Name.Anonymous() => None
       case thisp => Some(thisp.value)
@@ -33,15 +33,14 @@ private[qualifiers] class SuperSelectQualifierImpl(innermostEnclosingTemplateInf
         .getOrElse(Name.Anonymous())
     }
 
-    val qualifiedSuperp = (termSuper.superp, maybeEnclosingTemplate) match {
-      case (Name.Anonymous(), Some(enclosingTemplate)) =>
-        val inheritedTermNameOwners = inheritedTermNameOwnersInferrer.infer(termName)
-        TreeKeyedMap.get(inheritedTermNameOwners, enclosingTemplate).getOrElse(Nil)
-          .headOption
-          .map(TreeNameExtractor.extract)
-          .getOrElse(Name.Anonymous())
-      case (Name.Anonymous(), _) => Name.Anonymous()
-      case (superp, _) => superp
+    val qualifiedSuperp = termSuper.superp match {
+      case Name.Anonymous() => inheritedTermNameOwnersInferrer.infer(termName, context)
+        .values
+        .flatten
+        .headOption
+        .map(TreeNameExtractor.extract)
+        .getOrElse(Name.Anonymous())
+      case superp => superp
     }
     Term.Select(Term.Super(qualifiedThisp, qualifiedSuperp), termName)
   }

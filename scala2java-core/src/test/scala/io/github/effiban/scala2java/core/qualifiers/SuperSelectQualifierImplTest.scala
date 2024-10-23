@@ -1,12 +1,14 @@
 package io.github.effiban.scala2java.core.qualifiers
 
 import io.github.effiban.scala2java.core.entities.TermSupers
+import io.github.effiban.scala2java.core.matchers.QualificationContextMockitoMatcher.eqQualificationContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.typeinference.{InheritedTermNameOwnersInferrer, InnermostEnclosingTemplateInferrer}
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
 
 import scala.collection.MapView
+import scala.collection.immutable.ListMap
 import scala.meta.{Defn, Name, Term, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 class SuperSelectQualifierImplTest extends UnitTestSuite {
@@ -33,7 +35,7 @@ class SuperSelectQualifierImplTest extends UnitTestSuite {
 
     when(innermostEnclosingTemplateInferrer.infer(eqTree(theSuper), eqTo(Some("A")))).thenReturn(Some(templA))
 
-    superSelectQualifier.qualify(theSuper, c).structure shouldBe selectSuperC.structure
+    superSelectQualifier.qualify(theSuper, c, QualificationContext()).structure shouldBe selectSuperC.structure
   }
 
   test("qualify when has a thisp, has a superp, and no enclosing template - should return unchanged") {
@@ -43,9 +45,9 @@ class SuperSelectQualifierImplTest extends UnitTestSuite {
     val c = selectSuperC.name
 
     when(innermostEnclosingTemplateInferrer.infer(eqTree(theSuper), eqTo(Some("A")))).thenReturn(None)
-    doReturn(MapView.empty).when(inheritedTermNameOwnersInferrer).infer(eqTree(c))
+    doReturn(MapView.empty).when(inheritedTermNameOwnersInferrer).infer(eqTree(c), eqQualificationContext(QualificationContext()))
 
-    superSelectQualifier.qualify(theSuper, c).structure shouldBe selectSuperC.structure
+    superSelectQualifier.qualify(theSuper, c, QualificationContext()).structure shouldBe selectSuperC.structure
   }
 
   test("qualify when has a thisp, has no superp, has an enclosing template, and one parent found - " +
@@ -64,10 +66,12 @@ class SuperSelectQualifierImplTest extends UnitTestSuite {
     val theSuper = selectSuperC.qual.asInstanceOf[Term.Super]
     val c = selectSuperC.name
 
-    when(innermostEnclosingTemplateInferrer.infer(eqTree(theSuper), eqTo(Some("A")))).thenReturn(Some(templA))
-    doReturn(MapView((templA, List(t"B")))).when(inheritedTermNameOwnersInferrer).infer(eqTree(c))
+    val context = QualificationContext(qualifiedTypeMap = Map(t"B" -> t"qualB.B"))
 
-    superSelectQualifier.qualify(theSuper, c).structure shouldBe
+    when(innermostEnclosingTemplateInferrer.infer(eqTree(theSuper), eqTo(Some("A")))).thenReturn(Some(templA))
+    doReturn(ListMap((templA, List(t"qualB.B")))).when(inheritedTermNameOwnersInferrer).infer(eqTree(c), eqQualificationContext(context))
+
+    superSelectQualifier.qualify(theSuper, c, context).structure shouldBe
       Term.Select(Term.Super(Name.Indeterminate("A"), Name.Indeterminate("B")), c).structure
   }
 
@@ -87,10 +91,17 @@ class SuperSelectQualifierImplTest extends UnitTestSuite {
     val theSuper = selectSuperC.qual.asInstanceOf[Term.Super]
     val c = selectSuperC.name
 
-    when(innermostEnclosingTemplateInferrer.infer(eqTree(theSuper), eqTo(Some("A")))).thenReturn(Some(templA))
-    doReturn(MapView((templA, List(t"B", t"C")))).when(inheritedTermNameOwnersInferrer).infer(eqTree(c))
+    val context = QualificationContext(qualifiedTypeMap = Map(
+      t"B" -> t"qualB.B",
+      t"C" -> t"qualC.C"
+    ))
 
-    superSelectQualifier.qualify(theSuper, c).structure shouldBe
+    when(innermostEnclosingTemplateInferrer.infer(eqTree(theSuper), eqTo(Some("A")))).thenReturn(Some(templA))
+    doReturn(ListMap(
+      templA -> List(t"qualB.B", t"qualC.C"))
+    ).when(inheritedTermNameOwnersInferrer).infer(eqTree(c), eqQualificationContext(context))
+
+    superSelectQualifier.qualify(theSuper, c, context).structure shouldBe
       Term.Select(Term.Super(Name.Indeterminate("A"), Name.Indeterminate("B")), c).structure
   }
 
@@ -108,20 +119,25 @@ class SuperSelectQualifierImplTest extends UnitTestSuite {
     val theSuper = selectSuperC.qual.asInstanceOf[Term.Super]
     val c = selectSuperC.name
 
-    when(innermostEnclosingTemplateInferrer.infer(eqTree(theSuper), eqTo(Some("A")))).thenReturn(Some(templA))
-    doReturn(MapView.empty).when(inheritedTermNameOwnersInferrer).infer(eqTree(c))
+    val context = QualificationContext(qualifiedTypeMap = Map(t"B" -> t"qualB.B"))
 
-    superSelectQualifier.qualify(theSuper, c).structure shouldBe selectSuperC.structure
+    when(innermostEnclosingTemplateInferrer.infer(eqTree(theSuper), eqTo(Some("A")))).thenReturn(Some(templA))
+    doReturn(ListMap.empty).when(inheritedTermNameOwnersInferrer).infer(eqTree(c), eqQualificationContext(context))
+
+    superSelectQualifier.qualify(theSuper, c, context).structure shouldBe selectSuperC.structure
   }
 
-  test("qualify when has a thisp, has no superp, and has no enclosing template - should return unchanged") {
+  test("qualify when has a thisp, has no superp, and has no enclosing template and no inherited owners - should return unchanged") {
     val selectSuperC = q"A.super.c"
     val theSuper = selectSuperC.qual.asInstanceOf[Term.Super]
     val c = selectSuperC.name
 
-    when(innermostEnclosingTemplateInferrer.infer(eqTree(theSuper), eqTo(Some("A")))).thenReturn(None)
+    val context = QualificationContext()
 
-    superSelectQualifier.qualify(theSuper, c).structure shouldBe selectSuperC.structure
+    when(innermostEnclosingTemplateInferrer.infer(eqTree(theSuper), eqTo(Some("A")))).thenReturn(None)
+    doReturn(ListMap.empty).when(inheritedTermNameOwnersInferrer).infer(eqTree(c), eqQualificationContext(context))
+
+    superSelectQualifier.qualify(theSuper, c, context).structure shouldBe selectSuperC.structure
   }
 
   test("qualify when has no thisp, has a superp, and has an enclosing template - should return the input with a thisp for the member") {
@@ -138,10 +154,11 @@ class SuperSelectQualifierImplTest extends UnitTestSuite {
     val theSuper = selectSuperC.qual.asInstanceOf[Term.Super]
     val c = selectSuperC.name
 
-    when(innermostEnclosingTemplateInferrer.infer(eqTree(theSuper), eqTo(None))).thenReturn(Some(templA))
-    doReturn(MapView((templA, List(t"B")))).when(inheritedTermNameOwnersInferrer).infer(eqTree(c))
+    val context = QualificationContext()
 
-    superSelectQualifier.qualify(theSuper, c).structure shouldBe
+    when(innermostEnclosingTemplateInferrer.infer(eqTree(theSuper), eqTo(None))).thenReturn(Some(templA))
+
+    superSelectQualifier.qualify(theSuper, c, context).structure shouldBe
       Term.Select(Term.Super(t"A", Name.Indeterminate("B")), c).structure
   }
 
@@ -150,9 +167,11 @@ class SuperSelectQualifierImplTest extends UnitTestSuite {
     val termSelect = Term.Select(Term.Super(Name.Anonymous(), Name.Indeterminate("A")), q"x")
     val termSuper = termSelect.qual.asInstanceOf[Term.Super]
 
+    val context = QualificationContext()
+
     when(innermostEnclosingTemplateInferrer.infer(eqTree(termSuper), eqTo(None))).thenReturn(None)
 
-    superSelectQualifier.qualify(termSuper, termSelect.name).structure shouldBe termSelect.structure
+    superSelectQualifier.qualify(termSuper, termSelect.name, context).structure shouldBe termSelect.structure
   }
 
   test("qualify when has no thisp, has no superp, has an enclosing template, and parent found - " +
@@ -171,10 +190,13 @@ class SuperSelectQualifierImplTest extends UnitTestSuite {
     val theSuper = selectSuperC.qual.asInstanceOf[Term.Super]
     val c = selectSuperC.name
 
-    when(innermostEnclosingTemplateInferrer.infer(eqTree(theSuper), eqTo(None))).thenReturn(Some(templA))
-    doReturn(MapView((templA, List(t"B")))).when(inheritedTermNameOwnersInferrer).infer(eqTree(c))
+    val context = QualificationContext(qualifiedTypeMap = Map(t"B" -> t"qualB.B"))
 
-    superSelectQualifier.qualify(theSuper, c).structure shouldBe
+    when(innermostEnclosingTemplateInferrer.infer(eqTree(theSuper), eqTo(None))).thenReturn(Some(templA))
+    doReturn(ListMap((templA, List(t"qualB.B"))))
+      .when(inheritedTermNameOwnersInferrer).infer(eqTree(c), eqQualificationContext(context))
+
+    superSelectQualifier.qualify(theSuper, c, context).structure shouldBe
       Term.Select(Term.Super(t"A", Name.Indeterminate("B")), c).structure
   }
 
@@ -194,10 +216,12 @@ class SuperSelectQualifierImplTest extends UnitTestSuite {
     val theSuper = selectSuperC.qual.asInstanceOf[Term.Super]
     val c = selectSuperC.name
 
-    when(innermostEnclosingTemplateInferrer.infer(eqTree(theSuper), eqTo(None))).thenReturn(Some(templA))
-    doReturn(MapView.empty).when(inheritedTermNameOwnersInferrer).infer(eqTree(c))
+    val context = QualificationContext(qualifiedTypeMap = Map(t"B" -> t"qualB.B"))
 
-    superSelectQualifier.qualify(theSuper, c).structure shouldBe
+    when(innermostEnclosingTemplateInferrer.infer(eqTree(theSuper), eqTo(None))).thenReturn(Some(templA))
+    doReturn(ListMap.empty).when(inheritedTermNameOwnersInferrer).infer(eqTree(c), eqQualificationContext(context))
+
+    superSelectQualifier.qualify(theSuper, c, context).structure shouldBe
       Term.Select(Term.Super(t"A", Name.Anonymous()), c).structure
   }
 
@@ -205,8 +229,11 @@ class SuperSelectQualifierImplTest extends UnitTestSuite {
     val termSelect = Term.Select(TermSupers.Empty, q"x")
     val termName = termSelect.name
 
-    when(innermostEnclosingTemplateInferrer.infer(eqTree(TermSupers.Empty), eqTo(None))).thenReturn(None)
+    val context = QualificationContext(qualifiedTypeMap = Map(t"B" -> t"qualB.B"))
 
-    superSelectQualifier.qualify(TermSupers.Empty, termName).structure shouldBe termSelect.structure
+    when(innermostEnclosingTemplateInferrer.infer(eqTree(TermSupers.Empty), eqTo(None))).thenReturn(None)
+    doReturn(ListMap.empty).when(inheritedTermNameOwnersInferrer).infer(eqTree(termName), eqQualificationContext(context))
+
+    superSelectQualifier.qualify(TermSupers.Empty, termName, context).structure shouldBe termSelect.structure
   }
 }

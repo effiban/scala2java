@@ -19,7 +19,7 @@ private[qualifiers] class CompositeTermNameQualifierImpl(inheritedTermNameQualif
 
   private def qualifyInner(termName: Term.Name, context: QualificationContext): Term = {
     LazyList(
-      inheritedTermNameQualifier.qualify _,
+      aTermName => inheritedTermNameQualifier.qualify(aTermName, context),
       aTermName => importedTermNameQualifier.qualify(aTermName, context.importers),
       coreTermNameQualifier.qualify _
     ).map(_.apply(termName))

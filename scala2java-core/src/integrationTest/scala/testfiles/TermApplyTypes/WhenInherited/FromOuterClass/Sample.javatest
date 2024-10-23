@@ -1,0 +1,13 @@
+package testfiles.TermApplyTypes.WhenInherited.FromOuterClass;
+
+import testfilesext.SampleParentTrait4;
+
+public class Sample implements SampleParentTrait4 {
+
+    public class SampleInner {
+
+        public void foo() {
+            final var x = super.<int>fooTyped();
+        }
+    }
+}

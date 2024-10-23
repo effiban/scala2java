@@ -1,12 +1,13 @@
 package io.github.effiban.scala2java.core.qualifiers
 
 import io.github.effiban.scala2java.core.binders.FileScopeNonInheritedTermNameBinder
+import io.github.effiban.scala2java.core.matchers.QualificationContextMockitoMatcher.eqQualificationContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.typeinference.{InheritedTermNameOwnersInferrer, InnermostEnclosingTemplateInferrer}
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
 
-import scala.collection.MapView
+import scala.collection.immutable.ListMap
 import scala.meta.{Defn, Name, Term, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 class InheritedTermNameQualifierImplTest extends UnitTestSuite {
@@ -33,11 +34,13 @@ class InheritedTermNameQualifierImplTest extends UnitTestSuite {
     val foo = templA.stats.collectFirst {case defnDef: Defn.Def => defnDef}.get
     val x = foo.body.asInstanceOf[Term.Name]
 
+    val context = QualificationContext(qualifiedTypeMap = ListMap(t"B" -> t"qualB.B"))
+
     when(innermostEnclosingTemplateInferrer.infer(eqTree(x), eqTo(None))).thenReturn(Some(templA))
-    doReturn(MapView((templA, List(t"B")))).when(inheritedTermNameOwnersInferrer).infer(eqTree(x))
+    doReturn(ListMap((templA, List(t"qualB.B")))).when(inheritedTermNameOwnersInferrer).infer(eqTree(x), eqQualificationContext(context))
     when(fileScopeNonInheritedTermNameBinder.bind(eqTree(x))).thenReturn(None)
 
-    inheritedTermNameQualifier.qualify(x).value.structure shouldBe
+    inheritedTermNameQualifier.qualify(x, context).value.structure shouldBe
       Term.Select(Term.Super(t"A", Name.Indeterminate("B")), q"x").structure
   }
 
@@ -53,11 +56,17 @@ class InheritedTermNameQualifierImplTest extends UnitTestSuite {
     val foo = templA.stats.collectFirst {case defnDef: Defn.Def => defnDef}.get
     val x = foo.body.asInstanceOf[Term.Name]
 
+    val context = QualificationContext(qualifiedTypeMap = ListMap(
+      t"B" -> t"qualB.B",
+      t"C" -> t"qualC.C"
+    ))
+
     when(innermostEnclosingTemplateInferrer.infer(eqTree(x), eqTo(None))).thenReturn(Some(templA))
-    doReturn(MapView((templA, List(t"B", t"C")))).when(inheritedTermNameOwnersInferrer).infer(eqTree(x))
+    doReturn(ListMap((templA, List(t"qualB.B", t"qualC.C"))))
+      .when(inheritedTermNameOwnersInferrer).infer(eqTree(x), eqQualificationContext(context))
     when(fileScopeNonInheritedTermNameBinder.bind(eqTree(x))).thenReturn(None)
 
-    inheritedTermNameQualifier.qualify(x).value.structure shouldBe
+    inheritedTermNameQualifier.qualify(x, context).value.structure shouldBe
       Term.Select(Term.Super(t"A", Name.Indeterminate("B")), q"x").structure
   }
 
@@ -74,11 +83,13 @@ class InheritedTermNameQualifierImplTest extends UnitTestSuite {
     val foo = templA.stats.collectFirst {case defnDef: Defn.Def => defnDef}.get
     val x = foo.body.asInstanceOf[Term.Name]
 
+    val context = QualificationContext(qualifiedTypeMap = ListMap(t"B" -> t"qualB.B"))
+
     when(innermostEnclosingTemplateInferrer.infer(eqTree(x), eqTo(None))).thenReturn(Some(templA))
-    doReturn(MapView((templA, List(t"B")))).when(inheritedTermNameOwnersInferrer).infer(eqTree(x))
+    doReturn(ListMap((templA, List(t"qualB.B")))).when(inheritedTermNameOwnersInferrer).infer(eqTree(x), eqQualificationContext(context))
     when(fileScopeNonInheritedTermNameBinder.bind(eqTree(x))).thenReturn(Some(templA))
 
-    inheritedTermNameQualifier.qualify(x) shouldBe None
+    inheritedTermNameQualifier.qualify(x, context) shouldBe None
   }
 
   test("qualify for term that has an enclosing member, but is not inherited from any parent - should return None") {
@@ -93,17 +104,23 @@ class InheritedTermNameQualifierImplTest extends UnitTestSuite {
     val foo = templA.stats.collectFirst {case defnDef: Defn.Def => defnDef}.get
     val x = foo.body.asInstanceOf[Term.Name]
 
+    val context = QualificationContext()
+
     when(innermostEnclosingTemplateInferrer.infer(eqTree(x), eqTo(None))).thenReturn(Some(templA))
-    doReturn(MapView.empty).when(inheritedTermNameOwnersInferrer).infer(eqTree(x))
+    doReturn(ListMap.empty).when(inheritedTermNameOwnersInferrer).infer(eqTree(x), eqQualificationContext(context))
     when(fileScopeNonInheritedTermNameBinder.bind(eqTree(x))).thenReturn(None)
 
-    inheritedTermNameQualifier.qualify(x) shouldBe None
+    inheritedTermNameQualifier.qualify(x, context) shouldBe None
   }
 
-  test("qualify when has no enclosing template should return None") {
+  test("qualify when has no enclosing template and no inherited owners should return None") {
     val termName = q"x"
-    when(innermostEnclosingTemplateInferrer.infer(eqTree(termName), eqTo(None))).thenReturn(None)
 
-    inheritedTermNameQualifier.qualify(termName) shouldBe None
+    val context = QualificationContext()
+
+    when(innermostEnclosingTemplateInferrer.infer(eqTree(termName), eqTo(None))).thenReturn(None)
+    doReturn(ListMap.empty).when(inheritedTermNameOwnersInferrer).infer(eqTree(termName), eqQualificationContext(context))
+
+    inheritedTermNameQualifier.qualify(termName, context) shouldBe None
   }
 }
