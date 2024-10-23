@@ -4,7 +4,7 @@ import io.github.effiban.scala2java.core.matchers.QualificationContextMockitoMat
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import org.mockito.ArgumentMatchersSugar.any
 
-import scala.meta.{Init, Self, Stat, Tree, XtensionQuasiquoteImporter, XtensionQuasiquoteInit, XtensionQuasiquoteSelf, XtensionQuasiquoteTerm}
+import scala.meta.{Init, Self, Stat, Tree, Type, XtensionQuasiquoteImporter, XtensionQuasiquoteInit, XtensionQuasiquoteSelf, XtensionQuasiquoteTemplate, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 class TemplateQualifierImplTest extends UnitTestSuite {
 
@@ -12,31 +12,38 @@ class TemplateQualifierImplTest extends UnitTestSuite {
 
   private val templateQualifier = new TemplateQualifierImpl(treeQualifier)
 
-  test("qualify for a template of a class") {
+  test("qualify when template has all children types and all are qualified") {
 
-    val initialClass =
-      q"""
-      class MyClass extends A with B { c: C =>
+    val initialTemplate =
+      template"""
+      A with B { c: C =>
         val d = dd
         val e = ee
       }
       """
-    val initialTemplate = initialClass.templ
 
-    val expectedFinalClass =
-      q"""
-      class MyClass extends qualA.A with qualB.B { c: qualC.C =>
+    val expectedFinalTemplate =
+      template"""
+      qualA.A with qualB.B { c: qualC.C =>
         val d = qualdd.dd
         val e = qualee.ee
       }
       """
 
-    val expectedFinalTemplate = expectedFinalClass.templ
-
     val importers = List(importer"dummy1.dummy1", importer"dummy2.dummy2")
-    val parentContext = QualificationContext(importers = importers)
 
-    val expectedChildContext = QualificationContext(importers = importers)
+    val parentQualifiedTypeMap = Map[Type, Type](t"X" -> t"qualX.X")
+
+    val childQualifiedTypeMap = Map[Type, Type](
+      t"A" -> t"qualA.A",
+      t"B" -> t"qualB.B",
+      t"C" -> t"qualC.C",
+      t"X" -> t"qualX.X",
+    )
+
+    val parentContext = QualificationContext(importers = importers, qualifiedTypeMap = parentQualifiedTypeMap)
+
+    val expectedChildContext = QualificationContext(importers = importers, qualifiedTypeMap = childQualifiedTypeMap)
 
     doAnswer((tree: Tree, context: QualificationContext) => {
       val parentContextMatches = new QualificationContextMockitoMatcher(parentContext).matches(context)
@@ -54,128 +61,104 @@ class TemplateQualifierImplTest extends UnitTestSuite {
 
     val actualFinalTemplate = templateQualifier.qualify(initialTemplate, parentContext)
     actualFinalTemplate.structure shouldBe expectedFinalTemplate.structure
-    actualFinalTemplate.parent.value.structure shouldBe expectedFinalClass.structure
   }
 
-  test("qualify for a template of a trait") {
+  test("qualify when template has all children types and only inits and self are qualified") {
 
-    val initialTrait =
-      q"""
-      trait MyTrait extends A { c: C =>
+    val initialTemplate =
+      template"""
+      A with B { c: C =>
         val d = dd
-      }
-      """
-    val initialTemplate = initialTrait.templ
-
-    val expectedFinalTrait =
-      q"""
-      trait MyTrait extends qualA.A { c: qualC.C =>
-        val d = qualdd.dd
+        val e = ee
       }
       """
 
-    val expectedFinalTemplate = expectedFinalTrait.templ
+    val expectedFinalTemplate =
+      template"""
+      qualA.A with qualB.B { c: qualC.C =>
+        val d = dd
+        val e = ee
+      }
+      """
 
     val importers = List(importer"dummy1.dummy1", importer"dummy2.dummy2")
-    val parentContext = QualificationContext(importers = importers)
 
-    val expectedChildContext = QualificationContext(importers = importers)
+    val parentQualifiedTypeMap = Map[Type, Type](t"X" -> t"qualX.X")
+
+    val parentContext = QualificationContext(importers = importers, qualifiedTypeMap = parentQualifiedTypeMap)
 
     doAnswer((tree: Tree, context: QualificationContext) => {
       val parentContextMatches = new QualificationContextMockitoMatcher(parentContext).matches(context)
-      val childContextMatches = new QualificationContextMockitoMatcher(expectedChildContext).matches(context)
 
       tree match {
         case init: Init if init.structure == init"A".structure && parentContextMatches => init"qualA.A"
+        case init: Init if init.structure == init"B".structure && parentContextMatches => init"qualB.B"
         case self: Self if self.structure == self"c: C".structure && parentContextMatches => self"c: qualC.C"
-        case stat: Stat if stat.structure == q"val d = dd".structure && childContextMatches => q"val d = qualdd.dd"
         case aTree => aTree
       }
     }).when(treeQualifier).qualify(any[Tree], any[QualificationContext])
 
     val actualFinalTemplate = templateQualifier.qualify(initialTemplate, parentContext)
     actualFinalTemplate.structure shouldBe expectedFinalTemplate.structure
-    actualFinalTemplate.parent.value.structure shouldBe expectedFinalTrait.structure
   }
 
-  test("qualify for a template of an object") {
+  test("qualify when template has inits and self only, and only inits are qualified") {
 
-    val initialObject =
-      q"""
-      object MyObject extends A { c: C =>
-        val d = dd
-      }
-      """
-    val initialTemplate = initialObject.templ
-
-    val expectedFinalObject =
-      q"""
-      object MyObject extends qualA.A { c: qualC.C =>
-        val d = qualdd.dd
+    val initialTemplate =
+      template"""
+      A with B { c: C =>
       }
       """
 
-    val expectedFinalTemplate = expectedFinalObject.templ
+    val expectedFinalTemplate =
+      template"""
+      qualA.A with qualB.B { c: C =>
+      }
+      """
 
     val importers = List(importer"dummy1.dummy1", importer"dummy2.dummy2")
-    val parentContext = QualificationContext(importers = importers)
 
-    val expectedChildContext = QualificationContext(importers = importers)
+    val parentQualifiedTypeMap = Map[Type, Type](t"X" -> t"qualX.X")
+
+    val parentContext = QualificationContext(importers = importers, qualifiedTypeMap = parentQualifiedTypeMap)
 
     doAnswer((tree: Tree, context: QualificationContext) => {
       val parentContextMatches = new QualificationContextMockitoMatcher(parentContext).matches(context)
-      val childContextMatches = new QualificationContextMockitoMatcher(expectedChildContext).matches(context)
 
       tree match {
         case init: Init if init.structure == init"A".structure && parentContextMatches => init"qualA.A"
-        case self: Self if self.structure == self"c: C".structure && parentContextMatches => self"c: qualC.C"
-        case stat: Stat if stat.structure == q"val d = dd".structure && childContextMatches => q"val d = qualdd.dd"
+        case init: Init if init.structure == init"B".structure && parentContextMatches => init"qualB.B"
         case aTree => aTree
       }
     }).when(treeQualifier).qualify(any[Tree], any[QualificationContext])
 
     val actualFinalTemplate = templateQualifier.qualify(initialTemplate, parentContext)
     actualFinalTemplate.structure shouldBe expectedFinalTemplate.structure
-    actualFinalTemplate.parent.value.structure shouldBe expectedFinalObject.structure
   }
 
-  test("qualify for a template of a NewAnonymous") {
+  test("qualify when template has inits only, and only some are qualified") {
 
-    val initialNewAnonymous =
-      q"""
-      new A {
-        val d = dd
-      }
-      """
-    val initialTemplate = initialNewAnonymous.templ
+    val initialTemplate = template"A with B with C"
 
-    val expectedFinalNewAnonymous =
-      q"""
-      new qualA.A {
-        val d = qualdd.dd
-      }
-      """
-
-    val expectedFinalTemplate = expectedFinalNewAnonymous.templ
+    val expectedFinalTemplate = template"qualA.A with qualB.B with C"
 
     val importers = List(importer"dummy1.dummy1", importer"dummy2.dummy2")
-    val parentContext = QualificationContext(importers = importers)
 
-    val expectedChildContext = QualificationContext(importers = importers)
+    val parentQualifiedTypeMap = Map[Type, Type](t"X" -> t"qualX.X")
+
+    val parentContext = QualificationContext(importers = importers, qualifiedTypeMap = parentQualifiedTypeMap)
 
     doAnswer((tree: Tree, context: QualificationContext) => {
       val parentContextMatches = new QualificationContextMockitoMatcher(parentContext).matches(context)
-      val childContextMatches = new QualificationContextMockitoMatcher(expectedChildContext).matches(context)
 
       tree match {
         case init: Init if init.structure == init"A".structure && parentContextMatches => init"qualA.A"
-        case stat: Stat if stat.structure == q"val d = dd".structure && childContextMatches => q"val d = qualdd.dd"
+        case init: Init if init.structure == init"B".structure && parentContextMatches => init"qualB.B"
         case aTree => aTree
       }
     }).when(treeQualifier).qualify(any[Tree], any[QualificationContext])
 
     val actualFinalTemplate = templateQualifier.qualify(initialTemplate, parentContext)
     actualFinalTemplate.structure shouldBe expectedFinalTemplate.structure
-    actualFinalTemplate.parent.value.structure shouldBe expectedFinalNewAnonymous.structure
   }
 }

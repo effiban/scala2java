@@ -1,12 +1,13 @@
 package io.github.effiban.scala2java.core.qualifiers
 
+import io.github.effiban.scala2java.core.matchers.QualificationContextMockitoMatcher.eqQualificationContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 import org.mockito.ArgumentMatchersSugar.eqTo
 import org.mockito.Mockito.verifyNoInteractions
 
-import scala.meta.{Term, XtensionQuasiquoteImporter, XtensionQuasiquoteTerm, XtensionQuasiquoteTermParam}
+import scala.meta.{Term, Type, XtensionQuasiquoteImporter, XtensionQuasiquoteTerm, XtensionQuasiquoteTermParam, XtensionQuasiquoteType}
 
 class CompositeTermNameQualifierImplTest extends UnitTestSuite {
   private val inheritedTermNameQualifier = mock[InheritedTermNameQualifier]
@@ -18,6 +19,10 @@ class CompositeTermNameQualifierImplTest extends UnitTestSuite {
     importedTermNameQualifier,
     coreTermNameQualifier)
 
+  private val qualifiedTypeMap = Map[Type, Type](
+    t"Parent1" -> t"qual1.Parent1",
+    t"Parent2" -> t"qual1.Parent1"
+  )
 
   test("qualify when qualified by importers should return qualified term") {
     val importer1 = importer"a.{B, C}"
@@ -27,11 +32,13 @@ class CompositeTermNameQualifierImplTest extends UnitTestSuite {
     val termName = q"F"
     val expectedQualifiedTerm = q"d.F"
 
-    doReturn(None).when(inheritedTermNameQualifier).qualify(eqTree(termName))
+    val context = QualificationContext(importers = importers, qualifiedTypeMap = qualifiedTypeMap)
+
+    doReturn(None).when(inheritedTermNameQualifier).qualify(eqTree(termName), eqQualificationContext(context))
     doReturn(Some(expectedQualifiedTerm))
       .when(importedTermNameQualifier).qualify(eqTree(termName), eqTreeList(importers))
 
-    compositeTermNameQualifier.qualify(termName, QualificationContext(importers)).structure shouldBe expectedQualifiedTerm.structure
+    compositeTermNameQualifier.qualify(termName, context).structure shouldBe expectedQualifiedTerm.structure
   }
 
   test("qualify when qualified by core qualifier should return qualified term") {
@@ -42,11 +49,13 @@ class CompositeTermNameQualifierImplTest extends UnitTestSuite {
     val termName = q"Int"
     val expectedQualifiedTerm = q"scala.Int"
 
-    doReturn(None).when(inheritedTermNameQualifier).qualify(eqTree(termName))
+    val context = QualificationContext(importers = importers, qualifiedTypeMap = qualifiedTypeMap)
+
+    doReturn(None).when(inheritedTermNameQualifier).qualify(eqTree(termName), eqQualificationContext(context))
     doReturn(None).when(importedTermNameQualifier).qualify(eqTree(termName), eqTo(importers))
     doReturn(Some(expectedQualifiedTerm)).when(coreTermNameQualifier).qualify(eqTree(termName))
 
-    compositeTermNameQualifier.qualify(termName, QualificationContext(importers)).structure shouldBe expectedQualifiedTerm.structure
+    compositeTermNameQualifier.qualify(termName, context).structure shouldBe expectedQualifiedTerm.structure
   }
 
   test("qualify when not qualified by any qualifier - should return unchanged") {
@@ -56,11 +65,13 @@ class CompositeTermNameQualifierImplTest extends UnitTestSuite {
 
     val termName = q"Foo"
 
-    doReturn(None).when(inheritedTermNameQualifier).qualify(eqTree(termName))
+    val context = QualificationContext(importers = importers, qualifiedTypeMap = qualifiedTypeMap)
+
+    doReturn(None).when(inheritedTermNameQualifier).qualify(eqTree(termName), eqQualificationContext(context))
     doReturn(None).when(importedTermNameQualifier).qualify(eqTree(termName), eqTo(importers))
     doReturn(None).when(coreTermNameQualifier).qualify(eqTree(termName))
 
-    compositeTermNameQualifier.qualify(termName, QualificationContext(importers)).structure shouldBe termName.structure
+    compositeTermNameQualifier.qualify(termName, context).structure shouldBe termName.structure
   }
 
   test("qualify when Term.Name has a parent Object should return the name") {
@@ -72,7 +83,9 @@ class CompositeTermNameQualifierImplTest extends UnitTestSuite {
 
     val importers = List(importer"a.A")
 
-    compositeTermNameQualifier.qualify(anObject.name, QualificationContext(importers)).structure shouldBe anObject.name.structure
+    val context = QualificationContext(importers = importers, qualifiedTypeMap = qualifiedTypeMap)
+
+    compositeTermNameQualifier.qualify(anObject.name, context).structure shouldBe anObject.name.structure
   }
 
   test("qualify when Term.Name has a parent Object should not invoke inherited qualifier") {
@@ -116,7 +129,9 @@ class CompositeTermNameQualifierImplTest extends UnitTestSuite {
 
     val importers = List(importer"a.foo")
 
-    compositeTermNameQualifier.qualify(declDef.name, QualificationContext(importers)).structure shouldBe declDef.name.structure
+    val context = QualificationContext(importers = importers, qualifiedTypeMap = qualifiedTypeMap)
+
+    compositeTermNameQualifier.qualify(declDef.name, context).structure shouldBe declDef.name.structure
   }
 
   test("qualify when Term.Name has a parent Decl.Def should not invoke inherited qualifier") {
@@ -148,7 +163,9 @@ class CompositeTermNameQualifierImplTest extends UnitTestSuite {
 
     val importers = List(importer"x.X")
 
-    compositeTermNameQualifier.qualify(termParam.name.asInstanceOf[Term.Name], QualificationContext(importers)).structure shouldBe
+    val context = QualificationContext(importers = importers, qualifiedTypeMap = qualifiedTypeMap)
+
+    compositeTermNameQualifier.qualify(termParam.name.asInstanceOf[Term.Name], context).structure shouldBe
       termParam.name.structure
   }
 

@@ -1,15 +1,14 @@
 package io.github.effiban.scala2java.core.qualifiers
 
 import io.github.effiban.scala2java.core.binders.FileScopeNonInheritedTermNameBinder
-import io.github.effiban.scala2java.core.entities.TreeKeyedMap
 import io.github.effiban.scala2java.core.extractors.TreeNameExtractor
 import io.github.effiban.scala2java.core.typeinference.{InheritedTermNameOwnersInferrer, InnermostEnclosingTemplateInferrer}
 
-import scala.meta.{Name, Term, XtensionQuasiquoteTerm}
+import scala.meta.Term
 
 trait InheritedTermNameQualifier {
 
-  def qualify(termName: Term.Name): Option[Term]
+  def qualify(termName: Term.Name, context: QualificationContext): Option[Term]
 }
 
 private[qualifiers] class InheritedTermNameQualifierImpl(innermostEnclosingTemplateInferrer: InnermostEnclosingTemplateInferrer,
@@ -17,19 +16,20 @@ private[qualifiers] class InheritedTermNameQualifierImpl(innermostEnclosingTempl
                                                          fileScopeNonInheritedTermNameBinder: FileScopeNonInheritedTermNameBinder)
   extends InheritedTermNameQualifier {
 
-  override def qualify(termName: Term.Name): Option[Term] = {
+  override def qualify(termName: Term.Name, context: QualificationContext): Option[Term] = {
     val maybeEnclosingTemplate = innermostEnclosingTemplateInferrer.infer(termName)
 
     val maybeThisp = maybeEnclosingTemplate
       .flatMap(_.parent)
       .map(TreeNameExtractor.extract)
 
-    val maybeSuperp = maybeEnclosingTemplate.flatMap(enclosingTemplate => {
-      val inheritedTermNameOwners = inheritedTermNameOwnersInferrer.infer(termName)
-      TreeKeyedMap.get(inheritedTermNameOwners, enclosingTemplate).getOrElse(Nil)
-        .headOption
-        .map(TreeNameExtractor.extract)
-    })
+    val inheritedTermNameOwners = inheritedTermNameOwnersInferrer.infer(termName, context)
+    val maybeSuperp = inheritedTermNameOwners
+      .values
+      .flatten
+      .headOption
+      .map(TreeNameExtractor.extract)
+
     // TODO remove once we handle qualification of file-scope terms properly
     val maybeFileScopeTermNameDecl = fileScopeNonInheritedTermNameBinder.bind(termName)
 
