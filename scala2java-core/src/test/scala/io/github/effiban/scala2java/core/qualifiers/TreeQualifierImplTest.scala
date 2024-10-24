@@ -11,6 +11,7 @@ import scala.meta.{Template, Term, Type, XtensionQuasiquoteImporter, XtensionQua
 
 class TreeQualifierImplTest extends UnitTestSuite {
 
+  private val termApplyInfixQualifier = mock[TermApplyInfixQualifier]
   private val superSelectQualifier = mock[SuperSelectQualifier]
   private val termNameQualifier = mock[CompositeTermNameQualifier]
   private val typeNameQualifier = mock[CompositeTypeNameQualifier]
@@ -19,11 +20,44 @@ class TreeQualifierImplTest extends UnitTestSuite {
   private val qualificationContext = QualificationContext(List(importer"dummy.dummy"))
 
   private val treeQualifier = new TreeQualifierImpl(
+    termApplyInfixQualifier,
     superSelectQualifier,
     termNameQualifier,
     typeNameQualifier,
     templateQualifier
   )
+
+  test("qualify when has a nested Term.ApplyInfix, should qualify it with the dedicated qualifier only") {
+    val initialTree =
+      q"""
+      def foo() = {
+        val x = a plus b
+      }
+      """
+
+    val initialTermApplyInfix = initialTree.collect { case termApplyInfix: Term.ApplyInfix => termApplyInfix }.head
+
+    val expectedFinalTree =
+      q"""
+      def foo() = {
+        val x = quala.a plus qualb.b
+      }
+      """
+
+    val expectedFinalTermApplyInfix = expectedFinalTree.collect { case termApplyInfix: Term.ApplyInfix => termApplyInfix }.head
+
+    when(termApplyInfixQualifier.qualify(eqTree(initialTermApplyInfix), eqQualificationContext(qualificationContext)))
+      .thenReturn(expectedFinalTermApplyInfix)
+
+    doAnswer((termName: Term.Name) => termName)
+      .when(termNameQualifier).qualify(any[Term.Name], eqQualificationContext(qualificationContext))
+
+    treeQualifier.qualify(initialTree, qualificationContext).structure shouldBe expectedFinalTree.structure
+
+    verify(termNameQualifier, never).qualify(eqTree(q"a"), eqQualificationContext(qualificationContext))
+    verify(termNameQualifier, never).qualify(eqTree(q"plus"), eqQualificationContext(qualificationContext))
+    verify(termNameQualifier, never).qualify(eqTree(q"b"), eqQualificationContext(qualificationContext))
+  }
 
   test("qualify when has nested Term.Names but TermNameQualifier returns unchanged, should return unchanged") {
     val tree =
