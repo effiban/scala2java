@@ -8,11 +8,10 @@ import io.github.effiban.scala2java.spi.Scala2JavaExtension
  */
 trait ExtendedTransformers {
 
-  /** Override this method if you need to produce an output Java file with a different name than the input Scala file.
-   *
-   * @return if overriden - a transformer which changes the file name<br>
-   *         otherwise - the default which leaves the name unchanged<br>
+  /**
+   * @deprecated this is now ignored and will be removed in the next major version
    */
+  @deprecated
   def fileNameTransformer(): FileNameTransformer = FileNameTransformer.Identity
 
   /** Override this method if you need to transform a [[scala.meta.Defn.Class]].<br>
