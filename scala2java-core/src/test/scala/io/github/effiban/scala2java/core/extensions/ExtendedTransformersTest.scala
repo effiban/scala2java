@@ -10,19 +10,6 @@ class ExtendedTransformersTest extends UnitTestSuite {
   private val extension2 = mock[Scala2JavaExtension]
   private val extensions = List(extension1, extension2)
 
-  test("fileNameTransformers") {
-    val fileNameTransformer1 = mock[FileNameTransformer]
-    val fileNameTransformer2 = mock[FileNameTransformer]
-    val fileNameTransformers = List(fileNameTransformer1, fileNameTransformer2)
-
-    when(extension1.fileNameTransformer()).thenReturn(fileNameTransformer1)
-    when(extension2.fileNameTransformer()).thenReturn(fileNameTransformer2)
-
-    val extensionRegistry = ExtensionRegistry(extensions)
-
-    extensionRegistry.fileNameTransformers shouldBe fileNameTransformers
-  }
-
   test("classTransformers") {
     val classTransformer1 = mock[ClassTransformer]
     val classTransformer2 = mock[ClassTransformer]
