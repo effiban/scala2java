@@ -186,7 +186,7 @@ trait IntegrationTestRunner
 
   private def toPathPair(paths: List[Path]): Option[PathPair] = {
     val pathMap = paths.map(path => (extractFileExtension(path), path)).toMap
-    if (pathMap.keys.toSet == Set(FileExtensions.Scala, JavaTestExtension)) {
+    if (Set(FileExtensions.Scala, JavaTestExtension).subsetOf(pathMap.keySet)) {
       Some(PathPair(scalaPath = pathMap(FileExtensions.Scala), javaPath = pathMap(JavaTestExtension)))
     } else {
       None
