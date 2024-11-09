@@ -44,6 +44,7 @@ class TreeTransformerImplTest extends UnitTestSuite {
   private val internalTermApplyTransformer = mock[InternalTermApplyTransformer]
   private val internalTermSelectTransformer = mock[InternalTermSelectTransformer]
   private val termTupleToTermApplyTransformer = mock[TermTupleToTermApplyTransformer]
+  private val termSuperTransformer = mock[TermSuperTransformer]
   private val functionTypeTransformer = mock[FunctionTypeTransformer]
   private val typeSelectTransformer = mock[TypeSelectTransformer]
   private val typeTupleToTypeApplyTransformer = mock[TypeTupleToTypeApplyTransformer]
@@ -55,6 +56,7 @@ class TreeTransformerImplTest extends UnitTestSuite {
     internalTermApplyTransformer,
     internalTermSelectTransformer,
     termTupleToTermApplyTransformer,
+    termSuperTransformer,
     functionTypeTransformer,
     typeSelectTransformer,
     typeTupleToTypeApplyTransformer
