@@ -4,12 +4,12 @@ import io.github.effiban.scala2java.spi.predicates.TemplateInitExcludedPredicate
 
 import scala.meta.Template
 
-trait TemplateCleanup {
+trait TemplateInitCleanup {
 
   def cleanup(template: Template): Template
 }
 
-private[cleanup] class TemplateCleanupImpl(templateInitExcludedPredicate: TemplateInitExcludedPredicate) extends TemplateCleanup {
+private[cleanup] class TemplateInitCleanupImpl(templateInitExcludedPredicate: TemplateInitExcludedPredicate) extends TemplateInitCleanup {
 
   override def cleanup(template: Template): Template = {
     template.copy(inits = template.inits.filterNot(templateInitExcludedPredicate))

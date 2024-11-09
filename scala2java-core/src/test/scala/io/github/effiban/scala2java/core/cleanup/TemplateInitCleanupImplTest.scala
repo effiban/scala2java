@@ -6,11 +6,11 @@ import org.mockito.ArgumentMatchersSugar.any
 
 import scala.meta.{Init, XtensionQuasiquoteInit, XtensionQuasiquoteTemplate}
 
-class TemplateCleanupImplTest extends UnitTestSuite {
+class TemplateInitCleanupImplTest extends UnitTestSuite {
 
   private val templateInitExcludedPredicate = mock[TemplateInitExcludedPredicate]
 
-  private val templateCleanup = new TemplateCleanupImpl(templateInitExcludedPredicate)
+  private val templateInitCleanup = new TemplateInitCleanupImpl(templateInitExcludedPredicate)
 
   test("cleanup when none of the inits is excluded") {
     val template =
@@ -22,7 +22,7 @@ class TemplateCleanupImplTest extends UnitTestSuite {
 
     when(templateInitExcludedPredicate(any[Init])).thenReturn(false)
 
-    templateCleanup.cleanup(template).structure shouldBe template.structure
+    templateInitCleanup.cleanup(template).structure shouldBe template.structure
   }
 
   test("cleanup when some of the inits are excluded") {
@@ -45,6 +45,6 @@ class TemplateCleanupImplTest extends UnitTestSuite {
       case _ => false
     }).when(templateInitExcludedPredicate)(any[Init])
 
-    templateCleanup.cleanup(initialTemplate).structure shouldBe finalTemplate.structure
+    templateInitCleanup.cleanup(initialTemplate).structure shouldBe finalTemplate.structure
   }
 }
