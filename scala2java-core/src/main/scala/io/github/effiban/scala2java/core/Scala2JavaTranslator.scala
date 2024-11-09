@@ -38,7 +38,6 @@ object Scala2JavaTranslator {
     implicit val predicates: Predicates = new Predicates()
     implicit lazy val factories: Factories = new Factories(typeInferrers)
     implicit lazy val typeInferrers: TypeInferrers = new TypeInferrers(factories, predicates)
-    implicit val cleanups: Cleanups = new Cleanups()
 
     val flowRunner: Source => Unit =
       Function.chain[Source](
@@ -49,10 +48,10 @@ object Scala2JavaTranslator {
             new SemanticDesugarers().sourceDesugarer.desugar,
             new ScalaTreeTraversers().sourceTraverser.traverse,
             new Transformers().sourceTransformer.transform,
-            cleanups.sourceInitCleanup.cleanup,
+            new Cleanups().sourceInitCleanup.cleanup,
             SourceImportAdder.addTo,
             SourceUnqualifier.unqualify,
-            cleanups.sourceCleanup.cleanup
+            SourceImportRemover.removeJavaLangFrom
           )
         ).andThen(Enrichers.sourceEnricher.enrich)
         .andThen(enrichedSource => renderJava(enrichedSource, scalaPath, maybeOutputJavaBasePath))
