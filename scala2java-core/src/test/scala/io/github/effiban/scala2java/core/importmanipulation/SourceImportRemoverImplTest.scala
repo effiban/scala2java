@@ -86,4 +86,53 @@ class SourceImportRemoverImplTest extends UnitTestSuite {
     sourceImportRemover.removeUnusedFrom(initialSource).structure shouldBe expectedFinalSource.structure
   }
 
+  test("removeJavaLangFrom() when has no packages should return unchanged") {
+    val source = Source(List(q"val x: Int = 3"))
+
+    sourceImportRemover.removeJavaLangFrom(source).structure shouldBe source.structure
+  }
+
+  test("removeJavaLangFrom() when has packages should return a Source with the packages with removed imports") {
+    val initialSource =
+      source"""
+      package pkg1 {
+        import java.lang.String
+        import java.lang.IllegalArgumentException
+        import a.A
+        import b.B
+      }
+      package pkg2 {
+        import java.lang.Long
+        import java.lang.IllegalStateException
+        import c.C
+        import d.D
+      }
+      """
+
+    val initialPkg1 = initialSource.stats.head.asInstanceOf[Pkg]
+    val initialPkg2 = initialSource.stats(1).asInstanceOf[Pkg]
+
+    val expectedFinalSource =
+      source"""
+      package pkg1 {
+        import a.A
+        import b.B
+      }
+      package pkg2 {
+        import c.C
+        import d.D
+      }
+      """
+
+    val expectedFinalPkg1 = expectedFinalSource.stats.head.asInstanceOf[Pkg]
+    val expectedFinalPkg2 = expectedFinalSource.stats(1).asInstanceOf[Pkg]
+
+    doAnswer((pkg: Pkg) => pkg match {
+      case aPkg if aPkg.structure == initialPkg1.structure => expectedFinalPkg1
+      case aPkg if aPkg.structure == initialPkg2.structure => expectedFinalPkg2
+      case aPkg => throw new IllegalStateException(s"No final Pkg has been stubbed for initial Pkg $aPkg")
+    }).when(pkgImportRemover).removeJavaLangFrom(any[Pkg])
+
+    sourceImportRemover.removeJavaLangFrom(initialSource).structure shouldBe expectedFinalSource.structure
+  }
 }
