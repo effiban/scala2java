@@ -8,9 +8,13 @@ class Cleanups(implicit extensionRegistry: ExtensionRegistry) {
 
   val sourceCleanup: SourceCleanup = new SourceCleanupImpl(treeCleanup)
 
-  private lazy val templateCleanup = new TemplateCleanupImpl(
+  private lazy val treeCleanup: TreeCleanup = new TreeCleanupImpl(PkgImportRemover)
+
+  val sourceInitCleanup: SourceInitCleanup = new SourceInitCleanupImpl(treeInitCleanup)
+
+  private lazy val templateInitCleanup = new TemplateInitCleanupImpl(
     new CompositeTemplateInitExcludedPredicate(CoreTemplateInitExcludedPredicate)
   )
 
-  private lazy val treeCleanup: TreeCleanup = new TreeCleanupImpl(PkgImportRemover, templateCleanup)
+  private lazy val treeInitCleanup: TreeInitCleanup = new TreeInitCleanupImpl(templateInitCleanup)
 }
