@@ -8,6 +8,8 @@ import scala.reflect.runtime.universe._
 
 object ScalaReflectionUtils {
 
+  private val TrivialBaseClassNames = List("Object", "Any", "AnyRef")
+
   def classSymbolOf(tpe: Type): Option[ClassSymbol] = tpe match {
     case Type.Apply(typeSelect: Type.Select, _) => classSymbolOf(typeSelect)
     case typeSelect: Type.Select => classSymbolOf(typeSelect)
@@ -64,10 +66,33 @@ object ScalaReflectionUtils {
     }
   }
 
+  def typeExistsAndIsEmpty(typeRef: Type.Ref): Boolean = {
+    classSymbolOf(typeRef) match {
+      case None => false
+      case Some(cls) => hasTrivialDeclarationsOnly(cls) && hasTrivialBaseClassesOnly(cls)
+    }
+  }
+
+  private def hasTrivialDeclarationsOnly(cls: ClassSymbol) = {
+    cls.info.decls.forall {
+      case m: MethodSymbol => m.isConstructor && m.paramLists.flatten.isEmpty
+      case _ => false
+    }
+  }
+
+  private def hasTrivialBaseClassesOnly(cls: ClassSymbol) = {
+    val baseClassesExcludingSelf = cls.baseClasses
+      .slice(1, cls.baseClasses.size)
+      .map(_.name)
+      .map(_.toString)
+
+    baseClassesExcludingSelf.forall(TrivialBaseClassNames.contains)
+  }
+
   @tailrec
   private def symbolOf(symbol: Symbol, memberPath: List[Member]): Option[Symbol] = {
     (symbol, memberPath) match {
-      case (symbol: Symbol, (classOrTrait@(_ : Defn.Class | _: Defn.Trait)) :: members) =>
+      case (symbol: Symbol, (classOrTrait@(_: Defn.Class | _: Defn.Trait)) :: members) =>
         symbol.typeSignature.decl(TypeName(classOrTrait.name.value)) match {
           case NoSymbol => None
           case aSymbol => symbolOf(aSymbol, members)
@@ -94,9 +119,17 @@ object ScalaReflectionUtils {
       .flatMap(asClassSymbol)
   }
 
-  private def innerClassSymbolOf(outerType: Type, innerName: Type.Name) = {
+  private def innerClassSymbolOf(outerType: Type, innerName: Type.Name): Option[ClassSymbol] = {
+    val innerTypeName = TypeName(innerName.value)
     classSymbolOf(outerType)
-      .flatMap(outerClassSymbol => asClassSymbol(outerClassSymbol.companion.info.decl(TypeName(innerName.value))))
+      .flatMap(outerClassSymbol => asClassSymbol(innerClassSymbolOf(outerClassSymbol, innerTypeName)))
+  }
+
+  private def innerClassSymbolOf(outerClassSymbol: ClassSymbol, innerTypeName: TypeName): Symbol = {
+    outerClassSymbol.info.decl(innerTypeName) match {
+      case NoSymbol => outerClassSymbol.companion.info.decl(innerTypeName)
+      case symbol => symbol
+    }
   }
 
   private def asClassSymbol(symbol: Symbol): Option[ClassSymbol] = {

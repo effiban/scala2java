@@ -15,10 +15,16 @@ class ScalaReflectionUtilsTest extends UnitTestSuite {
     classSymbolOf(tpe).value.fullName shouldBe "scala.collection.immutable.List"
   }
 
-  test("classSymbolOf(Type.Project) for an existing inner class should return the corresponding symbol") {
+  test("classSymbolOf(Type.Project) for an existing inner class of an object should return the corresponding symbol") {
     val tpe = t"scala.collection.immutable.ArraySeq#ofRef"
 
     classSymbolOf(tpe).value.fullName shouldBe "scala.collection.immutable.ArraySeq.ofRef"
+  }
+
+  test("classSymbolOf(Type.Project) for an existing inner class of a trait should return the corresponding symbol") {
+    val tpe = t"scala.collection.Iterator#GroupedIterator"
+
+    classSymbolOf(tpe).value.fullName shouldBe "scala.collection.Iterator.GroupedIterator"
   }
 
   test("classSymbolOf(Type.Apply(Type.Select)) for an existing top-level class should return the corresponding symbol") {
@@ -149,5 +155,43 @@ class ScalaReflectionUtilsTest extends UnitTestSuite {
 
   test("isTypeMemberOf() when false") {
     isTypeMemberOf(RuntimeMirror.staticPackage("scala.collection.immutable"), Type.Name("bla")) shouldBe false
+  }
+
+  test("typeExistsAndIsEmpty() for a type which exists and is empty, should return true") {
+    typeExistsAndIsEmpty(t"io.github.effiban.scala2java.core.reflection.ScalaReflectionUtilsTest#EmptyTrait") shouldBe true
+  }
+
+  test("typeExistsAndIsEmpty() for a type which has a non-trivial parent and nothing else, should return false") {
+    typeExistsAndIsEmpty(t"io.github.effiban.scala2java.core.reflection.ScalaReflectionUtilsTest#ClassWithNonTrivialParentOnly") shouldBe false
+  }
+
+  test("typeExistsAndIsEmpty() for a type which has a non-default constructor and nothing else, should return false") {
+    typeExistsAndIsEmpty(t"io.github.effiban.scala2java.core.reflection.ScalaReflectionUtilsTest#ClassWithNonDefaultCtorOnly") shouldBe false
+  }
+
+  test("typeExistsAndIsEmpty() for a type which has no parents and default ctor. but has data members, should return false") {
+    typeExistsAndIsEmpty(t"io.github.effiban.scala2java.core.reflection.ScalaReflectionUtilsTest#ClassWithDataMembersOnly") shouldBe false
+  }
+
+  test("typeExistsAndIsEmpty() for a type which has no parents and default ctor. but has methods, should return false") {
+    typeExistsAndIsEmpty(t"io.github.effiban.scala2java.core.reflection.ScalaReflectionUtilsTest#ClassWithMethodsOnly") shouldBe false
+  }
+
+  test("typeExistsAndIsEmpty() for a type which has a constructor and members, should return false") {
+    typeExistsAndIsEmpty(t"scala.concurrent.duration.FiniteDuration") shouldBe false
+  }
+
+  trait EmptyTrait
+
+  class ClassWithNonTrivialParentOnly extends EmptyTrait
+
+  class ClassWithNonDefaultCtorOnly(x: Int)
+
+  class ClassWithDataMembersOnly {
+    val x: Int = 3
+  }
+
+  class ClassWithMethodsOnly {
+    def foo(x: Int): Int = x + 1
   }
 }
