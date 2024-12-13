@@ -8,7 +8,14 @@ import scala.reflect.runtime.universe._
 
 object ScalaReflectionUtils {
 
-  private val TrivialBaseClassNames = List("Object", "Any", "AnyRef")
+  private val TrivialClassFullNames =
+    Set(
+      "java.lang.Object",
+      "java.io.Serializable",
+      "scala.Any",
+      "scala.AnyRef",
+      "scala.AnyVal"
+  )
 
   def classSymbolOf(tpe: Type): Option[ClassSymbol] = tpe match {
     case Type.Apply(typeSelect: Type.Select, _) => classSymbolOf(typeSelect)
@@ -66,11 +73,17 @@ object ScalaReflectionUtils {
     }
   }
 
-  def typeExistsAndIsEmpty(typeRef: Type.Ref): Boolean = {
+  def isNonTrivialEmptyType(typeRef: Type.Ref): Boolean = {
     classSymbolOf(typeRef) match {
       case None => false
-      case Some(cls) => hasTrivialDeclarationsOnly(cls) && hasTrivialBaseClassesOnly(cls)
+      case Some(cls) => isNonTrivialEmptyClass(cls)
     }
+  }
+
+  private def isNonTrivialEmptyClass(cls: ClassSymbol) = {
+    isNonTrivialClassFullName(cls.fullName) &&
+      hasTrivialDeclarationsOnly(cls) &&
+      hasTrivialBaseClassesOnly(cls)
   }
 
   private def hasTrivialDeclarationsOnly(cls: ClassSymbol) = {
@@ -83,10 +96,9 @@ object ScalaReflectionUtils {
   private def hasTrivialBaseClassesOnly(cls: ClassSymbol) = {
     val baseClassesExcludingSelf = cls.baseClasses
       .slice(1, cls.baseClasses.size)
-      .map(_.name)
-      .map(_.toString)
+      .map(_.fullName)
 
-    baseClassesExcludingSelf.forall(TrivialBaseClassNames.contains)
+    baseClassesExcludingSelf.forall(isTrivialClassFullName)
   }
 
   @tailrec
@@ -146,4 +158,9 @@ object ScalaReflectionUtils {
   private def resultTypeOf(aTypeMember: TypeSymbol) = {
     aTypeMember.typeSignature.resultType.typeSymbol
   }
+
+  private def isNonTrivialClassFullName(name: String) = !isTrivialClassFullName(name)
+
+
+  private def isTrivialClassFullName(name: String) = TrivialClassFullNames.contains(name)
 }

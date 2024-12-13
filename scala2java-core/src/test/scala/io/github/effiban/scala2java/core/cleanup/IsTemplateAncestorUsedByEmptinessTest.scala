@@ -29,6 +29,17 @@ class IsTemplateAncestorUsedByEmptinessTest extends UnitTestSuite {
     apply(cls.templ, t"io.github.effiban.scala2java.core.cleanup.IsTemplateAncestorUsedByEmptinessTest#EmptyTrait") shouldBe true
   }
 
+  test("apply for class extending java.io.Serializable should return false") {
+    val cls =
+      q"""
+      class A extends java.io.Serializable {
+        val x = 3
+      }
+      """
+
+    apply(cls.templ, t"java.io.Serializable") shouldBe false
+  }
+
   test("apply for class extending non-empty class should return false") {
     val cls =
       q"""
