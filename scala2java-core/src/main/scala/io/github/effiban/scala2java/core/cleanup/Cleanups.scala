@@ -1,15 +1,17 @@
 package io.github.effiban.scala2java.core.cleanup
 
-import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
-import io.github.effiban.scala2java.core.predicates.{CompositeTemplateInitExcludedPredicate, CoreTemplateInitExcludedPredicate}
+import io.github.effiban.scala2java.core.collectors.TemplateAncestorsCollector
 
-class Cleanups(implicit extensionRegistry: ExtensionRegistry) {
+object Cleanups {
 
   val sourceInitCleanup: SourceInitCleanup = new SourceInitCleanupImpl(treeInitCleanup)
 
-  private lazy val templateInitCleanup = new TemplateInitCleanupImpl(
-    new CompositeTemplateInitExcludedPredicate(CoreTemplateInitExcludedPredicate)
+  private val templateDirectParentsUsedResolver = new TemplateParentsUsedResolverImpl(
+    TemplateAncestorsCollector,
+    CompositeIsTemplateAncestorUsed
   )
+
+  private val templateInitCleanup = new TemplateInitCleanupImpl(templateDirectParentsUsedResolver)
 
   private lazy val treeInitCleanup: TreeInitCleanup = new TreeInitCleanupImpl(templateInitCleanup)
 }

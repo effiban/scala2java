@@ -1,18 +1,17 @@
 package io.github.effiban.scala2java.core.cleanup
 
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.spi.predicates.TemplateInitExcludedPredicate
-import org.mockito.ArgumentMatchersSugar.any
+import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.{Init, XtensionQuasiquoteInit, XtensionQuasiquoteTemplate}
+import scala.meta.{XtensionQuasiquoteTemplate, XtensionQuasiquoteType}
 
 class TemplateInitCleanupImplTest extends UnitTestSuite {
 
-  private val templateInitExcludedPredicate = mock[TemplateInitExcludedPredicate]
+  private val templateParentsUsedResolver = mock[TemplateParentsUsedResolver]
 
-  private val templateInitCleanup = new TemplateInitCleanupImpl(templateInitExcludedPredicate)
+  private val templateInitCleanup = new TemplateInitCleanupImpl(templateParentsUsedResolver)
 
-  test("cleanup when none of the inits is excluded") {
+  test("cleanup when all inits are used") {
     val template =
       template"""
       A with B {
@@ -20,12 +19,12 @@ class TemplateInitCleanupImplTest extends UnitTestSuite {
       }
       """
 
-    when(templateInitExcludedPredicate(any[Init])).thenReturn(false)
+    when(templateParentsUsedResolver.resolve(eqTree(template))).thenReturn(List(t"A", t"B"))
 
     templateInitCleanup.cleanup(template).structure shouldBe template.structure
   }
 
-  test("cleanup when some of the inits are excluded") {
+  test("cleanup when some of the inits are unused") {
     val initialTemplate =
       template"""
       A with B with C with D {
@@ -40,10 +39,7 @@ class TemplateInitCleanupImplTest extends UnitTestSuite {
       }
       """
 
-    doAnswer((init: Init) => init match {
-      case init"B" | init"D" => true
-      case _ => false
-    }).when(templateInitExcludedPredicate)(any[Init])
+    when(templateParentsUsedResolver.resolve(eqTree(initialTemplate))).thenReturn(List(t"A", t"C"))
 
     templateInitCleanup.cleanup(initialTemplate).structure shouldBe finalTemplate.structure
   }

@@ -38,7 +38,7 @@ class SuperSelectUnqualifierImplTest extends UnitTestSuite {
       ListMap(
         classA.templ -> List(typeA1, typeA2),
         classB.templ -> List(typeB1, typeB2)
-      )).when(inheritedTermNameOwnersInferrer).infer(eqTree(termName), eqQualificationContext(QualificationContext()))
+      )).when(inheritedTermNameOwnersInferrer).inferAll(eqTree(termName), eqQualificationContext(QualificationContext()))
 
     when(fileScopeNonInheritedTermNameBinder.bind(eqTree(termName))).thenReturn(Some(q"val c: Int"))
 
@@ -65,7 +65,7 @@ class SuperSelectUnqualifierImplTest extends UnitTestSuite {
       ListMap(
         classA.templ -> List(typeA1, typeA2),
         classB.templ -> List(typeB1, typeB2)
-      )).when(inheritedTermNameOwnersInferrer).infer(eqTree(termName), eqQualificationContext(QualificationContext()))
+      )).when(inheritedTermNameOwnersInferrer).inferAll(eqTree(termName), eqQualificationContext(QualificationContext()))
 
     when(fileScopeNonInheritedTermNameBinder.bind(eqTree(termName))).thenReturn(None)
 
@@ -88,7 +88,7 @@ class SuperSelectUnqualifierImplTest extends UnitTestSuite {
     doReturn(
       ListMap(
         classA.templ -> List(typeA1, typeA2)
-      )).when(inheritedTermNameOwnersInferrer).infer(eqTree(termName), eqQualificationContext(QualificationContext()))
+      )).when(inheritedTermNameOwnersInferrer).inferAll(eqTree(termName), eqQualificationContext(QualificationContext()))
 
     when(fileScopeNonInheritedTermNameBinder.bind(eqTree(termName))).thenReturn(Some(q"val c: Int"))
 
@@ -112,7 +112,7 @@ class SuperSelectUnqualifierImplTest extends UnitTestSuite {
 
     doReturn(ListMap(
       classA.templ -> List(typeA1, typeA2)
-    )).when(inheritedTermNameOwnersInferrer).infer(eqTree(termName), eqQualificationContext(QualificationContext()))
+    )).when(inheritedTermNameOwnersInferrer).inferAll(eqTree(termName), eqQualificationContext(QualificationContext()))
 
     when(fileScopeNonInheritedTermNameBinder.bind(eqTree(termName))).thenReturn(None)
 
@@ -135,7 +135,7 @@ class SuperSelectUnqualifierImplTest extends UnitTestSuite {
 
     doReturn(ListMap(
       classA.templ -> List(typeA1, typeA2)
-    )).when(inheritedTermNameOwnersInferrer).infer(eqTree(termName), eqQualificationContext(QualificationContext()))
+    )).when(inheritedTermNameOwnersInferrer).inferAll(eqTree(termName), eqQualificationContext(QualificationContext()))
 
     when(fileScopeNonInheritedTermNameBinder.bind(eqTree(termName))).thenReturn(None)
 

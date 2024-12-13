@@ -1,6 +1,5 @@
 package io.github.effiban.scala2java.core.qualifiers
 
-import io.github.effiban.scala2java.core.entities.TreeKeyedMap
 import io.github.effiban.scala2java.core.extractors.TreeNameExtractor
 import io.github.effiban.scala2java.core.typeinference.{InheritedTermNameOwnersInferrer, InnermostEnclosingTemplateInferrer}
 
@@ -29,18 +28,22 @@ private[qualifiers] class SuperSelectQualifierImpl(innermostEnclosingTemplateInf
       case Some(name) => Name.Indeterminate(name)
       case None => maybeEnclosingTemplate
         .flatMap(_.parent)
-        .map(TreeNameExtractor.extract)
+        .map(TreeNameExtractor.extractIndeterminate)
         .getOrElse(Name.Anonymous())
     }
 
-    val qualifiedSuperp = termSuper.superp match {
-      case Name.Anonymous() => inheritedTermNameOwnersInferrer.infer(termName, context)
+    val qualifiedSuperp = (maybeEnclosingTemplate, termSuper.superp) match {
+      case (None, Name.Anonymous()) => inheritedTermNameOwnersInferrer.inferAll(termName, context)
         .values
         .flatten
         .headOption
-        .map(TreeNameExtractor.extract)
+        .map(TreeNameExtractor.extractIndeterminate)
         .getOrElse(Name.Anonymous())
-      case superp => superp
+      case (Some(template), Name.Anonymous()) => inheritedTermNameOwnersInferrer.infer(termName, template, context)
+        .headOption
+        .map(TreeNameExtractor.extractIndeterminate)
+        .getOrElse(Name.Anonymous())
+      case (_, superp) => superp
     }
     Term.Select(Term.Super(qualifiedThisp, qualifiedSuperp), termName)
   }

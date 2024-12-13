@@ -4,11 +4,11 @@ import io.github.effiban.scala2java.core.entities.TreeKeyedMap
 
 import scala.meta.{Template, Type}
 
-trait TemplateByContextQualifier {
+trait TemplateParentsByContextQualifier {
   def qualify(template: Template, context: QualificationContext): Template
 }
 
-object TemplateByContextQualifier extends TemplateByContextQualifier {
+object TemplateParentsByContextQualifier extends TemplateParentsByContextQualifier {
 
   def qualify(template: Template, context: QualificationContext): Template = {
     import template._
