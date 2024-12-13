@@ -1,5 +1,5 @@
 package testfiles.Objects.WithInits.One
 
-import testfilesext.SampleParentClass
+import testfilesext.SampleParentTrait
 
-object Sample extends SampleParentClass
+object Sample extends SampleParentTrait

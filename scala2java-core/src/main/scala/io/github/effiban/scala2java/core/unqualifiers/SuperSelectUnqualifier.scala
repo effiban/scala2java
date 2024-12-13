@@ -15,7 +15,7 @@ private[unqualifiers] class SuperSelectUnqualifierImpl(inheritedTermNameOwnersIn
                                                        fileScopeNonInheritedTermNameBinder: FileScopeNonInheritedTermNameBinder) extends SuperSelectUnqualifier {
 
   def unqualify(termSuper: Term.Super, termName: Term.Name, maybeTermSelectParent: Option[Tree]): Term.Ref = {
-    val inheritedTermNameOwners = inheritedTermNameOwnersInferrer.infer(termName, QualificationContext())
+    val inheritedTermNameOwners = inheritedTermNameOwnersInferrer.inferAll(termName, QualificationContext())
     val maybeFileScopeTermNameDecl = fileScopeNonInheritedTermNameBinder.bind(termName)
     val maybeSuper = (inheritedTermNameOwners, maybeFileScopeTermNameDecl, maybeTermSelectParent) match {
       case (inheritedOwners, _, _) if inheritedOwners.size > 1 => Some(termSuper.copy(superp = Name.Anonymous()))

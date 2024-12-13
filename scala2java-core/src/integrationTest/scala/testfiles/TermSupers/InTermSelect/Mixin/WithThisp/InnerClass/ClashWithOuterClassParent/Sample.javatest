@@ -7,5 +7,6 @@ public class Sample implements SampleParentTrait3 {
 
     public class SampleInner implements SampleParentTrait4 {
         public final int x = Sample.super.doSomething();
+        public final int y = doSomething2();
     }
 }

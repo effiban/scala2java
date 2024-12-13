@@ -12,10 +12,99 @@ import scala.meta.{Defn, Pat, Term, XtensionQuasiquoteTerm, XtensionQuasiquoteTy
 class InheritedTermNameOwnersInferrerImplTest extends UnitTestSuite {
 
   private val enclosingTemplateAncestorsInferrer = mock[EnclosingTemplateAncestorsInferrer]
+  private val templateAncestorsInferrer = mock[TemplateAncestorsInferrer]
 
-  private val inheritedTermNameOwnersInferrer = new InheritedTermNameOwnersInferrerImpl(enclosingTemplateAncestorsInferrer)
+  private val inheritedTermNameOwnersInferrer = new InheritedTermNameOwnersInferrerImpl(
+    enclosingTemplateAncestorsInferrer,
+    templateAncestorsInferrer
+  )
 
-  test("infer() when Term.Name has one enclosing member without parents, should return empty") {
+  test("infer() when the template has no ancestors, should return empty") {
+    val pkg =
+      q"""
+      package io.github.effiban.scala2java.core.typeinference {
+        class NoParents {
+          val x: Int = 3
+        }
+      }
+      """
+
+    val cls = pkg.stats.head.asInstanceOf[Defn.Class]
+    val templ = cls.templ
+    val termName = cls.templ.stats.head.asInstanceOf[Defn.Val]
+      .pats.head.asInstanceOf[Pat.Var]
+      .name
+
+    val context = QualificationContext()
+
+    doReturn(Nil).when(templateAncestorsInferrer).infer(eqTree(templ), eqQualificationContext(context))
+
+    inheritedTermNameOwnersInferrer.infer(termName, cls.templ, context) shouldBe empty
+  }
+
+  test("infer() when the template has ancestors, but the Term.Name is not a member of any parent - should return empty") {
+    val pkg =
+      q"""
+      package io.github.effiban.scala2java.core.typeinference {
+        import io.github.effiban.scala2java.core.typeinference.Parent1
+
+        private class Child4 extends Parent1 {
+          val z: Int = 3
+        }
+      }
+      """
+
+    val cls = pkg.stats.collectFirst { case cls: Defn.Class => cls }.get
+    val templ = cls.templ
+    val termName = cls.templ.stats.head.asInstanceOf[Defn.Val]
+      .pats.head.asInstanceOf[Pat.Var]
+      .name
+
+    val context = QualificationContext(qualifiedTypeMap = Map(t"Parent1" -> t"io.github.effiban.scala2java.core.typeinference.Parent1"))
+
+    doReturn(
+      List(
+        t"io.github.effiban.scala2java.core.typeinference.Parent1",
+        t"io.github.effiban.scala2java.core.typeinference.Grandparent1"
+      )
+    ).when(templateAncestorsInferrer).infer(eqTree(templ), eqQualificationContext(context))
+
+    inheritedTermNameOwnersInferrer.infer(termName, templ, context) shouldBe empty
+  }
+
+  test("infer() when the template has ancestors, and the Term.Name is a member of some, should return a corresponding Map") {
+    val pkg =
+      q"""
+      package io.github.effiban.scala2java.core.typeinference {
+        import io.github.effiban.scala2java.core.typeinference.Parent1
+
+        private class Child1 extends Parent1 {
+          x
+        }
+      }
+      """
+
+    val cls = pkg.stats.collectFirst { case cls: Defn.Class => cls }.get
+    val templ = cls.templ
+    val termName = templ.stats.head.asInstanceOf[Term.Name]
+
+    val context = QualificationContext(qualifiedTypeMap = Map(t"Parent1" -> t"io.github.effiban.scala2java.core.typeinference.Parent1"))
+
+    doReturn(
+      List(
+        t"io.github.effiban.scala2java.core.typeinference.Parent1",
+        t"io.github.effiban.scala2java.core.typeinference.Grandparent1"
+      )
+    ).when(templateAncestorsInferrer).infer(eqTree(templ), eqQualificationContext(context))
+
+    inheritedTermNameOwnersInferrer.infer(termName, templ, context).structure shouldBe
+      List(
+        t"io.github.effiban.scala2java.core.typeinference.Parent1",
+        t"io.github.effiban.scala2java.core.typeinference.Grandparent1"
+      ).structure
+  }
+
+  test("inferAll() when Term.Name has one enclosing member without ancestors, should return empty") {
     val pkg =
       q"""
       package io.github.effiban.scala2java.core.typeinference {
@@ -34,10 +123,10 @@ class InheritedTermNameOwnersInferrerImplTest extends UnitTestSuite {
 
     doReturn(ListMap.empty).when(enclosingTemplateAncestorsInferrer).infer(eqTree(termName), eqQualificationContext(context))
 
-    inheritedTermNameOwnersInferrer.infer(termName, context) shouldBe empty
+    inheritedTermNameOwnersInferrer.inferAll(termName, context) shouldBe empty
   }
 
-  test("infer() when Term.Name has one enclosing member with parents, but it's not a member of any parent, should return empty") {
+  test("inferAll() when Term.Name has one enclosing member with ancestors, but it's not a member of any parent, should return empty") {
     val pkg =
       q"""
       package io.github.effiban.scala2java.core.typeinference {
@@ -63,10 +152,10 @@ class InheritedTermNameOwnersInferrerImplTest extends UnitTestSuite {
       )
     )).when(enclosingTemplateAncestorsInferrer).infer(eqTree(termName), eqQualificationContext(context))
 
-    inheritedTermNameOwnersInferrer.infer(termName, context) shouldBe empty
+    inheritedTermNameOwnersInferrer.inferAll(termName, context) shouldBe empty
   }
 
-  test("infer() when Term.Name has one enclosing member with parents, and it's a member of some, should return a corresponding Map") {
+  test("inferAll() when Term.Name has one enclosing member with ancestors, and it's a member of some, should return a corresponding Map") {
     val pkg =
       q"""
       package io.github.effiban.scala2java.core.typeinference {
@@ -90,7 +179,7 @@ class InheritedTermNameOwnersInferrerImplTest extends UnitTestSuite {
       )
     )).when(enclosingTemplateAncestorsInferrer).infer(eqTree(termName), eqQualificationContext(context))
 
-    val resultMap = inheritedTermNameOwnersInferrer.infer(termName, context)
+    val resultMap = inheritedTermNameOwnersInferrer.inferAll(termName, context)
     resultMap.size shouldBe 1
     val (resultTemplate, resultParents) = resultMap.head
     resultTemplate.structure shouldBe cls.templ.structure
@@ -100,7 +189,7 @@ class InheritedTermNameOwnersInferrerImplTest extends UnitTestSuite {
     ).structure
   }
 
-  test("infer() when Term.Name has two enclosing members with parents, and it's a member of one, should return a corresponding Map") {
+  test("inferAll() when Term.Name has two enclosing members with ancestors, and it's a member of one, should return a corresponding Map") {
     val pkg =
       q"""
       package io.github.effiban.scala2java.core.typeinference {
@@ -138,7 +227,7 @@ class InheritedTermNameOwnersInferrerImplTest extends UnitTestSuite {
       ),
     )).when(enclosingTemplateAncestorsInferrer).infer(eqTree(y), eqQualificationContext(context))
 
-    val resultMap = inheritedTermNameOwnersInferrer.infer(y, context)
+    val resultMap = inheritedTermNameOwnersInferrer.inferAll(y, context)
     resultMap.size shouldBe 1
     val (resultMember, resultParents) = resultMap.head
     resultMember.structure shouldBe child1.templ.structure
@@ -148,7 +237,7 @@ class InheritedTermNameOwnersInferrerImplTest extends UnitTestSuite {
     ).structure
   }
 
-  test("infer() when Term.Name has two enclosing members with parents, and it's a member of both, should return a corresponding Map") {
+  test("inferAll() when Term.Name has two enclosing members with ancestors, and it's a member of both, should return a corresponding Map") {
     val pkg =
       q"""
       package io.github.effiban.scala2java.core.typeinference {
@@ -186,7 +275,7 @@ class InheritedTermNameOwnersInferrerImplTest extends UnitTestSuite {
       )
     )).when(enclosingTemplateAncestorsInferrer).infer(eqTree(innerX), eqQualificationContext(context))
 
-    val resultMap = inheritedTermNameOwnersInferrer.infer(innerX, context)
+    val resultMap = inheritedTermNameOwnersInferrer.inferAll(innerX, context)
     resultMap.size shouldBe 2
 
     val inferredChild1Parents = TreeKeyedMap(resultMap, child1.templ)

@@ -14,19 +14,24 @@ private[transformers] class TermSuperTransformerImpl(innermostEnclosingTemplateI
 
   override def transform(termSuper: Term.Super): Term.Super = {
     val transformedSuperp = termSuper.superp match {
-      case name: Name.Indeterminate => transformSuperName(termSuper, name)
-      case superp => superp
+      case Name.Anonymous() => Name.Anonymous()
+      case name: Name => transformSuperName(termSuper, name)
     }
     termSuper.copy(superp = transformedSuperp)
   }
 
   private def transformSuperName(termSuper: Term.Super, originalName: Name) = {
-    innermostEnclosingTemplateInferrer.infer(termSuper)
+    val maybeEnclosingMemberName = termSuper.thisp match {
+      case Name.Anonymous() => None
+      case thisp => Some(thisp.value)
+    }
+
+    innermostEnclosingTemplateInferrer.infer(termSuper, maybeEnclosingMemberName)
       .toList
       .flatMap(directParentTypesOf)
       .find(TreeNameExtractor.extract(_).value == originalName.value)
       .map(treeTransformer.transform)
-      .map(TreeNameExtractor.extract)
+      .map(TreeNameExtractor.extractIndeterminate)
       .getOrElse(originalName)
   }
 

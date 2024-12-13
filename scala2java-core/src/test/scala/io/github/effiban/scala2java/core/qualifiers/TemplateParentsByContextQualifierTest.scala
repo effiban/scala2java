@@ -1,11 +1,11 @@
 package io.github.effiban.scala2java.core.qualifiers
 
-import io.github.effiban.scala2java.core.qualifiers.TemplateByContextQualifier.qualify
+import io.github.effiban.scala2java.core.qualifiers.TemplateParentsByContextQualifier.qualify
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 
 import scala.meta.{XtensionQuasiquoteTemplate, XtensionQuasiquoteType}
 
-class TemplateByContextQualifierTest extends UnitTestSuite {
+class TemplateParentsByContextQualifierTest extends UnitTestSuite {
 
   test("qualify with inits and self when all are qualified") {
 

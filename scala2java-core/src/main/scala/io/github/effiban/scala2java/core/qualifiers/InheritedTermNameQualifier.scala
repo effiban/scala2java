@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.qualifiers
 
 import io.github.effiban.scala2java.core.binders.FileScopeNonInheritedTermNameBinder
 import io.github.effiban.scala2java.core.extractors.TreeNameExtractor
-import io.github.effiban.scala2java.core.typeinference.{InheritedTermNameOwnersInferrer, InnermostEnclosingTemplateInferrer}
+import io.github.effiban.scala2java.core.typeinference.InheritedTermNameOwnersInferrer
 
 import scala.meta.Term
 
@@ -11,28 +11,26 @@ trait InheritedTermNameQualifier {
   def qualify(termName: Term.Name, context: QualificationContext): Option[Term]
 }
 
-private[qualifiers] class InheritedTermNameQualifierImpl(innermostEnclosingTemplateInferrer: InnermostEnclosingTemplateInferrer,
-                                                         inheritedTermNameOwnersInferrer: InheritedTermNameOwnersInferrer,
+private[qualifiers] class InheritedTermNameQualifierImpl(inheritedTermNameOwnersInferrer: InheritedTermNameOwnersInferrer,
                                                          fileScopeNonInheritedTermNameBinder: FileScopeNonInheritedTermNameBinder)
   extends InheritedTermNameQualifier {
 
   override def qualify(termName: Term.Name, context: QualificationContext): Option[Term] = {
-    val maybeEnclosingTemplate = innermostEnclosingTemplateInferrer.infer(termName)
+    val inheritedTermNameOwners = inheritedTermNameOwnersInferrer.inferAll(termName, context)
+
+    val (maybeEnclosingTemplate, maybeInnermostOwner) = inheritedTermNameOwners
+      .headOption
+      .map { case (templ, ancestors) => (templ, ancestors.head) }
+      .unzip
 
     val maybeThisp = maybeEnclosingTemplate
       .flatMap(_.parent)
-      .map(TreeNameExtractor.extract)
+      .map(TreeNameExtractor.extractIndeterminate)
 
-    val inheritedTermNameOwners = inheritedTermNameOwnersInferrer.infer(termName, context)
-    val maybeSuperp = inheritedTermNameOwners
-      .values
-      .flatten
-      .headOption
-      .map(TreeNameExtractor.extract)
+    val maybeSuperp = maybeInnermostOwner.map(TreeNameExtractor.extractIndeterminate)
 
     // TODO remove once we handle qualification of file-scope terms properly
     val maybeFileScopeTermNameDecl = fileScopeNonInheritedTermNameBinder.bind(termName)
-
 
     (maybeThisp, maybeSuperp, maybeFileScopeTermNameDecl) match {
       case (Some(thisp), Some(superp), None) =>
@@ -44,6 +42,5 @@ private[qualifiers] class InheritedTermNameQualifierImpl(innermostEnclosingTempl
 }
 
 object InheritedTermNameQualifier extends InheritedTermNameQualifierImpl(
-  InnermostEnclosingTemplateInferrer,
   InheritedTermNameOwnersInferrer,
   FileScopeNonInheritedTermNameBinder)

@@ -48,7 +48,7 @@ object Scala2JavaTranslator {
             new SemanticDesugarers().sourceDesugarer.desugar,
             new ScalaTreeTraversers().sourceTraverser.traverse,
             new Transformers().sourceTransformer.transform,
-            new Cleanups().sourceInitCleanup.cleanup,
+            Cleanups.sourceInitCleanup.cleanup,
             SourceImportAdder.addTo,
             SourceUnqualifier.unqualify,
             SourceImportRemover.removeJavaLangFrom
