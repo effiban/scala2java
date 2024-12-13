@@ -157,28 +157,32 @@ class ScalaReflectionUtilsTest extends UnitTestSuite {
     isTypeMemberOf(RuntimeMirror.staticPackage("scala.collection.immutable"), Type.Name("bla")) shouldBe false
   }
 
-  test("typeExistsAndIsEmpty() for a type which exists and is empty, should return true") {
-    typeExistsAndIsEmpty(t"io.github.effiban.scala2java.core.reflection.ScalaReflectionUtilsTest#EmptyTrait") shouldBe true
+  test("isNonTrivialEmptyType() for a type which exists and is empty, should return true") {
+    isNonTrivialEmptyType(t"io.github.effiban.scala2java.core.reflection.ScalaReflectionUtilsTest#EmptyTrait") shouldBe true
   }
 
-  test("typeExistsAndIsEmpty() for a type which has a non-trivial parent and nothing else, should return false") {
-    typeExistsAndIsEmpty(t"io.github.effiban.scala2java.core.reflection.ScalaReflectionUtilsTest#ClassWithNonTrivialParentOnly") shouldBe false
+  test("isNonTrivialEmptyType() for a type which has a non-trivial parent and nothing else, should return false") {
+    isNonTrivialEmptyType(t"io.github.effiban.scala2java.core.reflection.ScalaReflectionUtilsTest#ClassWithNonTrivialParentOnly") shouldBe false
   }
 
-  test("typeExistsAndIsEmpty() for a type which has a non-default constructor and nothing else, should return false") {
-    typeExistsAndIsEmpty(t"io.github.effiban.scala2java.core.reflection.ScalaReflectionUtilsTest#ClassWithNonDefaultCtorOnly") shouldBe false
+  test("isNonTrivialEmptyType() for a type which has a non-default constructor and nothing else, should return false") {
+    isNonTrivialEmptyType(t"io.github.effiban.scala2java.core.reflection.ScalaReflectionUtilsTest#ClassWithNonDefaultCtorOnly") shouldBe false
   }
 
-  test("typeExistsAndIsEmpty() for a type which has no parents and default ctor. but has data members, should return false") {
-    typeExistsAndIsEmpty(t"io.github.effiban.scala2java.core.reflection.ScalaReflectionUtilsTest#ClassWithDataMembersOnly") shouldBe false
+  test("isNonTrivialEmptyType() for a type which has no parents and default ctor. but has data members, should return false") {
+    isNonTrivialEmptyType(t"io.github.effiban.scala2java.core.reflection.ScalaReflectionUtilsTest#ClassWithDataMembersOnly") shouldBe false
   }
 
-  test("typeExistsAndIsEmpty() for a type which has no parents and default ctor. but has methods, should return false") {
-    typeExistsAndIsEmpty(t"io.github.effiban.scala2java.core.reflection.ScalaReflectionUtilsTest#ClassWithMethodsOnly") shouldBe false
+  test("isNonTrivialEmptyType() for a type which has no parents and default ctor. but has methods, should return false") {
+    isNonTrivialEmptyType(t"io.github.effiban.scala2java.core.reflection.ScalaReflectionUtilsTest#ClassWithMethodsOnly") shouldBe false
   }
 
-  test("typeExistsAndIsEmpty() for a type which has a constructor and members, should return false") {
-    typeExistsAndIsEmpty(t"scala.concurrent.duration.FiniteDuration") shouldBe false
+  test("isNonTrivialEmptyType() for a type which has a constructor and members, should return false") {
+    isNonTrivialEmptyType(t"scala.concurrent.duration.FiniteDuration") shouldBe false
+  }
+
+  test("isNonTrivialEmptyType() for 'Serializable', should return false") {
+    isNonTrivialEmptyType(t"java.io.Serializable") shouldBe false
   }
 
   trait EmptyTrait

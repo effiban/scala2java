@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.cleanup
 
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionUtils.typeExistsAndIsEmpty
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionUtils.isNonTrivialEmptyType
 
 import scala.meta.{Template, Type}
 
@@ -11,5 +11,5 @@ import scala.meta.{Template, Type}
  */
 object IsTemplateAncestorUsedByEmptiness extends IsTemplateAncestorUsed {
 
-  def apply(template: Template, ancestorType: Type.Ref): Boolean = typeExistsAndIsEmpty(ancestorType)
+  def apply(template: Template, ancestorType: Type.Ref): Boolean = isNonTrivialEmptyType(ancestorType)
 }
