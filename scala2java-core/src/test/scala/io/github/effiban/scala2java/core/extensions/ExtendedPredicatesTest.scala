@@ -10,19 +10,6 @@ class ExtendedPredicatesTest extends UnitTestSuite {
   private val extension2 = mock[Scala2JavaExtension]
   private val extensions = List(extension1, extension2)
 
-  test("templateInitExcludedPredicates") {
-    val templateInitExcludedPredicate1 = mock[TemplateInitExcludedPredicate]
-    val templateInitExcludedPredicate2 = mock[TemplateInitExcludedPredicate]
-    val templateInitExcludedPredicates = List(templateInitExcludedPredicate1, templateInitExcludedPredicate2)
-
-    when(extension1.templateInitExcludedPredicate()).thenReturn(templateInitExcludedPredicate1)
-    when(extension2.templateInitExcludedPredicate()).thenReturn(templateInitExcludedPredicate2)
-
-    val extensionRegistry = ExtensionRegistry(extensions)
-
-    extensionRegistry.templateInitExcludedPredicates shouldBe templateInitExcludedPredicates
-  }
-
   test("termSelectHasApplyMethods") {
     val termSelectHasApplyMethod1 = mock[TermSelectHasApplyMethod]
     val termSelectHasApplyMethod2 = mock[TermSelectHasApplyMethod]

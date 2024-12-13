@@ -15,6 +15,7 @@ trait ExtendedPredicates {
    * @return if overriden - a predicate which determines whether to exclude a [[scala.meta.Init]]<br>
    *         otherwise - the default predicate which doesn't exclude anything<br>
    */
+  @deprecated
   def templateInitExcludedPredicate(): TemplateInitExcludedPredicate = TemplateInitExcludedPredicate.None
 
 
