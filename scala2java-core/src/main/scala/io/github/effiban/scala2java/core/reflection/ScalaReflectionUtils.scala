@@ -66,6 +66,24 @@ object ScalaReflectionUtils {
     classSymbolOf(typeRef).exists(cls => isTermMemberOf(cls, termName))
   }
 
+  def isTermMemberOf(termSelect: Term.Select, termName: Term.Name): Boolean = {
+    moduleSymbolOf(termSelect.toString()) match {
+      case Some(module) => isTermMemberOf(module, termName)
+      case _ => false
+    }
+  }
+
+  def isTermMemberOfCompanionOf(symbol: Symbol, termName: Term.Name): Boolean = {
+    symbol.info.companion.member(TermName(termName.value)) match {
+      case NoSymbol => false
+      case _ => true
+    }
+  }
+
+  def isTermMemberOfCompanionOf(typeRef: Type.Ref, termName: Term.Name): Boolean = {
+    classSymbolOf(typeRef).exists(cls => isTermMemberOfCompanionOf(cls, termName))
+  }
+
   def isTypeMemberOf(symbol: Symbol, typeName: Type.Name): Boolean = {
     symbol.typeSignature.decl(TypeName(typeName.value)) match {
       case NoSymbol => false
@@ -124,9 +142,7 @@ object ScalaReflectionUtils {
   }
 
   private def classSymbolOf(qualifierName: String, typeName: String): Option[ClassSymbol] = {
-    scala.util.Try(RuntimeMirror.staticPackage(qualifierName))
-      .orElse(scala.util.Try(RuntimeMirror.staticModule(qualifierName)))
-      .toOption
+    moduleSymbolOf(qualifierName)
       .map(module => module.typeSignature.decl(TypeName(typeName)))
       .flatMap(asClassSymbol)
   }
@@ -142,6 +158,12 @@ object ScalaReflectionUtils {
       case NoSymbol => outerClassSymbol.companion.info.decl(innerTypeName)
       case symbol => symbol
     }
+  }
+
+  private def moduleSymbolOf(qualifierName: String) = {
+    scala.util.Try(RuntimeMirror.staticPackage(qualifierName))
+      .orElse(scala.util.Try(RuntimeMirror.staticModule(qualifierName)))
+      .toOption
   }
 
   private def asClassSymbol(symbol: Symbol): Option[ClassSymbol] = {

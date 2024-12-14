@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.desugarers.semantic
 
 import io.github.effiban.scala2java.core.desugarers.SameTypeDesugarer
-import io.github.effiban.scala2java.core.predicates.Predicates
+import io.github.effiban.scala2java.core.predicates.{Predicates, TermSelectHasApplyMethod}
 import io.github.effiban.scala2java.core.typeinference.TypeInferrers
 
 import scala.meta.{Source, Template}
@@ -75,7 +75,7 @@ class SemanticDesugarers(implicit predicates: Predicates,
   private lazy val termApplyDesugarer: TermApplyDesugarer = new TermApplyDesugarerImpl(termApplyFunDesugarer, evaluatedTermDesugarer)
 
   private lazy val termApplyFunDesugarer: TermApplyFunDesugarer = new TermApplyFunDesugarerImpl(
-    compositeTermSelectHasApplyMethod,
+    TermSelectHasApplyMethod,
     evaluatedTermSelectQualDesugarer,
     termApplyTypeFunDesugarer,
     evaluatedTermDesugarer

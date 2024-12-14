@@ -1,8 +1,8 @@
 package io.github.effiban.scala2java.core.typeinference
 
+import io.github.effiban.scala2java.core.predicates.TermSelectHasApplyMethod
 import io.github.effiban.scala2java.spi.contexts.TermApplyInferenceContext
 import io.github.effiban.scala2java.spi.entities.PartialDeclDef
-import io.github.effiban.scala2java.spi.predicates.TermSelectHasApplyMethod
 import io.github.effiban.scala2java.spi.typeinferrers.ApplyDeclDefInferrer
 
 import scala.annotation.tailrec
