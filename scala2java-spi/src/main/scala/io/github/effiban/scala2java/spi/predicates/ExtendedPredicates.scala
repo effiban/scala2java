@@ -25,6 +25,7 @@ trait ExtendedPredicates {
    * The framework will use this in order to properly identify invocations where the `apply()`
    * does not appear explicitly and be able to infer their types and also transform them properly into Java.
    */
+  @deprecated
   def termSelectHasApplyMethod(): TermSelectHasApplyMethod = TermSelectHasApplyMethod.None
 
   /** Override this method if you need to specify that a given [[Term.Select]] (qualified name) appearing in the Scala source file,

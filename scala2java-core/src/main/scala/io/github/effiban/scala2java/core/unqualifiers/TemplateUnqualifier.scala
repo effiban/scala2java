@@ -1,7 +1,6 @@
 package io.github.effiban.scala2java.core.unqualifiers
 
 import io.github.effiban.scala2java.core.qualifiers.QualificationContext
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionUtils.{asScalaMetaTypeRef, classSymbolOf}
 
 import scala.meta.{Init, Self, Stat, Template}
 

@@ -141,12 +141,48 @@ class ScalaReflectionUtilsTest extends UnitTestSuite {
     isTermMemberOf(RuntimeMirror.staticModule("scala.collection.immutable.List"), Term.Name("bla")) shouldBe false
   }
 
-  test("isTermMemberOf(Type.Ref, Term.Name) when true") {
+  test("isTermMemberOf(Type.Ref, Term.Name) for a class when true") {
     isTermMemberOf(t"scala.collection.immutable.List", Term.Name("empty")) shouldBe true
   }
 
-  test("isTermMemberOf(Type.Ref, Term.Name) when false") {
+  test("isTermMemberOf(Type.Ref, Term.Name) for a class when false") {
     isTermMemberOf(t"scala.collection.immutable.List", Term.Name("bla")) shouldBe false
+  }
+
+  test("isTermMemberOf(Type.Ref, Term.Name) for a type def when true") {
+    isTermMemberOf(t"scala.List", Term.Name("empty")) shouldBe true
+  }
+
+  test("isTermMemberOf(Type.Ref, Term.Name) for a type def when false") {
+    isTermMemberOf(t"scala.List", Term.Name("bla")) shouldBe false
+  }
+
+  test("isTermMemberOf(Term.Ref, Term.Name) when true") {
+    isTermMemberOf(q"scala.collection.immutable.List", Term.Name("apply")) shouldBe true
+  }
+
+  test("isTermMemberOf(Term.Ref, Term.Name) when false") {
+    isTermMemberOf(q"scala.collection.immutable.List", Term.Name("bla")) shouldBe false
+  }
+
+  test("isTermMemberOfCompanionOf(Term.Ref, Term.Name) for a class when true") {
+    isTermMemberOfCompanionOf(t"scala.collection.immutable.List", q"apply") shouldBe true
+  }
+
+  test("isTermMemberOfCompanionOf(Term.Ref, Term.Name) for a class when false") {
+    isTermMemberOfCompanionOf(t"scala.collection.immutable.List", q"bla") shouldBe false
+  }
+
+  test("isTermMemberOfCompanionOf(Term.Ref, Term.Name) for a class when has no companion") {
+    isTermMemberOfCompanionOf(t"io.github.effiban.scala2java.core.reflection.ScalaReflectionUtilsTest", q"bla") shouldBe false
+  }
+
+  test("isTermMemberOfCompanionOf(Term.Ref, Term.Name) for a type def when true") {
+    isTermMemberOfCompanionOf(t"scala.List", q"apply") shouldBe true
+  }
+
+  test("isTermMemberOfCompanionOf(Term.Ref, Term.Name) for a type def when false") {
+    isTermMemberOfCompanionOf(t"scala.List", q"bla") shouldBe false
   }
 
   test("isTypeMemberOf() when true") {

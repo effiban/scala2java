@@ -9,8 +9,10 @@ import scala.meta.Term
  * does not appear explicitly.
  */
 // TODO - once file-scope or external type inference is added, add ability to check by a given type as well
+@deprecated
 trait TermSelectHasApplyMethod extends (Term.Select => Boolean)
 
+@deprecated
 object TermSelectHasApplyMethod {
   /** The default predicate which returns false, meaning none have an `apply()` method */
   val None: TermSelectHasApplyMethod = _ => false
