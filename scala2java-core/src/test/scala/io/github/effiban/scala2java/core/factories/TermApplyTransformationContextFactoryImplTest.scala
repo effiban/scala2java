@@ -25,7 +25,7 @@ class TermApplyTransformationContextFactoryImplTest extends UnitTestSuite {
     val termApply = Term.Apply(q"foo", List(q"2", q"3"))
 
     val expectedFunType = TypeSelects.ScalaInt
-    val expectedMaybeArgTypes = List(Some(TypeSelects.ScalaLong), Some(TypeSelects.ScalaString))
+    val expectedMaybeArgTypes = List(Some(TypeSelects.ScalaLong), Some(TypeSelects.JavaString))
 
     val expectedPartialDeclDef = PartialDeclDef(
       maybeParamNames = List(Some(q"param1"), Some(q"param2")),

@@ -12,10 +12,10 @@ class ApplyTypeTypeInferrerImplTest extends UnitTestSuite {
 
   private val applyTypeTypeInferrer = new ApplyTypeTypeInferrerImpl(applyReturnTypeInferrer)
 
-  test("infer() when term is 'classOf[Foo]' should return 'scala.Class[Foo]'") {
+  test("infer() when term is 'classOf[Foo]' should return 'java.lang.Class[Foo]'") {
     val innerType = t"Foo"
     val termApplyType = Term.ApplyType(TermNames.ScalaClassOf, List(innerType))
-    val expectedType = Type.Apply(TypeSelects.ScalaClass, List(innerType))
+    val expectedType = Type.Apply(TypeSelects.JavaClass, List(innerType))
 
     applyTypeTypeInferrer.infer(termApplyType).value.structure shouldBe expectedType.structure
   }

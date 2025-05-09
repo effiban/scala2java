@@ -17,8 +17,8 @@ class LitTypeInferrerTest extends UnitTestSuite {
     (Lit.Float(1.1f), ScalaFloat),
     (Lit.Double(1.1), ScalaDouble),
     (Lit.Char('a'), ScalaChar),
-    (Lit.String("abc"), ScalaString),
-    (Lit.Symbol(scala.Symbol("sym")), ScalaString),
+    (Lit.String("abc"), JavaString),
+    (Lit.Symbol(scala.Symbol("sym")), JavaString),
     (Lit.Unit(), ScalaUnit),
     (Lit.Null(), Type.AnonymousName())
   )

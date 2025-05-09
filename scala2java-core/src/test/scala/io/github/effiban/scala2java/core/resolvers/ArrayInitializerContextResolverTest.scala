@@ -11,11 +11,11 @@ import scala.meta.{Init, Lit, Name, Term, Type}
 
 class ArrayInitializerContextResolverTest extends UnitTestSuite {
 
-  test("""tryResolve() for a 'Term.Apply' of 'scala.Array[scala.Predef.String]("a", "b")' should return a context with type 'scala.Predef.String' and the values""") {
+  test("""tryResolve() for a 'Term.Apply' of 'scala.Array[java.lang.String]("a", "b")' should return a context with type 'java.lang.String' and the values""") {
     val args = List(Lit.String("a"), Lit.String("b"))
-    val termApply = Term.Apply(Term.ApplyType(TermSelects.ScalaArray, List(TypeSelects.ScalaString)), args)
+    val termApply = Term.Apply(Term.ApplyType(TermSelects.ScalaArray, List(TypeSelects.JavaString)), args)
 
-    val expectedContext = ArrayInitializerValuesContext(maybeType = Some(TypeSelects.ScalaString), values = args)
+    val expectedContext = ArrayInitializerValuesContext(maybeType = Some(TypeSelects.JavaString), values = args)
 
     tryResolve(termApply).value should equalArrayInitializerValuesContext(expectedContext)
   }
@@ -41,15 +41,15 @@ class ArrayInitializerContextResolverTest extends UnitTestSuite {
     tryResolve(termApply) shouldBe None
   }
 
-  test("""tryResolve() for an 'Init' of 'scala.Array[scala.Predef.String](3)' should return a context with type 'scala.Predef.String' and size 3""") {
+  test("""tryResolve() for an 'Init' of 'scala.Array[java.lang.String](3)' should return a context with type 'java.lang.String' and size 3""") {
     val arg = Lit.Int(3)
     val init = Init(
-      tpe = Type.Apply(TypeSelects.ScalaArray, List(TypeSelects.ScalaString)),
+      tpe = Type.Apply(TypeSelects.ScalaArray, List(TypeSelects.JavaString)),
       name = Name.Anonymous(),
       argss = List(List(arg))
     )
 
-    val expectedContext = ArrayInitializerSizeContext(tpe = TypeSelects.ScalaString, size = arg)
+    val expectedContext = ArrayInitializerSizeContext(tpe = TypeSelects.JavaString, size = arg)
 
     tryResolve(init).value should equalArrayInitializerSizeContext(expectedContext)
   }

@@ -84,11 +84,9 @@ object ScalaReflectionUtils {
     classSymbolOf(typeRef).exists(cls => isTermMemberOfCompanionOf(cls, termName))
   }
 
-  def isTypeMemberOf(symbol: Symbol, typeName: Type.Name): Boolean = {
-    symbol.typeSignature.decl(TypeName(typeName.value)) match {
-      case NoSymbol => false
-      case _ => true
-    }
+  def findAsScalaMetaTypeRef(ownerModule: ModuleSymbol, typeName: Type.Name): Option[Type.Ref] = {
+    asClassSymbol(ownerModule.typeSignature.decl(TypeName(typeName.value)))
+      .flatMap(asScalaMetaTypeRef)
   }
 
   def isNonTrivialEmptyType(typeRef: Type.Ref): Boolean = {

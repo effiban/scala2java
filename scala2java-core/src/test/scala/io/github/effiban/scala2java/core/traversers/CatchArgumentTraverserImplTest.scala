@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.traversers
 
+import io.github.effiban.scala2java.core.entities.TypeSelects.JavaThrowable
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
@@ -13,16 +14,16 @@ class CatchArgumentTraverserImplTest extends UnitTestSuite {
 
   test("traverse() for a Pat.Var arg") {
     val pat = p"e"
-    val transformedPat = p"e: scala.Throwable"
-    val traversedPat = p"e: Throwable"
+    val transformedPat = p"e: java.lang.Throwable"
+    val traversedPat = p"e: TraversedThrowable"
     doReturn(traversedPat).when(patTraverser).traverse(eqTree(transformedPat))
     catchArgumentTraverser.traverse(pat).structure shouldBe traversedPat.structure
   }
 
   test("traverse() for a Pat.Wildcard arg") {
     val pat = Pat.Wildcard()
-    val transformedPat = Pat.Typed(p"__", t"scala.Throwable")
-    val traversedPat = Pat.Typed(p"__", t"Throwable")
+    val transformedPat = Pat.Typed(p"__", JavaThrowable)
+    val traversedPat = Pat.Typed(p"__", t"TraversedThrowable")
     doReturn(traversedPat).when(patTraverser).traverse(eqTree(transformedPat))
     catchArgumentTraverser.traverse(pat).structure shouldBe traversedPat.structure
   }

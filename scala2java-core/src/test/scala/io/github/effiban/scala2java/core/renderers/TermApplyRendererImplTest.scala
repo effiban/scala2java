@@ -60,11 +60,11 @@ class TermApplyRendererImplTest extends UnitTestSuite {
   test("render() an Array initializer") {
     val values = List(Lit.String("a"), Lit.String("b"))
     val termApply = Term.Apply(
-      fun = Term.ApplyType(TermSelects.ScalaArray, List(TypeSelects.ScalaString)),
+      fun = Term.ApplyType(TermSelects.ScalaArray, List(TypeSelects.JavaString)),
       args = values
     )
 
-    val expectedContext = ArrayInitializerValuesRenderContext(tpe = TypeSelects.ScalaString, values = values)
+    val expectedContext = ArrayInitializerValuesRenderContext(tpe = TypeSelects.JavaString, values = values)
 
     when(arrayInitializerRenderContextResolver.tryResolve(eqTree(termApply))).thenReturn(Some(expectedContext))
 

@@ -52,11 +52,11 @@ class FunctionTypeInferrerImplTest extends UnitTestSuite {
     functionTypeInferrer.infer(termFunction).structure shouldBe t"scala.Int => scala.Any".structure
   }
 
-  test("infer() for function of (scala.Int, scala.Predef.String) => scala.Predef.String") {
-    val termFunction = q"""(x: scala.Int, y: scala.Predef.String) => "bla" + x + y"""
+  test("infer() for function of (scala.Int, java.lang.String) => java.lang.String") {
+    val termFunction = q"""(x: scala.Int, y: java.lang.String) => "bla" + x + y"""
 
-    when(termTypeInferrer.infer(eqTree(q""""bla" + x + y"""))).thenReturn(Some(TypeSelects.ScalaString))
+    when(termTypeInferrer.infer(eqTree(q""""bla" + x + y"""))).thenReturn(Some(TypeSelects.JavaString))
 
-    functionTypeInferrer.infer(termFunction).structure shouldBe t"(scala.Int, scala.Predef.String) => scala.Predef.String".structure
+    functionTypeInferrer.infer(termFunction).structure shouldBe t"(scala.Int, java.lang.String) => java.lang.String".structure
   }
 }

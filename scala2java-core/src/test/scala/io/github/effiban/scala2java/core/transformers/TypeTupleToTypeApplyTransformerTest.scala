@@ -13,12 +13,12 @@ class TypeTupleToTypeApplyTransformerTest extends UnitTestSuite {
   private val typeTupleToTypeApplyTransformer = new TypeTupleToTypeApplyTransformerImpl(treeTransformer)
 
   test("transform when 2 args should return java.util.Map.Entry[...]") {
-    val args = List(TypeSelects.ScalaString, TypeSelects.ScalaInt)
+    val args = List(TypeSelects.JavaString, TypeSelects.ScalaInt)
     val transformedArgs = List(TypeSelects.JavaString, t"int")
     val expectedTypeApply = Type.Apply(t"java.util.Map#Entry", transformedArgs)
 
     doAnswer((arg: Type) => arg match {
-      case t"scala.Predef.String" => TypeSelects.JavaString
+      case t"java.lang.String" => TypeSelects.JavaString
       case t"scala.Int" => t"int"
       case other => other
     }).when(treeTransformer).transform(any[Type])
@@ -27,12 +27,12 @@ class TypeTupleToTypeApplyTransformerTest extends UnitTestSuite {
   }
 
   test("transform when 3 args should return org.jooq.lambda.tuple.Tuple3[...]") {
-    val args = List(TypeSelects.ScalaString, TypeSelects.ScalaInt, TypeSelects.ScalaDouble)
+    val args = List(TypeSelects.JavaString, TypeSelects.ScalaInt, TypeSelects.ScalaDouble)
     val transformedArgs = List(TypeSelects.JavaString, t"int", t"double")
     val expectedTypeApply = Type.Apply(t"org.jooq.lambda.tuple.Tuple3", transformedArgs)
 
     doAnswer((arg: Type) => arg match {
-      case t"scala.Predef.String" => TypeSelects.JavaString
+      case t"java.lang.String" => TypeSelects.JavaString
       case t"scala.Int" => t"int"
       case t"scala.Double" => t"double"
       case other => other
@@ -43,7 +43,7 @@ class TypeTupleToTypeApplyTransformerTest extends UnitTestSuite {
 
   test("transform when 4 args should return org.jooq.lambda.tuple.Tuple4[...]") {
     val args = List(
-      TypeSelects.ScalaString,
+      TypeSelects.JavaString,
       TypeSelects.ScalaInt,
       TypeSelects.ScalaDouble,
       TypeSelects.ScalaFloat
@@ -58,7 +58,7 @@ class TypeTupleToTypeApplyTransformerTest extends UnitTestSuite {
     val expectedTypeApply = Type.Apply(t"org.jooq.lambda.tuple.Tuple4", transformedArgs)
 
     doAnswer((arg: Type) => arg match {
-      case t"scala.Predef.String" => TypeSelects.JavaString
+      case t"java.lang.String" => TypeSelects.JavaString
       case t"scala.Int" => t"int"
       case t"scala.Double" => t"double"
       case t"scala.Float" => t"float"

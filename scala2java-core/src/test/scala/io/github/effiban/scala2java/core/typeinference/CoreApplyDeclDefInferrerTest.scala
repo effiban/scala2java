@@ -20,18 +20,18 @@ class CoreApplyDeclDefInferrerTest extends UnitTestSuite {
 
   private val coreApplyDeclDefInferrer = new CoreApplyDeclDefInferrer(initializerDeclDefInferrer, typeClassifier)
 
-  test("""infer scala.List.apply[scala.Predef.String]("a", "b")""") {
-    val termApply = q"""scala.List.apply[scala.Predef.String]("a", "b")"""
+  test("""infer scala.List.apply[java.lang.String]("a", "b")""") {
+    val termApply = q"""scala.List.apply[java.lang.String]("a", "b")"""
 
-    val argTypes = List(TypeSelects.ScalaString, TypeSelects.ScalaString)
+    val argTypes = List(TypeSelects.JavaString, TypeSelects.JavaString)
     val maybeArgTypes = argTypes.map(Some(_))
     val context = TermApplyInferenceContext(maybeArgTypes = maybeArgTypes)
 
-    val expectedReturnType = Type.Apply(TypeSelects.ScalaList, List(TypeSelects.ScalaString))
+    val expectedReturnType = Type.Apply(TypeSelects.ScalaList, List(TypeSelects.JavaString))
 
-    when(initializerDeclDefInferrer.inferByAppliedTypes(eqTree(TermSelects.ScalaList), eqTreeList(List(TypeSelects.ScalaString)), eqTo(2)))
+    when(initializerDeclDefInferrer.inferByAppliedTypes(eqTree(TermSelects.ScalaList), eqTreeList(List(TypeSelects.JavaString)), eqTo(2)))
       .thenReturn(PartialDeclDef(
-        maybeParamTypes = List(Some(TypeSelects.ScalaString), Some(TypeSelects.ScalaString)),
+        maybeParamTypes = List(Some(TypeSelects.JavaString), Some(TypeSelects.JavaString)),
         maybeReturnType = Some(expectedReturnType))
       )
 
@@ -40,10 +40,10 @@ class CoreApplyDeclDefInferrerTest extends UnitTestSuite {
     )
   }
 
-  test("""infer scala.Predef.Map.apply[scala.Predef.String, scala.Int](("a", 1), ("b", 2))""") {
-    val termApply = q"""scala.Predef.Map.apply[scala.Predef.String, scala.Int](("a", 1), ("b", 2))"""
+  test("""infer scala.Predef.Map.apply[java.lang.String, scala.Int](("a", 1), ("b", 2))""") {
+    val termApply = q"""scala.Predef.Map.apply[java.lang.String, scala.Int](("a", 1), ("b", 2))"""
 
-    val appliedTypes = List(TypeSelects.ScalaString, TypeSelects.ScalaInt)
+    val appliedTypes = List(TypeSelects.JavaString, TypeSelects.ScalaInt)
     val argTypes = List.fill(2)(Type.Tuple(appliedTypes))
     val maybeArgTypes = argTypes.map(Some(_))
     val context = TermApplyInferenceContext(maybeArgTypes = maybeArgTypes)
@@ -61,10 +61,10 @@ class CoreApplyDeclDefInferrerTest extends UnitTestSuite {
     )
   }
 
-  test("""infer scala.Predef.Map.empty[scala.Predef.String, scala.Int]()""") {
-    val termApply = q"""scala.Predef.Map.empty[scala.Predef.String, scala.Int]()"""
+  test("""infer scala.Predef.Map.empty[java.lang.String, scala.Int]()""") {
+    val termApply = q"""scala.Predef.Map.empty[java.lang.String, scala.Int]()"""
 
-    val appliedTypes = List(TypeSelects.ScalaString, TypeSelects.ScalaInt)
+    val appliedTypes = List(TypeSelects.JavaString, TypeSelects.ScalaInt)
     val context = TermApplyInferenceContext(maybeArgTypes = Nil)
 
     val expectedReturnType = Type.Apply(TypeSelects.ScalaMap, appliedTypes)
@@ -119,11 +119,11 @@ class CoreApplyDeclDefInferrerTest extends UnitTestSuite {
   test("""infer scala.List.apply("a", "b")""") {
     val termApply = q"""scala.List.apply("a", "b")"""
 
-    val argTypes = List(TypeSelects.ScalaString, TypeSelects.ScalaString)
+    val argTypes = List(TypeSelects.JavaString, TypeSelects.JavaString)
     val maybeArgTypes = argTypes.map(Some(_))
     val context = TermApplyInferenceContext(maybeArgTypes = maybeArgTypes)
 
-    val expectedReturnType = Type.Apply(TypeSelects.ScalaList, List(TypeSelects.ScalaString))
+    val expectedReturnType = Type.Apply(TypeSelects.ScalaList, List(TypeSelects.JavaString))
 
     when(initializerDeclDefInferrer.inferByArgTypes(eqTree(TermSelects.ScalaList), eqOptionTreeList(maybeArgTypes)))
       .thenReturn(PartialDeclDef(
@@ -139,7 +139,7 @@ class CoreApplyDeclDefInferrerTest extends UnitTestSuite {
   test("""infer scala.Predef.Map.apply(("a", 1), ("b", 2))""") {
     val termApply = q"""scala.Predef.Map.apply(("a", 1), ("b", 2))"""
 
-    val tupleTypes = List(TypeSelects.ScalaString, TypeSelects.ScalaInt)
+    val tupleTypes = List(TypeSelects.JavaString, TypeSelects.ScalaInt)
     val argTypes = List.fill(2)(Type.Tuple(tupleTypes))
     val maybeArgTypes = argTypes.map(Some(_))
     val context = TermApplyInferenceContext(maybeArgTypes = maybeArgTypes)
@@ -289,7 +289,7 @@ class CoreApplyDeclDefInferrerTest extends UnitTestSuite {
 
   test("infer x.toString()") {
     coreApplyDeclDefInferrer.infer(q"x.toString()", TermApplyInferenceContext()) should equalPartialDeclDef(
-      PartialDeclDef(maybeReturnType = Some(TypeSelects.ScalaString))
+      PartialDeclDef(maybeReturnType = Some(TypeSelects.JavaString))
     )
   }
 
