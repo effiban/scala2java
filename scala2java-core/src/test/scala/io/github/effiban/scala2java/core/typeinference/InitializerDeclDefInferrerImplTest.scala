@@ -23,7 +23,7 @@ class InitializerDeclDefInferrerImplTest extends UnitTestSuite {
   test("inferByAppliedTypes() when inferrable") {
     val termSelect = TermSelects.ScalaMap
     val parameterizedType = TypeSelects.ScalaMap
-    val appliedTypes = List(TypeSelects.ScalaString, TypeSelects.ScalaInt)
+    val appliedTypes = List(TypeSelects.JavaString, TypeSelects.ScalaInt)
     val numArgs = 2
 
     when(parameterizedInitializerNameTypeMapping.typeInitializedBy(eqTree(termSelect))).thenReturn(Some(parameterizedType))
@@ -47,7 +47,7 @@ class InitializerDeclDefInferrerImplTest extends UnitTestSuite {
   test("inferByArgTypes() for tuple arg type when inferrable") {
     val termSelect = TermSelects.ScalaMap
     val parameterizedType = TypeSelects.ScalaMap
-    val tupleArgType = Type.Tuple(List(TypeSelects.ScalaString, TypeSelects.ScalaInt))
+    val tupleArgType = Type.Tuple(List(TypeSelects.JavaString, TypeSelects.ScalaInt))
     val tupleArgTypes = List.fill(2)(tupleArgType)
     val maybeTupleArgTypes = tupleArgTypes.map(Some(_))
 
@@ -65,7 +65,7 @@ class InitializerDeclDefInferrerImplTest extends UnitTestSuite {
   test("inferByArgTypes() for scalar arg type when inferrable") {
     val termSelect = TermSelects.ScalaList
     val parameterizedType = TypeSelects.ScalaList
-    val argType = TypeSelects.ScalaString
+    val argType = TypeSelects.JavaString
     val argTypes = List.fill(2)(argType)
     val maybeArgTypes = argTypes.map(Some(_))
 

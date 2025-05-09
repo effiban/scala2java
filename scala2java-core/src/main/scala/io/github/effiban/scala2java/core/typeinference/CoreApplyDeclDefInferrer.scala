@@ -56,7 +56,7 @@ private[typeinference] class CoreApplyDeclDefInferrer(initializerDeclDefInferrer
       case (Term.Select(_, q"take"), TermApplyInferenceContext(Some(parentType), _)) if typeClassifier.isJavaListLike(parentType) =>
         Some(parentType)
 
-      case (Term.Select(_, q"toString"), _) => Some(TypeSelects.ScalaString)
+      case (Term.Select(_, q"toString"), _) => Some(TypeSelects.JavaString)
 
       case (q"scala.Predef.print" | q"scala.Predef.println", _) => Some(TypeSelects.ScalaUnit)
 

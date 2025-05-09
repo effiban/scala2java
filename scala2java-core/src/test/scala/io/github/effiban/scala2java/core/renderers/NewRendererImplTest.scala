@@ -46,13 +46,13 @@ class NewRendererImplTest extends UnitTestSuite {
 
   test("render instantiation of 'scala.Array'") {
     val init = Init(
-      tpe = Type.Apply(TypeSelects.ScalaArray, List(TypeSelects.ScalaString)),
+      tpe = Type.Apply(TypeSelects.ScalaArray, List(TypeSelects.JavaString)),
       name = Name.Anonymous(),
       argss = List(List(Lit.Int(3)))
     )
     val `new` = New(init)
 
-    val expectedContext = ArrayInitializerSizeRenderContext(tpe = TypeSelects.ScalaString, size = Lit.Int(3))
+    val expectedContext = ArrayInitializerSizeRenderContext(tpe = TypeSelects.JavaString, size = Lit.Int(3))
 
     when(arrayInitializerRenderContextResolver.tryResolve(`new`.init)).thenReturn(Some(expectedContext))
 

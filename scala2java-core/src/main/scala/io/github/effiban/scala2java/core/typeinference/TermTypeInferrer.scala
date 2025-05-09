@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.typeinference
 
 import io.github.effiban.scala2java.core.entities.TypeSelects
-import io.github.effiban.scala2java.core.entities.TypeSelects.ScalaString
+import io.github.effiban.scala2java.core.entities.TypeSelects.JavaString
 import io.github.effiban.scala2java.spi.typeinferrers.TypeInferrer0
 
 import scala.meta.Term.{Annotate, ApplyType, Ascribe, Assign, Block, Do, For, ForYield, If, New, Return, Throw, Try, TryWithHandler, While}
@@ -37,7 +37,7 @@ private[typeinference] class TermTypeInferrerImpl(applyInfixTypeInferrer: => App
       case forYield: ForYield => infer(forYield.body)
       case function: Term.Function => Some(functionTypeInferrer.infer(function))
       case `if`: If => ifTypeInferrer.infer(`if`)
-      case _: Term.Interpolate => Some(ScalaString)
+      case _: Term.Interpolate => Some(JavaString)
       case lit: Lit => litTypeInferrer.infer(lit)
       case _: Term.Name => None // TODO handle local/file/package-scope Term.Name-s
       case `new`: New => Some(`new`.init.tpe)

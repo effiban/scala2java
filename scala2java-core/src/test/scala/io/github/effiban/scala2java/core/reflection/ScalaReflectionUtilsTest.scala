@@ -185,12 +185,18 @@ class ScalaReflectionUtilsTest extends UnitTestSuite {
     isTermMemberOfCompanionOf(t"scala.List", q"bla") shouldBe false
   }
 
-  test("isTypeMemberOf() when true") {
-    isTypeMemberOf(RuntimeMirror.staticPackage("scala.collection.immutable"), Type.Name("List")) shouldBe true
+  test("findAsScalaMetaTypeRef() when found directly") {
+    findAsScalaMetaTypeRef(RuntimeMirror.staticPackage("scala.collection.immutable"), t"List").value.structure shouldBe
+      t"scala.collection.immutable.List".structure
   }
 
-  test("isTypeMemberOf() when false") {
-    isTypeMemberOf(RuntimeMirror.staticPackage("scala.collection.immutable"), Type.Name("bla")) shouldBe false
+  test("findAsScalaMetaTypeRef() when found by dealiasing") {
+    findAsScalaMetaTypeRef(RuntimeMirror.staticPackage("scala"), t"List").value.structure shouldBe
+      t"scala.collection.immutable.List".structure
+  }
+
+  test("findAsScalaMetaTypeRef() when not found") {
+    findAsScalaMetaTypeRef(RuntimeMirror.staticPackage("scala.collection.immutable"), Type.Name("bla")) shouldBe None
   }
 
   test("isNonTrivialEmptyType() for a type which exists and is empty, should return true") {

@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.typeinference
 
 import io.github.effiban.scala2java.core.entities.TypeSelects
-import io.github.effiban.scala2java.core.entities.TypeSelects.{ScalaInt, ScalaString}
+import io.github.effiban.scala2java.core.entities.TypeSelects.{ScalaInt, JavaString}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -128,9 +128,9 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
       body = body
     )
 
-    when(litTypeInferrer.infer(eqTree(body))).thenReturn(Some(ScalaString))
+    when(litTypeInferrer.infer(eqTree(body))).thenReturn(Some(JavaString))
 
-    termTypeInferrer.infer(forYield).value.structure shouldBe ScalaString.structure
+    termTypeInferrer.infer(forYield).value.structure shouldBe JavaString.structure
   }
 
   test("infer Term.Function should return result of 'FunctionTypeInferrer'") {
@@ -158,7 +158,7 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
       args = List(Term.Name("myArg"))
     )
 
-    termTypeInferrer.infer(termInterpolate).value.structure shouldBe ScalaString.structure
+    termTypeInferrer.infer(termInterpolate).value.structure shouldBe JavaString.structure
   }
 
   test("infer 'Lit' when 'LitTypeInferrer' returns a result should return it") {
@@ -201,31 +201,31 @@ class TermTypeInferrerImplTest extends UnitTestSuite {
   test("infer 'Repeated' should return a scala.Array of its inferred type recursively") {
     val expr = Lit.String("abc")
 
-    when(litTypeInferrer.infer(eqTree(expr))).thenReturn(Some(TypeSelects.ScalaString))
+    when(litTypeInferrer.infer(eqTree(expr))).thenReturn(Some(TypeSelects.JavaString))
 
-    termTypeInferrer.infer(Term.Repeated(expr)).value.structure shouldBe Type.Apply(TypeSelects.ScalaArray, List(TypeSelects.ScalaString)).structure
+    termTypeInferrer.infer(Term.Repeated(expr)).value.structure shouldBe Type.Apply(TypeSelects.ScalaArray, List(TypeSelects.JavaString)).structure
   }
 
   test("infer 'Return' should infer by its expression recursively") {
     val expr = Lit.String("abc")
 
-    when(litTypeInferrer.infer(eqTree(expr))).thenReturn(Some(ScalaString))
+    when(litTypeInferrer.infer(eqTree(expr))).thenReturn(Some(JavaString))
 
-    termTypeInferrer.infer(Term.Return(expr)).value.structure shouldBe ScalaString.structure
+    termTypeInferrer.infer(Term.Return(expr)).value.structure shouldBe JavaString.structure
   }
 
   test("infer 'Super' should return result of SuperTypeInferrer") {
     val theSuper = q"super[X]"
 
-    when(superTypeInferrer.infer(eqTree(theSuper))).thenReturn(Some(ScalaString))
+    when(superTypeInferrer.infer(eqTree(theSuper))).thenReturn(Some(JavaString))
 
-    termTypeInferrer.infer(theSuper).value.structure shouldBe ScalaString.structure
+    termTypeInferrer.infer(theSuper).value.structure shouldBe JavaString.structure
   }
 
   test("infer 'Tuple' should return result of 'TupleTypeInferrer'") {
     val termTuple = Term.Tuple(List(Lit.String("a"), Lit.Int(1)))
 
-    val expectedTypeTuple = Type.Tuple(List(ScalaString, ScalaInt))
+    val expectedTypeTuple = Type.Tuple(List(JavaString, ScalaInt))
 
     when(tupleTypeInferrer.infer(eqTree(termTuple))).thenReturn(expectedTypeTuple)
 
