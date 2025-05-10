@@ -133,6 +133,16 @@ class ScalaReflectionUtilsTest extends UnitTestSuite {
       )
   }
 
+  test("findAsScalaMetaTermRef() when found by dealiasing in scala package object") {
+    findAndDealiasAsScalaMetaTermRef(RuntimeMirror.staticPackage("scala"), q"List").value.structure shouldBe
+      q"scala.collection.immutable.List".structure
+  }
+
+  test("findAsScalaMetaTermRef() when found by dealiasing in Predef") {
+    findAndDealiasAsScalaMetaTermRef(RuntimeMirror.staticModule("scala.Predef"), q"Map").value.structure shouldBe
+      q"scala.collection.immutable.Map".structure
+  }
+
   test("isTermMemberOf(Symbol, Term.Name) when true") {
     isTermMemberOf(RuntimeMirror.staticModule("scala.collection.immutable.List"), Term.Name("empty")) shouldBe true
   }
@@ -163,26 +173,6 @@ class ScalaReflectionUtilsTest extends UnitTestSuite {
 
   test("isTermMemberOf(Term.Ref, Term.Name) when false") {
     isTermMemberOf(q"scala.collection.immutable.List", Term.Name("bla")) shouldBe false
-  }
-
-  test("isTermMemberOfCompanionOf(Term.Ref, Term.Name) for a class when true") {
-    isTermMemberOfCompanionOf(t"scala.collection.immutable.List", q"apply") shouldBe true
-  }
-
-  test("isTermMemberOfCompanionOf(Term.Ref, Term.Name) for a class when false") {
-    isTermMemberOfCompanionOf(t"scala.collection.immutable.List", q"bla") shouldBe false
-  }
-
-  test("isTermMemberOfCompanionOf(Term.Ref, Term.Name) for a class when has no companion") {
-    isTermMemberOfCompanionOf(t"io.github.effiban.scala2java.core.reflection.ScalaReflectionUtilsTest", q"bla") shouldBe false
-  }
-
-  test("isTermMemberOfCompanionOf(Term.Ref, Term.Name) for a type def when true") {
-    isTermMemberOfCompanionOf(t"scala.List", q"apply") shouldBe true
-  }
-
-  test("isTermMemberOfCompanionOf(Term.Ref, Term.Name) for a type def when false") {
-    isTermMemberOfCompanionOf(t"scala.List", q"bla") shouldBe false
   }
 
   test("findAsScalaMetaTypeRef() when found directly") {

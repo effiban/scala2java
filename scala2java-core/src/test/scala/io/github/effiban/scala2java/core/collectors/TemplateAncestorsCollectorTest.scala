@@ -26,7 +26,7 @@ class TemplateAncestorsCollectorTest extends UnitTestSuite {
     actualAncestorTypeRefs.structure shouldBe expectedAncestorTypeRefs.structure
   }
 
-  test("collect for subtype of Scala inner type in Scala object: scala.Predef.Set") {
+  test("collect for subtype of Scala inner type in Scala object: scala.collection.immutable.Set") {
     val expectedAncestorTypeRefs = List(
       t"scala.collection.immutable.Set",
       t"scala.collection.immutable.SetOps",
@@ -46,7 +46,7 @@ class TemplateAncestorsCollectorTest extends UnitTestSuite {
 
     val actualAncestorTypeRefs = collect(
       template"""
-      scala.Predef.Set {
+      scala.collection.immutable.Set {
       }
       """
     )
@@ -131,10 +131,10 @@ class TemplateAncestorsCollectorTest extends UnitTestSuite {
       ).structure
   }
 
-  test("collectToMap for subtype of Scala inner type in Scala object: scala.Predef.Set") {
+  test("collectToMap for subtype of Scala inner type in Scala object: scala.collection.immutable.Set") {
     val actualAncestorTypeRefMap = collectToMap(
       template"""
-      scala.Predef.Set {
+      scala.collection.immutable.Set {
       }
       """
     )

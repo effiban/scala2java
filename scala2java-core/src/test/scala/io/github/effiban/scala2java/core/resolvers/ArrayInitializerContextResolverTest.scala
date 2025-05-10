@@ -35,7 +35,7 @@ class ArrayInitializerContextResolverTest extends UnitTestSuite {
     tryResolve(termApply).value should equalArrayInitializerValuesContext(ArrayInitializerValuesContext())
   }
 
-  test("tryResolve() for a 'Term.Apply' of 'scala.List(1)' should return None") {
+  test("tryResolve() for a 'Term.Apply' of 'scala.collection.immutable.List(1)' should return None") {
     val termApply = Term.Apply(TermSelects.ScalaList, List(Lit.Int(1)))
 
     tryResolve(termApply) shouldBe None
@@ -77,7 +77,7 @@ class ArrayInitializerContextResolverTest extends UnitTestSuite {
     tryResolve(init).value should equalArrayInitializerSizeContext(ArrayInitializerSizeContext())
   }
 
-  test("""tryResolve() for an 'Init' of 'scala.List(3)' should return None""") {
+  test("""tryResolve() for an 'Init' of 'scala.collection.immutable.List(3)' should return None""") {
     val arg = Lit.Int(3)
     val init = Init(
       tpe = TypeSelects.ScalaList,

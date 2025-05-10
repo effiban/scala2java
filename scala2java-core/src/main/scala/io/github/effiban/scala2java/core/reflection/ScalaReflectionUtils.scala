@@ -55,13 +55,6 @@ object ScalaReflectionUtils {
     cls.baseClasses.flatMap(asClassSymbol)
   }
 
-  def isTermMemberOf(symbol: Symbol, termName: Term.Name): Boolean = {
-    symbol.info.member(TermName(termName.value)) match {
-      case NoSymbol => false
-      case _ => true
-    }
-  }
-
   def isTermMemberOf(typeRef: Type.Ref, termName: Term.Name): Boolean = {
     classSymbolOf(typeRef).exists(cls => isTermMemberOf(cls, termName))
   }
@@ -73,15 +66,27 @@ object ScalaReflectionUtils {
     }
   }
 
-  def isTermMemberOfCompanionOf(symbol: Symbol, termName: Term.Name): Boolean = {
-    symbol.info.companion.member(TermName(termName.value)) match {
+  def isTermMemberOf(symbol: Symbol, termName: Term.Name): Boolean = {
+    symbol.info.member(TermName(termName.value)) match {
       case NoSymbol => false
       case _ => true
     }
   }
 
-  def isTermMemberOfCompanionOf(typeRef: Type.Ref, termName: Term.Name): Boolean = {
-    classSymbolOf(typeRef).exists(cls => isTermMemberOfCompanionOf(cls, termName))
+  def findAndDealiasAsScalaMetaTermRef(ownerModule: ModuleSymbol, termName: Term.Name): Option[Term.Ref] = {
+    val member = ownerModule.info.member(TermName(termName.value))
+    val maybeDealiasedFullName = member match {
+      case termSymbol: TermSymbol =>
+        val memberTypeFullName = member.typeSignature.toString
+        if (memberTypeFullName.endsWith(".type") && !termSymbol.isJava) {
+          // This indicates a member which is an alias to a Scala object
+          Some(s"scala.${memberTypeFullName.stripPrefix("scala.").stripSuffix(".type")}")
+        } else {
+          Some(termSymbol.fullName)
+        }
+      case _ => None
+    }
+    maybeDealiasedFullName.map(_.parse[Term].get.asInstanceOf[Term.Ref])
   }
 
   def findAsScalaMetaTypeRef(ownerModule: ModuleSymbol, typeName: Type.Name): Option[Type.Ref] = {

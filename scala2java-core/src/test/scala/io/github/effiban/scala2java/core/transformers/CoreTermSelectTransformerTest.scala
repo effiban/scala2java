@@ -8,7 +8,7 @@ import scala.meta.{Term, XtensionQuasiquoteTerm}
 
 class CoreTermSelectTransformerTest extends UnitTestSuite {
 
-  test("transform 'scala.Nil' should return 'java.util.List.of()'") {
+  test("transform 'scala.collection.immutable.Nil' should return 'java.util.List.of()'") {
     transform(ScalaNil).value.structure shouldBe q"java.util.List.of()".structure
   }
 

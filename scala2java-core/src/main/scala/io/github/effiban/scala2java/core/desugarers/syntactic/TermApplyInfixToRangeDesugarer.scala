@@ -15,10 +15,10 @@ object TermApplyInfixToRangeDesugarer extends TermApplyInfixDesugarer {
   }
 
   private def inclusiveRangeOf(start: Term, end: Term) =
-    Term.Apply(fun = q"scala.Range.inclusive", args = List(start, end))
+    Term.Apply(fun = q"scala.collection.immutable.Range.inclusive", args = List(start, end))
 
   private def exclusiveRangeOf(start: Term, end: Term) =
-    Term.Apply(fun = q"scala.Range.apply", args = List(start, end))
+    Term.Apply(fun = q"scala.collection.immutable.Range.apply", args = List(start, end))
 
   private def handleInvalidRHS(termApplyInfix: Term.ApplyInfix): Term.Apply = {
     throw new IllegalStateException(s"A range must have exactly one RHS term, but ${termApplyInfix.args.length} found in: $termApplyInfix")
