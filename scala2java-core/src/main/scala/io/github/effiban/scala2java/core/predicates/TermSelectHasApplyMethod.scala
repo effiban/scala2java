@@ -9,15 +9,5 @@ trait TermSelectHasApplyMethod extends (Term.Select => Boolean)
 
 object TermSelectHasApplyMethod extends TermSelectHasApplyMethod {
 
-  override def apply(termSelect: Term.Select): Boolean = {
-    (termSelect.qual, termSelect.name) match {
-      case (qual: Term.Ref, name) =>
-        hasApplyMethodOnObjectOf(termSelect)
-      case _ => false
-    }
-  }
-
-  private def hasApplyMethodOnObjectOf(termSelect: Term.Select) = {
-    isTermMemberOf(termSelect, q"apply")
-  }
+  override def apply(termSelect: Term.Select): Boolean = isTermMemberOf(termSelect, q"apply")
 }
