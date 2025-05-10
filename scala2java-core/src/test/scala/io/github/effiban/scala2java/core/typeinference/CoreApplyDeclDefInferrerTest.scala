@@ -20,8 +20,8 @@ class CoreApplyDeclDefInferrerTest extends UnitTestSuite {
 
   private val coreApplyDeclDefInferrer = new CoreApplyDeclDefInferrer(initializerDeclDefInferrer, typeClassifier)
 
-  test("""infer scala.List.apply[java.lang.String]("a", "b")""") {
-    val termApply = q"""scala.List.apply[java.lang.String]("a", "b")"""
+  test("""infer scala.collection.immutable.List.apply[java.lang.String]("a", "b")""") {
+    val termApply = q"""scala.collection.immutable.List.apply[java.lang.String]("a", "b")"""
 
     val argTypes = List(TypeSelects.JavaString, TypeSelects.JavaString)
     val maybeArgTypes = argTypes.map(Some(_))
@@ -40,8 +40,8 @@ class CoreApplyDeclDefInferrerTest extends UnitTestSuite {
     )
   }
 
-  test("""infer scala.Predef.Map.apply[java.lang.String, scala.Int](("a", 1), ("b", 2))""") {
-    val termApply = q"""scala.Predef.Map.apply[java.lang.String, scala.Int](("a", 1), ("b", 2))"""
+  test("""infer scala.collection.immutable.Map.apply[java.lang.String, scala.Int](("a", 1), ("b", 2))""") {
+    val termApply = q"""scala.collection.immutable.Map.apply[java.lang.String, scala.Int](("a", 1), ("b", 2))"""
 
     val appliedTypes = List(TypeSelects.JavaString, TypeSelects.ScalaInt)
     val argTypes = List.fill(2)(Type.Tuple(appliedTypes))
@@ -61,8 +61,8 @@ class CoreApplyDeclDefInferrerTest extends UnitTestSuite {
     )
   }
 
-  test("""infer scala.Predef.Map.empty[java.lang.String, scala.Int]()""") {
-    val termApply = q"""scala.Predef.Map.empty[java.lang.String, scala.Int]()"""
+  test("""infer scala.collection.immutable.Map.empty[java.lang.String, scala.Int]()""") {
+    val termApply = q"""scala.collection.immutable.Map.empty[java.lang.String, scala.Int]()"""
 
     val appliedTypes = List(TypeSelects.JavaString, TypeSelects.ScalaInt)
     val context = TermApplyInferenceContext(maybeArgTypes = Nil)
@@ -116,8 +116,8 @@ class CoreApplyDeclDefInferrerTest extends UnitTestSuite {
     )
   }
 
-  test("""infer scala.List.apply("a", "b")""") {
-    val termApply = q"""scala.List.apply("a", "b")"""
+  test("""infer scala.collection.immutable.List.apply("a", "b")""") {
+    val termApply = q"""scala.collection.immutable.List.apply("a", "b")"""
 
     val argTypes = List(TypeSelects.JavaString, TypeSelects.JavaString)
     val maybeArgTypes = argTypes.map(Some(_))
@@ -136,8 +136,8 @@ class CoreApplyDeclDefInferrerTest extends UnitTestSuite {
     )
   }
 
-  test("""infer scala.Predef.Map.apply(("a", 1), ("b", 2))""") {
-    val termApply = q"""scala.Predef.Map.apply(("a", 1), ("b", 2))"""
+  test("""infer scala.collection.immutable.Map.apply(("a", 1), ("b", 2))""") {
+    val termApply = q"""scala.collection.immutable.Map.apply(("a", 1), ("b", 2))"""
 
     val tupleTypes = List(TypeSelects.JavaString, TypeSelects.ScalaInt)
     val argTypes = List.fill(2)(Type.Tuple(tupleTypes))
@@ -157,8 +157,8 @@ class CoreApplyDeclDefInferrerTest extends UnitTestSuite {
     )
   }
 
-  test("infer scala.Predef.Map.empty()") {
-    val termApply = q"scala.Predef.Map.empty()"
+  test("infer scala.collection.immutable.Map.empty()") {
+    val termApply = q"scala.collection.immutable.Map.empty()"
 
     val context = TermApplyInferenceContext()
 
@@ -175,8 +175,8 @@ class CoreApplyDeclDefInferrerTest extends UnitTestSuite {
     )
   }
 
-  test("infer scala.Range.inclusive(1, 10)") {
-    val termApply = q"scala.Range.inclusive(1, 10)"
+  test("infer scala.collection.immutable.Range.inclusive(1, 10)") {
+    val termApply = q"scala.collection.immutable.Range.inclusive(1, 10)"
 
     val argTypes = List.fill(2)(TypeSelects.ScalaInt)
     val maybeArgTypes = argTypes.map(Some(_))
@@ -229,8 +229,8 @@ class CoreApplyDeclDefInferrerTest extends UnitTestSuite {
     )
   }
 
-  test("infer scala.List(1, 2).take(1)") {
-    val termApply = q"scala.List(1, 2).take(1)"
+  test("infer scala.collection.immutable.List(1, 2).take(1)") {
+    val termApply = q"scala.collection.immutable.List(1, 2).take(1)"
 
     val parentType = Type.Apply(TypeSelects.ScalaList, List(TypeSelects.ScalaInt))
     val argTypes = List(TypeSelects.ScalaInt)
@@ -261,8 +261,8 @@ class CoreApplyDeclDefInferrerTest extends UnitTestSuite {
     )
   }
 
-  test("infer scala.List(1, 2).length()") {
-    val termApply = q"scala.List(1, 2).length()"
+  test("infer scala.collection.immutable.List(1, 2).length()") {
+    val termApply = q"scala.collection.immutable.List(1, 2).length()"
 
     val parentType = Type.Apply(TypeSelects.ScalaList, List(TypeSelects.ScalaInt))
     val context = TermApplyInferenceContext(maybeParentType = Some(parentType))

@@ -63,7 +63,6 @@ object TypeSelects {
   final val JavaUnsupportedOperationException = t"java.lang.UnsupportedOperationException"
 
   final val ScalaAny = t"scala.Any"
-  final val ScalaAnyRef = t"scala.AnyRef"
   final val ScalaAnyVal = t"scala.AnyVal"
   final val ScalaArray = t"scala.Array"
   final val ScalaArraySeq = t"scala.collection.immutable.ArraySeq"

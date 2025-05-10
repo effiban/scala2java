@@ -9,7 +9,7 @@ import scala.meta.{Lit, Term}
 
 class TermApplyInfixToRangeDesugarerTest extends UnitTestSuite {
   
-  test("desugar 'to' with one arg should return a scala.Range method call") {
+  test("desugar 'to' with one arg should return a scala.collection.immutable.Range method call") {
     val termApplyInfix = Term.ApplyInfix(
       lhs = Lit.Int(1),
       op = ScalaTo,

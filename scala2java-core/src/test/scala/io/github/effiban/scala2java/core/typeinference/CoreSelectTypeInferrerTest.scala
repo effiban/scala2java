@@ -11,7 +11,7 @@ import scala.meta.{XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 class CoreSelectTypeInferrerTest extends UnitTestSuite {
 
-  test("infer() for 'scala.Nil' should return 'scala.List'") {
+  test("infer() for 'scala.collection.immutable.Nil' should return 'scala.collection.immutable.List'") {
     infer(ScalaNil, TermSelectInferenceContext()).value.structure shouldBe ScalaList.structure
   }
 

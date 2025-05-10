@@ -30,7 +30,7 @@ private[typeinference] class CoreApplyDeclDefInferrer(initializerDeclDefInferrer
         inferByAppliedTypes(qual, appliedTypes, args.size)
 
       case (Term.Select(qual: Term.Select, q"apply" | q"empty"), _) => inferByArgTypes(qual, context.maybeArgTypes)
-      case (Term.Select(qual@Term.Select(q"scala", q"Range"), q"inclusive"), _) => inferByArgTypes(qual, context.maybeArgTypes)
+      case (Term.Select(qual@Term.Select(q"scala.collection.immutable", q"Range"), q"inclusive"), _) => inferByArgTypes(qual, context.maybeArgTypes)
       case (Term.Select(qual@Term.Select(q"scala.concurrent", q"Future"), q"successful"), _) => inferByArgTypes(qual, context.maybeArgTypes)
 
       case _ => PartialDeclDef()

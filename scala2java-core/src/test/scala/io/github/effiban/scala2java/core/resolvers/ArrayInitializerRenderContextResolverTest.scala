@@ -28,7 +28,7 @@ class ArrayInitializerRenderContextResolverTest extends UnitTestSuite {
     tryResolve(termApply).value should equalArrayInitializerValuesRenderContext(expectedContext)
   }
 
-  test("tryResolve() for a 'Term.Apply' of 'scala.List(1)' should return None") {
+  test("tryResolve() for a 'Term.Apply' of 'scala.collection.immutable.List(1)' should return None") {
     val termApply = Term.Apply(TermSelects.ScalaList, List(Lit.Int(1)))
 
     tryResolve(termApply) shouldBe None

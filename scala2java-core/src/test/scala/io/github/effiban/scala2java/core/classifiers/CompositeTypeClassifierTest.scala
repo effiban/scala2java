@@ -15,8 +15,8 @@ class CompositeTypeClassifierTest extends UnitTestSuite {
 
   private val JavaTypedStreamLikeScenarios = Table(
     ("Type", "ExpectedResult"),
-    (t"scala.Stream[Int]", true),
-    (t"scala.Set[Int]", false)
+    (t"scala.collection.immutable.Stream[Int]", true),
+    (t"scala.collection.immutable.Set[Int]", false)
   )
 
   private val JavaListLikeScenarios = Table(
@@ -39,7 +39,7 @@ class CompositeTypeClassifierTest extends UnitTestSuite {
 
   private val JavaTypedSetLikeScenarios = Table(
     ("Type", "ExpectedResult"),
-    (t"scala.Set[Int]", true),
+    (t"scala.collection.immutable.Set[Int]", true),
     (t"scala.collection.immutable.TreeSet[Int]", false)
   )
 
@@ -51,7 +51,7 @@ class CompositeTypeClassifierTest extends UnitTestSuite {
 
   private val JavaTypedMapLikeScenarios = Table(
     ("Type", "ExpectedResult"),
-    (t"scala.Map[String, Int]", true),
+    (t"scala.collection.immutable.Map[String, Int]", true),
     (t"scala.collection.immutable.TreeMap[String, Int]", false)
   )
 

@@ -36,7 +36,7 @@ class TermSelectHasApplyMethodTest extends UnitTestSuite {
     (ScalaListMap, true),
     (ScalaSortedMap, true),
     (ScalaTreeMap, true),
-    (ScalaNil, false),
+    (ScalaNil, true),
     (ScalaNone, false),
     (q"foo.bar", false)
   )

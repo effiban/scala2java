@@ -23,7 +23,7 @@ class CoreQualifiedTermApplyTransformerTest extends UnitTestSuite {
     termSelectClassifier
   )
 
-  test("transform 'scala.Range.apply(1, 10)' should return 'java.util.stream.IntStream.range(1, 10)'") {
+  test("transform 'scala.collection.immutable.Range.apply(1, 10)' should return 'java.util.stream.IntStream.range(1, 10)'") {
     val args = List(q"1", q"10")
     val scalaQualifiedTermApply = QualifiedTermApply(Term.Select(ScalaRange, Apply), args)
     val expectedJavaQualifiedTermApply = QualifiedTermApply(Term.Select(JavaIntStream, JavaRange), args)
@@ -32,7 +32,7 @@ class CoreQualifiedTermApplyTransformerTest extends UnitTestSuite {
       equalQualifiedTermApply(expectedJavaQualifiedTermApply)
   }
 
-  test("transform 'scala.Range.inclusive(1, 10)' should return 'java.util.stream.IntStream.rangeClosed(1, 10)'") {
+  test("transform 'scala.collection.immutable.Range.inclusive(1, 10)' should return 'java.util.stream.IntStream.rangeClosed(1, 10)'") {
     val args = List(q"1", q"10")
     val scalaQualifiedTermApply = QualifiedTermApply(Term.Select(ScalaRange, ScalaInclusive), args)
     val expectedJavaQualifiedTermApply = QualifiedTermApply(Term.Select(JavaIntStream, JavaRangeClosed), args)
@@ -261,7 +261,7 @@ class CoreQualifiedTermApplyTransformerTest extends UnitTestSuite {
       equalQualifiedTermApply(expectedJavaQualifiedTermApply)
   }
 
-  test("transform 'scala.Stream.apply(1, 2)' should return 'java.util.stream.Stream.of(1, 2)'") {
+  test("transform 'scala.collection.immutable.Stream.apply(1, 2)' should return 'java.util.stream.Stream.of(1, 2)'") {
     val args = List(q"1", q"2")
     val scalaQualifiedTermApply = QualifiedTermApply(Term.Select(ScalaStream, Apply), args)
     val expectedJavaQualifiedTermApply = QualifiedTermApply(Term.Select(JavaStream, JavaOf), args)
@@ -272,7 +272,7 @@ class CoreQualifiedTermApplyTransformerTest extends UnitTestSuite {
       equalQualifiedTermApply(expectedJavaQualifiedTermApply)
   }
 
-  test("transform 'scala.Stream.apply[java.lang.Integer](1, 2)' should return 'java.util.stream.Stream.of[java.lang.Integer](1, 2)'") {
+  test("transform 'scala.collection.immutable.Stream.apply[java.lang.Integer](1, 2)' should return 'java.util.stream.Stream.of[java.lang.Integer](1, 2)'") {
     val args = List(q"1", q"2")
     val typeArgs = List(TypeSelects.JavaInteger)
     val scalaQualifiedTermApply = QualifiedTermApply(Term.Select(ScalaStream, Apply), typeArgs, args)
@@ -284,7 +284,7 @@ class CoreQualifiedTermApplyTransformerTest extends UnitTestSuite {
       equalQualifiedTermApply(expectedJavaQualifiedTermApply)
   }
 
-  test("transform 'scala.Stream.empty()' should return 'java.util.stream.Stream.of()'") {
+  test("transform 'scala.collection.immutable.Stream.empty()' should return 'java.util.stream.Stream.of()'") {
     val scalaQualifiedTermApply = QualifiedTermApply(Term.Select(ScalaStream, Empty), Nil)
     val expectedJavaQualifiedTermApply = QualifiedTermApply(Term.Select(JavaStream, JavaOf), Nil)
 
@@ -294,7 +294,7 @@ class CoreQualifiedTermApplyTransformerTest extends UnitTestSuite {
       equalQualifiedTermApply(expectedJavaQualifiedTermApply)
   }
 
-  test("transform 'scala.Stream.empty[java.lang.Integer]()' should return 'java.util.stream.Stream.of[java.lang.Integer]()'") {
+  test("transform 'scala.collection.immutable.Stream.empty[java.lang.Integer]()' should return 'java.util.stream.Stream.of[java.lang.Integer]()'") {
     val typeArgs = List(TypeSelects.JavaInteger)
     val scalaQualifiedTermApply = QualifiedTermApply(Term.Select(ScalaStream, Empty), typeArgs, Nil)
     val expectedJavaQualifiedTermApply = QualifiedTermApply(Term.Select(JavaStream, JavaOf), typeArgs, Nil)
@@ -349,7 +349,7 @@ class CoreQualifiedTermApplyTransformerTest extends UnitTestSuite {
       equalQualifiedTermApply(expectedJavaQualifiedTermApply)
   }
 
-  test("transform 'scala.Set.apply(1, 2)' should return 'java.util.Set.of(1, 2)'") {
+  test("transform 'scala.collection.immutable.Set.apply(1, 2)' should return 'java.util.Set.of(1, 2)'") {
     val args = List(q"1", q"2")
     val scalaQualifiedTermApply = QualifiedTermApply(Term.Select(ScalaSet, Apply), args)
     val expectedJavaQualifiedTermApply = QualifiedTermApply(Term.Select(JavaSet, JavaOf), args)
@@ -360,7 +360,7 @@ class CoreQualifiedTermApplyTransformerTest extends UnitTestSuite {
       equalQualifiedTermApply(expectedJavaQualifiedTermApply)
   }
 
-  test("transform 'scala.Set.apply[java.lang.Integer](1, 2)' should return 'java.util.Set.of[java.lang.Integer](1, 2)'") {
+  test("transform 'scala.collection.immutable.Set.apply[java.lang.Integer](1, 2)' should return 'java.util.Set.of[java.lang.Integer](1, 2)'") {
     val args = List(q"1", q"2")
     val typeArgs = List(TypeSelects.JavaInteger)
     val scalaQualifiedTermApply = QualifiedTermApply(Term.Select(ScalaSet, Apply), typeArgs, args)
@@ -372,7 +372,7 @@ class CoreQualifiedTermApplyTransformerTest extends UnitTestSuite {
       equalQualifiedTermApply(expectedJavaQualifiedTermApply)
   }
 
-  test("transform 'scala.Set.empty()' should return 'java.util.Set.of()'") {
+  test("transform 'scala.collection.immutable.Set.empty()' should return 'java.util.Set.of()'") {
     val scalaQualifiedTermApply = QualifiedTermApply(Term.Select(ScalaSet, Empty), Nil)
     val expectedJavaQualifiedTermApply = QualifiedTermApply(Term.Select(JavaSet, JavaOf), Nil)
 
@@ -382,7 +382,7 @@ class CoreQualifiedTermApplyTransformerTest extends UnitTestSuite {
       equalQualifiedTermApply(expectedJavaQualifiedTermApply)
   }
 
-  test("transform 'scala.Set.empty[java.lang.Integer]()' should return 'java.util.Set.of[java.lang.Integer]()'") {
+  test("transform 'scala.collection.immutable.Set.empty[java.lang.Integer]()' should return 'java.util.Set.of[java.lang.Integer]()'") {
     val typeArgs = List(TypeSelects.JavaInteger)
     val scalaQualifiedTermApply = QualifiedTermApply(Term.Select(ScalaSet, Empty), typeArgs, Nil)
     val expectedJavaQualifiedTermApply = QualifiedTermApply(Term.Select(JavaSet, JavaOf), typeArgs, Nil)
@@ -393,7 +393,7 @@ class CoreQualifiedTermApplyTransformerTest extends UnitTestSuite {
       equalQualifiedTermApply(expectedJavaQualifiedTermApply)
   }
 
-  test("""transform 'scala.Map.apply(("a", 1), ("b", 2))' should return 'java.util.Map.ofEntries(("a", 1), ("b", 2))'""") {
+  test("""transform 'scala.collection.immutable.Map.apply(("a", 1), ("b", 2))' should return 'java.util.Map.ofEntries(("a", 1), ("b", 2))'""") {
     val args = List(q"""("a", 1)""", q"""("b", 2)""")
     val scalaQualifiedTermApply = QualifiedTermApply(Term.Select(ScalaMap, Apply), args)
     val expectedJavaQualifiedTermApply = QualifiedTermApply(Term.Select(JavaMap, JavaOfEntries), args)
@@ -405,7 +405,7 @@ class CoreQualifiedTermApplyTransformerTest extends UnitTestSuite {
   }
 
   test(
-    """transform 'scala.Map.apply[java.lang.String, java.lang.Integer](("a", 1), ("b", 2))'
+    """transform 'scala.collection.immutable.Map.apply[java.lang.String, java.lang.Integer](("a", 1), ("b", 2))'
       |should return 'java.util.Map.ofEntries[java.lang.String, java.lang.Integer](("a", 1), ("b", 2))'""".stripMargin) {
     val args = List(q"""("a", 1)""", q"""("b", 2)""")
     val typeArgs = List(TypeSelects.JavaString, TypeSelects.JavaInteger)
@@ -418,7 +418,7 @@ class CoreQualifiedTermApplyTransformerTest extends UnitTestSuite {
       equalQualifiedTermApply(expectedJavaQualifiedTermApply)
   }
 
-  test("transform 'scala.Map.empty()' should return 'java.util.Map.of()'") {
+  test("transform 'scala.collection.immutable.Map.empty()' should return 'java.util.Map.of()'") {
     val scalaQualifiedTermApply = QualifiedTermApply(Term.Select(ScalaMap, Empty), Nil)
     val expectedJavaQualifiedTermApply = QualifiedTermApply(Term.Select(JavaMap, TermNames.JavaOf), Nil)
 
@@ -428,7 +428,7 @@ class CoreQualifiedTermApplyTransformerTest extends UnitTestSuite {
       equalQualifiedTermApply(expectedJavaQualifiedTermApply)
   }
 
-  test("transform 'scala.Map.empty[java.lang.String, java.lang.Integer]()' " +
+  test("transform 'scala.collection.immutable.Map.empty[java.lang.String, java.lang.Integer]()' " +
     "should return 'java.util.Map.of[java.lang.String, java.lang.Integer]()'") {
     val typeArgs = List(TypeSelects.JavaString, TypeSelects.JavaInteger)
     val scalaQualifiedTermApply = QualifiedTermApply(Term.Select(ScalaMap, Empty), typeArgs, Nil)

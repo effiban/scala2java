@@ -87,7 +87,7 @@ class TreeQualifierImplTest extends UnitTestSuite {
       q"""
       def foo() = {
         val x = scala.None
-        val y = scala.Nil
+        val y = scala.collection.immutable.Nil
       }
       """
 
