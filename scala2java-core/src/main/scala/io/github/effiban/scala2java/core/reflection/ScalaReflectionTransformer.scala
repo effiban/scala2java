@@ -7,9 +7,9 @@ import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLooku
 import scala.meta.{Term, Type, XtensionParseInputLike}
 import scala.reflect.runtime.universe._
 
-object ScalaReflectionTransformer {
+private[reflection] object ScalaReflectionTransformer {
 
-  private[reflection] def toScalaMetaTermRef(member: Symbol): Option[Term.Ref] = {
+  def toScalaMetaTermRef(member: Symbol): Option[Term.Ref] = {
     val maybeDealiasedFullName = member match {
       case termSymbol: TermSymbol =>
         if (isSingletonType(termSymbol)) {
@@ -22,16 +22,17 @@ object ScalaReflectionTransformer {
     maybeDealiasedFullName.map(_.parse[Term].get.asInstanceOf[Term.Ref])
   }
 
-  def asScalaMetaTypeRef(classSymbol: ClassSymbol): Option[Type.Ref] = {
-    classSymbol.owner match {
-      case owner if owner.isPackage =>
-        val qualifier = owner.fullName.parse[Term].get.asInstanceOf[Term.Ref]
-        Some(Type.Select(qualifier, Type.Name(classSymbol.name.toString)))
-      case owner if owner.isClass =>
-        val qualifier = owner.fullName.parse[Type].get
-        Some(Type.Project(qualifier, Type.Name(classSymbol.name.toString)))
-      case _ => None
-    }
+  def toScalaMetaTypeRef(symbol: Symbol): Option[Type.Ref] = {
+    dealiasedClassSymbolOf(symbol).flatMap(classSymbol =>
+      classSymbol.owner match {
+        case owner if owner.isPackage =>
+          val qualifier = owner.fullName.parse[Term].get.asInstanceOf[Term.Ref]
+          Some(Type.Select(qualifier, Type.Name(classSymbol.name.toString)))
+        case owner if owner.isClass =>
+          val qualifier = owner.fullName.parse[Type].get
+          Some(Type.Project(qualifier, Type.Name(classSymbol.name.toString)))
+        case _ => None
+      })
   }
 
   def toClassSymbol(tpe: Type): Option[ClassSymbol] = tpe match {
