@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.cleanup
 
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionUtils.isTermMemberOf
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionLookup.isTermMemberOf
 
 import scala.meta.{Decl, Defn, Pat, Template, Type}
 

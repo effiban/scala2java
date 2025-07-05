@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.predicates
 
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionUtils.isTermMemberOf
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionLookup.isTermMemberOf
 
 import scala.meta.{Term, XtensionQuasiquoteTerm}
 

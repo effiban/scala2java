@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.typeinference
 
 import io.github.effiban.scala2java.core.qualifiers.QualificationContext
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionUtils.isTermMemberOf
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionLookup.isTermMemberOf
 
 import scala.collection.immutable.ListMap
 import scala.meta.{Template, Term, Type}

@@ -2,38 +2,26 @@ package io.github.effiban.scala2java.core.reflection
 
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.asClassSymbol
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.{findModuleSymbolOf, findModuleTypeMemberOf, findTermMemberOf}
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionTransformer.classSymbolOf
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionTransformer.{asScalaMetaTypeRef, classSymbolOf}
 
 import scala.meta.{Term, Type, XtensionParseInputLike}
-import scala.reflect.runtime.universe._
+import scala.reflect.runtime.universe.{ClassSymbol, TermSymbol}
 
-object ScalaReflectionUtils {
-
-  def asScalaMetaTypeRef(classSymbol: ClassSymbol): Option[Type.Ref] = {
-    classSymbol.owner match {
-      case owner if owner.isPackage =>
-        val qualifier = owner.fullName.parse[Term].get.asInstanceOf[Term.Ref]
-        Some(Type.Select(qualifier, Type.Name(classSymbol.name.toString)))
-      case owner if owner.isClass =>
-        val qualifier = owner.fullName.parse[Type].get
-        Some(Type.Project(qualifier, Type.Name(classSymbol.name.toString)))
-      case _ => None
-    }
-  }
-
-  def selfAndBaseClassesOf(cls: ClassSymbol): List[ClassSymbol] = {
-    ScalaReflectionInternalLookup.selfAndBaseClassesOf(cls)
-  }
+object ScalaReflectionLookup {
 
   def isTermMemberOf(typeRef: Type.Ref, termName: Term.Name): Boolean = {
     classSymbolOf(typeRef).exists(cls => ScalaReflectionInternalLookup.isTermMemberOf(cls, termName.value))
   }
 
-  def isTermMemberOf(termSelect: Term.Select, termName: Term.Name): Boolean = {
-    findModuleSymbolOf(termSelect.toString()) match {
+  def isTermMemberOf(termRef: Term.Ref, termName: Term.Name): Boolean = {
+    findModuleSymbolOf(termRef.toString()) match {
       case Some(module) => ScalaReflectionInternalLookup.isTermMemberOf(module, termName.value)
       case _ => false
     }
+  }
+
+  def selfAndBaseClassesOf(cls: ClassSymbol): List[ClassSymbol] = {
+    ScalaReflectionInternalLookup.selfAndBaseClassesOf(cls)
   }
 
   def findAndDealiasAsScalaMetaTermRef(moduleTerm: Term.Ref, termName: Term.Name): Option[Term.Ref] = {
