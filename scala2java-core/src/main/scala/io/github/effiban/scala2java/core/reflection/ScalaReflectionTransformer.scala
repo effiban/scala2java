@@ -34,18 +34,18 @@ object ScalaReflectionTransformer {
     }
   }
 
-  def classSymbolOf(tpe: Type): Option[ClassSymbol] = tpe match {
-    case Type.Apply(typeSelect: Type.Select, _) => classSymbolOf(typeSelect)
-    case typeSelect: Type.Select => classSymbolOf(typeSelect)
+  def toClassSymbol(tpe: Type): Option[ClassSymbol] = tpe match {
+    case Type.Apply(typeSelect: Type.Select, _) => toClassSymbol(typeSelect)
+    case typeSelect: Type.Select => toClassSymbol(typeSelect)
     case Type.Project(tpe, name) => innerClassSymbolOf(tpe, name)
     case _ => None
   }
 
-  private def classSymbolOf(typeSelect: Type.Select): Option[ClassSymbol] = {
-    classSymbolOf(typeSelect.qual.toString(), typeSelect.name.value)
+  private def toClassSymbol(typeSelect: Type.Select): Option[ClassSymbol] = {
+    toClassSymbolOf(typeSelect.qual.toString(), typeSelect.name.value)
   }
 
-  private def classSymbolOf(qualifierName: String, typeName: String): Option[ClassSymbol] = {
+  private def toClassSymbolOf(qualifierName: String, typeName: String): Option[ClassSymbol] = {
     findModuleSymbolOf(qualifierName)
       .map(module => module.typeSignature.decl(TypeName(typeName)))
       .flatMap(dealiasedClassSymbolOf)
@@ -53,7 +53,7 @@ object ScalaReflectionTransformer {
 
   private def innerClassSymbolOf(outerType: Type, innerName: Type.Name): Option[ClassSymbol] = {
     val innerTypeName = TypeName(innerName.value)
-    classSymbolOf(outerType)
+    toClassSymbol(outerType)
       .flatMap(outerClassSymbol => dealiasedClassSymbolOf(findInnerClassSymbolOf(outerClassSymbol, innerTypeName)))
   }
 }

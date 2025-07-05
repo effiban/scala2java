@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.reflection
 
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.dealiasedClassSymbolOf
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.{findModuleSymbolOf, findModuleTypeMemberOf}
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionTransformer.{asScalaMetaTypeRef, classSymbolOf, toScalaMetaTermRef}
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionTransformer.{asScalaMetaTypeRef, toClassSymbol, toScalaMetaTermRef}
 
 import scala.meta.{Term, Type}
 import scala.reflect.runtime.universe.{ClassSymbol, NoSymbol}
@@ -10,7 +10,7 @@ import scala.reflect.runtime.universe.{ClassSymbol, NoSymbol}
 object ScalaReflectionLookup {
 
   def isTermMemberOf(typeRef: Type.Ref, termName: Term.Name): Boolean = {
-    classSymbolOf(typeRef).exists(cls => ScalaReflectionInternalLookup.isTermMemberOf(cls, termName.value))
+    toClassSymbol(typeRef).exists(cls => ScalaReflectionInternalLookup.isTermMemberOf(cls, termName.value))
   }
 
   def isTermMemberOf(termRef: Term.Ref, termName: Term.Name): Boolean = {

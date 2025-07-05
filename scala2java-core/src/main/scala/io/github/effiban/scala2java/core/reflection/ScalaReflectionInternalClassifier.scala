@@ -1,8 +1,5 @@
 package io.github.effiban.scala2java.core.reflection
 
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionTransformer.classSymbolOf
-
-import scala.meta.Type
 import scala.reflect.runtime.universe
 import scala.reflect.runtime.universe._
 
