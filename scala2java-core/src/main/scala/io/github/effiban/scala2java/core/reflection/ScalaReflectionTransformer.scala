@@ -3,10 +3,22 @@ package io.github.effiban.scala2java.core.reflection
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.asClassSymbol
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.{findInnerClassSymbolOf, findModuleSymbolOf}
 
-import scala.meta.Type
+import scala.meta.{Term, Type, XtensionParseInputLike}
 import scala.reflect.runtime.universe._
 
 object ScalaReflectionTransformer {
+
+  def asScalaMetaTypeRef(classSymbol: ClassSymbol): Option[Type.Ref] = {
+    classSymbol.owner match {
+      case owner if owner.isPackage =>
+        val qualifier = owner.fullName.parse[Term].get.asInstanceOf[Term.Ref]
+        Some(Type.Select(qualifier, Type.Name(classSymbol.name.toString)))
+      case owner if owner.isClass =>
+        val qualifier = owner.fullName.parse[Type].get
+        Some(Type.Project(qualifier, Type.Name(classSymbol.name.toString)))
+      case _ => None
+    }
+  }
 
   def classSymbolOf(tpe: Type): Option[ClassSymbol] = tpe match {
     case Type.Apply(typeSelect: Type.Select, _) => classSymbolOf(typeSelect)

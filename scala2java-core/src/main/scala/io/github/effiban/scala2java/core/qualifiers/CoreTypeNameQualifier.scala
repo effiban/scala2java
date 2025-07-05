@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.qualifiers
 
 import io.github.effiban.scala2java.core.entities.TermNames.Scala
 import io.github.effiban.scala2java.core.entities.TermSelects.{JavaLang, ScalaPredef}
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionUtils.findAsScalaMetaTypeRef
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionLookup.findAsScalaMetaTypeRef
 
 import scala.meta.{Term, Type}
 

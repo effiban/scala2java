@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.cleanup
 
-import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.core.cleanup.IsTemplateAncestorUsedByOverride.apply
+import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 
 import scala.meta.{XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
