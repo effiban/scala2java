@@ -117,6 +117,7 @@ object TypeSelects {
   final val ScalaList = t"scala.collection.immutable.List"
   final val ScalaLong = t"scala.Long"
   final val ScalaMap = t"scala.collection.immutable.Map"
+  final val ScalaNothing = t"scala.Nothing"
   final val ScalaNumeric = t"scala.math.Numeric"
   final val ScalaOption = t"scala.Option"
   final val ScalaOrdered = t"scala.math.Ordered"

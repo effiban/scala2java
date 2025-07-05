@@ -49,6 +49,7 @@ object CoreTypeSelectTransformer extends TypeSelectTransformer {
     ScalaList -> JavaList,
     ScalaLong -> t"long",
     ScalaMap -> JavaMap,
+    ScalaNothing -> JavaObject,
     ScalaOption -> JavaOptional,
     ScalaRange -> t"java.util.List[java.lang.Integer]",
     ScalaRight -> JavaEither,
