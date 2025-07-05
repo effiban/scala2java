@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.reflection
 
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.{asClassSymbol, finalResultTypeFullnameOf}
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.{dealiasedClassSymbolOf, finalResultTypeFullnameOf}
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalClassifier.isSingletonType
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.{findInnerClassSymbolOf, findModuleSymbolOf}
 
@@ -48,12 +48,12 @@ object ScalaReflectionTransformer {
   private def classSymbolOf(qualifierName: String, typeName: String): Option[ClassSymbol] = {
     findModuleSymbolOf(qualifierName)
       .map(module => module.typeSignature.decl(TypeName(typeName)))
-      .flatMap(asClassSymbol)
+      .flatMap(dealiasedClassSymbolOf)
   }
 
   private def innerClassSymbolOf(outerType: Type, innerName: Type.Name): Option[ClassSymbol] = {
     val innerTypeName = TypeName(innerName.value)
     classSymbolOf(outerType)
-      .flatMap(outerClassSymbol => asClassSymbol(findInnerClassSymbolOf(outerClassSymbol, innerTypeName)))
+      .flatMap(outerClassSymbol => dealiasedClassSymbolOf(findInnerClassSymbolOf(outerClassSymbol, innerTypeName)))
   }
 }

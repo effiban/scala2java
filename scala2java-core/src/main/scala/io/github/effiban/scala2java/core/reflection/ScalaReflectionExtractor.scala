@@ -4,7 +4,7 @@ import scala.reflect.runtime.universe._
 
 private[reflection] object ScalaReflectionExtractor {
 
-  def asClassSymbol(symbol: Symbol): Option[ClassSymbol] = {
+  def dealiasedClassSymbolOf(symbol: Symbol): Option[ClassSymbol] = {
     symbol match {
       case aClassSymbol: ClassSymbol => Some(aClassSymbol)
       // Handle the case of a Scala Type which is an alias to a Class

@@ -1,14 +1,14 @@
 package io.github.effiban.scala2java.core.reflection
 
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionAccess.RuntimeMirror
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.asClassSymbol
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.dealiasedClassSymbolOf
 
 import scala.reflect.runtime.universe._
 
 private[reflection] object ScalaReflectionInternalLookup {
 
   def selfAndBaseClassesOf(cls: ClassSymbol): List[ClassSymbol] = {
-    cls.baseClasses.flatMap(asClassSymbol)
+    cls.baseClasses.flatMap(dealiasedClassSymbolOf)
   }
 
   def isTermMemberOf(symbol: Symbol, termName: String): Boolean = {

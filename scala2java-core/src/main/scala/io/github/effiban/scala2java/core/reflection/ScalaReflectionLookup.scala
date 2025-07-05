@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.reflection
 
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.asClassSymbol
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.dealiasedClassSymbolOf
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.{findModuleSymbolOf, findModuleTypeMemberOf}
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionTransformer.{asScalaMetaTypeRef, classSymbolOf, toScalaMetaTermRef}
 
@@ -33,7 +33,7 @@ object ScalaReflectionLookup {
 
   def findAsScalaMetaTypeRef(module: Term.Ref, typeName: Type.Name): Option[Type.Ref] = {
     findModuleSymbolOf(module.toString()).flatMap(ownerModule => {
-      asClassSymbol(findModuleTypeMemberOf(ownerModule, typeName.value))
+      dealiasedClassSymbolOf(findModuleTypeMemberOf(ownerModule, typeName.value))
         .flatMap(asScalaMetaTypeRef)
     })
   }
