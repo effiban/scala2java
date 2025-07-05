@@ -1,12 +1,26 @@
 package io.github.effiban.scala2java.core.reflection
 
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.asClassSymbol
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.{asClassSymbol, finalResultTypeFullnameOf}
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalClassifier.isSingletonType
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.{findInnerClassSymbolOf, findModuleSymbolOf}
 
 import scala.meta.{Term, Type, XtensionParseInputLike}
 import scala.reflect.runtime.universe._
 
 object ScalaReflectionTransformer {
+
+  private[reflection] def toScalaMetaTermRef(member: Symbol): Option[Term.Ref] = {
+    val maybeDealiasedFullName = member match {
+      case termSymbol: TermSymbol =>
+        if (isSingletonType(termSymbol)) {
+          Some(finalResultTypeFullnameOf(termSymbol))
+        } else {
+          Some(termSymbol.fullName)
+        }
+      case _ => None
+    }
+    maybeDealiasedFullName.map(_.parse[Term].get.asInstanceOf[Term.Ref])
+  }
 
   def asScalaMetaTypeRef(classSymbol: ClassSymbol): Option[Type.Ref] = {
     classSymbol.owner match {
