@@ -22,6 +22,8 @@ object TermSelects {
   final val JavaStream = q"java.util.stream.Stream"
   final val JavaTry = q"io.vavr.control.Try"
 
+  final val ScalaPredef = q"scala.Predef"
+
   final val ScalaArray = q"scala.Array"
   final val ScalaArraySeq = q"scala.collection.immutable.ArraySeq"
   final val ScalaBigDecimal = q"scala.math.BigDecimal"

@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.reflection
 
-import io.github.effiban.scala2java.core.entities.ReflectedEntities.RuntimeMirror
+import io.github.effiban.scala2java.core.entities.ScalaReflectedEntities.RuntimeMirror
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionUtils._
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 
@@ -133,13 +133,13 @@ class ScalaReflectionUtilsTest extends UnitTestSuite {
       )
   }
 
-  test("findAsScalaMetaTermRef() when found by dealiasing in scala package object") {
-    findAndDealiasAsScalaMetaTermRef(RuntimeMirror.staticPackage("scala"), q"List").value.structure shouldBe
+  test("findAndDealiasAsScalaMetaTermRef() when found by dealiasing in scala package object") {
+    findAndDealiasAsScalaMetaTermRef(q"scala", q"List").value.structure shouldBe
       q"scala.collection.immutable.List".structure
   }
 
-  test("findAsScalaMetaTermRef() when found by dealiasing in Predef") {
-    findAndDealiasAsScalaMetaTermRef(RuntimeMirror.staticModule("scala.Predef"), q"Map").value.structure shouldBe
+  test("findAndDealiasAsScalaMetaTermRef() when found by dealiasing in Predef") {
+    findAndDealiasAsScalaMetaTermRef(q"scala.Predef", q"Map").value.structure shouldBe
       q"scala.collection.immutable.Map".structure
   }
 
@@ -176,17 +176,17 @@ class ScalaReflectionUtilsTest extends UnitTestSuite {
   }
 
   test("findAsScalaMetaTypeRef() when found directly") {
-    findAsScalaMetaTypeRef(RuntimeMirror.staticPackage("scala.collection.immutable"), t"List").value.structure shouldBe
+    findAsScalaMetaTypeRef(q"scala.collection.immutable", t"List").value.structure shouldBe
       t"scala.collection.immutable.List".structure
   }
 
   test("findAsScalaMetaTypeRef() when found by dealiasing") {
-    findAsScalaMetaTypeRef(RuntimeMirror.staticPackage("scala"), t"List").value.structure shouldBe
+    findAsScalaMetaTypeRef(q"scala", t"List").value.structure shouldBe
       t"scala.collection.immutable.List".structure
   }
 
   test("findAsScalaMetaTypeRef() when not found") {
-    findAsScalaMetaTypeRef(RuntimeMirror.staticPackage("scala.collection.immutable"), Type.Name("bla")) shouldBe None
+    findAsScalaMetaTypeRef(q"scala.collection.immutable", Type.Name("bla")) shouldBe None
   }
 
   test("isNonTrivialEmptyType() for a type which exists and is empty, should return true") {

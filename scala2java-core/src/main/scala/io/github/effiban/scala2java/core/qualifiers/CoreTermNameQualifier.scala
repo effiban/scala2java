@@ -1,11 +1,10 @@
 package io.github.effiban.scala2java.core.qualifiers
 
-import io.github.effiban.scala2java.core.entities.ReflectedEntities.{JavaLangPackage, PredefModule, ScalaPackage}
-import io.github.effiban.scala2java.core.entities.{TermNames, TermSelects}
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionUtils.{findAndDealiasAsScalaMetaTermRef, isTermMemberOf}
+import io.github.effiban.scala2java.core.entities.TermNames.Scala
+import io.github.effiban.scala2java.core.entities.TermSelects.{JavaLang, ScalaPredef}
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionUtils.findAndDealiasAsScalaMetaTermRef
 
 import scala.meta.Term
-import scala.reflect.runtime.universe._
 
 trait CoreTermNameQualifier {
   def qualify(termName: Term.Name): Option[Term]
@@ -23,18 +22,18 @@ object CoreTermNameQualifier extends CoreTermNameQualifier {
   }
 
   private def qualifyAsPredefMember(scalaMetaTermName: Term.Name) = {
-    qualifyAsMemberOf(PredefModule, scalaMetaTermName)
+    qualifyAsMemberOf(ScalaPredef, scalaMetaTermName)
   }
 
   private def qualifyAsScalaPackageMember(scalaMetaTermName: Term.Name) = {
-    qualifyAsMemberOf(ScalaPackage, scalaMetaTermName)
+    qualifyAsMemberOf(Scala, scalaMetaTermName)
   }
 
-  private def qualifyAsJavaLangMember(scalaMetaTermName: Term.Name): Option[Term] = {
-    qualifyAsMemberOf(JavaLangPackage, scalaMetaTermName)
+  private def qualifyAsJavaLangMember(scalaMetaTermName: Term.Name) = {
+    qualifyAsMemberOf(JavaLang, scalaMetaTermName)
   }
 
-  private def qualifyAsMemberOf(module: ModuleSymbol,
+  private def qualifyAsMemberOf(module: Term.Ref,
                                 termName: Term.Name): Option[Term] = {
     findAndDealiasAsScalaMetaTermRef(module, termName)
   }

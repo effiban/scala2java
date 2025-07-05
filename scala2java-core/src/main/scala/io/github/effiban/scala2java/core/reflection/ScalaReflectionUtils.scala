@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.reflection
 
-import io.github.effiban.scala2java.core.entities.ReflectedEntities.RuntimeMirror
+import io.github.effiban.scala2java.core.entities.ScalaReflectedEntities.RuntimeMirror
 
 import scala.annotation.tailrec
 import scala.meta.{Defn, Member, Pkg, Term, Type, XtensionParseInputLike}
@@ -73,25 +73,29 @@ object ScalaReflectionUtils {
     }
   }
 
-  def findAndDealiasAsScalaMetaTermRef(ownerModule: ModuleSymbol, termName: Term.Name): Option[Term.Ref] = {
-    val member = ownerModule.info.member(TermName(termName.value))
-    val maybeDealiasedFullName = member match {
-      case termSymbol: TermSymbol =>
-        val memberTypeFullName = member.typeSignature.toString
-        if (memberTypeFullName.endsWith(".type") && !termSymbol.isJava) {
-          // This indicates a member which is an alias to a Scala object
-          Some(s"scala.${memberTypeFullName.stripPrefix("scala.").stripSuffix(".type")}")
-        } else {
-          Some(termSymbol.fullName)
-        }
-      case _ => None
-    }
-    maybeDealiasedFullName.map(_.parse[Term].get.asInstanceOf[Term.Ref])
+  def findAndDealiasAsScalaMetaTermRef(moduleTerm: Term.Ref, termName: Term.Name): Option[Term.Ref] = {
+    findModuleSymbolOf(moduleTerm.toString()).flatMap(ownerModule => {
+      val member = ownerModule.info.member(TermName(termName.value))
+      val maybeDealiasedFullName = member match {
+        case termSymbol: TermSymbol =>
+          val memberTypeFullName = member.typeSignature.toString
+          if (memberTypeFullName.endsWith(".type") && !termSymbol.isJava) {
+            // This indicates a member which is an alias to a Scala object
+            Some(s"scala.${memberTypeFullName.stripPrefix("scala.").stripSuffix(".type")}")
+          } else {
+            Some(termSymbol.fullName)
+          }
+        case _ => None
+      }
+      maybeDealiasedFullName.map(_.parse[Term].get.asInstanceOf[Term.Ref])
+    })
   }
 
-  def findAsScalaMetaTypeRef(ownerModule: ModuleSymbol, typeName: Type.Name): Option[Type.Ref] = {
-    asClassSymbol(ownerModule.typeSignature.decl(TypeName(typeName.value)))
-      .flatMap(asScalaMetaTypeRef)
+  def findAsScalaMetaTypeRef(module: Term.Ref, typeName: Type.Name): Option[Type.Ref] = {
+    findModuleSymbolOf(module.toString()).flatMap(ownerModule => {
+      asClassSymbol(ownerModule.typeSignature.decl(TypeName(typeName.value)))
+        .flatMap(asScalaMetaTypeRef)
+    })
   }
 
   def isNonTrivialEmptyType(typeRef: Type.Ref): Boolean = {
@@ -188,4 +192,11 @@ object ScalaReflectionUtils {
 
 
   private def isTrivialClassFullName(name: String) = TrivialClassFullNames.contains(name)
+
+  private def findModuleSymbolOf(qualifierName: String): Option[ModuleSymbol] = {
+    scala.util.Try(RuntimeMirror.staticPackage(qualifierName))
+      .orElse(scala.util.Try(RuntimeMirror.staticModule(qualifierName)))
+      .toOption
+  }
+
 }
