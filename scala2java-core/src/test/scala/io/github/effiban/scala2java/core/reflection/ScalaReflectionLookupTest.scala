@@ -1,11 +1,36 @@
 package io.github.effiban.scala2java.core.reflection
 
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionLookup.{findAsScalaMetaTypeRef, findModuleTermMemberOf, findSelfAndBaseClassesOf, isTermMemberOf}
+import io.github.effiban.scala2java.core.entities.TermNames.Scala
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionLookup.{findModuleTermMemberOf, findModuleTypeMemberOf, findSelfAndBaseClassesOf, isTermMemberOf}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 
-import scala.meta.{Term, Type, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
+import scala.meta.{Term, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 class ScalaReflectionLookupTest extends UnitTestSuite {
+
+  test("isTermMemberOf(Type.Ref, Term.Name) for a class when true") {
+    isTermMemberOf(t"scala.collection.immutable.List", Term.Name("empty")) shouldBe true
+  }
+
+  test("isTermMemberOf(Type.Ref, Term.Name) for a class when false") {
+    isTermMemberOf(t"scala.collection.immutable.List", Term.Name("bla")) shouldBe false
+  }
+
+  test("isTermMemberOf(Type.Ref, Term.Name) for a type def when true") {
+    isTermMemberOf(t"scala.List", Term.Name("empty")) shouldBe true
+  }
+
+  test("isTermMemberOf(Type.Ref, Term.Name) for a type def when false") {
+    isTermMemberOf(t"scala.List", Term.Name("bla")) shouldBe false
+  }
+
+  test("isTermMemberOf(Term.Ref, Term.Name) when true") {
+    isTermMemberOf(q"scala.collection.immutable.List", Term.Name("apply")) shouldBe true
+  }
+
+  test("isTermMemberOf(Term.Ref, Term.Name) when false") {
+    isTermMemberOf(q"scala.collection.immutable.List", Term.Name("bla")) shouldBe false
+  }
 
   test("findSelfAndBaseClassesOf() should return the correct list of base classes") {
     findSelfAndBaseClassesOf(t"scala.collection.immutable.Seq").structure shouldBe
@@ -53,42 +78,17 @@ class ScalaReflectionLookupTest extends UnitTestSuite {
       q"scala.collection.immutable.Map".structure
   }
 
-  test("isTermMemberOf(Type.Ref, Term.Name) for a class when true") {
-    isTermMemberOf(t"scala.collection.immutable.List", Term.Name("empty")) shouldBe true
-  }
-
-  test("isTermMemberOf(Type.Ref, Term.Name) for a class when false") {
-    isTermMemberOf(t"scala.collection.immutable.List", Term.Name("bla")) shouldBe false
-  }
-
-  test("isTermMemberOf(Type.Ref, Term.Name) for a type def when true") {
-    isTermMemberOf(t"scala.List", Term.Name("empty")) shouldBe true
-  }
-
-  test("isTermMemberOf(Type.Ref, Term.Name) for a type def when false") {
-    isTermMemberOf(t"scala.List", Term.Name("bla")) shouldBe false
-  }
-
-  test("isTermMemberOf(Term.Ref, Term.Name) when true") {
-    isTermMemberOf(q"scala.collection.immutable.List", Term.Name("apply")) shouldBe true
-  }
-
-  test("isTermMemberOf(Term.Ref, Term.Name) when false") {
-    isTermMemberOf(q"scala.collection.immutable.List", Term.Name("bla")) shouldBe false
-  }
-
-  test("findAsScalaMetaTypeRef() when found directly") {
-    findAsScalaMetaTypeRef(q"scala.collection.immutable", t"List").value.structure shouldBe
+  test("findModuleTypeMemberOf() when found directly") {
+    findModuleTypeMemberOf(q"scala.collection.immutable", t"List").value.structure shouldBe
       t"scala.collection.immutable.List".structure
   }
 
-  test("findAsScalaMetaTypeRef() when found by dealiasing") {
-    findAsScalaMetaTypeRef(q"scala", t"List").value.structure shouldBe
+  test("findModuleTypeMemberOf() when found by dealiasing") {
+    findModuleTypeMemberOf(Scala, t"List").value.structure shouldBe
       t"scala.collection.immutable.List".structure
   }
 
-  test("findAsScalaMetaTypeRef() when not found") {
-    findAsScalaMetaTypeRef(q"scala.collection.immutable", Type.Name("bla")) shouldBe None
+  test("findModuleTypeMemberOf() when not found") {
+    findModuleTypeMemberOf(q"scala.collection.immutable", t"bla") shouldBe None
   }
-
 }
