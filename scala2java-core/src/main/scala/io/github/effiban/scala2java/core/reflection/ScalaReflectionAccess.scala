@@ -1,8 +1,8 @@
-package io.github.effiban.scala2java.core.entities
+package io.github.effiban.scala2java.core.reflection
 
 import scala.reflect.runtime.universe._
 
-object ScalaReflectedEntities {
+private[reflection] object ScalaReflectionAccess {
 
   final val RuntimeMirror = runtimeMirror(getClass.getClassLoader)
 }

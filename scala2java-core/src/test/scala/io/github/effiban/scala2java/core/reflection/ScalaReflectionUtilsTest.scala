@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.reflection
 
-import io.github.effiban.scala2java.core.entities.ScalaReflectedEntities.RuntimeMirror
+import ScalaReflectionAccess.RuntimeMirror
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionUtils._
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 
