@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.reflection
 
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionAccess.RuntimeMirror
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.asClassSymbol
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.{findInnerClassSymbolOf, findModuleSymbolOf}
 
 import scala.meta.Type
 import scala.reflect.runtime.universe._
@@ -13,12 +13,6 @@ object ScalaReflectionTransformer {
     case typeSelect: Type.Select => classSymbolOf(typeSelect)
     case Type.Project(tpe, name) => innerClassSymbolOf(tpe, name)
     case _ => None
-  }
-
-  private[reflection] def findModuleSymbolOf(qualifierName: String): Option[ModuleSymbol] = {
-    scala.util.Try(RuntimeMirror.staticPackage(qualifierName))
-      .orElse(scala.util.Try(RuntimeMirror.staticModule(qualifierName)))
-      .toOption
   }
 
   private def classSymbolOf(typeSelect: Type.Select): Option[ClassSymbol] = {
@@ -34,13 +28,6 @@ object ScalaReflectionTransformer {
   private def innerClassSymbolOf(outerType: Type, innerName: Type.Name): Option[ClassSymbol] = {
     val innerTypeName = TypeName(innerName.value)
     classSymbolOf(outerType)
-      .flatMap(outerClassSymbol => asClassSymbol(innerClassSymbolOf(outerClassSymbol, innerTypeName)))
-  }
-
-  private def innerClassSymbolOf(outerClassSymbol: ClassSymbol, innerTypeName: TypeName): Symbol = {
-    outerClassSymbol.info.decl(innerTypeName) match {
-      case NoSymbol => outerClassSymbol.companion.info.decl(innerTypeName)
-      case symbol => symbol
-    }
+      .flatMap(outerClassSymbol => asClassSymbol(findInnerClassSymbolOf(outerClassSymbol, innerTypeName)))
   }
 }
