@@ -9,58 +9,6 @@ import scala.reflect.runtime.universe.TypeName
 
 class ScalaReflectionUtilsTest extends UnitTestSuite {
 
-  test("classSymbolOf(Type.Select) for an existing top-level class should return the corresponding symbol") {
-    val tpe = t"scala.collection.immutable.List"
-
-    classSymbolOf(tpe).value.fullName shouldBe "scala.collection.immutable.List"
-  }
-
-  test("classSymbolOf(Type.Project) for an existing inner class of an object should return the corresponding symbol") {
-    val tpe = t"scala.collection.immutable.ArraySeq#ofRef"
-
-    classSymbolOf(tpe).value.fullName shouldBe "scala.collection.immutable.ArraySeq.ofRef"
-  }
-
-  test("classSymbolOf(Type.Project) for an existing inner class of a trait should return the corresponding symbol") {
-    val tpe = t"scala.collection.Iterator#GroupedIterator"
-
-    classSymbolOf(tpe).value.fullName shouldBe "scala.collection.Iterator.GroupedIterator"
-  }
-
-  test("classSymbolOf(Type.Apply(Type.Select)) for an existing top-level class should return the corresponding symbol") {
-    val tpe = t"scala.collection.immutable.List[scala.Int]"
-
-    classSymbolOf(tpe).value.fullName shouldBe "scala.collection.immutable.List"
-  }
-
-  test("classSymbolOf(List[Member]) for an existing top-level class in a package should return the corresponding symbol") {
-    val pkg = q"package scala.collection.immutable"
-    val cls = q"class List"
-
-    classSymbolOf(List(pkg, cls)).value.fullName shouldBe "scala.collection.immutable.List"
-  }
-
-  test("classSymbolOf(List[Member]) for an existing class type alias in a package should return the corresponding class symbol") {
-    val pkg = q"package scala"
-    val cls = q"class List"
-
-    classSymbolOf(List(pkg, cls)).value.fullName shouldBe "scala.collection.immutable.List"
-  }
-
-  test("classSymbolOf(List[Member]) for an existing top-level trait in a package should return the corresponding symbol") {
-    val pkg = q"package scala.collection.immutable"
-    val theTrait = q"trait Seq"
-
-    classSymbolOf(List(pkg, theTrait)).value.fullName shouldBe "scala.collection.immutable.Seq"
-  }
-
-  test("classSymbolOf(List[Member]) for a non-existing class in an existing package should return None") {
-    val pkg = q"package scala.collection.immutable"
-    val cls = q"class Bla"
-
-    classSymbolOf(List(pkg, cls)) shouldBe None
-  }
-
   test("symbolOf() for an existing top-level class in a package should return the corresponding symbol") {
     val pkg = q"package scala.collection.immutable"
     val cls = q"class List"
