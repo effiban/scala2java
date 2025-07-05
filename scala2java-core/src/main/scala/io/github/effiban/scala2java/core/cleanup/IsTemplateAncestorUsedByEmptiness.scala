@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.cleanup
 
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionUtils.isNonTrivialEmptyType
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionClassifier
 
 import scala.meta.{Template, Type}
 
@@ -9,7 +9,10 @@ import scala.meta.{Template, Type}
  * as a "marker" trait, and should always be considered as used,
  * even if there are no other references to it in the template.
  */
-object IsTemplateAncestorUsedByEmptiness extends IsTemplateAncestorUsed {
+class IsTemplateAncestorUsedByEmptinessImpl(scalaReflectionClassifier: ScalaReflectionClassifier) extends IsTemplateAncestorUsed {
 
-  def apply(template: Template, ancestorType: Type.Ref): Boolean = isNonTrivialEmptyType(ancestorType)
+  def apply(template: Template, ancestorType: Type.Ref): Boolean =
+    scalaReflectionClassifier.isNonTrivialEmptyType(ancestorType)
 }
+
+object IsTemplateAncestorUsedByEmptiness extends IsTemplateAncestorUsedByEmptinessImpl(ScalaReflectionClassifier)
