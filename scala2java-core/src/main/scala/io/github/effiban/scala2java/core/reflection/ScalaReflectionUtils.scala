@@ -10,15 +10,6 @@ import scala.reflect.runtime.universe._
 
 object ScalaReflectionUtils {
 
-  private val TrivialClassFullNames =
-    Set(
-      "java.lang.Object",
-      "java.io.Serializable",
-      "scala.Any",
-      "scala.AnyRef",
-      "scala.AnyVal"
-  )
-
   def symbolOf(memberPath: List[Member]): Option[Symbol] = {
     memberPath match {
       case (pkg: Pkg) :: members =>
@@ -86,34 +77,6 @@ object ScalaReflectionUtils {
     })
   }
 
-  def isNonTrivialEmptyType(typeRef: Type.Ref): Boolean = {
-    classSymbolOf(typeRef) match {
-      case None => false
-      case Some(cls) => isNonTrivialEmptyClass(cls)
-    }
-  }
-
-  private def isNonTrivialEmptyClass(cls: ClassSymbol) = {
-    isNonTrivialClassFullName(cls.fullName) &&
-      hasTrivialDeclarationsOnly(cls) &&
-      hasTrivialBaseClassesOnly(cls)
-  }
-
-  private def hasTrivialDeclarationsOnly(cls: ClassSymbol) = {
-    cls.info.decls.forall {
-      case m: MethodSymbol => m.isConstructor && m.paramLists.flatten.isEmpty
-      case _ => false
-    }
-  }
-
-  private def hasTrivialBaseClassesOnly(cls: ClassSymbol) = {
-    val baseClassesExcludingSelf = cls.baseClasses
-      .slice(1, cls.baseClasses.size)
-      .map(_.fullName)
-
-    baseClassesExcludingSelf.forall(isTrivialClassFullName)
-  }
-
   @tailrec
   private def symbolOf(symbol: Symbol, memberPath: List[Member]): Option[Symbol] = {
     (symbol, memberPath) match {
@@ -137,10 +100,4 @@ object ScalaReflectionUtils {
       .orElse(scala.util.Try(RuntimeMirror.staticModule(qualifierName)))
       .toOption
   }
-
-  private def isNonTrivialClassFullName(name: String) = !isTrivialClassFullName(name)
-
-
-  private def isTrivialClassFullName(name: String) = TrivialClassFullNames.contains(name)
-
 }
