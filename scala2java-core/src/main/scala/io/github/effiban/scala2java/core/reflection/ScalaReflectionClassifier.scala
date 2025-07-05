@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.reflection
 
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionTransformer.classSymbolOf
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionTransformer.toClassSymbol
 
 import scala.meta.Type
 import scala.reflect.runtime.universe._
@@ -22,7 +22,7 @@ object ScalaReflectionClassifier extends ScalaReflectionClassifier {
     )
 
   def isNonTrivialEmptyType(typeRef: Type.Ref): Boolean = {
-    classSymbolOf(typeRef) match {
+    toClassSymbol(typeRef) match {
       case None => false
       case Some(cls) => isNonTrivialEmptyClass(cls)
     }

@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.collectors
 
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionLookup.selfAndBaseClassesOf
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionTransformer.{asScalaMetaTypeRef, classSymbolOf}
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionTransformer.{asScalaMetaTypeRef, toClassSymbol}
 
 import scala.collection.immutable.ListMap
 import scala.meta.{Template, Type}
@@ -19,7 +19,7 @@ object TemplateAncestorsCollector extends TemplateAncestorsCollector {
   override def collectToMap(template: Template): ListMap[Type.Ref, List[Type.Ref]] = {
     ListMap.from(
       (template.inits.map(_.tpe) ++ template.self.decltpe)
-        .flatMap(classSymbolOf)
+        .flatMap(toClassSymbol)
         .map(classSymbol => (classSymbol, asScalaMetaTypeRef(classSymbol)))
         .collect { case (clsSym, Some(clsType)) => (clsSym, clsType) }
         .map { case (clsSym, clsType) => (clsType, selfAndBaseClassesOf(clsSym).flatMap(asScalaMetaTypeRef)) }
