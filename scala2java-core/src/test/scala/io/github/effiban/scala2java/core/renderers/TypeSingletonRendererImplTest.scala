@@ -3,23 +3,29 @@ package io.github.effiban.scala2java.core.renderers
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
-import scala.meta.{Name, Term, Type}
+import scala.meta.{Name, Term, Type, XtensionQuasiquoteTerm}
 
 class TypeSingletonRendererImplTest extends UnitTestSuite {
 
-  private val thisRenderer = mock[ThisRenderer]
+  private val termRefRenderer = mock[TermRefRenderer]
 
-  private val typeSingletonRenderer = new TypeSingletonRendererImpl(thisRenderer)
+  private val typeSingletonRenderer = new TypeSingletonRendererImpl(termRefRenderer)
 
   test("render() for 'this'") {
     val `this` = Term.This(Name.Anonymous())
     val singletonType = Type.Singleton(`this`)
 
-    doAnswer(`this`).when(thisRenderer).render(eqTree(`this`))
+    typeSingletonRenderer.render(singletonType)
+
+    verify(termRefRenderer).render(eqTree(`this`))
+  }
+
+  test("render() for a non-'this' singleton type") {
+    val termSelect = q"x.Y"
+    val singletonType = Type.Singleton(termSelect)
 
     typeSingletonRenderer.render(singletonType)
 
-    verify(thisRenderer).render(eqTree(`this`))
+    verify(termRefRenderer).render(eqTree(termSelect))
   }
-
 }

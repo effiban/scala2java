@@ -446,7 +446,7 @@ class Renderers(implicit javaWriter: JavaWriter) {
     arrayTypeRenderer
   )
 
-  private[renderers] val typeSingletonRenderer: TypeSingletonRenderer = new TypeSingletonRendererImpl(thisRenderer)
+  private[renderers] val typeSingletonRenderer: TypeSingletonRenderer = new TypeSingletonRendererImpl(defaultTermRefRenderer)
 
   private[renderers] val typeVarRenderer: TypeVarRenderer = new TypeVarRendererImpl()
 
