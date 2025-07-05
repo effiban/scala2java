@@ -1,33 +1,31 @@
 package io.github.effiban.scala2java.core.reflection
 
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionAccess.RuntimeMirror
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionLookup.{findAsScalaMetaTypeRef, findModuleTermMemberOf, isTermMemberOf, selfAndBaseClassesOf}
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionLookup.{findAsScalaMetaTypeRef, findModuleTermMemberOf, findSelfAndBaseClassesOf, isTermMemberOf}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 
 import scala.meta.{Term, Type, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 class ScalaReflectionLookupTest extends UnitTestSuite {
 
-  test("selfAndBaseClassesOf() should return the correct list of base classes") {
-    val clsSymbol = RuntimeMirror.staticClass("scala.collection.immutable.Seq")
-    selfAndBaseClassesOf(clsSymbol).map(_.fullName) shouldBe
+  test("findSelfAndBaseClassesOf() should return the correct list of base classes") {
+    findSelfAndBaseClassesOf(t"scala.collection.immutable.Seq").structure shouldBe
       List(
-        "scala.collection.immutable.Seq",
-        "scala.collection.immutable.SeqOps",
-        "scala.collection.Seq",
-        "scala.Equals",
-        "scala.collection.SeqOps",
-        "scala.PartialFunction",
-        "scala.Function1",
-        "scala.collection.immutable.Iterable",
-        "scala.collection.Iterable",
-        "scala.collection.IterableFactoryDefaults",
-        "scala.collection.IterableOps",
-        "scala.collection.IterableOnceOps",
-        "scala.collection.IterableOnce",
-        "java.lang.Object",
-        "scala.Any"
-      )
+        t"scala.collection.immutable.Seq",
+        t"scala.collection.immutable.SeqOps",
+        t"scala.collection.Seq",
+        t"scala.Equals",
+        t"scala.collection.SeqOps",
+        t"scala.PartialFunction",
+        t"scala.Function1",
+        t"scala.collection.immutable.Iterable",
+        t"scala.collection.Iterable",
+        t"scala.collection.IterableFactoryDefaults",
+        t"scala.collection.IterableOps",
+        t"scala.collection.IterableOnceOps",
+        t"scala.collection.IterableOnce",
+        t"java.lang.Object",
+        t"scala.Any"
+      ).structure
   }
 
   test("findModuleTermMemberOf() without alias in the scala package object") {

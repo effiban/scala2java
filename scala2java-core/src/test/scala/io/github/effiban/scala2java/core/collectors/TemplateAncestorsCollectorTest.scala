@@ -171,7 +171,7 @@ class TemplateAncestorsCollectorTest extends UnitTestSuite {
 
     actualAncestorTypeRefMap.size shouldBe 1
     val (actualParentType, actualAncestorTypes) = actualAncestorTypeRefMap.head
-    actualParentType.structure shouldBe t"scala.collection.Iterable".structure
+    actualParentType.structure shouldBe t"scala.Iterable".structure
     actualAncestorTypes.structure shouldBe List(
       t"scala.collection.Iterable",
       t"scala.collection.IterableFactoryDefaults",
