@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.qualifiers
 
 import io.github.effiban.scala2java.core.entities.TermNames.Scala
 import io.github.effiban.scala2java.core.entities.TermSelects.{JavaLang, ScalaPredef}
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionLookup.findAsScalaMetaTypeRef
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionLookup.findModuleTypeMemberOf
 
 import scala.meta.{Term, Type}
 
@@ -34,6 +34,6 @@ object CoreTypeNameQualifier extends CoreTypeNameQualifier {
   }
 
   private def qualifyAsMemberOf(module: Term.Ref, typeName: Type.Name) = {
-    findAsScalaMetaTypeRef(module, typeName)
+    findModuleTypeMemberOf(module, typeName)
   }
 }
