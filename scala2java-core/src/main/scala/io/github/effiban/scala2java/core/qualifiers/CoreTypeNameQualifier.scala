@@ -1,10 +1,10 @@
 package io.github.effiban.scala2java.core.qualifiers
 
-import io.github.effiban.scala2java.core.entities.ReflectedEntities.{JavaLangPackage, PredefModule, ScalaPackage}
+import io.github.effiban.scala2java.core.entities.TermNames.Scala
+import io.github.effiban.scala2java.core.entities.TermSelects.{JavaLang, ScalaPredef}
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionUtils.findAsScalaMetaTypeRef
 
-import scala.meta.Type
-import scala.reflect.runtime.universe._
+import scala.meta.{Term, Type}
 
 trait CoreTypeNameQualifier {
   def qualify(typeName: Type.Name): Option[Type]
@@ -22,18 +22,18 @@ object CoreTypeNameQualifier extends CoreTypeNameQualifier {
   }
 
   private def qualifyAsPredefMember(scalaMetaTypeName: Type.Name) = {
-    qualifyAsMemberOf(PredefModule, scalaMetaTypeName)
+    qualifyAsMemberOf(ScalaPredef, scalaMetaTypeName)
   }
 
   private def qualifyAsScalaPackageMember(scalaMetaTypeName: Type.Name) = {
-    qualifyAsMemberOf(ScalaPackage, scalaMetaTypeName)
+    qualifyAsMemberOf(Scala, scalaMetaTypeName)
   }
 
   private def qualifyAsJavaLangMember(scalaMetaTypeName: Type.Name) = {
-    qualifyAsMemberOf(JavaLangPackage, scalaMetaTypeName)
+    qualifyAsMemberOf(JavaLang, scalaMetaTypeName)
   }
 
-  private def qualifyAsMemberOf(module: ModuleSymbol, typeName: Type.Name) = {
+  private def qualifyAsMemberOf(module: Term.Ref, typeName: Type.Name) = {
     findAsScalaMetaTypeRef(module, typeName)
   }
 }
