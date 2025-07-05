@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.collectors
 
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionUtils.{asScalaMetaTypeRef, selfAndBaseClassesOf, classSymbolOf}
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionTransformer.classSymbolOf
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionUtils.{asScalaMetaTypeRef, selfAndBaseClassesOf}
 
 import scala.collection.immutable.ListMap
 import scala.meta.{Template, Type}

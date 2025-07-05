@@ -2,6 +2,7 @@ package io.github.effiban.scala2java.core.reflection
 
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionAccess.RuntimeMirror
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.asClassSymbol
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionTransformer.{classSymbolOf, findModuleSymbolOf}
 
 import scala.annotation.tailrec
 import scala.meta.{Defn, Member, Pkg, Term, Type, XtensionParseInputLike}
@@ -17,20 +18,6 @@ object ScalaReflectionUtils {
       "scala.AnyRef",
       "scala.AnyVal"
   )
-
-  def classSymbolOf(tpe: Type): Option[ClassSymbol] = tpe match {
-    case Type.Apply(typeSelect: Type.Select, _) => classSymbolOf(typeSelect)
-    case typeSelect: Type.Select => classSymbolOf(typeSelect)
-    case Type.Project(tpe, name) => innerClassSymbolOf(tpe, name)
-    case _ => None
-  }
-
-  def classSymbolOf(memberPath: List[Member]): Option[ClassSymbol] = {
-    symbolOf(memberPath) match {
-      case Some(symbol) => asClassSymbol(symbol)
-      case _ => None
-    }
-  }
 
   def symbolOf(memberPath: List[Member]): Option[Symbol] = {
     memberPath match {
@@ -145,29 +132,6 @@ object ScalaReflectionUtils {
     }
   }
 
-  private def classSymbolOf(typeSelect: Type.Select): Option[ClassSymbol] = {
-    classSymbolOf(typeSelect.qual.toString(), typeSelect.name.value)
-  }
-
-  private def classSymbolOf(qualifierName: String, typeName: String): Option[ClassSymbol] = {
-    moduleSymbolOf(qualifierName)
-      .map(module => module.typeSignature.decl(TypeName(typeName)))
-      .flatMap(asClassSymbol)
-  }
-
-  private def innerClassSymbolOf(outerType: Type, innerName: Type.Name): Option[ClassSymbol] = {
-    val innerTypeName = TypeName(innerName.value)
-    classSymbolOf(outerType)
-      .flatMap(outerClassSymbol => asClassSymbol(innerClassSymbolOf(outerClassSymbol, innerTypeName)))
-  }
-
-  private def innerClassSymbolOf(outerClassSymbol: ClassSymbol, innerTypeName: TypeName): Symbol = {
-    outerClassSymbol.info.decl(innerTypeName) match {
-      case NoSymbol => outerClassSymbol.companion.info.decl(innerTypeName)
-      case symbol => symbol
-    }
-  }
-
   private def moduleSymbolOf(qualifierName: String) = {
     scala.util.Try(RuntimeMirror.staticPackage(qualifierName))
       .orElse(scala.util.Try(RuntimeMirror.staticModule(qualifierName)))
@@ -178,11 +142,5 @@ object ScalaReflectionUtils {
 
 
   private def isTrivialClassFullName(name: String) = TrivialClassFullNames.contains(name)
-
-  private def findModuleSymbolOf(qualifierName: String): Option[ModuleSymbol] = {
-    scala.util.Try(RuntimeMirror.staticPackage(qualifierName))
-      .orElse(scala.util.Try(RuntimeMirror.staticModule(qualifierName)))
-      .toOption
-  }
 
 }
