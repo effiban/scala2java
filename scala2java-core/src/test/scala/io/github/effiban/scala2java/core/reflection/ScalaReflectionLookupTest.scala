@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.reflection
 
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionAccess.RuntimeMirror
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionLookup.{findAndDealiasAsScalaMetaTermRef, findAsScalaMetaTypeRef, isTermMemberOf, selfAndBaseClassesOf}
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionLookup.{findAsScalaMetaTypeRef, findModuleTermMemberOf, isTermMemberOf, selfAndBaseClassesOf}
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 
 import scala.meta.{Term, Type, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
@@ -30,13 +30,28 @@ class ScalaReflectionLookupTest extends UnitTestSuite {
       )
   }
 
-  test("findAndDealiasAsScalaMetaTermRef() when found by dealiasing in scala package object") {
-    findAndDealiasAsScalaMetaTermRef(q"scala", q"List").value.structure shouldBe
+  test("findModuleTermMemberOf() without alias in the scala package object") {
+    findModuleTermMemberOf(q"scala", q"Option").value.structure shouldBe
+      q"scala.Option".structure
+  }
+
+  test("findModuleTermMemberOf() without alias in the Predef object") {
+    findModuleTermMemberOf(q"scala.Predef", q"classOf").value.structure shouldBe
+      q"scala.Predef.classOf".structure
+  }
+
+  test("findModuleTermMemberOf() without alias in regular package") {
+    findModuleTermMemberOf(q"scala.collection.immutable", q"List").value.structure shouldBe
       q"scala.collection.immutable.List".structure
   }
 
-  test("findAndDealiasAsScalaMetaTermRef() when found by dealiasing in Predef") {
-    findAndDealiasAsScalaMetaTermRef(q"scala.Predef", q"Map").value.structure shouldBe
+  test("findModuleTermMemberOf() when found by dealiasing in scala package object") {
+    findModuleTermMemberOf(q"scala", q"List").value.structure shouldBe
+      q"scala.collection.immutable.List".structure
+  }
+
+  test("findModuleTermMemberOf() when found by dealiasing in Predef") {
+    findModuleTermMemberOf(q"scala.Predef", q"Map").value.structure shouldBe
       q"scala.collection.immutable.Map".structure
   }
 

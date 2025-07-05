@@ -1,11 +1,11 @@
 package io.github.effiban.scala2java.core.reflection
 
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.asClassSymbol
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.{findModuleSymbolOf, findModuleTypeMemberOf, findTermMemberOf}
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionTransformer.{asScalaMetaTypeRef, classSymbolOf}
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.{findModuleSymbolOf, findModuleTypeMemberOf}
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionTransformer.{asScalaMetaTypeRef, classSymbolOf, toScalaMetaTermRef}
 
-import scala.meta.{Term, Type, XtensionParseInputLike}
-import scala.reflect.runtime.universe.{ClassSymbol, TermSymbol}
+import scala.meta.{Term, Type}
+import scala.reflect.runtime.universe.{ClassSymbol, NoSymbol}
 
 object ScalaReflectionLookup {
 
@@ -24,23 +24,12 @@ object ScalaReflectionLookup {
     ScalaReflectionInternalLookup.selfAndBaseClassesOf(cls)
   }
 
-  def findAndDealiasAsScalaMetaTermRef(moduleTerm: Term.Ref, termName: Term.Name): Option[Term.Ref] = {
-    findModuleSymbolOf(moduleTerm.toString()).flatMap(ownerModule => {
-      val member = findTermMemberOf(ownerModule, termName.value)
-      val maybeDealiasedFullName = member match {
-        case termSymbol: TermSymbol =>
-          val memberTypeFullName = member.typeSignature.toString
-          if (memberTypeFullName.endsWith(".type") && !termSymbol.isJava) {
-            // This indicates a member which is an alias to a Scala object
-            Some(s"scala.${memberTypeFullName.stripPrefix("scala.").stripSuffix(".type")}")
-          } else {
-            Some(termSymbol.fullName)
-          }
-        case _ => None
-      }
-      maybeDealiasedFullName.map(_.parse[Term].get.asInstanceOf[Term.Ref])
-    })
-  }
+  def findModuleTermMemberOf(module: Term.Ref, termName: Term.Name): Option[Term.Ref] =
+    findModuleSymbolOf(module.toString())
+      .flatMap(module => ScalaReflectionInternalLookup.findTermMemberOf(module, termName.value) match {
+        case NoSymbol => None
+        case symbol => toScalaMetaTermRef(symbol)
+      })
 
   def findAsScalaMetaTypeRef(module: Term.Ref, typeName: Type.Name): Option[Type.Ref] = {
     findModuleSymbolOf(module.toString()).flatMap(ownerModule => {
