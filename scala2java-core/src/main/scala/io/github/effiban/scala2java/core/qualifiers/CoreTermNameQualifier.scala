@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.qualifiers
 
 import io.github.effiban.scala2java.core.entities.TermNames.Scala
 import io.github.effiban.scala2java.core.entities.TermSelects.{JavaLang, ScalaPredef}
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionLookup.findModuleTermMemberOf
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionLookup
 
 import scala.meta.Term
 
@@ -10,8 +10,7 @@ trait CoreTermNameQualifier {
   def qualify(termName: Term.Name): Option[Term]
 }
 
-object CoreTermNameQualifier extends CoreTermNameQualifier {
-
+private[qualifiers] class CoreTermNameQualifierImpl(scalaReflectionLookup: ScalaReflectionLookup) extends CoreTermNameQualifier {
   override def qualify(termName: Term.Name): Option[Term] = {
     LazyList(
       qualifyAsPredefMember _,
@@ -35,6 +34,8 @@ object CoreTermNameQualifier extends CoreTermNameQualifier {
 
   private def qualifyAsMemberOf(module: Term.Ref,
                                 termName: Term.Name): Option[Term] = {
-    findModuleTermMemberOf(module, termName)
+    scalaReflectionLookup.findModuleTermMemberOf(module, termName)
   }
 }
+
+object CoreTermNameQualifier extends CoreTermNameQualifierImpl(ScalaReflectionLookup)

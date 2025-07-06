@@ -9,7 +9,8 @@ import scala.meta.{Template, Type}
  * as a "marker" trait, and should always be considered as used,
  * even if there are no other references to it in the template.
  */
-class IsTemplateAncestorUsedByEmptinessImpl(scalaReflectionClassifier: ScalaReflectionClassifier) extends IsTemplateAncestorUsed {
+private[cleanup] class IsTemplateAncestorUsedByEmptinessImpl(scalaReflectionClassifier: ScalaReflectionClassifier)
+  extends IsTemplateAncestorUsed {
 
   def apply(template: Template, ancestorType: Type.Ref): Boolean =
     scalaReflectionClassifier.isNonTrivialEmptyType(ancestorType)
