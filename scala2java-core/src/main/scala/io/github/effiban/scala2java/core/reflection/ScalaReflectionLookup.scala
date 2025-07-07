@@ -6,7 +6,20 @@ import io.github.effiban.scala2java.core.reflection.ScalaReflectionTransformer.{
 import scala.meta.{Term, Type}
 import scala.reflect.runtime.universe.NoSymbol
 
-object ScalaReflectionLookup {
+trait ScalaReflectionLookup {
+
+  def isTermMemberOf(typeRef: Type.Ref, termName: Term.Name): Boolean
+
+  def isTermMemberOf(termRef: Term.Ref, termName: Term.Name): Boolean
+
+  def findSelfAndBaseClassesOf(tpe: Type.Ref): List[Type.Ref]
+
+  def findModuleTermMemberOf(module: Term.Ref, termName: Term.Name): Option[Term.Ref]
+
+  def findModuleTypeMemberOf(module: Term.Ref, typeName: Type.Name): Option[Type.Ref]
+}
+
+object ScalaReflectionLookup extends ScalaReflectionLookup {
 
   def isTermMemberOf(typeRef: Type.Ref, termName: Term.Name): Boolean = {
     toClassSymbol(typeRef).exists(cls => ScalaReflectionInternalLookup.isTermMemberOf(cls, termName.value))

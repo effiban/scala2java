@@ -1,292 +1,148 @@
 package io.github.effiban.scala2java.core.collectors
 
-import io.github.effiban.scala2java.core.collectors.TemplateAncestorsCollector.{collect, collectToMap}
 import io.github.effiban.scala2java.core.entities.TreeKeyedMap
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionLookup
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
+import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
+import org.mockito.ArgumentMatchers.any
 
-import scala.meta.{XtensionQuasiquoteTemplate, XtensionQuasiquoteType}
+import scala.meta.{Type, XtensionQuasiquoteTemplate, XtensionQuasiquoteType}
 
 class TemplateAncestorsCollectorTest extends UnitTestSuite {
 
-  test("collect for subtype of Scala type in package: scala.concurrent.Future") {
-    val expectedAncestorTypeRefs = List(
-      t"scala.concurrent.Future",
-      t"scala.concurrent.Awaitable",
-      t"java.lang.Object",
-      t"scala.Any"
-    )
+  private val scalaReflectionLookup = mock[ScalaReflectionLookup]
 
-    val actualAncestorTypeRefs = collect(
-      template"""
-      scala.concurrent.Future {
-      }
-      """
-    )
+  private val templateAncestorsCollector = new TemplateAncestorsCollectorImpl(scalaReflectionLookup)
 
-    actualAncestorTypeRefs.structure shouldBe expectedAncestorTypeRefs.structure
+  import templateAncestorsCollector._
+
+  test("collect for template with one init and no self, with 2 ancestors, all are Type.Name-s") {
+    val expectedAncestorTypes = List(t"A1", t"A2")
+
+    when(scalaReflectionLookup.findSelfAndBaseClassesOf(eqTree(t"A"))).thenReturn(expectedAncestorTypes)
+
+    val actualAncestorTypes = collect(template"A")
+    actualAncestorTypes.structure shouldBe expectedAncestorTypes.structure
   }
 
-  test("collect for subtype of Scala inner type in Scala object: scala.collection.immutable.Set") {
-    val expectedAncestorTypeRefs = List(
-      t"scala.collection.immutable.Set",
-      t"scala.collection.immutable.SetOps",
-      t"scala.collection.Set",
-      t"scala.Equals",
-      t"scala.collection.SetOps",
-      t"scala.Function1",
-      t"scala.collection.immutable.Iterable",
-      t"scala.collection.Iterable",
-      t"scala.collection.IterableFactoryDefaults",
-      t"scala.collection.IterableOps",
-      t"scala.collection.IterableOnceOps",
-      t"scala.collection.IterableOnce",
-      t"java.lang.Object",
-      t"scala.Any"
-    )
+  test("collect for template with one init and no self, with 2 ancestors, all are Type.Select-s") {
+    val expectedAncestorTypes = List(t"a.A1", t"a.A2")
 
-    val actualAncestorTypeRefs = collect(
-      template"""
-      scala.collection.immutable.Set {
-      }
-      """
-    )
+    when(scalaReflectionLookup.findSelfAndBaseClassesOf(eqTree(t"a.A"))).thenReturn(expectedAncestorTypes)
 
-    actualAncestorTypeRefs.structure shouldBe expectedAncestorTypeRefs.structure
+    val actualAncestorTypes = collect(template"a.A")
+    actualAncestorTypes.structure shouldBe expectedAncestorTypes.structure
   }
 
-  test("collect for subtype of Scala type which is an alias to another type: scala.Iterable") {
-    val expectedAncestorTypeRefs = List(
-      t"scala.collection.Iterable",
-      t"scala.collection.IterableFactoryDefaults",
-      t"scala.collection.IterableOps",
-      t"scala.collection.IterableOnceOps",
-      t"scala.collection.IterableOnce",
-      t"java.lang.Object",
-      t"scala.Any"
-    )
+  test("collect for template with one init and no self, with 2 ancestors, all are Type.Project-s") {
+    val expectedAncestorTypes = List(t"a.A1#B1", t"a.A2#B2")
 
-    val actualAncestorTypeRefs = collect(
-      template"""
-      scala.Iterable {
-      }
-      """
-    )
+    when(scalaReflectionLookup.findSelfAndBaseClassesOf(eqTree(t"a.A#B"))).thenReturn(expectedAncestorTypes)
 
-    actualAncestorTypeRefs.structure shouldBe expectedAncestorTypeRefs.structure
+    val actualAncestorTypes = collect(template"a.A#B")
+    actualAncestorTypes.structure shouldBe expectedAncestorTypes.structure
   }
 
-  test("collect for subtype of Java type in package: java.util.List") {
-    val expectedAncestorTypeRefs = List(
-      t"java.util.List",
-      t"java.util.Collection",
-      t"java.lang.Iterable",
-      t"java.lang.Object",
-      t"scala.Any"
-    )
+  test("collect for template with one init and no self, with 2 ancestors, init is a Type.Apply") {
+    val expectedAncestorTypes = List(t"a.A1", t"a.A2")
 
-    val actualAncestorTypeRefs = collect(
-      template"""
-      java.util.List {
-      }
-      """
-    )
+    when(scalaReflectionLookup.findSelfAndBaseClassesOf(eqTree(t"a.A"))).thenReturn(expectedAncestorTypes)
 
-    actualAncestorTypeRefs.structure shouldBe expectedAncestorTypeRefs.structure
+    val actualAncestorTypes = collect(template"a.A[B]")
+    actualAncestorTypes.structure shouldBe expectedAncestorTypes.structure
   }
 
-  test("collect for subtype of Java inner type in class: java.util.Map#Entry") {
-    val expectedAncestorTypeRefs = List(
-      t"java.util.Map#Entry",
-      t"java.lang.Object",
-      t"scala.Any"
-    )
+  test("collect for template with one init and one self, with 2 ancestors each") {
+    val expectedAncestorTypesOfA = List(t"A1", t"A2")
+    val expectedAncestorTypesOfB = List(t"B1", t"B2")
 
-    val actualAncestorTypeRefs = collect(
-      template"""
-      java.util.Map#Entry {
-      }
-      """
-    )
+    when(scalaReflectionLookup.findSelfAndBaseClassesOf(any[Type.Ref])).thenAnswer((tpe: Type.Ref) =>
+      tpe match {
+        case t"A" => expectedAncestorTypesOfA
+        case t"B" => expectedAncestorTypesOfB
+        case _ => Nil
+      })
 
-    actualAncestorTypeRefs.structure shouldBe expectedAncestorTypeRefs.structure
+    val actualAncestorTypes = collect(template"A { self: B => }")
+    actualAncestorTypes.structure shouldBe (expectedAncestorTypesOfA ++ expectedAncestorTypesOfB).structure
   }
 
-  test("collectToMap for subtype of Scala type in package: scala.concurrent.Future") {
-    val actualAncestorTypeRefMap = collectToMap(
-      template"""
-      scala.concurrent.Future[T] {
-      }
-      """
-    )
+  test("collect for template with two inits and 2 ancestors each") {
+    val expectedAncestorTypesOfA = List(t"A1", t"A2")
+    val expectedAncestorTypesOfB = List(t"B1", t"B2")
 
+    when(scalaReflectionLookup.findSelfAndBaseClassesOf(any[Type.Ref])).thenAnswer((tpe: Type.Ref) =>
+      tpe match {
+        case t"A" => expectedAncestorTypesOfA
+        case t"B" => expectedAncestorTypesOfB
+        case _ => Nil
+      })
 
-    actualAncestorTypeRefMap.size shouldBe 1
-    val (actualParentType, actualAncestorTypes) = actualAncestorTypeRefMap.head
-    actualParentType.structure shouldBe t"scala.concurrent.Future".structure
-    actualAncestorTypes.structure shouldBe
-      List(t"scala.concurrent.Future",
-        t"scala.concurrent.Awaitable",
-        t"java.lang.Object",
-        t"scala.Any"
-      ).structure
+    val actualAncestorTypes = collect(template"A with B")
+    actualAncestorTypes.structure shouldBe (expectedAncestorTypesOfA ++ expectedAncestorTypesOfB).structure
   }
 
-  test("collectToMap for subtype of Scala inner type in Scala object: scala.collection.immutable.Set") {
-    val actualAncestorTypeRefMap = collectToMap(
-      template"""
-      scala.collection.immutable.Set {
-      }
-      """
-    )
+  test("collectToMap for template with one init and no self, with 2 ancestors, Type.Name-s") {
+    val expectedAncestorTypes = List(t"A1", t"A2")
 
-    actualAncestorTypeRefMap.size shouldBe 1
-    val (actualParentType, actualAncestorTypes) = actualAncestorTypeRefMap.head
-    actualParentType.structure shouldBe t"scala.collection.immutable.Set".structure
-    actualAncestorTypes.structure shouldBe
-      List(
-        t"scala.collection.immutable.Set",
-        t"scala.collection.immutable.SetOps",
-        t"scala.collection.Set",
-        t"scala.Equals",
-        t"scala.collection.SetOps",
-        t"scala.Function1",
-        t"scala.collection.immutable.Iterable",
-        t"scala.collection.Iterable",
-        t"scala.collection.IterableFactoryDefaults",
-        t"scala.collection.IterableOps",
-        t"scala.collection.IterableOnceOps",
-        t"scala.collection.IterableOnce",
-        t"java.lang.Object",
-        t"scala.Any"
-      ).structure
+    when(scalaReflectionLookup.findSelfAndBaseClassesOf(eqTree(t"A"))).thenReturn(expectedAncestorTypes)
+
+    val actualAncestorTypes = collectToMap(template"A")
+    actualAncestorTypes.size shouldBe 1
+    actualAncestorTypes.values.head.structure shouldBe expectedAncestorTypes.structure
   }
 
-  test("collectToMap for subtype of Scala type which is an alias to another type: scala.Iterable") {
-    val actualAncestorTypeRefMap = collectToMap(
-      template"""
-      scala.Iterable {
-      }
-      """
-    )
+  test("collectToMap for template with one init and no self, with 2 ancestors, Type.Select-s") {
+    val expectedAncestorTypes = List(t"a.A1", t"a.A2")
 
-    actualAncestorTypeRefMap.size shouldBe 1
-    val (actualParentType, actualAncestorTypes) = actualAncestorTypeRefMap.head
-    actualParentType.structure shouldBe t"scala.Iterable".structure
-    actualAncestorTypes.structure shouldBe List(
-      t"scala.collection.Iterable",
-      t"scala.collection.IterableFactoryDefaults",
-      t"scala.collection.IterableOps",
-      t"scala.collection.IterableOnceOps",
-      t"scala.collection.IterableOnce",
-      t"java.lang.Object",
-      t"scala.Any"
-    ).structure
+    when(scalaReflectionLookup.findSelfAndBaseClassesOf(eqTree(t"a.A"))).thenReturn(expectedAncestorTypes)
+
+    val actualAncestorTypes = collectToMap(template"a.A")
+    actualAncestorTypes.size shouldBe 1
+    actualAncestorTypes.values.head.structure shouldBe expectedAncestorTypes.structure
   }
 
-  test("collectToMap for subtype of Java type in package: java.util.List") {
-    val actualAncestorTypeRefMap = collectToMap(
-      template"""
-      java.util.List {
-      }
-      """
-    )
+  test("collectToMap for template with one init and no self, with 2 ancestors, Type.Project-s") {
+    val expectedAncestorTypes = List(t"a.A1#B1", t"a.A2#B2")
 
-    actualAncestorTypeRefMap.size shouldBe 1
-    val (actualParentType, actualAncestorTypes) = actualAncestorTypeRefMap.head
-    actualParentType.structure shouldBe t"java.util.List".structure
-    actualAncestorTypes.structure shouldBe
-      List(
-        t"java.util.List",
-        t"java.util.Collection",
-        t"java.lang.Iterable",
-        t"java.lang.Object",
-        t"scala.Any"
-      ).structure
+    when(scalaReflectionLookup.findSelfAndBaseClassesOf(eqTree(t"a.A#B"))).thenReturn(expectedAncestorTypes)
+
+    val actualAncestorTypes = collectToMap(template"a.A#B")
+    actualAncestorTypes.size shouldBe 1
+    actualAncestorTypes.values.head.structure shouldBe expectedAncestorTypes.structure
   }
 
-  test("collectToMap for subtype of Java inner type in class: java.util.Map#Entry") {
-    val actualAncestorTypeRefMap = collectToMap(
-      template"""
-      java.util.Map#Entry {
-      }
-      """
-    )
+  test("collectToMap for template with one init and one self, with 2 ancestors each") {
+    val expectedAncestorTypesOfA = List(t"A1", t"A2")
+    val expectedAncestorTypesOfB = List(t"B1", t"B2")
 
-    actualAncestorTypeRefMap.size shouldBe 1
-    val (actualParentType, actualAncestorTypes) = actualAncestorTypeRefMap.head
-    actualParentType.structure shouldBe t"java.util.Map#Entry".structure
-    actualAncestorTypes.structure shouldBe List(
-      t"java.util.Map#Entry",
-      t"java.lang.Object",
-      t"scala.Any"
-    ).structure
+    when(scalaReflectionLookup.findSelfAndBaseClassesOf(any[Type.Ref])).thenAnswer((tpe: Type.Ref) =>
+      tpe match {
+        case t"A" => expectedAncestorTypesOfA
+        case t"B" => expectedAncestorTypesOfB
+        case _ => Nil
+      })
+
+    val actualAncestorTypes = collectToMap(template"A { self: B => }")
+    actualAncestorTypes.size shouldBe 2
+    TreeKeyedMap.get(actualAncestorTypes, t"A").value.structure shouldBe expectedAncestorTypesOfA.structure
+    TreeKeyedMap.get(actualAncestorTypes, t"B").value.structure shouldBe expectedAncestorTypesOfB.structure
   }
 
-  test("collectToMap for template with two parents: scala.concurrent.Future and scala.collection.Iterable") {
-    val actualAncestorTypeRefMap = collectToMap(
-      template"""
-      scala.concurrent.Future[T] with scala.collection.Iterable {
-      }
-      """
-    )
+  test("collectToMap for template with two inits and 2 ancestors each") {
+    val expectedAncestorTypesOfA = List(t"A1", t"A2")
+    val expectedAncestorTypesOfB = List(t"B1", t"B2")
 
-    actualAncestorTypeRefMap.size shouldBe 2
-    val actualParentTypes = actualAncestorTypeRefMap.keys.toList
-    val (actualParentType1, actualAncestorTypes1) = (actualParentTypes.head, TreeKeyedMap(actualAncestorTypeRefMap, actualParentTypes.head))
-    val (actualParentType2, actualAncestorTypes2) = (actualParentTypes(1), TreeKeyedMap(actualAncestorTypeRefMap, actualParentTypes(1)))
+    when(scalaReflectionLookup.findSelfAndBaseClassesOf(any[Type.Ref])).thenAnswer((tpe: Type.Ref) =>
+      tpe match {
+        case t"A" => expectedAncestorTypesOfA
+        case t"B" => expectedAncestorTypesOfB
+        case _ => Nil
+      })
 
-    actualParentType1.structure shouldBe t"scala.concurrent.Future".structure
-    actualAncestorTypes1.structure shouldBe
-      List(t"scala.concurrent.Future",
-        t"scala.concurrent.Awaitable",
-        t"java.lang.Object",
-        t"scala.Any"
-      ).structure
-
-    actualParentType2.structure shouldBe t"scala.collection.Iterable".structure
-    actualAncestorTypes2.structure shouldBe
-      List(
-        t"scala.collection.Iterable",
-        t"scala.collection.IterableFactoryDefaults",
-        t"scala.collection.IterableOps",
-        t"scala.collection.IterableOnceOps",
-        t"scala.collection.IterableOnce",
-        t"java.lang.Object",
-        t"scala.Any"
-      ).structure
-  }
-
-  test("collectToMap for template with one parent (scala.concurrent.Future) and a 'self' (scala.collection.Iterable)") {
-    val actualAncestorTypeRefMap = collectToMap(
-      template"""
-      scala.concurrent.Future[T]  { self: scala.collection.Iterable =>
-      }
-      """
-    )
-
-    actualAncestorTypeRefMap.size shouldBe 2
-    val actualParentTypes = actualAncestorTypeRefMap.keys.toList
-    val (actualParentType1, actualAncestorTypes1) = (actualParentTypes.head, TreeKeyedMap(actualAncestorTypeRefMap, actualParentTypes.head))
-    val (actualParentType2, actualAncestorTypes2) = (actualParentTypes(1), TreeKeyedMap(actualAncestorTypeRefMap, actualParentTypes(1)))
-
-    actualParentType1.structure shouldBe t"scala.concurrent.Future".structure
-    actualAncestorTypes1.structure shouldBe
-      List(t"scala.concurrent.Future",
-        t"scala.concurrent.Awaitable",
-        t"java.lang.Object",
-        t"scala.Any"
-      ).structure
-
-    actualParentType2.structure shouldBe t"scala.collection.Iterable".structure
-    actualAncestorTypes2.structure shouldBe
-      List(
-        t"scala.collection.Iterable",
-        t"scala.collection.IterableFactoryDefaults",
-        t"scala.collection.IterableOps",
-        t"scala.collection.IterableOnceOps",
-        t"scala.collection.IterableOnce",
-        t"java.lang.Object",
-        t"scala.Any"
-      ).structure
+    val actualAncestorTypes = collectToMap(template"A with B")
+    actualAncestorTypes.size shouldBe 2
+    TreeKeyedMap.get(actualAncestorTypes, t"A").value.structure shouldBe expectedAncestorTypesOfA.structure
+    TreeKeyedMap.get(actualAncestorTypes, t"B").value.structure shouldBe expectedAncestorTypesOfB.structure
   }
 }
