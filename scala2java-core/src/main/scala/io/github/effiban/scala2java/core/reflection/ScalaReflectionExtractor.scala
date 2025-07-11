@@ -26,4 +26,8 @@ private[reflection] object ScalaReflectionExtractor {
   def finalResultTypeOf(tpe: Type): Symbol = {
     tpe.finalResultType.typeSymbol
   }
+
+  def finalResultTypeArgsOf(tpe: Type): List[Type] = {
+    tpe.finalResultType.typeArgs
+  }
 }

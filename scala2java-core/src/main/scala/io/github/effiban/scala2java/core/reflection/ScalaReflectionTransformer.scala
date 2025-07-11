@@ -1,14 +1,16 @@
 package io.github.effiban.scala2java.core.reflection
 
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.{dealiasedClassSymbolOf, finalResultTypeFullnameOf, finalResultTypeOf}
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.{dealiasedClassSymbolOf, finalResultTypeArgsOf, finalResultTypeFullnameOf, finalResultTypeOf}
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalClassifier.isSingletonType
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.{findInnerClassSymbolOf, findModuleSymbolOf}
 
-import scala.meta.{Term, Type, XtensionParseInputLike}
+import scala.meta.{Term, Type, XtensionParseInputLike, XtensionQuasiquoteType}
 import scala.reflect.runtime.universe
 import scala.reflect.runtime.universe._
 
 private[reflection] object ScalaReflectionTransformer {
+
+  private final val ScalaMaxArity = 22
 
   def toScalaMetaTermRef(member: Symbol): Option[Term.Ref] = {
     val maybeDealiasedFullName = member match {
@@ -37,8 +39,14 @@ private[reflection] object ScalaReflectionTransformer {
   }
 
   def toScalaMetaType(tpe: universe.Type): Option[Type] = {
-    val sym = finalResultTypeOf(tpe)
-    toScalaMetaTypeRef(sym)
+    finalResultTypeOf(tpe) match {
+      case sym if (1 to ScalaMaxArity).exists(n => sym == definitions.TupleClass(n)) =>
+        val smTypeArgs = finalResultTypeArgsOf(tpe).map(
+          typeArg => toScalaMetaType(typeArg).getOrElse(t"scala.Any")
+        )
+        Some(Type.Tuple(smTypeArgs))
+      case sym => toScalaMetaTypeRef(sym)
+    }
   }
 
   def toClassSymbol(tpe: Type): Option[ClassSymbol] = tpe match {
