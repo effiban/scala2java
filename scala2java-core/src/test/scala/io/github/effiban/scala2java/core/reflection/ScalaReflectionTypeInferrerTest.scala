@@ -27,6 +27,10 @@ class ScalaReflectionTypeInferrerTest extends UnitTestSuite {
       t"(scala.Int, java.lang.String)".structure
   }
 
+  test("inferScalaMetaTypeOf() for 'TestClassWithDataMembersOnly.z' should return '(scala.Int, scala.Long, java.lang.String) => java.lang.String'") {
+    inferScalaMetaTypeOf(t"io.github.effiban.scala2java.core.reflection.TestClassWithDataMembersOnly", q"z").value.structure shouldBe
+      t"(scala.Int, scala.Long, java.lang.String) => java.lang.String".structure
+  }
 
   class TestInnerClassWithDataMembersOnly {
     val x: Int = 3
