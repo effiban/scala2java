@@ -1,7 +1,0 @@
-package testfiles.DefnVals.WithoutDeclaredType.InClass.NonInferrable;
-
-import testfilesext.SampleObject;
-
-public class Sample {
-    private final /* UnknownType */ x = SampleObject;
-}

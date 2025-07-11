@@ -2,6 +2,7 @@ package io.github.effiban.scala2java.core.typeinference
 
 import io.github.effiban.scala2java.core.entities.TypeSelects
 import io.github.effiban.scala2java.core.matchers.TermSelectInferenceContextMatcher.eqTermSelectInferenceContext
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionTypeInferrer
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.spi.contexts.TermSelectInferenceContext
 import io.github.effiban.scala2java.spi.predicates.TermSelectSupportsNoArgInvocation
@@ -16,11 +17,13 @@ class InternalSelectTypeInferrerImplTest extends UnitTestSuite {
   private val qualifierTypeInferrer = mock[QualifierTypeInferrer]
   private val selectTypeInferrer = mock[SelectTypeInferrer]
   private val termSelectSupportsNoArgInvocation = mock[TermSelectSupportsNoArgInvocation]
+  private val scalaReflectionTypeInferrer = mock[ScalaReflectionTypeInferrer]
   private val internalSelectTypeInferrer = new InternalSelectTypeInferrerImpl(
     applyReturnTypeInferrer,
     qualifierTypeInferrer,
     selectTypeInferrer,
-    termSelectSupportsNoArgInvocation
+    termSelectSupportsNoArgInvocation,
+    scalaReflectionTypeInferrer
   )
 
   test("infer() when Term.Select supports a no-arg invocation, should infer as a no-arg Term.Apply and return that result") {
@@ -50,7 +53,10 @@ class InternalSelectTypeInferrerImplTest extends UnitTestSuite {
     internalSelectTypeInferrer.infer(termSelect) shouldBe None
   }
 
-  test("infer() when Term.Select does not support no-arg invocation, and inner inferrer returns a type - should return it") {
+  test("infer() when Term.Select does not support no-arg invocation, " +
+    "and qualifier type is inferred, " +
+    "and custom inferrer returns a type " +
+    "- should return it") {
     val termSelect = q"a.b"
     val qualifierType = t"A"
     val expectedContext = TermSelectInferenceContext(Some(qualifierType))
@@ -63,7 +69,29 @@ class InternalSelectTypeInferrerImplTest extends UnitTestSuite {
     internalSelectTypeInferrer.infer(termSelect).value.structure shouldBe expectedSelectType.structure
   }
 
-  test("infer() when Term.Select does not support no-arg invocation, and inner inferrer returns None - should return None") {
+  test("infer() when Term.Select does not support no-arg invocation, " +
+    "and qualifier type is inferred, " +
+    "and custom inferrer returns None ," +
+    "and reflection inferrer returns a type ," +
+    "- should return that type") {
+    val termSelect = q"a.b"
+    val qualifierType = t"A"
+    val expectedContext = TermSelectInferenceContext(Some(qualifierType))
+    val expectedInferredType = TypeSelects.JavaString
+
+    when(termSelectSupportsNoArgInvocation(eqTree(termSelect), eqTermSelectInferenceContext(expectedContext))).thenReturn(false)
+    when(qualifierTypeInferrer.infer(eqTree(termSelect))).thenReturn(Some(qualifierType))
+    when(selectTypeInferrer.infer(eqTree(termSelect), eqTermSelectInferenceContext(expectedContext))).thenReturn(None)
+    when(scalaReflectionTypeInferrer.inferScalaMetaTypeOf(eqTree(qualifierType), eqTree(termSelect.name))).thenReturn(Some(expectedInferredType))
+
+    internalSelectTypeInferrer.infer(termSelect).value.structure shouldBe expectedInferredType.structure
+  }
+
+  test("infer() when Term.Select does not support no-arg invocation, " +
+    "and qualifier type is inferred, " +
+    "and custom inferrer returns None ," +
+    "and reflection inferrer returns None ," +
+    "- should return None") {
     val termSelect = q"a.b"
     val qualifierType = t"A"
     val expectedContext = TermSelectInferenceContext(Some(qualifierType))
@@ -71,6 +99,40 @@ class InternalSelectTypeInferrerImplTest extends UnitTestSuite {
     when(termSelectSupportsNoArgInvocation(eqTree(termSelect), eqTermSelectInferenceContext(expectedContext))).thenReturn(false)
     when(qualifierTypeInferrer.infer(eqTree(termSelect))).thenReturn(Some(qualifierType))
     when(selectTypeInferrer.infer(eqTree(termSelect), eqTermSelectInferenceContext(expectedContext))).thenReturn(None)
+    when(scalaReflectionTypeInferrer.inferScalaMetaTypeOf(eqTree(qualifierType), eqTree(termSelect.name))).thenReturn(None)
+
+    internalSelectTypeInferrer.infer(termSelect) shouldBe None
+  }
+
+  test("infer() when Term.Select does not support no-arg invocation, " +
+    "and qualifier type is not inferred, " +
+    "and custom inferrer returns None ," +
+    "and reflection inferrer returns a type ," +
+    "- should return that type") {
+    val termSelect = q"a.b"
+    val expectedContext = TermSelectInferenceContext()
+    val expectedInferredType = TypeSelects.JavaString
+
+    when(termSelectSupportsNoArgInvocation(eqTree(termSelect), eqTermSelectInferenceContext(expectedContext))).thenReturn(false)
+    when(qualifierTypeInferrer.infer(eqTree(termSelect))).thenReturn(None)
+    when(selectTypeInferrer.infer(eqTree(termSelect), eqTermSelectInferenceContext(expectedContext))).thenReturn(None)
+    when(scalaReflectionTypeInferrer.inferScalaMetaTypeOf(eqTree(q"a"), eqTree(termSelect.name))).thenReturn(Some(expectedInferredType))
+
+    internalSelectTypeInferrer.infer(termSelect).value.structure shouldBe expectedInferredType.structure
+  }
+
+  test("infer() when Term.Select does not support no-arg invocation, " +
+    "and qualifier type is not inferred, " +
+    "and custom inferrer returns None ," +
+    "and reflection inferrer returns None ," +
+    "- should return None") {
+    val termSelect = q"a.b"
+    val expectedContext = TermSelectInferenceContext()
+
+    when(termSelectSupportsNoArgInvocation(eqTree(termSelect), eqTermSelectInferenceContext(expectedContext))).thenReturn(false)
+    when(qualifierTypeInferrer.infer(eqTree(termSelect))).thenReturn(None)
+    when(selectTypeInferrer.infer(eqTree(termSelect), eqTermSelectInferenceContext(expectedContext))).thenReturn(None)
+    when(scalaReflectionTypeInferrer.inferScalaMetaTypeOf(eqTree(q"a"), eqTree(termSelect.name))).thenReturn(None)
 
     internalSelectTypeInferrer.infer(termSelect) shouldBe None
   }

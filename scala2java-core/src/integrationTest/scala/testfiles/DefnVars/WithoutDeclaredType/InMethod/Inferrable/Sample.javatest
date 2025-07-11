@@ -1,0 +1,10 @@
+package testfiles.DefnVars.WithoutDeclaredType.InMethod.Inferrable;
+
+import testfilesext.SampleObject;
+
+public class Sample {
+
+    public void foo() {
+        SampleObject x = SampleObject;
+    }
+}
