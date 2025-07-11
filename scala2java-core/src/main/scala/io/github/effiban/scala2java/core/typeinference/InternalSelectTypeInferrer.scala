@@ -1,5 +1,7 @@
 package io.github.effiban.scala2java.core.typeinference
 
+
+import io.github.effiban.scala2java.core.entities.Regexes.ScalaTupleElementRegex
 import io.github.effiban.scala2java.spi.contexts.TermSelectInferenceContext
 import io.github.effiban.scala2java.spi.predicates.TermSelectSupportsNoArgInvocation
 import io.github.effiban.scala2java.spi.typeinferrers.{SelectTypeInferrer, TypeInferrer0}
@@ -21,6 +23,14 @@ private[typeinference] class InternalSelectTypeInferrerImpl(applyReturnTypeInfer
       applyReturnTypeInferrer.infer(Term.Apply(termSelect, Nil))
     } else {
       selectTypeInferrer.infer(termSelect, inferenceContext)
+        .orElse(inferSpecialCase(termSelect, inferenceContext))
+    }
+  }
+
+  private def inferSpecialCase(termSelect: Term.Select, inferenceContext: TermSelectInferenceContext) = {
+    (termSelect.qual, inferenceContext.maybeQualType, termSelect.name) match {
+      case (_,  Some(Type.Tuple(typeArgs)), Term.Name(ScalaTupleElementRegex(indexStr))) => Some(typeArgs.apply(indexStr.toInt - 1))
+      case _ => None
     }
   }
 }

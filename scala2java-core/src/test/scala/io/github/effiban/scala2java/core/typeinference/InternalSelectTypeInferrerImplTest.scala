@@ -1,8 +1,8 @@
 package io.github.effiban.scala2java.core.typeinference
 
+import io.github.effiban.scala2java.core.entities.TypeSelects
 import io.github.effiban.scala2java.core.matchers.TermSelectInferenceContextMatcher.eqTermSelectInferenceContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.spi.contexts.TermSelectInferenceContext
 import io.github.effiban.scala2java.spi.predicates.TermSelectSupportsNoArgInvocation
 import io.github.effiban.scala2java.spi.typeinferrers.SelectTypeInferrer
@@ -28,7 +28,7 @@ class InternalSelectTypeInferrerImplTest extends UnitTestSuite {
     val qualifierType = t"A"
     val expectedContext = TermSelectInferenceContext(Some(qualifierType))
     val expectedTermApply = q"a.b()"
-    val expectedReturnType = TypeNames.String
+    val expectedReturnType = TypeSelects.JavaString
 
     when(qualifierTypeInferrer.infer(eqTree(termSelect))).thenReturn(Some(qualifierType))
     when(termSelectSupportsNoArgInvocation(eqTree(termSelect), eqTermSelectInferenceContext(expectedContext))).thenReturn(true)
@@ -54,7 +54,7 @@ class InternalSelectTypeInferrerImplTest extends UnitTestSuite {
     val termSelect = q"a.b"
     val qualifierType = t"A"
     val expectedContext = TermSelectInferenceContext(Some(qualifierType))
-    val expectedSelectType = TypeNames.String
+    val expectedSelectType = TypeSelects.JavaString
 
     when(termSelectSupportsNoArgInvocation(eqTree(termSelect), eqTermSelectInferenceContext(expectedContext))).thenReturn(false)
     when(qualifierTypeInferrer.infer(eqTree(termSelect))).thenReturn(Some(qualifierType))
@@ -73,5 +73,29 @@ class InternalSelectTypeInferrerImplTest extends UnitTestSuite {
     when(selectTypeInferrer.infer(eqTree(termSelect), eqTermSelectInferenceContext(expectedContext))).thenReturn(None)
 
     internalSelectTypeInferrer.infer(termSelect) shouldBe None
+  }
+
+  test("infer() for first elem of a Tuple2 should return correct type") {
+    val termSelect = q"""("a", 1)._1"""
+    val qualifierType = t"(java.lang.String, scala.Int)"
+    val expectedContext = TermSelectInferenceContext(Some(qualifierType))
+
+    when(termSelectSupportsNoArgInvocation(eqTree(termSelect), eqTermSelectInferenceContext(expectedContext))).thenReturn(false)
+    when(qualifierTypeInferrer.infer(eqTree(termSelect))).thenReturn(Some(qualifierType))
+    when(selectTypeInferrer.infer(eqTree(termSelect), eqTermSelectInferenceContext(expectedContext))).thenReturn(None)
+
+    internalSelectTypeInferrer.infer(termSelect).value.structure shouldBe TypeSelects.JavaString.structure
+  }
+
+  test("infer() for second elem of a Tuple2 should return correct type") {
+    val termSelect = q"""("a", 1)._2"""
+    val qualifierType = t"(java.lang.String, scala.Int)"
+    val expectedContext = TermSelectInferenceContext(Some(qualifierType))
+
+    when(termSelectSupportsNoArgInvocation(eqTree(termSelect), eqTermSelectInferenceContext(expectedContext))).thenReturn(false)
+    when(qualifierTypeInferrer.infer(eqTree(termSelect))).thenReturn(Some(qualifierType))
+    when(selectTypeInferrer.infer(eqTree(termSelect), eqTermSelectInferenceContext(expectedContext))).thenReturn(None)
+
+    internalSelectTypeInferrer.infer(termSelect).value.structure shouldBe TypeSelects.ScalaInt.structure
   }
 }
