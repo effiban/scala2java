@@ -40,17 +40,7 @@ private[reflection] object ScalaReflectionTransformer {
   }
 
   def toScalaMetaType(tpe: universe.Type): Option[Type] = {
-    finalResultTypeOf(tpe) match {
-      case sym if (1 to ScalaMaxArity).exists(n => sym == definitions.FunctionClass(n)) => toScalaMetaTypeFunction(tpe)
-      case sym if (1 to ScalaMaxArity).exists(n => sym == definitions.TupleClass(n)) => toScalaMetaTypeTuple(tpe)
-      case sym =>
-        val maybeSMType = toScalaMetaTypeRef(sym)
-        (maybeSMType, tpe.finalResultType.typeArgs) match {
-          case (None, _) => None
-          case (_, Nil) => maybeSMType
-          case (Some(scalaMetaType), targs) => toScalaMetaTypeApply(scalaMetaType, targs)
-        }
-    }
+    if (isSingletonType(tpe)) toScalaMetaTypeSingleton(tpe) else toScalaMetaTypeNonSingleton(tpe)
   }
 
   def toClassSymbol(tpe: Type): Option[ClassSymbol] = tpe match {
@@ -74,6 +64,25 @@ private[reflection] object ScalaReflectionTransformer {
     val innerTypeName = TypeName(innerName.value)
     toClassSymbol(outerType)
       .flatMap(outerClassSymbol => dealiasedClassSymbolOf(findInnerClassSymbolOf(outerClassSymbol, innerTypeName)))
+  }
+
+  private def toScalaMetaTypeSingleton(tpe: universe.Type) = {
+    val maybeScalaMetaObjRef = finalResultTypeFullnameOf(tpe).parse[Term].toOption.map(_.asInstanceOf[Term.Ref])
+    maybeScalaMetaObjRef.map(Type.Singleton(_))
+  }
+
+  private def toScalaMetaTypeNonSingleton(tpe: universe.Type) = {
+    finalResultTypeOf(tpe) match {
+      case sym if (1 to ScalaMaxArity).exists(n => sym == definitions.FunctionClass(n)) => toScalaMetaTypeFunction(tpe)
+      case sym if (1 to ScalaMaxArity).exists(n => sym == definitions.TupleClass(n)) => toScalaMetaTypeTuple(tpe)
+      case sym =>
+        val maybeSMType = toScalaMetaTypeRef(sym)
+        (maybeSMType, tpe.finalResultType.typeArgs) match {
+          case (None, _) => None
+          case (_, Nil) => maybeSMType
+          case (Some(scalaMetaType), targs) => toScalaMetaTypeApply(scalaMetaType, targs)
+        }
+    }
   }
 
   private def toScalaMetaTypeFunction(tpe: universe.Type) = {

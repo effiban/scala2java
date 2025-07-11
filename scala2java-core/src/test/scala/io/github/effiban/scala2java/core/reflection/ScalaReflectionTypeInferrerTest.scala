@@ -3,9 +3,14 @@ package io.github.effiban.scala2java.core.reflection
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionTypeInferrer.inferScalaMetaTypeOf
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 
-import scala.meta.{XtensionQuasiquoteTerm, XtensionQuasiquoteType}
+import scala.meta.{Type, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 class ScalaReflectionTypeInferrerTest extends UnitTestSuite {
+
+  test("inferScalaMetaTypeOf() for 'TestObjectWithDataMembersOnly' should return a corresponding Type.Singleton") {
+    inferScalaMetaTypeOf(q"io.github.effiban.scala2java.core.reflection", q"TestObjectWithDataMembersOnly").value.structure shouldBe
+      Type.Singleton(q"io.github.effiban.scala2java.core.reflection.TestObjectWithDataMembersOnly").structure
+  }
 
   test("inferScalaMetaTypeOf() for 'TestObjectWithDataMembersOnly.x' should return 'scala.Int'") {
     inferScalaMetaTypeOf(q"io.github.effiban.scala2java.core.reflection.TestObjectWithDataMembersOnly", q"x").value.structure shouldBe
