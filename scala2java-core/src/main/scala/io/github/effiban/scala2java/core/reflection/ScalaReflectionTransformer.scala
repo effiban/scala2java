@@ -1,12 +1,11 @@
 package io.github.effiban.scala2java.core.reflection
 
-import io.github.effiban.scala2java.core.entities.TypeSelects
 import io.github.effiban.scala2java.core.entities.TypeSelects.ScalaAny
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.{dealiasedClassSymbolOf, finalResultTypeArgsOf, finalResultTypeFullnameOf, finalResultTypeOf}
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalClassifier.isSingletonType
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.{findInnerClassSymbolOf, findModuleSymbolOf}
 
-import scala.meta.{Term, Type, XtensionParseInputLike, XtensionQuasiquoteType}
+import scala.meta.{Term, Type, XtensionParseInputLike}
 import scala.reflect.runtime.universe
 import scala.reflect.runtime.universe._
 
@@ -42,18 +41,15 @@ private[reflection] object ScalaReflectionTransformer {
 
   def toScalaMetaType(tpe: universe.Type): Option[Type] = {
     finalResultTypeOf(tpe) match {
-      case sym if (1 to ScalaMaxArity).exists(n => sym == definitions.FunctionClass(n)) =>
-        val smTypeArgs = tpe.finalResultType.typeArgs.map(
-          typeArg => toScalaMetaType(typeArg).getOrElse(ScalaAny)
-        )
-        val (smParamTypeArgs, smResultTypeArg) = (smTypeArgs.slice(0, smTypeArgs.size - 1), smTypeArgs.last)
-        Some(Type.Function(smParamTypeArgs, smResultTypeArg))
-      case sym if (1 to ScalaMaxArity).exists(n => sym == definitions.TupleClass(n)) =>
-        val smTypeArgs = finalResultTypeArgsOf(tpe).map(
-          typeArg => toScalaMetaType(typeArg).getOrElse(ScalaAny)
-        )
-        Some(Type.Tuple(smTypeArgs))
-      case sym => toScalaMetaTypeRef(sym)
+      case sym if (1 to ScalaMaxArity).exists(n => sym == definitions.FunctionClass(n)) => toScalaMetaTypeFunction(tpe)
+      case sym if (1 to ScalaMaxArity).exists(n => sym == definitions.TupleClass(n)) => toScalaMetaTypeTuple(tpe)
+      case sym =>
+        val maybeSMType = toScalaMetaTypeRef(sym)
+        (maybeSMType, tpe.finalResultType.typeArgs) match {
+          case (None, _) => None
+          case (_, Nil) => maybeSMType
+          case (Some(scalaMetaType), targs) => toScalaMetaTypeApply(scalaMetaType, targs)
+        }
     }
   }
 
@@ -78,5 +74,25 @@ private[reflection] object ScalaReflectionTransformer {
     val innerTypeName = TypeName(innerName.value)
     toClassSymbol(outerType)
       .flatMap(outerClassSymbol => dealiasedClassSymbolOf(findInnerClassSymbolOf(outerClassSymbol, innerTypeName)))
+  }
+
+  private def toScalaMetaTypeFunction(tpe: universe.Type) = {
+    val smTypeArgs = tpe.finalResultType.typeArgs.map(
+      typeArg => toScalaMetaType(typeArg).getOrElse(ScalaAny)
+    )
+    val (smParamTypeArgs, smResultTypeArg) = (smTypeArgs.slice(0, smTypeArgs.size - 1), smTypeArgs.last)
+    Some(Type.Function(smParamTypeArgs, smResultTypeArg))
+  }
+
+  private def toScalaMetaTypeTuple(tpe: universe.Type) = {
+    val smTypeArgs = finalResultTypeArgsOf(tpe).map(
+      typeArg => toScalaMetaType(typeArg).getOrElse(ScalaAny)
+    )
+    Some(Type.Tuple(smTypeArgs))
+  }
+
+  private def toScalaMetaTypeApply(scalaMetaType: Type.Ref, targs: List[universe.Type]) = {
+    val scalaMetaTargs = targs.map(targ => toScalaMetaType(targ).getOrElse(ScalaAny))
+    Some(Type.Apply(scalaMetaType, scalaMetaTargs))
   }
 }
