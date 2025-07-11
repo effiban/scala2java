@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.reflection
 
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionAccess.RuntimeMirror
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionCreator.createTypeTagOf
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.dealiasedClassSymbolOf
 
 import scala.reflect.runtime.universe._
@@ -36,4 +37,14 @@ private[reflection] object ScalaReflectionInternalLookup {
 
   def findModuleTypeMemberOf(module: ModuleSymbol, typeName: String): Symbol =
     module.typeSignature.decl(TypeName(typeName))
+
+  def findSelfAndBaseTypeTagsOf[T: TypeTag]: List[TypeTag[_]] = {
+    val tpe = typeOf[T]
+
+    // Get all supertypes by applying baseType to each base class symbol
+    val baseTypes = tpe.baseClasses.map(sym => tpe.baseType(sym))
+
+    // Convert each supertype into a TypeTag and extract its type arguments
+    baseTypes.map(createTypeTagOf)
+  }
 }

@@ -4,5 +4,5 @@ import java.util.List;
 import java.util.List.of;
 
 public class Sample {
-    private final List x = of();
+    private final List<Object> x = of();
 }
