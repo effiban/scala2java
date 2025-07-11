@@ -12,6 +12,14 @@ class ScalaReflectionTypeInferrerTest extends UnitTestSuite {
       Type.Singleton(q"io.github.effiban.scala2java.core.reflection.TestObjectWithDataMembersOnly").structure
   }
 
+  test("inferScalaMetaTypeOf() for 'scala.collection.immutable.Nil' should return 'scala.collection.immutable.List'") {
+    inferScalaMetaTypeOf(q"scala.collection.immutable", q"Nil").value.structure shouldBe t"scala.collection.immutable.List[scala.Nothing]".structure
+  }
+
+  test("inferScalaMetaTypeOf() for 'scala.None' should return 'scala.Option'") {
+    inferScalaMetaTypeOf(q"scala", q"None").value.structure shouldBe t"scala.Option[scala.Nothing]".structure
+  }
+
   test("inferScalaMetaTypeOf() for 'TestObjectWithDataMembersOnly.x' should return 'scala.Int'") {
     inferScalaMetaTypeOf(q"io.github.effiban.scala2java.core.reflection.TestObjectWithDataMembersOnly", q"x").value.structure shouldBe
       t"scala.Int".structure

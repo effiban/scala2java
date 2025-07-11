@@ -1,6 +1,8 @@
 package io.github.effiban.scala2java.core.reflection
 
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.findModuleSymbolOf
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionClassifier.isTrivialClassFullName
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionCreator.createTypeTagOf
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.{findModuleSymbolOf, findSelfAndBaseTypeTagsOf}
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionTransformer.{toClassSymbol, toScalaMetaType}
 
 import scala.meta.{Term, Type}
@@ -30,9 +32,21 @@ object ScalaReflectionTypeInferrer extends ScalaReflectionTypeInferrer {
   }
 
   private def inferScalaMetaTypeOf(qualSym: Symbol, name: Term.Name): Option[Type] = {
-      qualSym.info.member(TermName(name.value)) match {
-        case NoSymbol => None
-        case sym => toScalaMetaType(sym.typeSignature)
+    qualSym.info.member(TermName(name.value)) match {
+      case NoSymbol => None
+      case symbol => toScalaMetaType(symbol.typeSignature) match {
+        case Some(smTypeSingleton: Type.Singleton) => inferScalaMetaBaseTypeOfSingleton(symbol, smTypeSingleton)
+        case other => other
+      }
+    }
+  }
+
+  private def inferScalaMetaBaseTypeOfSingleton(singletonSymbol: Symbol, smTypeSingleton: Type.Singleton) = {
+    findSelfAndBaseTypeTagsOf(createTypeTagOf(singletonSymbol.typeSignature))
+      .filterNot(tag => isTrivialClassFullName(tag.tpe.typeSymbol.fullName)) match {
+      case _ :: baseTag :: _ => toScalaMetaType(baseTag.tpe)
+      case _ => Some(smTypeSingleton)
     }
   }
 }
+

@@ -6,6 +6,7 @@ import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
 import io.github.effiban.scala2java.core.factories.Factories
 import io.github.effiban.scala2java.core.predicates._
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionTypeInferrer
+import io.github.effiban.scala2java.spi.typeinferrers.SelectTypeInferrer
 
 class TypeInferrers(factories: => Factories,
                     predicates: => Predicates)
@@ -47,7 +48,7 @@ class TypeInferrers(factories: => Factories,
   private[typeinference] lazy val internalSelectTypeInferrer = new InternalSelectTypeInferrerImpl(
     applyReturnTypeInferrer,
     qualifierTypeInferrer,
-    new CompositeSelectTypeInferrer(CoreSelectTypeInferrer),
+    new CompositeSelectTypeInferrer(SelectTypeInferrer.Empty),
     new CompositeTermSelectSupportsNoArgInvocation(CoreTermSelectSupportsNoArgInvocation),
     ScalaReflectionTypeInferrer
   )
