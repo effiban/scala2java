@@ -1,4 +1,4 @@
-package testfiles.DefnVars.WithoutDeclaredType.InMethod.NonInferrable
+package testfiles.DefnVars.WithoutDeclaredType.InMethod.Inferrable
 
 import testfilesext.SampleObject
 

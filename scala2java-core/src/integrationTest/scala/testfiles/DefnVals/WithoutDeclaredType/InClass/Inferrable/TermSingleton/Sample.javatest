@@ -1,0 +1,7 @@
+package testfiles.DefnVals.WithoutDeclaredType.InClass.Inferrable.TermSingleton;
+
+import testfilesext.SampleObject;
+
+public class Sample {
+    private final SampleObject x = SampleObject;
+}

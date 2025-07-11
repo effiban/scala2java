@@ -1,10 +1,11 @@
 package io.github.effiban.scala2java.core.reflection
 
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.{dealiasedClassSymbolOf, finalResultTypeFullnameOf}
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.{dealiasedClassSymbolOf, finalResultTypeFullnameOf, finalResultTypeOf}
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalClassifier.isSingletonType
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.{findInnerClassSymbolOf, findModuleSymbolOf}
 
 import scala.meta.{Term, Type, XtensionParseInputLike}
+import scala.reflect.runtime.universe
 import scala.reflect.runtime.universe._
 
 private[reflection] object ScalaReflectionTransformer {
@@ -33,6 +34,11 @@ private[reflection] object ScalaReflectionTransformer {
           Some(Type.Project(qualifier, Type.Name(classSymbol.name.toString)))
         case _ => None
       })
+  }
+
+  def toScalaMetaType(tpe: universe.Type): Option[Type] = {
+    val sym = finalResultTypeOf(tpe)
+    toScalaMetaTypeRef(sym)
   }
 
   def toClassSymbol(tpe: Type): Option[ClassSymbol] = tpe match {

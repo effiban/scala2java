@@ -2,6 +2,7 @@ package io.github.effiban.scala2java.core.typeinference
 
 
 import io.github.effiban.scala2java.core.entities.Regexes.ScalaTupleElementRegex
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionTypeInferrer
 import io.github.effiban.scala2java.spi.contexts.TermSelectInferenceContext
 import io.github.effiban.scala2java.spi.predicates.TermSelectSupportsNoArgInvocation
 import io.github.effiban.scala2java.spi.typeinferrers.{SelectTypeInferrer, TypeInferrer0}
@@ -13,7 +14,8 @@ trait InternalSelectTypeInferrer extends TypeInferrer0[Term.Select]
 private[typeinference] class InternalSelectTypeInferrerImpl(applyReturnTypeInferrer: => ApplyReturnTypeInferrer,
                                                             qualifierTypeInferrer: => QualifierTypeInferrer,
                                                             selectTypeInferrer: => SelectTypeInferrer,
-                                                            termSelectSupportsNoArgInvocation: TermSelectSupportsNoArgInvocation)
+                                                            termSelectSupportsNoArgInvocation: TermSelectSupportsNoArgInvocation,
+                                                            scalaReflectionTypeInferrer: ScalaReflectionTypeInferrer)
   extends InternalSelectTypeInferrer {
 
   override def infer(termSelect: Term.Select): Option[Type] = {
@@ -23,7 +25,18 @@ private[typeinference] class InternalSelectTypeInferrerImpl(applyReturnTypeInfer
       applyReturnTypeInferrer.infer(Term.Apply(termSelect, Nil))
     } else {
       selectTypeInferrer.infer(termSelect, inferenceContext)
+        .orElse(inferByReflection(termSelect, inferenceContext))
         .orElse(inferSpecialCase(termSelect, inferenceContext))
+    }
+  }
+
+  private def inferByReflection(termSelect: Term.Select, inferenceContext: TermSelectInferenceContext) = {
+    import scalaReflectionTypeInferrer._
+
+    (termSelect.qual, inferenceContext.maybeQualType, termSelect.name) match {
+      case (qual: Term.Ref, None, name) => inferScalaMetaTypeOf(qual, name)
+      case (_, Some(qualType: Type.Ref), name) => inferScalaMetaTypeOf(qualType, name)
+      case _ => None
     }
   }
 

@@ -23,7 +23,7 @@ private[reflection] object ScalaReflectionExtractor {
     finalResultTypeOf(tpe).fullName
   }
 
-  private def finalResultTypeOf(tpe: Type) = {
+  def finalResultTypeOf(tpe: Type): Symbol = {
     tpe.finalResultType.typeSymbol
   }
 }

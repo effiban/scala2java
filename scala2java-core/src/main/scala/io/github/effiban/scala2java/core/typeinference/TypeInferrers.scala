@@ -5,6 +5,7 @@ import io.github.effiban.scala2java.core.entities.ParameterizedInitializerNameTy
 import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
 import io.github.effiban.scala2java.core.factories.Factories
 import io.github.effiban.scala2java.core.predicates._
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionTypeInferrer
 
 class TypeInferrers(factories: => Factories,
                     predicates: => Predicates)
@@ -47,7 +48,8 @@ class TypeInferrers(factories: => Factories,
     applyReturnTypeInferrer,
     qualifierTypeInferrer,
     new CompositeSelectTypeInferrer(CoreSelectTypeInferrer),
-    new CompositeTermSelectSupportsNoArgInvocation(CoreTermSelectSupportsNoArgInvocation)
+    new CompositeTermSelectSupportsNoArgInvocation(CoreTermSelectSupportsNoArgInvocation),
+    ScalaReflectionTypeInferrer
   )
 
   private lazy val parameterizedInitializerDeclDefInferrer = new InitializerDeclDefInferrerImpl(
