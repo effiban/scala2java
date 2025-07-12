@@ -15,4 +15,8 @@ private[reflection] class TestClass {
   def fun4(): (Int, Long, String) => String = (i, l, s) => (i + l).toString + s
 
   def fun5(): List[Int] = List(3)
+
+  private class TestInnerClass {
+    val x = 5
+  }
 }
