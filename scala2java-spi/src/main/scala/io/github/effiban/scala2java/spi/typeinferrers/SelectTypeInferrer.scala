@@ -8,8 +8,10 @@ import scala.meta.Term
  * In addition to the qualified name, the inferrer receives a context argument containing
  * additional information to make the inference more accurate (such as the type of qualifier).
  */
+@deprecated
 trait SelectTypeInferrer extends TypeInferrer1[Term.Select, TermSelectInferenceContext]
 
+@deprecated
 object SelectTypeInferrer {
 
   /** The empty inferrer which always returns `None`, meaning - cannot be inferred. */
