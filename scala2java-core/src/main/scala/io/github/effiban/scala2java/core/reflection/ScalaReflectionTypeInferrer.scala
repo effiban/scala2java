@@ -5,10 +5,11 @@ import io.github.effiban.scala2java.core.entities.TypeSelects.ScalaAny
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionClassifier.isTrivialClassFullName
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionCreator.createTypeTagOf
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.{findModuleSymbolOf, findSelfAndBaseTypeTagsOf, resolveAncestorTypeParamToTypeArg}
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionTransformer.{asScalaMetaTypeNameToType, toClassSymbol, toScalaMetaType, toTypeTag}
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionTransformer.{toClassSymbol, toScalaMetaType}
 
+import scala.collection.immutable.ListMap
 import scala.meta.transversers.Transformer
-import scala.meta.{Term, Tree, Type}
+import scala.meta.{Term, Tree, Type, XtensionQuasiquoteType}
 import scala.reflect.runtime.universe._
 
 trait ScalaReflectionTypeInferrer {
@@ -41,18 +42,36 @@ object ScalaReflectionTypeInferrer extends ScalaReflectionTypeInferrer {
       case Some(qualCls) => qualCls.info.member(TermName(name.value)) match {
         case NoSymbol => None
         case member =>
-          val maybeQualTypeTag = toTypeTag(qual, qualArgs)
-          maybeQualTypeTag.flatMap(qualTypeTag => {
-            val owner = member.owner
-            val ownerTypeTag = createTypeTagOf(owner.typeSignature)
-            val ownerTypeParamToQualTypeArg = resolveAncestorTypeParamToTypeArg(ownerTypeTag, qualTypeTag)
-            val smOwnerTypeParamToQualTypeArg = asScalaMetaTypeNameToType(ownerTypeParamToQualTypeArg)
-            val maybeSMMemberType = toScalaMetaType(member.typeSignature)
-            maybeSMMemberType.map(replaceScalaMetaTypeParamsWithTypeArgs(_, smOwnerTypeParamToQualTypeArg))
-          })
+          val owner = member.owner
+          val ownerTypeTag = createTypeTagOf(owner.typeSignature)
+          val placeholderTypeToSMQualArg = mapPlaceholderTypesTo(qualArgs)
+          val qualWithPlaceholdersTypeTag = createTypeTagOf(qualCls.toType, placeholderTypeToSMQualArg.keySet.toList)
+          val ownerTypeParamToQualPlaceholderTypeArg = resolveAncestorTypeParamToTypeArg(ownerTypeTag, qualWithPlaceholdersTypeTag)
+          val smOwnerTypeParamToQualTypeArg = ownerTypeParamToQualPlaceholderTypeArg.map {
+            case (typeParam, typeArg) => (Type.Name(typeParam.name.toString), placeholderTypeToSMQualArg.getOrElse(typeArg, ScalaAny))
+          }
+          val maybeSMMemberType = toScalaMetaType(member.typeSignature)
+          maybeSMMemberType.map(replaceScalaMetaTypeParamsWithTypeArgs(_, smOwnerTypeParamToQualTypeArg))
       }
       case _ => None
     }
+  }
+
+  private def mapPlaceholderTypesTo(qualArgs: List[Type]) = {
+    ListMap.from(
+      qualArgs.zipWithIndex.flatMap {
+        case (qualArg, idx) =>
+          val smPlaceholderType = placeholderTypeAtIndex(idx)
+          toClassSymbol(smPlaceholderType).map(placeholderCls => (placeholderCls.toType, qualArg))
+      }
+    )
+  }
+
+  private def placeholderTypeAtIndex(idx: Int) = {
+    Type.Project(
+      t"io.github.effiban.scala2java.core.reflection.ScalaReflectionTypeInferrer",
+      Type.Name(s"Placeholder${idx + 1}")
+    )
   }
 
   private def inferScalaMetaTypeOf(qualSym: Symbol, name: Term.Name): Option[Type] = {
@@ -87,5 +106,51 @@ object ScalaReflectionTypeInferrer extends ScalaReflectionTypeInferrer {
     }.apply(tpe)
       .asInstanceOf[Type]
   }
+
+  // The number of placeholder classes is according to the Scala maximum number of type params
+
+  private class Placeholder1
+
+  private class Placeholder2
+
+  private class Placeholder3
+
+  private class Placeholder4
+
+  private class Placeholder5
+
+  private class Placeholder6
+
+  private class Placeholder7
+
+  private class Placeholder8
+
+  private class Placeholder9
+
+  private class Placeholder10
+
+  private class Placeholder11
+
+  private class Placeholder12
+
+  private class Placeholder13
+
+  private class Placeholder14
+
+  private class Placeholder15
+
+  private class Placeholder16
+
+  private class Placeholder17
+
+  private class Placeholder18
+
+  private class Placeholder19
+
+  private class Placeholder20
+
+  private class Placeholder21
+
+  private class Placeholder22
 }
 

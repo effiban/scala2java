@@ -13,4 +13,9 @@ private[reflection] object ScalaReflectionCreator {
         tpe.asInstanceOf[U#Type]
     })
   }
+
+  def createTypeTagOf(tpe: universe.Type, typeArgs: List[universe.Type]): TypeTag[Nothing] = {
+    val appliedTypeInstance = appliedType(tpe, typeArgs: _*)
+    createTypeTagOf(appliedTypeInstance)
+  }
 }

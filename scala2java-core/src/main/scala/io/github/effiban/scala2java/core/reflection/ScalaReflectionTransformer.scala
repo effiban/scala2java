@@ -1,13 +1,11 @@
 package io.github.effiban.scala2java.core.reflection
 
 import io.github.effiban.scala2java.core.entities.TypeSelects.ScalaAny
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionCreator.createTypeTagOf
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.{dealiasedClassSymbolOf, finalResultTypeArgsOf, finalResultTypeFullnameOf, finalResultTypeOf}
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalClassifier.isSingletonType
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.{findInnerClassSymbolOf, findModuleSymbolOf}
 
 import scala.meta.{Term, Type, XtensionParseInputLike}
-import scala.reflect.internal.Flags
 import scala.reflect.runtime.universe
 import scala.reflect.runtime.universe._
 
@@ -45,21 +43,6 @@ private[reflection] object ScalaReflectionTransformer {
     case typeSelect: Type.Select => toClassSymbol(typeSelect)
     case Type.Project(tpe, name) => innerClassSymbolOf(tpe, name)
     case _ => None
-  }
-
-  def toTypeTag(smTypeRef: Type.Ref, smTypeArgs: List[Type]): Option[TypeTag[_]] = {
-    val maybeBaseSymbol = toClassSymbol(smTypeRef)
-    maybeBaseSymbol.map(baseSymbol => {
-      val typeArgs = smTypeArgs.map(arg => toClassSymbol(arg).map(_.toType).getOrElse(NoType))
-      val appliedTypeInstance = appliedType(baseSymbol.toType, typeArgs: _*)
-      createTypeTagOf(appliedTypeInstance)
-    })
-  }
-
-  def asScalaMetaTypeNameToType(typeSymbolToType: Map[TypeSymbol, universe.Type]): Map[Type.Name, Type] = {
-    typeSymbolToType.map {
-      case (typeSymbol, typeArg) => (Type.Name(typeSymbol.name.toString), toScalaMetaType(typeArg).getOrElse(ScalaAny))
-    }
   }
 
   private def toScalaMetaTypeRefFromClass(symbol: Symbol): Option[Type.Ref] = {
