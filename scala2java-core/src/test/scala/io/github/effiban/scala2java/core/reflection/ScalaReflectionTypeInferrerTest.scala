@@ -50,6 +50,76 @@ class ScalaReflectionTypeInferrerTest extends UnitTestSuite {
       t"scala.collection.immutable.List[scala.Long]".structure
   }
 
+  test("inferScalaMetaTypeOf() for 'TestParameterizedClassWithDataMembersOnly[scala.Int, scala.Long, java.lang.String].x' " +
+    "should return 'scala.Int'") {
+    val inferredType = inferScalaMetaTypeOf(
+      t"io.github.effiban.scala2java.core.reflection.TestParameterizedClassWithDataMembersOnly",
+      List(t"scala.Int", t"scala.Long", t"java.lang.String"),
+      q"x"
+    )
+    inferredType.value.structure shouldBe t"scala.Int".structure
+  }
+
+  test("inferScalaMetaTypeOf() for 'TestParameterizedClassWithDataMembersOnly[scala.Int, scala.Long, java.lang.String].y' " +
+    "should return '(scala.Int, scala.Long)'") {
+    val inferredType = inferScalaMetaTypeOf(
+      t"io.github.effiban.scala2java.core.reflection.TestParameterizedClassWithDataMembersOnly",
+      List(t"scala.Int", t"scala.Long", t"java.lang.String"),
+      q"y"
+    )
+    inferredType.value.structure shouldBe t"(scala.Int, scala.Long)".structure
+  }
+
+  test("inferScalaMetaTypeOf() for 'TestParameterizedClassWithDataMembersOnly[scala.Int, scala.Long, java.lang.String].z' " +
+    "should return '(scala.Int, scala.Long, java.lang.String) => java.lang.String'") {
+    val inferredType = inferScalaMetaTypeOf(
+      t"io.github.effiban.scala2java.core.reflection.TestParameterizedClassWithDataMembersOnly",
+      List(t"scala.Int", t"scala.Long", t"java.lang.String"),
+      q"z"
+    )
+    inferredType.value.structure shouldBe t"(scala.Int, scala.Long, java.lang.String) => java.lang.String".structure
+  }
+
+  test("inferScalaMetaTypeOf() for 'TestParameterizedClassWithDataMembersOnly[scala.Int, scala.Long, java.lang.String].w' " +
+    "should return 'scala.collection.immutable.List[scala.Int]'") {
+    val inferredType = inferScalaMetaTypeOf(
+      t"io.github.effiban.scala2java.core.reflection.TestParameterizedClassWithDataMembersOnly",
+      List(t"scala.Int", t"scala.Long", t"java.lang.String"),
+      q"w"
+    )
+    inferredType.value.structure shouldBe t"scala.collection.immutable.List[scala.Int]".structure
+  }
+
+  test("inferScalaMetaTypeOf() for 'TestParameterizedClassWithDataMembersOnly[scala.Int, scala.Long, java.lang.String].v' " +
+    "should return 'scala.collection.immutable.List[scala.collection.immutable.List[scala.Int]]'") {
+    val inferredType = inferScalaMetaTypeOf(
+      t"io.github.effiban.scala2java.core.reflection.TestParameterizedClassWithDataMembersOnly",
+      List(t"scala.Int", t"scala.Long", t"java.lang.String"),
+      q"v"
+    )
+    inferredType.value.structure shouldBe t"scala.collection.immutable.List[scala.collection.immutable.List[scala.Int]]".structure
+  }
+
+  test("inferScalaMetaTypeOf() for 'TestChildParameterizedClassWithDataMembersOnly[scala.Int, scala.Long, java.lang.String].x' " +
+    "should return 'scala.Int'") {
+    val inferredType = inferScalaMetaTypeOf(
+      t"io.github.effiban.scala2java.core.reflection.TestChildParameterizedClassWithDataMembersOnly",
+      List(t"scala.Int", t"scala.Long", t"java.lang.String"),
+      q"x"
+    )
+    inferredType.value.structure shouldBe t"scala.Int".structure
+  }
+
+  test("inferScalaMetaTypeOf() for 'TestChildParameterizedClassWithDataMembersOnly[scala.Int, scala.Long, java.lang.String].y' " +
+    "should return '(scala.Int, scala.Long)'") {
+    val inferredType = inferScalaMetaTypeOf(
+      t"io.github.effiban.scala2java.core.reflection.TestChildParameterizedClassWithDataMembersOnly",
+      List(t"scala.Int", t"scala.Long", t"java.lang.String"),
+      q"y"
+    )
+    inferredType.value.structure shouldBe t"(scala.Int, scala.Long)".structure
+  }
+
   class TestInnerClassWithDataMembersOnly {
     val x: Int = 3
   }

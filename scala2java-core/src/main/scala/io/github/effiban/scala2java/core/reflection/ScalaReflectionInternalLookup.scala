@@ -47,4 +47,16 @@ private[reflection] object ScalaReflectionInternalLookup {
     // Convert each supertype into a TypeTag and extract its type arguments
     baseTypes.map(createTypeTagOf)
   }
+
+  def resolveAncestorTypeParamToTypeArg(ancestorTypeTag: TypeTag[_], typeTag: TypeTag[_]): Map[TypeSymbol, Type] = {
+    val theSelfAndBaseTypeTags = findSelfAndBaseTypeTagsOf(typeTag)
+    theSelfAndBaseTypeTags.find(_.tpe.typeSymbol == ancestorTypeTag.tpe.typeSymbol) match {
+      case Some(ownerTypeTag) => ancestorTypeTag.tpe.typeParams.indices
+        .slice(0, ownerTypeTag.tpe.typeArgs.size)
+        .map(idx => (ancestorTypeTag.tpe.typeParams(idx), ownerTypeTag.tpe.typeArgs(idx)))
+        .map { case (typeParam: TypeSymbol, typeArg) => (typeParam, typeArg) }
+        .toMap
+      case None => Map.empty
+    }
+  }
 }
