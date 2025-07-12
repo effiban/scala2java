@@ -1,19 +1,21 @@
 package io.github.effiban.scala2java.core.typeinference
 
 import io.github.effiban.scala2java.core.predicates.TermSelectHasApplyMethod
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionMethodSignatureInferrer
 import io.github.effiban.scala2java.spi.contexts.TermApplyInferenceContext
 import io.github.effiban.scala2java.spi.entities.PartialDeclDef
 import io.github.effiban.scala2java.spi.typeinferrers.ApplyDeclDefInferrer
 
 import scala.annotation.tailrec
-import scala.meta.{Term, XtensionQuasiquoteTerm}
+import scala.meta.{Term, Type, XtensionQuasiquoteTerm}
 
 trait InternalApplyDeclDefInferrer {
   def infer(termApply: Term.Apply, context: TermApplyInferenceContext): PartialDeclDef
 }
 
 private[typeinference] class InternalApplyDeclDefInferrerImpl(applyDeclDefInferrer: => ApplyDeclDefInferrer,
-                                                              termSelectHasApplyMethod: TermSelectHasApplyMethod)
+                                                              termSelectHasApplyMethod: TermSelectHasApplyMethod,
+                                                              scalaReflectionMethodSignatureInferrer: ScalaReflectionMethodSignatureInferrer)
   extends InternalApplyDeclDefInferrer {
 
   @tailrec
@@ -33,7 +35,22 @@ private[typeinference] class InternalApplyDeclDefInferrerImpl(applyDeclDefInferr
         )
         infer(adjustedTermApply, context)
 
-      case _ => applyDeclDefInferrer.infer(termApply, context)
+      case _ =>
+        applyDeclDefInferrer.infer(termApply, context) match {
+          case partialDeclDef if partialDeclDef.isEmpty => inferByReflection(termApply, context)
+          case other => other
+        }
+    }
+  }
+
+  private def inferByReflection(termApply: Term.Apply, context: TermApplyInferenceContext) = {
+    import scalaReflectionMethodSignatureInferrer._
+
+    val maybeParentType = context.maybeParentType
+
+    (termApply.fun, maybeParentType) match {
+      case (Term.Select(_, name), Some(parentType: Type.Ref)) => inferPartialMethodSignature(parentType, name)
+      case _ => PartialDeclDef()
     }
   }
 }

@@ -9,7 +9,7 @@ private[reflection] object ScalaReflectionExtractor {
       case aClassSymbol: ClassSymbol => Some(aClassSymbol)
       // Handle the case of a Scala Type which is an alias to a Class
       case aTypeMember: TypeSymbol =>
-        val resultType = finalResultTypeOf(aTypeMember.typeSignature)
+        val resultType = finalResultTypeSymbolOf(aTypeMember.typeSignature)
         if (resultType.isClass) Some(resultType.asClass) else None
       case _ => None
     }
@@ -20,14 +20,18 @@ private[reflection] object ScalaReflectionExtractor {
   }
 
   def finalResultTypeFullnameOf(tpe: Type): String = {
-    finalResultTypeOf(tpe).fullName
+    finalResultTypeSymbolOf(tpe).fullName
   }
 
-  def finalResultTypeOf(tpe: Type): Symbol = {
+  def finalResultTypeSymbolOf(tpe: Type): Symbol = {
     tpe.finalResultType.typeSymbol
   }
 
   def finalResultTypeArgsOf(tpe: Type): List[Type] = {
     tpe.finalResultType.typeArgs
+  }
+
+  def finalResultTypeOf(sym: Symbol): Type = {
+    sym.typeSignature.finalResultType
   }
 }

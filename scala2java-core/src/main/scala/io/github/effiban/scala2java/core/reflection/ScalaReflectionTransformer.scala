@@ -1,7 +1,7 @@
 package io.github.effiban.scala2java.core.reflection
 
 import io.github.effiban.scala2java.core.entities.TypeSelects.ScalaAny
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.{dealiasedClassSymbolOf, finalResultTypeArgsOf, finalResultTypeFullnameOf, finalResultTypeOf}
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.{dealiasedClassSymbolOf, finalResultTypeArgsOf, finalResultTypeFullnameOf, finalResultTypeSymbolOf}
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalClassifier.isSingletonType
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.{findInnerClassSymbolOf, findModuleSymbolOf}
 
@@ -80,7 +80,7 @@ private[reflection] object ScalaReflectionTransformer {
   }
 
   private def toScalaMetaTypeNonSingleton(tpe: universe.Type) = {
-    finalResultTypeOf(tpe) match {
+    finalResultTypeSymbolOf(tpe) match {
       case sym if (1 to ScalaMaxArity).exists(n => sym == definitions.FunctionClass(n)) => toScalaMetaTypeFunction(tpe)
       case sym if (1 to ScalaMaxArity).exists(n => sym == definitions.TupleClass(n)) => toScalaMetaTypeTuple(tpe)
       case sym =>
