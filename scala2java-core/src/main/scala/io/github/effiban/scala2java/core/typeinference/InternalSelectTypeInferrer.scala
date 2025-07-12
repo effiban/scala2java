@@ -5,7 +5,7 @@ import io.github.effiban.scala2java.core.entities.Regexes.ScalaTupleElementRegex
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionTypeInferrer
 import io.github.effiban.scala2java.spi.contexts.TermSelectInferenceContext
 import io.github.effiban.scala2java.spi.predicates.TermSelectSupportsNoArgInvocation
-import io.github.effiban.scala2java.spi.typeinferrers.{SelectTypeInferrer, TypeInferrer0}
+import io.github.effiban.scala2java.spi.typeinferrers.TypeInferrer0
 
 import scala.meta.{Term, Type}
 
@@ -13,7 +13,6 @@ trait InternalSelectTypeInferrer extends TypeInferrer0[Term.Select]
 
 private[typeinference] class InternalSelectTypeInferrerImpl(applyReturnTypeInferrer: => ApplyReturnTypeInferrer,
                                                             qualifierTypeInferrer: => QualifierTypeInferrer,
-                                                            selectTypeInferrer: => SelectTypeInferrer,
                                                             termSelectSupportsNoArgInvocation: TermSelectSupportsNoArgInvocation,
                                                             scalaReflectionTypeInferrer: ScalaReflectionTypeInferrer)
   extends InternalSelectTypeInferrer {
@@ -24,8 +23,7 @@ private[typeinference] class InternalSelectTypeInferrerImpl(applyReturnTypeInfer
     if (termSelectSupportsNoArgInvocation(termSelect, inferenceContext)) {
       applyReturnTypeInferrer.infer(Term.Apply(termSelect, Nil))
     } else {
-      selectTypeInferrer.infer(termSelect, inferenceContext)
-        .orElse(inferByReflection(termSelect, inferenceContext))
+      inferByReflection(termSelect, inferenceContext)
         .orElse(inferSpecialCase(termSelect, inferenceContext))
     }
   }

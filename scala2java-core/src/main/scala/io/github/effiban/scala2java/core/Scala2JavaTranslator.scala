@@ -37,7 +37,7 @@ object Scala2JavaTranslator {
     implicit val extensionRegistry: ExtensionRegistry = ExtensionRegistryBuilder.buildFor(source)
     implicit val predicates: Predicates = new Predicates()
     implicit lazy val factories: Factories = new Factories(typeInferrers)
-    implicit lazy val typeInferrers: TypeInferrers = new TypeInferrers(factories, predicates)
+    implicit lazy val typeInferrers: TypeInferrers = new TypeInferrers(factories)
 
     val flowRunner: Source => Unit =
       Function.chain[Source](
