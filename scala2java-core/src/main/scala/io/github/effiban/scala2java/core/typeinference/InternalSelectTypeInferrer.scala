@@ -36,6 +36,7 @@ private[typeinference] class InternalSelectTypeInferrerImpl(applyReturnTypeInfer
     (termSelect.qual, inferenceContext.maybeQualType, termSelect.name) match {
       case (qual: Term.Ref, None, name) => inferScalaMetaTypeOf(qual, name)
       case (_, Some(qualType: Type.Ref), name) => inferScalaMetaTypeOf(qualType, name)
+      case (_, Some(Type.Apply(qualType: Type.Ref, args)), name) => inferScalaMetaTypeOf(qualType, args, name)
       case _ => None
     }
   }
