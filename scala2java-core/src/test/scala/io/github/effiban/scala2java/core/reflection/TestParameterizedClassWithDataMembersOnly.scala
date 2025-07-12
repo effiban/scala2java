@@ -9,3 +9,5 @@ sealed class TestParameterizedClassWithDataMembersOnly[A, B, C] {
 }
 
 class TestChildParameterizedClassWithDataMembersOnly[A2, B2, C2] extends TestParameterizedClassWithDataMembersOnly[A2, B2, C2]
+
+class TestChildParameterizedClassWithDataMembersOnly2[A2, B2, C2] extends TestParameterizedClassWithDataMembersOnly[List[A2], B2, C2]

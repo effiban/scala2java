@@ -51,9 +51,9 @@ private[reflection] object ScalaReflectionInternalLookup {
   def resolveAncestorTypeParamToTypeArg(ancestorTypeTag: TypeTag[_], typeTag: TypeTag[_]): Map[TypeSymbol, Type] = {
     val theSelfAndBaseTypeTags = findSelfAndBaseTypeTagsOf(typeTag)
     theSelfAndBaseTypeTags.find(_.tpe.typeSymbol == ancestorTypeTag.tpe.typeSymbol) match {
-      case Some(ownerTypeTag) => ancestorTypeTag.tpe.typeParams.indices
-        .slice(0, ownerTypeTag.tpe.typeArgs.size)
-        .map(idx => (ancestorTypeTag.tpe.typeParams(idx), ownerTypeTag.tpe.typeArgs(idx)))
+      case Some(appliedAncestorTypeTag) => ancestorTypeTag.tpe.typeParams.indices
+        .slice(0, appliedAncestorTypeTag.tpe.typeArgs.size)
+        .map(idx => (ancestorTypeTag.tpe.typeParams(idx), appliedAncestorTypeTag.tpe.typeArgs(idx)))
         .map { case (typeParam: TypeSymbol, typeArg) => (typeParam, typeArg) }
         .toMap
       case None => Map.empty

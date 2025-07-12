@@ -44,30 +44,30 @@ object ScalaReflectionTypeInferrer extends ScalaReflectionTypeInferrer {
         case member =>
           val owner = member.owner
           val ownerTypeTag = createTypeTagOf(owner.typeSignature)
-          val placeholderTypeToSMQualArg = mapPlaceholderTypesTo(qualArgs)
-          val qualWithPlaceholdersTypeTag = createTypeTagOf(qualCls.toType, placeholderTypeToSMQualArg.keySet.toList)
-          val ownerTypeParamToQualPlaceholderTypeArg = resolveAncestorTypeParamToTypeArg(ownerTypeTag, qualWithPlaceholdersTypeTag)
-          val smOwnerTypeParamToQualTypeArg = ownerTypeParamToQualPlaceholderTypeArg.map {
-            case (typeParam, typeArg) => (Type.Name(typeParam.name.toString), placeholderTypeToSMQualArg.getOrElse(typeArg, ScalaAny))
+          val smPlaceholderTypeToQualArg = mapScalaMetaPlaceholderTypesTo(qualArgs)
+          val placeholderTypes = smPlaceholderTypeToQualArg.keySet.flatMap(toClassSymbol).map(_.toType).toList
+          val qualWithPlaceholdersTypeTag = createTypeTagOf(qualCls.toType, placeholderTypes)
+          val ownerTypeParamToQualTypeArgWithPlaceholder = resolveAncestorTypeParamToTypeArg(ownerTypeTag, qualWithPlaceholdersTypeTag)
+          val smOwnerTypeParamToQualTypeArgWithPlaceholder = ownerTypeParamToQualTypeArgWithPlaceholder.map {
+            case (typeParam, typeArg) => (Type.Name(typeParam.name.toString), toScalaMetaType(typeArg).getOrElse(ScalaAny))
+          }
+          val smOwnerTypeParamToQualTypeArg = smOwnerTypeParamToQualTypeArgWithPlaceholder.map {
+            case (typeParam, typeArg) => (typeParam, replaceScalaMetaType(typeArg, smPlaceholderTypeToQualArg))
           }
           val maybeSMMemberType = toScalaMetaType(member.typeSignature)
-          maybeSMMemberType.map(replaceScalaMetaTypeParamsWithTypeArgs(_, smOwnerTypeParamToQualTypeArg))
+          maybeSMMemberType.map(replaceScalaMetaType(_, smOwnerTypeParamToQualTypeArg))
       }
       case _ => None
     }
   }
 
-  private def mapPlaceholderTypesTo(qualArgs: List[Type]) = {
+  private def mapScalaMetaPlaceholderTypesTo(qualArgs: List[Type]) = {
     ListMap.from(
-      qualArgs.zipWithIndex.flatMap {
-        case (qualArg, idx) =>
-          val smPlaceholderType = placeholderTypeAtIndex(idx)
-          toClassSymbol(smPlaceholderType).map(placeholderCls => (placeholderCls.toType, qualArg))
-      }
+      qualArgs.zipWithIndex.map { case (qualArg, idx) => (scalaMetaPlaceholderTypeWithIndex(idx), qualArg) }
     )
   }
 
-  private def placeholderTypeAtIndex(idx: Int) = {
+  private def scalaMetaPlaceholderTypeWithIndex(idx: Int) = {
     Type.Project(
       t"io.github.effiban.scala2java.core.reflection.ScalaReflectionTypeInferrer",
       Type.Name(s"Placeholder${idx + 1}")
@@ -92,14 +92,11 @@ object ScalaReflectionTypeInferrer extends ScalaReflectionTypeInferrer {
     }
   }
 
-  private[reflection] def replaceScalaMetaTypeParamsWithTypeArgs(tpe: Type,
-                                                                 typeParamToTypeArg: Map[Type.Name, Type]): Type = {
+  private def replaceScalaMetaType(tpe: Type, typeMapping: Map[_ <: Type, _ <: Type]): Type = {
     new Transformer {
       override def apply(aTree: Tree): Tree = {
         aTree match {
-          case tpe@(_: Type.Select | _: Type.Project) => tpe
-          case typeName: Type.Name => TreeKeyedMap.get(typeParamToTypeArg, typeName)
-            .getOrElse(ScalaAny)
+          case tpe: Type => TreeKeyedMap.get(typeMapping, tpe).getOrElse(super.apply(tpe))
           case other => super.apply(other)
         }
       }
