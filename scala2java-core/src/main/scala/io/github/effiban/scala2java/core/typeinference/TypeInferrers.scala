@@ -5,7 +5,7 @@ import io.github.effiban.scala2java.core.entities.ParameterizedInitializerNameTy
 import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
 import io.github.effiban.scala2java.core.factories.Factories
 import io.github.effiban.scala2java.core.predicates._
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionTypeInferrer
+import io.github.effiban.scala2java.core.reflection.{ScalaReflectionMethodSignatureInferrer, ScalaReflectionTypeInferrer}
 
 class TypeInferrers(factories: => Factories)
                    (implicit extensionRegistry: ExtensionRegistry) {
@@ -40,7 +40,8 @@ class TypeInferrers(factories: => Factories)
 
   lazy val internalApplyDeclDefInferrer: InternalApplyDeclDefInferrer = new InternalApplyDeclDefInferrerImpl(
     new CompositeApplyDeclDefInferrer(coreApplyDeclDefInferrer),
-    TermSelectHasApplyMethod
+    TermSelectHasApplyMethod,
+    ScalaReflectionMethodSignatureInferrer
   )
 
   private[typeinference] lazy val internalSelectTypeInferrer = new InternalSelectTypeInferrerImpl(
