@@ -1,0 +1,12 @@
+package testfiles.DefnDefs.WithoutDeclaredType.Inferrable.TermSelect;
+
+import testfilesext.SampleObject.func1;
+import testfilesext.SampleObject;
+
+public class Sample {
+
+    private int foo() {
+        func1();
+        return SampleObject.y;
+    }
+}

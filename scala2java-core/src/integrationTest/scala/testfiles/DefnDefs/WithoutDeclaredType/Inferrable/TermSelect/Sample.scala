@@ -1,4 +1,4 @@
-package testfiles.DefnDefs.WithoutDeclaredType.NonInferrable.WithLastStatementType.TermSelect
+package testfiles.DefnDefs.WithoutDeclaredType.Inferrable.TermSelect
 
 import testfilesext.SampleObject
 

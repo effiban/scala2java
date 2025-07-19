@@ -42,6 +42,10 @@ private[reflection] object ScalaReflectionTransformer {
     case Type.Apply(typeSelect: Type.Select, _) => toClassSymbol(typeSelect)
     case typeSelect: Type.Select => toClassSymbol(typeSelect)
     case Type.Project(tpe, name) => innerClassSymbolOf(tpe, name)
+    case Type.Singleton(term: Term.Ref) =>
+      findModuleSymbolOf(term.toString())
+        .map(module => module.typeSignature.typeSymbol)
+        .flatMap(dealiasedClassSymbolOf)
     case _ => None
   }
 

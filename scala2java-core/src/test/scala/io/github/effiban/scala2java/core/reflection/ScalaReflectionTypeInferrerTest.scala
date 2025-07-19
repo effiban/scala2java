@@ -13,15 +13,18 @@ class ScalaReflectionTypeInferrerTest extends UnitTestSuite {
   private val TestParameterizedClass = t"io.github.effiban.scala2java.core.reflection.TestParameterizedClass"
   private val TestChildParameterizedClass = t"io.github.effiban.scala2java.core.reflection.TestChildParameterizedClass"
   private val TestChildParameterizedClass2 = t"io.github.effiban.scala2java.core.reflection.TestChildParameterizedClass2"
+  private val TestObject = q"io.github.effiban.scala2java.core.reflection.TestObject"
+  private val TestObjectType = Type.Singleton(TestObject)
+  private val TestAliases = q"io.github.effiban.scala2java.core.reflection.TestAliases"
 
 
   private val NoQualifierTypeScenarios = Table(
     ("Qualifier", "Name", "Expected type"),
-    (q"io.github.effiban.scala2java.core.reflection", q"TestObject",
-      Type.Singleton(q"io.github.effiban.scala2java.core.reflection.TestObject")),
     (q"scala.collection.immutable", q"Nil", t"scala.collection.immutable.List[scala.Nothing]"),
     (Scala, q"None", t"scala.Option[scala.Nothing]"),
-    (q"io.github.effiban.scala2java.core.reflection.TestObject", q"x", t"scala.Int"),
+    (q"io.github.effiban.scala2java.core.reflection", q"TestObject", TestObjectType),
+    (TestObject, q"x", t"scala.Int"),
+    (TestAliases, q"TestObject", TestObjectType),
   )
 
   private val QualifierTypeWithoutArgsScenarios = Table(
@@ -31,24 +34,28 @@ class ScalaReflectionTypeInferrerTest extends UnitTestSuite {
     (TestClass, q"y", t"(scala.Int, java.lang.String)"),
     (TestClass, q"z", t"(scala.Int, scala.Long, java.lang.String) => java.lang.String"),
     (TestClass, q"w", t"scala.collection.immutable.List[scala.Long]"),
+    (TestObjectType, q"x", t"scala.Int")
   )
 
   private val QualifierTypeWithArgsScenarios = Table(
     ("Qualifier Type", "Qualifier Type Args", "Name", "Expected type"),
     (TestParameterizedClass, List(t"scala.Int", t"scala.Long", t"java.lang.String"), q"x", t"scala.Int"),
     (TestParameterizedClass, List(t"AA", t"BB", t"CC"), q"x", t"AA"),
-    (TestParameterizedClass, List(t"List[AA]", t"BB", t"CC"), q"x", t"List[AA]"),
+    (TestParameterizedClass, List(t"scala.collection.immutable.List[AA]", t"BB", t"CC"), q"x",
+      t"scala.collection.immutable.List[AA]"),
     (TestParameterizedClass, List(t"scala.Int", t"scala.Long", t"java.lang.String"), q"y", t"(scala.Int, scala.Long)"),
     (TestParameterizedClass, List(t"scala.Int", t"scala.Long", t"java.lang.String"), q"z",
       t"(scala.Int, scala.Long, java.lang.String) => java.lang.String"),
-    (TestParameterizedClass, List(t"scala.Int", t"scala.Long", t"java.lang.String"), q"w", t"scala.collection.immutable.List[scala.Int]"),
+    (TestParameterizedClass, List(t"scala.Int", t"scala.Long", t"java.lang.String"), q"w",
+      t"scala.collection.immutable.List[scala.Int]"),
     (TestParameterizedClass, List(t"scala.Int", t"scala.Long", t"java.lang.String"), q"v",
       t"scala.collection.immutable.List[scala.collection.immutable.List[scala.Int]]"),
     (TestParameterizedClass, List(t"AA", t"BB", t"CC"), q"v",
       t"scala.collection.immutable.List[scala.collection.immutable.List[AA]]"),
     (TestChildParameterizedClass, List(t"scala.Int", t"scala.Long", t"java.lang.String"), q"x", t"scala.Int"),
     (TestChildParameterizedClass, List(t"scala.Int", t"scala.Long", t"java.lang.String"), q"y", t"(scala.Int, scala.Long)"),
-    (TestChildParameterizedClass2, List(t"scala.Int", t"scala.Long", t"java.lang.String"), q"x", t"scala.collection.immutable.List[scala.Int]"),
+    (TestChildParameterizedClass2, List(t"scala.Int", t"scala.Long", t"java.lang.String"), q"x",
+      t"scala.collection.immutable.List[scala.Int]"),
     (TestChildParameterizedClass2, List(t"AA", t"BB", t"CC"), q"x", t"scala.collection.immutable.List[AA]")
   )
 
