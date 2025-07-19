@@ -1,0 +1,12 @@
+package testfiles.DefnDefs.WithoutDeclaredType.Inferrable.TermApply;
+
+import testfilesext.SampleObject.func1;
+import testfilesext.SampleObject.func2;
+
+public class Sample {
+
+    private void foo() {
+        func1();
+        func2();
+    }
+}

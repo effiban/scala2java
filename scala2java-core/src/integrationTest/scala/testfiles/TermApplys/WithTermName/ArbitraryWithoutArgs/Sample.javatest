@@ -5,6 +5,6 @@ import testfilesext.SampleObject;
 public class Sample {
 
     public void foo() {
-        final var x = SampleObject.func1B;
+        final String x = SampleObject.func1B;
     }
 }
