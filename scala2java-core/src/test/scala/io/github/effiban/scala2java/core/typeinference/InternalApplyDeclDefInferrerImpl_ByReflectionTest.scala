@@ -57,4 +57,38 @@ class InternalApplyDeclDefInferrerImpl_ByReflectionTest extends UnitTestSuite {
 
     internalApplyDeclDefInferrer.infer(termApply, ContextWithParentType) should equalPartialDeclDef(expectedPartialDeclDef)
   }
+
+  test("infer() when 'fun' is a Term.Select with no 'apply' method, " +
+    "and not inferred by custom inferrer, " +
+    "and parent type not inferred, " +
+    "and inner qual is a Term.Ref, " +
+    "and not inferred by reflection") {
+    val termSelect = q"foo.bar"
+    val termApply = q"foo.bar(x)"
+    val qual = q"foo"
+
+    when(termSelectHasApplyMethod(eqTree(termSelect))).thenReturn(false)
+    when(applyDeclDefInferrer.infer(eqTree(termApply), eqTo(TermApplyInferenceContext()))).thenReturn(PartialDeclDef())
+    when(scalaReflectionMethodSignatureInferrer.inferPartialMethodSignature(eqTree(qual), eqTree(termSelect.name))).thenReturn(PartialDeclDef())
+
+    internalApplyDeclDefInferrer.infer(termApply, TermApplyInferenceContext()) should equalPartialDeclDef(PartialDeclDef())
+  }
+
+  test("infer() when 'fun' is a Term.Select with no 'apply' method, " +
+    "and not inferred by custom inferrer, " +
+    "and parent type not inferred, " +
+    "and inner qual is a Term.Ref, " +
+    "and inferred by reflection") {
+    val termSelect = q"foo.bar"
+    val termApply = q"foo.bar(x)"
+    val qual = q"foo"
+    val expectedPartialDeclDef = PartialDeclDef(maybeReturnType = Some(ScalaInt))
+
+    when(termSelectHasApplyMethod(eqTree(termSelect))).thenReturn(false)
+    when(applyDeclDefInferrer.infer(eqTree(termApply), eqTo(TermApplyInferenceContext()))).thenReturn(PartialDeclDef())
+    when(scalaReflectionMethodSignatureInferrer.inferPartialMethodSignature(eqTree(qual), eqTree(termSelect.name))).thenReturn(expectedPartialDeclDef)
+
+    internalApplyDeclDefInferrer.infer(termApply, TermApplyInferenceContext()) should equalPartialDeclDef(expectedPartialDeclDef)
+  }
+
 }

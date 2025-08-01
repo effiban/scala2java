@@ -50,6 +50,7 @@ private[typeinference] class InternalApplyDeclDefInferrerImpl(applyDeclDefInferr
 
     (termApply.fun, maybeParentType) match {
       case (Term.Select(_, name), Some(parentType: Type.Ref)) => inferPartialMethodSignature(parentType, name)
+      case (Term.Select(qual: Term.Ref, name), None) => inferPartialMethodSignature(qual, name)
       case _ => PartialDeclDef()
     }
   }

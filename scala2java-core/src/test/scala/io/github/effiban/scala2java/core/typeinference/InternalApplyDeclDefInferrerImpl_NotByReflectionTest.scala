@@ -84,11 +84,12 @@ class InternalApplyDeclDefInferrerImpl_NotByReflectionTest extends UnitTestSuite
     internalApplyDeclDefInferrer.infer(termApply, context) should equalPartialDeclDef(ThePartialDeclDef)
   }
 
-  test("infer() when 'fun' is a Term.Select with no 'apply' method, " +
+  test("infer() when 'fun' is a Term.Select with a qualifier that is a Term.Apply," +
+    " with no 'apply' method, " +
     "and not inferred by custom inferrer, " +
     "and parent type not inferred") {
-    val termSelect = q"foo.bar"
-    val termApply = q"foo.bar(x)"
+    val termSelect = q"foo(5).bar"
+    val termApply = q"foo(5).bar(x)"
     val context = TermApplyInferenceContext()
 
     when(termSelectHasApplyMethod(eqTree(termSelect))).thenReturn(false)
