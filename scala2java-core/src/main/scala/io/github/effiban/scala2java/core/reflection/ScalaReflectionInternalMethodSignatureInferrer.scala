@@ -1,8 +1,8 @@
 package io.github.effiban.scala2java.core.reflection
 
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.{finalResultTypeFullnameOf, finalResultTypeOf}
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.findModuleSymbolOf
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionTransformer.{toClassSymbol, toScalaMetaPartialDeclDef, toScalaMetaType}
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.finalResultTypeSymbolOf
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.isAssignableFrom
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionTransformer.{toClassSymbol, toScalaMetaPartialDeclDef}
 import io.github.effiban.scala2java.spi.entities.PartialDeclDef
 
 import scala.meta.{Term, Type}
@@ -36,8 +36,8 @@ private[reflection] object ScalaReflectionInternalMethodSignatureInferrer {
   }
 
   private def paramMatchesScalaMetaArg(param: Symbol, smArgType: Type): Boolean = {
-    val paramTypeFullName = finalResultTypeFullnameOf(param)
-    toClassSymbol(smArgType).map(_.fullName).contains(paramTypeFullName)
+    val paramType = finalResultTypeSymbolOf(param)
+    toClassSymbol(smArgType).exists(argType => isAssignableFrom(paramType, argType))
   }
 
   private def resolveScalaMetaPartialMethodSignature(method: MethodSymbol): PartialDeclDef = {

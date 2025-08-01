@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.reflection
 
+import io.github.effiban.scala2java.core.entities.TypeSelects.ScalaAnyVal
 import io.github.effiban.scala2java.core.matchers.PartialDeclDefScalatestMatcher.equalPartialDeclDef
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionMethodSignatureInferrer.inferPartialMethodSignature
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
@@ -14,7 +15,8 @@ class ScalaReflectionMethodSignatureInferrer_WithArgs_NoTypeArgsTest extends Uni
 
   private val TestCasesWithParentTypeWhenMatches = Table(
     ("Method", "Arg Types", "Expected Param Types", "Expected Return Type"),
-    (q"fun6", List(t"scala.Int", t"scala.Long"), List(t"scala.Int", t"scala.Long"), t"java.lang.String")
+    (q"fun6", List(t"scala.Int", t"scala.Long"), List(t"scala.Int", t"scala.Long"), t"java.lang.String"),
+    (q"fun7", List(t"scala.Int"), List(ScalaAnyVal), t"java.lang.String")
   )
 
   private val TestCasesWithParentTypeWhenDoesntMatch = Table(

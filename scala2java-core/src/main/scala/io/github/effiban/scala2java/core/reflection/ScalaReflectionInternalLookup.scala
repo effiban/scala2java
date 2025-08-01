@@ -4,6 +4,7 @@ import io.github.effiban.scala2java.core.reflection.ScalaReflectionAccess.Runtim
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionCreator.createTypeTagOf
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.dealiasedClassSymbolOf
 
+import scala.reflect.runtime.universe
 import scala.reflect.runtime.universe._
 
 private[reflection] object ScalaReflectionInternalLookup {
@@ -59,4 +60,10 @@ private[reflection] object ScalaReflectionInternalLookup {
       case None => Map.empty
     }
   }
+
+  def isAssignableFrom(targetSymbol: universe.Symbol, sourceSymbol: universe.Symbol): Boolean =
+    (targetSymbol, sourceSymbol) match {
+      case (targetClass: ClassSymbol, sourceClass: ClassSymbol) if sourceClass.baseClasses.exists(_.fullName == targetClass.fullName) => true
+      case _ => false
+    }
 }
