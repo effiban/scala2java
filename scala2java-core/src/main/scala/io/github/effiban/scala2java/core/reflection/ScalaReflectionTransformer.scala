@@ -1,9 +1,10 @@
 package io.github.effiban.scala2java.core.reflection
 
 import io.github.effiban.scala2java.core.entities.TypeSelects.ScalaAny
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.{dealiasedClassSymbolOf, finalResultTypeArgsOf, finalResultTypeFullnameOf, finalResultTypeSymbolOf}
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.{dealiasedClassSymbolOf, finalResultTypeArgsOf, finalResultTypeFullnameOf, finalResultTypeOf, finalResultTypeSymbolOf}
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalClassifier.isSingletonType
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.{findInnerClassSymbolOf, findModuleSymbolOf}
+import io.github.effiban.scala2java.spi.entities.PartialDeclDef
 
 import scala.meta.{Term, Type, XtensionParseInputLike}
 import scala.reflect.runtime.universe
@@ -47,6 +48,17 @@ private[reflection] object ScalaReflectionTransformer {
         .map(module => module.typeSignature.typeSymbol)
         .flatMap(dealiasedClassSymbolOf)
     case _ => None
+  }
+
+  def toScalaMetaPartialDeclDef(method: MethodSymbol): PartialDeclDef = {
+    val maybeSMParamTypes = method.paramLists.headOption.map { paramTypes =>
+      paramTypes.map(paramType => toScalaMetaType(paramType.typeSignature))
+    }.getOrElse(Nil)
+    val maybeSMReturnType = toScalaMetaType(finalResultTypeOf(method))
+    PartialDeclDef(
+      maybeParamTypes = maybeSMParamTypes,
+      maybeReturnType = maybeSMReturnType
+    )
   }
 
   private def toScalaMetaTypeRefFromClass(symbol: Symbol): Option[Type.Ref] = {

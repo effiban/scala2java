@@ -12,4 +12,6 @@ private[reflection] object TestObject {
   def fun4(): (Int, Long, String) => String = (i, l, s) => (i + l).toString + s
 
   def fun5(): List[Int] = List(3)
+
+  def fun6(a: Int, b: Long): String = (a + b).toString
 }
