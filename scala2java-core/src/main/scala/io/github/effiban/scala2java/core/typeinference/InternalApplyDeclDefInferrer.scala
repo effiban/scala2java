@@ -1,5 +1,6 @@
 package io.github.effiban.scala2java.core.typeinference
 
+import io.github.effiban.scala2java.core.entities.TypeSelects.ScalaAny
 import io.github.effiban.scala2java.core.predicates.TermSelectHasApplyMethod
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionMethodSignatureInferrer
 import io.github.effiban.scala2java.spi.contexts.TermApplyInferenceContext
@@ -7,7 +8,7 @@ import io.github.effiban.scala2java.spi.entities.PartialDeclDef
 import io.github.effiban.scala2java.spi.typeinferrers.ApplyDeclDefInferrer
 
 import scala.annotation.tailrec
-import scala.meta.{Term, Type, XtensionQuasiquoteTerm}
+import scala.meta.{Term, Type, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 trait InternalApplyDeclDefInferrer {
   def infer(termApply: Term.Apply, context: TermApplyInferenceContext): PartialDeclDef
@@ -47,10 +48,11 @@ private[typeinference] class InternalApplyDeclDefInferrerImpl(applyDeclDefInferr
     import scalaReflectionMethodSignatureInferrer._
 
     val maybeParentType = context.maybeParentType
+    val argTypes = context.maybeArgTypes.map(_.getOrElse(ScalaAny))
 
     (termApply.fun, maybeParentType) match {
-      case (Term.Select(_, name), Some(parentType: Type.Ref)) => inferPartialMethodSignature(parentType, name)
-      case (Term.Select(qual: Term.Ref, name), None) => inferPartialMethodSignature(qual, name)
+      case (Term.Select(_, name), Some(parentType: Type.Ref)) => inferPartialMethodSignature(parentType, name, argTypes)
+      case (Term.Select(qual: Term.Ref, name), None) => inferPartialMethodSignature(qual, name, argTypes)
       case _ => PartialDeclDef()
     }
   }

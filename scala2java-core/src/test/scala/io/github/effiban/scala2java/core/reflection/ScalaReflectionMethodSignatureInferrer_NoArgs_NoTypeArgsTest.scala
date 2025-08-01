@@ -7,7 +7,7 @@ import io.github.effiban.scala2java.spi.entities.PartialDeclDef
 
 import scala.meta.{Term, Type, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
-class ScalaReflectionMethodSignatureInferrer_NoArgsNoGenericTypesTest extends UnitTestSuite {
+class ScalaReflectionMethodSignatureInferrer_NoArgs_NoTypeArgsTest extends UnitTestSuite {
 
   private val TestClassType = t"io.github.effiban.scala2java.core.reflection.TestClass"
   private val TestObject = q"io.github.effiban.scala2java.core.reflection.TestObject"
@@ -32,14 +32,14 @@ class ScalaReflectionMethodSignatureInferrer_NoArgsNoGenericTypesTest extends Un
 
   forAll(TestCasesWithParentType) { (fun: Term.Name, expectedReturnType: Type) =>
     test(s"inferPartialMethodSignature for 'TestClass.${fun.toString()}' should return a signature with return type '$expectedReturnType'") {
-      val result = inferPartialMethodSignature(TestClassType, fun)
+      val result = inferPartialMethodSignature(TestClassType, fun, Nil)
       result should equalPartialDeclDef(PartialDeclDef(maybeReturnType = Some(expectedReturnType)))
     }
   }
 
   forAll(TestCasesWithoutParentType) { (fun: Term.Name, expectedReturnType: Type) =>
     test(s"inferPartialMethodSignature for 'TestObject.${fun.toString()}' should return a signature with return type '$expectedReturnType'") {
-      val result = inferPartialMethodSignature(TestObject, fun)
+      val result = inferPartialMethodSignature(TestObject, fun, Nil)
       result should equalPartialDeclDef(PartialDeclDef(maybeReturnType = Some(expectedReturnType)))
     }
   }
