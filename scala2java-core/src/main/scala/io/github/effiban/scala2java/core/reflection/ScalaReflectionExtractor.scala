@@ -19,6 +19,10 @@ private[reflection] object ScalaReflectionExtractor {
     finalResultTypeFullnameOf(sym.typeSignature)
   }
 
+  def finalResultTypeSymbolOf(sym: Symbol): Symbol = {
+    finalResultTypeOf(sym).typeSymbol
+  }
+
   def finalResultTypeFullnameOf(tpe: Type): String = {
     finalResultTypeSymbolOf(tpe).fullName
   }
