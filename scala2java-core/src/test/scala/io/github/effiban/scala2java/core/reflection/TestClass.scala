@@ -22,6 +22,10 @@ private[reflection] class TestClass {
 
   def fun8(a: (Int, Long)): String = a.toString
 
+  def fun9(a: () => Int): Int = a()
+
+  def fun10(a: (Int, Long) => String): String = a(1, 2L)
+
   private class TestInnerClass {
     val x = 5
   }

@@ -22,6 +22,6 @@ private[reflection] object ScalaReflectionInternalClassifier {
   }
 
   def isFunction(sym: Symbol): Boolean = {
-    (1 to ScalaMaxArity).exists(n => sym == definitions.FunctionClass(n))
+    (0 to ScalaMaxArity).exists(n => sym == definitions.FunctionClass(n))
   }
 }
