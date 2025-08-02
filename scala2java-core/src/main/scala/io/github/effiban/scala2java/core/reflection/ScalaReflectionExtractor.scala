@@ -38,4 +38,11 @@ private[reflection] object ScalaReflectionExtractor {
   def finalResultTypeOf(sym: Symbol): Type = {
     sym.typeSignature.finalResultType
   }
+
+  def byNameInnerTypeSymbolOf(paramType: Type): Symbol = {
+    paramType match {
+      case TypeRef(_, _, List(innerType)) if paramType.typeSymbol == definitions.ByNameParamClass => innerType.typeSymbol
+      case _ => NoSymbol
+    }
+  }
 }
