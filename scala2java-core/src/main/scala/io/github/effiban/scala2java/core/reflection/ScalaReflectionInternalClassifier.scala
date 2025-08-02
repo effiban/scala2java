@@ -17,11 +17,13 @@ private[reflection] object ScalaReflectionInternalClassifier {
     }
   }
 
-  def isTuple(sym: Symbol): Boolean = {
+  def isTupleType(sym: Symbol): Boolean = {
     (1 to ScalaMaxArity).exists(n => sym == definitions.TupleClass(n))
   }
 
-  def isFunction(sym: Symbol): Boolean = {
+  def isFunctionType(sym: Symbol): Boolean = {
     (0 to ScalaMaxArity).exists(n => sym == definitions.FunctionClass(n))
   }
+
+  def isByNameParamType(sym: Symbol): Boolean = sym == definitions.ByNameParamClass
 }

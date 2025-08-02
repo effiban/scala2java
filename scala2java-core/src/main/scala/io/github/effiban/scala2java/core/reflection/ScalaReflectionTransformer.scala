@@ -1,8 +1,8 @@
 package io.github.effiban.scala2java.core.reflection
 
 import io.github.effiban.scala2java.core.entities.TypeSelects.ScalaAny
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.{dealiasedClassSymbolOf, finalResultTypeArgsOf, finalResultTypeFullnameOf, finalResultTypeOf, finalResultTypeSymbolOf}
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalClassifier.{isFunction, isSingletonType, isTuple}
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.{byNameInnerTypeSymbolOf, dealiasedClassSymbolOf, finalResultTypeArgsOf, finalResultTypeFullnameOf, finalResultTypeOf, finalResultTypeSymbolOf}
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalClassifier.{isByNameParamType, isFunctionType, isSingletonType, isTupleType}
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.{findInnerClassSymbolOf, findModuleSymbolOf}
 import io.github.effiban.scala2java.spi.entities.PartialDeclDef
 
@@ -95,8 +95,9 @@ private[reflection] object ScalaReflectionTransformer {
 
   private def toScalaMetaTypeNonSingleton(tpe: universe.Type) = {
     finalResultTypeSymbolOf(tpe) match {
-      case sym if isFunction(sym) => toScalaMetaTypeFunction(tpe)
-      case sym if isTuple(sym) => toScalaMetaTypeTuple(tpe)
+      case sym if isFunctionType(sym) => toScalaMetaTypeFunction(tpe)
+      case sym if isTupleType(sym) => toScalaMetaTypeTuple(tpe)
+      case sym if isByNameParamType(sym) => toScalaMetaTypeByName(tpe)
       case sym =>
         val maybeSMType = toScalaMetaTypeRef(sym)
         (maybeSMType, tpe.finalResultType.typeArgs) match {
@@ -104,6 +105,13 @@ private[reflection] object ScalaReflectionTransformer {
           case (_, Nil) => maybeSMType
           case (Some(scalaMetaType), targs) => toScalaMetaTypeApply(scalaMetaType, targs)
         }
+    }
+  }
+
+  private def toScalaMetaTypeByName(tpe: universe.Type) = {
+    byNameInnerTypeSymbolOf(tpe) match {
+      case NoSymbol => None
+      case innerSym => toScalaMetaType(innerSym.typeSignature).map(Type.ByName(_))
     }
   }
 
