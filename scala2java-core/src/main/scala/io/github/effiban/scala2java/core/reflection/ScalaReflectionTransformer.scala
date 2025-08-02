@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.reflection
 
 import io.github.effiban.scala2java.core.entities.TypeSelects.ScalaAny
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.{dealiasedClassSymbolOf, finalResultTypeArgsOf, finalResultTypeFullnameOf, finalResultTypeOf, finalResultTypeSymbolOf}
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalClassifier.isSingletonType
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalClassifier.{isFunction, isSingletonType, isTuple}
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.{findInnerClassSymbolOf, findModuleSymbolOf}
 import io.github.effiban.scala2java.spi.entities.PartialDeclDef
 
@@ -11,8 +11,6 @@ import scala.reflect.runtime.universe
 import scala.reflect.runtime.universe._
 
 private[reflection] object ScalaReflectionTransformer {
-
-  private final val ScalaMaxArity = 22
 
   def toScalaMetaTermRef(member: Symbol): Option[Term.Ref] = {
     val maybeDealiasedFullName = member match {
@@ -97,8 +95,8 @@ private[reflection] object ScalaReflectionTransformer {
 
   private def toScalaMetaTypeNonSingleton(tpe: universe.Type) = {
     finalResultTypeSymbolOf(tpe) match {
-      case sym if (1 to ScalaMaxArity).exists(n => sym == definitions.FunctionClass(n)) => toScalaMetaTypeFunction(tpe)
-      case sym if (1 to ScalaMaxArity).exists(n => sym == definitions.TupleClass(n)) => toScalaMetaTypeTuple(tpe)
+      case sym if isFunction(sym) => toScalaMetaTypeFunction(tpe)
+      case sym if isTuple(sym) => toScalaMetaTypeTuple(tpe)
       case sym =>
         val maybeSMType = toScalaMetaTypeRef(sym)
         (maybeSMType, tpe.finalResultType.typeArgs) match {
