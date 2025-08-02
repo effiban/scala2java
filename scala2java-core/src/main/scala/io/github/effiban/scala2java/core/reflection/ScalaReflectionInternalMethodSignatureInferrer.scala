@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.reflection
 
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.finalResultTypeSymbolOf
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalClassifier.isTuple
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.isAssignableFrom
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionTransformer.{toClassSymbol, toScalaMetaPartialDeclDef}
 import io.github.effiban.scala2java.spi.entities.PartialDeclDef
@@ -38,8 +39,8 @@ private[reflection] object ScalaReflectionInternalMethodSignatureInferrer {
       val paramTypeSym = paramType.typeSymbol
       val paramTypeArgSyms = paramType.typeArgs.map(_.typeSymbol)
 
-      paramTypeSym.fullName match {
-        case s"scala.Tuple${_}" => smArgTypes(idx) match {
+      paramTypeSym match {
+        case sym if isTuple(sym) => smArgTypes(idx) match {
           case Type.Tuple(smArgTypeArgs) => paramTypesMatchScalaMetaArgTypes(paramTypeArgSyms, smArgTypeArgs)
           case _ => false
         }
