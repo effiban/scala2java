@@ -20,6 +20,8 @@ private[reflection] class TestClass {
 
   def fun7(a: AnyVal): String = a.toString
 
+  def fun8(a: (Int, Long)): String = a.toString
+
   private class TestInnerClass {
     val x = 5
   }
