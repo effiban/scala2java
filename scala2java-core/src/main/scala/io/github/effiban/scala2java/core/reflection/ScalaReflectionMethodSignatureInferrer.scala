@@ -1,12 +1,10 @@
 package io.github.effiban.scala2java.core.reflection
 
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.{finalResultTypeFullnameOf, finalResultTypeOf}
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.findModuleSymbolOf
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionTransformer.{toClassSymbol, toScalaMetaPartialDeclDef, toScalaMetaType}
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionTransformer.toClassSymbol
 import io.github.effiban.scala2java.spi.entities.PartialDeclDef
 
 import scala.meta.{Term, Type}
-import scala.reflect.runtime.universe._
 
 trait ScalaReflectionMethodSignatureInferrer {
   def inferPartialMethodSignature(qualType: Type.Ref, name: Term.Name, argTypes: List[Type]): PartialDeclDef

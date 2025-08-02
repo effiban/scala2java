@@ -32,7 +32,20 @@ private[reflection] object ScalaReflectionInternalMethodSignatureInferrer {
 
   private def paramTypesMatchScalaMetaArgTypes(params: List[Symbol], smArgTypes: List[Type]): Boolean = {
     params.size == smArgTypes.size &&
-    params.indices.forall(idx => paramMatchesScalaMetaArg(params(idx), smArgTypes(idx)))
+    params.indices.forall(idx => {
+      val param = params(idx)
+      val paramType = param.typeSignature
+      val paramTypeSym = paramType.typeSymbol
+      val paramTypeArgSyms = paramType.typeArgs.map(_.typeSymbol)
+
+      paramTypeSym.fullName match {
+        case s"scala.Tuple${_}" => smArgTypes(idx) match {
+          case Type.Tuple(smArgTypeArgs) => paramTypesMatchScalaMetaArgTypes(paramTypeArgSyms, smArgTypeArgs)
+          case _ => false
+        }
+        case _ => paramMatchesScalaMetaArg(param, smArgTypes(idx))
+      }
+    })
   }
 
   private def paramMatchesScalaMetaArg(param: Symbol, smArgType: Type): Boolean = {
