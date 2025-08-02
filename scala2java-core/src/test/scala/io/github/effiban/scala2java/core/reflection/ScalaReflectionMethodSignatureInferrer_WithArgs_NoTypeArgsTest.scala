@@ -17,7 +17,13 @@ class ScalaReflectionMethodSignatureInferrer_WithArgs_NoTypeArgsTest extends Uni
     ("Method", "Arg Types", "Expected Param Types", "Expected Return Type"),
     (q"fun6", List(t"scala.Int", t"scala.Long"), List(t"scala.Int", t"scala.Long"), t"java.lang.String"),
     (q"fun7", List(t"scala.Int"), List(ScalaAnyVal), t"java.lang.String"),
-    (q"fun8", List(t"(scala.Int, scala.Long)"), List(t"(scala.Int, scala.Long)"), t"java.lang.String")
+    (q"fun8", List(t"(scala.Int, scala.Long)"), List(t"(scala.Int, scala.Long)"), t"java.lang.String"),
+    (q"fun9", List(t"() => scala.Int"), List(t"() => scala.Int"), t"scala.Int"),
+    (q"fun10",
+      List(t"(scala.Int, scala.Long) => java.lang.String"),
+      List(t"(scala.Int, scala.Long) => java.lang.String"),
+      t"java.lang.String"
+    )
   )
 
   private val TestCasesWithParentTypeWhenDoesntMatch = Table(
@@ -26,7 +32,11 @@ class ScalaReflectionMethodSignatureInferrer_WithArgs_NoTypeArgsTest extends Uni
     (q"fun6", List(t"scala.Long", t"scala.String")),
     (q"fun8", List(t"(scala.Long, scala.Int)")),
     (q"fun8", List(t"(scala.Int)")),
-    (q"fun8", List(t"(scala.Int, scala.Long, java.lang.String)"))
+    (q"fun8", List(t"(scala.Int, scala.Long, java.lang.String)")),
+    (q"fun9", List(t"scala.Int => scala.Int")),
+    (q"fun9", List(t"scala.Int")),
+    (q"fun10", List(t"(scala.Long, scala.Int) => java.lang.String")),
+    (q"fun10", List(t"(scala.Int, scala.Long, java.lang.String) => java.lang.String"))
   )
 
   private val TestCasesWithoutParentTypeWhenMatches = Table(

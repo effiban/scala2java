@@ -1,7 +1,6 @@
 package io.github.effiban.scala2java.core.reflection
 
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.finalResultTypeSymbolOf
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalClassifier.isTuple
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalClassifier.{isFunction, isTuple}
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.isAssignableFrom
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionTransformer.{toClassSymbol, toScalaMetaPartialDeclDef}
 import io.github.effiban.scala2java.spi.entities.PartialDeclDef
@@ -38,20 +37,24 @@ private[reflection] object ScalaReflectionInternalMethodSignatureInferrer {
       val paramType = param.typeSignature
       val paramTypeSym = paramType.typeSymbol
       val paramTypeArgSyms = paramType.typeArgs.map(_.typeSymbol)
+      val smArgType = smArgTypes(idx)
 
       paramTypeSym match {
         case sym if isTuple(sym) => smArgTypes(idx) match {
           case Type.Tuple(smArgTypeArgs) => paramTypesMatchScalaMetaArgTypes(paramTypeArgSyms, smArgTypeArgs)
           case _ => false
         }
-        case _ => paramMatchesScalaMetaArg(param, smArgTypes(idx))
+        case sym if isFunction(sym) => smArgTypes(idx) match {
+          case Type.Function(smArgTypeArgs, smResultType) => paramTypesMatchScalaMetaArgTypes(paramTypeArgSyms, smArgTypeArgs :+ smResultType)
+          case _ => false
+        }
+        case _ => paramTypeMatchesScalaMetaArgType(paramTypeSym, smArgTypes(idx))
       }
     })
   }
 
-  private def paramMatchesScalaMetaArg(param: Symbol, smArgType: Type): Boolean = {
-    val paramType = finalResultTypeSymbolOf(param)
-    toClassSymbol(smArgType).exists(argType => isAssignableFrom(paramType, argType))
+  private def paramTypeMatchesScalaMetaArgType(paramTypeSym: Symbol, smArgType: Type): Boolean = {
+    toClassSymbol(smArgType).exists(argType => isAssignableFrom(paramTypeSym, argType))
   }
 
   private def resolveScalaMetaPartialMethodSignature(method: MethodSymbol): PartialDeclDef = {
