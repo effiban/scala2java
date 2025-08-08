@@ -27,14 +27,16 @@ private[reflection] object ScalaReflectionInternalMethodSignatureInferrer {
 
   private def methodMatchesScalaMetaArgs(method: MethodSymbol, smArgTypes: List[Type]): Boolean = {
     method.paramLists match {
-      case List(params: List[Symbol]) => paramTypesMatchScalaMetaArgTypes(params, smArgTypes)
+      case List(params: List[Symbol]) => paramTypesMatchScalaMetaArgTypes(method, params, smArgTypes)
       case Nil if smArgTypes.isEmpty => true
       case _ => false
     }
   }
 
-  private def paramTypesMatchScalaMetaArgTypes(params: List[Symbol], smArgTypes: List[Type]): Boolean = {
-    mapParamsToScalaMetaArgTypes(params, smArgTypes) match {
+  private def paramTypesMatchScalaMetaArgTypes(method: MethodSymbol,
+                                               params: List[Symbol],
+                                               smArgTypes: List[Type]): Boolean = {
+    mapParamsToScalaMetaArgTypes(method, params, smArgTypes) match {
       case Right(mapping) =>
         mapping.forall { case (param, argTypes) =>
           val paramType = param.typeSignature
@@ -50,11 +52,11 @@ private[reflection] object ScalaReflectionInternalMethodSignatureInferrer {
 
     paramTypeSym match {
       case sym if isTupleType(sym) => smArgType match {
-        case Type.Tuple(smArgTypeArgs) => paramTypesMatchScalaMetaArgTypes(paramTypeArgSyms, smArgTypeArgs)
+        case Type.Tuple(smArgTypeArgs) => nestedParamTypesMatchScalaMetaArgTypes(paramTypeArgSyms, smArgTypeArgs)
         case _ => false
       }
       case sym if isFunctionType(sym) => smArgType match {
-        case Type.Function(smArgTypeArgs, smResultType) => paramTypesMatchScalaMetaArgTypes(paramTypeArgSyms, smArgTypeArgs :+ smResultType)
+        case Type.Function(smArgTypeArgs, smResultType) => nestedParamTypesMatchScalaMetaArgTypes(paramTypeArgSyms, smArgTypeArgs :+ smResultType)
         case _ => false
       }
       case sym if isByNameParamType(paramTypeSym) =>
@@ -66,6 +68,13 @@ private[reflection] object ScalaReflectionInternalMethodSignatureInferrer {
         simpleParamTypeMatchesScalaMetaArgType(innerParamSym, smArgType)
       case _ => simpleParamTypeMatchesScalaMetaArgType(paramTypeSym, smArgType)
     }
+  }
+
+  private def nestedParamTypesMatchScalaMetaArgTypes(params: List[Symbol], smArgTypes: List[Type]): Boolean = {
+    params.size == smArgTypes.size &&
+      params.zipWithIndex.forall { case (param, index) =>
+        paramTypeMatchesScalaMetaArgType(param.typeSignature, smArgTypes(index))
+      }
   }
 
   private def simpleParamTypeMatchesScalaMetaArgType(paramTypeSym: Symbol, smArgType: Type): Boolean = {

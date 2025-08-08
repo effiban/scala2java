@@ -66,4 +66,11 @@ private[reflection] object ScalaReflectionInternalLookup {
       case (targetClass: ClassSymbol, sourceClass: ClassSymbol) if sourceClass.baseClasses.exists(_.fullName == targetClass.fullName) => true
       case _ => false
     }
+
+
+  def methodParamHasDefaultValue(method: MethodSymbol, paramIndex: Int): Boolean = {
+    val syntheticDefaultMethodName = s"${method.name}$$default$$${paramIndex + 1}"
+    val ownerMethods = method.owner.info.members.filter(_.isMethod).toList
+    ownerMethods.map(_.name.toString).contains(syntheticDefaultMethodName)
+  }
 }
