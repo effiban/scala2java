@@ -32,7 +32,9 @@ class ScalaReflectionMethodSignatureInferrer_WithArgs_NoTypeArgsTest extends Uni
     (q"fun13", List(t"java.lang.String", t"scala.Int"), List(t"java.lang.String", t"scala.Int*"), t"java.lang.String"),
     (q"fun13", List(t"java.lang.String", t"scala.Int", t"scala.Int"), List(t"java.lang.String", t"scala.Int*"), t"java.lang.String"),
     (q"fun14", List(t"java.lang.String", t"scala.Int"), List(t"java.lang.String", t"scala.Int"), t"java.lang.String"),
-    (q"fun14", List(t"java.lang.String"), List(t"java.lang.String", t"scala.Int"), t"java.lang.String")
+    (q"fun14", List(t"java.lang.String"), List(t"java.lang.String", t"scala.Int"), t"java.lang.String"),
+    (q"fun15", Nil, List(t"java.lang.String", t"scala.Int"), t"java.lang.String"),
+    (q"fun15", List(t"java.lang.String", t"scala.Int"), List(t"java.lang.String", t"scala.Int"), t"java.lang.String"),
   )
 
   private val TestCasesWithParentTypeWhenDoesntMatch = Table(
@@ -56,7 +58,9 @@ class ScalaReflectionMethodSignatureInferrer_WithArgs_NoTypeArgsTest extends Uni
     (q"fun13", List(t"java.lang.String", t"java.lang.String")),
     (q"fun13", List(t"java.lang.String", t"scala.Int", t"java.lang.String")),
     (q"fun14", List(t"java.lang.String", t"scala.Int", t"scala.Int")),
-    (q"fun14", List(t"scala.Int", t"java.lang.String"))
+    (q"fun14", List(t"scala.Int", t"java.lang.String")),
+    (q"fun15", List(t"java.lang.String")),
+    (q"fun15", List(t"java.lang.String", t"scala.Int", t"scala.Int"))
   )
 
   private val TestCasesWithoutParentTypeWhenMatches = Table(
