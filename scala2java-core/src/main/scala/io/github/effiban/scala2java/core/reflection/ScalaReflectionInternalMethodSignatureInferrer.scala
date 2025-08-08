@@ -1,12 +1,14 @@
 package io.github.effiban.scala2java.core.reflection
 
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.byNameInnerTypeSymbolOf
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalClassifier.{isByNameParamType, isFunctionType, isTupleType}
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalClassifier.{isByNameParamType, isFunctionType, isRepeatedParamType, isTupleType}
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.isAssignableFrom
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionMethodParamMapper.mapParamsToScalaMetaArgTypes
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionTransformer.{toClassSymbol, toScalaMetaPartialDeclDef}
 import io.github.effiban.scala2java.spi.entities.PartialDeclDef
 
 import scala.meta.{Term, Type}
+import scala.reflect.runtime.universe
 import scala.reflect.runtime.universe._
 
 private[reflection] object ScalaReflectionInternalMethodSignatureInferrer {
@@ -32,16 +34,17 @@ private[reflection] object ScalaReflectionInternalMethodSignatureInferrer {
   }
 
   private def paramTypesMatchScalaMetaArgTypes(params: List[Symbol], smArgTypes: List[Type]): Boolean = {
-    params.size == smArgTypes.size &&
-    params.indices.forall(idx => {
-      val param = params(idx)
-      val smArgType = smArgTypes(idx)
-      paramTypeMatchesScalaMetaArgType(param, smArgType)
-    })
+    mapParamsToScalaMetaArgTypes(params, smArgTypes) match {
+      case Right(mapping) =>
+        mapping.forall { case (param, argTypes) =>
+          val paramType = param.typeSignature
+          argTypes.forall(argType => paramTypeMatchesScalaMetaArgType(paramType, argType))
+        }
+      case Left(_) => false
+    }
   }
 
-  private def paramTypeMatchesScalaMetaArgType(param: Symbol, smArgType: Type) = {
-    val paramType = param.typeSignature
+  private def paramTypeMatchesScalaMetaArgType(paramType: universe.Type, smArgType: Type): Boolean = {
     val paramTypeSym = paramType.typeSymbol
     val paramTypeArgSyms = paramType.typeArgs.map(_.typeSymbol)
 
@@ -56,6 +59,10 @@ private[reflection] object ScalaReflectionInternalMethodSignatureInferrer {
       }
       case sym if isByNameParamType(paramTypeSym) =>
         val innerParamSym = byNameInnerTypeSymbolOf(paramType)
+        simpleParamTypeMatchesScalaMetaArgType(innerParamSym, smArgType)
+
+      case sym if isRepeatedParamType(paramTypeSym) =>
+        val innerParamSym = paramTypeArgSyms.headOption.getOrElse(NoSymbol)
         simpleParamTypeMatchesScalaMetaArgType(innerParamSym, smArgType)
       case _ => simpleParamTypeMatchesScalaMetaArgType(paramTypeSym, smArgType)
     }

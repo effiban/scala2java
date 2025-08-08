@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.reflection
 
 import io.github.effiban.scala2java.core.entities.TypeSelects.ScalaAny
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.{byNameInnerTypeSymbolOf, dealiasedClassSymbolOf, finalResultTypeArgsOf, finalResultTypeFullnameOf, finalResultTypeOf, finalResultTypeSymbolOf}
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalClassifier.{isByNameParamType, isFunctionType, isSingletonType, isTupleType}
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalClassifier.{isByNameParamType, isFunctionType, isRepeatedParamType, isSingletonType, isTupleType}
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.{findInnerClassSymbolOf, findModuleSymbolOf}
 import io.github.effiban.scala2java.spi.entities.PartialDeclDef
 
@@ -98,6 +98,7 @@ private[reflection] object ScalaReflectionTransformer {
       case sym if isFunctionType(sym) => toScalaMetaTypeFunction(tpe)
       case sym if isTupleType(sym) => toScalaMetaTypeTuple(tpe)
       case sym if isByNameParamType(sym) => toScalaMetaTypeByName(tpe)
+      case sym if isRepeatedParamType(sym) => toScalaMetaTypeRepeated(tpe)
       case sym =>
         val maybeSMType = toScalaMetaTypeRef(sym)
         (maybeSMType, tpe.finalResultType.typeArgs) match {
@@ -119,16 +120,28 @@ private[reflection] object ScalaReflectionTransformer {
     val smTypeArgs = tpe.finalResultType.typeArgs.map(
       typeArg => toScalaMetaType(typeArg).getOrElse(ScalaAny)
     )
-    val (smParamTypeArgs, smResultTypeArg) = (smTypeArgs.slice(0, smTypeArgs.size - 1), smTypeArgs.last)
-    Some(Type.Function(smParamTypeArgs, smResultTypeArg))
+    smTypeArgs.lastOption.map(smResultTypeArg => {
+      val smParamTypeArgs = smTypeArgs.dropRight(1)
+      Type.Function(smParamTypeArgs, smResultTypeArg)
+    })
   }
 
   private def toScalaMetaTypeTuple(tpe: universe.Type) = {
     val smTypeArgs = finalResultTypeArgsOf(tpe).map(
       typeArg => toScalaMetaType(typeArg).getOrElse(ScalaAny)
     )
-    Some(Type.Tuple(smTypeArgs))
+    smTypeArgs match {
+      case Nil => None
+      case smTypeArgs => Some(Type.Tuple(smTypeArgs))
+    }
   }
+
+  private def toScalaMetaTypeRepeated(tpe: universe.Type) = {
+    finalResultTypeArgsOf(tpe).headOption
+      .map(smTypeArg => toScalaMetaType(smTypeArg).getOrElse(ScalaAny))
+      .map(Type.Repeated(_))
+  }
+
 
   private def toScalaMetaTypeApply(scalaMetaType: Type.Ref, targs: List[universe.Type]) = {
     val scalaMetaTargs = targs.map(targ => toScalaMetaType(targ).getOrElse(ScalaAny))
