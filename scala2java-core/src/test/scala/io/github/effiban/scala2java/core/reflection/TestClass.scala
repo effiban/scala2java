@@ -32,6 +32,8 @@ private[reflection] class TestClass {
 
   def fun13(a: String, b: Int*): String = a + b.mkString(", ")
 
+  def fun14(a: String, b: Int = 3): String = a + b
+
   private class TestInnerClass {
     val x = 5
   }
