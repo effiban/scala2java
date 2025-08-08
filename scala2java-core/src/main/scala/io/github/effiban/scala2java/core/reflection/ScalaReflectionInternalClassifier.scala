@@ -26,4 +26,6 @@ private[reflection] object ScalaReflectionInternalClassifier {
   }
 
   def isByNameParamType(sym: Symbol): Boolean = sym == definitions.ByNameParamClass
+
+  def isRepeatedParamType(sym: Symbol): Boolean = sym == definitions.RepeatedParamClass
 }

@@ -28,6 +28,10 @@ private[reflection] class TestClass {
 
   def fun11(a: => Int): String = a.toString
 
+  def fun12(a: Int*): String = a.mkString(", ")
+
+  def fun13(a: String, b: Int*): String = a + b.mkString(", ")
+
   private class TestInnerClass {
     val x = 5
   }
