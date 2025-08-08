@@ -28,10 +28,14 @@ private[reflection] object ScalaReflectionMethodParamMapper {
                                           paramIdx: Int,
                                           smArgTypes: List[Type])  = {
     (param, paramIdx) match {
-      case (aParam, anIdx) if isRepeatedParamType(aParam.typeSignature.typeSymbol) => Right(aParam -> smArgTypes.drop(anIdx))
-      case (aParam, anIdx) if smArgTypes.isDefinedAt(anIdx) => Right(aParam -> List(smArgTypes(anIdx)))
-      case (aParam, anIdx) if methodParamHasDefaultValue(method, anIdx) => Right(aParam -> Nil)
+      case (aParam, aParamIdx) if isRepeatedParamType(aParam.typeSignature.typeSymbol) => Right(aParam -> smArgTypes.drop(aParamIdx))
+      case (aParam, aParamIdx) if smArgTypes.isDefinedAt(aParamIdx) => Right(aParam -> List(smArgTypes(aParamIdx)))
+      case (aParam, aParamIdx) if methodParamHasDefaultValue(method, aParamIdx) => Right(aParam -> Nil)
+      case (aParam, _) if isImplicitParamThatCanBeSkipped(aParam, smArgTypes) => Right(aParam -> Nil)
       case _ => Left[Unit, (Symbol, List[Type])](())
     }
   }
+
+  private def isImplicitParamThatCanBeSkipped(param: Symbol, smArgTypes: List[Type]) =
+    param.isImplicit && smArgTypes.isEmpty
 }
