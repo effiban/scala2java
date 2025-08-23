@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.typeinference
 
 import io.github.effiban.scala2java.core.entities.TypeSelects.{ScalaAny, ScalaInt}
+import io.github.effiban.scala2java.core.factories.TermApplyInferenceContextFactory
 import io.github.effiban.scala2java.core.matchers.PartialDeclDefScalatestMatcher.equalPartialDeclDef
 import io.github.effiban.scala2java.core.matchers.TermApplyInferenceContextMockitoMatcher.eqTermApplyInferenceContext
 import io.github.effiban.scala2java.core.predicates.TermSelectHasApplyMethod
@@ -9,23 +10,25 @@ import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
 import io.github.effiban.scala2java.spi.contexts.TermApplyInferenceContext
 import io.github.effiban.scala2java.spi.entities.PartialDeclDef
 import io.github.effiban.scala2java.spi.typeinferrers.ApplyDeclDefInferrer
-import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeList
+import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqTreeMultiList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
 
 import scala.meta.{XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
-class InternalApplyDeclDefInferrerImpl_ByReflection_NoTypeArgsTest extends UnitTestSuite {
+class InternalApplyDeclDefInferrerImpl_ByReflection_BasicTest extends UnitTestSuite {
 
   private val ParentType = t"Parent"
 
   private val applyDeclDefInferrer = mock[ApplyDeclDefInferrer]
   private val termSelectHasApplyMethod = mock[TermSelectHasApplyMethod]
   private val scalaReflectionMethodSignatureInferrer = mock[ScalaReflectionMethodSignatureInferrer]
+  private val termApplyInferenceContextFactory = mock[TermApplyInferenceContextFactory]
 
   private val internalApplyDeclDefInferrer = new InternalApplyDeclDefInferrerImpl(
     applyDeclDefInferrer,
     termSelectHasApplyMethod,
-    scalaReflectionMethodSignatureInferrer
+    scalaReflectionMethodSignatureInferrer,
+    termApplyInferenceContextFactory
   )
 
   test("infer() when parent type inferred, " +
@@ -36,7 +39,7 @@ class InternalApplyDeclDefInferrerImpl_ByReflection_NoTypeArgsTest extends UnitT
     val argType = t"scala.Int"
     val context = TermApplyInferenceContext(
       maybeParentType = Some(ParentType),
-      maybeArgTypes = List(Some(argType))
+      maybeArgTypeLists = List(List(Some(argType)))
     )
 
     when(termSelectHasApplyMethod(eqTree(termSelect))).thenReturn(false)
@@ -44,7 +47,7 @@ class InternalApplyDeclDefInferrerImpl_ByReflection_NoTypeArgsTest extends UnitT
     when(scalaReflectionMethodSignatureInferrer.inferPartialMethodSignature(
       eqTree(ParentType),
       eqTree(q"bar"),
-      eqTreeList(List(argType))
+      eqTreeMultiList(List(List(argType)))
     )).thenReturn(PartialDeclDef())
 
     internalApplyDeclDefInferrer.infer(termApply, context) should equalPartialDeclDef(PartialDeclDef())
@@ -58,7 +61,7 @@ class InternalApplyDeclDefInferrerImpl_ByReflection_NoTypeArgsTest extends UnitT
     val argType = t"scala.Int"
     val context = TermApplyInferenceContext(
       maybeParentType = Some(ParentType),
-      maybeArgTypes = List(Some(argType))
+      maybeArgTypeLists = List(List(Some(argType)))
     )
     val expectedPartialDeclDef = PartialDeclDef(maybeReturnType = Some(ScalaInt))
 
@@ -67,7 +70,7 @@ class InternalApplyDeclDefInferrerImpl_ByReflection_NoTypeArgsTest extends UnitT
     when(scalaReflectionMethodSignatureInferrer.inferPartialMethodSignature(
       eqTree(ParentType),
       eqTree(q"bar"),
-      eqTreeList(List(argType))
+      eqTreeMultiList(List(List(argType)))
     )).thenReturn(expectedPartialDeclDef)
 
     internalApplyDeclDefInferrer.infer(termApply, context) should equalPartialDeclDef(expectedPartialDeclDef)
@@ -80,7 +83,7 @@ class InternalApplyDeclDefInferrerImpl_ByReflection_NoTypeArgsTest extends UnitT
     val termApply = q"foo.bar(x)"
     val context = TermApplyInferenceContext(
       maybeParentType = Some(ParentType),
-      maybeArgTypes = List(None)
+      maybeArgTypeLists = List(List(None))
     )
 
     when(termSelectHasApplyMethod(eqTree(termSelect))).thenReturn(false)
@@ -88,7 +91,7 @@ class InternalApplyDeclDefInferrerImpl_ByReflection_NoTypeArgsTest extends UnitT
     when(scalaReflectionMethodSignatureInferrer.inferPartialMethodSignature(
       eqTree(ParentType),
       eqTree(q"bar"),
-      eqTreeList(List(ScalaAny))
+      eqTreeMultiList(List(List(ScalaAny)))
     )).thenReturn(PartialDeclDef())
 
     internalApplyDeclDefInferrer.infer(termApply, context) should equalPartialDeclDef(PartialDeclDef())
@@ -103,7 +106,7 @@ class InternalApplyDeclDefInferrerImpl_ByReflection_NoTypeArgsTest extends UnitT
     val qual = q"foo"
     val argType = t"scala.Int"
     val context = TermApplyInferenceContext(
-      maybeArgTypes = List(Some(argType))
+      maybeArgTypeLists = List(List(Some(argType)))
     )
 
     when(termSelectHasApplyMethod(eqTree(termSelect))).thenReturn(false)
@@ -111,7 +114,7 @@ class InternalApplyDeclDefInferrerImpl_ByReflection_NoTypeArgsTest extends UnitT
     when(scalaReflectionMethodSignatureInferrer.inferPartialMethodSignature(
       eqTree(qual),
       eqTree(termSelect.name),
-      eqTreeList(List(argType))
+      eqTreeMultiList(List(List(argType)))
     )).thenReturn(PartialDeclDef())
 
     internalApplyDeclDefInferrer.infer(termApply, context) should equalPartialDeclDef(PartialDeclDef())
@@ -126,7 +129,7 @@ class InternalApplyDeclDefInferrerImpl_ByReflection_NoTypeArgsTest extends UnitT
     val qual = q"foo"
     val argType = t"scala.Int"
     val context = TermApplyInferenceContext(
-      maybeArgTypes = List(Some(argType))
+      maybeArgTypeLists = List(List(Some(argType)))
     )
     val expectedPartialDeclDef = PartialDeclDef(maybeReturnType = Some(ScalaInt))
 
@@ -135,7 +138,7 @@ class InternalApplyDeclDefInferrerImpl_ByReflection_NoTypeArgsTest extends UnitT
     when(scalaReflectionMethodSignatureInferrer.inferPartialMethodSignature(
       eqTree(qual),
       eqTree(termSelect.name),
-      eqTreeList(List(argType))
+      eqTreeMultiList(List(List(argType)))
     )).thenReturn(PartialDeclDef())
 
     internalApplyDeclDefInferrer.infer(termApply, context) should equalPartialDeclDef(expectedPartialDeclDef)

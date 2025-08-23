@@ -2,7 +2,7 @@ package io.github.effiban.scala2java.core.reflection
 
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.byNameInnerTypeSymbolOf
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalClassifier.{isByNameParamType, isFunctionType, isRepeatedParamType, isTupleType}
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.isAssignableFrom
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.{isAssignableFrom, selfAndBaseClassesOf}
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionMethodParamMapper.mapParamsToScalaMetaArgTypes
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionTransformer.{toClassSymbol, toScalaMetaPartialDeclDef}
 import io.github.effiban.scala2java.spi.entities.PartialDeclDef
@@ -13,24 +13,26 @@ import scala.reflect.runtime.universe._
 
 private[reflection] object ScalaReflectionInternalMethodSignatureInferrer {
 
-  def inferPartialMethodSignature(qualSym: Symbol, name: Term.Name, smArgTypes: List[Type]): PartialDeclDef = {
+  def inferPartialMethodSignature(qualSym: Symbol, name: Term.Name, smArgTypeLists: List[List[Type]]): PartialDeclDef = {
     qualSym.info.member(TermName(name.value)).alternatives
       .collect { case method: MethodSymbol => method }
-      .map(method => resolvePartialMethodSignatureIfMatches(method, smArgTypes))
+      .map(method => resolvePartialMethodSignatureIfMatches(method, smArgTypeLists))
       .collectFirst { case partialDeclDef: PartialDeclDef if partialDeclDef.nonEmpty => partialDeclDef }
       .getOrElse(PartialDeclDef())
   }
 
-  private def resolvePartialMethodSignatureIfMatches(method: MethodSymbol, smArgTypes: List[Type]): PartialDeclDef = {
-    if (methodMatchesScalaMetaArgs(method, smArgTypes)) resolveScalaMetaPartialMethodSignature(method) else PartialDeclDef()
+  private def resolvePartialMethodSignatureIfMatches(method: MethodSymbol, smArgTypeLists: List[List[Type]]): PartialDeclDef = {
+    if (methodMatchesScalaMetaArgs(method, smArgTypeLists)) resolveScalaMetaPartialMethodSignature(method) else PartialDeclDef()
   }
 
-  private def methodMatchesScalaMetaArgs(method: MethodSymbol, smArgTypes: List[Type]): Boolean = {
-    method.paramLists match {
-      case List(params: List[Symbol]) => paramTypesMatchScalaMetaArgTypes(method, params, smArgTypes)
-      case Nil if smArgTypes.isEmpty => true
-      case _ => false
-    }
+  private def methodMatchesScalaMetaArgs(method: MethodSymbol, smArgTypeLists: List[List[Type]]): Boolean = {
+    // If a method has multiple param lists, the number of actual arg lists cannot be greater than the number of param lists
+    // - but it can be smaller, if a param list has only defaults / implicits
+    smArgTypeLists.size <= method.paramLists.size &&
+      method.paramLists.zipWithIndex.forall { case (params, index) =>
+        val smArgTypes = if (smArgTypeLists.isDefinedAt(index)) smArgTypeLists(index) else List.empty[Type]
+        paramTypesMatchScalaMetaArgTypes(method, params, smArgTypes)
+      }
   }
 
   private def paramTypesMatchScalaMetaArgTypes(method: MethodSymbol,

@@ -1,0 +1,10 @@
+package testfiles.DefnVals.WithoutDeclaredType.InClass.Inferrable.TermApply.WithTwoArgLists;
+
+import testfilesext.SampleObject.func15;
+
+public class Sample {
+    private final String x = func15(1,
+        2,
+        3,
+        4);
+}

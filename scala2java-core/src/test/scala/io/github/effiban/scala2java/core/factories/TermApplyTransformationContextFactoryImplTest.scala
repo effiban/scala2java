@@ -28,14 +28,14 @@ class TermApplyTransformationContextFactoryImplTest extends UnitTestSuite {
     val expectedMaybeArgTypes = List(Some(TypeSelects.ScalaLong), Some(TypeSelects.JavaString))
 
     val expectedPartialDeclDef = PartialDeclDef(
-      maybeParamNames = List(Some(q"param1"), Some(q"param2")),
-      maybeParamTypes = expectedMaybeArgTypes,
+      maybeParamNameLists = List(List(Some(q"param1"), Some(q"param2"))),
+      maybeParamTypeLists = List(expectedMaybeArgTypes),
       maybeReturnType = Some(expectedFunType)
     )
 
     val expectedPartialDeclDefContext = TermApplyInferenceContext(
       maybeParentType = Some(expectedFunType),
-      maybeArgTypes = expectedMaybeArgTypes
+      maybeArgTypeLists = List(expectedMaybeArgTypes)
     )
 
     val expectedTransformationContext = TermApplyTransformationContext(

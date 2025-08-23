@@ -15,7 +15,7 @@ import scala.meta.{Term, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
 class CoreQualifiedTermApplyTransformerTest extends UnitTestSuite {
 
-  private val DummyContext = TermApplyTransformationContext(partialDeclDef = PartialDeclDef(maybeParamTypes = List(Some(t"scala.Int"))))
+  private val DummyContext = TermApplyTransformationContext(partialDeclDef = PartialDeclDef(maybeParamTypeLists = List(List(Some(t"scala.Int")))))
 
   private val termSelectClassifier = mock[TermSelectClassifier]
 

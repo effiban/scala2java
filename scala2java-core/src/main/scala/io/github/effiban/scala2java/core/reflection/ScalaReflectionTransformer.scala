@@ -49,12 +49,12 @@ private[reflection] object ScalaReflectionTransformer {
   }
 
   def toScalaMetaPartialDeclDef(method: MethodSymbol): PartialDeclDef = {
-    val maybeSMParamTypes = method.paramLists.headOption.map { paramTypes =>
-      paramTypes.map(paramType => toScalaMetaType(paramType.typeSignature))
-    }.getOrElse(Nil)
+    val maybeSMParamTypeLists = method.paramLists.map { params =>
+      params.map(param => toScalaMetaType(param.typeSignature))
+    }
     val maybeSMReturnType = toScalaMetaType(finalResultTypeOf(method))
     PartialDeclDef(
-      maybeParamTypes = maybeSMParamTypes,
+      maybeParamTypeLists = maybeSMParamTypeLists,
       maybeReturnType = maybeSMReturnType
     )
   }

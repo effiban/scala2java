@@ -1,6 +1,7 @@
 package io.github.effiban.scala2java.core.typeinference
 
 import io.github.effiban.scala2java.core.entities.TypeSelects.ScalaInt
+import io.github.effiban.scala2java.core.factories.TermApplyInferenceContextFactory
 import io.github.effiban.scala2java.core.matchers.PartialDeclDefScalatestMatcher.equalPartialDeclDef
 import io.github.effiban.scala2java.core.matchers.TermApplyInferenceContextMockitoMatcher.eqTermApplyInferenceContext
 import io.github.effiban.scala2java.core.predicates.TermSelectHasApplyMethod
@@ -21,11 +22,13 @@ class InternalApplyDeclDefInferrerImpl_NotByReflectionTest extends UnitTestSuite
   private val applyDeclDefInferrer = mock[ApplyDeclDefInferrer]
   private val termSelectHasApplyMethod = mock[TermSelectHasApplyMethod]
   private val scalaReflectionMethodSignatureInferrer = mock[ScalaReflectionMethodSignatureInferrer]
+  private val termApplyInferenceContextFactory = mock[TermApplyInferenceContextFactory]
 
   private val internalApplyDeclDefInferrer = new InternalApplyDeclDefInferrerImpl(
     applyDeclDefInferrer,
     termSelectHasApplyMethod,
-    scalaReflectionMethodSignatureInferrer
+    scalaReflectionMethodSignatureInferrer,
+    termApplyInferenceContextFactory
   )
 
   test("infer() when 'fun' is a Term.Select with an 'apply' method") {

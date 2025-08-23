@@ -4,7 +4,7 @@ import org.mockito.ArgumentMatchers.argThat
 
 import scala.meta.Tree
 
-/** Convenience reporter methods (using `argThat`) for Mockito [[ArgumentMatcher]]-s,
+/** Convenience reporter methods (using `argThat`) for Mockito [[org.mockito.ArgumentMatcher]]-s,
  *  which combine other matchers from this package
  */
 object CombinedMatchers {
@@ -29,10 +29,24 @@ object CombinedMatchers {
    */
   def eqTreeList[T <: Tree](expected: List[T]): List[T] = argThat(new ListMatcher(expected, new TreeMatcher[T](_)))
 
+  /** Checks if the given expected multi-list of trees is equal to the actual one
+   *
+   * @param expected the expected multi-list of trees to match
+   */
+  def eqTreeMultiList[T <: Tree](expected: List[List[T]]): List[List[T]] =
+    argThat(new MultiListMatcher(expected, new TreeMatcher[T](_)))
+
   /** Checks if the given expected list of optional trees is equal to the actual one
    *
    * @param expected the expected list of optional trees to match
    */
   def eqOptionTreeList[T <: Tree](expected: List[Option[T]]): List[Option[T]] =
     argThat(new ListMatcher(expected, new OptionMatcher[T](_, new TreeMatcher[T](_))))
+
+  /** Checks if the given expected multi-list of optional trees is equal to the actual one
+   *
+   * @param expected the expected multi-list of optional trees to match
+   */
+  def eqOptionTreeMultiList[T <: Tree](expected: List[List[Option[T]]]): List[List[Option[T]]] =
+    argThat(new MultiListMatcher(expected, new OptionMatcher[T](_, new TreeMatcher[T](_))))
 }

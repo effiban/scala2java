@@ -8,7 +8,7 @@ import io.github.effiban.scala2java.spi.entities.PartialDeclDef
 
 import scala.meta.{Term, Type, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
-class ScalaReflectionMethodSignatureInferrer_WithArgs_NoTypeArgsTest extends UnitTestSuite {
+class ScalaReflectionMethodSignatureInferrer_WithArgs_Test extends UnitTestSuite {
 
   private val TestClassType = t"io.github.effiban.scala2java.core.reflection.TestClass"
   private val TestObject = q"io.github.effiban.scala2java.core.reflection.TestObject"
@@ -82,11 +82,11 @@ class ScalaReflectionMethodSignatureInferrer_WithArgs_NoTypeArgsTest extends Uni
      expectedReturnType: Type) =>
 
       test(s"inferPartialMethodSignature for 'TestClass.${method.toString()}(${argTypes.mkString(",")})' " +
-        s"should return a signature with param types '$expectedParamTypes' and return type '$expectedReturnType'") {
+        s"should return a signature with param type lists '${List(expectedParamTypes.map(Some(_)))}' and return type '$expectedReturnType'") {
 
-        val result = inferPartialMethodSignature(TestClassType, method, argTypes)
+        val result = inferPartialMethodSignature(TestClassType, method, List(argTypes))
         result should equalPartialDeclDef(PartialDeclDef(
-          maybeParamTypes = expectedParamTypes.map(Some(_)),
+          maybeParamTypeLists = List(expectedParamTypes.map(Some(_))),
           maybeReturnType = Some(expectedReturnType))
         )
       }
@@ -99,11 +99,11 @@ class ScalaReflectionMethodSignatureInferrer_WithArgs_NoTypeArgsTest extends Uni
      expectedReturnType: Type) =>
 
       test(s"inferPartialMethodSignature for 'TestObject.${method.toString()}(${argTypes.mkString(",")})' " +
-        s"should return a signature with arg types '$expectedParamTypes' and return type '$expectedReturnType'") {
+        s"should return a signature with arg types '${List(expectedParamTypes.map(Some(_)))}' and return type '$expectedReturnType'") {
 
-        val result = inferPartialMethodSignature(TestObject, method, argTypes)
+        val result = inferPartialMethodSignature(TestObject, method, List(argTypes))
         result should equalPartialDeclDef(PartialDeclDef(
-          maybeParamTypes = expectedParamTypes.map(Some(_)),
+          maybeParamTypeLists = List(expectedParamTypes.map(Some(_))),
           maybeReturnType = Some(expectedReturnType))
         )
       }
@@ -112,7 +112,7 @@ class ScalaReflectionMethodSignatureInferrer_WithArgs_NoTypeArgsTest extends Uni
   forAll(TestCasesWithParentTypeWhenDoesntMatch) { (method: Term.Name, argTypes: List[Type]) =>
     test(s"inferPartialMethodSignature for 'TestClass.${method.toString()}(${argTypes.mkString(",")})' " +
       " should return an empty signature due to mismatch") {
-      val result = inferPartialMethodSignature(TestClassType, method, argTypes)
+      val result = inferPartialMethodSignature(TestClassType, method, List(argTypes))
       result should equalPartialDeclDef(PartialDeclDef())
     }
   }
@@ -120,7 +120,7 @@ class ScalaReflectionMethodSignatureInferrer_WithArgs_NoTypeArgsTest extends Uni
   forAll(TestCasesWithoutParentTypeWhenDoesntMatch) { (method: Term.Name, argTypes: List[Type]) =>
     test(s"inferPartialMethodSignature for 'TestObject.${method.toString()}(${argTypes.mkString(",")})' " +
       " should return an empty signature due to mismatch") {
-      val result = inferPartialMethodSignature(TestObject, method, argTypes)
+      val result = inferPartialMethodSignature(TestObject, method, List(argTypes))
       result should equalPartialDeclDef(PartialDeclDef())
     }
   }
