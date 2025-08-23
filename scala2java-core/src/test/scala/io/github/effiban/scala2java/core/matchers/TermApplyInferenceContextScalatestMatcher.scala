@@ -26,8 +26,14 @@ class TermApplyInferenceContextScalatestMatcher(expectedContext: TermApplyInfere
   }
 
   private def maybeArgTypesMatch(actualContext: TermApplyInferenceContext): Boolean = {
-    new ListMatcher(expectedContext.maybeArgTypes, new OptionMatcher[Type](_, new TreeMatcher[Type](_)))
-      .matches(actualContext.maybeArgTypes)
+    val expectedMaybeArgTypeLists = expectedContext.maybeArgTypeLists
+    val actualMaybeArgTypeLists = actualContext.maybeArgTypeLists
+
+    expectedMaybeArgTypeLists.size == actualMaybeArgTypeLists.size &&
+      expectedMaybeArgTypeLists.zipWithIndex.forall { case (expectedMaybeArgTypeList, index) =>
+        new ListMatcher(expectedMaybeArgTypeList, new OptionMatcher[Type](_, new TreeMatcher[Type](_)))
+          .matches(actualContext.maybeArgTypeLists(index))
+      }
   }
 }
 

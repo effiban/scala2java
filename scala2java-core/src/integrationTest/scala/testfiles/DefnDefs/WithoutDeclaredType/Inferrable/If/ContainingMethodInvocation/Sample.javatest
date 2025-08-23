@@ -1,4 +1,4 @@
-package testfiles.DefnDefs.WithoutDeclaredType.NonInferrable.WithLastStatementType.IfElse;
+package testfiles.DefnDefs.WithoutDeclaredType.Inferrable.If.ContainingMethodInvocation;
 
 import testfilesext.SampleObject.func1;
 import testfilesext.SampleObject.func2;
@@ -6,13 +6,13 @@ import testfilesext.SampleObject.func3;
 
 public class Sample {
 
-    private /* UnknownType */ foo() {
+    private void foo() {
         func1();
         if (2 < 3) {
-            /* return? */func2();
+            func2();
         }
         else {
-            /* return? */func3(3);
+            func3(3);
         }
     }
 }

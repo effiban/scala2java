@@ -21,7 +21,7 @@ private[typeinference] class InitializerDeclDefInferrerImpl(compositeCollectiveT
 
     typeInitializedBy(qual) match {
       case Some(parameterizedType) => PartialDeclDef(
-        maybeParamTypes = List.fill(numArgs)(Some(inferParamTypeFromAppliedTypes(appliedTypes))),
+        maybeParamTypeLists = List(List.fill(numArgs)(Some(inferParamTypeFromAppliedTypes(appliedTypes)))),
         maybeReturnType = Some(Type.Apply(parameterizedType, appliedTypes))
       )
       case None => PartialDeclDef()
@@ -35,7 +35,7 @@ private[typeinference] class InitializerDeclDefInferrerImpl(compositeCollectiveT
         val paramType = inferParamTypeFromArgTypes(maybeArgTypes)
         val appliedTypes = inferAppliedTypesFromParamType(paramType)
         PartialDeclDef(
-          maybeParamTypes = List.fill(maybeArgTypes.size)(Some(paramType)),
+          maybeParamTypeLists = List(List.fill(maybeArgTypes.size)(Some(paramType))),
           maybeReturnType = Some(Type.Apply(parameterizedType, appliedTypes))
         )
       case None => PartialDeclDef()

@@ -23,13 +23,25 @@ class PartialDeclDefScalatestMatcher(expectedPartialDeclDef: PartialDeclDef) ext
   override def toString: String = s"Matcher for: $expectedPartialDeclDef"
 
   private def maybeParamNamesMatch(actualPartialDeclDef: PartialDeclDef): Boolean = {
-    new ListMatcher(expectedPartialDeclDef.maybeParamNames, new OptionMatcher[Term.Name](_, new TreeMatcher[Term.Name](_)))
-      .matches(actualPartialDeclDef.maybeParamNames)
+    val expectedMaybeParamNameLists = expectedPartialDeclDef.maybeParamNameLists
+    val actualMaybeParamNameLists = actualPartialDeclDef.maybeParamNameLists
+
+    expectedMaybeParamNameLists.size == actualMaybeParamNameLists.size &&
+      expectedMaybeParamNameLists.zipWithIndex.forall { case (expectedMaybeParamNameList, index) =>
+        new ListMatcher(expectedMaybeParamNameList, new OptionMatcher[Term.Name](_, new TreeMatcher[Term.Name](_)))
+          .matches(actualPartialDeclDef.maybeParamNameLists(index))
+      }
   }
 
   private def maybeParamTypesMatch(actualPartialDeclDef: PartialDeclDef): Boolean = {
-    new ListMatcher(expectedPartialDeclDef.maybeParamTypes, new OptionMatcher[Type](_, new TreeMatcher[Type](_)))
-      .matches(actualPartialDeclDef.maybeParamTypes)
+    val expectedMaybeParamTypeLists = expectedPartialDeclDef.maybeParamTypeLists
+    val actualMaybeParamTypeLists = actualPartialDeclDef.maybeParamTypeLists
+
+    expectedMaybeParamTypeLists.size == actualMaybeParamTypeLists.size &&
+      expectedMaybeParamTypeLists.zipWithIndex.forall { case (expectedMaybeParamTypeList, index) =>
+        new ListMatcher(expectedMaybeParamTypeList, new OptionMatcher[Type](_, new TreeMatcher[Type](_)))
+          .matches(actualPartialDeclDef.maybeParamTypeLists(index))
+      }
   }
 
   private def maybeReturnTypesMatch(actualPartialDeclDef: PartialDeclDef): Boolean = {

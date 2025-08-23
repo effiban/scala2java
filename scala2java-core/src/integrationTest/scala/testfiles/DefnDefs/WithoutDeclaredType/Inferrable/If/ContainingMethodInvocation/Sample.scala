@@ -1,4 +1,4 @@
-package testfiles.DefnDefs.WithoutDeclaredType.NonInferrable.WithLastStatementType.IfElse
+package testfiles.DefnDefs.WithoutDeclaredType.Inferrable.If.ContainingMethodInvocation
 
 import testfilesext.SampleObject
 

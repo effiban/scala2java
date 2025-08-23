@@ -1,10 +1,10 @@
 package io.github.effiban.scala2java.core.typeinference
 
+import io.github.effiban.scala2java.core.entities.TypeSelects
 import io.github.effiban.scala2java.core.extensions.ExtensionRegistry
 import io.github.effiban.scala2java.core.matchers.PartialDeclDefScalatestMatcher.equalPartialDeclDef
 import io.github.effiban.scala2java.core.matchers.TermApplyInferenceContextMockitoMatcher.eqTermApplyInferenceContext
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.testtrees.TypeNames
 import io.github.effiban.scala2java.spi.contexts.TermApplyInferenceContext
 import io.github.effiban.scala2java.spi.entities.PartialDeclDef
 import io.github.effiban.scala2java.spi.typeinferrers.ApplyDeclDefInferrer
@@ -15,13 +15,13 @@ import scala.meta.{XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 class CompositeApplyDeclDefInferrerTest extends UnitTestSuite {
 
   private val TheTermApply = q"foo(x, y)"
-  private val MaybeArgTypes = List(Some(TypeNames.String), Some(TypeNames.Int))
-  private val Context = TermApplyInferenceContext(Some(t"Foo"), MaybeArgTypes)
+  private val MaybeArgTypes = List(Some(TypeSelects.JavaString), Some(TypeSelects.ScalaInt))
+  private val Context = TermApplyInferenceContext(Some(t"Foo"), List(MaybeArgTypes))
   
   private val ThePartialDeclDef = PartialDeclDef(
-    maybeParamNames = List(Some(q"param1"), Some(q"param2")),
-    maybeParamTypes = List(Some(TypeNames.String), Some(TypeNames.Int)),
-    maybeReturnType = Some(TypeNames.Long)
+    maybeParamNameLists = List(List(Some(q"param1"), Some(q"param2"))),
+    maybeParamTypeLists = List(List(Some(TypeSelects.JavaString), Some(TypeSelects.ScalaInt))),
+    maybeReturnType = Some(TypeSelects.ScalaLong)
   )
 
   private implicit val extensionRegistry: ExtensionRegistry = mock[ExtensionRegistry]

@@ -41,7 +41,8 @@ class TypeInferrers(factories: => Factories)
   lazy val internalApplyDeclDefInferrer: InternalApplyDeclDefInferrer = new InternalApplyDeclDefInferrerImpl(
     new CompositeApplyDeclDefInferrer(coreApplyDeclDefInferrer),
     TermSelectHasApplyMethod,
-    ScalaReflectionMethodSignatureInferrer
+    ScalaReflectionMethodSignatureInferrer,
+    factories.termApplyInferenceContextFactory
   )
 
   private[typeinference] lazy val internalSelectTypeInferrer = new InternalSelectTypeInferrerImpl(

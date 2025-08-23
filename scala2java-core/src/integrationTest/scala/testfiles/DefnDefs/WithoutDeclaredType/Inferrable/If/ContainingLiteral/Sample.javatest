@@ -1,4 +1,4 @@
-package testfiles.DefnDefs.WithoutDeclaredType.Inferrable.If;
+package testfiles.DefnDefs.WithoutDeclaredType.Inferrable.If.ContainingLiteral;
 
 
 public class Sample {

@@ -3,7 +3,6 @@ package io.github.effiban.scala2java.core.typeinference
 import io.github.effiban.scala2java.core.entities.{ParameterizedInitializerNameTypeMapping, TermSelects, TypeSelects}
 import io.github.effiban.scala2java.core.matchers.PartialDeclDefScalatestMatcher.equalPartialDeclDef
 import io.github.effiban.scala2java.core.testsuites.UnitTestSuite
-import io.github.effiban.scala2java.core.testtrees.{TermNames, TypeNames}
 import io.github.effiban.scala2java.spi.entities.PartialDeclDef
 import io.github.effiban.scala2java.test.utils.matchers.CombinedMatchers.eqOptionTreeList
 import io.github.effiban.scala2java.test.utils.matchers.TreeMatcher.eqTree
@@ -30,7 +29,7 @@ class InitializerDeclDefInferrerImplTest extends UnitTestSuite {
 
     initializerDeclDefInferrer.inferByAppliedTypes(termSelect, appliedTypes, numArgs) should equalPartialDeclDef(
       PartialDeclDef(
-        maybeParamTypes = List.fill(numArgs)(Some(Type.Tuple(appliedTypes))),
+        maybeParamTypeLists = List(List.fill(numArgs)(Some(Type.Tuple(appliedTypes)))),
         maybeReturnType = Some(Type.Apply(parameterizedType, appliedTypes))
       )
     )
@@ -56,7 +55,7 @@ class InitializerDeclDefInferrerImplTest extends UnitTestSuite {
 
     initializerDeclDefInferrer.inferByArgTypes(termSelect, maybeTupleArgTypes) should equalPartialDeclDef(
       PartialDeclDef(
-        maybeParamTypes = maybeTupleArgTypes,
+        maybeParamTypeLists = List(maybeTupleArgTypes),
         maybeReturnType = Some(Type.Apply(parameterizedType, tupleArgType.args))
       )
     )
@@ -74,7 +73,7 @@ class InitializerDeclDefInferrerImplTest extends UnitTestSuite {
 
     initializerDeclDefInferrer.inferByArgTypes(termSelect, maybeArgTypes) should equalPartialDeclDef(
       PartialDeclDef(
-        maybeParamTypes = maybeArgTypes,
+        maybeParamTypeLists = List(maybeArgTypes),
         maybeReturnType = Some(Type.Apply(parameterizedType, List(argType)))
       )
     )
@@ -85,6 +84,6 @@ class InitializerDeclDefInferrerImplTest extends UnitTestSuite {
 
     when(parameterizedInitializerNameTypeMapping.typeInitializedBy(eqTree(termSelect))).thenReturn(None)
 
-    initializerDeclDefInferrer.inferByArgTypes(termSelect, List(Some(TypeNames.Int))) should equalPartialDeclDef(PartialDeclDef())
+    initializerDeclDefInferrer.inferByArgTypes(termSelect, List(Some(TypeSelects.ScalaInt))) should equalPartialDeclDef(PartialDeclDef())
   }
 }
