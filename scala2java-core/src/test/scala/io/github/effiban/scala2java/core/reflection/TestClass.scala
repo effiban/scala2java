@@ -1,6 +1,6 @@
 package io.github.effiban.scala2java.core.reflection
 
-private[reflection] class TestClass {
+private[reflection] sealed class TestClass {
   val x: Int = 3
   val y: (Int, String) = (4, "5")
   val z: (Int, Long, String) => String = (i, l, s) => i.toString + l.toString + s
@@ -41,4 +41,12 @@ private[reflection] class TestClass {
   private class TestInnerClass {
     val x = 5
   }
+}
+
+private[reflection] class TestChildClass extends TestClass {
+
+}
+
+private[reflection] object TestChildObject extends TestClass {
+
 }
