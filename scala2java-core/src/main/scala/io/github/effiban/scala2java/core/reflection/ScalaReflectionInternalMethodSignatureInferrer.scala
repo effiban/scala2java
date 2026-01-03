@@ -1,8 +1,8 @@
 package io.github.effiban.scala2java.core.reflection
 
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.byNameInnerTypeSymbolOf
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.byNameInnerTypeOf
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalClassifier.{isByNameParamType, isFunctionType, isRepeatedParamType, isTupleType}
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.{isAssignableFrom, selfAndBaseClassesOf}
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.isAssignableFrom
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionMethodParamMapper.mapParamsToScalaMetaArgTypes
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionTransformer.{toClassSymbol, toScalaMetaPartialDeclDef}
 import io.github.effiban.scala2java.spi.entities.PartialDeclDef
@@ -50,32 +50,42 @@ private[reflection] object ScalaReflectionInternalMethodSignatureInferrer {
 
   private def paramTypeMatchesScalaMetaArgType(paramType: universe.Type, smArgType: Type): Boolean = {
     val paramTypeSym = paramType.typeSymbol
-    val paramTypeArgSyms = paramType.typeArgs.map(_.typeSymbol)
+    val paramTypeArgs = paramType.typeArgs
 
     paramTypeSym match {
       case sym if isTupleType(sym) => smArgType match {
-        case Type.Tuple(smArgTypeArgs) => nestedParamTypesMatchScalaMetaArgTypes(paramTypeArgSyms, smArgTypeArgs)
+        case Type.Tuple(smArgTypeArgs) => nestedParamTypesMatchScalaMetaArgTypes(paramTypeArgs, smArgTypeArgs)
         case _ => false
       }
+
       case sym if isFunctionType(sym) => smArgType match {
-        case Type.Function(smArgTypeArgs, smResultType) => nestedParamTypesMatchScalaMetaArgTypes(paramTypeArgSyms, smArgTypeArgs :+ smResultType)
+        case Type.Function(smArgTypeArgs, smResultType) => nestedParamTypesMatchScalaMetaArgTypes(paramTypeArgs, smArgTypeArgs :+ smResultType)
         case _ => false
       }
+
       case sym if isByNameParamType(paramTypeSym) =>
-        val innerParamSym = byNameInnerTypeSymbolOf(paramType)
-        simpleParamTypeMatchesScalaMetaArgType(innerParamSym, smArgType)
+        val maybeInnerParamType = byNameInnerTypeOf(paramType)
+        maybeInnerParamType.exists(innerParamType => paramTypeMatchesScalaMetaArgType(innerParamType, smArgType))
 
       case sym if isRepeatedParamType(paramTypeSym) =>
-        val innerParamSym = paramTypeArgSyms.headOption.getOrElse(NoSymbol)
-        simpleParamTypeMatchesScalaMetaArgType(innerParamSym, smArgType)
+        val maybeInnerParamType = paramTypeArgs.headOption
+        maybeInnerParamType.exists(innerParamType => paramTypeMatchesScalaMetaArgType(innerParamType, smArgType))
+
+      case sym if paramTypeArgs.nonEmpty => smArgType match {
+        case Type.Apply(smQualType, smArgTypeArgs) =>
+          simpleParamTypeMatchesScalaMetaArgType(paramTypeSym, smQualType) &&
+            nestedParamTypesMatchScalaMetaArgTypes(paramTypeArgs, smArgTypeArgs)
+        case _ => false
+      }
+
       case _ => simpleParamTypeMatchesScalaMetaArgType(paramTypeSym, smArgType)
     }
   }
 
-  private def nestedParamTypesMatchScalaMetaArgTypes(params: List[Symbol], smArgTypes: List[Type]): Boolean = {
-    params.size == smArgTypes.size &&
-      params.zipWithIndex.forall { case (param, index) =>
-        paramTypeMatchesScalaMetaArgType(param.typeSignature, smArgTypes(index))
+  private def nestedParamTypesMatchScalaMetaArgTypes(paramTypes: List[universe.Type], smArgTypes: List[Type]): Boolean = {
+    paramTypes.size == smArgTypes.size &&
+      paramTypes.zipWithIndex.forall { case (paramType, index) =>
+        paramTypeMatchesScalaMetaArgType(paramType, smArgTypes(index))
       }
   }
 

@@ -36,8 +36,6 @@ private[reflection] sealed class TestClass {
 
   def fun15(implicit a: String, b: Int): String = a + b
 
-  def fun16(a: String, b: Int)(c: String, d: Long): String = a + b + c + d
-
   private class TestInnerClass {
     val x = 5
   }
