@@ -8,7 +8,7 @@ import io.github.effiban.scala2java.spi.entities.PartialDeclDef
 
 import scala.meta.{Term, Type, XtensionQuasiquoteTerm, XtensionQuasiquoteType}
 
-class ScalaReflectionMethodSignatureInferrer_WithArgs_Test extends UnitTestSuite {
+class ScalaReflectionMethodSignatureInferrer_SingleArgList_Test extends UnitTestSuite {
 
   private val TestClassType = t"io.github.effiban.scala2java.core.reflection.TestClass"
   private val TestObject = q"io.github.effiban.scala2java.core.reflection.TestObject"
@@ -60,7 +60,7 @@ class ScalaReflectionMethodSignatureInferrer_WithArgs_Test extends UnitTestSuite
     (q"fun14", List(t"java.lang.String", t"scala.Int", t"scala.Int")),
     (q"fun14", List(t"scala.Int", t"java.lang.String")),
     (q"fun15", List(t"java.lang.String")),
-    (q"fun15", List(t"java.lang.String", t"scala.Int", t"scala.Int"))
+    (q"fun15", List(t"java.lang.String", t"scala.Int", t"scala.Int")),
   )
 
   private val TestCasesWithoutParentTypeWhenMatches = Table(

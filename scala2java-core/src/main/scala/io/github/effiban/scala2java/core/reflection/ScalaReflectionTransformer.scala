@@ -1,8 +1,8 @@
 package io.github.effiban.scala2java.core.reflection
 
 import io.github.effiban.scala2java.core.entities.TypeSelects.ScalaAny
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor.{byNameInnerTypeSymbolOf, dealiasedClassSymbolOf, finalResultTypeArgsOf, finalResultTypeFullnameOf, finalResultTypeOf, finalResultTypeSymbolOf}
-import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalClassifier.{isByNameParamType, isFunctionType, isRepeatedParamType, isSingletonType, isTupleType}
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionExtractor._
+import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalClassifier._
 import io.github.effiban.scala2java.core.reflection.ScalaReflectionInternalLookup.{findInnerClassSymbolOf, findModuleSymbolOf}
 import io.github.effiban.scala2java.spi.entities.PartialDeclDef
 
@@ -110,10 +110,8 @@ private[reflection] object ScalaReflectionTransformer {
   }
 
   private def toScalaMetaTypeByName(tpe: universe.Type) = {
-    byNameInnerTypeSymbolOf(tpe) match {
-      case NoSymbol => None
-      case innerSym => toScalaMetaType(innerSym.typeSignature).map(Type.ByName(_))
-    }
+    byNameInnerTypeOf(tpe)
+      .flatMap(innerType => toScalaMetaType(innerType).map(Type.ByName(_)))
   }
 
   private def toScalaMetaTypeFunction(tpe: universe.Type) = {
